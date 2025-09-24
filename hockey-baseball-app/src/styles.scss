@@ -5,12 +5,55 @@
 // custom components at https://material.angular.dev/guide/theming
 @use '@angular/material' as mat;
 
+// Define custom color palettes
+$custom-primary-palette: (
+  0: #000000,
+  10: #370002,
+  20: #550005,
+  25: #650008,
+  30: #75000a,
+  35: #85000d,
+  40: #95000f,
+  50: #cf142b,
+  // Your primary red color
+  60: #d53545,
+  70: #db545f,
+  80: #e17279,
+  90: #e78f93,
+  95: #edacad,
+  98: #f3c8c7,
+  99: #f9e4e1,
+  100: #ffffff,
+);
+
+$custom-secondary-palette: (
+  0: #000000,
+  10: #090b0c,
+  // Your dark text color
+  20: #1a1f21,
+  25: #252b2d,
+  30: #303738,
+  35: #3b4344,
+  40: #464f50,
+  50: #5e6869,
+  60: #778f9c,
+  // Your secondary bg color
+  70: #8fa2af,
+  80: #a7b5c2,
+  90: #bfc8d5,
+  95: #d7dbe8,
+  98: #efeefb,
+  99: #f7f6ff,
+  100: #ffffff,
+);
+
 html {
   @include mat.theme(
     (
       color: (
-        primary: mat.$rose-palette,
-        tertiary: mat.$red-palette,
+        primary: $custom-primary-palette,
+        secondary: $custom-secondary-palette,
+        tertiary: $custom-primary-palette,
       ),
       typography: Roboto,
       density: 0,
@@ -19,16 +62,12 @@ html {
 }
 
 body {
-  // Default the application to a light color theme. This can be changed to
-  // `dark` to enable the dark color theme, or to `light dark` to defer to the
-  // user's system settings.
+  // Light color theme with custom colors
   color-scheme: light;
 
-  // Set a default background, font and text colors for the application using
-  // Angular Material's system-level CSS variables. Learn more about these
-  // variables at https://material.angular.dev/guide/system-variables
-  background-color: var(--mat-sys-surface);
-  color: var(--mat-sys-on-surface);
+  // Custom background and text colors
+  background-color: #ffffff; // White background as requested
+  color: #090b0c; // Dark text color as requested
   font: var(--mat-sys-body-medium);
 
   // Reset the user agent margin.
@@ -39,6 +78,39 @@ body {
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Custom CSS properties for easy access */
+:root {
+  --color-primary: #cf142b;
+  --color-dark: #090b0c;
+  --color-secondary: #778f9c;
+  --color-white: #ffffff;
+}
+
+/* Custom utility classes */
+@layer utilities {
+  .text-custom-primary {
+    color: var(--color-primary);
+  }
+  .text-custom-dark {
+    color: var(--color-dark);
+  }
+  .bg-custom-primary {
+    background-color: var(--color-primary);
+  }
+  .bg-custom-secondary {
+    background-color: var(--color-secondary);
+  }
+  .bg-custom-white {
+    background-color: var(--color-white);
+  }
+  .border-custom-primary {
+    border-color: var(--color-primary);
+  }
+  .border-custom-secondary {
+    border-color: var(--color-secondary);
+  }
+}
 
 html,
 body {
