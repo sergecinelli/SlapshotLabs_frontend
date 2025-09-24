@@ -1,95 +1,76 @@
-<!-- Hockey Baseball App with Custom Colors -->
+<!-- Sign In Page -->
 
-<div class="container">
-  <!-- Header Section -->
-  <header class="header bg-custom-white p-6 border-b border-custom-secondary">
-    <h1 class="text-custom-primary text-4xl font-bold mb-2">{{ title() }}</h1>
-    <p class="text-custom-dark text-lg">Welcome to your Hockey Baseball App!</p>
-  </header>
-
-  <!-- Main Content -->
-  <main class="main-content p-6">
-    <!-- Color Showcase Section -->
-    <section class="color-showcase mb-8">
-      <h2 class="text-custom-dark text-2xl font-semibold mb-4">Color Theme Showcase</h2>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <!-- Primary Color Card -->
-        <div class="bg-custom-primary text-white p-6 rounded-lg">
-          <h3 class="text-xl font-semibold mb-2">Primary Red</h3>
-          <p class="text-sm opacity-90">#cf142b</p>
-          <p class="mt-2">Used for primary actions and important elements</p>
-        </div>
-
-        <!-- Secondary Color Card -->
-        <div class="bg-custom-secondary text-white p-6 rounded-lg">
-          <h3 class="text-xl font-semibold mb-2">Secondary Blue</h3>
-          <p class="text-sm opacity-90">#778f9c</p>
-          <p class="mt-2">Used for secondary elements and backgrounds</p>
-        </div>
-
-        <!-- Dark Text Card -->
-        <div class="bg-custom-white border-2 border-custom-dark p-6 rounded-lg">
-          <h3 class="text-custom-dark text-xl font-semibold mb-2">Dark Text</h3>
-          <p class="text-custom-dark text-sm opacity-75">#090b0c</p>
-          <p class="text-custom-dark mt-2">Used for primary text content</p>
-        </div>
+<div class="min-h-screen bg-custom-white flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+  <mat-card class="max-w-sm">
+    <mat-card-content class="!p-10">
+      <!-- Logo -->
+      <div class="text-center mb-6">
+        <img 
+          src="assets/logo.png" 
+          alt="Slapshot Labs Logo" 
+          class="mx-auto h-16 w-auto"
+        />
       </div>
-    </section>
 
-    <!-- Action Buttons Section -->
-    <section class="actions mb-8">
-      <h2 class="text-custom-dark text-2xl font-semibold mb-4">Action Examples</h2>
-      <div class="flex flex-wrap gap-4">
-        <button
-          class="bg-custom-primary hover:bg-red-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
-        >
-          Primary Action
-        </button>
-        <button
-          class="bg-custom-secondary hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-medium transition-colors"
-        >
-          Secondary Action
-        </button>
-        <button
-          class="bg-custom-white border-2 border-custom-dark text-custom-dark hover:bg-gray-100 px-6 py-3 rounded-lg font-medium transition-colors"
-        >
-          Outlined Action
-        </button>
+      <!-- LOGIN HERE Section -->
+      <div class="text-start mb-6">
+        <h2 class="text-xl font-medium text-custom-primary mb-2">LOGIN HERE</h2>
+        <mat-divider class="w-12 !border-t-4 rounded-sm !border-t-custom-primary"/>
       </div>
-    </section>
 
-    <!-- Sample Cards Section -->
-    <section class="cards">
-      <h2 class="text-custom-dark text-2xl font-semibold mb-4">Sample Cards</h2>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <!-- Card 1 -->
-        <div class="bg-custom-white border border-gray-200 rounded-lg p-6 shadow-sm">
-          <div class="flex items-center mb-3">
-            <div class="w-3 h-3 bg-custom-primary rounded-full mr-3"></div>
-            <h3 class="text-custom-dark text-lg font-semibold">Hockey Stats</h3>
-          </div>
-          <p class="text-custom-dark text-sm mb-4">
-            Track your hockey performance with detailed statistics and analytics.
-          </p>
-          <div class="bg-custom-secondary text-white px-3 py-1 rounded-full text-xs inline-block">
-            Active
-          </div>
+      <!-- Sign In Form -->
+      <form (ngSubmit)="onSubmit()">
+        <div class="space-y-2">
+          <!-- Email Address -->
+          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="w-full">
+            <mat-label class="uppercase text-custom-secondary">Email Address</mat-label>
+            <input
+              matInput
+              type="email"
+              autocomplete="email"
+              required
+              [(ngModel)]="email"
+              name="email"
+              placeholder="Enter your email"
+            />
+          </mat-form-field>
+
+          <!-- Password -->
+          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="w-full">
+            <mat-label class="uppercase text-custom-secondary">Password</mat-label>
+            <input
+              matInput
+              type="password"
+              autocomplete="current-password"
+              required
+              [(ngModel)]="password"
+              name="password"
+              placeholder="Enter your password"
+            />
+          </mat-form-field>
         </div>
 
-        <!-- Card 2 -->
-        <div class="bg-custom-white border border-gray-200 rounded-lg p-6 shadow-sm">
-          <div class="flex items-center mb-3">
-            <div class="w-3 h-3 bg-custom-primary rounded-full mr-3"></div>
-            <h3 class="text-custom-dark text-lg font-semibold">Baseball Analytics</h3>
-          </div>
-          <p class="text-custom-dark text-sm mb-4">
-            Comprehensive baseball data analysis and performance tracking.
-          </p>
-          <div class="bg-custom-secondary text-white px-3 py-1 rounded-full text-xs inline-block">
-            Active
-          </div>
+        <!-- Remember Me and Forgot Password Row -->
+        <div class="flex items-center justify-between mb-4 -ml-2">
+          <mat-checkbox [(ngModel)]="rememberMe" name="remember-me">
+            Remember Me
+          </mat-checkbox>
+
+          <a href="#" class="text-custom-primary hover:text-red-700 no-underline font-medium text-md">
+            Forgot Password?
+          </a>
         </div>
-      </div>
-    </section>
-  </main>
+
+        <!-- Login Button -->
+        <button
+          matButton="filled"
+          type="submit"
+          class="!px-8"
+          style="background-color: var(--color-primary);"
+        >
+          LOGIN
+        </button>
+      </form>
+    </mat-card-content>
+  </mat-card>
 </div>
