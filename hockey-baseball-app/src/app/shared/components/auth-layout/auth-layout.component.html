@@ -1,0 +1,64 @@
+<div
+  class="min-h-screen bg-custom-white flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8"
+>
+  <mat-card class="h-[800px]">
+    <mat-card-content class="!flex !flex-row !p-0 !h-full">
+      <!-- Left Image with Overlay -->
+      <div class="relative w-[768px] h-full overflow-hidden rounded-l-lg">
+        <img
+          src="assets/login-image.jpg"
+          alt="Slapshot Labs Logo"
+          class="w-full h-full object-cover"
+        />
+        <!-- Circular Gradient Overlay -->
+        <div
+          class="absolute inset-0 flex flex-col justify-between p-16 text-white"
+          style="
+            background: radial-gradient(
+              circle at center,
+              rgba(239, 68, 68, 0.8) 30%,
+              rgba(220, 38, 38, 0.97) 70%,
+              rgba(153, 27, 27, 0.95) 100%
+            );
+          "
+        >
+          <!-- Main Content -->
+          <div class="flex-1 flex flex-col justify-center mt-24">
+            <h1 class="text-4xl font-medium mb-4 leading-tight uppercase">Slapshot Labs</h1>
+            <div class="w-24 rounded h-1 bg-white mb-6"></div>
+            <p class="text-lg leading-relaxed">
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed posuere libero odio, eu
+              porttitor odio blandit sit amet.
+            </p>
+          </div>
+
+          <!-- Bottom Link -->
+          <div class="mt-auto">
+            <p class="text-white text-sm opacity-90">
+              For more information about product go to
+              <a href="https://example.com" class="text-white underline hover:no-underline">
+                https://example.com
+              </a>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex flex-col p-10 self-center w-[300px]">
+        <!-- Logo -->
+        <div class="text-center mb-6">
+          <img src="assets/logo.png" alt="Slapshot Labs Logo" class="mx-auto h-16 w-auto" />
+        </div>
+
+        <!-- Title Section -->
+        <div class="text-start mb-6">
+          <h2 class="text-xl font-medium text-custom-primary mb-2">{{ title }}</h2>
+          <mat-divider class="w-12 !border-t-4 rounded-sm !border-t-custom-primary" />
+        </div>
+
+        <!-- Content Projection -->
+        <ng-content></ng-content>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

@@ -1,12 +1,12 @@
 import { Component, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { EmailService } from '../../services/email.service';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
-import { MatCardModule } from '@angular/material/card';
-import { MatDivider } from '@angular/material/divider';
-import { EmailService } from '../../services/email.service';
+import { AuthLayoutComponent } from '../../shared/components/auth-layout/auth-layout.component';
+import { AuthButtonComponent } from '../../shared/components/auth-button/auth-button.component';
+import { AuthLinkComponent } from '../../shared/components/auth-link/auth-link.component';
 
 @Component({
   selector: 'app-forgot-password',
@@ -15,9 +15,9 @@ import { EmailService } from '../../services/email.service';
     ReactiveFormsModule,
     MatFormFieldModule,
     MatInputModule,
-    MatButtonModule,
-    MatCardModule,
-    MatDivider
+    AuthLayoutComponent,
+    AuthButtonComponent,
+    AuthLinkComponent,
   ],
   templateUrl: './forgot-password.component.html',
   styleUrl: './forgot-password.component.scss',

@@ -1,24 +1,24 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
-import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatCardModule } from '@angular/material/card';
-import { MatDivider } from '@angular/material/divider';
+import { AuthLayoutComponent } from '../../shared/components/auth-layout/auth-layout.component';
+import { AuthButtonComponent } from '../../shared/components/auth-button/auth-button.component';
+import { AuthLinkComponent } from '../../shared/components/auth-link/auth-link.component';
 
 @Component({
   selector: 'app-sign-in',
   standalone: true,
   imports: [
     ReactiveFormsModule,
+    MatCheckboxModule,
     MatFormFieldModule,
     MatInputModule,
-    MatButtonModule,
-    MatCheckboxModule,
-    MatCardModule,
-    MatDivider,
+    AuthLayoutComponent,
+    AuthButtonComponent,
+    AuthLinkComponent,
   ],
   templateUrl: './sign-in.component.html',
   styleUrl: './sign-in.component.scss',
