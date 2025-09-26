@@ -208,3 +208,11 @@ mat-card {
     0 8px 25px rgba(0, 0, 0, 0.15),
     0 4px 10px rgba(0, 0, 0, 0.1) !important;
 }
+
+/* Global Material Error Styling */
+mat-error {
+  color: var(--color-primary) !important;
+  padding-left: 0 !important;
+  margin-left: -16px !important;
+  font-size: 0.875rem;
+}

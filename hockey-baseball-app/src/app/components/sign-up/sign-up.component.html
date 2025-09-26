@@ -59,7 +59,7 @@
         </div>
 
         <!-- Sign Up Form -->
-        <form (ngSubmit)="onSubmit()">
+        <form [formGroup]="signUpForm" (ngSubmit)="onSubmit()">
           <div class="space-y-2">
             <!-- Email Address -->
             <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="w-full">
@@ -68,11 +68,19 @@
                 matInput
                 type="email"
                 autocomplete="email"
-                required
-                [(ngModel)]="email"
-                name="email"
+                formControlName="email"
                 placeholder="Enter your email"
               />
+              @if (email?.invalid && (email?.dirty || email?.touched)) {
+                <mat-error>
+                  @if (email?.errors?.['required']) {
+                    Email address is required
+                  }
+                  @if (email?.errors?.['email']) {
+                    Please enter a valid email address
+                  }
+                </mat-error>
+              }
             </mat-form-field>
 
             <!-- First Name and Last Name Row -->
@@ -83,11 +91,19 @@
                   matInput
                   type="text"
                   autocomplete="given-name"
-                  required
-                  [(ngModel)]="firstName"
-                  name="firstName"
+                  formControlName="firstName"
                   placeholder="First name"
                 />
+                @if (firstName?.invalid && (firstName?.dirty || firstName?.touched)) {
+                  <mat-error>
+                    @if (firstName?.errors?.['required']) {
+                      First name is required
+                    }
+                    @if (firstName?.errors?.['minlength']) {
+                      First name must be at least 2 characters long
+                    }
+                  </mat-error>
+                }
               </mat-form-field>
 
               <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="w-full">
@@ -96,11 +112,19 @@
                   matInput
                   type="text"
                   autocomplete="family-name"
-                  required
-                  [(ngModel)]="lastName"
-                  name="lastName"
+                  formControlName="lastName"
                   placeholder="Last name"
                 />
+                @if (lastName?.invalid && (lastName?.dirty || lastName?.touched)) {
+                  <mat-error>
+                    @if (lastName?.errors?.['required']) {
+                      Last name is required
+                    }
+                    @if (lastName?.errors?.['minlength']) {
+                      Last name must be at least 2 characters long
+                    }
+                  </mat-error>
+                }
               </mat-form-field>
             </div>
 
@@ -111,11 +135,19 @@
                 matInput
                 type="tel"
                 autocomplete="tel"
-                required
-                [(ngModel)]="phoneNumber"
-                name="phoneNumber"
+                formControlName="phoneNumber"
                 placeholder="Enter your phone number"
               />
+              @if (phoneNumber?.invalid && (phoneNumber?.dirty || phoneNumber?.touched)) {
+                <mat-error>
+                  @if (phoneNumber?.errors?.['required']) {
+                    Phone number is required
+                  }
+                  @if (phoneNumber?.errors?.['pattern']) {
+                    Please enter a valid phone number
+                  }
+                </mat-error>
+              }
             </mat-form-field>
 
             <!-- Password -->
@@ -125,11 +157,19 @@
                 matInput
                 type="password"
                 autocomplete="new-password"
-                required
-                [(ngModel)]="password"
-                name="password"
+                formControlName="password"
                 placeholder="Enter your password"
               />
+              @if (password?.invalid && (password?.dirty || password?.touched)) {
+                <mat-error>
+                  @if (password?.errors?.['required']) {
+                    Password is required
+                  }
+                  @if (password?.errors?.['minlength']) {
+                    Password must be at least 6 characters long
+                  }
+                </mat-error>
+              }
             </mat-form-field>
 
             <!-- Confirm Password -->
@@ -139,11 +179,21 @@
                 matInput
                 type="password"
                 autocomplete="new-password"
-                required
-                [(ngModel)]="confirmPassword"
-                name="confirmPassword"
+                formControlName="confirmPassword"
                 placeholder="Confirm your password"
               />
+              @if (confirmPassword?.invalid && (confirmPassword?.dirty || confirmPassword?.touched)) {
+                <mat-error>
+                  @if (confirmPassword?.errors?.['required']) {
+                    Confirm password is required
+                  }
+                </mat-error>
+              }
+              @if (signUpForm.errors?.['passwordMismatch'] && confirmPassword?.dirty) {
+                <mat-error>
+                  Passwords do not match
+                </mat-error>
+              }
             </mat-form-field>
           </div>
 

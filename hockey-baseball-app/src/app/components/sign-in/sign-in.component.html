@@ -59,7 +59,7 @@
         </div>
 
         <!-- Sign In Form -->
-        <form (ngSubmit)="onSubmit()">
+        <form [formGroup]="signInForm" (ngSubmit)="onSubmit()">
           <div class="space-y-2">
             <!-- Email Address -->
             <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="w-full">
@@ -68,11 +68,19 @@
                 matInput
                 type="email"
                 autocomplete="email"
-                required
-                [(ngModel)]="email"
-                name="email"
+                formControlName="email"
                 placeholder="Enter your email"
               />
+              @if (email?.invalid && (email?.dirty || email?.touched)) {
+                <mat-error>
+                  @if (email?.errors?.['required']) {
+                    Email address is required
+                  }
+                  @if (email?.errors?.['email']) {
+                    Please enter a valid email address
+                  }
+                </mat-error>
+              }
             </mat-form-field>
 
             <!-- Password -->
@@ -82,17 +90,25 @@
                 matInput
                 type="password"
                 autocomplete="current-password"
-                required
-                [(ngModel)]="password"
-                name="password"
+                formControlName="password"
                 placeholder="Enter your password"
               />
+              @if (password?.invalid && (password?.dirty || password?.touched)) {
+                <mat-error>
+                  @if (password?.errors?.['required']) {
+                    Password is required
+                  }
+                  @if (password?.errors?.['minlength']) {
+                    Password must be at least 6 characters long
+                  }
+                </mat-error>
+              }
             </mat-form-field>
           </div>
 
           <!-- Remember Me and Forgot Password Row -->
           <div class="flex items-center justify-between mb-4 -ml-2">
-            <mat-checkbox [(ngModel)]="rememberMe" name="remember-me"> Remember Me </mat-checkbox>
+            <mat-checkbox formControlName="rememberMe"> Remember Me </mat-checkbox>
 
             <a
               (click)="navigateToForgotPassword()"

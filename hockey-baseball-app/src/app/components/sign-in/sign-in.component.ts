@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { FormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
@@ -12,7 +12,7 @@ import { MatDivider } from '@angular/material/divider';
   selector: 'app-sign-in',
   standalone: true,
   imports: [
-    FormsModule,
+    ReactiveFormsModule,
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
@@ -24,26 +24,31 @@ import { MatDivider } from '@angular/material/divider';
   styleUrl: './sign-in.component.scss',
 })
 export class SignInComponent {
-  // Form fields
-  email = '';
-  password = '';
-  rememberMe = false;
-
-  constructor(private router: Router) {}
+  signInForm: FormGroup;
+  
+  constructor(private router: Router, private formBuilder: FormBuilder) {
+    this.signInForm = this.formBuilder.group({
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(6)]],
+      rememberMe: [false]
+    });
+  }
 
   onSubmit() {
-    console.log('Sign in attempt:', {
-      email: this.email,
-      password: '***',
-      rememberMe: this.rememberMe,
-    });
-
-    // TODO: Implement actual authentication logic
-    if (this.email && this.password) {
-      alert('Sign in functionality would be implemented here!');
-    } else {
-      alert('Please fill in all required fields.');
+    if (this.signInForm.invalid) {
+      this.signInForm.markAllAsTouched();
+      return;
     }
+
+    const formValue = this.signInForm.value;
+    console.log('Sign in attempt:', {
+      email: formValue.email,
+      password: '***',
+      rememberMe: formValue.rememberMe
+    });
+    
+    // TODO: Implement actual authentication logic
+    alert('Sign in functionality would be implemented here!');
   }
 
   navigateToSignUp() {
@@ -52,5 +57,18 @@ export class SignInComponent {
 
   navigateToForgotPassword() {
     this.router.navigate(['/forgot-password']);
+  }
+
+  // Getters for easy access to form controls in template
+  get email() {
+    return this.signInForm.get('email');
+  }
+
+  get password() {
+    return this.signInForm.get('password');
+  }
+
+  get rememberMe() {
+    return this.signInForm.get('rememberMe');
   }
 }

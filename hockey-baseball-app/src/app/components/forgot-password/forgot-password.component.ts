@@ -1,6 +1,6 @@
 import { Component, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
-import { FormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
@@ -12,31 +12,36 @@ import { EmailService } from '../../services/email.service';
   selector: 'app-forgot-password',
   standalone: true,
   imports: [
-    FormsModule,
+    ReactiveFormsModule,
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
     MatCardModule,
-    MatDivider,
+    MatDivider
   ],
   templateUrl: './forgot-password.component.html',
   styleUrl: './forgot-password.component.scss',
 })
 export class ForgotPasswordComponent implements OnDestroy {
-  email = '';
+  forgotPasswordForm: FormGroup;
   isEmailSent = false;
   isLoading = false;
   errorMessage = '';
-
+  
   // Resend functionality
   canResend = false;
   resendCountdown = 0;
   resendTimer: any;
 
   constructor(
-    private router: Router,
-    private emailService: EmailService
-  ) {}
+    private router: Router, 
+    private emailService: EmailService,
+    private formBuilder: FormBuilder
+  ) {
+    this.forgotPasswordForm = this.formBuilder.group({
+      email: ['', [Validators.required, Validators.email]]
+    });
+  }
 
   ngOnDestroy() {
     if (this.resendTimer) {
@@ -46,16 +51,9 @@ export class ForgotPasswordComponent implements OnDestroy {
 
   onSubmit() {
     this.errorMessage = '';
-
-    // Email format validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!this.email) {
-      this.errorMessage = 'Please enter your email address.';
-      return;
-    }
-
-    if (!emailRegex.test(this.email)) {
-      this.errorMessage = 'Please enter a valid email address.';
+    
+    if (this.forgotPasswordForm.invalid) {
+      this.forgotPasswordForm.markAllAsTouched();
       return;
     }
 
@@ -64,8 +62,9 @@ export class ForgotPasswordComponent implements OnDestroy {
 
   sendPasswordResetEmail() {
     this.isLoading = true;
-
-    this.emailService.sendPasswordResetEmail(this.email).subscribe({
+    const email = this.forgotPasswordForm.get('email')?.value;
+    
+    this.emailService.sendPasswordResetEmail(email).subscribe({
       next: (response) => {
         console.log('Password reset email sent:', response);
         this.isEmailSent = true;
@@ -76,7 +75,7 @@ export class ForgotPasswordComponent implements OnDestroy {
         console.error('Error sending password reset email:', error);
         this.errorMessage = 'Failed to send email. Please try again.';
         this.isLoading = false;
-      },
+      }
     });
   }
 
@@ -89,7 +88,7 @@ export class ForgotPasswordComponent implements OnDestroy {
   startResendTimer() {
     this.canResend = false;
     this.resendCountdown = 60; // 60 seconds
-
+    
     this.resendTimer = setInterval(() => {
       this.resendCountdown--;
       if (this.resendCountdown <= 0) {
@@ -101,5 +100,15 @@ export class ForgotPasswordComponent implements OnDestroy {
 
   navigateToSignIn() {
     this.router.navigate(['/sign-in']);
+  }
+
+  // Getter for easy access to email control in template
+  get email() {
+    return this.forgotPasswordForm.get('email');
+  }
+
+  // Get email value for display in success message
+  get emailValue() {
+    return this.forgotPasswordForm.get('email')?.value || '';
   }
 }
