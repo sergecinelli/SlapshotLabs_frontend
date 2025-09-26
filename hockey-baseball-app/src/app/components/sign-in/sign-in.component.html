@@ -95,8 +95,8 @@
             <mat-checkbox [(ngModel)]="rememberMe" name="remember-me"> Remember Me </mat-checkbox>
 
             <a
-              href="#"
-              class="text-custom-primary hover:text-red-700 no-underline font-medium text-md"
+              (click)="navigateToForgotPassword()"
+              class="text-custom-primary hover:text-red-700 no-underline font-medium text-md cursor-pointer"
             >
               Forgot Password?
             </a>

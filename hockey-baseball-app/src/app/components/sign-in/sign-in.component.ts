@@ -18,7 +18,7 @@ import { MatDivider } from '@angular/material/divider';
     MatButtonModule,
     MatCheckboxModule,
     MatCardModule,
-    MatDivider
+    MatDivider,
   ],
   templateUrl: './sign-in.component.html',
   styleUrl: './sign-in.component.scss',
@@ -28,16 +28,16 @@ export class SignInComponent {
   email = '';
   password = '';
   rememberMe = false;
-  
+
   constructor(private router: Router) {}
-  
+
   onSubmit() {
     console.log('Sign in attempt:', {
       email: this.email,
       password: '***',
-      rememberMe: this.rememberMe
+      rememberMe: this.rememberMe,
     });
-    
+
     // TODO: Implement actual authentication logic
     if (this.email && this.password) {
       alert('Sign in functionality would be implemented here!');
@@ -45,8 +45,12 @@ export class SignInComponent {
       alert('Please fill in all required fields.');
     }
   }
-  
+
   navigateToSignUp() {
     this.router.navigate(['/sign-up']);
+  }
+
+  navigateToForgotPassword() {
+    this.router.navigate(['/forgot-password']);
   }
 }

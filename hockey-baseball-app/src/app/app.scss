@@ -36,6 +36,7 @@
 
 // Mat-card elevation override for more dispersed shadow
 :host ::ng-deep mat-card {
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15), 
-              0 4px 10px rgba(0, 0, 0, 0.1) !important;
+  box-shadow:
+    0 8px 25px rgba(0, 0, 0, 0.15),
+    0 4px 10px rgba(0, 0, 0, 0.1) !important;
 }

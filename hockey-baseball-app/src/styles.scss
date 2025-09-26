@@ -121,3 +121,90 @@ body {
   margin: 0;
   font-family: Roboto, 'Helvetica Neue', sans-serif;
 }
+
+/* Global Button States */
+/* Override Material Design disabled button styles */
+.mat-mdc-button.mat-mdc-button-disabled {
+  background-color: var(--color-secondary) !important;
+  color: white !important;
+  opacity: 1 !important;
+  cursor: not-allowed;
+}
+
+.mat-mdc-outlined-button.mat-mdc-button-disabled {
+  background-color: var(--color-secondary) !important;
+  color: white !important;
+  border-color: var(--color-secondary) !important;
+  opacity: 1 !important;
+  cursor: not-allowed;
+}
+
+/* Loading state styling for buttons */
+.loading-button {
+  background-color: var(--color-secondary) !important;
+  color: white !important;
+  
+  &.mat-mdc-outlined-button {
+    border-color: var(--color-secondary) !important;
+  }
+}
+
+/* Resend button styling */
+.resend-button {
+  transition: all 0.3s ease;
+  
+  &:disabled {
+    opacity: 1 !important;
+    cursor: not-allowed;
+    background-color: var(--color-secondary) !important;
+    color: white !important;
+    border-color: var(--color-secondary) !important;
+  }
+  
+  &:not(:disabled):hover {
+    opacity: 0.9;
+  }
+}
+
+/* Global Form Field Styles */
+.mat-mdc-text-field-wrapper {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.mat-internal-form-field > label {
+  padding-left: 0;
+  font-size: 14px;
+}
+
+.mdc-floating-label {
+  padding-bottom: 4px;
+}
+
+/* Placeholder color overrides */
+.mat-mdc-input-element::placeholder {
+  color: var(--color-secondary) !important;
+  opacity: 0.7 !important;
+}
+
+.mat-mdc-input-element::-webkit-input-placeholder {
+  color: var(--color-secondary) !important;
+  opacity: 0.7 !important;
+}
+
+.mat-mdc-input-element::-moz-placeholder {
+  color: var(--color-secondary) !important;
+  opacity: 0.7 !important;
+}
+
+.mat-mdc-input-element:-ms-input-placeholder {
+  color: var(--color-secondary) !important;
+  opacity: 0.7 !important;
+}
+
+/* Global Mat-card elevation */
+mat-card {
+  box-shadow:
+    0 8px 25px rgba(0, 0, 0, 0.15),
+    0 4px 10px rgba(0, 0, 0, 0.1) !important;
+}

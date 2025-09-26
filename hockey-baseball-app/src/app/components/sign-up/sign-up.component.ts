@@ -16,7 +16,7 @@ import { MatDivider } from '@angular/material/divider';
     MatInputModule,
     MatButtonModule,
     MatCardModule,
-    MatDivider
+    MatDivider,
   ],
   templateUrl: './sign-up.component.html',
   styleUrl: './sign-up.component.scss',
@@ -29,47 +29,54 @@ export class SignUpComponent {
   phoneNumber = '';
   password = '';
   confirmPassword = '';
-  
+
   constructor(private router: Router) {}
-  
+
   onSubmit() {
     // Basic validation
-    if (!this.email || !this.firstName || !this.lastName || !this.phoneNumber || !this.password || !this.confirmPassword) {
+    if (
+      !this.email ||
+      !this.firstName ||
+      !this.lastName ||
+      !this.phoneNumber ||
+      !this.password ||
+      !this.confirmPassword
+    ) {
       alert('Please fill in all required fields.');
       return;
     }
-    
+
     if (this.password !== this.confirmPassword) {
       alert('Passwords do not match.');
       return;
     }
-    
+
     // Email format validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(this.email)) {
       alert('Please enter a valid email address.');
       return;
     }
-    
+
     // Password strength validation (minimum 6 characters)
     if (this.password.length < 6) {
       alert('Password must be at least 6 characters long.');
       return;
     }
-    
+
     console.log('Sign up attempt:', {
       email: this.email,
       firstName: this.firstName,
       lastName: this.lastName,
       phoneNumber: this.phoneNumber,
       password: '***',
-      confirmPassword: '***'
+      confirmPassword: '***',
     });
-    
+
     // TODO: Implement actual registration logic
     alert('Sign up functionality would be implemented here!');
   }
-  
+
   navigateToSignIn() {
     this.router.navigate(['/sign-in']);
   }
