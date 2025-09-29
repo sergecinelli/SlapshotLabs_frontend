@@ -5,7 +5,6 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { AuthLayoutComponent } from '../../shared/components/auth-layout/auth-layout';
 import { AuthButtonComponent } from '../../shared/components/auth-button/auth-button';
-import { AuthLinkComponent } from '../../shared/components/auth-link/auth-link';
 
 @Component({
   selector: 'app-reset-password',
@@ -16,7 +15,6 @@ import { AuthLinkComponent } from '../../shared/components/auth-link/auth-link';
     MatInputModule,
     AuthLayoutComponent,
     AuthButtonComponent,
-    AuthLinkComponent,
   ],
   templateUrl: './reset-password.html',
   styleUrl: './reset-password.scss'
