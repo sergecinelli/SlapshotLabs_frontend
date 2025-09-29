@@ -3,9 +3,9 @@ import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { AuthLayoutComponent } from '../../shared/components/auth-layout/auth-layout.component';
-import { AuthButtonComponent } from '../../shared/components/auth-button/auth-button.component';
-import { AuthLinkComponent } from '../../shared/components/auth-link/auth-link.component';
+import { AuthLayoutComponent } from '../../shared/components/auth-layout/auth-layout';
+import { AuthButtonComponent } from '../../shared/components/auth-button/auth-button';
+import { AuthLinkComponent } from '../../shared/components/auth-link/auth-link';
 
 @Component({
   selector: 'app-sign-up',
@@ -18,8 +18,8 @@ import { AuthLinkComponent } from '../../shared/components/auth-link/auth-link.c
     AuthButtonComponent,
     AuthLinkComponent,
   ],
-  templateUrl: './sign-up.component.html',
-  styleUrl: './sign-up.component.scss',
+  templateUrl: './sign-up.html',
+  styleUrl: './sign-up.scss',
 })
 export class SignUpComponent {
   signUpForm: FormGroup;

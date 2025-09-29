@@ -1,5 +1,5 @@
 <!-- Sign Up Page -->
-<app-auth-layout title="SIGN UP HERE">
+<app-auth-layout titleText="SIGN UP HERE">
   <!-- Sign Up Form -->
   <form [formGroup]="signUpForm" (ngSubmit)="onSubmit()">
     <div class="space-y-2">
@@ -39,10 +39,10 @@
           @if (firstName?.invalid && (firstName?.dirty || firstName?.touched)) {
             <mat-error>
               @if (firstName?.errors?.['required']) {
-                First name is required
+                Required
               }
               @if (firstName?.errors?.['minlength']) {
-                First name must be at least 2 characters long
+                Min 2 characters
               }
             </mat-error>
           }
@@ -60,10 +60,10 @@
           @if (lastName?.invalid && (lastName?.dirty || lastName?.touched)) {
             <mat-error>
               @if (lastName?.errors?.['required']) {
-                Last name is required
+                Required
               }
               @if (lastName?.errors?.['minlength']) {
-                Last name must be at least 2 characters long
+                Min 2 characters
               }
             </mat-error>
           }
@@ -108,7 +108,7 @@
               Password is required
             }
             @if (password?.errors?.['minlength']) {
-              Password must be at least 6 characters long
+              Min 6 characters
             }
           </mat-error>
         }
@@ -124,13 +124,6 @@
           formControlName="confirmPassword"
           placeholder="Confirm your password"
         />
-        @if (confirmPassword?.invalid && (confirmPassword?.dirty || confirmPassword?.touched)) {
-          <mat-error>
-            @if (confirmPassword?.errors?.['required']) {
-              Confirm password is required
-            }
-          </mat-error>
-        }
       </mat-form-field>
 
       <!-- Form-level error for password mismatch -->

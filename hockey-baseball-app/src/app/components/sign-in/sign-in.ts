@@ -4,9 +4,9 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { AuthLayoutComponent } from '../../shared/components/auth-layout/auth-layout.component';
-import { AuthButtonComponent } from '../../shared/components/auth-button/auth-button.component';
-import { AuthLinkComponent } from '../../shared/components/auth-link/auth-link.component';
+import { AuthLayoutComponent } from '../../shared/components/auth-layout/auth-layout';
+import { AuthButtonComponent } from '../../shared/components/auth-button/auth-button';
+import { AuthLinkComponent } from '../../shared/components/auth-link/auth-link';
 
 @Component({
   selector: 'app-sign-in',
@@ -20,8 +20,8 @@ import { AuthLinkComponent } from '../../shared/components/auth-link/auth-link.c
     AuthButtonComponent,
     AuthLinkComponent,
   ],
-  templateUrl: './sign-in.component.html',
-  styleUrl: './sign-in.component.scss',
+  templateUrl: './sign-in.html',
+  styleUrl: './sign-in.scss',
 })
 export class SignInComponent {
   signInForm: FormGroup;

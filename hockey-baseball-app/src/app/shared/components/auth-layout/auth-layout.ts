@@ -6,9 +6,9 @@ import { MatDivider } from '@angular/material/divider';
   selector: 'app-auth-layout',
   standalone: true,
   imports: [MatCardModule, MatDivider],
-  templateUrl: './auth-layout.component.html',
-  styleUrl: './auth-layout.component.scss'
+  templateUrl: './auth-layout.html',
+  styleUrl: './auth-layout.scss'
 })
 export class AuthLayoutComponent {
-  @Input() title: string = '';
+  @Input() titleText: string = '';
 }

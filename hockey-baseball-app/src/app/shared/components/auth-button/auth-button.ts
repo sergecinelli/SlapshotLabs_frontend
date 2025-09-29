@@ -5,8 +5,8 @@ import { MatButtonModule } from '@angular/material/button';
   selector: 'app-auth-button',
   standalone: true,
   imports: [MatButtonModule],
-  templateUrl: './auth-button.component.html',
-  styleUrl: './auth-button.component.scss'
+  templateUrl: './auth-button.html',
+  styleUrl: './auth-button.scss'
 })
 export class AuthButtonComponent {
   @Input() text: string = '';
