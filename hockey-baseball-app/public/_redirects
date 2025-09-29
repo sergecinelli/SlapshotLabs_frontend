@@ -1,2 +1,6 @@
-# Fallback for Angular SPA
-/*  /index.html  200
+# Handle Angular routes
+/sign-in /index.html 200
+/sign-up /index.html 200
+/forgot-password /index.html 200
+/reset-password /index.html 200
+/* /index.html 200

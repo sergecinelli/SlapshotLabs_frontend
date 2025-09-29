@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: hockey-baseball-app
+    env: static
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist/hockey-baseball-app/browser
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
