@@ -1,0 +1,20 @@
+button {
+  // Match the resend-button disabled styling
+  &[disabled] {
+    opacity: 1 !important;
+    cursor: not-allowed;
+    background-color: var(--color-secondary) !important;
+    color: white !important;
+    
+    // For outlined buttons
+    &.mat-mdc-outlined-button {
+      border-color: var(--color-secondary) !important;
+    }
+  }
+
+  // Loading state
+  &.loading-button {
+    pointer-events: none;
+    opacity: 0.8;
+  }
+}
