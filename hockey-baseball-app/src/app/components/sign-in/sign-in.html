@@ -2,7 +2,7 @@
 <app-auth-layout titleText="LOGIN HERE">
   <!-- Sign In Form -->
   <form [formGroup]="signInForm" (ngSubmit)="onSubmit()">
-    <div class="space-y-2">
+    <div class="space-y-0">
       <!-- Email Address -->
       <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="w-full">
         <mat-label class="uppercase text-custom-secondary">Email Address</mat-label>
@@ -41,7 +41,7 @@
               Password is required
             }
             @if (password?.errors?.['minlength']) {
-              Password must be at least 6 characters long
+              At least 6 characters long
             }
           </mat-error>
         }
@@ -54,7 +54,7 @@
 
       <a
         (click)="navigateToForgotPassword()"
-        class="text-custom-primary hover:text-red-700 no-underline font-medium text-md cursor-pointer"
+        class="text-custom-primary hover:text-red-700 no-underline font-medium text-xs cursor-pointer"
       >
         Forgot Password?
       </a>
