@@ -1,0 +1,123 @@
+<div class="space-y-6">
+  <!-- Page Header -->
+  <div>
+    <h1 class="text-3xl font-bold text-gray-900">Profile</h1>
+    <p class="text-gray-600 mt-2">Manage your personal information and account settings.</p>
+  </div>
+
+  <!-- Profile Card -->
+  <div class="bg-white rounded-lg shadow border border-gray-200">
+    <div class="px-6 py-4 border-b border-gray-200">
+      <h2 class="text-lg font-semibold text-gray-900">Personal Information</h2>
+    </div>
+    <div class="p-6">
+      <div class="flex items-start space-x-6">
+        <!-- Avatar -->
+        <div class="flex-shrink-0">
+          <div class="w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center">
+            <span class="text-blue-600 font-bold text-2xl">{{ userProfile.firstName.charAt(0) }}{{ userProfile.lastName.charAt(0) }}</span>
+          </div>
+          <button class="mt-3 text-sm text-blue-600 hover:text-blue-800 font-medium">
+            Change Photo
+          </button>
+        </div>
+
+        <!-- Profile Form -->
+        <div class="flex-1 space-y-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">First Name</label>
+              <input 
+                type="text" 
+                [value]="userProfile.firstName"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Enter first name"
+              >
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
+              <input 
+                type="text" 
+                [value]="userProfile.lastName"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Enter last name"
+              >
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+            <input 
+              type="email" 
+              [value]="userProfile.email"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Enter email address"
+            >
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+            <input 
+              type="tel" 
+              [value]="userProfile.phone"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Enter phone number"
+            >
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Organization</label>
+              <input 
+                type="text" 
+                [value]="userProfile.organization"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Enter organization"
+              >
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Role</label>
+              <select class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                <option value="coach">Coach</option>
+                <option value="manager">Manager</option>
+                <option value="analyst">Analyst</option>
+                <option value="admin">Admin</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="mt-8 flex justify-end space-x-4">
+        <button class="px-4 py-2 text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 transition-colors">
+          Cancel
+        </button>
+        <button class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+          Save Changes
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Account Info -->
+  <div class="bg-white rounded-lg shadow border border-gray-200">
+    <div class="px-6 py-4 border-b border-gray-200">
+      <h2 class="text-lg font-semibold text-gray-900">Account Information</h2>
+    </div>
+    <div class="p-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Member Since</label>
+          <p class="text-gray-900 bg-gray-50 px-3 py-2 rounded-md">{{ userProfile.joinDate }}</p>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Account Status</label>
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+            Active
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

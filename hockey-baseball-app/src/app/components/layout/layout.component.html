@@ -1,0 +1,82 @@
+<div class="flex h-screen bg-gray-50">
+  <!-- Left Navigation Panel -->
+  <div class="w-64 bg-gray-100 shadow-lg flex flex-col">
+    <!-- Logo Section -->
+    <div class="p-6 border-b border-gray-300 bg-white">
+      <div class="flex items-center space-x-3">
+        <img src="assets/logo.png" alt="Hockey Baseball App" class="rounded-lg mx-auto">
+      </div>
+    </div>
+
+    <!-- Navigation Menu -->
+    <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
+      @for (item of navigationItems(); track item.path) {
+        <div>
+          <!-- Main Navigation Item -->
+          <button
+            (click)="item.children ? toggleSubmenu(item) : navigate(item.path)"
+            [class]="'flex items-center justify-between w-full px-4 py-3 text-sm transition-colors duration-200 text-left bg-transparent border-none cursor-pointer ' +
+              (isActive(item.path) || isParentActive(item) 
+                ? 'text-custom-primary font-semibold' 
+                : 'text-custom-dark hover:text-custom-primary font-medium')"
+          >
+            <span>{{ item.label }}</span>
+            @if (item.children) {
+              <svg 
+                [class]="'w-4 h-4 transition-transform duration-200 ' + (isActive(item.path) || isParentActive(item) ? 'text-custom-primary' : 'text-custom-secondary')"
+                [style.transform]="item.expanded ? 'rotate(90deg)' : 'rotate(0deg)'"
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+            }
+          </button>
+
+          <!-- Submenu -->
+          @if (item.children && item.expanded) {
+            <div class="ml-6 mt-1 space-y-1 border-l border-gray-300 pl-4">
+              @for (child of item.children; track child.path) {
+                <button
+                  (click)="navigate(child.path)"
+                  [class]="'w-full px-4 py-2 text-sm transition-colors duration-200 text-left bg-transparent border-none cursor-pointer ' +
+                    (isActive(child.path) 
+                      ? 'text-custom-primary font-semibold' 
+                      : 'text-custom-dark hover:text-custom-primary font-medium')"
+                >
+                  {{ child.label }}
+                </button>
+              }
+            </div>
+          }
+        </div>
+      }
+    </nav>
+  </div>
+
+  <!-- Main Content Area -->
+  <div class="flex-1 flex flex-col overflow-hidden">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b border-gray-200">
+      <div class="px-6 py-6 flex items-center justify-end h-full">
+        <div class="flex items-center space-x-6">
+          <a href="#" class="text-custom-secondary hover:text-custom-dark font-medium text-sm">
+            Support
+          </a>
+          <a href="#" class="text-custom-secondary hover:text-custom-dark font-medium text-sm">
+            Alerts
+          </a>
+          <button (click)="logout()" class="text-custom-primary hover:text-red-800 font-medium text-sm bg-transparent border-none cursor-pointer">
+            Logout
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Page Content -->
+    <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-6">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>
