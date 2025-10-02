@@ -2,6 +2,7 @@ import { Component, computed } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { NavigationService, NavigationItem } from '../../services/navigation.service';
+import { IconService } from '../../services/icon.service';
 
 @Component({
   selector: 'app-layout',
@@ -11,7 +12,10 @@ import { NavigationService, NavigationItem } from '../../services/navigation.ser
   styleUrl: './layout.component.scss'
 })
 export class LayoutComponent {
-  constructor(private navigationService: NavigationService) {}
+  constructor(
+    private navigationService: NavigationService,
+    private iconService: IconService
+  ) {}
 
   protected get navigationItems() {
     return this.navigationService.navigationItems;
@@ -43,5 +47,9 @@ export class LayoutComponent {
 
   protected logout(): void {
     this.navigationService.navigate('/sign-in');
+  }
+
+  protected getIconPath(iconName?: string): string {
+    return this.iconService.getIconPath(iconName);
   }
 }

@@ -5,8 +5,10 @@ import { filter } from 'rxjs';
 export interface NavigationItem {
   label: string;
   path: string;
+  icon?: string;
   children?: NavigationItem[];
   expanded?: boolean;
+  isHovered?: boolean;
 }
 
 @Injectable({
@@ -17,41 +19,49 @@ export class NavigationService {
   private readonly _navigationItems = signal<NavigationItem[]>([
     {
       label: 'Dashboard',
-      path: '/dashboard'
+      path: '/dashboard',
+      icon: 'dashboard'
     },
     {
       label: 'Account',
       path: '/account',
+      icon: 'account',
       expanded: false,
       children: [
-        { label: 'Profile', path: '/account/profile' },
-        { label: 'Payment Method', path: '/account/payment-method' },
-        { label: 'Payment History', path: '/account/payment-history' }
+        { label: 'Profile', path: '/account/profile', icon: 'profile' },
+        { label: 'Payment Method', path: '/account/payment-method', icon: 'payment' },
+        { label: 'Payment History', path: '/account/payment-history', icon: 'history' }
       ]
     },
     {
       label: 'Goalies',
-      path: '/goalies'
+      path: '/goalies',
+      icon: 'goalies'
     },
     {
       label: 'Players',
-      path: '/players'
+      path: '/players',
+      icon: 'players'
     },
     {
       label: 'Teams',
-      path: '/teams'
+      path: '/teams',
+      icon: 'teams'
     },
     {
       label: 'Schedule',
-      path: '/schedule'
+      path: '/schedule',
+      icon: 'schedule'
     },
     {
       label: 'Analytics',
-      path: '/analytics'
+      path: '/analytics',
+      icon: 'analytics'
     },
     {
       label: 'Video Library',
-      path: '/video-library'
+      path: '/video-library',
+      icon: 'video'
     }
   ]);
 
@@ -114,6 +124,10 @@ export class NavigationService {
       return item;
     });
     this._navigationItems.set(updatedItems);
+  }
+
+  updateNavigationItems(items: NavigationItem[]): void {
+    this._navigationItems.set(items);
   }
 
   private getFlatNavigationItems(): NavigationItem[] {
