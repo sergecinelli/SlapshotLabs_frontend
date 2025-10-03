@@ -6,22 +6,16 @@ import { PageHeaderComponent } from '../../shared/components/page-header/page-he
   selector: 'app-dashboard',
   standalone: true,
   imports: [CommonModule, PageHeaderComponent],
-  templateUrl: './dashboard.component.html',
+  template: `
+    <div class="p-6 pt-0">
+      <app-page-header title="Dashboard"></app-page-header>
+      <div class="flex items-center justify-center h-96">
+        <div class="text-center">
+          <p class="text-custom-secondary">This feature will be implemented in the future.</p>
+        </div>
+      </div>
+    </div>
+  `,
   styleUrl: './dashboard.component.scss'
 })
-export class DashboardComponent {
-  stats = [
-    { label: 'Total Teams', value: '12', icon: '🏒' },
-    { label: 'Active Players', value: '185', icon: '👤' },
-    { label: 'Games Played', value: '47', icon: '🥅' },
-    { label: 'Videos', value: '23', icon: '📹' }
-  ];
-
-  recentActivity = [
-    'New player John Smith added to Rangers team',
-    'Game scheduled: Rangers vs Hawks - Oct 15, 2025',
-    'Training video uploaded for goalies',
-    'Player stats updated for Sarah Johnson',
-    'Team photo session completed for Eagles'
-  ];
-}
+export class DashboardComponent {}
