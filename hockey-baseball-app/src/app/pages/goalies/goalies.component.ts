@@ -1,13 +1,14 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { PageHeaderComponent } from '../../shared/components/page-header/page-header';
 
 @Component({
   selector: 'app-goalies',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, PageHeaderComponent],
   template: `
     <div class="p-6 pt-0">
-      <h1 class="text-2xl font-medium text-custom-primary mb-6">Goalies</h1>
+      <app-page-header title="Goalies"></app-page-header>
       <div class="flex items-center justify-center h-96">
         <div class="text-center">
           <p class="text-custom-secondary">This feature will be implemented in the future.</p>

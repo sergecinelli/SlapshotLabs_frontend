@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { AuthButtonComponent } from '../../../shared/components/auth-button/auth-button';
+import { PageHeaderComponent } from '../../../shared/components/page-header/page-header';
 import { Router } from '@angular/router';
 
 @Component({
@@ -15,6 +16,7 @@ import { Router } from '@angular/router';
     MatFormFieldModule,
     MatInputModule,
     AuthButtonComponent,
+    PageHeaderComponent,
   ],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.scss'

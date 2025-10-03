@@ -1,20 +1,27 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { PageHeaderComponent } from '../../shared/components/page-header/page-header';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule],
-  template: `
-    <div class="p-6 pt-0">
-      <h1 class="text-2xl font-medium text-custom-primary mb-6">Dashboard</h1>
-      <div class="flex items-center justify-center h-96">
-        <div class="text-center">
-          <p class="text-custom-secondary">This feature will be implemented in the future.</p>
-        </div>
-      </div>
-    </div>
-  `,
+  imports: [CommonModule, PageHeaderComponent],
+  templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
-export class DashboardComponent {}
+export class DashboardComponent {
+  stats = [
+    { label: 'Total Teams', value: '12', icon: '🏒' },
+    { label: 'Active Players', value: '185', icon: '👤' },
+    { label: 'Games Played', value: '47', icon: '🥅' },
+    { label: 'Videos', value: '23', icon: '📹' }
+  ];
+
+  recentActivity = [
+    'New player John Smith added to Rangers team',
+    'Game scheduled: Rangers vs Hawks - Oct 15, 2025',
+    'Training video uploaded for goalies',
+    'Player stats updated for Sarah Johnson',
+    'Team photo session completed for Eagles'
+  ];
+}
