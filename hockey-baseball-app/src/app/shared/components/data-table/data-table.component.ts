@@ -1,9 +1,10 @@
-import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy, ElementRef, Renderer2, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSortModule, Sort } from '@angular/material/sort';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatTooltipModule, MatTooltip } from '@angular/material/tooltip';
 
 export interface TableColumn {
   key: string;
@@ -12,6 +13,7 @@ export interface TableColumn {
   sortable?: boolean;
   width?: string;
   align?: 'left' | 'center' | 'right';
+  showTooltip?: boolean; // Optional: control tooltip visibility per column
 }
 
 export interface TableAction {
@@ -24,13 +26,18 @@ export interface TableAction {
 @Component({
   selector: 'app-data-table',
   standalone: true,
-  imports: [CommonModule, MatTableModule, MatButtonModule, MatSortModule, MatProgressSpinnerModule],
+  imports: [CommonModule, MatTableModule, MatButtonModule, MatSortModule, MatProgressSpinnerModule, MatTooltipModule],
   templateUrl: './data-table.component.html',
   styleUrl: './data-table.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class DataTableComponent {
+export class DataTableComponent implements AfterViewInit {
   @Input() columns: TableColumn[] = [];
+  
+  constructor(
+    private elementRef: ElementRef,
+    private renderer: Renderer2
+  ) {}
   @Input() set data(value: any[]) {
     this._data = value;
   }
@@ -67,5 +74,60 @@ export class DataTableComponent {
 
   private getNestedValue(obj: any, path: string): any {
     return path.split('.').reduce((current, key) => current?.[key], obj);
+  }
+
+  getTooltipText(item: any, column: TableColumn): string {
+    const value = this.getCellValue(item, column);
+    if (value === null || value === undefined) {
+      return '-';
+    }
+    
+    // Special formatting for specific fields
+    switch (column.key) {
+      case 'weight':
+        return `${new Intl.NumberFormat().format(value)} lbs`;
+      case 'height':
+        return `Height: ${value}`;
+      case 'birthYear':
+        return `Born in ${value}`;
+      default:
+        // General formatting for number types
+        if (column.type === 'number' && column.key !== 'birthYear') {
+          return new Intl.NumberFormat().format(value);
+        }
+        break;
+    }
+    
+    return String(value);
+  }
+
+  ngAfterViewInit(): void {
+    // Implementation for after view init if needed
+  }
+
+  isTextTruncated(element: HTMLElement): boolean {
+    if (!element) return false;
+    
+    // Check if the element's scrollWidth is greater than its clientWidth
+    // This indicates that the content is wider than the visible area
+    return element.scrollWidth > element.clientWidth;
+  }
+
+  onCellMouseEnter(cellElement: HTMLElement, matTooltip: MatTooltip, item: any, column: TableColumn): void {
+    // Always show tooltip if explicitly enabled for the column
+    if (column.showTooltip === true) {
+      matTooltip.disabled = false;
+      return;
+    }
+    
+    // Never show tooltip if explicitly disabled for the column  
+    if (column.showTooltip === false) {
+      matTooltip.disabled = true;
+      return;
+    }
+    
+    // Default behavior: show tooltip only if text is truncated
+    const isTextTruncated = this.isTextTruncated(cellElement);
+    matTooltip.disabled = !isTextTruncated;
   }
 }

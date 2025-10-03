@@ -35,9 +35,15 @@
           </th>
         }
         <td mat-cell *matCellDef="let element" 
+            #cellElement
+            #tooltip="matTooltip"
             [style.width]="column.width"
             [class.text-center]="column.align === 'center'"
-            [class.text-right]="column.align === 'right'">
+            [class.text-right]="column.align === 'right'"
+            [matTooltip]="getTooltipText(element, column)"
+            matTooltipPosition="above"
+            [matTooltipDisabled]="column.showTooltip === false"
+            (mouseenter)="onCellMouseEnter(cellElement, tooltip, element, column)">
           @switch (column.type) {
             <!-- Text -->
             @case ('text') {
