@@ -1,0 +1,113 @@
+<div class="data-table-container">
+  <!-- Loading State -->
+  @if (loading) {
+    <div class="loading-state">
+      <div class="flex items-center justify-center py-8">
+        <mat-spinner diameter="32"></mat-spinner>
+        <span class="ml-3 text-custom-secondary">Loading...</span>
+      </div>
+    </div>
+  }
+
+  <!-- Material Table -->
+  @if (!loading) {
+    <div class="table-wrapper">
+    <table mat-table [dataSource]="data" matSort (matSortChange)="onSortChange($event)" class="mat-elevation-2">
+      
+      <!-- Dynamic Columns -->
+      @for (column of columns; track column.key) {
+        <ng-container [matColumnDef]="column.key">
+        <!-- Sortable header -->
+        @if (column.sortable) {
+          <th mat-header-cell *matHeaderCellDef mat-sort-header="{{column.key}}" 
+              [style.width]="column.width"
+              [class.text-center]="column.align === 'center'"
+              [class.text-right]="column.align === 'right'">
+            {{ column.label }}
+          </th>
+        } @else {
+          <!-- Non-sortable header -->
+          <th mat-header-cell *matHeaderCellDef 
+              [style.width]="column.width"
+              [class.text-center]="column.align === 'center'"
+              [class.text-right]="column.align === 'right'">
+            {{ column.label }}
+          </th>
+        }
+        <td mat-cell *matCellDef="let element" 
+            [style.width]="column.width"
+            [class.text-center]="column.align === 'center'"
+            [class.text-right]="column.align === 'right'">
+          @switch (column.type) {
+            <!-- Text -->
+            @case ('text') {
+              <span>
+                {{ getCellValue(element, column) || '-' }}
+              </span>
+            }
+            
+            <!-- Number -->
+            @case ('number') {
+              <span class="font-mono">
+                @if (column.key === 'birthYear') {
+                  {{ getCellValue(element, column) }}
+                } @else {
+                  {{ getCellValue(element, column) | number }}
+                }
+              </span>
+            }
+
+            <!-- Dropdown -->
+            @case ('dropdown') {
+              <span>
+                {{ getCellValue(element, column) || '-' }}
+              </span>
+            }
+            
+            <!-- Default -->
+            @default {
+              <span>
+                {{ getCellValue(element, column) || '-' }}
+              </span>
+            }
+          }
+        </td>
+        </ng-container>
+      }
+
+      <!-- Actions Column -->
+      @if (actions.length > 0) {
+        <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef class="text-center" style="width: 160px;">Actions</th>
+        <td mat-cell *matCellDef="let element" class="text-center actions-cell" style="width: 160px;">
+          <div class="flex flex-wrap items-center justify-center gap-1">
+            @for (action of actions; track action.action) {
+              <button 
+                mat-button
+                (click)="onActionClick(action.action, element)"
+                [color]="action.variant === 'primary' ? 'primary' : action.variant === 'danger' ? 'warn' : ''"
+                class="action-button"
+              >
+                {{ action.label }}
+              </button>
+            }
+          </div>
+        </td>
+        </ng-container>
+      }
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns" class="custom-header"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="table-row"></tr>
+    </table>
+
+    <!-- Empty State -->
+    @if (data.length === 0) {
+      <div class="empty-state">
+        <div class="text-center py-12">
+          <div class="text-gray-500">{{ emptyMessage }}</div>
+        </div>
+      </div>
+    }
+    </div>
+  }
+</div>
