@@ -112,6 +112,16 @@
         line-height: 1.2 !important;
         border-radius: 4px !important;
         
+        &.icon-only-button {
+          width: 28px !important;
+          height: 28px !important;
+          padding: 2px !important;
+          min-width: 28px !important;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        
         &.mat-mdc-button {
           &.mat-primary {
             background-color: var(--color-primary) !important;
@@ -131,6 +141,20 @@
               background-color: #e5e7eb !important;
             }
           }
+        }
+      }
+      
+      .action-icon {
+        width: 16px !important;
+        height: 16px !important;
+        filter: brightness(0) saturate(100%) invert(30%) sepia(10%) saturate(1000%) hue-rotate(200deg) brightness(96%) contrast(86%);
+        
+        .mat-primary & {
+          filter: brightness(0) saturate(100%) invert(100%) sepia(100%) saturate(0%) hue-rotate(340deg) brightness(101%) contrast(103%);
+        }
+        
+        .mat-warn & {
+          filter: brightness(0) saturate(100%) invert(100%) sepia(100%) saturate(0%) hue-rotate(340deg) brightness(101%) contrast(103%);
         }
       }
     }

@@ -5,6 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatSortModule, Sort } from '@angular/material/sort';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule, MatTooltip } from '@angular/material/tooltip';
+import { IconService } from '../../../services/icon.service';
 
 export interface TableColumn {
   key: string;
@@ -21,6 +22,7 @@ export interface TableAction {
   icon?: string;
   action: string;
   variant?: 'primary' | 'secondary' | 'danger';
+  iconOnly?: boolean; // When true, only show icon without label
 }
 
 @Component({
@@ -36,7 +38,8 @@ export class DataTableComponent implements AfterViewInit {
   
   constructor(
     private elementRef: ElementRef,
-    private renderer: Renderer2
+    private renderer: Renderer2,
+    public iconService: IconService
   ) {}
   @Input() set data(value: any[]) {
     this._data = value;

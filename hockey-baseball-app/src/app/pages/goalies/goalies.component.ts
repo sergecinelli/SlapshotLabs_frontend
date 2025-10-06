@@ -32,34 +32,34 @@ export class GoaliesComponent implements OnInit {
   loading = signal(true);
 
   tableColumns: TableColumn[] = [
-    { key: 'team', label: 'Team', sortable: true, type: 'dropdown', width: '120px' },
-    { key: 'level', label: 'Level', sortable: true, type: 'dropdown', width: '100px' },
-    { key: 'position', label: 'Position', sortable: false, width: '100px' },
-    { key: 'height', label: 'Height', sortable: true, width: '90px' },
-    { key: 'weight', label: 'Weight', sortable: true, type: 'number', width: '90px' },
-    { key: 'shoots', label: 'Shoots (R/L)', sortable: true, type: 'dropdown', width: '120px' },
-    { key: 'jerseyNumber', label: 'Jersey Number', sortable: true, type: 'number', width: '110px' },
-    { key: 'firstName', label: 'First Name', sortable: true, width: '120px' },
-    { key: 'lastName', label: 'Last Name', sortable: true, width: '120px' },
-    { key: 'birthYear', label: 'Birth Year', sortable: true, type: 'number', width: '100px' },
-    { key: 'shotsOnGoal', label: 'Shots on Goal', sortable: true, type: 'number', width: '120px' },
-    { key: 'saves', label: 'Saves', sortable: true, type: 'number', width: '90px' },
-    { key: 'goalsAgainst', label: 'Goals Against', sortable: true, type: 'number', width: '120px' },
-    { key: 'shotsOnGoalPerGame', label: 'Shots on Goal/Game', sortable: true, type: 'number', width: '150px' },
-    { key: 'gamesPlayed', label: 'Games Played', sortable: true, type: 'number', width: '130px' },
-    { key: 'wins', label: 'Wins', sortable: true, type: 'number', width: '80px' },
-    { key: 'losses', label: 'Losses', sortable: true, type: 'number', width: '90px' },
-    { key: 'goals', label: 'Goals', sortable: true, type: 'number', width: '80px' },
-    { key: 'assists', label: 'Assists', sortable: true, type: 'number', width: '90px' },
-    { key: 'points', label: 'Points', sortable: true, type: 'number', width: '80px' },
-    { key: 'ppga', label: 'PPGA', sortable: true, type: 'number', width: '80px' },
-    { key: 'shga', label: 'SHGA', sortable: true, type: 'number', width: '80px' }
+    { key: 'team', label: 'Team', sortable: true, type: 'dropdown', width: '100px' },
+    { key: 'position', label: 'Pos', sortable: false, width: '60px' },
+    { key: 'height', label: 'Ht', sortable: true, width: '65px' },
+    { key: 'weight', label: 'Wt', sortable: true, type: 'number', width: '65px' },
+    { key: 'shoots', label: 'Shoots (R/L)', sortable: true, type: 'dropdown', width: '100px' },
+    { key: 'jerseyNumber', label: 'Jersey #', sortable: true, type: 'number', width: '70px' },
+    { key: 'firstName', label: 'First Name', sortable: true, width: '100px' },
+    { key: 'lastName', label: 'Last Name', sortable: true, width: '100px' },
+    { key: 'birthYear', label: 'Birth Year', sortable: true, type: 'number', width: '90px' },
+    { key: 'shotsOnGoal', label: 'SOG', sortable: true, type: 'number', width: '70px' },
+    { key: 'saves', label: 'Saves', sortable: true, type: 'number', width: '75px' },
+    { key: 'goalsAgainst', label: 'GA', sortable: true, type: 'number', width: '60px' },
+    { key: 'shotsOnGoalPerGame', label: 'SOG/Game', sortable: true, type: 'number', width: '80px' },
+    { key: 'gamesPlayed', label: 'GP', sortable: true, type: 'number', width: '60px' },
+    { key: 'wins', label: 'Wins', sortable: true, type: 'number', width: '65px' },
+    { key: 'losses', label: 'Losses', sortable: true, type: 'number', width: '75px' },
+    { key: 'goals', label: 'Goals', sortable: true, type: 'number', width: '70px' },
+    { key: 'assists', label: 'Assists', sortable: true, type: 'number', width: '75px' },
+    { key: 'points', label: 'Pts', sortable: true, type: 'number', width: '60px' },
+    { key: 'ppga', label: 'PPGA', sortable: true, type: 'number', width: '70px' },
+    { key: 'shga', label: 'SHGA', sortable: true, type: 'number', width: '70px' }
   ];
 
   tableActions: TableAction[] = [
     { label: 'Delete', action: 'delete', variant: 'danger' },
     { label: 'Edit', action: 'edit', variant: 'secondary' },
     { label: 'Profile', action: 'view-profile', variant: 'primary' },
+    { label: 'Spray Chart', icon: 'spray-chart', action: 'shot-spray-chart', variant: 'secondary', iconOnly: true },
   ];
 
   constructor(

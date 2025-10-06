@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Hockey net frame -->
+  <path d="M4 8 L4 18 L20 18 L20 8" fill="none" stroke="currentColor" stroke-width="1.5"/>
+  
+  <!-- Net mesh lines - vertical -->
+  <line x1="7" y1="8" x2="7" y2="18" stroke="currentColor" stroke-width="0.5" opacity="0.3"/>
+  <line x1="10" y1="8" x2="10" y2="18" stroke="currentColor" stroke-width="0.5" opacity="0.3"/>
+  <line x1="14" y1="8" x2="14" y2="18" stroke="currentColor" stroke-width="0.5" opacity="0.3"/>
+  <line x1="17" y1="8" x2="17" y2="18" stroke="currentColor" stroke-width="0.5" opacity="0.3"/>
+  
+  <!-- Net mesh lines - horizontal -->
+  <line x1="4" y1="11" x2="20" y2="11" stroke="currentColor" stroke-width="0.5" opacity="0.3"/>
+  <line x1="4" y1="14" x2="20" y2="14" stroke="currentColor" stroke-width="0.5" opacity="0.3"/>
+  
+  <!-- Shot spray dots representing shots on goal -->
+  <circle cx="6" cy="10" r="1.2" fill="currentColor"/>
+  <circle cx="9" cy="12" r="1.2" fill="currentColor"/>
+  <circle cx="12" cy="9" r="1.2" fill="currentColor"/>
+  <circle cx="15" cy="13" r="1.2" fill="currentColor"/>
+  <circle cx="18" cy="10" r="1.2" fill="currentColor"/>
+  <circle cx="8" cy="16" r="1.2" fill="currentColor"/>
+  <circle cx="16" cy="15" r="1.2" fill="currentColor"/>
+</svg>
