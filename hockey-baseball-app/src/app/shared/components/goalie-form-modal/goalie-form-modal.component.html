@@ -1,0 +1,218 @@
+<div class="goalie-form-modal">
+  <h2 mat-dialog-title class="modal-title">
+    <mat-icon class="title-icon">sports_hockey</mat-icon>
+    {{ isEditMode ? 'Edit Goalie' : 'Add New Goalie' }}
+  </h2>
+
+  <mat-dialog-content class="modal-content">
+    <form [formGroup]="goalieForm" class="goalie-form">
+      
+      <!-- Personal Information Section -->
+      <div class="form-section">
+        <div class="section-header">
+          <span class="section-title">Personal Information</span>
+        </div>
+        <mat-divider class="section-divider"></mat-divider>
+        <div class="form-row">
+          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+            <mat-label class="uppercase text-custom-secondary">First Name *</mat-label>
+            <input matInput formControlName="firstName" placeholder="Enter first name">
+            <mat-error *ngIf="goalieForm.get('firstName')?.errors && goalieForm.get('firstName')?.touched">
+              {{ getErrorMessage('firstName') }}
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+            <mat-label class="uppercase text-custom-secondary">Last Name *</mat-label>
+            <input matInput formControlName="lastName" placeholder="Enter last name">
+            <mat-error *ngIf="goalieForm.get('lastName')?.errors && goalieForm.get('lastName')?.touched">
+              {{ getErrorMessage('lastName') }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+            <mat-label class="uppercase text-custom-secondary">Birth Year</mat-label>
+            <input matInput type="number" formControlName="birthYear" placeholder="Enter birth year">
+            <mat-error *ngIf="goalieForm.get('birthYear')?.errors && goalieForm.get('birthYear')?.touched">
+              {{ getErrorMessage('birthYear') }}
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+            <mat-label class="uppercase text-custom-secondary">Jersey Number</mat-label>
+            <input matInput type="number" formControlName="jerseyNumber" placeholder="Enter jersey number">
+            <mat-error *ngIf="goalieForm.get('jerseyNumber')?.errors && goalieForm.get('jerseyNumber')?.touched">
+              {{ getErrorMessage('jerseyNumber') }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Physical Information Section -->
+      <div class="form-section">
+        <div class="section-header">
+          <span class="section-title">Physical Information</span>
+        </div>
+        <mat-divider class="section-divider"></mat-divider>
+        <div class="form-row">
+          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+            <mat-label class="uppercase text-custom-secondary">Height</mat-label>
+            <input matInput formControlName="height" placeholder="e.g., 6'2&quot;">
+            <mat-error *ngIf="goalieForm.get('height')?.errors && goalieForm.get('height')?.touched">
+              {{ getErrorMessage('height') }}
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+            <mat-label class="uppercase text-custom-secondary">Weight (lbs)</mat-label>
+            <input matInput type="number" formControlName="weight" placeholder="Enter weight">
+            <mat-error *ngIf="goalieForm.get('weight')?.errors && goalieForm.get('weight')?.touched">
+              {{ getErrorMessage('weight') }}
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+            <mat-label class="uppercase text-custom-secondary">Shoots</mat-label>
+            <mat-select formControlName="shoots">
+              <mat-option *ngFor="let option of shootsOptions" [value]="option.value">
+                {{ option.label }}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="goalieForm.get('shoots')?.errors && goalieForm.get('shoots')?.touched">
+              {{ getErrorMessage('shoots') }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Team Information Section -->
+      <div class="form-section">
+        <div class="section-header">
+          <span class="section-title">Team Information</span>
+        </div>
+        <mat-divider class="section-divider"></mat-divider>
+        <div class="form-row">
+          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field full-width">
+            <mat-label class="uppercase text-custom-secondary">Team</mat-label>
+            <mat-select formControlName="team">
+              <mat-option *ngFor="let team of teamOptions" [value]="team.value">
+                {{ team.label }}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="goalieForm.get('team')?.errors && goalieForm.get('team')?.touched">
+              {{ getErrorMessage('team') }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Statistics Section -->
+      <div class="form-section">
+        <div class="section-header">
+          <span class="section-title">Game Statistics</span>
+        </div>
+        <mat-divider class="section-divider"></mat-divider>
+        <div class="form-row">
+          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+            <mat-label class="uppercase text-custom-secondary">Games Played</mat-label>
+            <input matInput type="number" formControlName="gamesPlayed" placeholder="Enter games played">
+            <mat-error *ngIf="goalieForm.get('gamesPlayed')?.errors && goalieForm.get('gamesPlayed')?.touched">
+              {{ getErrorMessage('gamesPlayed') }}
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+            <mat-label class="uppercase text-custom-secondary">Wins</mat-label>
+            <input matInput type="number" formControlName="wins" placeholder="Enter wins">
+            <mat-error *ngIf="goalieForm.get('wins')?.errors && goalieForm.get('wins')?.touched">
+              {{ getErrorMessage('wins') }}
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+            <mat-label class="uppercase text-custom-secondary">Losses</mat-label>
+            <input matInput type="number" formControlName="losses" placeholder="Enter losses">
+            <mat-error *ngIf="goalieForm.get('losses')?.errors && goalieForm.get('losses')?.touched">
+              {{ getErrorMessage('losses') }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+            <mat-label class="uppercase text-custom-secondary">Shots on Goal</mat-label>
+            <input matInput type="number" formControlName="shotsOnGoal" placeholder="Enter shots on goal">
+            <mat-error *ngIf="goalieForm.get('shotsOnGoal')?.errors && goalieForm.get('shotsOnGoal')?.touched">
+              {{ getErrorMessage('shotsOnGoal') }}
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+            <mat-label class="uppercase text-custom-secondary">Saves</mat-label>
+            <input matInput type="number" formControlName="saves" placeholder="Enter saves">
+            <mat-error *ngIf="goalieForm.get('saves')?.errors && goalieForm.get('saves')?.touched">
+              {{ getErrorMessage('saves') }}
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+            <mat-label class="uppercase text-custom-secondary">Goals Against</mat-label>
+            <input matInput type="number" formControlName="goalsAgainst" placeholder="Enter goals against">
+            <mat-error *ngIf="goalieForm.get('goalsAgainst')?.errors && goalieForm.get('goalsAgainst')?.touched">
+              {{ getErrorMessage('goalsAgainst') }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+            <mat-label class="uppercase text-custom-secondary">Goals</mat-label>
+            <input matInput type="number" formControlName="goals" placeholder="Enter goals (optional)">
+            <mat-error *ngIf="goalieForm.get('goals')?.errors && goalieForm.get('goals')?.touched">
+              {{ getErrorMessage('goals') }}
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+            <mat-label class="uppercase text-custom-secondary">Assists</mat-label>
+            <input matInput type="number" formControlName="assists" placeholder="Enter assists (optional)">
+            <mat-error *ngIf="goalieForm.get('assists')?.errors && goalieForm.get('assists')?.touched">
+              {{ getErrorMessage('assists') }}
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+            <mat-label class="uppercase text-custom-secondary">PPGA</mat-label>
+            <input matInput type="number" formControlName="ppga" placeholder="Power Play Goals Against">
+            <mat-error *ngIf="goalieForm.get('ppga')?.errors && goalieForm.get('ppga')?.touched">
+              {{ getErrorMessage('ppga') }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+            <mat-label class="uppercase text-custom-secondary">SHGA</mat-label>
+            <input matInput type="number" formControlName="shga" placeholder="Short Handed Goals Against">
+            <mat-error *ngIf="goalieForm.get('shga')?.errors && goalieForm.get('shga')?.touched">
+              {{ getErrorMessage('shga') }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+      </div>
+
+    </form>
+  </mat-dialog-content>
+
+  <mat-dialog-actions class="modal-actions">
+    <button mat-stroked-button (click)="onCancel()" class="cancel-btn">
+      Cancel
+    </button>
+    <button mat-raised-button color="primary" (click)="onSubmit()" class="submit-btn">
+      <mat-icon>save</mat-icon>
+      {{ isEditMode ? 'Update Goalie' : 'Add Goalie' }}
+    </button>
+  </mat-dialog-actions>
+</div>

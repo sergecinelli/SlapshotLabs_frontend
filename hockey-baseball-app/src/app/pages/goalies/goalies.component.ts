@@ -1,18 +1,34 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header';
 import { DataTableComponent, TableColumn, TableAction } from '../../shared/components/data-table/data-table.component';
 import { GoalieService } from '../../services/goalie.service';
 import { Goalie } from '../../shared/interfaces/goalie.interface';
+import { GoalieFormModalComponent, GoalieFormModalData } from '../../shared/components/goalie-form-modal/goalie-form-modal.component';
 
 @Component({
   selector: 'app-goalies',
   standalone: true,
-  imports: [CommonModule, PageHeaderComponent, DataTableComponent],
+  imports: [CommonModule, PageHeaderComponent, DataTableComponent, MatButtonModule, MatIconModule, MatDialogModule],
   template: `
     <div class="p-6 pt-0">
       <app-page-header title="Goalies"></app-page-header>
+      
+      <!-- Add Goalie Button -->
+      <div class="mb-4 flex justify-end">
+        <button 
+          mat-raised-button 
+          color="primary" 
+          (click)="openAddGoalieModal()"
+          class="add-goalie-btn">
+          <mat-icon>add</mat-icon>
+          Add a Goalie
+        </button>
+      </div>
       
       <app-data-table
         [columns]="tableColumns"
@@ -33,7 +49,7 @@ export class GoaliesComponent implements OnInit {
 
   tableColumns: TableColumn[] = [
     { key: 'team', label: 'Team', sortable: true, type: 'dropdown', width: '100px' },
-    { key: 'position', label: 'Pos', sortable: false, width: '60px' },
+    { key: 'position', label: 'Pos', sortable: false, width: '75px' },
     { key: 'height', label: 'Ht', sortable: true, width: '65px' },
     { key: 'weight', label: 'Wt', sortable: true, type: 'number', width: '65px' },
     { key: 'shoots', label: 'Shoots (R/L)', sortable: true, type: 'dropdown', width: '100px' },
@@ -44,7 +60,7 @@ export class GoaliesComponent implements OnInit {
     { key: 'shotsOnGoal', label: 'SOG', sortable: true, type: 'number', width: '70px' },
     { key: 'saves', label: 'Saves', sortable: true, type: 'number', width: '75px' },
     { key: 'goalsAgainst', label: 'GA', sortable: true, type: 'number', width: '60px' },
-    { key: 'shotsOnGoalPerGame', label: 'SOG/Game', sortable: true, type: 'number', width: '80px' },
+    { key: 'shotsOnGoalPerGame', label: 'SOG/Game', sortable: true, type: 'number', width: '90px' },
     { key: 'gamesPlayed', label: 'GP', sortable: true, type: 'number', width: '60px' },
     { key: 'wins', label: 'Wins', sortable: true, type: 'number', width: '65px' },
     { key: 'losses', label: 'Losses', sortable: true, type: 'number', width: '75px' },
@@ -64,7 +80,8 @@ export class GoaliesComponent implements OnInit {
 
   constructor(
     private goalieService: GoalieService,
-    private http: HttpClient
+    private http: HttpClient,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
@@ -142,18 +159,81 @@ export class GoaliesComponent implements OnInit {
     }
   }
 
-  private editGoalie(goalie: Goalie): void {
-    console.log('Edit goalie:', goalie);
-    // TODO: Navigate to edit form or open modal
-  }
-
   private viewGoalieProfile(goalie: Goalie): void {
-    console.log('View goalie profile:', goalie);
-    // TODO: Navigate to goalie profile page
+    console.log('View profile for:', goalie);
+    // TODO: Implement goalie profile view
   }
 
   private viewShotSprayChart(goalie: Goalie): void {
     console.log('View shot spray chart for:', goalie);
     // TODO: Navigate to shot spray chart page
+  }
+
+  openAddGoalieModal(): void {
+    const dialogRef = this.dialog.open(GoalieFormModalComponent, {
+      width: '800px',
+      maxWidth: '95vw',
+      data: {
+        isEditMode: false
+      } as GoalieFormModalData,
+      panelClass: 'goalie-form-modal-dialog',
+      disableClose: true
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.addGoalie(result);
+      }
+    });
+  }
+
+  private addGoalie(goalieData: Partial<Goalie>): void {
+    this.goalieService.addGoalie(goalieData).subscribe({
+      next: (newGoalie) => {
+        const currentGoalies = this.goalies();
+        this.goalies.set([...currentGoalies, newGoalie]);
+        console.log('Goalie added successfully');
+      },
+      error: (error) => {
+        console.error('Error adding goalie:', error);
+      }
+    });
+  }
+
+  private editGoalie(goalie: Goalie): void {
+    const dialogRef = this.dialog.open(GoalieFormModalComponent, {
+      width: '800px',
+      maxWidth: '95vw',
+      data: {
+        goalie: goalie,
+        isEditMode: true
+      } as GoalieFormModalData,
+      panelClass: 'goalie-form-modal-dialog',
+      disableClose: true
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.updateGoalie(result);
+      }
+    });
+  }
+
+  private updateGoalie(goalieData: Partial<Goalie>): void {
+    this.goalieService.updateGoalie(goalieData.id!, goalieData).subscribe({
+      next: (updatedGoalie) => {
+        const currentGoalies = this.goalies();
+        const index = currentGoalies.findIndex(g => g.id === updatedGoalie.id);
+        if (index !== -1) {
+          const newGoalies = [...currentGoalies];
+          newGoalies[index] = updatedGoalie;
+          this.goalies.set(newGoalies);
+          console.log('Goalie updated successfully');
+        }
+      },
+      error: (error) => {
+        console.error('Error updating goalie:', error);
+      }
+    });
   }
 }

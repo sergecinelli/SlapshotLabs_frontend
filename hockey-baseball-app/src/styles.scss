@@ -236,3 +236,140 @@ mat-error {
   background-color: rgba(97, 97, 97, 0.9) !important;
   color: white !important;
 }
+
+/* Material Design Select Dropdown Fixes */
+.mat-mdc-select-panel {
+  background-color: white !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  border-radius: 4px !important;
+  max-height: 300px !important;
+  overflow-y: auto !important;
+  z-index: 1100 !important;
+}
+
+.mat-mdc-option {
+  background-color: white !important;
+  color: var(--color-dark) !important;
+  min-height: 48px !important;
+  padding: 0 16px !important;
+  
+  &:hover:not(.mdc-list-item--disabled) {
+    background-color: #f3f4f6 !important;
+  }
+  
+  &.mdc-list-item--selected:not(.mdc-list-item--disabled) {
+    background-color: var(--color-primary) !important;
+    color: white !important;
+  }
+  
+  &.mat-mdc-option-active {
+    background-color: rgba(207, 20, 43, 0.1) !important;
+    color: var(--color-primary) !important;
+  }
+}
+
+/* Ensure select overlay has proper z-index */
+.cdk-overlay-pane.mat-mdc-select-panel-above {
+  z-index: 1100 !important;
+}
+
+.cdk-overlay-container .cdk-overlay-pane {
+  z-index: 1100 !important;
+  
+  &.mat-mdc-select-panel-above {
+    z-index: 1101 !important;
+  }
+}
+
+/* Fix select field focus and underline issues */
+.mat-mdc-form-field.mat-focused {
+  .mat-mdc-text-field-wrapper {
+    .mdc-line-ripple::before,
+    .mdc-line-ripple::after {
+      border-bottom-color: var(--color-primary) !important;
+      z-index: 1 !important;
+    }
+  }
+}
+
+.mat-mdc-select {
+  .mat-mdc-select-value {
+    color: var(--color-dark) !important;
+  }
+  
+  .mat-mdc-select-arrow {
+    color: var(--color-secondary) !important;
+  }
+  
+  &.mat-mdc-select-focused {
+    .mat-mdc-select-arrow {
+      color: var(--color-primary) !important;
+    }
+  }
+}
+
+/* Modal-specific font size reductions */
+::ng-deep .goalie-form-modal-dialog,
+::ng-deep .goalie-profile-modal-dialog {
+  .mat-mdc-form-field {
+    font-size: 14px !important;
+    
+    .mat-mdc-input-element {
+      font-size: 14px !important;
+    }
+    
+    .mdc-floating-label {
+      font-size: 12px !important;
+    }
+    
+    .mat-mdc-form-field-subscript-wrapper {
+      font-size: 12px !important;
+    }
+    
+    .mat-mdc-select-value {
+      font-size: 14px !important;
+    }
+    
+    .mat-mdc-select-trigger {
+      font-size: 14px !important;
+    }
+  }
+  
+  .mat-mdc-option {
+    font-size: 14px !important;
+  }
+  
+  mat-error {
+    font-size: 12px !important;
+  }
+}
+
+/* Global dropdown options font size for modal contexts - High specificity */
+.cdk-overlay-container .cdk-overlay-pane .mat-mdc-select-panel .mat-mdc-option {
+  font-size: 14px !important;
+  
+  .mdc-list-item__primary-text {
+    font-size: 14px !important;
+  }
+  
+  span {
+    font-size: 14px !important;
+  }
+}
+
+/* Ensure dropdown text is smaller in all contexts */
+.mat-mdc-select-panel .mat-mdc-option {
+  font-size: 14px !important;
+  line-height: 20px !important;
+  min-height: 44px !important;
+}
+
+.mat-mdc-option .mdc-list-item__primary-text {
+  font-size: 14px !important;
+}
+
+/* Override Material Design defaults with even higher specificity */
+.cdk-overlay-pane[aria-label*="select"] .mat-mdc-option,
+.cdk-overlay-pane .mat-mdc-select-panel .mat-mdc-option {
+  font-size: 14px !important;
+}

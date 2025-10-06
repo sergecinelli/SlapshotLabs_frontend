@@ -35,9 +35,23 @@ export class GoalieService {
     return of(true).pipe(delay(300));
   }
 
-  updateGoalie(goalie: Partial<Goalie>): Observable<Goalie> {
+  addGoalie(goalieData: Partial<Goalie>): Observable<Goalie> {
+    // Simulate add operation
+    const newGoalie: Goalie = {
+      id: 'goalie-' + Date.now().toString(),
+      ...goalieData
+    } as Goalie;
+    console.log(`Add new goalie:`, newGoalie);
+    return of(newGoalie).pipe(delay(300));
+  }
+
+  updateGoalie(id: string, goalieData: Partial<Goalie>): Observable<Goalie> {
     // Simulate update operation
-    console.log(`Update goalie:`, goalie);
-    return of(goalie as Goalie).pipe(delay(300));
+    const updatedGoalie: Goalie = {
+      id,
+      ...goalieData
+    } as Goalie;
+    console.log(`Update goalie with ID ${id}:`, updatedGoalie);
+    return of(updatedGoalie).pipe(delay(300));
   }
 }
