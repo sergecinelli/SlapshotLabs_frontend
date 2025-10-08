@@ -1,0 +1,86 @@
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ActivatedRoute, Router } from '@angular/router';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatCardModule } from '@angular/material/card';
+import { MatDividerModule } from '@angular/material/divider';
+import { GoalieService } from '../../services/goalie.service';
+import { Goalie } from '../../shared/interfaces/goalie.interface';
+
+@Component({
+  selector: 'app-goalie-profile',
+  standalone: true,
+  imports: [
+    CommonModule,
+    MatButtonModule,
+    MatIconModule,
+    MatCardModule,
+    MatDividerModule
+  ],
+  templateUrl: './goalie-profile.html',
+  styleUrl: './goalie-profile.scss'
+})
+export class GoalieProfileComponent implements OnInit {
+  goalie: Goalie | null = null;
+  loading = true;
+
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router,
+    private goalieService: GoalieService
+  ) {}
+
+  ngOnInit(): void {
+    const goalieId = this.route.snapshot.paramMap.get('id');
+    if (goalieId) {
+      this.loadGoalie(goalieId);
+    } else {
+      this.router.navigate(['/goalies']);
+    }
+  }
+
+  private loadGoalie(id: string): void {
+    this.goalieService.getGoalieById(id).subscribe({
+      next: (goalie) => {
+        if (goalie) {
+          this.goalie = goalie;
+          this.loading = false;
+        } else {
+          console.error('Goalie not found');
+          this.loading = false;
+          this.router.navigate(['/goalies']);
+        }
+      },
+      error: (error) => {
+        console.error('Error loading goalie:', error);
+        this.loading = false;
+        this.router.navigate(['/goalies']);
+      }
+    });
+  }
+
+  calculateAge(): number {
+    if (!this.goalie) return 0;
+    const currentYear = new Date().getFullYear();
+    return currentYear - this.goalie.birthYear;
+  }
+
+  calculateSavePercentage(): string {
+    if (!this.goalie || this.goalie.shotsOnGoal === 0) return '0.00';
+    const savePercentage = (this.goalie.saves / this.goalie.shotsOnGoal) * 100;
+    return savePercentage.toFixed(2);
+  }
+
+  calculateGoalsAgainstAverage(): string {
+    if (!this.goalie || this.goalie.gamesPlayed === 0) return '0.00';
+    const gaa = this.goalie.goalsAgainst / this.goalie.gamesPlayed;
+    return gaa.toFixed(2);
+  }
+
+  calculateWinPercentage(): string {
+    if (!this.goalie || this.goalie.gamesPlayed === 0) return '0.00';
+    const winPercentage = (this.goalie.wins / this.goalie.gamesPlayed) * 100;
+    return winPercentage.toFixed(1);
+  }
+}

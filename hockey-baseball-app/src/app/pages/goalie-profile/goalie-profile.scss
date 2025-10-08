@@ -1,0 +1,365 @@
+.goalie-profile-page {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+  
+  .back-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--color-secondary);
+    border-color: var(--color-secondary);
+    
+    &:hover {
+      background-color: rgba(119, 143, 156, 0.1);
+    }
+  }
+  
+  .loading-container {
+    text-align: center;
+    padding: 48px;
+    color: var(--color-secondary);
+    font-size: 1.125rem;
+  }
+  
+  .error-container {
+    text-align: center;
+    padding: 48px;
+    color: var(--color-dark);
+    
+    p {
+      font-size: 1.125rem;
+      margin-bottom: 24px;
+      color: var(--color-secondary);
+    }
+  }
+  
+  .profile-content {
+    
+    .profile-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 32px;
+      padding: 24px;
+      background-color: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      
+      .player-info {
+        flex: 1;
+        
+        .player-name {
+          font-size: 2rem;
+          font-weight: 600;
+          color: var(--color-dark);
+          margin: 0 0 16px 0;
+        }
+        
+        .player-details {
+          display: flex;
+          gap: 16px;
+          
+          .team {
+            background-color: var(--color-primary);
+            color: white;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: 500;
+            font-size: 0.75rem;
+          }
+          
+          .position {
+            background-color: var(--color-secondary);
+            color: white;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: 500;
+            font-size: 0.75rem;
+          }
+          
+          .jersey {
+            background-color: var(--color-dark);
+            color: white;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: 500;
+            font-size: 0.75rem;
+          }
+        }
+      }
+      
+      .player-avatar {
+        .avatar-icon {
+          font-size: 4.5rem;
+          width: 4.5rem;
+          height: 4.5rem;
+          color: var(--color-secondary);
+          background-color: #f3f4f6;
+          border-radius: 50%;
+          padding: 18px;
+        }
+      }
+    }
+    
+    .info-card {
+      margin-bottom: 32px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      
+      &:last-child {
+        margin-bottom: 0;
+      }
+      
+      mat-card-header {
+        padding-bottom: 8px;
+        
+        mat-card-title {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          color: var(--color-dark);
+          font-size: 1.125rem;
+          font-weight: 500;
+          
+          mat-icon {
+            color: var(--color-primary);
+            font-size: 1.125rem;
+            display: flex;
+            align-items: center;
+          }
+        }
+      }
+      
+      mat-card-content {
+        padding-top: 16px;
+        
+        .info-grid {
+          display: flex;
+          flex-wrap: nowrap; /* keep everything in one row */
+          gap: 24px; /* spacing between items */
+          
+          .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px; /* reduced gap between label and value */
+            min-width: 0; /* allow text to wrap if needed */
+            flex: 1; /* grow equally to fill available space */
+            text-align: center; /* center align content within each item */
+            
+            &.full-width {
+              flex-basis: 100%; /* full width when needed */
+            }
+            
+            .label {
+              font-weight: 500;
+              color: var(--color-secondary);
+              font-size: 0.75rem;
+              text-transform: uppercase;
+              letter-spacing: 0.5px;
+            }
+            
+            .value {
+              font-weight: 500;
+              color: var(--color-dark);
+              font-size: 0.875rem;
+            }
+          }
+        }
+        
+        .stats-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+          gap: 16px;
+          margin-bottom: 16px;
+          
+          &:last-child {
+            margin-bottom: 0;
+          }
+          
+          .stat-item {
+            text-align: center;
+            padding: 12px 8px;
+            
+            &.highlight {
+              background-color: #f9fafb;
+              border-radius: 12px;
+              border: 2px solid var(--color-primary);
+              
+              .stat-value {
+                color: var(--color-primary);
+                font-size: 1.25rem;
+                font-weight: 600;
+              }
+              
+              .stat-label {
+                color: var(--color-primary);
+                font-weight: 500;
+              }
+            }
+            
+            .stat-value {
+              display: block;
+              font-size: 1.25rem;
+              font-weight: 500;
+              color: var(--color-dark);
+              margin-bottom: 4px;
+            }
+            
+            .stat-label {
+              display: block;
+              font-size: 0.625rem;
+              color: var(--color-secondary);
+              text-transform: uppercase;
+              letter-spacing: 0.5px;
+              font-weight: 500;
+            }
+          }
+        }
+        
+        .rink-info {
+          .info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px solid #f3f4f6;
+            
+            &:last-child {
+              border-bottom: none;
+            }
+            
+            &.full-width {
+              flex-direction: column;
+              align-items: flex-start;
+              gap: 8px;
+            }
+            
+            .label {
+              font-weight: 500;
+              color: var(--color-secondary);
+              min-width: 120px;
+              font-size: 0.875rem;
+              text-transform: uppercase;
+              letter-spacing: 0.5px;
+            }
+            
+            .value {
+              font-weight: 600;
+              color: var(--color-dark);
+              text-align: right;
+              font-size: 1rem;
+            }
+            
+            &.full-width .value {
+              text-align: left;
+            }
+          }
+        }
+        
+        mat-divider {
+          margin: 16px 0; /* reduced from 24px */
+          border-color: var(--color-primary) !important;
+          border-top-width: 2px !important;
+        }
+      }
+    }
+  }
+}
+
+// Responsive Design
+@media (max-width: 1024px) {
+  .goalie-profile-page {
+    padding: 16px;
+    
+    .profile-content {
+      .profile-header {
+        padding: 20px;
+        
+        .player-info .player-name {
+          font-size: 1.875rem; /* reduced by 2px from 2rem */
+        }
+        
+        .player-avatar .avatar-icon {
+          font-size: 4rem;
+          width: 4rem;
+          height: 4rem;
+          padding: 16px;
+        }
+      }
+      
+      .info-card {
+        margin-bottom: 24px;
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .goalie-profile-page {
+    padding: 12px;
+    
+    .profile-content {
+      .profile-header {
+        flex-direction: column;
+        gap: 20px;
+        text-align: center;
+        padding: 16px;
+        
+        .player-info .player-name {
+          font-size: 1.625rem; /* reduced by 2px from 1.75rem */
+        }
+        
+        .player-details {
+          justify-content: center;
+          flex-wrap: wrap;
+        }
+      }
+      
+      .info-card {
+        margin-bottom: 16px;
+        
+        mat-card-content {
+          .info-grid {
+            flex-direction: column !important; /* stack vertically on mobile */
+            gap: 16px;
+          }
+          
+          .stats-grid {
+            grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)) !important;
+            gap: 12px; /* reduced from 16px */
+            
+            .stat-item {
+              padding: 10px 6px; /* reduced from 16px 8px */
+              
+              &.highlight .stat-value {
+                font-size: 1.375rem; /* reduced by 2px from 1.5rem */
+                font-weight: 600;
+              }
+              
+              .stat-value {
+                font-size: 1rem; /* reduced by 2px from 1.125rem */
+                font-weight: 500;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// Global override for mat-divider to make them red with 2px width
+::ng-deep .goalie-profile-page {
+  mat-divider {
+    border-top-color: var(--color-primary) !important;
+    border-color: var(--color-primary) !important;
+    border-top-width: 2px !important;
+  }
+  
+  .mat-divider {
+    border-top-color: var(--color-primary) !important;
+    border-color: var(--color-primary) !important;
+    border-top-width: 2px !important;
+  }
+}
