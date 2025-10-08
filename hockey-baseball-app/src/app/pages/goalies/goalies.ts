@@ -5,10 +5,10 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header';
-import { DataTableComponent, TableColumn, TableAction } from '../../shared/components/data-table/data-table.component';
+import { DataTableComponent, TableColumn, TableAction } from '../../shared/components/data-table/data-table';
 import { GoalieService } from '../../services/goalie.service';
 import { Goalie } from '../../shared/interfaces/goalie.interface';
-import { GoalieFormModalComponent, GoalieFormModalData } from '../../shared/components/goalie-form-modal/goalie-form-modal.component';
+import { GoalieFormModalComponent, GoalieFormModalData } from '../../shared/components/goalie-form-modal/goalie-form-modal';
 
 @Component({
   selector: 'app-goalies',
@@ -41,7 +41,7 @@ import { GoalieFormModalComponent, GoalieFormModalData } from '../../shared/comp
       ></app-data-table>
     </div>
   `,
-  styleUrl: './goalies.component.scss'
+  styleUrl: './goalies.scss'
 })
 export class GoaliesComponent implements OnInit {
   goalies = signal<Goalie[]>([]);

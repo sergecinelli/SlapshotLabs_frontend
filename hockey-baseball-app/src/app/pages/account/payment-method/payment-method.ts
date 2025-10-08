@@ -3,12 +3,12 @@ import { CommonModule } from '@angular/common';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header';
 
 @Component({
-  selector: 'app-payment-history',
+  selector: 'app-payment-method',
   standalone: true,
   imports: [CommonModule, PageHeaderComponent],
   template: `
     <div class="p-6 pt-0">
-      <app-page-header title="Payment History"></app-page-header>
+      <app-page-header title="Payment Method"></app-page-header>
       <div class="flex items-center justify-center h-96">
         <div class="text-center">
           <p class="text-custom-secondary">This feature will be implemented in the future.</p>
@@ -16,6 +16,6 @@ import { PageHeaderComponent } from '../../../shared/components/page-header/page
       </div>
     </div>
   `,
-  styleUrl: './payment-history.component.scss'
+  styleUrl: './payment-method.scss'
 })
-export class PaymentHistoryComponent {}
+export class PaymentMethodComponent {}

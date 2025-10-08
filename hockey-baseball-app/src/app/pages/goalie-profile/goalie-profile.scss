@@ -136,19 +136,19 @@
         
         .info-grid {
           display: flex;
-          flex-wrap: nowrap; /* keep everything in one row */
-          gap: 24px; /* spacing between items */
+          flex-wrap: nowrap;
+          gap: 24px;
           
           .info-item {
             display: flex;
             flex-direction: column;
-            gap: 6px; /* reduced gap between label and value */
-            min-width: 0; /* allow text to wrap if needed */
-            flex: 1; /* grow equally to fill available space */
-            text-align: center; /* center align content within each item */
+            gap: 6px;
+            min-width: 0;
+            flex: 1;
+            text-align: center;
             
             &.full-width {
-              flex-basis: 100%; /* full width when needed */
+              flex-basis: 100%;
             }
             
             .label {
@@ -258,7 +258,7 @@
         }
         
         mat-divider {
-          margin: 16px 0; /* reduced from 24px */
+          margin: 16px 0;
           border-color: var(--color-primary) !important;
           border-top-width: 2px !important;
         }
@@ -267,7 +267,6 @@
   }
 }
 
-// Responsive Design
 @media (max-width: 1024px) {
   .goalie-profile-page {
     padding: 16px;
@@ -277,7 +276,7 @@
         padding: 20px;
         
         .player-info .player-name {
-          font-size: 1.875rem; /* reduced by 2px from 2rem */
+          font-size: 1.875rem;
         }
         
         .player-avatar .avatar-icon {
@@ -307,7 +306,7 @@
         padding: 16px;
         
         .player-info .player-name {
-          font-size: 1.625rem; /* reduced by 2px from 1.75rem */
+          font-size: 1.625rem;
         }
         
         .player-details {
@@ -321,24 +320,24 @@
         
         mat-card-content {
           .info-grid {
-            flex-direction: column !important; /* stack vertically on mobile */
+            flex-direction: column !important;
             gap: 16px;
           }
           
           .stats-grid {
             grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)) !important;
-            gap: 12px; /* reduced from 16px */
+            gap: 12px;
             
             .stat-item {
-              padding: 10px 6px; /* reduced from 16px 8px */
+              padding: 10px 6px;
               
               &.highlight .stat-value {
-                font-size: 1.375rem; /* reduced by 2px from 1.5rem */
+                font-size: 1.375rem;
                 font-weight: 600;
               }
               
               .stat-value {
-                font-size: 1rem; /* reduced by 2px from 1.125rem */
+                font-size: 1rem;
                 font-weight: 500;
               }
             }
@@ -349,7 +348,6 @@
   }
 }
 
-// Global override for mat-divider to make them red with 2px width
 ::ng-deep .goalie-profile-page {
   mat-divider {
     border-top-color: var(--color-primary) !important;

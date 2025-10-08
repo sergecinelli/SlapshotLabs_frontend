@@ -16,6 +16,6 @@ import { PageHeaderComponent } from '../../shared/components/page-header/page-he
       </div>
     </div>
   `,
-  styleUrl: './dashboard.component.scss'
+  styleUrl: './dashboard.scss'
 })
 export class DashboardComponent {}

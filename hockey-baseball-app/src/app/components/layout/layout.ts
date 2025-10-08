@@ -8,8 +8,8 @@ import { IconService } from '../../services/icon.service';
   selector: 'app-layout',
   standalone: true,
   imports: [CommonModule, RouterOutlet],
-  templateUrl: './layout.component.html',
-  styleUrl: './layout.component.scss'
+  templateUrl: './layout.html',
+  styleUrl: './layout.scss'
 })
 export class LayoutComponent {
   constructor(

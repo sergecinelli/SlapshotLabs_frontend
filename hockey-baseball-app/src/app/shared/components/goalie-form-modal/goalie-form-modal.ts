@@ -29,8 +29,8 @@ export interface GoalieFormModalData {
     MatIconModule,
     MatDividerModule
   ],
-  templateUrl: './goalie-form-modal.component.html',
-  styleUrl: './goalie-form-modal.component.scss'
+  templateUrl: './goalie-form-modal.html',
+  styleUrl: './goalie-form-modal.scss'
 })
 export class GoalieFormModalComponent implements OnInit {
   goalieForm: FormGroup;

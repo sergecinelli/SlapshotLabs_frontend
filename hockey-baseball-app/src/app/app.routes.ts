@@ -3,20 +3,20 @@ import { SignInComponent } from './components/sign-in/sign-in';
 import { SignUpComponent } from './components/sign-up/sign-up';
 import { ForgotPasswordComponent } from './components/forgot-password/forgot-password';
 import { ResetPasswordComponent } from './components/reset-password/reset-password';
-import { LayoutComponent } from './components/layout/layout.component';
+import { LayoutComponent } from './components/layout/layout';
 
 // Page Components
-import { DashboardComponent } from './pages/dashboard/dashboard.component';
-import { ProfileComponent } from './pages/account/profile/profile.component';
-import { PaymentMethodComponent } from './pages/account/payment-method/payment-method.component';
-import { PaymentHistoryComponent } from './pages/account/payment-history/payment-history.component';
-import { GoaliesComponent } from './pages/goalies/goalies.component';
+import { DashboardComponent } from './pages/dashboard/dashboard';
+import { ProfileComponent } from './pages/account/profile/profile';
+import { PaymentMethodComponent } from './pages/account/payment-method/payment-method';
+import { PaymentHistoryComponent } from './pages/account/payment-history/payment-history';
+import { GoaliesComponent } from './pages/goalies/goalies';
 import { GoalieProfileComponent } from './pages/goalie-profile/goalie-profile';
-import { PlayersComponent } from './pages/players/players.component';
-import { TeamsComponent } from './pages/teams/teams.component';
-import { ScheduleComponent } from './pages/schedule/schedule.component';
-import { AnalyticsComponent } from './pages/analytics/analytics.component';
-import { VideoLibraryComponent } from './pages/video-library/video-library.component';
+import { PlayersComponent } from './pages/players/players';
+import { TeamsComponent } from './pages/teams/teams';
+import { ScheduleComponent } from './pages/schedule/schedule';
+import { AnalyticsComponent } from './pages/analytics/analytics';
+import { VideoLibraryComponent } from './pages/video-library/video-library';
 
 export const routes: Routes = [
   // Authentication routes

@@ -3,12 +3,12 @@ import { CommonModule } from '@angular/common';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header';
 
 @Component({
-  selector: 'app-players',
+  selector: 'app-analytics',
   standalone: true,
   imports: [CommonModule, PageHeaderComponent],
   template: `
     <div class="p-6 pt-0">
-      <app-page-header title="Players"></app-page-header>
+      <app-page-header title="Analytics"></app-page-header>
       <div class="flex items-center justify-center h-96">
         <div class="text-center">
           <p class="text-custom-secondary">This feature will be implemented in the future.</p>
@@ -16,6 +16,6 @@ import { PageHeaderComponent } from '../../shared/components/page-header/page-he
       </div>
     </div>
   `,
-  styleUrl: './players.component.scss'
+  styleUrl: './analytics.scss'
 })
-export class PlayersComponent {}
+export class AnalyticsComponent {}

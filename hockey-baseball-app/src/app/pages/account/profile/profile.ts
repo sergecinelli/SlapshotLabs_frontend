@@ -18,8 +18,8 @@ import { Router } from '@angular/router';
     AuthButtonComponent,
     PageHeaderComponent,
   ],
-  templateUrl: './profile.component.html',
-  styleUrl: './profile.component.scss'
+  templateUrl: './profile.html',
+  styleUrl: './profile.scss'
 })
 export class ProfileComponent {
   profileForm: FormGroup;

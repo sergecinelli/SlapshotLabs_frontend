@@ -29,8 +29,8 @@ export interface TableAction {
   selector: 'app-data-table',
   standalone: true,
   imports: [CommonModule, MatTableModule, MatButtonModule, MatSortModule, MatProgressSpinnerModule, MatTooltipModule],
-  templateUrl: './data-table.component.html',
-  styleUrl: './data-table.component.scss',
+  templateUrl: './data-table.html',
+  styleUrl: './data-table.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DataTableComponent implements AfterViewInit {

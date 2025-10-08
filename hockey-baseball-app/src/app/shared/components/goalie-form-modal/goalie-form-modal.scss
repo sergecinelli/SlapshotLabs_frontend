@@ -8,7 +8,6 @@
   will-change: transform;
   backface-visibility: hidden;
   
-  // Force smaller font sizes for all form elements
   ::ng-deep .mat-mdc-form-field {
     font-size: 14px !important;
     
@@ -155,7 +154,6 @@
   }
 }
 
-// Global overrides for this modal
 ::ng-deep .goalie-form-modal-dialog {
   .cdk-overlay-backdrop {
     background-color: rgba(0, 0, 0, 0.5) !important;
@@ -175,7 +173,6 @@
     }
   }
   
-  // Input field font size reductions
   .mat-mdc-form-field {
     font-size: 14px !important;
     
@@ -208,7 +205,6 @@
     font-size: 12px !important;
   }
   
-  // Additional targeting for Material Design classes
   .mdc-text-field__input {
     font-size: 14px !important;
   }
@@ -230,7 +226,6 @@
   }
 }
 
-// Target dropdown options that appear in overlays from this modal
 ::ng-deep .cdk-overlay-container .mat-mdc-select-panel {
   .mat-mdc-option {
     font-size: 14px !important;
@@ -245,7 +240,6 @@
   }
 }
 
-// Comprehensive border radius fix
 ::ng-deep .goalie-form-modal-dialog {
   .mat-mdc-dialog-container .mdc-dialog__surface,
   .mat-mdc-dialog-surface,
@@ -255,14 +249,12 @@
     overflow: hidden !important;
   }
   
-  // Ensure the container itself has border radius
   .mat-mdc-dialog-container {
     border-radius: 12px !important;
     overflow: hidden !important;
   }
 }
 
-// Responsive design
 @media (max-width: 768px) {
   .goalie-form-modal {
     max-width: 95vw;
