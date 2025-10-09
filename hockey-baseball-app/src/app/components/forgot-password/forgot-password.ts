@@ -1,7 +1,7 @@
 import { Component, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { EmailService } from '../../services/email.service';
+import { AuthService } from '../../services/auth.service';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { AuthLayoutComponent } from '../../shared/components/auth-layout/auth-layout';
@@ -35,7 +35,7 @@ export class ForgotPasswordComponent implements OnDestroy {
 
   constructor(
     private router: Router, 
-    private emailService: EmailService,
+    private authService: AuthService,
     private formBuilder: FormBuilder
   ) {
     this.forgotPasswordForm = this.formBuilder.group({
@@ -64,7 +64,7 @@ export class ForgotPasswordComponent implements OnDestroy {
     this.isLoading = true;
     const email = this.forgotPasswordForm.get('email')?.value;
     
-    this.emailService.sendPasswordResetEmail(email).subscribe({
+    this.authService.requestPasswordReset(email).subscribe({
       next: (response) => {
         console.log('Password reset email sent:', response);
         this.isEmailSent = true;
@@ -73,7 +73,7 @@ export class ForgotPasswordComponent implements OnDestroy {
       },
       error: (error) => {
         console.error('Error sending password reset email:', error);
-        this.errorMessage = 'Failed to send email. Please try again.';
+        this.errorMessage = error.message || 'Failed to send email. Please try again.';
         this.isLoading = false;
       }
     });

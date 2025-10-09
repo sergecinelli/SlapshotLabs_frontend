@@ -3,6 +3,7 @@ import { RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { NavigationService, NavigationItem } from '../../services/navigation.service';
 import { IconService } from '../../services/icon.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-layout',
@@ -14,7 +15,8 @@ import { IconService } from '../../services/icon.service';
 export class LayoutComponent {
   constructor(
     private navigationService: NavigationService,
-    private iconService: IconService
+    private iconService: IconService,
+    private authService: AuthService
   ) {}
 
   protected get navigationItems() {
@@ -46,7 +48,17 @@ export class LayoutComponent {
   }
 
   protected logout(): void {
-    this.navigationService.navigate('/sign-in');
+    this.authService.signOut().subscribe({
+      next: () => {
+        console.log('Successfully signed out');
+        this.navigationService.navigate('/sign-in');
+      },
+      error: (error) => {
+        console.error('Error during sign out:', error);
+        // Navigate to sign-in anyway as the local state is cleared
+        this.navigationService.navigate('/sign-in');
+      }
+    });
   }
 
   protected getIconPath(iconName?: string): string {

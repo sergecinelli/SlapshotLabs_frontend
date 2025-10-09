@@ -4,6 +4,8 @@ import { SignUpComponent } from './components/sign-up/sign-up';
 import { ForgotPasswordComponent } from './components/forgot-password/forgot-password';
 import { ResetPasswordComponent } from './components/reset-password/reset-password';
 import { LayoutComponent } from './components/layout/layout';
+import { AuthGuard } from './shared/guards/auth.guard';
+import { GuestGuard } from './shared/guards/guest.guard';
 
 // Page Components
 import { DashboardComponent } from './pages/dashboard/dashboard';
@@ -20,21 +22,22 @@ import { VideoLibraryComponent } from './pages/video-library/video-library';
 
 export const routes: Routes = [
   // Authentication routes
-  { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
-  { path: 'sign-in', component: SignInComponent },
-  { path: 'sign-up', component: SignUpComponent },
-  { path: 'forgot-password', component: ForgotPasswordComponent },
-  { path: 'reset-password', component: ResetPasswordComponent },
+  { path: 'sign-in', component: SignInComponent, canActivate: [GuestGuard] },
+  { path: 'sign-up', component: SignUpComponent, canActivate: [GuestGuard] },
+  { path: 'forgot-password', component: ForgotPasswordComponent, canActivate: [GuestGuard] },
+  { path: 'reset-password', component: ResetPasswordComponent, canActivate: [GuestGuard] },
   
   // Main application routes with layout
   {
     path: '',
     component: LayoutComponent,
+    canActivate: [AuthGuard],
     children: [
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       { path: 'dashboard', component: DashboardComponent },
       
       // Account routes
-      { path: 'account', redirectTo: '/account/profile', pathMatch: 'full' },
+      { path: 'account', redirectTo: 'account/profile', pathMatch: 'full' },
       { path: 'account/profile', component: ProfileComponent },
       { path: 'account/payment-method', component: PaymentMethodComponent },
       { path: 'account/payment-history', component: PaymentHistoryComponent },

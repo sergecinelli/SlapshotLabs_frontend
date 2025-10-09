@@ -1,12 +1,15 @@
-import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { Router, ActivatedRoute } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { AuthLayoutComponent } from '../../shared/components/auth-layout/auth-layout';
 import { AuthButtonComponent } from '../../shared/components/auth-button/auth-button';
 import { AuthLinkComponent } from '../../shared/components/auth-link/auth-link';
+import { AuthService } from '../../services/auth.service';
+import { UserSignInForm } from '../../shared/interfaces/auth.interfaces';
 
 @Component({
   selector: 'app-sign-in',
@@ -23,15 +26,28 @@ import { AuthLinkComponent } from '../../shared/components/auth-link/auth-link';
   templateUrl: './sign-in.html',
   styleUrl: './sign-in.scss',
 })
-export class SignInComponent {
+export class SignInComponent implements OnInit {
   signInForm: FormGroup;
+  isLoading = false;
+  returnUrl: string = '/dashboard';
   
-  constructor(private router: Router, private formBuilder: FormBuilder) {
+  constructor(
+    private router: Router,
+    private route: ActivatedRoute,
+    private formBuilder: FormBuilder,
+    private authService: AuthService,
+    private snackBar: MatSnackBar
+  ) {
     this.signInForm = this.formBuilder.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
       rememberMe: [false]
     });
+  }
+
+  ngOnInit() {
+    // Get the return URL from route parameters or default to '/dashboard'
+    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/dashboard';
   }
 
   onSubmit() {
@@ -40,15 +56,36 @@ export class SignInComponent {
       return;
     }
 
-    const formValue = this.signInForm.value;
-    console.log('Sign in attempt:', {
-      email: formValue.email,
-      password: '***',
-      rememberMe: formValue.rememberMe
+    this.isLoading = true;
+    const formValue: UserSignInForm = {
+      email: this.signInForm.value.email,
+      password: this.signInForm.value.password,
+      rememberMe: this.signInForm.value.rememberMe || false
+    };
+
+    this.authService.signIn(formValue).subscribe({
+      next: () => {
+        this.isLoading = false;
+        this.snackBar.open('Successfully signed in!', 'Close', {
+          duration: 3000,
+          panelClass: ['success-snackbar']
+        });
+        // Navigate to intended route
+        this.router.navigate([this.returnUrl]);
+      },
+      error: (error) => {
+        this.isLoading = false;
+        this.snackBar.open(
+          error.message || 'Sign in failed. Please try again.', 
+          'Close', 
+          {
+            duration: 5000,
+            panelClass: ['error-snackbar']
+          }
+        );
+        console.error('Sign in error:', error);
+      }
     });
-    
-    // TODO: Implement actual authentication logic
-    alert('Sign in functionality would be implemented here!');
   }
 
   navigateToSignUp() {
