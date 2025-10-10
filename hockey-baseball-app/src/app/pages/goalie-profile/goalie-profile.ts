@@ -41,20 +41,26 @@ export class GoalieProfileComponent implements OnInit {
   }
 
   private loadGoalie(id: string): void {
+    this.loading = true;
+    console.log(`Loading goalie with ID: ${id}`);
+    
     this.goalieService.getGoalieById(id).subscribe({
       next: (goalie) => {
         if (goalie) {
+          console.log('Goalie loaded successfully:', goalie);
           this.goalie = goalie;
-          this.loading = false;
         } else {
-          console.error('Goalie not found');
-          this.loading = false;
+          console.error(`Goalie not found with ID: ${id}`);
+          // Could redirect to 404 page or show error message
+          // For now, navigate back to goalies list
           this.router.navigate(['/goalies']);
         }
+        this.loading = false;
       },
       error: (error) => {
         console.error('Error loading goalie:', error);
         this.loading = false;
+        // Could show a user-friendly error message here
         this.router.navigate(['/goalies']);
       }
     });

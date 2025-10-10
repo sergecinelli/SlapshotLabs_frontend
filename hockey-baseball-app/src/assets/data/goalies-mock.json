@@ -29,7 +29,8 @@
       "assists": 2,
       "points": 2,
       "ppga": 5,
-      "shga": 1
+      "shga": 1,
+      "savesAboveAvg": 15
     },
     {
       "id": "goalie-002",
@@ -60,7 +61,8 @@
       "assists": 1,
       "points": 1,
       "ppga": 3,
-      "shga": 0
+      "shga": 0,
+      "savesAboveAvg": 12
     },
     {
       "id": "goalie-003",
@@ -91,7 +93,8 @@
       "assists": 3,
       "points": 3,
       "ppga": 8,
-      "shga": 2
+      "shga": 2,
+      "savesAboveAvg": 20
     },
     {
       "id": "goalie-004",
@@ -122,7 +125,8 @@
       "assists": 0,
       "points": 0,
       "ppga": 2,
-      "shga": 1
+      "shga": 1,
+      "savesAboveAvg": 8
     },
     {
       "id": "goalie-005",
@@ -153,7 +157,8 @@
       "assists": 1,
       "points": 1,
       "ppga": 6,
-      "shga": 1
+      "shga": 1,
+      "savesAboveAvg": 18
     },
     {
       "id": "goalie-006",
@@ -184,7 +189,8 @@
       "assists": 2,
       "points": 3,
       "ppga": 7,
-      "shga": 0
+      "shga": 0,
+      "savesAboveAvg": 25
     },
     {
       "id": "goalie-007",
@@ -215,7 +221,8 @@
       "assists": 0,
       "points": 0,
       "ppga": 4,
-      "shga": 2
+      "shga": 2,
+      "savesAboveAvg": 6
     },
     {
       "id": "goalie-008",
@@ -246,7 +253,8 @@
       "assists": 1,
       "points": 1,
       "ppga": 1,
-      "shga": 0
+      "shga": 0,
+      "savesAboveAvg": 10
     },
     {
       "id": "goalie-009",
@@ -277,7 +285,8 @@
       "assists": 2,
       "points": 2,
       "ppga": 5,
-      "shga": 3
+      "shga": 3,
+      "savesAboveAvg": 14
     },
     {
       "id": "goalie-010",
@@ -308,7 +317,8 @@
       "assists": 1,
       "points": 1,
       "ppga": 6,
-      "shga": 1
+      "shga": 1,
+      "savesAboveAvg": 22
     }
   ],
   "total": 10

@@ -8,15 +8,15 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
-import { Goalie } from '../../interfaces/goalie.interface';
+import { Player } from '../../interfaces/player.interface';
 
-export interface GoalieFormModalData {
-  goalie?: Goalie;
+export interface PlayerFormModalData {
+  player?: Player;
   isEditMode: boolean;
 }
 
 @Component({
-  selector: 'app-goalie-form-modal',
+  selector: 'app-player-form-modal',
   standalone: true,
   imports: [
     CommonModule,
@@ -29,16 +29,24 @@ export interface GoalieFormModalData {
     MatIconModule,
     MatDividerModule
   ],
-  templateUrl: './goalie-form-modal.html',
-  styleUrl: './goalie-form-modal.scss'
+  templateUrl: './player-form-modal.html',
+  styleUrl: './player-form-modal.scss'
 })
-export class GoalieFormModalComponent implements OnInit {
-  goalieForm: FormGroup;
+export class PlayerFormModalComponent implements OnInit {
+  playerForm: FormGroup;
   isEditMode: boolean;
 
   shootsOptions = [
     { value: 'Right Shot', label: 'Right Shot' },
     { value: 'Left Shot', label: 'Left Shot' }
+  ];
+
+  positionOptions = [
+    { value: 'Left Wing', label: 'Left Wing' },
+    { value: 'Center', label: 'Center' },
+    { value: 'Right Wing', label: 'Right Wing' },
+    { value: 'Left Defense', label: 'Left Defense' },
+    { value: 'Right Defense', label: 'Right Defense' }
   ];
 
   teamOptions = [
@@ -56,16 +64,16 @@ export class GoalieFormModalComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private dialogRef: MatDialogRef<GoalieFormModalComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: GoalieFormModalData
+    private dialogRef: MatDialogRef<PlayerFormModalComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: PlayerFormModalData
   ) {
     this.isEditMode = data.isEditMode;
-    this.goalieForm = this.createForm();
+    this.playerForm = this.createForm();
   }
 
   ngOnInit(): void {
-    if (this.isEditMode && this.data.goalie) {
-      this.populateForm(this.data.goalie);
+    if (this.isEditMode && this.data.player) {
+      this.populateForm(this.data.player);
     }
   }
 
@@ -74,96 +82,86 @@ export class GoalieFormModalComponent implements OnInit {
       firstName: ['', [Validators.required]],
       lastName: ['', [Validators.required]],
       team: [this.teamOptions[0]?.value || ''],
+      position: [this.positionOptions[1]?.value || 'Center'],
       jerseyNumber: ['', [Validators.min(1), Validators.max(99)]],
       height: [''],
       weight: ['', [Validators.min(1)]],
       shoots: [this.shootsOptions[0]?.value || ''],
       birthYear: ['', [Validators.min(1900), Validators.max(new Date().getFullYear())]],
       shotsOnGoal: ['', [Validators.min(0)]],
-      saves: ['', [Validators.min(0)]],
-      goalsAgainst: ['', [Validators.min(0)]],
       gamesPlayed: ['', [Validators.min(0)]],
-      wins: ['', [Validators.min(0)]],
-      losses: ['', [Validators.min(0)]],
       goals: ['', [Validators.min(0)]],
       assists: ['', [Validators.min(0)]],
-      ppga: ['', [Validators.min(0)]],
-      shga: ['', [Validators.min(0)]],
-      savesAboveAvg: ['', [Validators.min(-100)]]
+      scoringChances: ['', [Validators.min(0)]],
+      blockedShots: ['', [Validators.min(0)]],
+      penaltiesDrawn: ['', [Validators.min(0)]]
     });
   }
 
-  private populateForm(goalie: Goalie): void {
-    this.goalieForm.patchValue({
-      firstName: goalie.firstName,
-      lastName: goalie.lastName,
-      team: goalie.team,
-      jerseyNumber: goalie.jerseyNumber,
-      height: goalie.height,
-      weight: goalie.weight,
-      shoots: goalie.shoots,
-      birthYear: goalie.birthYear,
-      shotsOnGoal: goalie.shotsOnGoal,
-      saves: goalie.saves,
-      goalsAgainst: goalie.goalsAgainst,
-      gamesPlayed: goalie.gamesPlayed,
-      wins: goalie.wins,
-      losses: goalie.losses,
-      goals: goalie.goals,
-      assists: goalie.assists,
-      ppga: goalie.ppga,
-      shga: goalie.shga,
-      savesAboveAvg: goalie.savesAboveAvg
+  private populateForm(player: Player): void {
+    this.playerForm.patchValue({
+      firstName: player.firstName,
+      lastName: player.lastName,
+      team: player.team,
+      position: player.position,
+      jerseyNumber: player.jerseyNumber,
+      height: player.height,
+      weight: player.weight,
+      shoots: player.shoots,
+      birthYear: player.birthYear,
+      shotsOnGoal: player.shotsOnGoal,
+      gamesPlayed: player.gamesPlayed,
+      goals: player.goals,
+      assists: player.assists,
+      scoringChances: player.scoringChances,
+      blockedShots: player.blockedShots,
+      penaltiesDrawn: player.penaltiesDrawn
     });
   }
 
   onSubmit(): void {
-    if (this.goalieForm.valid) {
-      const formValue = this.goalieForm.value;
+    if (this.playerForm.valid) {
+      const formValue = this.playerForm.value;
       
-      const goalieData: Partial<Goalie> = {
+      const playerData: Partial<Player> = {
         firstName: formValue.firstName,
         lastName: formValue.lastName,
         team: formValue.team,
+        position: formValue.position,
         jerseyNumber: formValue.jerseyNumber,
         height: formValue.height,
         weight: formValue.weight,
         shoots: formValue.shoots,
         birthYear: formValue.birthYear,
         shotsOnGoal: formValue.shotsOnGoal,
-        saves: formValue.saves,
-        goalsAgainst: formValue.goalsAgainst,
         gamesPlayed: formValue.gamesPlayed,
-        wins: formValue.wins,
-        losses: formValue.losses,
         goals: formValue.goals || 0,
         assists: formValue.assists || 0,
-        ppga: formValue.ppga || 0,
-        shga: formValue.shga || 0,
-        savesAboveAvg: formValue.savesAboveAvg || 0,
+        scoringChances: formValue.scoringChances || 0,
+        blockedShots: formValue.blockedShots || 0,
+        penaltiesDrawn: formValue.penaltiesDrawn || 0,
         // Calculate derived values
         points: (formValue.goals || 0) + (formValue.assists || 0),
-        shotsOnGoalPerGame: formValue.gamesPlayed > 0 ? (formValue.shotsOnGoal || 0) / formValue.gamesPlayed : 0,
-        // Set position as Goalie (not editable)
-        position: 'Goalie',
-        // Use default rink data for now (since it's not in the form anymore)
+        shotSprayChart: '',
+        // Use default rink data for now
         rink: {
           facilityName: 'Default Facility',
           rinkName: 'Main Rink',
           city: 'City',
           address: 'Address'
-        }
+        },
+        level: 'Professional'
       };
 
-      if (this.isEditMode && this.data.goalie) {
-        goalieData.id = this.data.goalie.id;
+      if (this.isEditMode && this.data.player) {
+        playerData.id = this.data.player.id;
       }
 
-      this.dialogRef.close(goalieData);
+      this.dialogRef.close(playerData);
     } else {
       // Mark all fields as touched to show validation errors
-      Object.keys(this.goalieForm.controls).forEach(key => {
-        this.goalieForm.get(key)?.markAsTouched();
+      Object.keys(this.playerForm.controls).forEach(key => {
+        this.playerForm.get(key)?.markAsTouched();
       });
     }
   }
@@ -173,7 +171,7 @@ export class GoalieFormModalComponent implements OnInit {
   }
 
   getErrorMessage(fieldName: string): string {
-    const control = this.goalieForm.get(fieldName);
+    const control = this.playerForm.get(fieldName);
     if (control?.errors && control.touched) {
       if (control.errors['required']) {
         return `${this.getFieldLabel(fieldName)} is required`;
@@ -193,22 +191,19 @@ export class GoalieFormModalComponent implements OnInit {
       firstName: 'First Name',
       lastName: 'Last Name',
       team: 'Team',
+      position: 'Position',
       jerseyNumber: 'Jersey Number',
       height: 'Height',
       weight: 'Weight',
       shoots: 'Shoots',
       birthYear: 'Birth Year',
       shotsOnGoal: 'Shots on Goal',
-      saves: 'Saves',
-      goalsAgainst: 'Goals Against',
       gamesPlayed: 'Games Played',
-      wins: 'Wins',
-      losses: 'Losses',
       goals: 'Goals',
       assists: 'Assists',
-      ppga: 'PPGA',
-      shga: 'SHGA',
-      savesAboveAvg: 'Saves Above Average'
+      scoringChances: 'Scoring Chances',
+      blockedShots: 'Blocked Shots',
+      penaltiesDrawn: 'Penalties Drawn'
     };
     return labels[fieldName] || fieldName;
   }
