@@ -96,7 +96,6 @@ export class CsrfInterceptor implements HttpInterceptor {
     const publicEndpoints = [
       '/api/openapi.json',
       '/api/users/csrf',
-      // Add other public endpoints here if needed
     ];
     
     return publicEndpoints.some(endpoint => url.includes(endpoint));

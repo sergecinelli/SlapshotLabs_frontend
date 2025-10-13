@@ -26,7 +26,8 @@ export class CsrfTokenService {
 
     return this.http.post(this.csrfUrl, {}, {
       responseType: 'text',
-      observe: 'response'
+      observe: 'response',
+      withCredentials: true  // Ensure cookies are sent/received
     }).pipe(
       map(response => {
         // Try to get CSRF token from document.cookie (client-side)
