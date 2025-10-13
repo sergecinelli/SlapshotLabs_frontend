@@ -30,26 +30,36 @@ export class CsrfTokenService {
       withCredentials: true  // Ensure cookies are sent/received
     }).pipe(
       map(response => {
+        console.log('🔒 CSRF Service - Response received');
+        console.log('🔒 CSRF Service - All response headers:', response.headers.keys());
+        
         // Try to get CSRF token from document.cookie (client-side)
-        // Since browsers handle cookie setting automatically, we should read from document.cookie
         let csrfToken = '';
         if (typeof document !== 'undefined') {
           csrfToken = this.getCsrfTokenFromCookie();
+          console.log('🔒 CSRF Service - Cookie token result:', csrfToken ? 'FOUND' : 'NOT FOUND');
         }
         
-        // If still not found, try to extract from response headers (less reliable in browsers)
+        // If not found in cookies, try to extract from Set-Cookie header
         if (!csrfToken) {
-          const cookies = response.headers.get('set-cookie');
-          if (cookies) {
-            const csrfMatch = cookies.match(/csrftoken=([^;]+)/);
+          const setCookieHeader = response.headers.get('set-cookie');
+          console.log('🔒 CSRF Service - Set-Cookie header:', setCookieHeader);
+          
+          if (setCookieHeader) {
+            const csrfMatch = setCookieHeader.match(/csrftoken=([^;\s]+)/);
             if (csrfMatch) {
               csrfToken = csrfMatch[1];
+              console.log('🔒 CSRF Service - Extracted from Set-Cookie:', csrfToken.substring(0, 10) + '...');
             }
           }
         }
-
+        
+        // For cross-origin requests, browsers typically don't expose Set-Cookie headers
+        // Let's try a different approach - make a GET request that might return the token in response body
         if (!csrfToken) {
-          throw new Error('CSRF token not found. Please ensure your backend is setting the csrftoken cookie.');
+          console.log('🔒 CSRF Service - Token not found, this is likely a CORS issue');
+          console.log('🔒 CSRF Service - Backend needs to be configured to allow credentials from this origin');
+          throw new Error('CSRF token not found. This is likely due to CORS configuration. The backend needs to allow credentials from your frontend origin.');
         }
 
         this.csrfToken.next(csrfToken);
