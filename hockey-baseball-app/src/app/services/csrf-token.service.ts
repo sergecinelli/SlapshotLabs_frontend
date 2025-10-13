@@ -68,17 +68,25 @@ export class CsrfTokenService {
    */
   private getCsrfTokenFromCookie(): string {
     if (typeof document === 'undefined') {
+      console.log('🍪 CSRF Service - Document undefined (SSR)');
       return '';
     }
 
+    console.log('🍪 CSRF Service - All cookies:', document.cookie);
     const cookies = document.cookie.split(';');
+    console.log('🍪 CSRF Service - Cookie array:', cookies);
+    
     for (const cookie of cookies) {
       const [name, value] = cookie.trim().split('=');
+      console.log('🍪 CSRF Service - Checking cookie:', name, '=', value);
       // Django uses 'csrftoken' by default, but some configurations might use 'csrf'
       if (name === 'csrftoken' || name === 'csrf') {
-        return decodeURIComponent(value || '');
+        const decodedValue = decodeURIComponent(value || '');
+        console.log('🍪 CSRF Service - Found CSRF cookie:', name, '-> decoded:', decodedValue);
+        return decodedValue;
       }
     }
+    console.log('🍪 CSRF Service - No CSRF cookie found');
     return '';
   }
 
@@ -93,12 +101,19 @@ export class CsrfTokenService {
    * Get the current CSRF token synchronously
    */
   getCsrfTokenSync(): string | null {
+    console.log('🍪 CSRF Service - getCsrfTokenSync called');
+    console.log('🍪 CSRF Service - Current token:', this.csrfToken.value ? 'exists' : 'null');
+    console.log('🍪 CSRF Service - Is initialized:', this.isInitialized);
+    
     // Try to get from cookie if not initialized
     if (!this.csrfToken.value && typeof document !== 'undefined') {
+      console.log('🍪 CSRF Service - Trying to read from cookie...');
       const cookieToken = this.getCsrfTokenFromCookie();
+      console.log('🍪 CSRF Service - Cookie token:', cookieToken ? 'FOUND: ' + cookieToken.substring(0, 10) + '...' : 'NOT FOUND');
       if (cookieToken) {
         this.csrfToken.next(cookieToken);
         this.isInitialized = true;
+        console.log('🍪 CSRF Service - Token set from cookie');
       }
     }
     return this.csrfToken.value;

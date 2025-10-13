@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Observable, BehaviorSubject, of } from 'rxjs';
-import { map, tap, catchError, shareReplay } from 'rxjs/operators';
+import { Observable, BehaviorSubject, of, throwError } from 'rxjs';
+import { map, tap, catchError, shareReplay, switchMap } from 'rxjs/operators';
 import { ApiService } from './api.service';
 import { CsrfTokenService } from './csrf-token.service';
 import {
@@ -67,10 +67,19 @@ export class AuthService {
       remember_me: signInData.rememberMe
     };
 
-    return this.apiService.post<void>('/users/signin', signInRequest).pipe(
+    // Try to initialize CSRF token first, then sign in
+    return this.csrfTokenService.initializeCsrfToken().pipe(
+      switchMap(() => {
+        console.log('🔑 Auth Service - CSRF token initialized, proceeding with sign-in');
+        return this.apiService.post<void>('/users/signin', signInRequest);
+      }),
       tap(() => {
         // After successful sign-in, get user profile
         this.refreshCurrentUser().subscribe();
+      }),
+      catchError(error => {
+        console.error('😱 Auth Service - Sign-in failed:', error);
+        return throwError(() => error);
       })
     );
   }
