@@ -15,6 +15,7 @@ import { PaymentHistoryComponent } from './pages/account/payment-history/payment
 import { GoaliesComponent } from './pages/goalies/goalies';
 import { GoalieProfileComponent } from './pages/goalie-profile/goalie-profile';
 import { PlayersComponent } from './pages/players/players';
+import { PlayerProfileComponent } from './pages/player-profile/player-profile';
 import { TeamsComponent } from './pages/teams/teams';
 import { ScheduleComponent } from './pages/schedule/schedule';
 import { AnalyticsComponent } from './pages/analytics/analytics';
@@ -46,6 +47,7 @@ export const routes: Routes = [
       { path: 'goalies', component: GoaliesComponent },
       { path: 'goalie-profile/:id', component: GoalieProfileComponent },
       { path: 'players', component: PlayersComponent },
+      { path: 'player-profile/:id', component: PlayerProfileComponent },
       { path: 'teams', component: TeamsComponent },
       { path: 'schedule', component: ScheduleComponent },
       { path: 'analytics', component: AnalyticsComponent },

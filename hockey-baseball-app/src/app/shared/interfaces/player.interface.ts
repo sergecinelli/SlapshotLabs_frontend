@@ -74,3 +74,35 @@ export interface PlayerTableData {
   players: Player[];
   total: number;
 }
+
+export interface PlayerSeasonStats {
+  season: string;
+  logo: string;
+  team: string;
+  gamesPlayed: number;
+  goals: number;
+  assists: number;
+  points: number;
+  shotsOnGoal: number;
+  scoringChances: number;
+  penaltiesDrawn: number;
+  turnovers: number;
+  faceOffWinPercentage: number;
+}
+
+export interface PlayerRecentGameStats {
+  season: string;
+  date: string;
+  vs: string;
+  teamLogo: string;
+  team: string;
+  score: string;
+  goals: number;
+  assists: number;
+  points: number;
+  shotsOnGoal: number;
+  scoringChances: number;
+  penaltiesDrawn: number;
+  turnovers: number;
+  faceOffWinPercentage: number;
+}

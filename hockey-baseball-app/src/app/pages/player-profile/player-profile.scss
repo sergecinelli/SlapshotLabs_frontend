@@ -1,0 +1,591 @@
+.add-player-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: var(--color-primary) !important;
+  color: white !important;
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(207, 20, 43, 0.3);
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background-color: #b8122a !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(207, 20, 43, 0.4);
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
+  
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.player-profile-page {
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+  
+  .loading-container {
+    text-align: center;
+    padding: 48px;
+    color: var(--color-secondary);
+    font-size: 1.125rem;
+  }
+  
+  .error-container {
+    text-align: center;
+    padding: 48px;
+    color: var(--color-dark);
+    
+    p {
+      font-size: 1.125rem;
+      margin-bottom: 24px;
+      color: var(--color-secondary);
+    }
+  }
+  
+  .profile-content {
+    
+    .profile-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 32px;
+      padding: 24px;
+      background-color: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      gap: 24px;
+      
+      .player-info-section {
+        display: flex;
+        gap: 24px;
+        flex: 1;
+        
+        .player-photo-container {
+          flex-shrink: 0;
+          
+          .player-photo {
+            width: 120px;
+            height: 120px;
+            background-color: #f3f4f6;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            
+            .photo-placeholder {
+              font-size: 3rem;
+              color: var(--color-secondary);
+              width: 3rem;
+              height: 3rem;
+              display: inline-flex;
+              align-items: center;
+              justify-content: center;
+            }
+          }
+        }
+        
+        .player-details {
+          flex: 1;
+          
+          .name-address {
+            margin-bottom: 16px;
+            
+            .player-name {
+              font-size: 2rem;
+              font-weight: 600;
+              color: var(--color-dark);
+              margin: 0 0 8px 0;
+            }
+            
+            .address {
+              color: var(--color-secondary);
+              margin: 0;
+              font-size: 0.875rem;
+            }
+          }
+          
+          .basic-info {
+            margin-bottom: 16px;
+            
+            .info-row {
+              display: flex;
+              gap: 16px;
+              margin-bottom: 8px;
+              flex-wrap: wrap;
+              
+              span {
+                background-color: var(--color-secondary);
+                color: white;
+                padding: 4px 12px;
+                border-radius: 16px;
+                font-weight: 500;
+                font-size: 0.75rem;
+                white-space: nowrap;
+                
+                &.jersey-number {
+                  background-color: var(--color-primary);
+                }
+                
+                &.position {
+                  background-color: var(--color-dark);
+                }
+              }
+            }
+          }
+          
+          .player-bio {
+            p {
+              color: var(--color-secondary);
+              font-size: 0.875rem;
+              line-height: 1.5;
+              margin: 0;
+            }
+          }
+        }
+      }
+      
+      .team-info {
+        flex-shrink: 0;
+        text-align: center;
+        
+        .current-team {
+          h3 {
+            font-size: 0.875rem;
+            color: var(--color-secondary);
+            margin: 0 0 8px 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+          }
+          
+          .team-logo-placeholder {
+            width: 80px;
+            height: 80px;
+            background-color: #f3f4f6;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 16px auto;
+            overflow: hidden;
+            
+            mat-icon {
+              font-size: 2.5rem;
+              color: var(--color-secondary);
+              width: 2.5rem;
+              height: 2.5rem;
+              display: inline-flex;
+              align-items: center;
+              justify-content: center;
+            }
+          }
+          
+          .team-name {
+            font-weight: 500;
+            color: var(--color-dark);
+            margin: 8px 0 0 0;
+            font-size: 0.875rem;
+          }
+        }
+      }
+    }
+    
+    .info-card {
+      margin-bottom: 32px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      
+      &:last-child {
+        margin-bottom: 0;
+      }
+      
+      mat-card-header {
+        padding-bottom: 8px;
+        
+        mat-card-title {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          color: var(--color-dark);
+          font-size: 1.125rem;
+          font-weight: 500;
+          
+          mat-icon {
+            color: var(--color-primary);
+            font-size: 1.125rem;
+            display: flex;
+            align-items: center;
+          }
+        }
+      }
+      
+      mat-card-content {
+        padding-top: 16px;
+        
+        // Standard stats grid for other cards
+        .stats-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+          gap: 16px;
+          margin-bottom: 16px;
+          
+          &:last-child {
+            margin-bottom: 0;
+          }
+          
+          .stat-item {
+            text-align: center;
+            padding: 12px 8px;
+            
+            &.highlight {
+              background-color: #f9fafb;
+              border-radius: 12px;
+              border: 2px solid var(--color-primary);
+              
+              .stat-value {
+                color: var(--color-primary);
+                font-size: 1.25rem;
+                font-weight: 600;
+              }
+              
+              .stat-label {
+                color: var(--color-primary);
+                font-weight: 500;
+              }
+            }
+            
+            .stat-value {
+              display: block;
+              font-size: 1.25rem;
+              font-weight: 500;
+              color: var(--color-dark);
+              margin-bottom: 4px;
+            }
+            
+            .stat-label {
+              display: block;
+              font-size: 0.625rem;
+              color: var(--color-secondary);
+              text-transform: uppercase;
+              letter-spacing: 0.5px;
+              font-weight: 500;
+            }
+          }
+        }
+        
+        mat-divider {
+          margin: 16px 0;
+          border-color: var(--color-primary) !important;
+          border-top-width: 2px !important;
+        }
+      }
+      
+      // Bio card specific styling
+      &.bio-card {
+        mat-card-content {
+          p {
+            color: var(--color-secondary);
+            font-size: 0.875rem;
+            line-height: 1.6;
+            margin: 0;
+          }
+        }
+      }
+      
+      // Current season stats specific styling
+      &.current-season-stats {
+        mat-card-content {
+          .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 20px;
+            
+            .stat-box {
+              background-color: #ffffff;
+              border: 2px solid #e5e7eb;
+              border-radius: 8px;
+              padding: 20px 16px;
+              text-align: center;
+              
+              &.highlight {
+                border-color: var(--color-primary);
+                background-color: #f0f9ff;
+              }
+              
+              .stat-value {
+                display: block;
+                font-size: 1.5rem;
+                font-weight: 600;
+                color: var(--color-dark);
+                margin-bottom: 8px;
+              }
+              
+              .stat-label {
+                display: block;
+                font-size: 0.75rem;
+                color: var(--color-secondary);
+                font-weight: 500;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+              }
+            }
+          }
+          
+          .penalty-stats-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-top: 20px;
+            
+            .penalty-stat-box {
+              background-color: #f9fafb;
+              border: 1px solid #e5e7eb;
+              border-radius: 6px;
+              padding: 12px 16px;
+              text-align: center;
+              
+              .penalty-label {
+                display: block;
+                color: var(--color-secondary);
+                font-size: 0.75rem;
+                font-weight: 500;
+                margin-bottom: 4px;
+              }
+              
+              .penalty-value {
+                display: block;
+                color: var(--color-dark);
+                font-size: 1rem;
+                font-weight: 600;
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    // Stats Table Card Specific Styles
+    .stats-table-card {
+      .table-container {
+        background-color: white;
+        border-radius: 0.5rem;
+        box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+        overflow-x: auto;
+        overflow-y: hidden;
+        margin-top: 8px;
+        
+        &::-webkit-scrollbar {
+          height: 8px;
+        }
+        
+        &::-webkit-scrollbar-track {
+          background-color: #f1f5f9;
+          border-radius: 4px;
+        }
+        
+        &::-webkit-scrollbar-thumb {
+          background-color: #cbd5e1;
+          border-radius: 4px;
+          
+          &:hover {
+            background-color: #94a3b8;
+          }
+        }
+        
+        .stats-table {
+          width: 100%;
+          min-width: 1000px;
+          table-layout: fixed;
+          
+          // Header styling
+          .mat-mdc-header-row {
+            .mat-mdc-header-cell {
+              background-color: #e5e7eb;
+              color: #4b5563;
+              font-weight: 500;
+              font-size: 14px !important;
+              padding: 8px 12px !important;
+              border: 0;
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              
+              &:first-child {
+                border-top-left-radius: 8px;
+              }
+              
+              &:last-child {
+                border-top-right-radius: 8px;
+              }
+              
+              &.center {
+                text-align: center;
+              }
+            }
+          }
+          
+          // Row styling
+          .mat-mdc-row {
+            transition-property: color, background-color, border-color;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            transition-duration: 150ms;
+            
+            &:hover {
+              .mat-mdc-cell {
+                background-color: #f9fafb !important;
+              }
+            }
+            
+            .mat-mdc-cell {
+              font-size: 12px !important;
+              color: #111827 !important;
+              border-bottom: 1px solid #e5e7eb !important;
+              padding: 8px 12px !important;
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              
+              &.center {
+                text-align: center !important;
+              }
+              
+              &.team-cell {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                white-space: normal !important;
+                overflow: visible !important;
+                text-overflow: initial !important;
+                
+                .team-logo {
+                  font-size: 1rem;
+                  display: inline-flex;
+                  align-items: center;
+                  justify-content: center;
+                  width: 20px;
+                  height: 20px;
+                  
+                  &:empty {
+                    display: none;
+                  }
+                }
+                
+                .team-name {
+                  font-weight: 500;
+                  color: #111827;
+                  font-size: 12px;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// Responsive design
+@media (max-width: 1024px) {
+  .player-profile-page {
+    padding: 16px;
+    
+    .profile-content {
+      .profile-header {
+        flex-direction: column;
+        gap: 20px;
+        
+        .player-info-section {
+          .player-photo-container {
+            .player-photo {
+              width: 100px;
+              height: 100px;
+              
+              .photo-placeholder {
+                font-size: 2.5rem;
+                width: 2.5rem;
+                height: 2.5rem;
+              }
+            }
+          }
+          
+          .player-details {
+            .name-address {
+              .player-name {
+                font-size: 1.5rem;
+              }
+            }
+          }
+        }
+      }
+      
+      .stats-table-card {
+        .table-container {
+          .stats-table {
+            min-width: 800px;
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .player-profile-page {
+    .profile-content {
+      .profile-header {
+        .player-info-section {
+          flex-direction: column;
+          text-align: center;
+          
+          .player-details {
+            .basic-info {
+              .info-row {
+                justify-content: center;
+              }
+            }
+          }
+        }
+      }
+      
+      .info-card {
+        mat-card-content {
+          .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+          }
+        }
+        
+        &.current-season-stats {
+          mat-card-content {
+            .stats-row {
+              grid-template-columns: repeat(2, 1fr);
+              gap: 12px;
+              
+              .stat-box {
+                padding: 16px 12px;
+                
+                .stat-value {
+                  font-size: 1.25rem;
+                }
+              }
+            }
+            
+            .penalty-stats-row {
+              grid-template-columns: 1fr;
+              gap: 12px;
+            }
+          }
+        }
+      }
+    }
+  }
+}

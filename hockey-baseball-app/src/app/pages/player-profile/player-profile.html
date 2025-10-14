@@ -1,0 +1,343 @@
+<div class="player-profile-page">
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <p>Loading player profile...</p>
+  </div>
+
+  <!-- Profile Content -->
+  <div *ngIf="!loading && player" class="profile-content">
+    
+    <!-- Action Buttons Row -->
+    <div class="mb-4 flex justify-end gap-3">
+      <button 
+        mat-raised-button 
+        color="primary" 
+        (click)="onEditProfile()"
+        class="add-player-btn">
+        <mat-icon>edit</mat-icon>
+        Edit Player Profile
+      </button>
+      <button 
+        mat-raised-button 
+        color="accent" 
+        (click)="onRequestAnalysis()"
+        class="add-player-btn">
+        <mat-icon>analytics</mat-icon>
+        Request Player Analysis
+      </button>
+    </div>
+    
+    <!-- Header Section with Basic Info -->
+    <div class="profile-header">
+      <div class="player-info-section">
+        <div class="player-photo-container">
+          <div class="player-photo">
+            <mat-icon class="photo-placeholder">person</mat-icon>
+          </div>
+        </div>
+        <div class="player-details">
+          <div class="name-address">
+            <h1 class="player-name">{{ player.firstName }} {{ player.lastName }}</h1>
+            <p class="address">(lives in: {{ getAddress() }})</p>
+          </div>
+          <div class="basic-info">
+            <div class="info-row">
+              <span class="jersey-number">#{{ player.jerseyNumber }}</span>
+              <span class="position">{{ player.position }}</span>
+              <span class="shoots">Shoots: {{ player.shoots }}</span>
+            </div>
+            <div class="info-row">
+              <span class="height">{{ player.height }}</span>
+              <span class="weight">{{ player.weight }} lbs</span>
+              <span class="birth-info">{{ player.birthYear }} ({{ calculateAge() }} years)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="team-info">
+        <div class="current-team">
+          <div class="team-logo-placeholder">
+            <mat-icon>sports_hockey</mat-icon>
+          </div>
+          <p class="team-name">{{ player.team }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Player Bio Section -->
+    <mat-card class="info-card bio-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>person</mat-icon>
+          Player Bio
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <p>{{ player.firstName }} {{ player.lastName }} is a skilled {{ player.position }} known for exceptional playmaking abilities and strong offensive presence on the ice.</p>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Current Season Stats Card -->
+    <mat-card class="info-card current-season-stats">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>analytics</mat-icon>
+          Current Season Stats
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <!-- First Row: 4 main stats -->
+        <div class="stats-row">
+          <div class="stat-box">
+            <div class="stat-value">{{ player.gamesPlayed }}</div>
+            <div class="stat-label">Games Played</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value">{{ player.goals }}</div>
+            <div class="stat-label">Goals</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value">{{ player.assists }}</div>
+            <div class="stat-label">Assists</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value">45%</div>
+            <div class="stat-label">Face Off Win %</div>
+          </div>
+        </div>
+
+        <!-- Second Row: 4 additional stats -->
+        <div class="stats-row">
+          <div class="stat-box">
+            <div class="stat-value">10</div>
+            <div class="stat-label">PP Goals</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value">5</div>
+            <div class="stat-label">SH Goals</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value">{{ player.shotsOnGoal }}</div>
+            <div class="stat-label">Shots on Goal</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value">{{ player.scoringChances }}</div>
+            <div class="stat-label">Scoring Chances</div>
+          </div>
+        </div>
+
+        <!-- Third Row: 3 penalty/turnover stats -->
+        <div class="penalty-stats-row">
+          <div class="penalty-stat-box">
+            <span class="penalty-label">Penalty Minutes:</span>
+            <span class="penalty-value">45</span>
+          </div>
+          <div class="penalty-stat-box">
+            <span class="penalty-label">Penalties Drawn:</span>
+            <span class="penalty-value">{{ player.penaltiesDrawn }}</span>
+          </div>
+          <div class="penalty-stat-box">
+            <span class="penalty-label">Turnovers:</span>
+            <span class="penalty-value">23</span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Recent Game Stats Table -->
+    <mat-card class="info-card stats-table-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>history</mat-icon>
+          Recent Game Stats (this will show the last 5 games)
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="table-container">
+          <table mat-table [dataSource]="getRecentGameStats()" class="stats-table recent-games-table">
+            
+            <!-- Season Column -->
+            <ng-container matColumnDef="season">
+              <th mat-header-cell *matHeaderCellDef class="header-cell">Season</th>
+              <td mat-cell *matCellDef="let element" class="data-cell">{{ element.season }}</td>
+            </ng-container>
+
+            <!-- Date Column -->
+            <ng-container matColumnDef="date">
+              <th mat-header-cell *matHeaderCellDef class="header-cell">Date</th>
+              <td mat-cell *matCellDef="let element" class="data-cell">{{ element.date }}</td>
+            </ng-container>
+
+            <!-- vs Column -->
+            <ng-container matColumnDef="vs">
+              <th mat-header-cell *matHeaderCellDef class="header-cell center">vs</th>
+              <td mat-cell *matCellDef="let element" class="data-cell center">{{ element.team }}</td>
+            </ng-container>
+
+            <!-- Team Column -->
+            <ng-container matColumnDef="team">
+              <th mat-header-cell *matHeaderCellDef class="header-cell">Team Name</th>
+              <td mat-cell *matCellDef="let element" class="data-cell team-cell">
+                <span class="team-logo">{{ element.teamLogo }}</span>
+                <span class="team-name">{{ element.team }}</span>
+              </td>
+            </ng-container>
+
+            <!-- Score Column -->
+            <ng-container matColumnDef="score">
+              <th mat-header-cell *matHeaderCellDef class="header-cell">Score</th>
+              <td mat-cell *matCellDef="let element" class="data-cell">{{ element.score }}</td>
+            </ng-container>
+
+            <!-- Goals Column -->
+            <ng-container matColumnDef="goals">
+              <th mat-header-cell *matHeaderCellDef class="header-cell center">Goals</th>
+              <td mat-cell *matCellDef="let element" class="data-cell center">{{ element.goals }}</td>
+            </ng-container>
+
+            <!-- Assists Column -->
+            <ng-container matColumnDef="assists">
+              <th mat-header-cell *matHeaderCellDef class="header-cell center">Assists</th>
+              <td mat-cell *matCellDef="let element" class="data-cell center">{{ element.assists }}</td>
+            </ng-container>
+
+            <!-- Points Column -->
+            <ng-container matColumnDef="points">
+              <th mat-header-cell *matHeaderCellDef class="header-cell center">Pts</th>
+              <td mat-cell *matCellDef="let element" class="data-cell center">{{ element.points }}</td>
+            </ng-container>
+
+            <!-- SOG Column -->
+            <ng-container matColumnDef="shotsOnGoal">
+              <th mat-header-cell *matHeaderCellDef class="header-cell center">SOG</th>
+              <td mat-cell *matCellDef="let element" class="data-cell center">{{ element.shotsOnGoal }}</td>
+            </ng-container>
+
+            <!-- Scoring Chances Column -->
+            <ng-container matColumnDef="scoringChances">
+              <th mat-header-cell *matHeaderCellDef class="header-cell center">Scoring Chances</th>
+              <td mat-cell *matCellDef="let element" class="data-cell center">{{ element.scoringChances }}</td>
+            </ng-container>
+
+            <!-- Penalty Column -->
+            <ng-container matColumnDef="penaltiesDrawn">
+              <th mat-header-cell *matHeaderCellDef class="header-cell center">Penalty</th>
+              <td mat-cell *matCellDef="let element" class="data-cell center">{{ element.penaltiesDrawn }}</td>
+            </ng-container>
+
+            <!-- Turnovers Column -->
+            <ng-container matColumnDef="turnovers">
+              <th mat-header-cell *matHeaderCellDef class="header-cell center">Turnovers</th>
+              <td mat-cell *matCellDef="let element" class="data-cell center">{{ element.turnovers }}</td>
+            </ng-container>
+
+            <!-- Face Off Column -->
+            <ng-container matColumnDef="faceOffWinPercentage">
+              <th mat-header-cell *matHeaderCellDef class="header-cell center">Face Off</th>
+              <td mat-cell *matCellDef="let element" class="data-cell center">{{ element.faceOffWinPercentage }}%</td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="recentGameStatsColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: recentGameStatsColumns;"></tr>
+          </table>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Season Stats Table -->
+    <mat-card class="info-card stats-table-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>table_chart</mat-icon>
+          Season Stats (list of all the stats for each of the seasons the person played)
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="table-container">
+          <table mat-table [dataSource]="getSeasonStats()" class="stats-table">
+            
+            <!-- Season Column -->
+            <ng-container matColumnDef="season">
+              <th mat-header-cell *matHeaderCellDef class="header-cell">Season</th>
+              <td mat-cell *matCellDef="let element" class="data-cell">{{ element.season }}</td>
+            </ng-container>
+
+            <!-- Team Column -->
+            <ng-container matColumnDef="team">
+              <th mat-header-cell *matHeaderCellDef class="header-cell">Team</th>
+              <td mat-cell *matCellDef="let element" class="data-cell team-cell">
+                <span class="team-logo">{{ element.logo }}</span>
+                <span class="team-name">{{ element.team }}</span>
+              </td>
+            </ng-container>
+
+            <!-- GP Column -->
+            <ng-container matColumnDef="gamesPlayed">
+              <th mat-header-cell *matHeaderCellDef class="header-cell center">Games Played</th>
+              <td mat-cell *matCellDef="let element" class="data-cell center">{{ element.gamesPlayed }}</td>
+            </ng-container>
+
+            <!-- Goals Column -->
+            <ng-container matColumnDef="goals">
+              <th mat-header-cell *matHeaderCellDef class="header-cell center">Goals</th>
+              <td mat-cell *matCellDef="let element" class="data-cell center">{{ element.goals }}</td>
+            </ng-container>
+
+            <!-- Assists Column -->
+            <ng-container matColumnDef="assists">
+              <th mat-header-cell *matHeaderCellDef class="header-cell center">Assists</th>
+              <td mat-cell *matCellDef="let element" class="data-cell center">{{ element.assists }}</td>
+            </ng-container>
+
+            <!-- Points Column -->
+            <ng-container matColumnDef="points">
+              <th mat-header-cell *matHeaderCellDef class="header-cell center">Pts</th>
+              <td mat-cell *matCellDef="let element" class="data-cell center">{{ element.points }}</td>
+            </ng-container>
+
+            <!-- SOG Column -->
+            <ng-container matColumnDef="shotsOnGoal">
+              <th mat-header-cell *matHeaderCellDef class="header-cell center">SOG</th>
+              <td mat-cell *matCellDef="let element" class="data-cell center">{{ element.shotsOnGoal }}</td>
+            </ng-container>
+
+            <!-- Scoring Chances Column -->
+            <ng-container matColumnDef="scoringChances">
+              <th mat-header-cell *matHeaderCellDef class="header-cell center">Scoring Chances</th>
+              <td mat-cell *matCellDef="let element" class="data-cell center">{{ element.scoringChances }}</td>
+            </ng-container>
+
+            <!-- Penalty Column -->
+            <ng-container matColumnDef="penaltiesDrawn">
+              <th mat-header-cell *matHeaderCellDef class="header-cell center">Penalty</th>
+              <td mat-cell *matCellDef="let element" class="data-cell center">{{ element.penaltiesDrawn }}</td>
+            </ng-container>
+
+            <!-- Turnovers Column -->
+            <ng-container matColumnDef="turnovers">
+              <th mat-header-cell *matHeaderCellDef class="header-cell center">Turnovers</th>
+              <td mat-cell *matCellDef="let element" class="data-cell center">{{ element.turnovers }}</td>
+            </ng-container>
+
+            <!-- Face Off Column -->
+            <ng-container matColumnDef="faceOffWinPercentage">
+              <th mat-header-cell *matHeaderCellDef class="header-cell center">Face Off</th>
+              <td mat-cell *matCellDef="let element" class="data-cell center">{{ element.faceOffWinPercentage }}%</td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="seasonStatsColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: seasonStatsColumns;"></tr>
+          </table>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="!loading && !player" class="error-container">
+    <p>Player not found.</p>
+  </div>
+
+</div>
