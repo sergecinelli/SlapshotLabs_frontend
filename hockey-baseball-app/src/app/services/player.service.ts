@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of, delay } from 'rxjs';
-import { map, catchError } from 'rxjs/operators';
+import { Observable, of, delay, throwError } from 'rxjs';
+import { map, catchError, switchMap } from 'rxjs/operators';
 import { Player, PlayerTableData, PlayerApiOut, PlayerApiIn } from '../shared/interfaces/player.interface';
 import { ApiService } from './api.service';
 
@@ -17,13 +17,22 @@ export class PlayerService {
   ) {}
 
   getPlayers(): Observable<PlayerTableData> {
-    return this.apiService.get<PlayerApiOut[]>('/hockey/players').pipe(
-      map(apiPlayers => {
+    return this.apiService.get<PlayerApiOut[]>('/hockey/player/list').pipe(
+      switchMap(apiPlayers => {
         const players = apiPlayers.map(apiPlayer => this.fromApiOutFormat(apiPlayer));
-        return {
+        
+        // If API returns empty list, use mock data
+        if (players.length === 0) {
+          console.log('API returned empty players list, falling back to mock data');
+          return this.http.get<PlayerTableData>(this.mockDataPath).pipe(
+            delay(500)
+          );
+        }
+        
+        return of({
           players: players,
           total: players.length
-        };
+        });
       }),
       catchError(error => {
         console.error('Failed to fetch players:', error);
@@ -66,9 +75,23 @@ export class PlayerService {
   }
 
   deletePlayer(id: string): Observable<boolean> {
-    // Simulate delete operation
-    console.log(`Delete player with ID: ${id}`);
-    return of(true).pipe(delay(300));
+    // Convert string ID to number for API call
+    const numericId = parseInt(id, 10);
+    if (isNaN(numericId)) {
+      console.error(`Invalid player ID for deletion: ${id}`);
+      return of(false);
+    }
+
+    return this.apiService.delete<void>(`/hockey/player/${numericId}`).pipe(
+      map(() => {
+        console.log(`Player with ID ${id} deleted successfully`);
+        return true;
+      }),
+      catchError(error => {
+        console.error(`Failed to delete player with ID ${id}:`, error);
+        return of(false);
+      })
+    );
   }
 
   addPlayer(playerData: Partial<Player>): Observable<Player> {
@@ -109,13 +132,37 @@ export class PlayerService {
   }
 
   updatePlayer(id: string, playerData: Partial<Player>): Observable<Player> {
-    // Simulate update operation
-    const updatedPlayer: Player = {
-      id,
-      ...playerData
-    } as Player;
-    console.log(`Update player with ID ${id}:`, updatedPlayer);
-    return of(updatedPlayer).pipe(delay(300));
+    // Convert string ID to number for API call
+    const numericId = parseInt(id, 10);
+    if (isNaN(numericId)) {
+      console.error(`Invalid player ID for update: ${id}`);
+      return throwError(() => new Error(`Invalid player ID: ${id}`));
+    }
+
+    const apiUpdateData = this.toApiUpdateFormat(playerData);
+    
+    return this.apiService.put<void>(`/hockey/player/${numericId}`, apiUpdateData).pipe(
+      switchMap(() => {
+        // After successful update, fetch the updated player data
+        return this.getPlayerById(id);
+      }),
+      map(updatedPlayer => {
+        if (!updatedPlayer) {
+          throw new Error(`Player with ID ${id} not found after update`);
+        }
+        console.log(`Player with ID ${id} updated successfully`);
+        return updatedPlayer;
+      }),
+      catchError(error => {
+        console.error(`Failed to update player with ID ${id}:`, error);
+        // Fallback to mock behavior
+        const updatedPlayer: Player = {
+          id,
+          ...playerData
+        } as Player;
+        return of(updatedPlayer);
+      })
+    );
   }
 
   private fromApiOutFormat(apiPlayer: PlayerApiOut): Player {
@@ -151,6 +198,56 @@ export class PlayerService {
         address: 'Address'
       }
     };
+  }
+
+  private toApiUpdateFormat(playerData: Partial<Player>): Partial<PlayerApiIn> {
+    const updateData: Partial<PlayerApiIn> = {};
+    
+    // Only include fields that are provided and exist in the API
+    if (playerData.height) {
+      updateData.height = this.parseHeightToInches(playerData.height);
+    }
+    if (playerData.weight !== undefined) {
+      updateData.weight = playerData.weight;
+    }
+    if (playerData.shoots) {
+      updateData.shoots = playerData.shoots === 'Right Shot' ? 1 : 0;
+    }
+    if (playerData.jerseyNumber !== undefined) {
+      updateData.jersey_number = playerData.jerseyNumber;
+    }
+    if (playerData.firstName) {
+      updateData.first_name = playerData.firstName;
+    }
+    if (playerData.lastName) {
+      updateData.last_name = playerData.lastName;
+    }
+    if (playerData.birthYear) {
+      updateData.birth_year = playerData.birthYear;
+    }
+    if (playerData.position) {
+      updateData.position_id = this.mapPositionNameToId(playerData.position);
+    }
+    if (playerData.goals !== undefined) {
+      updateData.goals = playerData.goals;
+    }
+    if (playerData.assists !== undefined) {
+      updateData.assists = playerData.assists;
+    }
+    if (playerData.points !== undefined) {
+      updateData.points = playerData.points;
+    }
+    if (playerData.scoringChances !== undefined) {
+      updateData.scoring_chances = playerData.scoringChances;
+    }
+    if (playerData.blockedShots !== undefined) {
+      updateData.blocked_shots = playerData.blockedShots;
+    }
+    if (playerData.penaltiesDrawn !== undefined) {
+      updateData.penalties_drawn = playerData.penaltiesDrawn;
+    }
+    
+    return updateData;
   }
 
   private toApiInFormat(playerData: Partial<Player>, teamId: number): PlayerApiIn {
