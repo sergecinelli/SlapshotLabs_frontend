@@ -264,6 +264,152 @@
         }
       }
     }
+    
+    // Stats Table Card Specific Styles (matching goalies table)
+    .stats-table-card {
+      .table-container {
+        background-color: white;
+        border-radius: 0.5rem;
+        box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+        overflow-x: auto;
+        overflow-y: hidden;
+        margin-top: 8px;
+        
+        &::-webkit-scrollbar {
+          height: 8px;
+        }
+        
+        &::-webkit-scrollbar-track {
+          background-color: #f1f5f9;
+          border-radius: 4px;
+        }
+        
+        &::-webkit-scrollbar-thumb {
+          background-color: #cbd5e1;
+          border-radius: 4px;
+          
+          &:hover {
+            background-color: #94a3b8;
+          }
+        }
+        
+        .stats-table {
+          width: 100%;
+          min-width: 800px;
+          table-layout: fixed;
+          
+          // Header styling to match goalies table
+          .mat-mdc-header-row {
+            .mat-mdc-header-cell {
+              background-color: #e5e7eb;
+              color: #4b5563;
+              font-weight: 500;
+              font-size: 14px !important; // text-sm equivalent
+              padding: 8px 16px !important;
+              border: 0;
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              
+              &:first-child {
+                border-top-left-radius: 8px;
+              }
+              
+              &:last-child {
+                border-top-right-radius: 8px;
+              }
+              
+              &.center {
+                text-align: center;
+              }
+            }
+          }
+          
+          // Row styling to match goalies table
+          .mat-mdc-row {
+            transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            transition-duration: 150ms;
+            
+            &:hover {
+              .mat-mdc-cell {
+                background-color: #f9fafb !important;
+              }
+            }
+            
+            .mat-mdc-cell {
+              font-size: 12px !important;
+              color: #111827 !important;
+              border-bottom: 1px solid #e5e7eb !important;
+              padding: 8px 16px !important;
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              
+              &.center {
+                text-align: center !important;
+              }
+              
+              &.team-cell {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                white-space: normal !important;
+                overflow: visible !important;
+                text-overflow: initial !important;
+                
+                .team-logo {
+                  font-size: 1rem;
+                  display: inline-flex;
+                  align-items: center;
+                  justify-content: center;
+                  width: 20px;
+                  height: 20px;
+                  // Hide empty logos
+                  &:empty {
+                    display: none;
+                  }
+                }
+                
+                .team-name {
+                  font-weight: 500;
+                  color: #111827;
+                  font-size: 12px;
+                }
+              }
+              
+              &.save-percentage {
+                font-weight: 600;
+                color: var(--color-primary);
+              }
+            }
+          }
+        }
+        
+        // Specific styles for recent games table - keep same font sizes as main table
+        .recent-games-table {
+          // Headers should be the same size as season stats
+          .mat-mdc-header-row {
+            .mat-mdc-header-cell {
+              font-size: 14px !important; // Same as season stats
+            }
+          }
+          
+          .mat-mdc-row {
+            .mat-mdc-cell {
+              font-size: 12px !important; // Same as season stats
+              padding: 8px 16px !important; // Same as season stats
+              
+              &.team-cell {
+                .team-name {
+                  font-size: 12px; // Same as season stats
+                }
+              }
+            }
+          }
+        }
+      }
+    }
   }
 }
 
@@ -289,6 +435,67 @@
       
       .info-card {
         margin-bottom: 24px;
+        
+        &.stats-table-card {
+          .table-container {
+            .stats-table {
+              .mat-mdc-header-row {
+                .mat-mdc-header-cell {
+                  padding: 6px 12px !important;
+                  font-size: 12px !important; // Slightly smaller for tablet
+                }
+              }
+              
+              .mat-mdc-row {
+                .mat-mdc-cell {
+                  padding: 6px 12px !important;
+                  font-size: 11px !important; // Slightly smaller for tablet
+                  
+                  &.team-cell {
+                    gap: 6px;
+                    
+                    .team-logo {
+                      font-size: 0.875rem;
+                      width: 16px;
+                      height: 16px;
+                    }
+                    
+                    .team-name {
+                      font-size: 11px;
+                    }
+                  }
+                }
+              }
+            }
+            
+            .recent-games-table {
+              .mat-mdc-header-row {
+                .mat-mdc-header-cell {
+                  font-size: 12px !important; // Same as season stats header
+                }
+              }
+              
+              .mat-mdc-row {
+                .mat-mdc-cell {
+                  font-size: 11px !important; // Same as season stats cells
+                  padding: 6px 12px !important;
+                  
+                  &.team-cell {
+                    .team-logo {
+                      font-size: 0.75rem;
+                      width: 14px;
+                      height: 14px;
+                    }
+                    
+                    .team-name {
+                      font-size: 11px; // Same as cells
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     }
   }
@@ -339,6 +546,69 @@
               .stat-value {
                 font-size: 1rem;
                 font-weight: 500;
+              }
+            }
+          }
+        }
+        
+        &.stats-table-card {
+          .table-container {
+            .stats-table {
+              min-width: 600px;
+              
+              .mat-mdc-header-row {
+                .mat-mdc-header-cell {
+                  padding: 4px 8px !important;
+                  font-size: 11px !important; // Smaller for mobile
+                }
+              }
+              
+              .mat-mdc-row {
+                .mat-mdc-cell {
+                  padding: 4px 8px !important;
+                  font-size: 10px !important; // Smaller for mobile
+                  
+                  &.team-cell {
+                    gap: 4px;
+                    
+                    .team-logo {
+                      font-size: 0.75rem;
+                      width: 14px;
+                      height: 14px;
+                    }
+                    
+                    .team-name {
+                      font-size: 10px;
+                    }
+                  }
+                }
+              }
+            }
+            
+            .recent-games-table {
+              .mat-mdc-header-row {
+                .mat-mdc-header-cell {
+                  font-size: 11px !important; // Same as season stats header
+                }
+              }
+              
+              .mat-mdc-row {
+                .mat-mdc-cell {
+                  font-size: 10px !important; // Same as season stats cells
+                  padding: 4px 8px !important;
+                  
+                  &.team-cell {
+                    .team-logo {
+                      font-size: 0.625rem;
+                      width: 12px;
+                      height: 12px;
+                    }
+                    
+                    .team-name {
+                      font-size: 10px; // Same as cells
+                    }
+                  }
+                }
               }
             }
           }

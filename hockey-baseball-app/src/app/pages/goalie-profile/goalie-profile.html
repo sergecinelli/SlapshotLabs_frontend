@@ -52,6 +52,10 @@
             <span class="label">Shoots:</span>
             <span class="value">{{ goalie.shoots }}</span>
           </div>
+          <div class="info-item">
+            <span class="label">Country:</span>
+            <span class="value">{{ getCountry() }}</span>
+          </div>
         </div>
       </mat-card-content>
     </mat-card>
@@ -136,6 +140,168 @@
             <span class="stat-value">{{ goalie.shga }}</span>
             <span class="stat-label">SHGA</span>
           </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Season Stats Table -->
+    <mat-card class="info-card stats-table-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>table_chart</mat-icon>
+          Season Stats
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="table-container">
+          <table mat-table [dataSource]="getSeasonStats()" class="stats-table">
+            
+            <!-- Season Column -->
+            <ng-container matColumnDef="season">
+              <th mat-header-cell *matHeaderCellDef class="header-cell">Season</th>
+              <td mat-cell *matCellDef="let element" class="data-cell">{{ element.season }}</td>
+            </ng-container>
+
+            <!-- Team Column -->
+            <ng-container matColumnDef="team">
+              <th mat-header-cell *matHeaderCellDef class="header-cell">Team</th>
+              <td mat-cell *matCellDef="let element" class="data-cell team-cell">
+                <span class="team-logo">{{ element.logo }}</span>
+                <span class="team-name">{{ element.team }}</span>
+              </td>
+            </ng-container>
+
+            <!-- GP Column -->
+            <ng-container matColumnDef="gamesPlayed">
+              <th mat-header-cell *matHeaderCellDef class="header-cell center">GP</th>
+              <td mat-cell *matCellDef="let element" class="data-cell center">{{ element.gamesPlayed }}</td>
+            </ng-container>
+
+            <!-- W Column -->
+            <ng-container matColumnDef="wins">
+              <th mat-header-cell *matHeaderCellDef class="header-cell center">W</th>
+              <td mat-cell *matCellDef="let element" class="data-cell center">{{ element.wins }}</td>
+            </ng-container>
+
+            <!-- L Column -->
+            <ng-container matColumnDef="losses">
+              <th mat-header-cell *matHeaderCellDef class="header-cell center">L</th>
+              <td mat-cell *matCellDef="let element" class="data-cell center">{{ element.losses }}</td>
+            </ng-container>
+
+            <!-- T Column -->
+            <ng-container matColumnDef="ties">
+              <th mat-header-cell *matHeaderCellDef class="header-cell center">T</th>
+              <td mat-cell *matCellDef="let element" class="data-cell center">{{ element.ties }}</td>
+            </ng-container>
+
+            <!-- GA Column -->
+            <ng-container matColumnDef="goalsAgainst">
+              <th mat-header-cell *matHeaderCellDef class="header-cell center">GA</th>
+              <td mat-cell *matCellDef="let element" class="data-cell center">{{ element.goalsAgainst }}</td>
+            </ng-container>
+
+            <!-- SA Column -->
+            <ng-container matColumnDef="shotsAgainst">
+              <th mat-header-cell *matHeaderCellDef class="header-cell center">SA</th>
+              <td mat-cell *matCellDef="let element" class="data-cell center">{{ element.shotsAgainst }}</td>
+            </ng-container>
+
+            <!-- SV Column -->
+            <ng-container matColumnDef="saves">
+              <th mat-header-cell *matHeaderCellDef class="header-cell center">SV</th>
+              <td mat-cell *matCellDef="let element" class="data-cell center">{{ element.saves }}</td>
+            </ng-container>
+
+            <!-- SV % Column -->
+            <ng-container matColumnDef="savePercentage">
+              <th mat-header-cell *matHeaderCellDef class="header-cell center">SV %</th>
+              <td mat-cell *matCellDef="let element" class="data-cell center save-percentage">
+                {{ (element.savePercentage * 100).toFixed(3) }}%
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="seasonStatsColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: seasonStatsColumns;"></tr>
+          </table>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Recent Game Stats Table -->
+    <mat-card class="info-card stats-table-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>history</mat-icon>
+          Recent Game Stats (show last 5 games)
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="table-container">
+          <table mat-table [dataSource]="getRecentGameStats()" class="stats-table recent-games-table">
+            
+            <!-- Season Column -->
+            <ng-container matColumnDef="season">
+              <th mat-header-cell *matHeaderCellDef class="header-cell">Season</th>
+              <td mat-cell *matCellDef="let element" class="data-cell">{{ element.season }}</td>
+            </ng-container>
+
+            <!-- Date Column -->
+            <ng-container matColumnDef="date">
+              <th mat-header-cell *matHeaderCellDef class="header-cell">Date</th>
+              <td mat-cell *matCellDef="let element" class="data-cell">{{ element.date }}</td>
+            </ng-container>
+
+            <!-- vs Column -->
+            <ng-container matColumnDef="vs">
+              <th mat-header-cell *matHeaderCellDef class="header-cell center">vs</th>
+              <td mat-cell *matCellDef="let element" class="data-cell center">{{ element.vs }}</td>
+            </ng-container>
+
+            <!-- Team Column -->
+            <ng-container matColumnDef="team">
+              <th mat-header-cell *matHeaderCellDef class="header-cell">Team</th>
+              <td mat-cell *matCellDef="let element" class="data-cell team-cell">
+                <span class="team-logo">{{ element.teamLogo }}</span>
+                <span class="team-name">{{ element.team }}</span>
+              </td>
+            </ng-container>
+
+            <!-- Score Column -->
+            <ng-container matColumnDef="score">
+              <th mat-header-cell *matHeaderCellDef class="header-cell">Score</th>
+              <td mat-cell *matCellDef="let element" class="data-cell">{{ element.score }}</td>
+            </ng-container>
+
+            <!-- GA Column -->
+            <ng-container matColumnDef="goalsAgainst">
+              <th mat-header-cell *matHeaderCellDef class="header-cell center">GA</th>
+              <td mat-cell *matCellDef="let element" class="data-cell center">{{ element.goalsAgainst }}</td>
+            </ng-container>
+
+            <!-- SA Column -->
+            <ng-container matColumnDef="shotsAgainst">
+              <th mat-header-cell *matHeaderCellDef class="header-cell center">SA</th>
+              <td mat-cell *matCellDef="let element" class="data-cell center">{{ element.shotsAgainst }}</td>
+            </ng-container>
+
+            <!-- SV Column -->
+            <ng-container matColumnDef="saves">
+              <th mat-header-cell *matHeaderCellDef class="header-cell center">SV</th>
+              <td mat-cell *matCellDef="let element" class="data-cell center">{{ element.saves }}</td>
+            </ng-container>
+
+            <!-- SV % Column -->
+            <ng-container matColumnDef="savePercentage">
+              <th mat-header-cell *matHeaderCellDef class="header-cell center">SV %</th>
+              <td mat-cell *matCellDef="let element" class="data-cell center save-percentage">
+                {{ (element.savePercentage * 100).toFixed(3) }}%
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="recentGameStatsColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: recentGameStatsColumns;"></tr>
+          </table>
         </div>
       </mat-card-content>
     </mat-card>

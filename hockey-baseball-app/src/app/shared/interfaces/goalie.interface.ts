@@ -60,6 +60,7 @@ export interface Goalie {
   firstName: string;
   lastName: string;
   birthYear: number;
+  country?: string;  // Optional country field
   shotsOnGoal: number;
   saves: number;
   goalsAgainst: number;
@@ -73,10 +74,39 @@ export interface Goalie {
   points: number;
   ppga: number;  // Power Play Goals Against
   shga: number;  // Short Handed Goals Against
-  savesAboveAvg: number;  // New field to match API
+  savesAboveAvg: number;
 }
 
 export interface GoalieTableData {
   goalies: Goalie[];
   total: number;
+}
+
+// Season Stats interface
+export interface GoalieSeasonStats {
+  season: string;
+  logo: string;
+  team: string;
+  gamesPlayed: number;
+  wins: number;
+  losses: number;
+  ties: number;
+  goalsAgainst: number;
+  shotsAgainst: number;
+  saves: number;
+  savePercentage: number;
+}
+
+// Recent Game Stats interface
+export interface GoalieRecentGameStats {
+  season: string;
+  date: string;
+  vs: string;
+  teamLogo: string;
+  team: string;
+  score: string;
+  goalsAgainst: number;
+  shotsAgainst: number;
+  saves: number;
+  savePercentage: number;
 }

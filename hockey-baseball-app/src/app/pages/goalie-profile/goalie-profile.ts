@@ -5,8 +5,9 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatTableModule } from '@angular/material/table';
 import { GoalieService } from '../../services/goalie.service';
-import { Goalie } from '../../shared/interfaces/goalie.interface';
+import { Goalie, GoalieSeasonStats, GoalieRecentGameStats } from '../../shared/interfaces/goalie.interface';
 
 @Component({
   selector: 'app-goalie-profile',
@@ -16,7 +17,8 @@ import { Goalie } from '../../shared/interfaces/goalie.interface';
     MatButtonModule,
     MatIconModule,
     MatCardModule,
-    MatDividerModule
+    MatDividerModule,
+    MatTableModule
   ],
   templateUrl: './goalie-profile.html',
   styleUrl: './goalie-profile.scss'
@@ -24,6 +26,10 @@ import { Goalie } from '../../shared/interfaces/goalie.interface';
 export class GoalieProfileComponent implements OnInit {
   goalie: Goalie | null = null;
   loading = true;
+  
+  // Table column definitions
+  seasonStatsColumns: string[] = ['season', 'team', 'gamesPlayed', 'wins', 'losses', 'ties', 'goalsAgainst', 'shotsAgainst', 'saves', 'savePercentage'];
+  recentGameStatsColumns: string[] = ['season', 'date', 'vs', 'team', 'score', 'goalsAgainst', 'shotsAgainst', 'saves', 'savePercentage'];
 
   constructor(
     private route: ActivatedRoute,
@@ -88,5 +94,121 @@ export class GoalieProfileComponent implements OnInit {
     if (!this.goalie || this.goalie.gamesPlayed === 0) return '0.00';
     const winPercentage = (this.goalie.wins / this.goalie.gamesPlayed) * 100;
     return winPercentage.toFixed(1);
+  }
+  
+  // Mock data methods
+  getCountry(): string {
+    // Return default mocked country value
+    // If goalie has country data, use it, otherwise default to Canada
+    return this.goalie?.country || 'Canada';
+  }
+  
+  getSeasonStats(): GoalieSeasonStats[] {
+    return [
+      {
+        season: '2024/2025',
+        logo: '',
+        team: 'Florida Panthers',
+        gamesPlayed: 20,
+        wins: 5,
+        losses: 10,
+        ties: 5,
+        goalsAgainst: 15,
+        shotsAgainst: 95,
+        saves: 80,
+        savePercentage: 0.842
+      },
+      {
+        season: '2023/2024',
+        logo: '',
+        team: 'Toronto Maple Leaves',
+        gamesPlayed: 20,
+        wins: 5,
+        losses: 10,
+        ties: 5,
+        goalsAgainst: 15,
+        shotsAgainst: 95,
+        saves: 80,
+        savePercentage: 0.842
+      },
+      {
+        season: '2022/2023',
+        logo: '',
+        team: 'Toronto Maple Leaves',
+        gamesPlayed: 20,
+        wins: 5,
+        losses: 10,
+        ties: 5,
+        goalsAgainst: 15,
+        shotsAgainst: 95,
+        saves: 80,
+        savePercentage: 0.842
+      }
+    ];
+  }
+  
+  getRecentGameStats(): GoalieRecentGameStats[] {
+    return [
+      {
+        season: '2025/2026',
+        date: 'Oct. 10, 2025',
+        vs: 'vs',
+        teamLogo: '',
+        team: 'Toronto Maple Leafs',
+        score: '(L/W/T) 5 - 3',
+        goalsAgainst: 5,
+        shotsAgainst: 28,
+        saves: 23,
+        savePercentage: 0.821
+      },
+      {
+        season: '2025/2026',
+        date: 'Oct. 10, 2025',
+        vs: 'vs',
+        teamLogo: '',
+        team: 'Toronto Maple Leafs',
+        score: '(L/W/T) 5 - 3',
+        goalsAgainst: 5,
+        shotsAgainst: 28,
+        saves: 23,
+        savePercentage: 0.821
+      },
+      {
+        season: '2025/2026',
+        date: 'Oct. 10, 2025',
+        vs: 'vs',
+        teamLogo: '',
+        team: 'Toronto Maple Leafs',
+        score: '(L/W/T) 5 - 3',
+        goalsAgainst: 5,
+        shotsAgainst: 28,
+        saves: 23,
+        savePercentage: 0.821
+      },
+      {
+        season: '2025/2026',
+        date: 'Oct. 10, 2025',
+        vs: 'vs',
+        teamLogo: '',
+        team: 'Toronto Maple Leafs',
+        score: '(L/W/T) 5 - 3',
+        goalsAgainst: 5,
+        shotsAgainst: 28,
+        saves: 23,
+        savePercentage: 0.821
+      },
+      {
+        season: '2025/2026',
+        date: 'Oct. 10, 2025',
+        vs: 'vs',
+        teamLogo: '',
+        team: 'Toronto Maple Leafs',
+        score: '(L/W/T) 5 - 3',
+        goalsAgainst: 5,
+        shotsAgainst: 28,
+        saves: 23,
+        savePercentage: 0.821
+      }
+    ];
   }
 }
