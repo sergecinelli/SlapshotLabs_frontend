@@ -1,0 +1,132 @@
+<div class="team-form-modal">
+  <h2 mat-dialog-title class="modal-title">
+    <mat-icon class="title-icon">groups</mat-icon>
+    {{ isEditMode ? 'Edit Team' : 'Add New Team' }}
+  </h2>
+
+  <mat-dialog-content class="modal-content">
+    <form [formGroup]="teamForm" class="team-form">
+      
+      <!-- Basic Information Section -->
+      <div class="form-section">
+        <div class="section-header">
+          <span class="section-title">Basic Information</span>
+        </div>
+        <mat-divider class="section-divider"></mat-divider>
+        <div class="form-row">
+          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+            <mat-label class="uppercase text-custom-secondary">Team Name *</mat-label>
+            <input matInput formControlName="name" placeholder="Enter team name">
+            <mat-error *ngIf="teamForm.get('name')?.errors && teamForm.get('name')?.touched">
+              {{ getErrorMessage('name') }}
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+            <mat-label class="uppercase text-custom-secondary">Logo URL</mat-label>
+            <input matInput formControlName="logo" placeholder="Enter logo URL (optional)">
+            <mat-error *ngIf="teamForm.get('logo')?.errors && teamForm.get('logo')?.touched">
+              {{ getErrorMessage('logo') }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+            <mat-label class="uppercase text-custom-secondary">Level</mat-label>
+            <mat-select formControlName="level">
+              <mat-option *ngFor="let option of levelOptions" [value]="option.value">
+                {{ option.label }}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="teamForm.get('level')?.errors && teamForm.get('level')?.touched">
+              {{ getErrorMessage('level') }}
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+            <mat-label class="uppercase text-custom-secondary">Division</mat-label>
+            <mat-select formControlName="division">
+              <mat-option *ngFor="let option of divisionOptions" [value]="option.value">
+                {{ option.label }}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="teamForm.get('division')?.errors && teamForm.get('division')?.touched">
+              {{ getErrorMessage('division') }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Season Statistics Section -->
+      <div class="form-section">
+        <div class="section-header">
+          <span class="section-title">Season Statistics</span>
+        </div>
+        <mat-divider class="section-divider"></mat-divider>
+        <div class="form-row">
+          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+            <mat-label class="uppercase text-custom-secondary">Games Played</mat-label>
+            <input matInput type="number" formControlName="gamesPlayed" placeholder="Enter games played">
+            <mat-error *ngIf="teamForm.get('gamesPlayed')?.errors && teamForm.get('gamesPlayed')?.touched">
+              {{ getErrorMessage('gamesPlayed') }}
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+            <mat-label class="uppercase text-custom-secondary">Wins</mat-label>
+            <input matInput type="number" formControlName="wins" placeholder="Enter wins">
+            <mat-error *ngIf="teamForm.get('wins')?.errors && teamForm.get('wins')?.touched">
+              {{ getErrorMessage('wins') }}
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+            <mat-label class="uppercase text-custom-secondary">Losses</mat-label>
+            <input matInput type="number" formControlName="losses" placeholder="Enter losses">
+            <mat-error *ngIf="teamForm.get('losses')?.errors && teamForm.get('losses')?.touched">
+              {{ getErrorMessage('losses') }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+            <mat-label class="uppercase text-custom-secondary">Points</mat-label>
+            <input matInput type="number" formControlName="points" placeholder="Enter points">
+            <mat-error *ngIf="teamForm.get('points')?.errors && teamForm.get('points')?.touched">
+              {{ getErrorMessage('points') }}
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+            <mat-label class="uppercase text-custom-secondary">Goals For</mat-label>
+            <input matInput type="number" formControlName="goalsFor" placeholder="Enter goals for">
+            <mat-error *ngIf="teamForm.get('goalsFor')?.errors && teamForm.get('goalsFor')?.touched">
+              {{ getErrorMessage('goalsFor') }}
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+            <mat-label class="uppercase text-custom-secondary">Goals Against</mat-label>
+            <input matInput type="number" formControlName="goalsAgainst" placeholder="Enter goals against">
+            <mat-error *ngIf="teamForm.get('goalsAgainst')?.errors && teamForm.get('goalsAgainst')?.touched">
+              {{ getErrorMessage('goalsAgainst') }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+      </div>
+
+    </form>
+  </mat-dialog-content>
+
+  <mat-dialog-actions class="modal-actions">
+    <button mat-stroked-button (click)="onCancel()" class="cancel-btn">
+      Cancel
+    </button>
+    <button mat-raised-button color="primary" (click)="onSubmit()" class="submit-btn">
+      <mat-icon>save</mat-icon>
+      {{ isEditMode ? 'Update Team' : 'Add Team' }}
+    </button>
+  </mat-dialog-actions>
+</div>

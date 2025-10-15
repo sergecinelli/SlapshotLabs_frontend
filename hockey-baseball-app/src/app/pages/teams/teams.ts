@@ -8,6 +8,7 @@ import { PageHeaderComponent } from '../../shared/components/page-header/page-he
 import { DataTableComponent, TableColumn, TableAction } from '../../shared/components/data-table/data-table';
 import { TeamService } from '../../services/team.service';
 import { Team } from '../../shared/interfaces/team.interface';
+import { TeamFormModalComponent, TeamFormModalData } from '../../shared/components/team-form-modal/team-form-modal';
 
 @Component({
   selector: 'app-teams',
@@ -171,12 +172,70 @@ export class TeamsComponent implements OnInit {
   }
 
   openAddTeamModal(): void {
-    console.log('Add team modal would open here');
-    // TODO: Implement team form modal when needed
+    const dialogRef = this.dialog.open(TeamFormModalComponent, {
+      width: '800px',
+      maxWidth: '95vw',
+      data: {
+        isEditMode: false
+      } as TeamFormModalData,
+      panelClass: 'team-form-modal-dialog',
+      disableClose: true
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.addTeam(result);
+      }
+    });
   }
 
   private editTeam(team: Team): void {
-    console.log('Edit team modal would open here for:', team);
-    // TODO: Implement team edit modal when needed
+    const dialogRef = this.dialog.open(TeamFormModalComponent, {
+      width: '800px',
+      maxWidth: '95vw',
+      data: {
+        team: team,
+        isEditMode: true
+      } as TeamFormModalData,
+      panelClass: 'team-form-modal-dialog',
+      disableClose: true
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.updateTeam(result);
+      }
+    });
+  }
+
+  private addTeam(teamData: Partial<Team>): void {
+    this.teamService.addTeam(teamData).subscribe({
+      next: (newTeam) => {
+        const currentTeams = this.teams();
+        this.teams.set([...currentTeams, newTeam]);
+        console.log('Team added successfully');
+      },
+      error: (error) => {
+        console.error('Error adding team:', error);
+      }
+    });
+  }
+
+  private updateTeam(teamData: Partial<Team>): void {
+    this.teamService.updateTeam(teamData.id!, teamData).subscribe({
+      next: (updatedTeam) => {
+        const currentTeams = this.teams();
+        const index = currentTeams.findIndex(t => t.id === updatedTeam.id);
+        if (index !== -1) {
+          const newTeams = [...currentTeams];
+          newTeams[index] = updatedTeam;
+          this.teams.set(newTeams);
+          console.log('Team updated successfully');
+        }
+      },
+      error: (error) => {
+        console.error('Error updating team:', error);
+      }
+    });
   }
 }
