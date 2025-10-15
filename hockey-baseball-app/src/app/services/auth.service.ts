@@ -1,6 +1,6 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Observable, BehaviorSubject, of, throwError } from 'rxjs';
-import { map, tap, catchError, shareReplay, switchMap } from 'rxjs/operators';
+import { tap, catchError, shareReplay, switchMap } from 'rxjs/operators';
 import { ApiService } from './api.service';
 import { CsrfTokenService } from './csrf-token.service';
 import {
@@ -28,13 +28,8 @@ export class AuthService {
   // Cache for ongoing API requests to prevent multiple simultaneous calls
   private currentUserRequest$: Observable<UserProfile | null> | null = null;
 
-  constructor(
-    private apiService: ApiService,
-    private csrfTokenService: CsrfTokenService
-  ) {
-    // Don't automatically fetch user on initialization
-    // Call initializeAuth() manually when needed
-  }
+  private apiService = inject(ApiService);
+  private csrfTokenService = inject(CsrfTokenService);
 
   /**
    * Initialize authentication by checking if user is already signed in
@@ -126,7 +121,7 @@ export class AuthService {
         this.isAuthenticatedSubject.next(true);
         this.currentUserRequest$ = null; // Clear the ongoing request
       }),
-      catchError((error) => {
+      catchError(() => {
         this.currentUserSubject.next(null);
         this.isAuthenticatedSubject.next(false);
         this.currentUserRequest$ = null; // Clear the ongoing request

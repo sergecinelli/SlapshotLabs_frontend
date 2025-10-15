@@ -54,6 +54,10 @@
 
       <a
         (click)="navigateToForgotPassword()"
+        (keyup.enter)="navigateToForgotPassword()"
+        (keyup.space)="navigateToForgotPassword()"
+        tabindex="0"
+        role="button"
         class="text-custom-primary hover:text-red-700 no-underline font-medium text-xs cursor-pointer"
       >
         Forgot Password?

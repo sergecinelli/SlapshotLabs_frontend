@@ -1,18 +1,18 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, throwError } from 'rxjs';
-import { map, catchError, tap } from 'rxjs/operators';
+import { map, catchError } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CsrfTokenService {
+  private http = inject(HttpClient);
+
   private readonly csrfUrl = `${environment.apiUrl}/users/csrf`;
   private csrfToken = new BehaviorSubject<string | null>(null);
   private isInitialized = false;
-
-  constructor(private http: HttpClient) {}
 
   /**
    * Initialize CSRF token by making a request to /api/users/csrf

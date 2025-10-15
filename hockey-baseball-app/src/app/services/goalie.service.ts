@@ -1,8 +1,8 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of, delay } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
-import { Goalie, GoalieTableData, GoalieApiOut, GoalieApiIn } from '../shared/interfaces/goalie.interface';
+import { Goalie, GoalieTableData, GoalieApiOut } from '../shared/interfaces/goalie.interface';
 import { ApiService } from './api.service';
 import { GoalieDataMapper } from '../shared/utils/goalie-data-mapper';
 
@@ -10,12 +10,10 @@ import { GoalieDataMapper } from '../shared/utils/goalie-data-mapper';
   providedIn: 'root'
 })
 export class GoalieService {
-  private readonly mockDataPath = '/assets/data/goalies-mock.json';
+  private http = inject(HttpClient);
+  private apiService = inject(ApiService);
 
-  constructor(
-    private http: HttpClient,
-    private apiService: ApiService
-  ) {}
+  private readonly mockDataPath = '/assets/data/goalies-mock.json';
 
   getGoalies(): Observable<GoalieTableData> {
     return this.apiService.get<GoalieApiOut[]>('/hockey/goalies').pipe(

@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of, delay, throwError } from 'rxjs';
 import { map, catchError, switchMap } from 'rxjs/operators';
@@ -9,12 +9,10 @@ import { ApiService } from './api.service';
   providedIn: 'root'
 })
 export class PlayerService {
-  private readonly mockDataPath = '/assets/data/players-mock.json';
+  private http = inject(HttpClient);
+  private apiService = inject(ApiService);
 
-  constructor(
-    private http: HttpClient,
-    private apiService: ApiService
-  ) {}
+  private readonly mockDataPath = '/assets/data/players-mock.json';
 
   getPlayers(): Observable<PlayerTableData> {
     return this.apiService.get<PlayerApiOut[]>('/hockey/player/list').pipe(

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
@@ -24,18 +24,16 @@ import { Player, PlayerSeasonStats, PlayerRecentGameStats } from '../../shared/i
   styleUrl: './player-profile.scss'
 })
 export class PlayerProfileComponent implements OnInit {
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private playerService = inject(PlayerService);
+
   player: Player | null = null;
   loading = true;
   
   // Table column definitions
   seasonStatsColumns: string[] = ['season', 'team', 'gamesPlayed', 'goals', 'assists', 'points', 'shotsOnGoal', 'scoringChances', 'penaltiesDrawn', 'turnovers', 'faceOffWinPercentage'];
   recentGameStatsColumns: string[] = ['season', 'date', 'vs', 'team', 'score', 'goals', 'assists', 'points', 'shotsOnGoal', 'scoringChances', 'penaltiesDrawn', 'turnovers', 'faceOffWinPercentage'];
-
-  constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    private playerService: PlayerService
-  ) {}
 
   ngOnInit(): void {
     const playerId = this.route.snapshot.paramMap.get('id');

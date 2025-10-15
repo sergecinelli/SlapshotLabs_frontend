@@ -39,6 +39,7 @@ export interface Team {
   goalsAgainst: number;
   points: number;
   gamesPlayed: number;
+  [key: string]: unknown;  // Index signature for compatibility with Record<string, unknown>
 }
 
 export interface TeamTableData {

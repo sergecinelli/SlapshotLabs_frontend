@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
@@ -33,6 +33,10 @@ export interface PlayerFormModalData {
   styleUrl: './player-form-modal.scss'
 })
 export class PlayerFormModalComponent implements OnInit {
+  private fb = inject(FormBuilder);
+  private dialogRef = inject<MatDialogRef<PlayerFormModalComponent>>(MatDialogRef);
+  data = inject<PlayerFormModalData>(MAT_DIALOG_DATA);
+
   playerForm: FormGroup;
   isEditMode: boolean;
 
@@ -62,11 +66,9 @@ export class PlayerFormModalComponent implements OnInit {
     { value: 'Blizzard Kings', label: 'Blizzard Kings' }
   ];
 
-  constructor(
-    private fb: FormBuilder,
-    private dialogRef: MatDialogRef<PlayerFormModalComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: PlayerFormModalData
-  ) {
+  constructor() {
+    const data = this.data;
+
     this.isEditMode = data.isEditMode;
     this.playerForm = this.createForm();
   }

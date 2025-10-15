@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
@@ -24,18 +24,16 @@ import { Goalie, GoalieSeasonStats, GoalieRecentGameStats } from '../../shared/i
   styleUrl: './goalie-profile.scss'
 })
 export class GoalieProfileComponent implements OnInit {
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private goalieService = inject(GoalieService);
+
   goalie: Goalie | null = null;
   loading = true;
   
   // Table column definitions
   seasonStatsColumns: string[] = ['season', 'team', 'gamesPlayed', 'wins', 'losses', 'ties', 'goalsAgainst', 'shotsAgainst', 'saves', 'savePercentage'];
   recentGameStatsColumns: string[] = ['season', 'date', 'vs', 'team', 'score', 'goalsAgainst', 'shotsAgainst', 'saves', 'savePercentage'];
-
-  constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    private goalieService: GoalieService
-  ) {}
 
   ngOnInit(): void {
     const goalieId = this.route.snapshot.paramMap.get('id');

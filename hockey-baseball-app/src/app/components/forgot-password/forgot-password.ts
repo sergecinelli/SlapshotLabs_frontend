@@ -1,4 +1,4 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
@@ -23,6 +23,10 @@ import { AuthLinkComponent } from '../../shared/components/auth-link/auth-link';
   styleUrls: ['./forgot-password.scss'],
 })
 export class ForgotPasswordComponent implements OnDestroy {
+  private router = inject(Router);
+  private authService = inject(AuthService);
+  private formBuilder = inject(FormBuilder);
+
   forgotPasswordForm: FormGroup;
   isEmailSent = false;
   isLoading = false;
@@ -31,13 +35,9 @@ export class ForgotPasswordComponent implements OnDestroy {
   // Resend functionality
   canResend = false;
   resendCountdown = 0;
-  resendTimer: any;
+  resendTimer: ReturnType<typeof setInterval> | undefined;
 
-  constructor(
-    private router: Router, 
-    private authService: AuthService,
-    private formBuilder: FormBuilder
-  ) {
+  constructor() {
     this.forgotPasswordForm = this.formBuilder.group({
       email: ['', [Validators.required, Validators.email]]
     });

@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy, ElementRef, Renderer2, AfterViewInit } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy, ElementRef, Renderer2, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
@@ -33,27 +33,25 @@ export interface TableAction {
   styleUrl: './data-table.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class DataTableComponent implements AfterViewInit {
+export class DataTableComponent<T extends Record<string, unknown> = Record<string, unknown>> {
+  private elementRef = inject(ElementRef);
+  private renderer = inject(Renderer2);
+  iconService = inject(IconService);
+
   @Input() columns: TableColumn[] = [];
-  
-  constructor(
-    private elementRef: ElementRef,
-    private renderer: Renderer2,
-    public iconService: IconService
-  ) {}
-  @Input() set data(value: any[]) {
+  @Input() set data(value: T[]) {
     this._data = value;
   }
-  get data(): any[] {
+  get data(): T[] {
     return this._data;
   }
-  private _data: any[] = [];
+  private _data: T[] = [];
   
   @Input() actions: TableAction[] = [];
   @Input() loading = false;
   @Input() emptyMessage = 'No data available';
   
-  @Output() actionClick = new EventEmitter<{ action: string, item: any }>();
+  @Output() actionClick = new EventEmitter<{ action: string, item: T }>();
   @Output() sort = new EventEmitter<{ column: string, direction: 'asc' | 'desc' }>();
 
   get displayedColumns(): string[] {
@@ -67,19 +65,26 @@ export class DataTableComponent implements AfterViewInit {
     }
   }
 
-  onActionClick(action: string, item: any): void {
+  onActionClick(action: string, item: T): void {
     this.actionClick.emit({ action, item });
   }
 
-  getCellValue(item: any, column: TableColumn): any {
+  getCellValue(item: T, column: TableColumn): unknown {
     return this.getNestedValue(item, column.key);
   }
 
-  private getNestedValue(obj: any, path: string): any {
-    return path.split('.').reduce((current, key) => current?.[key], obj);
+  private getNestedValue(obj: Record<string, unknown>, path: string): unknown {
+    return path.split('.').reduce((current: unknown, key: string) => (current as Record<string, unknown>)?.[key], obj);
   }
 
-  getTooltipText(item: any, column: TableColumn): string {
+  getNumberValue(item: T, column: TableColumn): number | null {
+    const value = this.getCellValue(item, column);
+    if (value === null || value === undefined) return null;
+    const numValue = Number(value);
+    return isNaN(numValue) ? null : numValue;
+  }
+
+  getTooltipText(item: T, column: TableColumn): string {
     const value = this.getCellValue(item, column);
     if (value === null || value === undefined) {
       return '-';
@@ -88,7 +93,7 @@ export class DataTableComponent implements AfterViewInit {
     // Special formatting for specific fields
     switch (column.key) {
       case 'weight':
-        return `${new Intl.NumberFormat().format(value)} lbs`;
+        return `${new Intl.NumberFormat().format(Number(value))} lbs`;
       case 'height':
         return `Height: ${value}`;
       case 'birthYear':
@@ -96,7 +101,7 @@ export class DataTableComponent implements AfterViewInit {
       default:
         // General formatting for number types
         if (column.type === 'number' && column.key !== 'birthYear') {
-          return new Intl.NumberFormat().format(value);
+          return new Intl.NumberFormat().format(Number(value));
         }
         break;
     }
@@ -104,9 +109,6 @@ export class DataTableComponent implements AfterViewInit {
     return String(value);
   }
 
-  ngAfterViewInit(): void {
-    // Implementation for after view init if needed
-  }
 
   isTextTruncated(element: HTMLElement): boolean {
     if (!element) return false;
@@ -116,7 +118,7 @@ export class DataTableComponent implements AfterViewInit {
     return element.scrollWidth > element.clientWidth;
   }
 
-  onCellMouseEnter(cellElement: HTMLElement, matTooltip: MatTooltip, item: any, column: TableColumn): void {
+  onCellMouseEnter(cellElement: HTMLElement, matTooltip: MatTooltip, item: T, column: TableColumn): void {
     // Always show tooltip if explicitly enabled for the column
     if (column.showTooltip === true) {
       matTooltip.disabled = false;

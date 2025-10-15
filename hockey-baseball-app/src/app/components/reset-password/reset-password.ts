@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl, ValidationErrors } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -22,18 +22,18 @@ import { PasswordResetConfirm } from '../../shared/interfaces/auth.interfaces';
   styleUrl: './reset-password.scss'
 })
 export class ResetPasswordComponent implements OnInit {
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  private formBuilder = inject(FormBuilder);
+  private authService = inject(AuthService);
+
   resetPasswordForm: FormGroup;
   isLoading = false;
   errorMessage = '';
   uidb64 = '';
   token = '';
   
-  constructor(
-    private router: Router, 
-    private route: ActivatedRoute,
-    private formBuilder: FormBuilder,
-    private authService: AuthService
-  ) {
+  constructor() {
     this.resetPasswordForm = this.formBuilder.group({
       password: ['', [Validators.required, Validators.minLength(8)]],
       confirmPassword: ['', [Validators.required]]

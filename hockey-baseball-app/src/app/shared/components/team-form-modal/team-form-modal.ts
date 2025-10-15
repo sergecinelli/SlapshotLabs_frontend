@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
@@ -33,6 +33,10 @@ export interface TeamFormModalData {
   styleUrl: './team-form-modal.scss'
 })
 export class TeamFormModalComponent implements OnInit {
+  private fb = inject(FormBuilder);
+  private dialogRef = inject<MatDialogRef<TeamFormModalComponent>>(MatDialogRef);
+  data = inject<TeamFormModalData>(MAT_DIALOG_DATA);
+
   teamForm: FormGroup;
   isEditMode: boolean;
 
@@ -51,11 +55,9 @@ export class TeamFormModalComponent implements OnInit {
     { value: 'Pacific', label: 'Pacific' }
   ];
 
-  constructor(
-    private fb: FormBuilder,
-    private dialogRef: MatDialogRef<TeamFormModalComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: TeamFormModalData
-  ) {
+  constructor() {
+    const data = this.data;
+
     this.isEditMode = data.isEditMode;
     this.teamForm = this.createForm();
   }

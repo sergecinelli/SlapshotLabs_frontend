@@ -68,6 +68,7 @@ export interface Player {
   penaltiesDrawn: number;
   rink: PlayerRink;
   level: string;
+  [key: string]: unknown;  // Index signature for compatibility with Record<string, unknown>
 }
 
 export interface PlayerTableData {

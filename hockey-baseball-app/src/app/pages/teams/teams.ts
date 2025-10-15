@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { MatButtonModule } from '@angular/material/button';
@@ -44,6 +44,10 @@ import { TeamFormModalComponent, TeamFormModalData } from '../../shared/componen
   styleUrl: './teams.scss'
 })
 export class TeamsComponent implements OnInit {
+  private teamService = inject(TeamService);
+  private http = inject(HttpClient);
+  private dialog = inject(MatDialog);
+
   teams = signal<Team[]>([]);
   loading = signal(true);
 
@@ -64,12 +68,6 @@ export class TeamsComponent implements OnInit {
     { label: 'Edit', action: 'edit', variant: 'secondary' },
     { label: 'View', action: 'view-profile', variant: 'primary' }
   ];
-
-  constructor(
-    private teamService: TeamService,
-    private http: HttpClient,
-    private dialog: MatDialog
-  ) {}
 
   ngOnInit(): void {
     this.loadTeams();
@@ -115,15 +113,15 @@ export class TeamsComponent implements OnInit {
       
       if (aValue === bValue) return 0;
       
-      const result = aValue < bValue ? -1 : 1;
+      const result = (aValue as string | number) < (bValue as string | number) ? -1 : 1;
       return direction === 'asc' ? result : -result;
     });
     
     this.teams.set(sortedTeams);
   }
 
-  private getNestedValue(obj: any, path: string): any {
-    return path.split('.').reduce((current, key) => current?.[key], obj);
+  private getNestedValue(obj: Team, path: string): unknown {
+    return path.split('.').reduce((current: unknown, key: string) => (current as Record<string, unknown>)?.[key], obj);
   }
 
   private deleteTeam(team: Team): void {

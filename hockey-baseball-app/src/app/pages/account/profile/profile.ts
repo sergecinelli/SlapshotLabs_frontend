@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -24,17 +24,17 @@ import { UserProfile, UserEditRequest } from '../../../shared/interfaces/auth.in
   styleUrl: './profile.scss'
 })
 export class ProfileComponent implements OnInit {
+  private formBuilder = inject(FormBuilder);
+  private router = inject(Router);
+  private authService = inject(AuthService);
+
   profileForm: FormGroup;
   isLoading = false;
   isSaving = false;
   errorMessage = '';
   successMessage = '';
   
-  constructor(
-    private formBuilder: FormBuilder, 
-    private router: Router,
-    private authService: AuthService
-  ) {
+  constructor() {
     // Initialize form with empty values - will be populated from API
     this.profileForm = this.formBuilder.group({
       email: ['', [Validators.required, Validators.email]],

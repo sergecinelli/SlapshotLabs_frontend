@@ -1,4 +1,4 @@
-import { Component, computed } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { NavigationService, NavigationItem } from '../../services/navigation.service';
@@ -13,11 +13,9 @@ import { AuthService } from '../../services/auth.service';
   styleUrl: './layout.scss'
 })
 export class LayoutComponent {
-  constructor(
-    private navigationService: NavigationService,
-    private iconService: IconService,
-    private authService: AuthService
-  ) {}
+  private navigationService = inject(NavigationService);
+  private iconService = inject(IconService);
+  private authService = inject(AuthService);
 
   protected get navigationItems() {
     return this.navigationService.navigationItems;

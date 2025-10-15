@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -27,17 +27,17 @@ import { UserSignInForm } from '../../shared/interfaces/auth.interfaces';
   styleUrl: './sign-in.scss',
 })
 export class SignInComponent implements OnInit {
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  private formBuilder = inject(FormBuilder);
+  private authService = inject(AuthService);
+  private snackBar = inject(MatSnackBar);
+
   signInForm: FormGroup;
   isLoading = false;
   returnUrl = '/dashboard';
   
-  constructor(
-    private router: Router,
-    private route: ActivatedRoute,
-    private formBuilder: FormBuilder,
-    private authService: AuthService,
-    private snackBar: MatSnackBar
-  ) {
+  constructor() {
     this.signInForm = this.formBuilder.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],

@@ -53,7 +53,7 @@ export interface Goalie {
   team: string;
   level: string;
   position: string;
-  height: string;  // e.g., "5'6\""
+  height: string;  // e.g., "5'6""
   weight: number;  // in lbs
   shoots: 'Right Shot' | 'Left Shot';
   jerseyNumber: number;
@@ -75,6 +75,7 @@ export interface Goalie {
   ppga: number;  // Power Play Goals Against
   shga: number;  // Short Handed Goals Against
   savesAboveAvg: number;
+  [key: string]: unknown;  // Index signature for compatibility with Record<string, unknown>
 }
 
 export interface GoalieTableData {

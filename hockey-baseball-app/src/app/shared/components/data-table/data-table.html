@@ -58,7 +58,7 @@
                 @if (column.key === 'birthYear') {
                   {{ getCellValue(element, column) }}
                 } @else {
-                  {{ getCellValue(element, column) | number }}
+                  {{ getNumberValue(element, column) | number }}
                 }
               </span>
             }

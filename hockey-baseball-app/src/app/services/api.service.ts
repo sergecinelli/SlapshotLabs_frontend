@@ -1,7 +1,7 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
-import { catchError, retry, switchMap } from 'rxjs/operators';
+import { catchError, retry } from 'rxjs/operators';
 import { CsrfTokenService } from './csrf-token.service';
 import { environment } from '../../environments/environment';
 
@@ -10,11 +10,8 @@ import { environment } from '../../environments/environment';
 })
 export class ApiService {
   private readonly baseUrl = environment.apiUrl;
-
-  constructor(
-    private http: HttpClient,
-    private csrfTokenService: CsrfTokenService
-  ) {}
+  private http = inject(HttpClient);
+  private csrfTokenService = inject(CsrfTokenService);
 
   /**
    * Get HTTP options with proper headers for cookie-based authentication
@@ -78,7 +75,7 @@ export class ApiService {
   /**
    * Generic POST request
    */
-  post<T>(endpoint: string, body: any, includeCredentials = true): Observable<T> {
+  post<T>(endpoint: string, body: unknown, includeCredentials = true): Observable<T> {
     return this.http.post<T>(
       `${this.baseUrl}${endpoint}`,
       body,
@@ -91,7 +88,7 @@ export class ApiService {
   /**
    * Generic PUT request
    */
-  put<T>(endpoint: string, body: any, includeCredentials = true): Observable<T> {
+  put<T>(endpoint: string, body: unknown, includeCredentials = true): Observable<T> {
     return this.http.put<T>(
       `${this.baseUrl}${endpoint}`,
       body,

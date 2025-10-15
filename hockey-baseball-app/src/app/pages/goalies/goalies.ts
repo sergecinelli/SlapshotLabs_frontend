@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { MatButtonModule } from '@angular/material/button';
@@ -44,6 +44,10 @@ import { GoalieFormModalComponent, GoalieFormModalData } from '../../shared/comp
   styleUrl: './goalies.scss'
 })
 export class GoaliesComponent implements OnInit {
+  private goalieService = inject(GoalieService);
+  private http = inject(HttpClient);
+  private dialog = inject(MatDialog);
+
   goalies = signal<Goalie[]>([]);
   loading = signal(true);
 
@@ -77,12 +81,6 @@ export class GoaliesComponent implements OnInit {
     { label: 'Profile', action: 'view-profile', variant: 'primary' },
     { label: 'Spray Chart', icon: 'spray-chart', action: 'shot-spray-chart', variant: 'secondary', iconOnly: true },
   ];
-
-  constructor(
-    private goalieService: GoalieService,
-    private http: HttpClient,
-    private dialog: MatDialog
-  ) {}
 
   ngOnInit(): void {
     this.loadGoalies();
@@ -131,15 +129,15 @@ export class GoaliesComponent implements OnInit {
       
       if (aValue === bValue) return 0;
       
-      const result = aValue < bValue ? -1 : 1;
+      const result = (aValue as string | number) < (bValue as string | number) ? -1 : 1;
       return direction === 'asc' ? result : -result;
     });
     
     this.goalies.set(sortedGoalies);
   }
 
-  private getNestedValue(obj: any, path: string): any {
-    return path.split('.').reduce((current, key) => current?.[key], obj);
+  private getNestedValue(obj: Goalie, path: string): unknown {
+    return path.split('.').reduce((current: unknown, key: string) => (current as Record<string, unknown>)?.[key], obj);
   }
 
   private deleteGoalie(goalie: Goalie): void {

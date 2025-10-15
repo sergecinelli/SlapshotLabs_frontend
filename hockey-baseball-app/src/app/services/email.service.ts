@@ -12,7 +12,6 @@ export interface EmailResponse {
   providedIn: 'root',
 })
 export class EmailService {
-  constructor() {}
 
   /**
    * Simulates sending a password reset email

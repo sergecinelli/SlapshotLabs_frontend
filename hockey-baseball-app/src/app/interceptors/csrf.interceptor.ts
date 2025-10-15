@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { switchMap, catchError } from 'rxjs/operators';
@@ -7,11 +7,11 @@ import { environment } from '../../environments/environment';
 
 @Injectable()
 export class CsrfInterceptor implements HttpInterceptor {
+  private csrfTokenService = inject(CsrfTokenService);
+
   private readonly baseUrl = environment.apiUrl.replace('/api', '');
 
-  constructor(private csrfTokenService: CsrfTokenService) {}
-
-  intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+  intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
     console.log('🔒 CSRF Interceptor - Processing:', request.method, request.url);
     console.log('🔒 CSRF Interceptor - Base URL:', this.baseUrl);
     console.log('🔒 CSRF Interceptor - URL matches base?', request.url.startsWith(this.baseUrl));
@@ -44,9 +44,9 @@ export class CsrfInterceptor implements HttpInterceptor {
   }
 
   private handleProtectedRequest(
-    request: HttpRequest<any>,
+    request: HttpRequest<unknown>,
     next: HttpHandler
-  ): Observable<HttpEvent<any>> {
+  ): Observable<HttpEvent<unknown>> {
     console.log('🔒 CSRF Interceptor - handleProtectedRequest called for:', request.url);
     // Try to get CSRF token synchronously first
     const csrfToken = this.csrfTokenService.getCsrfTokenSync();

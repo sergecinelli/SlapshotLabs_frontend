@@ -1,4 +1,4 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal, inject } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs';
 
@@ -15,6 +15,8 @@ export interface NavigationItem {
   providedIn: 'root'
 })
 export class NavigationService {
+  private router = inject(Router);
+
   private readonly _currentPath = signal<string>('');
   private readonly _navigationItems = signal<NavigationItem[]>([
     {
@@ -69,18 +71,18 @@ export class NavigationService {
   readonly currentPath = this._currentPath.asReadonly();
   readonly navigationItems = this._navigationItems.asReadonly();
 
-  constructor(private router: Router) {
+  constructor() {
     // Track current route
     this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe((event: NavigationEnd) => {
         this._currentPath.set(event.urlAfterRedirects);
-        this.updateExpandedState(event.urlAfterRedirects);
+        this.updateExpandedState();
       });
     
     // Set initial path
     this._currentPath.set(this.router.url);
-    this.updateExpandedState(this.router.url);
+    this.updateExpandedState();
   }
 
   toggleSubmenu(item: NavigationItem): void {
@@ -115,7 +117,7 @@ export class NavigationService {
     return activeItem?.label || 'Dashboard';
   }
 
-  private updateExpandedState(currentPath: string): void {
+  private updateExpandedState(): void {
     const items = this._navigationItems();
     const updatedItems = items.map(item => {
       if (item.children && this.isParentActive(item)) {

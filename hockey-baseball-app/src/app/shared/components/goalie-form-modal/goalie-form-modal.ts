@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
@@ -33,6 +33,10 @@ export interface GoalieFormModalData {
   styleUrl: './goalie-form-modal.scss'
 })
 export class GoalieFormModalComponent implements OnInit {
+  private fb = inject(FormBuilder);
+  private dialogRef = inject<MatDialogRef<GoalieFormModalComponent>>(MatDialogRef);
+  data = inject<GoalieFormModalData>(MAT_DIALOG_DATA);
+
   goalieForm: FormGroup;
   isEditMode: boolean;
 
@@ -54,11 +58,9 @@ export class GoalieFormModalComponent implements OnInit {
     { value: 'Blizzard Kings', label: 'Blizzard Kings' }
   ];
 
-  constructor(
-    private fb: FormBuilder,
-    private dialogRef: MatDialogRef<GoalieFormModalComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: GoalieFormModalData
-  ) {
+  constructor() {
+    const data = this.data;
+
     this.isEditMode = data.isEditMode;
     this.goalieForm = this.createForm();
   }

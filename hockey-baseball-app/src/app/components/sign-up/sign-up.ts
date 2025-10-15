@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -25,20 +25,20 @@ import { UserRegistrationForm } from '../../shared/interfaces/auth.interfaces';
   styleUrl: './sign-up.scss',
 })
 export class SignUpComponent {
+  private router = inject(Router);
+  private formBuilder = inject(FormBuilder);
+  private authService = inject(AuthService);
+  private snackBar = inject(MatSnackBar);
+
   signUpForm: FormGroup;
   isLoading = false;
   
-  constructor(
-    private router: Router, 
-    private formBuilder: FormBuilder,
-    private authService: AuthService,
-    private snackBar: MatSnackBar
-  ) {
+  constructor() {
     this.signUpForm = this.formBuilder.group({
       email: ['', [Validators.required, Validators.email]],
       firstName: ['', [Validators.required, Validators.minLength(2)]],
       lastName: ['', [Validators.required, Validators.minLength(2)]],
-      phoneNumber: ['', [Validators.required, Validators.pattern(/^[\+]?[1-9][\d]{0,15}$/)]],
+      phoneNumber: ['', [Validators.required, Validators.pattern(/^[+]?[1-9][\d]{0,15}$/)]],
       password: ['', [Validators.required, Validators.minLength(6)]],
       confirmPassword: ['', [Validators.required]]
     }, { validators: this.passwordMatchValidator });
