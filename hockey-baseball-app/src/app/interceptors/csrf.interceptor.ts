@@ -49,7 +49,7 @@ export class CsrfInterceptor implements HttpInterceptor {
   ): Observable<HttpEvent<any>> {
     console.log('🔒 CSRF Interceptor - handleProtectedRequest called for:', request.url);
     // Try to get CSRF token synchronously first
-    let csrfToken = this.csrfTokenService.getCsrfTokenSync();
+    const csrfToken = this.csrfTokenService.getCsrfTokenSync();
     console.log('🔒 CSRF Interceptor - Sync token result:', csrfToken ? 'FOUND' : 'NOT FOUND');
     if (csrfToken) {
       console.log('🔒 CSRF Interceptor - Token value:', csrfToken.substring(0, 10) + '...');

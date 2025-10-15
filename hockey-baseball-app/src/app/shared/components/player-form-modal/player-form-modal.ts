@@ -187,7 +187,7 @@ export class PlayerFormModalComponent implements OnInit {
   }
 
   private getFieldLabel(fieldName: string): string {
-    const labels: { [key: string]: string } = {
+    const labels: Record<string, string> = {
       firstName: 'First Name',
       lastName: 'Last Name',
       team: 'Team',

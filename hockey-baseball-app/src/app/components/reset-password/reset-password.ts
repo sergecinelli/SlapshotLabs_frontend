@@ -25,8 +25,8 @@ export class ResetPasswordComponent implements OnInit {
   resetPasswordForm: FormGroup;
   isLoading = false;
   errorMessage = '';
-  uidb64: string = '';
-  token: string = '';
+  uidb64 = '';
+  token = '';
   
   constructor(
     private router: Router, 

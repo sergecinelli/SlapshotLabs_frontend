@@ -10,5 +10,5 @@ import { MatDivider } from '@angular/material/divider';
   styleUrl: './auth-layout.scss'
 })
 export class AuthLayoutComponent {
-  @Input() titleText: string = '';
+  @Input() titleText = '';
 }

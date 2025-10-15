@@ -147,7 +147,7 @@ export class TeamFormModalComponent implements OnInit {
   }
 
   private getFieldLabel(fieldName: string): string {
-    const labels: { [key: string]: string } = {
+    const labels: Record<string, string> = {
       name: 'Team Name',
       logo: 'Logo',
       level: 'Level',

@@ -236,7 +236,7 @@ export class TeamService {
   }
 
   private mapTeamLevelIdToName(teamLevelId: number): string {
-    const levelMap: { [key: number]: string } = {
+    const levelMap: Record<number, string> = {
       1: 'NHL',
       2: 'AHL',
       3: 'Junior A',
@@ -247,7 +247,7 @@ export class TeamService {
   }
 
   private mapTeamLevelNameToId(level: string): number {
-    const levelMap: { [key: string]: number } = {
+    const levelMap: Record<string, number> = {
       'NHL': 1,
       'AHL': 2,
       'Junior A': 3,
@@ -258,7 +258,7 @@ export class TeamService {
   }
 
   private mapDivisionIdToName(divisionId: number): string {
-    const divisionMap: { [key: number]: string } = {
+    const divisionMap: Record<number, string> = {
       1: 'Atlantic',
       2: 'Metropolitan',
       3: 'Central',
@@ -268,7 +268,7 @@ export class TeamService {
   }
 
   private mapDivisionNameToId(division: string): number {
-    const divisionMap: { [key: string]: number } = {
+    const divisionMap: Record<string, number> = {
       'Atlantic': 1,
       'Metropolitan': 2,
       'Central': 3,

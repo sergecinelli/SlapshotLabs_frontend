@@ -8,8 +8,8 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
   styleUrl: './auth-link.scss'
 })
 export class AuthLinkComponent {
-  @Input() text: string = '';
-  @Input() linkText: string = '';
+  @Input() text = '';
+  @Input() linkText = '';
   
   @Output() linkClicked = new EventEmitter<void>();
 

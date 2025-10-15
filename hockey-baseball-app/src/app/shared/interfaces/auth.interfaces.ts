@@ -54,7 +54,7 @@ export interface ApiMessage {
 }
 
 export interface ApiErrorResponse {
-  errors: { [key: string]: any };
+  errors: Record<string, any>;
 }
 
 // User registration form interface (matches your current form)

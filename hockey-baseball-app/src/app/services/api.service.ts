@@ -19,7 +19,7 @@ export class ApiService {
   /**
    * Get HTTP options with proper headers for cookie-based authentication
    */
-  private getHttpOptions(includeCredentials: boolean = true) {
+  private getHttpOptions(includeCredentials = true) {
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
       'Accept': 'application/json'
@@ -65,7 +65,7 @@ export class ApiService {
   /**
    * Generic GET request
    */
-  get<T>(endpoint: string, includeCredentials: boolean = true): Observable<T> {
+  get<T>(endpoint: string, includeCredentials = true): Observable<T> {
     return this.http.get<T>(
       `${this.baseUrl}${endpoint}`,
       this.getHttpOptions(includeCredentials)
@@ -78,7 +78,7 @@ export class ApiService {
   /**
    * Generic POST request
    */
-  post<T>(endpoint: string, body: any, includeCredentials: boolean = true): Observable<T> {
+  post<T>(endpoint: string, body: any, includeCredentials = true): Observable<T> {
     return this.http.post<T>(
       `${this.baseUrl}${endpoint}`,
       body,
@@ -91,7 +91,7 @@ export class ApiService {
   /**
    * Generic PUT request
    */
-  put<T>(endpoint: string, body: any, includeCredentials: boolean = true): Observable<T> {
+  put<T>(endpoint: string, body: any, includeCredentials = true): Observable<T> {
     return this.http.put<T>(
       `${this.baseUrl}${endpoint}`,
       body,
@@ -104,7 +104,7 @@ export class ApiService {
   /**
    * Generic DELETE request
    */
-  delete<T>(endpoint: string, includeCredentials: boolean = true): Observable<T> {
+  delete<T>(endpoint: string, includeCredentials = true): Observable<T> {
     return this.http.delete<T>(
       `${this.baseUrl}${endpoint}`,
       this.getHttpOptions(includeCredentials)

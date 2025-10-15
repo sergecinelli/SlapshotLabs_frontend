@@ -283,7 +283,7 @@ export class PlayerService {
   }
 
   private mapPositionIdToName(positionId: number): 'Left Wing' | 'Center' | 'Right Wing' | 'Left Defense' | 'Right Defense' {
-    const positionMap: { [key: number]: 'Left Wing' | 'Center' | 'Right Wing' | 'Left Defense' | 'Right Defense' } = {
+    const positionMap: Record<number, 'Left Wing' | 'Center' | 'Right Wing' | 'Left Defense' | 'Right Defense'> = {
       1: 'Left Wing',
       2: 'Center',
       3: 'Right Wing',
@@ -294,7 +294,7 @@ export class PlayerService {
   }
 
   private mapPositionNameToId(position: string): number {
-    const positionMap: { [key: string]: number } = {
+    const positionMap: Record<string, number> = {
       'Left Wing': 1,
       'Center': 2,
       'Right Wing': 3,

@@ -62,7 +62,7 @@ export class GoalieDataMapper {
    * @param teamId - Team ID (required by API)
    * @returns GoalieApiIn object
    */
-  static toApiInFormat(goalie: Partial<Goalie>, teamId: number = 1): GoalieApiIn {
+  static toApiInFormat(goalie: Partial<Goalie>, teamId = 1): GoalieApiIn {
     return {
       team_id: teamId,
       height: this.heightStringToInches(goalie.height || ''),

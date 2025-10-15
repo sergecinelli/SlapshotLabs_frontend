@@ -9,12 +9,12 @@ import { MatButtonModule } from '@angular/material/button';
   styleUrl: './auth-button.scss'
 })
 export class AuthButtonComponent {
-  @Input() text: string = '';
+  @Input() text = '';
   @Input() type: 'submit' | 'button' = 'button';
-  @Input() disabled: boolean = false;
+  @Input() disabled = false;
   @Input() variant: 'filled' | 'outlined' = 'filled';
-  @Input() loading: boolean = false;
-  @Input() loadingText: string = 'Loading...';
+  @Input() loading = false;
+  @Input() loadingText = 'Loading...';
   
   @Output() clicked = new EventEmitter<void>();
 

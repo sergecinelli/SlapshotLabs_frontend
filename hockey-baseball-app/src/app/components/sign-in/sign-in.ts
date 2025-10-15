@@ -29,7 +29,7 @@ import { UserSignInForm } from '../../shared/interfaces/auth.interfaces';
 export class SignInComponent implements OnInit {
   signInForm: FormGroup;
   isLoading = false;
-  returnUrl: string = '/dashboard';
+  returnUrl = '/dashboard';
   
   constructor(
     private router: Router,
