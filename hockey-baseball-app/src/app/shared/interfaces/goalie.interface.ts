@@ -14,7 +14,7 @@ export interface GoalieApiIn {
   jersey_number: number;
   first_name: string;
   last_name: string;
-  birth_year: number;
+  birth_year: string;  // Date format: YYYY-MM-DD
   wins: number;
   losses: number;
   position_id: number;  // Position ID, 0 by default for goalies

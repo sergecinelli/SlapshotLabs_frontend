@@ -106,7 +106,7 @@ export class PlayerService {
 
     const apiUpdateData = this.toApiUpdateFormat(playerData);
     
-    return this.apiService.put<void>(`/hockey/player/${numericId}`, apiUpdateData).pipe(
+    return this.apiService.patch<void>(`/hockey/player/${numericId}`, apiUpdateData).pipe(
       switchMap(() => {
         // After successful update, fetch the updated player data
         return this.getPlayerById(id);
@@ -140,7 +140,7 @@ export class PlayerService {
       jerseyNumber: apiPlayer.number,  // Changed from jersey_number to number
       firstName: apiPlayer.first_name,
       lastName: apiPlayer.last_name,
-      birthYear: new Date(apiPlayer.birth_year).getFullYear(),  // Parse date
+      birthYear: this.dateStringToYear(apiPlayer.birth_year),  // Convert date string to year
       shotsOnGoal: apiPlayer.shots_on_goal,  // Now available in API
       shotSprayChart: '', // Not available in current API schema
       gamesPlayed: apiPlayer.games_played,
@@ -184,7 +184,7 @@ export class PlayerService {
       updateData.last_name = playerData.lastName;
     }
     if (playerData.birthYear) {
-      updateData.birth_year = playerData.birthYear;
+      updateData.birth_year = this.yearToDateString(playerData.birthYear);
     }
     if (playerData.position) {
       updateData.position_id = this.mapPositionNameToId(playerData.position);
@@ -223,7 +223,7 @@ export class PlayerService {
       number: playerData.jerseyNumber || 0,  // Changed from jersey_number to number
       first_name: playerData.firstName || '',
       last_name: playerData.lastName || '',
-      birth_year: playerData.birthYear || new Date().getFullYear() - 25,
+      birth_year: this.yearToDateString(playerData.birthYear || new Date().getFullYear() - 25),
       goals: playerData.goals || 0,
       assists: playerData.assists || 0,
       points: playerData.points || 0,
@@ -241,6 +241,26 @@ export class PlayerService {
       return feet * 12 + inches;
     }
     return 72; // Default to 6'0"
+  }
+
+  /**
+   * Convert year number to date string format (YYYY-MM-DD)
+   * @param year - Year as number (e.g. 1995)
+   * @returns Date string in YYYY-MM-DD format
+   */
+  private yearToDateString(year: number): string {
+    // Use January 1st of the given year
+    return `${year}-01-01`;
+  }
+
+  /**
+   * Convert date string to year number
+   * @param dateString - Date string in YYYY-MM-DD format
+   * @returns Year as number
+   */
+  private dateStringToYear(dateString: string): number {
+    const date = new Date(dateString);
+    return date.getFullYear();
   }
 
   private mapPositionIdToName(positionId: number): 'Left Wing' | 'Center' | 'Right Wing' | 'Left Defense' | 'Right Defense' {

@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
-import { Observable, BehaviorSubject, of, throwError } from 'rxjs';
-import { tap, catchError, shareReplay, switchMap } from 'rxjs/operators';
+import { Observable, BehaviorSubject, of, throwError, timer } from 'rxjs';
+import { tap, catchError, shareReplay, switchMap, mergeMap } from 'rxjs/operators';
 import { ApiService } from './api.service';
 import { CsrfTokenService } from './csrf-token.service';
 import {
@@ -62,16 +62,27 @@ export class AuthService {
       remember_me: signInData.rememberMe
     };
 
-    // Try to initialize CSRF token first, then sign in
-    return this.csrfTokenService.initializeCsrfToken().pipe(
+    // Refresh CSRF token before sign-in for security
+    console.log('🔄 Auth Service - Refreshing CSRF token before sign-in');
+    return this.apiService.refreshCsrfToken().pipe(
       switchMap(() => {
-        console.log('🔑 Auth Service - CSRF token initialized, proceeding with sign-in');
+        console.log('🔑 Auth Service - CSRF token refreshed, proceeding with sign-in');
         return this.apiService.post<void>('/users/signin', signInRequest);
       }),
-      tap(() => {
-        // After successful sign-in, get user profile
-        this.refreshCurrentUser().subscribe();
+      switchMap(() => {
+        console.log('✅ Auth Service - Sign-in successful, waiting briefly for token sync');
+        // Small delay to ensure CSRF token is properly synchronized
+        return timer(100).pipe(
+          mergeMap(() => {
+            console.log('🔄 Auth Service - Getting user profile after token sync');
+            return this.refreshCurrentUser();
+          })
+        );
       }),
+      tap(() => {
+        console.log('✅ Auth Service - User profile loaded successfully');
+      }),
+      switchMap(() => of(void 0)), // Convert to Observable<void>
       catchError(error => {
         console.error('😱 Auth Service - Sign-in failed:', error);
         return throwError(() => error);
@@ -83,18 +94,41 @@ export class AuthService {
    * Sign out user
    */
   signOut(): Observable<void> {
-    return this.apiService.get<void>('/users/signout').pipe(
-      tap(() => {
-        this.currentUserSubject.next(null);
-        this.isAuthenticatedSubject.next(false);
-        this.csrfTokenService.clearCsrfToken();
+    return this.apiService.get<unknown>('/users/signout').pipe(
+      switchMap(() => {
+        // After logout, refresh CSRF token for security
+        console.log('🔄 Auth Service - Refreshing CSRF token after logout');
+        return this.apiService.refreshCsrfToken().pipe(
+          tap(() => {
+            this.currentUserSubject.next(null);
+            this.isAuthenticatedSubject.next(false);
+          }),
+          switchMap(() => of(void 0)), // Convert to Observable<void>
+          catchError(() => {
+            // If CSRF refresh fails after logout, clear token completely
+            this.currentUserSubject.next(null);
+            this.isAuthenticatedSubject.next(false);
+            this.csrfTokenService.clearCsrfToken();
+            return of(void 0);
+          })
+        );
       }),
       catchError(() => {
-        // Even if sign-out fails, clear local state
-        this.currentUserSubject.next(null);
-        this.isAuthenticatedSubject.next(false);
-        this.csrfTokenService.clearCsrfToken();
-        return of(undefined);
+        // If sign-out fails, try to refresh CSRF token anyway then clear local state
+        return this.apiService.refreshCsrfToken().pipe(
+          tap(() => {
+            this.currentUserSubject.next(null);
+            this.isAuthenticatedSubject.next(false);
+          }),
+          switchMap(() => of(void 0)), // Convert to Observable<void>
+          catchError(() => {
+            // If both sign-out and CSRF refresh fail, clear everything
+            this.currentUserSubject.next(null);
+            this.isAuthenticatedSubject.next(false);
+            this.csrfTokenService.clearCsrfToken();
+            return of(void 0);
+          })
+        );
       })
     );
   }

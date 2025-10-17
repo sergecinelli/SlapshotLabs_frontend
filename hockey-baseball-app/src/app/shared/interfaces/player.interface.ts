@@ -15,7 +15,7 @@ export interface PlayerApiIn {
   number: number;  // Jersey number
   first_name: string;
   last_name: string;
-  birth_year: number;
+  birth_year: string;  // Date format: YYYY-MM-DD
   goals: number;
   assists: number;
   points: number;

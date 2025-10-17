@@ -106,7 +106,7 @@ export class TeamService {
 
     const apiUpdateData = TeamDataMapper.toApiUpdateFormat(teamData);
     
-    return this.apiService.put<void>(`/hockey/team/${numericId}`, apiUpdateData).pipe(
+    return this.apiService.patch<void>(`/hockey/team/${numericId}`, apiUpdateData).pipe(
       switchMap(() => {
         // After successful update, fetch the updated team data
         return this.getTeamById(id);

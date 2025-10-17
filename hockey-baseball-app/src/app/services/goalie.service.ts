@@ -127,6 +127,16 @@ export class GoalieService {
     );
   }
 
+  /**
+   * Convert year number to date string format (YYYY-MM-DD)
+   * @param year - Year as number (e.g. 1995)
+   * @returns Date string in YYYY-MM-DD format
+   */
+  private yearToDateString(year: number): string {
+    // Use January 1st of the given year
+    return `${year}-01-01`;
+  }
+
   private toApiPatchFormat(goalieData: Partial<Goalie>): Partial<GoalieApiIn> {
     const updateData: Partial<GoalieApiIn> = {};
     
@@ -150,7 +160,7 @@ export class GoalieService {
       updateData.last_name = goalieData.lastName;
     }
     if (goalieData.birthYear) {
-      updateData.birth_year = goalieData.birthYear;
+      updateData.birth_year = this.yearToDateString(goalieData.birthYear);
     }
     if (goalieData.wins !== undefined) {
       updateData.wins = goalieData.wins;

@@ -138,6 +138,15 @@ export class CsrfTokenService {
   }
 
   /**
+   * Force refresh CSRF token by clearing current token and fetching a new one
+   */
+  refreshCsrfToken(): Observable<string> {
+    console.log('🔄 CSRF Service - Refreshing CSRF token');
+    this.clearCsrfToken();
+    return this.initializeCsrfToken();
+  }
+
+  /**
    * Check if CSRF token is initialized
    */
   isTokenInitialized(): boolean {

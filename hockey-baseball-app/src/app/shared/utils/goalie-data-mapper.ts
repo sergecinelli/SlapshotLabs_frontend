@@ -71,10 +71,10 @@ export class GoalieDataMapper {
       jersey_number: goalie.jerseyNumber || 0,
       first_name: goalie.firstName || '',
       last_name: goalie.lastName || '',
-      birth_year: goalie.birthYear || new Date().getFullYear(),
+      birth_year: this.yearToDateString(goalie.birthYear || new Date().getFullYear()),
       wins: goalie.wins || 0,
       losses: goalie.losses || 0,
-      position_id: 0  // Default position_id for goalies
+      position_id: 6  // Default position_id for goalies
     };
   }
 
@@ -96,7 +96,7 @@ export class GoalieDataMapper {
       jerseyNumber: apiGoalie.jersey_number,
       firstName: apiGoalie.first_name,
       lastName: apiGoalie.last_name,
-      birthYear: new Date(apiGoalie.birth_year).getFullYear(),
+      birthYear: this.dateStringToYear(apiGoalie.birth_year),
       shotsOnGoal: apiGoalie.shots_on_goal,
       saves: apiGoalie.saves,
       goalsAgainst: apiGoalie.goals_against,
@@ -127,5 +127,25 @@ export class GoalieDataMapper {
    */
   static fromApiOutArrayFormat(apiGoalies: GoalieApiOut[]): Goalie[] {
     return apiGoalies.map(apiGoalie => this.fromApiOutFormat(apiGoalie));
+  }
+
+  /**
+   * Convert year number to date string format (YYYY-MM-DD)
+   * @param year - Year as number (e.g. 1995)
+   * @returns Date string in YYYY-MM-DD format
+   */
+  private static yearToDateString(year: number): string {
+    // Use January 1st of the given year
+    return `${year}-01-01`;
+  }
+
+  /**
+   * Convert date string to year number
+   * @param dateString - Date string in YYYY-MM-DD format
+   * @returns Year as number
+   */
+  private static dateStringToYear(dateString: string): number {
+    const date = new Date(dateString);
+    return date.getFullYear();
   }
 }

@@ -145,6 +145,13 @@ export class ApiService {
   }
 
   /**
+   * Refresh CSRF token (useful for logout and login)
+   */
+  refreshCsrfToken(): Observable<string> {
+    return this.csrfTokenService.refreshCsrfToken();
+  }
+
+  /**
    * Get the base API URL
    */
   getBaseUrl(): string {

@@ -66,15 +66,21 @@ export class CsrfInterceptor implements HttpInterceptor {
       return next.handle(csrfRequest).pipe(
         catchError(error => {
           if (error.status === 403) {
+            console.log('🚑 CSRF Interceptor - 403 error, refreshing token and retrying');
             // CSRF token might be stale, refresh and retry once
-            return this.csrfTokenService.initializeCsrfToken().pipe(
+            return this.csrfTokenService.refreshCsrfToken().pipe(
               switchMap(newToken => {
+                console.log('🔄 CSRF Interceptor - Token refreshed, retrying request');
                 const retryRequest = request.clone({
                   setHeaders: {
                     'X-CSRFToken': newToken
                   }
                 });
                 return next.handle(retryRequest);
+              }),
+              catchError(refreshError => {
+                console.error('😱 CSRF Interceptor - Token refresh failed:', refreshError);
+                return throwError(() => error); // Return original error
               })
             );
           }
@@ -83,9 +89,11 @@ export class CsrfInterceptor implements HttpInterceptor {
       );
     }
 
-    // No token available, initialize it first then proceed
-    return this.csrfTokenService.initializeCsrfToken().pipe(
+    // No token available, get/refresh it first then proceed
+    console.log('🔄 CSRF Interceptor - No token available, refreshing...');
+    return this.csrfTokenService.refreshCsrfToken().pipe(
       switchMap(token => {
+        console.log('🔑 CSRF Interceptor - Token obtained, proceeding with request');
         const csrfRequest = request.clone({
           setHeaders: {
             'X-CSRFToken': token
@@ -94,8 +102,8 @@ export class CsrfInterceptor implements HttpInterceptor {
         return next.handle(csrfRequest);
       }),
       catchError(error => {
-        console.error('Failed to initialize CSRF token:', error);
-        // If CSRF initialization fails, proceed without token
+        console.error('😱 CSRF Interceptor - Failed to get CSRF token:', error);
+        // If CSRF token fetch fails, proceed without token
         // This allows the backend to return appropriate error
         return next.handle(request);
       })
