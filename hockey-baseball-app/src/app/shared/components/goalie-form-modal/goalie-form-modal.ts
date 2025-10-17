@@ -8,11 +8,19 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
+import { forkJoin } from 'rxjs';
 import { Goalie } from '../../interfaces/goalie.interface';
+import { TeamService } from '../../../services/team.service';
+import { PositionService, PositionOption } from '../../../services/position.service';
 
 export interface GoalieFormModalData {
   goalie?: Goalie;
   isEditMode: boolean;
+}
+
+export interface TeamOption {
+  value: string;
+  label: string;
 }
 
 @Component({
@@ -35,28 +43,21 @@ export interface GoalieFormModalData {
 export class GoalieFormModalComponent implements OnInit {
   private fb = inject(FormBuilder);
   private dialogRef = inject<MatDialogRef<GoalieFormModalComponent>>(MatDialogRef);
+  private teamService = inject(TeamService);
+  private positionService = inject(PositionService);
   data = inject<GoalieFormModalData>(MAT_DIALOG_DATA);
 
   goalieForm: FormGroup;
   isEditMode: boolean;
+  isLoading = true;
 
   shootsOptions = [
     { value: 'Right Shot', label: 'Right Shot' },
     { value: 'Left Shot', label: 'Left Shot' }
   ];
 
-  teamOptions = [
-    { value: 'Red Wings', label: 'Red Wings' },
-    { value: 'Blue Sharks', label: 'Blue Sharks' },
-    { value: 'Lightning Bolts', label: 'Lightning Bolts' },
-    { value: 'Golden Eagles', label: 'Golden Eagles' },
-    { value: 'Ice Wolves', label: 'Ice Wolves' },
-    { value: 'Storm Riders', label: 'Storm Riders' },
-    { value: 'Fire Hawks', label: 'Fire Hawks' },
-    { value: 'Arctic Foxes', label: 'Arctic Foxes' },
-    { value: 'Thunder Cats', label: 'Thunder Cats' },
-    { value: 'Blizzard Kings', label: 'Blizzard Kings' }
-  ];
+  positionOptions: PositionOption[] = [];
+  teamOptions: TeamOption[] = [];
 
   constructor() {
     const data = this.data;
@@ -66,56 +67,120 @@ export class GoalieFormModalComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    if (this.isEditMode && this.data.goalie) {
-      this.populateForm(this.data.goalie);
+    this.loadFormData();
+  }
+
+  private loadFormData(): void {
+    this.isLoading = true;
+    
+    // Fetch teams and positions concurrently
+    forkJoin({
+      teams: this.teamService.getTeams(),
+      positions: this.positionService.getPositions()
+    }).subscribe({
+      next: ({ teams, positions }) => {
+        // Transform teams to options format
+        this.teamOptions = teams.teams.map(team => ({
+          value: team.id,
+          label: team.name
+        }));
+        
+        this.positionOptions = positions;
+        
+        // Set default values to first available options
+        this.setDefaultFormValues();
+        
+        this.isLoading = false;
+        
+        // Populate form if in edit mode (this will override defaults)
+        if (this.isEditMode && this.data.goalie) {
+          this.populateForm(this.data.goalie);
+        }
+      },
+      error: (error) => {
+        console.error('Failed to load form data:', error);
+        // Use fallback data
+        this.teamOptions = this.getDefaultTeams();
+        this.positionOptions = this.positionService.getDefaultPositions();
+        
+        // Set default values to first available options
+        this.setDefaultFormValues();
+        
+        this.isLoading = false;
+        
+        // Populate form if in edit mode (this will override defaults)
+        if (this.isEditMode && this.data.goalie) {
+          this.populateForm(this.data.goalie);
+        }
+      }
+    });
+  }
+
+  private getDefaultTeams(): TeamOption[] {
+    return [
+      { value: 'Red Wings', label: 'Red Wings' },
+      { value: 'Blue Sharks', label: 'Blue Sharks' },
+      { value: 'Lightning Bolts', label: 'Lightning Bolts' },
+      { value: 'Golden Eagles', label: 'Golden Eagles' },
+      { value: 'Ice Wolves', label: 'Ice Wolves' }
+    ];
+  }
+
+  private setDefaultFormValues(): void {
+    const defaultValues: Record<string, string> = {};
+    
+    // Set first team as default
+    if (this.teamOptions.length > 0) {
+      defaultValues['team'] = this.teamOptions[0].value;
+    }
+    
+    // Set first position as default
+    if (this.positionOptions.length > 0) {
+      defaultValues['position'] = this.positionOptions[0].value;
+    }
+    
+    // Set first shoots option as default (already handled in createForm)
+    if (this.shootsOptions.length > 0) {
+      defaultValues['shoots'] = this.shootsOptions[0].value;
+    }
+    
+    // Apply defaults to form
+    if (Object.keys(defaultValues).length > 0) {
+      this.goalieForm.patchValue(defaultValues);
     }
   }
 
   private createForm(): FormGroup {
     return this.fb.group({
+      team: [''],
+      birthYear: ['', [Validators.min(1900), Validators.max(new Date().getFullYear())]],
+      jerseyNumber: ['', [Validators.min(1), Validators.max(99)]],
       firstName: ['', [Validators.required]],
       lastName: ['', [Validators.required]],
-      team: [this.teamOptions[0]?.value || ''],
-      jerseyNumber: ['', [Validators.min(1), Validators.max(99)]],
+      position: [''],
       height: [''],
       weight: ['', [Validators.min(1)]],
       shoots: [this.shootsOptions[0]?.value || ''],
-      birthYear: ['', [Validators.min(1900), Validators.max(new Date().getFullYear())]],
-      shotsOnGoal: ['', [Validators.min(0)]],
-      saves: ['', [Validators.min(0)]],
-      goalsAgainst: ['', [Validators.min(0)]],
-      gamesPlayed: ['', [Validators.min(0)]],
-      wins: ['', [Validators.min(0)]],
-      losses: ['', [Validators.min(0)]],
-      goals: ['', [Validators.min(0)]],
-      assists: ['', [Validators.min(0)]],
-      ppga: ['', [Validators.min(0)]],
-      shga: ['', [Validators.min(0)]],
-      savesAboveAvg: ['', [Validators.min(-100)]]
+      birthplace: [''],
+      address: [''],
+      playerBiography: ['']
     });
   }
 
   private populateForm(goalie: Goalie): void {
     this.goalieForm.patchValue({
+      team: goalie.team,
+      birthYear: goalie.birthYear,
+      jerseyNumber: goalie.jerseyNumber,
       firstName: goalie.firstName,
       lastName: goalie.lastName,
-      team: goalie.team,
-      jerseyNumber: goalie.jerseyNumber,
+      position: goalie.position,
       height: goalie.height,
       weight: goalie.weight,
       shoots: goalie.shoots,
-      birthYear: goalie.birthYear,
-      shotsOnGoal: goalie.shotsOnGoal,
-      saves: goalie.saves,
-      goalsAgainst: goalie.goalsAgainst,
-      gamesPlayed: goalie.gamesPlayed,
-      wins: goalie.wins,
-      losses: goalie.losses,
-      goals: goalie.goals,
-      assists: goalie.assists,
-      ppga: goalie.ppga,
-      shga: goalie.shga,
-      savesAboveAvg: goalie.savesAboveAvg
+      birthplace: goalie.birthplace,
+      address: goalie.address,
+      playerBiography: goalie.playerBiography
     });
   }
 
@@ -124,31 +189,33 @@ export class GoalieFormModalComponent implements OnInit {
       const formValue = this.goalieForm.value;
       
       const goalieData: Partial<Goalie> = {
+        team: formValue.team,
+        birthYear: formValue.birthYear,
+        jerseyNumber: formValue.jerseyNumber,
         firstName: formValue.firstName,
         lastName: formValue.lastName,
-        team: formValue.team,
-        jerseyNumber: formValue.jerseyNumber,
+        position: formValue.position,
         height: formValue.height,
         weight: formValue.weight,
         shoots: formValue.shoots,
-        birthYear: formValue.birthYear,
-        shotsOnGoal: formValue.shotsOnGoal,
-        saves: formValue.saves,
-        goalsAgainst: formValue.goalsAgainst,
-        gamesPlayed: formValue.gamesPlayed,
-        wins: formValue.wins,
-        losses: formValue.losses,
-        goals: formValue.goals || 0,
-        assists: formValue.assists || 0,
-        ppga: formValue.ppga || 0,
-        shga: formValue.shga || 0,
-        savesAboveAvg: formValue.savesAboveAvg || 0,
-        // Calculate derived values
-        points: (formValue.goals || 0) + (formValue.assists || 0),
-        shotsOnGoalPerGame: formValue.gamesPlayed > 0 ? (formValue.shotsOnGoal || 0) / formValue.gamesPlayed : 0,
-        // Set position as Goalie (not editable)
-        position: 'Goalie',
-        // Use default rink data for now (since it's not in the form anymore)
+        birthplace: formValue.birthplace,
+        address: formValue.address,
+        playerBiography: formValue.playerBiography,
+        // Set default values for fields not in form
+        level: '',
+        shotsOnGoal: 0,
+        saves: 0,
+        goalsAgainst: 0,
+        gamesPlayed: 0,
+        wins: 0,
+        losses: 0,
+        goals: 0,
+        assists: 0,
+        ppga: 0,
+        shga: 0,
+        savesAboveAvg: 0,
+        points: 0,
+        shotsOnGoalPerGame: 0,
         rink: {
           facilityName: 'Default Facility',
           rinkName: 'Main Rink',
@@ -192,25 +259,18 @@ export class GoalieFormModalComponent implements OnInit {
 
   private getFieldLabel(fieldName: string): string {
     const labels: Record<string, string> = {
+      team: 'Team',
+      birthYear: 'Birth Year',
+      jerseyNumber: 'Number',
       firstName: 'First Name',
       lastName: 'Last Name',
-      team: 'Team',
-      jerseyNumber: 'Jersey Number',
+      position: 'Position',
       height: 'Height',
       weight: 'Weight',
       shoots: 'Shoots',
-      birthYear: 'Birth Year',
-      shotsOnGoal: 'Shots on Goal',
-      saves: 'Saves',
-      goalsAgainst: 'Goals Against',
-      gamesPlayed: 'Games Played',
-      wins: 'Wins',
-      losses: 'Losses',
-      goals: 'Goals',
-      assists: 'Assists',
-      ppga: 'PPGA',
-      shga: 'SHGA',
-      savesAboveAvg: 'Saves Above Average'
+      birthplace: 'Birthplace',
+      address: 'Address',
+      playerBiography: 'Player Biography'
     };
     return labels[fieldName] || fieldName;
   }

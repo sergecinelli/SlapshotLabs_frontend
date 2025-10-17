@@ -58,6 +58,9 @@ export interface Goalie {
   firstName: string;
   lastName: string;
   birthYear: number;
+  birthplace?: string;  // Birthplace field
+  address?: string;  // Single address field
+  playerBiography?: string;  // Player biography text
   country?: string;  // Optional country field
   shotsOnGoal: number;
   saves: number;

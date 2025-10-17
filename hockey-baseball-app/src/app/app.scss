@@ -68,3 +68,7 @@
 :host ::ng-deep mat-error {
   font-size: 12px !important;
 }
+
+::ng-deep textarea {
+    resize: none !important;
+}

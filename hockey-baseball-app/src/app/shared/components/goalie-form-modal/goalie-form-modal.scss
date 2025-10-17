@@ -62,6 +62,15 @@
     will-change: scroll-position;
     backface-visibility: hidden;
     
+    .loading-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 200px;
+      color: var(--color-secondary);
+      font-size: 14px;
+    }
+    
     .goalie-form {
       .form-section {
         margin-bottom: 0px;
