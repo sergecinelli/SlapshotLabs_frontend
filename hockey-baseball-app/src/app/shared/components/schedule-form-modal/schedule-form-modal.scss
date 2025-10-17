@@ -1,4 +1,4 @@
-.goalie-form-modal {
+.schedule-form-modal {
   width: 100%;
   max-width: 800px;
   background-color: white;
@@ -71,7 +71,7 @@
       font-size: 14px;
     }
     
-    .goalie-form {
+    .schedule-form {
       .form-section {
         margin-bottom: 0px;
         
@@ -92,7 +92,7 @@
         }
         
         .section-divider {
-          margin-bottom: px;
+          margin-bottom: 16px;
           border-top-color: var(--color-primary) !important;
           border-top-width: 2px !important;
           transform: translateZ(0);
@@ -163,7 +163,7 @@
   }
 }
 
-::ng-deep .goalie-form-modal-dialog {
+::ng-deep .schedule-form-modal-dialog {
   .cdk-overlay-backdrop {
     background-color: rgba(0, 0, 0, 0.5) !important;
   }
@@ -249,7 +249,7 @@
   }
 }
 
-::ng-deep .goalie-form-modal-dialog {
+::ng-deep .schedule-form-modal-dialog {
   .mat-mdc-dialog-container .mdc-dialog__surface,
   .mat-mdc-dialog-surface,
   .mdc-dialog .mdc-dialog__surface,
@@ -265,14 +265,14 @@
 }
 
 @media (max-width: 768px) {
-  .goalie-form-modal {
+  .schedule-form-modal {
     max-width: 95vw;
     
     .modal-content {
       padding: 16px;
       max-height: 70vh;
       
-      .goalie-form {
+      .schedule-form {
         .form-section {
           margin-bottom: 12px;
           

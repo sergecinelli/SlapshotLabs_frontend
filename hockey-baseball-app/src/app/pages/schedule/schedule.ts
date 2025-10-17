@@ -7,6 +7,7 @@ import { PageHeaderComponent } from '../../shared/components/page-header/page-he
 import { DataTableComponent, TableColumn, TableAction } from '../../shared/components/data-table/data-table';
 import { ScheduleService } from '../../services/schedule.service';
 import { Schedule, GameStatus, GameType } from '../../shared/interfaces/schedule.interface';
+import { ScheduleFormModalComponent, ScheduleFormModalData } from '../../shared/components/schedule-form-modal/schedule-form-modal';
 
 @Component({
   selector: 'app-schedule',
@@ -122,8 +123,35 @@ export class ScheduleComponent implements OnInit {
   }
 
   private editSchedule(schedule: Schedule): void {
-    console.log('Edit schedule:', schedule);
-    // TODO: Open edit modal
+    const dialogRef = this.dialog.open(ScheduleFormModalComponent, {
+      width: '800px',
+      maxWidth: '95vw',
+      disableClose: true,
+      data: {
+        schedule: schedule,
+        isEditMode: true
+      } as ScheduleFormModalData,
+      panelClass: 'schedule-form-modal-dialog'
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.scheduleService.updateSchedule(schedule.id, result).subscribe({
+          next: (updatedSchedule) => {
+            const schedules = this.schedules();
+            const index = schedules.findIndex(s => s.id === schedule.id);
+            if (index !== -1) {
+              schedules[index] = updatedSchedule;
+              this.schedules.set([...schedules]);
+            }
+            console.log('Schedule updated successfully');
+          },
+          error: (error) => {
+            console.error('Error updating schedule:', error);
+          }
+        });
+      }
+    });
   }
 
   private deleteSchedule(schedule: Schedule): void {
@@ -144,7 +172,29 @@ export class ScheduleComponent implements OnInit {
   }
 
   openAddScheduleModal(): void {
-    console.log('Opening add schedule modal');
-    // TODO: Implement add schedule modal
+    const dialogRef = this.dialog.open(ScheduleFormModalComponent, {
+      width: '800px',
+      maxWidth: '95vw',
+      disableClose: true,
+      data: {
+        isEditMode: false
+      } as ScheduleFormModalData,
+      panelClass: 'schedule-form-modal-dialog'
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.scheduleService.addSchedule(result).subscribe({
+          next: (newSchedule) => {
+            const updatedSchedules = [...this.schedules(), newSchedule];
+            this.schedules.set(updatedSchedules);
+            console.log('Schedule added successfully');
+          },
+          error: (error) => {
+            console.error('Error adding schedule:', error);
+          }
+        });
+      }
+    });
   }
 }
