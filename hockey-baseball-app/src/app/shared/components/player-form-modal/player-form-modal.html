@@ -1,12 +1,44 @@
 <div class="player-form-modal">
   <h2 mat-dialog-title class="modal-title">
     <mat-icon class="title-icon">sports_hockey</mat-icon>
-    {{ isEditMode ? 'Edit Player' : 'Add New Player' }}
+    {{ isEditMode ? 'Edit Player' : 'Add Player' }}
   </h2>
 
   <mat-dialog-content class="modal-content">
-    <form [formGroup]="playerForm" class="player-form">
+    <div *ngIf="isLoading" class="loading-container">
+      <p>Loading form data...</p>
+    </div>
+    <form [formGroup]="playerForm" class="player-form" *ngIf="!isLoading">
       
+      <!-- Team Information Section -->
+      <div class="form-section">
+        <div class="section-header">
+          <span class="section-title">Team Information</span>
+        </div>
+        <mat-divider class="section-divider"></mat-divider>
+        <div class="form-row">
+          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+            <mat-label class="uppercase text-custom-secondary">Team (drop down list of teams)</mat-label>
+            <mat-select formControlName="team" placeholder="Select team">
+              <mat-option *ngFor="let team of teamOptions" [value]="team.value">
+                {{ team.label }}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="playerForm.get('team')?.errors && playerForm.get('team')?.touched">
+              {{ getErrorMessage('team') }}
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+            <mat-label class="uppercase text-custom-secondary">Birth Year:</mat-label>
+            <input matInput type="number" formControlName="birthYear" placeholder="Enter birth year">
+            <mat-error *ngIf="playerForm.get('birthYear')?.errors && playerForm.get('birthYear')?.touched">
+              {{ getErrorMessage('birthYear') }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+      </div>
+
       <!-- Personal Information Section -->
       <div class="form-section">
         <div class="section-header">
@@ -15,7 +47,15 @@
         <mat-divider class="section-divider"></mat-divider>
         <div class="form-row">
           <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
-            <mat-label class="uppercase text-custom-secondary">First Name *</mat-label>
+            <mat-label class="uppercase text-custom-secondary">Number:</mat-label>
+            <input matInput type="number" formControlName="jerseyNumber" placeholder="Enter jersey number">
+            <mat-error *ngIf="playerForm.get('jerseyNumber')?.errors && playerForm.get('jerseyNumber')?.touched">
+              {{ getErrorMessage('jerseyNumber') }}
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+            <mat-label class="uppercase text-custom-secondary">First Name</mat-label>
             <input matInput formControlName="firstName" placeholder="Enter first name">
             <mat-error *ngIf="playerForm.get('firstName')?.errors && playerForm.get('firstName')?.touched">
               {{ getErrorMessage('firstName') }}
@@ -23,28 +63,22 @@
           </mat-form-field>
 
           <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
-            <mat-label class="uppercase text-custom-secondary">Last Name *</mat-label>
+            <mat-label class="uppercase text-custom-secondary">Last Name:</mat-label>
             <input matInput formControlName="lastName" placeholder="Enter last name">
             <mat-error *ngIf="playerForm.get('lastName')?.errors && playerForm.get('lastName')?.touched">
               {{ getErrorMessage('lastName') }}
             </mat-error>
           </mat-form-field>
-        </div>
-
-        <div class="form-row">
-          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
-            <mat-label class="uppercase text-custom-secondary">Birth Year</mat-label>
-            <input matInput type="number" formControlName="birthYear" placeholder="Enter birth year">
-            <mat-error *ngIf="playerForm.get('birthYear')?.errors && playerForm.get('birthYear')?.touched">
-              {{ getErrorMessage('birthYear') }}
-            </mat-error>
-          </mat-form-field>
 
           <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
-            <mat-label class="uppercase text-custom-secondary">Jersey Number</mat-label>
-            <input matInput type="number" formControlName="jerseyNumber" placeholder="Enter jersey number">
-            <mat-error *ngIf="playerForm.get('jerseyNumber')?.errors && playerForm.get('jerseyNumber')?.touched">
-              {{ getErrorMessage('jerseyNumber') }}
+            <mat-label class="uppercase text-custom-secondary">Position:</mat-label>
+            <mat-select formControlName="position" placeholder="Select position">
+              <mat-option *ngFor="let option of positionOptions" [value]="option.value">
+                {{ option.label }}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="playerForm.get('position')?.errors && playerForm.get('position')?.touched">
+              {{ getErrorMessage('position') }}
             </mat-error>
           </mat-form-field>
         </div>
@@ -66,16 +100,16 @@
           </mat-form-field>
 
           <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
-            <mat-label class="uppercase text-custom-secondary">Weight (lbs)</mat-label>
-            <input matInput type="number" formControlName="weight" placeholder="Enter weight">
+            <mat-label class="uppercase text-custom-secondary">Weight</mat-label>
+            <input matInput type="number" formControlName="weight" placeholder="Enter weight in lbs">
             <mat-error *ngIf="playerForm.get('weight')?.errors && playerForm.get('weight')?.touched">
               {{ getErrorMessage('weight') }}
             </mat-error>
           </mat-form-field>
 
           <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
-            <mat-label class="uppercase text-custom-secondary">Shoots</mat-label>
-            <mat-select formControlName="shoots">
+            <mat-label class="uppercase text-custom-secondary">Shoots (R/L)</mat-label>
+            <mat-select formControlName="shoots" placeholder="Select shooting hand">
               <mat-option *ngFor="let option of shootsOptions" [value]="option.value">
                 {{ option.label }}
               </mat-option>
@@ -84,106 +118,46 @@
               {{ getErrorMessage('shoots') }}
             </mat-error>
           </mat-form-field>
-        </div>
-      </div>
-
-      <!-- Team & Position Information Section -->
-      <div class="form-section">
-        <div class="section-header">
-          <span class="section-title">Team & Position Information</span>
-        </div>
-        <mat-divider class="section-divider"></mat-divider>
-        <div class="form-row">
-          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
-            <mat-label class="uppercase text-custom-secondary">Team</mat-label>
-            <mat-select formControlName="team">
-              <mat-option *ngFor="let team of teamOptions" [value]="team.value">
-                {{ team.label }}
-              </mat-option>
-            </mat-select>
-            <mat-error *ngIf="playerForm.get('team')?.errors && playerForm.get('team')?.touched">
-              {{ getErrorMessage('team') }}
-            </mat-error>
-          </mat-form-field>
 
           <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
-            <mat-label class="uppercase text-custom-secondary">Position</mat-label>
-            <mat-select formControlName="position">
-              <mat-option *ngFor="let position of positionOptions" [value]="position.value">
-                {{ position.label }}
-              </mat-option>
-            </mat-select>
-            <mat-error *ngIf="playerForm.get('position')?.errors && playerForm.get('position')?.touched">
-              {{ getErrorMessage('position') }}
+            <mat-label class="uppercase text-custom-secondary">Birthplace:</mat-label>
+            <input matInput formControlName="birthplace" placeholder="Enter birthplace">
+            <mat-error *ngIf="playerForm.get('birthplace')?.errors && playerForm.get('birthplace')?.touched">
+              {{ getErrorMessage('birthplace') }}
             </mat-error>
           </mat-form-field>
         </div>
       </div>
 
-      <!-- Statistics Section -->
+      <!-- Address Section -->
       <div class="form-section">
         <div class="section-header">
-          <span class="section-title">Game Statistics</span>
+          <span class="section-title">Address</span>
         </div>
         <mat-divider class="section-divider"></mat-divider>
         <div class="form-row">
-          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
-            <mat-label class="uppercase text-custom-secondary">Games Played</mat-label>
-            <input matInput type="number" formControlName="gamesPlayed" placeholder="Enter games played">
-            <mat-error *ngIf="playerForm.get('gamesPlayed')?.errors && playerForm.get('gamesPlayed')?.touched">
-              {{ getErrorMessage('gamesPlayed') }}
-            </mat-error>
-          </mat-form-field>
-
-          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
-            <mat-label class="uppercase text-custom-secondary">Shots on Goal</mat-label>
-            <input matInput type="number" formControlName="shotsOnGoal" placeholder="Enter shots on goal">
-            <mat-error *ngIf="playerForm.get('shotsOnGoal')?.errors && playerForm.get('shotsOnGoal')?.touched">
-              {{ getErrorMessage('shotsOnGoal') }}
-            </mat-error>
-          </mat-form-field>
-
-          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
-            <mat-label class="uppercase text-custom-secondary">Goals</mat-label>
-            <input matInput type="number" formControlName="goals" placeholder="Enter goals">
-            <mat-error *ngIf="playerForm.get('goals')?.errors && playerForm.get('goals')?.touched">
-              {{ getErrorMessage('goals') }}
+          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field full-width">
+            <mat-label class="uppercase text-custom-secondary">Address</mat-label>
+            <input matInput formControlName="address" placeholder="Enter full address (city, province/state, country)">
+            <mat-error *ngIf="playerForm.get('address')?.errors && playerForm.get('address')?.touched">
+              {{ getErrorMessage('address') }}
             </mat-error>
           </mat-form-field>
         </div>
+      </div>
 
-        <div class="form-row">
-          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
-            <mat-label class="uppercase text-custom-secondary">Assists</mat-label>
-            <input matInput type="number" formControlName="assists" placeholder="Enter assists">
-            <mat-error *ngIf="playerForm.get('assists')?.errors && playerForm.get('assists')?.touched">
-              {{ getErrorMessage('assists') }}
-            </mat-error>
-          </mat-form-field>
-
-          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
-            <mat-label class="uppercase text-custom-secondary">Scoring Chances</mat-label>
-            <input matInput type="number" formControlName="scoringChances" placeholder="Enter scoring chances">
-            <mat-error *ngIf="playerForm.get('scoringChances')?.errors && playerForm.get('scoringChances')?.touched">
-              {{ getErrorMessage('scoringChances') }}
-            </mat-error>
-          </mat-form-field>
-
-          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
-            <mat-label class="uppercase text-custom-secondary">Blocked Shots</mat-label>
-            <input matInput type="number" formControlName="blockedShots" placeholder="Enter blocked shots">
-            <mat-error *ngIf="playerForm.get('blockedShots')?.errors && playerForm.get('blockedShots')?.touched">
-              {{ getErrorMessage('blockedShots') }}
-            </mat-error>
-          </mat-form-field>
+      <!-- Player Biography Section -->
+      <div class="form-section">
+        <div class="section-header">
+          <span class="section-title">Player Biography</span>
         </div>
-
+        <mat-divider class="section-divider"></mat-divider>
         <div class="form-row">
-          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
-            <mat-label class="uppercase text-custom-secondary">Penalties Drawn</mat-label>
-            <input matInput type="number" formControlName="penaltiesDrawn" placeholder="Enter penalties drawn">
-            <mat-error *ngIf="playerForm.get('penaltiesDrawn')?.errors && playerForm.get('penaltiesDrawn')?.touched">
-              {{ getErrorMessage('penaltiesDrawn') }}
+          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field full-width">
+            <mat-label class="uppercase text-custom-secondary">Player Biography</mat-label>
+            <textarea matInput formControlName="playerBiography" rows="4" placeholder="Enter player biography and background information"></textarea>
+            <mat-error *ngIf="playerForm.get('playerBiography')?.errors && playerForm.get('playerBiography')?.touched">
+              {{ getErrorMessage('playerBiography') }}
             </mat-error>
           </mat-form-field>
         </div>
@@ -193,10 +167,10 @@
   </mat-dialog-content>
 
   <mat-dialog-actions class="modal-actions">
-    <button mat-stroked-button (click)="onCancel()" class="cancel-btn">
+    <button mat-stroked-button (click)="onCancel()" class="cancel-btn" [disabled]="isLoading">
       Cancel
     </button>
-    <button mat-raised-button color="primary" (click)="onSubmit()" class="submit-btn">
+    <button mat-raised-button color="primary" (click)="onSubmit()" class="submit-btn" [disabled]="isLoading || playerForm.invalid">
       <mat-icon>save</mat-icon>
       {{ isEditMode ? 'Update Player' : 'Add Player' }}
     </button>
