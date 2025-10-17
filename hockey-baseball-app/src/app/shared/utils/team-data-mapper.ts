@@ -14,15 +14,11 @@ export class TeamDataMapper {
     return {
       id: apiTeam.id.toString(),
       name: apiTeam.name,
-      logo: '/assets/icons/teams.svg', // Default logo since not in API
+      group: apiTeam.group || 'Eastern Conference',
       level: this.mapLevelIdToName(apiTeam.level_id),
       division: this.mapDivisionIdToName(apiTeam.division_id),
-      wins: 0, // Not available in current API
-      losses: 0, // Not available in current API
-      goalsFor: 0, // Not available in current API
-      goalsAgainst: 0, // Not available in current API
-      points: 0, // Not available in current API
-      gamesPlayed: 0, // Not available in current API
+      city: apiTeam.city || '',
+      logo: apiTeam.logo || '/assets/icons/teams.svg',
       createdAt: new Date() // Set creation date for newly created items
     };
   }
@@ -35,10 +31,12 @@ export class TeamDataMapper {
   static toApiInFormat(team: Partial<Team>): TeamApiIn {
     return {
       name: team.name || '',
+      group: team.group || 'Eastern Conference',
       level_id: this.mapLevelNameToId(team.level || 'NHL'),
       division_id: this.mapDivisionNameToId(team.division || 'Atlantic'),
       age_group: 'Adult', // Default age group
-      city: team.name?.includes(' ') ? team.name.split(' ')[0] : team.name || 'City'
+      city: team.city || '',
+      logo: team.logo
     };
   }
 
@@ -53,11 +51,20 @@ export class TeamDataMapper {
     if (team.name) {
       updateData.name = team.name;
     }
+    if (team.group) {
+      updateData.group = team.group;
+    }
     if (team.level) {
       updateData.level_id = this.mapLevelNameToId(team.level);
     }
     if (team.division) {
       updateData.division_id = this.mapDivisionNameToId(team.division);
+    }
+    if (team.city) {
+      updateData.city = team.city;
+    }
+    if (team.logo) {
+      updateData.logo = team.logo;
     }
     
     return updateData;
