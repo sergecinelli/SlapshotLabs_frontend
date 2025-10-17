@@ -1,0 +1,90 @@
+.add-schedule-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: var(--color-primary) !important;
+  color: white !important;
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(207, 20, 43, 0.3);
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background-color: #b8122a !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(207, 20, 43, 0.4);
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
+  
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+}
+.status-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-align: center;
+  display: inline-block;
+  min-width: 80px;
+  
+  &.game-in-progress {
+    background-color: #fef3c7;
+    color: #92400e;
+  }
+  
+  &.not-started {
+    background-color: #e5e7eb;
+    color: #374151;
+  }
+  
+  &.game-over {
+    background-color: #d1fae5;
+    color: #065f46;
+  }
+}
+
+.game-type-badge {
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  display: inline-block;
+  
+  &.regular-season {
+    background-color: #dbeafe;
+    color: #1e40af;
+  }
+  
+  &.playoff {
+    background-color: #fce7f3;
+    color: #be185d;
+  }
+  
+  &.tournament {
+    background-color: #f3e8ff;
+    color: #7c3aed;
+  }
+  
+  &.exhibition {
+    background-color: #fef3c7;
+    color: #92400e;
+  }
+  
+  &.summer-league {
+    background-color: #d1fae5;
+    color: #065f46;
+  }
+}
+
+.score-display {
+  font-weight: 600;
+  color: #1f2937;
+}

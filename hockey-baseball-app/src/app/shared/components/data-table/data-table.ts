@@ -10,7 +10,7 @@ import { IconService } from '../../../services/icon.service';
 export interface TableColumn {
   key: string;
   label: string;
-  type?: 'text' | 'number' | 'actions' | 'dropdown';
+  type?: 'text' | 'number' | 'actions' | 'dropdown' | 'custom';
   sortable?: boolean;
   width?: string;
   align?: 'left' | 'center' | 'right';
@@ -23,6 +23,7 @@ export interface TableAction {
   action: string;
   variant?: 'primary' | 'secondary' | 'danger';
   iconOnly?: boolean; // When true, only show icon without label
+  condition?: (item: any) => boolean; // Optional condition to show/hide action
 }
 
 @Component({
@@ -134,5 +135,28 @@ export class DataTableComponent<T extends Record<string, unknown> = Record<strin
     // Default behavior: show tooltip only if text is truncated
     const isTextTruncated = this.isTextTruncated(cellElement);
     matTooltip.disabled = !isTextTruncated;
+  }
+
+  // Custom rendering methods for schedule-specific fields
+  getStatusBadgeClass(status: unknown): string {
+    const statusStr = String(status || '');
+    const statusMap: Record<string, string> = {
+      'Game in Progress': 'status-badge game-in-progress',
+      'Not Started': 'status-badge not-started', 
+      'Game Over': 'status-badge game-over'
+    };
+    return statusMap[statusStr] || 'status-badge';
+  }
+
+  getGameTypeBadgeClass(gameType: unknown): string {
+    const typeStr = String(gameType || '');
+    const typeMap: Record<string, string> = {
+      'Regular Season': 'game-type-badge regular-season',
+      'Playoff': 'game-type-badge playoff',
+      'Tournament': 'game-type-badge tournament',
+      'Exhibition': 'game-type-badge exhibition',
+      'Summer League': 'game-type-badge summer-league'
+    };
+    return typeMap[typeStr] || 'game-type-badge';
   }
 }

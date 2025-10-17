@@ -73,6 +73,12 @@
         overflow: hidden;
         text-overflow: ellipsis;
         
+        // Override text overflow for badge cells
+        &.badge-cell {
+          text-overflow: unset;
+          overflow: visible;
+        }
+        
         &.text-center {
           text-align: center !important;
         }
@@ -164,5 +170,64 @@
     background-color: white;
     border-radius: 0.5rem;
     box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  }
+
+  // Badge styles for schedule table
+  .status-badge {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-align: center;
+    display: inline-block;
+    min-width: 80px;
+    
+    &.game-in-progress {
+      background-color: #fef3c7;
+      color: #92400e;
+    }
+    
+    &.not-started {
+      background-color: #e5e7eb;
+      color: #374151;
+    }
+    
+    &.game-over {
+      background-color: #d1fae5;
+      color: #065f46;
+    }
+  }
+
+  .game-type-badge {
+    padding: 4px 8px;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    display: inline-block;
+    
+    &.regular-season {
+      background-color: #dbeafe;
+      color: #1e40af;
+    }
+    
+    &.playoff {
+      background-color: #fce7f3;
+      color: #be185d;
+    }
+    
+    &.tournament {
+      background-color: #f3e8ff;
+      color: #7c3aed;
+    }
+    
+    &.exhibition {
+      background-color: #fef3c7;
+      color: #92400e;
+    }
+    
+    &.summer-league {
+      background-color: #d1fae5;
+      color: #065f46;
+    }
   }
 }
