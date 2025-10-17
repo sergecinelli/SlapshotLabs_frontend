@@ -157,26 +157,26 @@ export class PlayersComponent implements OnInit {
           if (success) {
             const updatedPlayers = this.players().filter(p => p.id !== player.id);
             this.players.set(updatedPlayers);
-            this.snackBar.open(
-              `Player ${player.firstName} ${player.lastName} deleted successfully`,
-              'Close',
-              { duration: 3000, panelClass: ['custom-snackbar', 'success-snackbar'] }
-            );
+            // this.snackBar.open(
+            //   `Player ${player.firstName} ${player.lastName} deleted successfully`,
+            //   'Close',
+            //   { duration: 3000, panelClass: ['custom-snackbar', 'success-snackbar'] }
+            // );
           } else {
-            this.snackBar.open(
-              'Failed to delete player. Please try again.',
-              'Close',
-              { duration: 3000, panelClass: ['custom-snackbar', 'error-snackbar'] }
-            );
+            // this.snackBar.open(
+            //   'Failed to delete player. Please try again.',
+            //   'Close',
+            //   { duration: 3000, panelClass: ['custom-snackbar', 'error-snackbar'] }
+            // );
           }
         },
         error: (error) => {
           console.error('Error deleting player:', error);
-          this.snackBar.open(
-            'Error deleting player. Please try again.',
-            'Close',
-            { duration: 3000, panelClass: ['custom-snackbar', 'error-snackbar'] }
-          );
+          // this.snackBar.open(
+          //   'Error deleting player. Please try again.',
+          //   'Close',
+          //   { duration: 3000, panelClass: ['custom-snackbar', 'error-snackbar'] }
+          // );
         }
       });
     }
@@ -240,11 +240,11 @@ export class PlayersComponent implements OnInit {
         // Add new player at the beginning (newest first)
         const updatedPlayers = [newPlayer, ...currentPlayers];
         this.players.set(updatedPlayers);
-        this.snackBar.open(
-          `Player ${newPlayer.firstName} ${newPlayer.lastName} added successfully`,
-          'Close',
-          { duration: 3000, panelClass: ['custom-snackbar', 'success-snackbar'] }
-        );
+        // this.snackBar.open(
+        //   `Player ${newPlayer.firstName} ${newPlayer.lastName} added successfully`,
+        //   'Close',
+        //   { duration: 3000, panelClass: ['custom-snackbar', 'success-snackbar'] }
+        // );
       },
       error: (error) => {
         console.error('Error adding player:', error);
@@ -280,11 +280,11 @@ export class PlayersComponent implements OnInit {
           const newPlayers = [...currentPlayers];
           newPlayers[index] = updatedPlayer;
           this.players.set(newPlayers);
-          this.snackBar.open(
-            `Player ${updatedPlayer.firstName} ${updatedPlayer.lastName} updated successfully`,
-            'Close',
-            { duration: 3000, panelClass: ['custom-snackbar', 'success-snackbar'] }
-          );
+          // this.snackBar.open(
+          //   `Player ${updatedPlayer.firstName} ${updatedPlayer.lastName} updated successfully`,
+          //   'Close',
+          //   { duration: 3000, panelClass: ['custom-snackbar', 'success-snackbar'] }
+          // );
         }
       },
       error: (error) => {

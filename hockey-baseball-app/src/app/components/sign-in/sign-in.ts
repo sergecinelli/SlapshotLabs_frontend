@@ -66,23 +66,23 @@ export class SignInComponent implements OnInit {
     this.authService.signIn(formValue).subscribe({
       next: () => {
         this.isLoading = false;
-        this.snackBar.open('Successfully signed in!', 'Close', {
-          duration: 3000,
-          panelClass: ['success-snackbar']
-        });
+        // this.snackBar.open('Successfully signed in!', 'Close', {
+        //   duration: 3000,
+        //   panelClass: ['success-snackbar']
+        // });
         // Navigate to intended route
         this.router.navigate([this.returnUrl]);
       },
       error: (error) => {
         this.isLoading = false;
-        this.snackBar.open(
-          error.message || 'Sign in failed. Please try again.', 
-          'Close', 
-          {
-            duration: 5000,
-            panelClass: ['error-snackbar']
-          }
-        );
+        // this.snackBar.open(
+        //   error.message || 'Sign in failed. Please try again.', 
+        //   'Close', 
+        //   {
+        //     duration: 5000,
+        //     panelClass: ['error-snackbar']
+        //   }
+        // );
         console.error('Sign in error:', error);
       }
     });

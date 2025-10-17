@@ -75,27 +75,27 @@ export class SignUpComponent {
     this.authService.signUp(formValue).subscribe({
       next: (response) => {
         this.isLoading = false;
-        this.snackBar.open(
-          response.message || 'Registration successful! Please sign in.', 
-          'Close', 
-          {
-            duration: 5000,
-            panelClass: ['success-snackbar']
-          }
-        );
+        // this.snackBar.open(
+        //   response.message || 'Registration successful! Please sign in.', 
+        //   'Close', 
+        //   {
+        //     duration: 5000,
+        //     panelClass: ['success-snackbar']
+        //   }
+        // );
         // Navigate to sign-in page
         this.router.navigate(['/sign-in']);
       },
       error: (error) => {
         this.isLoading = false;
-        this.snackBar.open(
-          error.message || 'Registration failed. Please try again.', 
-          'Close', 
-          {
-            duration: 5000,
-            panelClass: ['error-snackbar']
-          }
-        );
+        // this.snackBar.open(
+        //   error.message || 'Registration failed. Please try again.', 
+        //   'Close', 
+        //   {
+        //     duration: 5000,
+        //     panelClass: ['error-snackbar']
+        //   }
+        // );
         console.error('Sign up error:', error);
       }
     });

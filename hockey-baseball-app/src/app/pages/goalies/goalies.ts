@@ -161,26 +161,26 @@ export class GoaliesComponent implements OnInit {
           if (success) {
             const updatedGoalies = this.goalies().filter(g => g.id !== goalie.id);
             this.goalies.set(updatedGoalies);
-            this.snackBar.open(
-              `Goalie ${goalie.firstName} ${goalie.lastName} deleted successfully`,
-              'Close',
-              { duration: 3000, panelClass: ['custom-snackbar', 'success-snackbar'] }
-            );
+            // this.snackBar.open(
+            //   `Goalie ${goalie.firstName} ${goalie.lastName} deleted successfully`,
+            //   'Close',
+            //   { duration: 3000, panelClass: ['custom-snackbar', 'success-snackbar'] }
+            // );
           } else {
-            this.snackBar.open(
-              'Failed to delete goalie. Please try again.',
-              'Close',
-              { duration: 3000, panelClass: ['custom-snackbar', 'error-snackbar'] }
-            );
+            // this.snackBar.open(
+            //   'Failed to delete goalie. Please try again.',
+            //   'Close',
+            //   { duration: 3000, panelClass: ['custom-snackbar', 'error-snackbar'] }
+            // );
           }
         },
         error: (error) => {
           console.error('Error deleting goalie:', error);
-          this.snackBar.open(
-            'Error deleting goalie. Please try again.',
-            'Close',
-            { duration: 3000, panelClass: ['custom-snackbar', 'error-snackbar'] }
-          );
+          // this.snackBar.open(
+          //   'Error deleting goalie. Please try again.',
+          //   'Close',
+          //   { duration: 3000, panelClass: ['custom-snackbar', 'error-snackbar'] }
+          // );
         }
       });
     }
@@ -244,11 +244,11 @@ export class GoaliesComponent implements OnInit {
         // Add new goalie at the beginning (newest first)
         const updatedGoalies = [newGoalie, ...currentGoalies];
         this.goalies.set(updatedGoalies);
-        this.snackBar.open(
-          `Goalie ${newGoalie.firstName} ${newGoalie.lastName} added successfully`,
-          'Close',
-          { duration: 3000, panelClass: ['custom-snackbar', 'success-snackbar'] }
-        );
+        // this.snackBar.open(
+        //   `Goalie ${newGoalie.firstName} ${newGoalie.lastName} added successfully`,
+        //   'Close',
+        //   { duration: 3000, panelClass: ['custom-snackbar', 'success-snackbar'] }
+        // );
       },
       error: (error) => {
         console.error('Error adding goalie:', error);
@@ -284,11 +284,11 @@ export class GoaliesComponent implements OnInit {
           const newGoalies = [...currentGoalies];
           newGoalies[index] = updatedGoalie;
           this.goalies.set(newGoalies);
-          this.snackBar.open(
-            `Goalie ${updatedGoalie.firstName} ${updatedGoalie.lastName} updated successfully`,
-            'Close',
-            { duration: 3000, panelClass: ['custom-snackbar', 'success-snackbar'] }
-          );
+          // this.snackBar.open(
+          //   `Goalie ${updatedGoalie.firstName} ${updatedGoalie.lastName} updated successfully`,
+          //   'Close',
+          //   { duration: 3000, panelClass: ['custom-snackbar', 'success-snackbar'] }
+          // );
         }
       },
       error: (error) => {

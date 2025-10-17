@@ -145,26 +145,26 @@ export class TeamsComponent implements OnInit {
           if (success) {
             const updatedTeams = this.teams().filter(t => t.id !== team.id);
             this.teams.set(updatedTeams);
-            this.snackBar.open(
-              `Team ${team.name} deleted successfully`,
-              'Close',
-              { duration: 3000, panelClass: ['custom-snackbar', 'success-snackbar'] }
-            );
+            // this.snackBar.open(
+            //   `Team ${team.name} deleted successfully`,
+            //   'Close',
+            //   { duration: 3000, panelClass: ['custom-snackbar', 'success-snackbar'] }
+            // );
           } else {
-            this.snackBar.open(
-              'Failed to delete team. Please try again.',
-              'Close',
-              { duration: 3000, panelClass: ['custom-snackbar', 'error-snackbar'] }
-            );
+            // this.snackBar.open(
+            //   'Failed to delete team. Please try again.',
+            //   'Close',
+            //   { duration: 3000, panelClass: ['custom-snackbar', 'error-snackbar'] }
+            // );
           }
         },
         error: (error) => {
           console.error('Error deleting team:', error);
-          this.snackBar.open(
-            'Error deleting team. Please try again.',
-            'Close',
-            { duration: 3000, panelClass: ['custom-snackbar', 'error-snackbar'] }
-          );
+          // this.snackBar.open(
+          //   'Error deleting team. Please try again.',
+          //   'Close',
+          //   { duration: 3000, panelClass: ['custom-snackbar', 'error-snackbar'] }
+          // );
         }
       });
     }
@@ -242,11 +242,11 @@ export class TeamsComponent implements OnInit {
         // Add new team at the beginning (newest first)
         const updatedTeams = [newTeam, ...currentTeams];
         this.teams.set(updatedTeams);
-        this.snackBar.open(
-          `Team ${newTeam.name} added successfully`,
-          'Close',
-          { duration: 3000, panelClass: ['custom-snackbar', 'success-snackbar'] }
-        );
+        // this.snackBar.open(
+        //   `Team ${newTeam.name} added successfully`,
+        //   'Close',
+        //   { duration: 3000, panelClass: ['custom-snackbar', 'success-snackbar'] }
+        // );
       },
       error: (error) => {
         console.error('Error adding team:', error);
@@ -263,11 +263,11 @@ export class TeamsComponent implements OnInit {
           const newTeams = [...currentTeams];
           newTeams[index] = updatedTeam;
           this.teams.set(newTeams);
-          this.snackBar.open(
-            `Team ${updatedTeam.name} updated successfully`,
-            'Close',
-            { duration: 3000, panelClass: ['custom-snackbar', 'success-snackbar'] }
-          );
+          // this.snackBar.open(
+          //   `Team ${updatedTeam.name} updated successfully`,
+          //   'Close',
+          //   { duration: 3000, panelClass: ['custom-snackbar', 'success-snackbar'] }
+          // );
         }
       },
       error: (error) => {

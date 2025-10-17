@@ -137,7 +137,7 @@ export class AuthService {
    * Edit user profile
    */
   editUser(editData: UserEditRequest): Observable<void> {
-    return this.apiService.post<void>('/users/edit', editData).pipe(
+    return this.apiService.patch<void>('/users/edit', editData).pipe(
       tap(() => {
         // Refresh user data after successful edit
         this.refreshCurrentUser().subscribe();
