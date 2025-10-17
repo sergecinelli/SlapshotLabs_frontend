@@ -1,6 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, of, delay, throwError } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { map, catchError, switchMap } from 'rxjs/operators';
 import { Player, PlayerTableData, PlayerApiOut, PlayerApiIn } from '../shared/interfaces/player.interface';
 import { ApiService } from './api.service';
@@ -9,35 +8,20 @@ import { ApiService } from './api.service';
   providedIn: 'root'
 })
 export class PlayerService {
-  private http = inject(HttpClient);
   private apiService = inject(ApiService);
-
-  private readonly mockDataPath = '/assets/data/players-mock.json';
 
   getPlayers(): Observable<PlayerTableData> {
     return this.apiService.get<PlayerApiOut[]>('/hockey/player/list').pipe(
-      switchMap(apiPlayers => {
+      map(apiPlayers => {
         const players = apiPlayers.map(apiPlayer => this.fromApiOutFormat(apiPlayer));
-        
-        // If API returns empty list, use mock data
-        if (players.length === 0) {
-          console.log('API returned empty players list, falling back to mock data');
-          return this.http.get<PlayerTableData>(this.mockDataPath).pipe(
-            delay(500)
-          );
-        }
-        
-        return of({
+        return {
           players: players,
           total: players.length
-        });
+        };
       }),
       catchError(error => {
         console.error('Failed to fetch players:', error);
-        // Fallback to mock data if API fails
-        return this.http.get<PlayerTableData>(this.mockDataPath).pipe(
-          delay(500)
-        );
+        return throwError(() => error);
       })
     );
   }
@@ -46,28 +30,15 @@ export class PlayerService {
     // Convert string ID to number for API call
     const numericId = parseInt(id, 10);
     if (isNaN(numericId)) {
-      // If ID is not numeric, fall back to filtering mock data
-      return new Observable<Player | undefined>(observer => {
-        this.getPlayers().subscribe(data => {
-          const player = data.players.find(p => p.id === id);
-          observer.next(player);
-          observer.complete();
-        });
-      });
+      console.error(`Invalid player ID: ${id}`);
+      return throwError(() => new Error(`Invalid player ID: ${id}`));
     }
 
     return this.apiService.get<PlayerApiOut>(`/hockey/player/${numericId}`).pipe(
       map(apiPlayer => this.fromApiOutFormat(apiPlayer)),
       catchError(error => {
         console.error(`Failed to fetch player with ID ${id}:`, error);
-        // Fallback to mock data search
-        return new Observable<Player | undefined>(observer => {
-          this.getPlayers().subscribe(data => {
-            const player = data.players.find(p => p.id === id);
-            observer.next(player);
-            observer.complete();
-          });
-        });
+        return throwError(() => error);
       })
     );
   }
@@ -77,7 +48,7 @@ export class PlayerService {
     const numericId = parseInt(id, 10);
     if (isNaN(numericId)) {
       console.error(`Invalid player ID for deletion: ${id}`);
-      return of(false);
+      return throwError(() => new Error(`Invalid player ID: ${id}`));
     }
 
     return this.apiService.delete<void>(`/hockey/player/${numericId}`).pipe(
@@ -87,7 +58,7 @@ export class PlayerService {
       }),
       catchError(error => {
         console.error(`Failed to delete player with ID ${id}:`, error);
-        return of(false);
+        return throwError(() => error);
       })
     );
   }
@@ -111,7 +82,8 @@ export class PlayerService {
             rinkName: 'Main Rink',
             city: 'City',
             address: 'Address'
-          }
+          },
+          createdAt: new Date() // Set creation date
         } as Player;
         
         console.log(`Added new player:`, newPlayer);
@@ -119,12 +91,7 @@ export class PlayerService {
       }),
       catchError(error => {
         console.error('Failed to add player:', error);
-        // Fallback to mock behavior
-        const newPlayer: Player = {
-          id: 'player-' + Date.now().toString(),
-          ...playerData
-        } as Player;
-        return of(newPlayer).pipe(delay(300));
+        return throwError(() => error);
       })
     );
   }
@@ -153,12 +120,7 @@ export class PlayerService {
       }),
       catchError(error => {
         console.error(`Failed to update player with ID ${id}:`, error);
-        // Fallback to mock behavior
-        const updatedPlayer: Player = {
-          id,
-          ...playerData
-        } as Player;
-        return of(updatedPlayer);
+        return throwError(() => error);
       })
     );
   }
@@ -174,13 +136,13 @@ export class PlayerService {
       position: this.mapPositionIdToName(apiPlayer.position_id),
       height: heightString,
       weight: apiPlayer.weight,
-      shoots: apiPlayer.shoots === 1 ? 'Right Shot' : 'Left Shot',
-      jerseyNumber: apiPlayer.jersey_number,
+      shoots: apiPlayer.shoots === 'R' ? 'Right Shot' : 'Left Shot',
+      jerseyNumber: apiPlayer.number,  // Changed from jersey_number to number
       firstName: apiPlayer.first_name,
       lastName: apiPlayer.last_name,
-      birthYear: apiPlayer.birth_year,
-      shotsOnGoal: 0, // Not provided in API, default to 0
-      shotSprayChart: apiPlayer.shot_spray_chart,
+      birthYear: new Date(apiPlayer.birth_year).getFullYear(),  // Parse date
+      shotsOnGoal: apiPlayer.shots_on_goal,  // Now available in API
+      shotSprayChart: '', // Not available in current API schema
       gamesPlayed: apiPlayer.games_played,
       goals: apiPlayer.goals,
       assists: apiPlayer.assists,
@@ -194,7 +156,8 @@ export class PlayerService {
         rinkName: 'Main Rink',
         city: 'City',
         address: 'Address'
-      }
+      },
+      createdAt: new Date() // Set creation date for newly created items
     };
   }
 
@@ -209,10 +172,10 @@ export class PlayerService {
       updateData.weight = playerData.weight;
     }
     if (playerData.shoots) {
-      updateData.shoots = playerData.shoots === 'Right Shot' ? 1 : 0;
+      updateData.shoots = playerData.shoots === 'Right Shot' ? 'R' : 'L';
     }
     if (playerData.jerseyNumber !== undefined) {
-      updateData.jersey_number = playerData.jerseyNumber;
+      updateData.number = playerData.jerseyNumber;  // Changed from jersey_number to number
     }
     if (playerData.firstName) {
       updateData.first_name = playerData.firstName;
@@ -256,8 +219,8 @@ export class PlayerService {
       position_id: this.mapPositionNameToId(playerData.position || 'Center'),
       height: heightInches,
       weight: playerData.weight || 180,
-      shoots: playerData.shoots === 'Right Shot' ? 1 : 0,
-      jersey_number: playerData.jerseyNumber || 0,
+      shoots: playerData.shoots === 'Right Shot' ? 'R' : 'L',
+      number: playerData.jerseyNumber || 0,  // Changed from jersey_number to number
       first_name: playerData.firstName || '',
       last_name: playerData.lastName || '',
       birth_year: playerData.birthYear || new Date().getFullYear() - 25,

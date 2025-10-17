@@ -2,28 +2,18 @@
 export interface TeamApiOut {
   id: number;
   name: string;
-  logo: string;
-  team_level_id: number;
+  level_id: number;  // Changed from team_level_id
   division_id: number;
-  wins: number;
-  losses: number;
-  goals_for: number;
-  goals_against: number;
-  points: number;
-  games_played: number;
+  age_group: string;
+  city: string;
 }
 
 export interface TeamApiIn {
   name: string;
-  logo: string;
-  team_level_id: number;
+  level_id: number;
   division_id: number;
-  wins: number;
-  losses: number;
-  goals_for: number;
-  goals_against: number;
-  points: number;
-  games_played: number;
+  age_group: string;
+  city: string;
 }
 
 // Frontend interface
@@ -39,6 +29,7 @@ export interface Team {
   goalsAgainst: number;
   points: number;
   gamesPlayed: number;
+  createdAt?: Date;  // Creation date for sorting
   [key: string]: unknown;  // Index signature for compatibility with Record<string, unknown>
 }
 

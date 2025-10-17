@@ -11,8 +11,8 @@ export interface PlayerApiIn {
   position_id: number;
   height: number;  // Height in inches
   weight: number;  // Weight in lbs
-  shoots: number;  // 1 for Right Shot, 0 for Left Shot
-  jersey_number: number;
+  shoots: string;  // "R" for Right Shot, "L" for Left Shot
+  number: number;  // Jersey number
   first_name: string;
   last_name: string;
   birth_year: number;
@@ -30,19 +30,25 @@ export interface PlayerApiOut {
   position_id: number;
   height: number;  // Height in inches
   weight: number;  // Weight in lbs
-  shoots: number;  // 1 for Right Shot, 0 for Left Shot
-  jersey_number: number;
+  shoots: string;  // "R" for Right Shot, "L" for Left Shot
+  number: number;  // Jersey number (named "number" in API)
   first_name: string;
   last_name: string;
-  birth_year: number;
+  birth_year: string;  // Date format
   goals: number;
   assists: number;
   points: number;
   scoring_chances: number;
   blocked_shots: number;
   penalties_drawn: number;
+  penalties_taken: number;
   games_played: number;
-  shot_spray_chart: string;
+  shots_on_goal: number;
+  shots_on_goal_per_game: number;
+  five_on_five_diff: number;
+  overall_diff: number;
+  penalty_kill_diff: number;
+  power_play_goals_diff: number;
 }
 
 // Frontend interface - keeping structure similar to goalies
@@ -68,6 +74,7 @@ export interface Player {
   penaltiesDrawn: number;
   rink: PlayerRink;
   level: string;
+  createdAt?: Date;  // Creation date for sorting
   [key: string]: unknown;  // Index signature for compatibility with Record<string, unknown>
 }
 

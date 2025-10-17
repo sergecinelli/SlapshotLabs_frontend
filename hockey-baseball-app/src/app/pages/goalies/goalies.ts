@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header';
 import { DataTableComponent, TableColumn, TableAction } from '../../shared/components/data-table/data-table';
 import { GoalieService } from '../../services/goalie.service';
@@ -47,6 +48,7 @@ export class GoaliesComponent implements OnInit {
   private goalieService = inject(GoalieService);
   private http = inject(HttpClient);
   private dialog = inject(MatDialog);
+  private snackBar = inject(MatSnackBar);
 
   goalies = signal<Goalie[]>([]);
   loading = signal(true);
@@ -90,7 +92,9 @@ export class GoaliesComponent implements OnInit {
     this.loading.set(true);
     this.goalieService.getGoalies().subscribe({
       next: (data) => {
-        this.goalies.set(data.goalies);
+        // Sort by creation date (newest to oldest) by default
+        const sortedGoalies = this.sortByDate(data.goalies, 'desc');
+        this.goalies.set(sortedGoalies);
         this.loading.set(false);
       },
       error: (error) => {
@@ -140,6 +144,16 @@ export class GoaliesComponent implements OnInit {
     return path.split('.').reduce((current: unknown, key: string) => (current as Record<string, unknown>)?.[key], obj);
   }
 
+  private sortByDate(goalies: Goalie[], direction: 'asc' | 'desc'): Goalie[] {
+    return [...goalies].sort((a, b) => {
+      const aDate = a.createdAt || new Date(0); // Use epoch if no date
+      const bDate = b.createdAt || new Date(0);
+      
+      const result = aDate.getTime() - bDate.getTime();
+      return direction === 'desc' ? -result : result; // desc = newest first
+    });
+  }
+
   private deleteGoalie(goalie: Goalie): void {
     if (confirm(`Are you sure you want to delete ${goalie.firstName} ${goalie.lastName}?`)) {
       this.goalieService.deleteGoalie(goalie.id).subscribe({
@@ -147,11 +161,26 @@ export class GoaliesComponent implements OnInit {
           if (success) {
             const updatedGoalies = this.goalies().filter(g => g.id !== goalie.id);
             this.goalies.set(updatedGoalies);
-            console.log('Goalie deleted successfully');
+            this.snackBar.open(
+              `Goalie ${goalie.firstName} ${goalie.lastName} deleted successfully`,
+              'Close',
+              { duration: 3000, panelClass: ['custom-snackbar', 'success-snackbar'] }
+            );
+          } else {
+            this.snackBar.open(
+              'Failed to delete goalie. Please try again.',
+              'Close',
+              { duration: 3000, panelClass: ['custom-snackbar', 'error-snackbar'] }
+            );
           }
         },
         error: (error) => {
           console.error('Error deleting goalie:', error);
+          this.snackBar.open(
+            'Error deleting goalie. Please try again.',
+            'Close',
+            { duration: 3000, panelClass: ['custom-snackbar', 'error-snackbar'] }
+          );
         }
       });
     }
@@ -212,8 +241,14 @@ export class GoaliesComponent implements OnInit {
     this.goalieService.addGoalie(goalieData).subscribe({
       next: (newGoalie) => {
         const currentGoalies = this.goalies();
-        this.goalies.set([...currentGoalies, newGoalie]);
-        console.log('Goalie added successfully');
+        // Add new goalie at the beginning (newest first)
+        const updatedGoalies = [newGoalie, ...currentGoalies];
+        this.goalies.set(updatedGoalies);
+        this.snackBar.open(
+          `Goalie ${newGoalie.firstName} ${newGoalie.lastName} added successfully`,
+          'Close',
+          { duration: 3000, panelClass: ['custom-snackbar', 'success-snackbar'] }
+        );
       },
       error: (error) => {
         console.error('Error adding goalie:', error);
@@ -249,7 +284,11 @@ export class GoaliesComponent implements OnInit {
           const newGoalies = [...currentGoalies];
           newGoalies[index] = updatedGoalie;
           this.goalies.set(newGoalies);
-          console.log('Goalie updated successfully');
+          this.snackBar.open(
+            `Goalie ${updatedGoalie.firstName} ${updatedGoalie.lastName} updated successfully`,
+            'Close',
+            { duration: 3000, panelClass: ['custom-snackbar', 'success-snackbar'] }
+          );
         }
       },
       error: (error) => {

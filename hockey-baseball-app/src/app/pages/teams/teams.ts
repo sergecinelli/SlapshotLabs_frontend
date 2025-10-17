@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header';
 import { DataTableComponent, TableColumn, TableAction } from '../../shared/components/data-table/data-table';
 import { TeamService } from '../../services/team.service';
@@ -47,6 +48,7 @@ export class TeamsComponent implements OnInit {
   private teamService = inject(TeamService);
   private http = inject(HttpClient);
   private dialog = inject(MatDialog);
+  private snackBar = inject(MatSnackBar);
 
   teams = signal<Team[]>([]);
   loading = signal(true);
@@ -77,7 +79,9 @@ export class TeamsComponent implements OnInit {
     this.loading.set(true);
     this.teamService.getTeams().subscribe({
       next: (data) => {
-        this.teams.set(data.teams);
+        // Sort by creation date (newest to oldest) by default
+        const sortedTeams = this.sortByDate(data.teams, 'desc');
+        this.teams.set(sortedTeams);
         this.loading.set(false);
       },
       error: (error) => {
@@ -124,6 +128,16 @@ export class TeamsComponent implements OnInit {
     return path.split('.').reduce((current: unknown, key: string) => (current as Record<string, unknown>)?.[key], obj);
   }
 
+  private sortByDate(teams: Team[], direction: 'asc' | 'desc'): Team[] {
+    return [...teams].sort((a, b) => {
+      const aDate = a.createdAt || new Date(0); // Use epoch if no date
+      const bDate = b.createdAt || new Date(0);
+      
+      const result = aDate.getTime() - bDate.getTime();
+      return direction === 'desc' ? -result : result; // desc = newest first
+    });
+  }
+
   private deleteTeam(team: Team): void {
     if (confirm(`Are you sure you want to delete ${team.name}?`)) {
       this.teamService.deleteTeam(team.id).subscribe({
@@ -131,11 +145,26 @@ export class TeamsComponent implements OnInit {
           if (success) {
             const updatedTeams = this.teams().filter(t => t.id !== team.id);
             this.teams.set(updatedTeams);
-            console.log('Team deleted successfully');
+            this.snackBar.open(
+              `Team ${team.name} deleted successfully`,
+              'Close',
+              { duration: 3000, panelClass: ['custom-snackbar', 'success-snackbar'] }
+            );
+          } else {
+            this.snackBar.open(
+              'Failed to delete team. Please try again.',
+              'Close',
+              { duration: 3000, panelClass: ['custom-snackbar', 'error-snackbar'] }
+            );
           }
         },
         error: (error) => {
           console.error('Error deleting team:', error);
+          this.snackBar.open(
+            'Error deleting team. Please try again.',
+            'Close',
+            { duration: 3000, panelClass: ['custom-snackbar', 'error-snackbar'] }
+          );
         }
       });
     }
@@ -210,8 +239,14 @@ export class TeamsComponent implements OnInit {
     this.teamService.addTeam(teamData).subscribe({
       next: (newTeam) => {
         const currentTeams = this.teams();
-        this.teams.set([...currentTeams, newTeam]);
-        console.log('Team added successfully');
+        // Add new team at the beginning (newest first)
+        const updatedTeams = [newTeam, ...currentTeams];
+        this.teams.set(updatedTeams);
+        this.snackBar.open(
+          `Team ${newTeam.name} added successfully`,
+          'Close',
+          { duration: 3000, panelClass: ['custom-snackbar', 'success-snackbar'] }
+        );
       },
       error: (error) => {
         console.error('Error adding team:', error);
@@ -228,7 +263,11 @@ export class TeamsComponent implements OnInit {
           const newTeams = [...currentTeams];
           newTeams[index] = updatedTeam;
           this.teams.set(newTeams);
-          console.log('Team updated successfully');
+          this.snackBar.open(
+            `Team ${updatedTeam.name} updated successfully`,
+            'Close',
+            { duration: 3000, panelClass: ['custom-snackbar', 'success-snackbar'] }
+          );
         }
       },
       error: (error) => {

@@ -99,6 +99,19 @@ export class ApiService {
   }
 
   /**
+   * Generic PATCH request
+   */
+  patch<T>(endpoint: string, body: unknown, includeCredentials = true): Observable<T> {
+    return this.http.patch<T>(
+      `${this.baseUrl}${endpoint}`,
+      body,
+      this.getHttpOptions(includeCredentials)
+    ).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  /**
    * Generic DELETE request
    */
   delete<T>(endpoint: string, includeCredentials = true): Observable<T> {

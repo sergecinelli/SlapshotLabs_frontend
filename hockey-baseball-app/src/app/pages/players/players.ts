@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header';
 import { DataTableComponent, TableColumn, TableAction } from '../../shared/components/data-table/data-table';
 import { PlayerService } from '../../services/player.service';
@@ -47,6 +48,7 @@ export class PlayersComponent implements OnInit {
   private playerService = inject(PlayerService);
   private http = inject(HttpClient);
   private dialog = inject(MatDialog);
+  private snackBar = inject(MatSnackBar);
 
   players = signal<Player[]>([]);
   loading = signal(true);
@@ -86,7 +88,9 @@ export class PlayersComponent implements OnInit {
     this.loading.set(true);
     this.playerService.getPlayers().subscribe({
       next: (data) => {
-        this.players.set(data.players);
+        // Sort by creation date (newest to oldest) by default
+        const sortedPlayers = this.sortByDate(data.players, 'desc');
+        this.players.set(sortedPlayers);
         this.loading.set(false);
       },
       error: (error) => {
@@ -136,6 +140,16 @@ export class PlayersComponent implements OnInit {
     return path.split('.').reduce((current: unknown, key: string) => (current as Record<string, unknown>)?.[key], obj);
   }
 
+  private sortByDate(players: Player[], direction: 'asc' | 'desc'): Player[] {
+    return [...players].sort((a, b) => {
+      const aDate = a.createdAt || new Date(0); // Use epoch if no date
+      const bDate = b.createdAt || new Date(0);
+      
+      const result = aDate.getTime() - bDate.getTime();
+      return direction === 'desc' ? -result : result; // desc = newest first
+    });
+  }
+
   private deletePlayer(player: Player): void {
     if (confirm(`Are you sure you want to delete ${player.firstName} ${player.lastName}?`)) {
       this.playerService.deletePlayer(player.id).subscribe({
@@ -143,11 +157,26 @@ export class PlayersComponent implements OnInit {
           if (success) {
             const updatedPlayers = this.players().filter(p => p.id !== player.id);
             this.players.set(updatedPlayers);
-            console.log('Player deleted successfully');
+            this.snackBar.open(
+              `Player ${player.firstName} ${player.lastName} deleted successfully`,
+              'Close',
+              { duration: 3000, panelClass: ['custom-snackbar', 'success-snackbar'] }
+            );
+          } else {
+            this.snackBar.open(
+              'Failed to delete player. Please try again.',
+              'Close',
+              { duration: 3000, panelClass: ['custom-snackbar', 'error-snackbar'] }
+            );
           }
         },
         error: (error) => {
           console.error('Error deleting player:', error);
+          this.snackBar.open(
+            'Error deleting player. Please try again.',
+            'Close',
+            { duration: 3000, panelClass: ['custom-snackbar', 'error-snackbar'] }
+          );
         }
       });
     }
@@ -208,8 +237,14 @@ export class PlayersComponent implements OnInit {
     this.playerService.addPlayer(playerData).subscribe({
       next: (newPlayer) => {
         const currentPlayers = this.players();
-        this.players.set([...currentPlayers, newPlayer]);
-        console.log('Player added successfully');
+        // Add new player at the beginning (newest first)
+        const updatedPlayers = [newPlayer, ...currentPlayers];
+        this.players.set(updatedPlayers);
+        this.snackBar.open(
+          `Player ${newPlayer.firstName} ${newPlayer.lastName} added successfully`,
+          'Close',
+          { duration: 3000, panelClass: ['custom-snackbar', 'success-snackbar'] }
+        );
       },
       error: (error) => {
         console.error('Error adding player:', error);
@@ -245,7 +280,11 @@ export class PlayersComponent implements OnInit {
           const newPlayers = [...currentPlayers];
           newPlayers[index] = updatedPlayer;
           this.players.set(newPlayers);
-          console.log('Player updated successfully');
+          this.snackBar.open(
+            `Player ${updatedPlayer.firstName} ${updatedPlayer.lastName} updated successfully`,
+            'Close',
+            { duration: 3000, panelClass: ['custom-snackbar', 'success-snackbar'] }
+          );
         }
       },
       error: (error) => {

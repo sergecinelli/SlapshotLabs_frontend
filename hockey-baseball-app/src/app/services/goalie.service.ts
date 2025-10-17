@@ -1,8 +1,7 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, of, delay } from 'rxjs';
-import { map, catchError } from 'rxjs/operators';
-import { Goalie, GoalieTableData, GoalieApiOut } from '../shared/interfaces/goalie.interface';
+import { Observable, throwError } from 'rxjs';
+import { map, catchError, switchMap } from 'rxjs/operators';
+import { Goalie, GoalieTableData, GoalieApiOut, GoalieApiIn } from '../shared/interfaces/goalie.interface';
 import { ApiService } from './api.service';
 import { GoalieDataMapper } from '../shared/utils/goalie-data-mapper';
 
@@ -10,13 +9,10 @@ import { GoalieDataMapper } from '../shared/utils/goalie-data-mapper';
   providedIn: 'root'
 })
 export class GoalieService {
-  private http = inject(HttpClient);
   private apiService = inject(ApiService);
 
-  private readonly mockDataPath = '/assets/data/goalies-mock.json';
-
   getGoalies(): Observable<GoalieTableData> {
-    return this.apiService.get<GoalieApiOut[]>('/hockey/goalies').pipe(
+    return this.apiService.get<GoalieApiOut[]>('/hockey/goalie/list').pipe(
       map(apiGoalies => {
         const goalies = GoalieDataMapper.fromApiOutArrayFormat(apiGoalies);
         return {
@@ -26,10 +22,7 @@ export class GoalieService {
       }),
       catchError(error => {
         console.error('Failed to fetch goalies:', error);
-        // Fallback to mock data if API fails
-        return this.http.get<GoalieTableData>(this.mockDataPath).pipe(
-          delay(500)
-        );
+        return throwError(() => error);
       })
     );
   }
@@ -38,37 +31,37 @@ export class GoalieService {
     // Convert string ID to number for API call
     const numericId = parseInt(id, 10);
     if (isNaN(numericId)) {
-      // If ID is not numeric, fall back to filtering mock data
-      return new Observable<Goalie | undefined>(observer => {
-        this.getGoalies().subscribe(data => {
-          const goalie = data.goalies.find(g => g.id === id);
-          observer.next(goalie);
-          observer.complete();
-        });
-      });
+      console.error(`Invalid goalie ID: ${id}`);
+      return throwError(() => new Error(`Invalid goalie ID: ${id}`));
     }
 
     return this.apiService.get<GoalieApiOut>(`/hockey/goalie/${numericId}`).pipe(
       map(apiGoalie => GoalieDataMapper.fromApiOutFormat(apiGoalie)),
       catchError(error => {
         console.error(`Failed to fetch goalie with ID ${id}:`, error);
-        // Fallback to mock data search
-        return new Observable<Goalie | undefined>(observer => {
-          this.getGoalies().subscribe(data => {
-            const goalie = data.goalies.find(g => g.id === id);
-            observer.next(goalie);
-            observer.complete();
-          });
-        });
+        return throwError(() => error);
       })
     );
   }
 
-  // Mock methods for future implementation
   deleteGoalie(id: string): Observable<boolean> {
-    // Simulate delete operation
-    console.log(`Delete goalie with ID: ${id}`);
-    return of(true).pipe(delay(300));
+    // Convert string ID to number for API call
+    const numericId = parseInt(id, 10);
+    if (isNaN(numericId)) {
+      console.error(`Invalid goalie ID for deletion: ${id}`);
+      return throwError(() => new Error(`Invalid goalie ID: ${id}`));
+    }
+
+    return this.apiService.delete<void>(`/hockey/goalie/${numericId}`).pipe(
+      map(() => {
+        console.log(`Goalie with ID ${id} deleted successfully`);
+        return true;
+      }),
+      catchError(error => {
+        console.error(`Failed to delete goalie with ID ${id}:`, error);
+        return throwError(() => error);
+      })
+    );
   }
 
   addGoalie(goalieData: Partial<Goalie>): Observable<Goalie> {
@@ -90,7 +83,8 @@ export class GoalieService {
             rinkName: 'Main Rink',
             city: 'City',
             address: 'Address'
-          }
+          },
+          createdAt: new Date() // Set creation date
         } as Goalie;
         
         console.log(`Added new goalie:`, newGoalie);
@@ -98,23 +92,73 @@ export class GoalieService {
       }),
       catchError(error => {
         console.error('Failed to add goalie:', error);
-        // Fallback to mock behavior
-        const newGoalie: Goalie = {
-          id: 'goalie-' + Date.now().toString(),
-          ...goalieData
-        } as Goalie;
-        return of(newGoalie).pipe(delay(300));
+        return throwError(() => error);
       })
     );
   }
 
   updateGoalie(id: string, goalieData: Partial<Goalie>): Observable<Goalie> {
-    // Simulate update operation
-    const updatedGoalie: Goalie = {
-      id,
-      ...goalieData
-    } as Goalie;
-    console.log(`Update goalie with ID ${id}:`, updatedGoalie);
-    return of(updatedGoalie).pipe(delay(300));
+    // Convert string ID to number for API call
+    const numericId = parseInt(id, 10);
+    if (isNaN(numericId)) {
+      console.error(`Invalid goalie ID for update: ${id}`);
+      return throwError(() => new Error(`Invalid goalie ID: ${id}`));
+    }
+
+    // Transform frontend data to API format for partial update
+    const apiUpdateData = this.toApiPatchFormat(goalieData);
+    
+    return this.apiService.patch<void>(`/hockey/goalie/${numericId}`, apiUpdateData).pipe(
+      switchMap(() => {
+        // After successful update, fetch the updated goalie data
+        return this.getGoalieById(id);
+      }),
+      map(updatedGoalie => {
+        if (!updatedGoalie) {
+          throw new Error(`Goalie with ID ${id} not found after update`);
+        }
+        console.log(`Goalie with ID ${id} updated successfully`);
+        return updatedGoalie;
+      }),
+      catchError(error => {
+        console.error(`Failed to update goalie with ID ${id}:`, error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  private toApiPatchFormat(goalieData: Partial<Goalie>): Partial<GoalieApiIn> {
+    const updateData: Partial<GoalieApiIn> = {};
+    
+    // Only include fields that are provided and exist in the API
+    if (goalieData.height) {
+      updateData.height = GoalieDataMapper.heightStringToInches(goalieData.height);
+    }
+    if (goalieData.weight !== undefined) {
+      updateData.weight = goalieData.weight;
+    }
+    if (goalieData.shoots) {
+      updateData.shoots = GoalieDataMapper.shootsToApiFormat(goalieData.shoots);
+    }
+    if (goalieData.jerseyNumber !== undefined) {
+      updateData.jersey_number = goalieData.jerseyNumber;
+    }
+    if (goalieData.firstName) {
+      updateData.first_name = goalieData.firstName;
+    }
+    if (goalieData.lastName) {
+      updateData.last_name = goalieData.lastName;
+    }
+    if (goalieData.birthYear) {
+      updateData.birth_year = goalieData.birthYear;
+    }
+    if (goalieData.wins !== undefined) {
+      updateData.wins = goalieData.wins;
+    }
+    if (goalieData.losses !== undefined) {
+      updateData.losses = goalieData.losses;
+    }
+    
+    return updateData;
   }
 }

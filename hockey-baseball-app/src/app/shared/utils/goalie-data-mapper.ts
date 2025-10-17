@@ -41,19 +41,19 @@ export class GoalieDataMapper {
   /**
    * Convert frontend shoots format to API format
    * @param shoots - "Right Shot" or "Left Shot"
-   * @returns 1 for Right Shot, 0 for Left Shot
+   * @returns "R" for Right Shot, "L" for Left Shot
    */
-  static shootsToApiFormat(shoots: string): number {
-    return shoots === 'Right Shot' ? 1 : 0;
+  static shootsToApiFormat(shoots: string): string {
+    return shoots === 'Right Shot' ? 'R' : 'L';
   }
 
   /**
    * Convert API shoots format to frontend format
-   * @param shoots - 1 for Right Shot, 0 for Left Shot
+   * @param shoots - "R" for Right Shot, "L" for Left Shot
    * @returns "Right Shot" or "Left Shot"
    */
-  static shootsFromApiFormat(shoots: number): 'Right Shot' | 'Left Shot' {
-    return shoots === 1 ? 'Right Shot' : 'Left Shot';
+  static shootsFromApiFormat(shoots: string): 'Right Shot' | 'Left Shot' {
+    return shoots === 'R' ? 'Right Shot' : 'Left Shot';
   }
 
   /**
@@ -74,7 +74,6 @@ export class GoalieDataMapper {
       birth_year: goalie.birthYear || new Date().getFullYear(),
       wins: goalie.wins || 0,
       losses: goalie.losses || 0,
-      saves_above_avg: goalie.savesAboveAvg || 0,
       position_id: 0  // Default position_id for goalies
     };
   }
@@ -97,7 +96,7 @@ export class GoalieDataMapper {
       jerseyNumber: apiGoalie.jersey_number,
       firstName: apiGoalie.first_name,
       lastName: apiGoalie.last_name,
-      birthYear: apiGoalie.birth_year,
+      birthYear: new Date(apiGoalie.birth_year).getFullYear(),
       shotsOnGoal: apiGoalie.shots_on_goal,
       saves: apiGoalie.saves,
       goalsAgainst: apiGoalie.goals_against,
@@ -114,9 +113,10 @@ export class GoalieDataMapper {
       goals: apiGoalie.goals,
       assists: apiGoalie.assists,
       points: apiGoalie.points,
-      ppga: apiGoalie.power_play_goals, // Using power_play_goals for ppga
-      shga: apiGoalie.short_handed_goals, // Using short_handed_goals for shga
-      savesAboveAvg: apiGoalie.saves_above_avg
+      ppga: apiGoalie.power_play_goals_against, // Using power_play_goals_against for ppga
+      shga: apiGoalie.short_handed_goals_against, // Using short_handed_goals_against for shga
+      savesAboveAvg: 0, // Field not available in API
+      createdAt: new Date() // Set creation date for newly created items
     };
   }
 
