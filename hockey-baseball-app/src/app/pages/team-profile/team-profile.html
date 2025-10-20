@@ -1,0 +1,289 @@
+<div class="team-profile-page">
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <p>Loading team profile...</p>
+  </div>
+
+  <!-- Profile Content -->
+  <div *ngIf="!loading && team" class="profile-content">
+    
+    <!-- Action Buttons Row -->
+    <div class="mb-4 flex justify-end gap-3">
+      <button 
+        mat-raised-button 
+        color="primary" 
+        (click)="onEditTeamProfile()"
+        class="add-team-btn">
+        <mat-icon>edit</mat-icon>
+        Edit Team Profile
+      </button>
+      <button 
+        mat-raised-button 
+        color="accent" 
+        (click)="onRequestTeamAnalysis()"
+        class="add-team-btn">
+        <mat-icon>analytics</mat-icon>
+        Request Team Analysis
+      </button>
+    </div>
+    
+    <!-- Header Section with Basic Info -->
+    <div class="profile-header">
+      <div class="team-header-layout">
+        <!-- First Row: Logo + Team Name + Season/City + Team Record -->
+        <div class="team-main-info">
+          <div class="team-logo-container">
+            <div class="team-logo">
+              <mat-icon class="logo-placeholder">sports_hockey</mat-icon>
+            </div>
+          </div>
+          <div class="team-name-container">
+            <h1 class="team-name">{{ team.name }}</h1>
+          </div>
+          <div class="team-stats-container">
+            <div class="stats-row">
+              <span class="current-season">{{ getCurrentSeason() }}</span>
+              <span class="city">{{ team.city }}</span>
+            </div>
+            <div class="stats-row">
+              <span class="team-record">{{ getTeamRecord() }}</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Second Row: Age Group, Level, Division -->
+        <div class="team-categories">
+          <span class="age-group">{{ team.group }}</span>
+          <span class="level">{{ team.level }}</span>
+          <span class="division">{{ team.division }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Season Stats Table -->
+    <mat-card class="info-card season-stats-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>table_chart</mat-icon>
+          SEASON
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <!-- Season Navigation -->
+        <div class="season-navigation">
+          <span class="current-season">{{ getCurrentSeason() }}</span>
+          <button mat-button class="previous-season-btn" (click)="showPreviousSeason()">
+            &lt; {{ getPreviousSeason() }}
+          </button>
+        </div>
+        
+        <div class="table-container">
+          <table mat-table [dataSource]="getSeasonStatsDataSource()" class="season-table">
+            
+            <!-- Season Column -->
+            <ng-container matColumnDef="season">
+              <th mat-header-cell *matHeaderCellDef class="header-cell">Season</th>
+              <td mat-cell *matCellDef="let element" class="data-cell">{{ element.season }}</td>
+            </ng-container>
+
+            <!-- Games Played Column -->
+            <ng-container matColumnDef="gamesPlayed">
+              <th mat-header-cell *matHeaderCellDef class="header-cell">Games Played</th>
+              <td mat-cell *matCellDef="let element" class="data-cell">{{ element.gamesPlayed }}</td>
+            </ng-container>
+
+            <!-- Wins Column -->
+            <ng-container matColumnDef="wins">
+              <th mat-header-cell *matHeaderCellDef class="header-cell">Wins</th>
+              <td mat-cell *matCellDef="let element" class="data-cell">{{ element.wins }}</td>
+            </ng-container>
+
+            <!-- Losses Column -->
+            <ng-container matColumnDef="losses">
+              <th mat-header-cell *matHeaderCellDef class="header-cell">Losses</th>
+              <td mat-cell *matCellDef="let element" class="data-cell">{{ element.losses }}</td>
+            </ng-container>
+
+            <!-- Ties Column -->
+            <ng-container matColumnDef="ties">
+              <th mat-header-cell *matHeaderCellDef class="header-cell">Ties</th>
+              <td mat-cell *matCellDef="let element" class="data-cell">{{ element.ties }}</td>
+            </ng-container>
+
+            <!-- Points Column -->
+            <ng-container matColumnDef="points">
+              <th mat-header-cell *matHeaderCellDef class="header-cell">Points</th>
+              <td mat-cell *matCellDef="let element" class="data-cell">{{ element.points }}</td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="seasonStatsColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: seasonStatsColumns;"></tr>
+          </table>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Schedule Section -->
+    <mat-card class="info-card schedule-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>schedule</mat-icon>
+          Schedule
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <!-- Recent Games -->
+        <div class="schedule-section">
+          <h3 class="schedule-subtitle red-text">{{ getRecentGamesTitle() }}</h3>
+          <div class="table-container">
+            <table mat-table [dataSource]="getRecentGames()" class="schedule-table recent-games-table">
+              
+              <!-- Date Column -->
+              <ng-container matColumnDef="date">
+                <th mat-header-cell *matHeaderCellDef class="header-cell">Date</th>
+                <td mat-cell *matCellDef="let element" class="data-cell">{{ element.date }}</td>
+              </ng-container>
+
+              <!-- Opponent Column -->
+              <ng-container matColumnDef="opponent">
+                <th mat-header-cell *matHeaderCellDef class="header-cell">Opponent</th>
+                <td mat-cell *matCellDef="let element" class="data-cell">{{ element.opponent }}</td>
+              </ng-container>
+
+              <!-- Result Column -->
+              <ng-container matColumnDef="result">
+                <th mat-header-cell *matHeaderCellDef class="header-cell">Result</th>
+                <td mat-cell *matCellDef="let element" class="data-cell result-cell" [ngClass]="getResultClass(element.result || '')">{{ element.result }}</td>
+              </ng-container>
+
+              <!-- Game Type Column -->
+              <ng-container matColumnDef="gameType">
+                <th mat-header-cell *matHeaderCellDef class="header-cell">Game Type</th>
+                <td mat-cell *matCellDef="let element" class="data-cell">{{ element.gameType }}</td>
+              </ng-container>
+
+              <!-- Rink Column -->
+              <ng-container matColumnDef="rink">
+                <th mat-header-cell *matHeaderCellDef class="header-cell">Rink</th>
+                <td mat-cell *matCellDef="let element" class="data-cell">{{ element.rink }}</td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="recentGamesColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: recentGamesColumns;"></tr>
+            </table>
+          </div>
+        </div>
+
+        <!-- Upcoming Games -->
+        <div class="schedule-section">
+          <h3 class="schedule-subtitle red-text">{{ getUpcomingGamesTitle() }}</h3>
+          <div class="table-container">
+            <table mat-table [dataSource]="getUpcomingGames()" class="schedule-table upcoming-games-table">
+              
+              <!-- Date Column -->
+              <ng-container matColumnDef="date">
+                <th mat-header-cell *matHeaderCellDef class="header-cell">Date</th>
+                <td mat-cell *matCellDef="let element" class="data-cell">{{ element.date }}</td>
+              </ng-container>
+
+              <!-- Time Column -->
+              <ng-container matColumnDef="time">
+                <th mat-header-cell *matHeaderCellDef class="header-cell">Time</th>
+                <td mat-cell *matCellDef="let element" class="data-cell">{{ element.time }}</td>
+              </ng-container>
+
+              <!-- Opponent Column -->
+              <ng-container matColumnDef="opponent">
+                <th mat-header-cell *matHeaderCellDef class="header-cell">Opponent</th>
+                <td mat-cell *matCellDef="let element" class="data-cell">{{ element.opponent }}</td>
+              </ng-container>
+
+              <!-- Game Type Column -->
+              <ng-container matColumnDef="gameType">
+                <th mat-header-cell *matHeaderCellDef class="header-cell">Game Type</th>
+                <td mat-cell *matCellDef="let element" class="data-cell">{{ element.gameType }}</td>
+              </ng-container>
+
+              <!-- Rink Column -->
+              <ng-container matColumnDef="rink">
+                <th mat-header-cell *matHeaderCellDef class="header-cell">Rink</th>
+                <td mat-cell *matCellDef="let element" class="data-cell">{{ element.rink }}</td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="upcomingGamesColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: upcomingGamesColumns;"></tr>
+            </table>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Roster Section -->
+    <mat-card class="info-card roster-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>group</mat-icon>
+          Roster
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="table-container">
+          <table mat-table [dataSource]="getTeamRoster()" class="roster-table">
+            
+            <!-- Jersey Number Column -->
+            <ng-container matColumnDef="jerseyNumber">
+              <th mat-header-cell *matHeaderCellDef class="header-cell">Jersey #</th>
+              <td mat-cell *matCellDef="let element" class="data-cell">#{{ element.jerseyNumber }}</td>
+            </ng-container>
+
+            <!-- First Name Column -->
+            <ng-container matColumnDef="firstName">
+              <th mat-header-cell *matHeaderCellDef class="header-cell">First Name</th>
+              <td mat-cell *matCellDef="let element" class="data-cell">{{ element.firstName }}</td>
+            </ng-container>
+
+            <!-- Last Name Column -->
+            <ng-container matColumnDef="lastName">
+              <th mat-header-cell *matHeaderCellDef class="header-cell">Last Name</th>
+              <td mat-cell *matCellDef="let element" class="data-cell">{{ element.lastName }}</td>
+            </ng-container>
+
+            <!-- Position Column -->
+            <ng-container matColumnDef="position">
+              <th mat-header-cell *matHeaderCellDef class="header-cell">Position</th>
+              <td mat-cell *matCellDef="let element" class="data-cell">{{ element.position }}</td>
+            </ng-container>
+
+            <!-- Height Column -->
+            <ng-container matColumnDef="height">
+              <th mat-header-cell *matHeaderCellDef class="header-cell">Height</th>
+              <td mat-cell *matCellDef="let element" class="data-cell">{{ element.height }}</td>
+            </ng-container>
+
+            <!-- Weight Column -->
+            <ng-container matColumnDef="weight">
+              <th mat-header-cell *matHeaderCellDef class="header-cell">Weight</th>
+              <td mat-cell *matCellDef="let element" class="data-cell">{{ element.weight }} lbs</td>
+            </ng-container>
+
+            <!-- Shoots Column -->
+            <ng-container matColumnDef="shoots">
+              <th mat-header-cell *matHeaderCellDef class="header-cell">Shoots</th>
+              <td mat-cell *matCellDef="let element" class="data-cell">{{ element.shoots }}</td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="rosterColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: rosterColumns;"></tr>
+          </table>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="!loading && !team" class="error-container">
+    <p>Team not found.</p>
+  </div>
+
+</div>
