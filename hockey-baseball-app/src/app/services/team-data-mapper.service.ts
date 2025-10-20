@@ -15,11 +15,11 @@ export class TeamDataMapperService {
     return {
       id: apiTeam.id.toString(),
       name: apiTeam.name,
-      group: apiTeam.group || '1U',
+      group: apiTeam.age_group || '1U',  // Use age_group as group
       level: this.teamOptionsService.getLevelName(apiTeam.level_id),
       division: this.teamOptionsService.getDivisionName(apiTeam.division_id),
       city: apiTeam.city || '',
-      logo: apiTeam.logo || '/assets/icons/teams.svg',
+      logo: '/assets/icons/teams.svg',  // Default logo since API doesn't return it directly
       createdAt: new Date()
     };
   }
@@ -30,12 +30,10 @@ export class TeamDataMapperService {
   toApiInFormat(team: Partial<Team>): TeamApiIn {
     return {
       name: team.name || '',
-      group: team.group || '1U',
+      age_group: team.group || '1U',
       level_id: this.teamOptionsService.getLevelId(team.level || 'NHL'),
       division_id: this.teamOptionsService.getDivisionId(team.division || 'Atlantic'),
-      age_group: 'Adult', // Default age group
-      city: team.city || '',
-      logo: team.logo
+      city: team.city || ''
     };
   }
 
@@ -48,9 +46,6 @@ export class TeamDataMapperService {
     if (team.name) {
       updateData.name = team.name;
     }
-    if (team.group) {
-      updateData.group = team.group;
-    }
     if (team.level) {
       updateData.level_id = this.teamOptionsService.getLevelId(team.level);
     }
@@ -59,9 +54,6 @@ export class TeamDataMapperService {
     }
     if (team.city) {
       updateData.city = team.city;
-    }
-    if (team.logo) {
-      updateData.logo = team.logo;
     }
     
     return updateData;

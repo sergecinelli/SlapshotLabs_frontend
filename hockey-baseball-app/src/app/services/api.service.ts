@@ -86,6 +86,29 @@ export class ApiService {
   }
 
   /**
+   * POST request with multipart/form-data (for file uploads)
+   */
+  postMultipart<T>(endpoint: string, formData: FormData, includeCredentials = true): Observable<T> {
+    const headers = new HttpHeaders({
+      'Accept': 'application/json'
+      // Don't set Content-Type for FormData - let browser set it with boundary
+    });
+
+    const options = {
+      headers,
+      withCredentials: includeCredentials
+    };
+
+    return this.http.post<T>(
+      `${this.baseUrl}${endpoint}`,
+      formData,
+      options
+    ).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  /**
    * Generic PUT request
    */
   put<T>(endpoint: string, body: unknown, includeCredentials = true): Observable<T> {
@@ -106,6 +129,29 @@ export class ApiService {
       `${this.baseUrl}${endpoint}`,
       body,
       this.getHttpOptions(includeCredentials)
+    ).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  /**
+   * PATCH request with multipart/form-data (for file uploads)
+   */
+  patchMultipart<T>(endpoint: string, formData: FormData, includeCredentials = true): Observable<T> {
+    const headers = new HttpHeaders({
+      'Accept': 'application/json'
+      // Don't set Content-Type for FormData - let browser set it with boundary
+    });
+
+    const options = {
+      headers,
+      withCredentials: includeCredentials
+    };
+
+    return this.http.patch<T>(
+      `${this.baseUrl}${endpoint}`,
+      formData,
+      options
     ).pipe(
       catchError(this.handleError)
     );

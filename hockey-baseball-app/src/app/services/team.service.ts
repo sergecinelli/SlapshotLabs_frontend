@@ -65,11 +65,20 @@ export class TeamService {
     );
   }
 
-  addTeam(teamData: Partial<Team>): Observable<Team> {
+  addTeam(teamData: Partial<Team>, logoFile?: File): Observable<Team> {
     // Transform frontend data to API format
     const apiTeamData = this.teamDataMapper.toApiInFormat(teamData);
     
-    return this.apiService.post<{ id: number }>('/hockey/team', apiTeamData).pipe(
+    // Create FormData for multipart request
+    const formData = new FormData();
+    formData.append('data', JSON.stringify(apiTeamData));
+    
+    // Add logo file if provided
+    if (logoFile) {
+      formData.append('logo', logoFile);
+    }
+    
+    return this.apiService.postMultipart<{ id: number }>('/hockey/team', formData).pipe(
       map(response => {
         // Create a complete team object with the returned ID
         const newTeam: Team = {
@@ -93,7 +102,7 @@ export class TeamService {
     );
   }
 
-  updateTeam(id: string, teamData: Partial<Team>): Observable<Team> {
+  updateTeam(id: string, teamData: Partial<Team>, logoFile?: File): Observable<Team> {
     // Convert string ID to number for API call
     const numericId = parseInt(id, 10);
     if (isNaN(numericId)) {
@@ -103,7 +112,16 @@ export class TeamService {
 
     const apiUpdateData = this.teamDataMapper.toApiUpdateFormat(teamData);
     
-    return this.apiService.patch<void>(`/hockey/team/${numericId}`, apiUpdateData).pipe(
+    // Create FormData for multipart request
+    const formData = new FormData();
+    formData.append('data', JSON.stringify(apiUpdateData));
+    
+    // Add logo file if provided
+    if (logoFile) {
+      formData.append('logo', logoFile);
+    }
+    
+    return this.apiService.patchMultipart<void>(`/hockey/team/${numericId}`, formData).pipe(
       switchMap(() => {
         // After successful update, fetch the updated team data
         return this.getTeamById(id);
@@ -117,6 +135,24 @@ export class TeamService {
       }),
       catchError(error => {
         console.error(`Failed to update team with ID ${id}:`, error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  /**
+   * Get team logo
+   */
+  getTeamLogo(id: string): Observable<Blob> {
+    const numericId = parseInt(id, 10);
+    if (isNaN(numericId)) {
+      console.error(`Invalid team ID for logo: ${id}`);
+      return throwError(() => new Error(`Invalid team ID: ${id}`));
+    }
+
+    return this.apiService.get<Blob>(`/hockey/team/${numericId}/logo`).pipe(
+      catchError(error => {
+        console.error(`Failed to fetch logo for team with ID ${id}:`, error);
         return throwError(() => error);
       })
     );

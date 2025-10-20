@@ -2,22 +2,18 @@
 export interface TeamApiOut {
   id: number;
   name: string;
-  group: string;
-  level_id: number;  // Changed from team_level_id
-  division_id: number;
   age_group: string;
+  level_id: number;
+  division_id: number;
   city: string;
-  logo?: string;
 }
 
 export interface TeamApiIn {
   name: string;
-  group: string;
+  age_group: string;
   level_id: number;
   division_id: number;
-  age_group: string;
   city: string;
-  logo?: string;
 }
 
 // Frontend interface
