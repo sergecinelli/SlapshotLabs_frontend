@@ -1,85 +1,90 @@
-<div class="space-y-6">
+<div class="p-6 pt-0 space-y-6">
   <!-- Page Header -->
-  <div>
-    <app-page-header title="Dashboard"></app-page-header>
-    <p class="text-gray-600 mt-2">Welcome back! Here's what's happening with your hockey teams.</p>
-  </div>
-
-  <!-- Stats Cards -->
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-    @for (stat of stats; track stat.label) {
-      <div class="bg-white rounded-lg shadow p-6 border border-gray-200">
-        <div class="flex items-center justify-between">
-          <div>
-            <p class="text-sm font-medium text-gray-600">{{ stat.label }}</p>
-            <p class="text-3xl font-bold text-gray-900">{{ stat.value }}</p>
-          </div>
-          <div [class]="'text-3xl opacity-80'">
-            {{ stat.icon }}
-          </div>
-        </div>
-      </div>
-    }
+  <app-page-header title="Dashboard"></app-page-header>
+  
+  <!-- Quick Actions Row -->
+  <div class="flex flex-wrap gap-4 justify-center">
+    <app-action-button 
+      label="Add Team"
+      (buttonClick)="openAddTeamModal()">
+    </app-action-button>
+    <app-action-button 
+      label="Add Player"
+      (buttonClick)="openAddPlayerModal()">
+    </app-action-button>
+    <app-action-button 
+      label="Add Goalie"
+      (buttonClick)="openAddGoalieModal()">
+    </app-action-button>
+    <app-action-button 
+      label="Add Game"
+      (buttonClick)="openAddGameModal()">
+    </app-action-button>
+    <app-action-button 
+      label="Create Highlight Reel"
+      (buttonClick)="createHighlightReel()">
+    </app-action-button>
   </div>
 
   <!-- Main Content Grid -->
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-    <!-- Recent Activity -->
-    <div class="bg-white rounded-lg shadow border border-gray-200">
-      <div class="px-6 py-4 border-b border-gray-200">
-        <h2 class="text-lg font-semibold text-gray-900">Recent Activity</h2>
+    <!-- Upcoming Games -->
+    <div class="bg-white rounded-lg shadow-lg border border-gray-200">
+      <div class="px-6 pt-4 border-b border-gray-200">
+        <h2 class="text-xl font-semibold text-gray-900">Upcoming Games</h2>
       </div>
       <div class="p-6">
-        <div class="space-y-4">
-          @for (activity of recentActivity; track $index) {
-            <div class="flex items-start space-x-3">
-              <div class="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
-              <p class="text-sm text-gray-700">{{ activity }}</p>
-            </div>
-          }
-        </div>
+        @if (loading()) {
+          <div class="flex justify-center items-center py-8">
+            <div class="text-gray-500">Loading games...</div>
+          </div>
+        } @else if (upcomingGames().length === 0) {
+          <div class="text-center py-8 text-gray-500">
+            No upcoming games scheduled.
+          </div>
+        } @else {
+          <div>
+            @for (game of upcomingGames(); track game.id; let i = $index) {
+              @if (i < 5) {
+                <div class="game-item">
+                  <div class="game-line">
+                    {{ game.date }} - {{ game.time }} - {{ game.homeTeam }} at {{ game.awayTeam }}
+                  </div>
+                </div>
+              }
+            }
+          </div>
+        }
       </div>
     </div>
 
-    <!-- Quick Actions -->
-    <div class="bg-white rounded-lg shadow border border-gray-200">
-      <div class="px-6 py-4 border-b border-gray-200">
-        <h2 class="text-lg font-semibold text-gray-900">Quick Actions</h2>
+    <!-- Game Results -->
+    <div class="bg-white rounded-lg shadow-lg border border-gray-200">
+      <div class="px-6 pt-4 border-b border-gray-200">
+        <h2 class="text-xl font-semibold text-gray-900">Game Results</h2>
       </div>
       <div class="p-6">
-        <div class="grid grid-cols-2 gap-4">
-          <button class="flex flex-col items-center p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
-            <span class="text-2xl mb-2">➕</span>
-            <span class="text-sm font-medium text-blue-700">Add Player</span>
-          </button>
-          <button class="flex flex-col items-center p-4 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
-            <span class="text-2xl mb-2">📅</span>
-            <span class="text-sm font-medium text-green-700">Schedule Game</span>
-          </button>
-          <button class="flex flex-col items-center p-4 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors">
-            <span class="text-2xl mb-2">📹</span>
-            <span class="text-sm font-medium text-purple-700">Upload Video</span>
-          </button>
-          <button class="flex flex-col items-center p-4 bg-orange-50 rounded-lg hover:bg-orange-100 transition-colors">
-            <span class="text-2xl mb-2">📊</span>
-            <span class="text-sm font-medium text-orange-700">View Analytics</span>
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Placeholder for Charts/Graphs -->
-  <div class="bg-white rounded-lg shadow border border-gray-200">
-    <div class="px-6 py-4 border-b border-gray-200">
-      <h2 class="text-lg font-semibold text-gray-900">Performance Overview</h2>
-    </div>
-    <div class="p-6">
-      <div class="h-64 bg-gray-50 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-300">
-        <div class="text-center">
-          <span class="text-4xl text-gray-400">📈</span>
-          <p class="text-gray-500 mt-2">Charts and graphs will be displayed here</p>
-        </div>
+        @if (loading()) {
+          <div class="flex justify-center items-center py-8">
+            <div class="text-gray-500">Loading games...</div>
+          </div>
+        } @else if (gameResults().length === 0) {
+          <div class="text-center py-8 text-gray-500">
+            No completed games found.
+          </div>
+        } @else {
+          <div>
+            @for (game of gameResults(); track game.id; let i = $index) {
+              @if (i < 5) {
+                <div class="game-item">
+                  <div class="game-line">
+                    {{ game.date }} - {{ game.time }} - {{ game.homeTeam }} [{{ game.homeGoals }}] at {{ game.awayTeam }} [{{ game.awayGoals }}]
+                  </div>
+                </div>
+              }
+            }
+          </div>
+        }
       </div>
     </div>
   </div>

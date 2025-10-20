@@ -1,0 +1,46 @@
+.action-button {
+  width: 200px;
+  height: 100px;
+  border: 2px solid #dc2626;
+  background-color: white;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  font-family: inherit;
+  
+  &:hover:not(:disabled) {
+    background-color: #fef2f2;
+    border-color: #b91c1c;
+  }
+  
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.button-content {
+  text-align: center;
+}
+
+.button-label {
+  color: #dc2626;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .action-button {
+    width: 160px;
+    height: 80px;
+  }
+  
+  .button-label {
+    font-size: 14px;
+  }
+}

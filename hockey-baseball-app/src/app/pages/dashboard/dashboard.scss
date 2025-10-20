@@ -1,15 +1,23 @@
-.stat-card {
-  transition: transform 0.2s ease-in-out;
+// Game list styles - simple line format
+.game-item {
+  padding: 8px 0;
+  border-bottom: 1px solid #e5e7eb;
   
-  &:hover {
-    transform: translateY(-2px);
+  &:last-child {
+    border-bottom: none;
   }
 }
 
-.quick-action-btn {
-  transition: all 0.2s ease-in-out;
-  
-  &:hover {
-    transform: scale(1.02);
+.game-line {
+  font-size: 16px;
+  color: #374151;
+  line-height: 1.5;
+  font-weight: bold;
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .game-line {
+    font-size: 14px;
   }
 }
