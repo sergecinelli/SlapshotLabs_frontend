@@ -38,8 +38,11 @@ export class GoalieService {
       return throwError(() => new Error(`Invalid goalie ID: ${id}`));
     }
 
-    return this.apiService.get<GoalieApiOut>(`/hockey/goalie/${numericId}`).pipe(
-      map(apiGoalie => GoalieDataMapper.fromApiOutFormat(apiGoalie)),
+    return this.apiService.get<any>(`/hockey/goalie/${numericId}`).pipe(
+      map(apiGoalie => {
+        // Single goalie endpoint returns flat object without photo wrapper
+        return GoalieDataMapper.fromApiOutFormat({ photo: '', data: apiGoalie });
+      }),
       catchError(error => {
         console.error(`Failed to fetch goalie with ID ${id}:`, error);
         return throwError(() => error);

@@ -37,8 +37,11 @@ export class PlayerService {
       return throwError(() => new Error(`Invalid player ID: ${id}`));
     }
 
-    return this.apiService.get<PlayerApiOut>(`/hockey/player/${numericId}`).pipe(
-      map(apiPlayer => this.fromApiOutFormat(apiPlayer)),
+    return this.apiService.get<any>(`/hockey/player/${numericId}`).pipe(
+      map(apiPlayer => {
+        // Single player endpoint returns flat object without photo wrapper
+        return this.fromApiOutFormat({ photo: '', data: apiPlayer });
+      }),
       catchError(error => {
         console.error(`Failed to fetch player with ID ${id}:`, error);
         return throwError(() => error);
