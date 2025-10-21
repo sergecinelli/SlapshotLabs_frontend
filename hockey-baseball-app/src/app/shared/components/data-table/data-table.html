@@ -64,6 +64,13 @@
               </span>
             }
 
+            <!-- Date -->
+            @case ('date') {
+              <span>
+                {{ getDateValue(element, column) | date:'MMM. d, y' }}
+              </span>
+            }
+
             <!-- Dropdown -->
             @case ('dropdown') {
               <span>

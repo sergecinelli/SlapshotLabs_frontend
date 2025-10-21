@@ -10,7 +10,7 @@ import { IconService } from '../../../services/icon.service';
 export interface TableColumn {
   key: string;
   label: string;
-  type?: 'text' | 'number' | 'actions' | 'dropdown' | 'custom';
+  type?: 'text' | 'number' | 'actions' | 'dropdown' | 'custom' | 'date';
   sortable?: boolean;
   width?: string;
   align?: 'left' | 'center' | 'right';
@@ -72,6 +72,22 @@ export class DataTableComponent<T extends Record<string, unknown> = Record<strin
 
   getCellValue(item: T, column: TableColumn): unknown {
     return this.getNestedValue(item, column.key);
+  }
+
+  getDateValue(item: T, column: TableColumn): Date | null {
+    const value = this.getCellValue(item, column);
+    if (value === null || value === undefined) return null;
+    
+    if (value instanceof Date) {
+      return value;
+    }
+    
+    if (typeof value === 'string' || typeof value === 'number') {
+      const date = new Date(value);
+      return isNaN(date.getTime()) ? null : date;
+    }
+    
+    return null;
   }
 
   private getNestedValue(obj: Record<string, unknown>, path: string): unknown {
