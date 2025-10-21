@@ -1,4 +1,4 @@
-import { Goalie, GoalieApiIn, GoalieApiOut, GoalieApiInData, GoalieApiOutData } from '../interfaces/goalie.interface';
+import { Goalie, GoalieApiIn, GoalieApiOut } from '../interfaces/goalie.interface';
 
 /**
  * Utility class for transforming data between frontend and API formats

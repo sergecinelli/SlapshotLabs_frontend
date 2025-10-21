@@ -6,7 +6,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header';
 import { DataTableComponent, TableColumn, TableAction } from '../../shared/components/data-table/data-table';
 import { ScheduleService } from '../../services/schedule.service';
-import { Schedule, GameStatus, GameType } from '../../shared/interfaces/schedule.interface';
+import { Schedule } from '../../shared/interfaces/schedule.interface';
 import { ScheduleFormModalComponent, ScheduleFormModalData } from '../../shared/components/schedule-form-modal/schedule-form-modal';
 
 @Component({

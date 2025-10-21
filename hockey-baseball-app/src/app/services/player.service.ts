@@ -11,7 +11,7 @@ export class PlayerService {
   private apiService = inject(ApiService);
 
   getPlayers(): Observable<PlayerTableData> {
-    return this.apiService.get<any[]>('/hockey/player/list').pipe(
+    return this.apiService.get<PlayerApiOutData[]>('/hockey/player/list').pipe(
       map(apiPlayers => {
         // /list endpoint returns flat objects without photo wrapper
         const players = apiPlayers.map(apiPlayer => 
@@ -37,7 +37,7 @@ export class PlayerService {
       return throwError(() => new Error(`Invalid player ID: ${id}`));
     }
 
-    return this.apiService.get<any>(`/hockey/player/${numericId}`).pipe(
+    return this.apiService.get<PlayerApiOutData>(`/hockey/player/${numericId}`).pipe(
       map(apiPlayer => {
         // Single player endpoint returns flat object without photo wrapper
         return this.fromApiOutFormat({ photo: '', data: apiPlayer });
@@ -226,13 +226,13 @@ export class PlayerService {
         first_name: playerData.firstName || '',
         last_name: playerData.lastName || '',
         birth_year: this.yearToDateString(playerData.birthYear || new Date().getFullYear() - 25),
-        player_bio: (playerData as any).playerBiography,
-        birthplace_country: (playerData as any).country,
-        birthplace_region: this.extractRegion((playerData as any).birthplace),
-        birthplace_city: this.extractCity((playerData as any).birthplace),
-        address_country: (playerData as any).country,
-        address_region: this.extractRegion((playerData as any).address),
-        address_city: this.extractCity((playerData as any).address),
+        player_bio: (playerData as Record<string, unknown>)['playerBiography'] as string | undefined,
+        birthplace_country: (playerData as Record<string, unknown>)['country'] as string | undefined,
+        birthplace_region: this.extractRegion((playerData as Record<string, unknown>)['birthplace'] as string | undefined),
+        birthplace_city: this.extractCity((playerData as Record<string, unknown>)['birthplace'] as string | undefined),
+        address_country: (playerData as Record<string, unknown>)['country'] as string | undefined,
+        address_region: this.extractRegion((playerData as Record<string, unknown>)['address'] as string | undefined),
+        address_city: this.extractCity((playerData as Record<string, unknown>)['address'] as string | undefined),
         penalties_drawn: playerData.penaltiesDrawn,
         penalty_minutes: 0,
         faceoffs: 0,

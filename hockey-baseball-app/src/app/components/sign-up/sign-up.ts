@@ -73,7 +73,7 @@ export class SignUpComponent {
     };
 
     this.authService.signUp(formValue).subscribe({
-      next: (response) => {
+      next: () => {
         this.isLoading = false;
         // this.snackBar.open(
         //   response.message || 'Registration successful! Please sign in.', 

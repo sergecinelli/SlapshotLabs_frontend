@@ -23,7 +23,7 @@ export interface TableAction {
   action: string;
   variant?: 'primary' | 'secondary' | 'danger';
   iconOnly?: boolean; // When true, only show icon without label
-  condition?: (item: any) => boolean; // Optional condition to show/hide action
+  condition?: (item: Record<string, unknown>) => boolean; // Optional condition to show/hide action
 }
 
 @Component({

@@ -207,8 +207,8 @@ export class TeamFormModalComponent implements OnInit {
   /**
    * Get form errors for debugging
    */
-  get formErrors(): any {
-    const errors: any = {};
+  get formErrors(): Record<string, unknown> {
+    const errors: Record<string, unknown> = {};
     Object.keys(this.teamForm.controls).forEach(key => {
       const control = this.teamForm.get(key);
       if (control && control.errors) {

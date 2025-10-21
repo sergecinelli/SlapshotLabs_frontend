@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
 import { map, catchError, switchMap } from 'rxjs/operators';
-import { Goalie, GoalieTableData, GoalieApiOut, GoalieApiIn, GoalieApiPatch, GoalieApiInData } from '../shared/interfaces/goalie.interface';
+import { Goalie, GoalieTableData, GoalieApiPatch, GoalieApiInData, GoalieApiOutData } from '../shared/interfaces/goalie.interface';
 import { ApiService } from './api.service';
 import { GoalieDataMapper } from '../shared/utils/goalie-data-mapper';
 
@@ -12,7 +12,7 @@ export class GoalieService {
   private apiService = inject(ApiService);
 
   getGoalies(): Observable<GoalieTableData> {
-    return this.apiService.get<any[]>('/hockey/goalie/list').pipe(
+    return this.apiService.get<GoalieApiOutData[]>('/hockey/goalie/list').pipe(
       map(apiGoalies => {
         // /list endpoint returns flat objects without photo wrapper
         const goalies = apiGoalies.map(apiGoalie => 
@@ -38,7 +38,7 @@ export class GoalieService {
       return throwError(() => new Error(`Invalid goalie ID: ${id}`));
     }
 
-    return this.apiService.get<any>(`/hockey/goalie/${numericId}`).pipe(
+    return this.apiService.get<GoalieApiOutData>(`/hockey/goalie/${numericId}`).pipe(
       map(apiGoalie => {
         // Single goalie endpoint returns flat object without photo wrapper
         return GoalieDataMapper.fromApiOutFormat({ photo: '', data: apiGoalie });

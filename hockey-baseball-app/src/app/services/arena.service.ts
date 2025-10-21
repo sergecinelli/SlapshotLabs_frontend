@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { catchError } from 'rxjs/operators';
 import { Arena, Rink } from '../shared/interfaces/arena.interface';
 import { ApiService } from './api.service';
 

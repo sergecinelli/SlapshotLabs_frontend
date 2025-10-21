@@ -98,12 +98,12 @@ export class VideoLibraryComponent implements OnInit {
   onSort(event: { column: string, direction: 'asc' | 'desc' }): void {
     const { column, direction } = event;
     const sortedVideos = [...this.videos()].sort((a, b) => {
-      const aValue = (a as any)[column];
-      const bValue = (b as any)[column];
+      const aValue = (a as Record<string, unknown>)[column];
+      const bValue = (b as Record<string, unknown>)[column];
       
       if (aValue === bValue) return 0;
       
-      const result = aValue < bValue ? -1 : 1;
+      const result = (aValue as string | number) < (bValue as string | number) ? -1 : 1;
       return direction === 'asc' ? result : -result;
     });
     

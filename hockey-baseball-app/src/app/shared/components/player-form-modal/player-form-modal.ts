@@ -127,7 +127,7 @@ export class PlayerFormModalComponent implements OnInit {
   }
 
   private setDefaultFormValues(): void {
-    const defaultValues: { [key: string]: string } = {};
+    const defaultValues: Record<string, string> = {};
     
     // Set first team as default
     if (this.teamOptions.length > 0) {
@@ -191,9 +191,9 @@ export class PlayerFormModalComponent implements OnInit {
       height: player.height,
       weight: player.weight,
       shoots: player.shoots,
-      birthplace: (player as any).birthplace,
-      address: (player as any).address,
-      playerBiography: (player as any).playerBiography
+      birthplace: (player as Record<string, unknown>)['birthplace'],
+      address: (player as Record<string, unknown>)['address'],
+      playerBiography: (player as Record<string, unknown>)['playerBiography']
     });
   }
 

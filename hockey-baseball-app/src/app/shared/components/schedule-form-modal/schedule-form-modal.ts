@@ -15,8 +15,7 @@ import { Team } from '../../interfaces/team.interface';
 import { Arena, Rink } from '../../interfaces/arena.interface';
 import { TeamService } from '../../../services/team.service';
 import { ArenaService } from '../../../services/arena.service';
-import { forkJoin, of } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { forkJoin } from 'rxjs';
 
 export interface ScheduleFormModalData {
   schedule?: Schedule;
@@ -158,35 +157,35 @@ export class ScheduleFormModalComponent implements OnInit {
    */
   private setDefaultValues(): void {
     if (!this.isEditMode) {
-      const defaultValues: any = {
+      const defaultValues: Record<string, string | number> = {
         gameType: GameType.RegularSeason,
         status: GameStatus.NotStarted
       };
 
       // Set default team values
       if (this.teamOptions.length > 0) {
-        defaultValues.visitingTeam = this.teamOptions[0].value;
+        defaultValues['visitingTeam'] = this.teamOptions[0].value;
         // Set different team for home team if available
-        defaultValues.homeTeam = this.teamOptions.length > 1 ? this.teamOptions[1].value : this.teamOptions[0].value;
+        defaultValues['homeTeam'] = this.teamOptions.length > 1 ? this.teamOptions[1].value : this.teamOptions[0].value;
       }
-
+      
       // Set default arena value
       if (this.arenaOptions.length > 0) {
-        defaultValues.arena = this.arenaOptions[0].value;
+        defaultValues['arena'] = this.arenaOptions[0].value;
         // Filter rinks for selected arena
         this.filteredRinks = this.rinks.filter(rink => rink.arena_id === this.arenaOptions[0].value);
         this.rinkOptions = this.arenaService.transformRinksToOptions(this.filteredRinks);
         
         if (this.rinkOptions.length > 0) {
-          defaultValues.rink = this.rinkOptions[0].value;
+          defaultValues['rink'] = this.rinkOptions[0].value;
         }
       }
-
+      
       // Set default start time (tomorrow at 7 PM)
       const tomorrow = new Date();
       tomorrow.setDate(tomorrow.getDate() + 1);
       tomorrow.setHours(19, 0, 0, 0); // 7 PM
-      defaultValues.startTime = tomorrow.toISOString().slice(0, 16);
+      defaultValues['startTime'] = tomorrow.toISOString().slice(0, 16);
 
       this.scheduleForm.patchValue(defaultValues);
     }
