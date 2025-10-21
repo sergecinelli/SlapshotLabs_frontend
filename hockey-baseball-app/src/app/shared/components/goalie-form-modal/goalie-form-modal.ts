@@ -168,8 +168,21 @@ export class GoalieFormModalComponent implements OnInit {
   }
 
   private populateForm(goalie: Goalie): void {
+    // Find the team ID by matching team name
+    let teamId = '';
+    const matchingTeam = this.teamOptions.find(opt => opt.label === goalie.team);
+    if (matchingTeam) {
+      teamId = matchingTeam.value;
+    } else {
+      // Fallback: try to extract team ID from team string like "Team 1"
+      const teamIdMatch = goalie.team.match(/Team (\d+)/);
+      if (teamIdMatch && teamIdMatch[1]) {
+        teamId = teamIdMatch[1];
+      }
+    }
+    
     this.goalieForm.patchValue({
-      team: goalie.team,
+      team: teamId,
       birthYear: goalie.birthYear,
       jerseyNumber: goalie.jerseyNumber,
       firstName: goalie.firstName,
@@ -188,8 +201,12 @@ export class GoalieFormModalComponent implements OnInit {
     if (this.goalieForm.valid) {
       const formValue = this.goalieForm.value;
       
+      // Convert team ID back to team name
+      const selectedTeam = this.teamOptions.find(opt => opt.value === formValue.team);
+      const teamName = selectedTeam ? selectedTeam.label : formValue.team;
+      
       const goalieData: Partial<Goalie> = {
-        team: formValue.team,
+        team: teamName,
         birthYear: formValue.birthYear,
         jerseyNumber: formValue.jerseyNumber,
         firstName: formValue.firstName,

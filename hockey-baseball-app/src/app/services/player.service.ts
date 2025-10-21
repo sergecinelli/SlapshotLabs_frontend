@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
 import { map, catchError, switchMap } from 'rxjs/operators';
-import { Player, PlayerTableData, PlayerApiOut, PlayerApiIn } from '../shared/interfaces/player.interface';
+import { Player, PlayerTableData, PlayerApiOut, PlayerApiIn, PlayerApiPatch, PlayerApiInData, PlayerApiOutData } from '../shared/interfaces/player.interface';
 import { ApiService } from './api.service';
 
 @Injectable({
@@ -11,9 +11,12 @@ export class PlayerService {
   private apiService = inject(ApiService);
 
   getPlayers(): Observable<PlayerTableData> {
-    return this.apiService.get<PlayerApiOut[]>('/hockey/player/list').pipe(
+    return this.apiService.get<any[]>('/hockey/player/list').pipe(
       map(apiPlayers => {
-        const players = apiPlayers.map(apiPlayer => this.fromApiOutFormat(apiPlayer));
+        // /list endpoint returns flat objects without photo wrapper
+        const players = apiPlayers.map(apiPlayer => 
+          this.fromApiOutFormat({ photo: '', data: apiPlayer })
+        );
         return {
           players: players,
           total: players.length
@@ -63,9 +66,9 @@ export class PlayerService {
     );
   }
 
-  addPlayer(playerData: Partial<Player>): Observable<Player> {
-    // Transform frontend data to API format
-    const apiPlayerData = this.toApiInFormat(playerData, 1); // Default team_id = 1
+  addPlayer(playerData: Partial<Player>, photo = ''): Observable<Player> {
+    // Transform frontend data to API format with photo wrapper
+    const apiPlayerData = this.toApiInFormat(playerData, 1, photo); // Default team_id = 1
     
     return this.apiService.post<{ id: number }>('/hockey/player', apiPlayerData).pipe(
       map(response => {
@@ -96,7 +99,7 @@ export class PlayerService {
     );
   }
 
-  updatePlayer(id: string, playerData: Partial<Player>): Observable<Player> {
+  updatePlayer(id: string, playerData: Partial<Player>, photo?: string): Observable<Player> {
     // Convert string ID to number for API call
     const numericId = parseInt(id, 10);
     if (isNaN(numericId)) {
@@ -104,7 +107,7 @@ export class PlayerService {
       return throwError(() => new Error(`Invalid player ID: ${id}`));
     }
 
-    const apiUpdateData = this.toApiUpdateFormat(playerData);
+    const apiUpdateData = this.toApiUpdateFormat(playerData, photo);
     
     return this.apiService.patch<void>(`/hockey/player/${numericId}`, apiUpdateData).pipe(
       switchMap(() => {
@@ -126,30 +129,31 @@ export class PlayerService {
   }
 
   private fromApiOutFormat(apiPlayer: PlayerApiOut): Player {
-    const heightFeet = Math.floor(apiPlayer.height / 12);
-    const heightInches = apiPlayer.height % 12;
+    const data = apiPlayer.data;
+    const heightFeet = Math.floor(data.height / 12);
+    const heightInches = data.height % 12;
     const heightString = `${heightFeet}'${heightInches}"`;
 
     return {
-      id: apiPlayer.id.toString(),
-      team: `Team ${apiPlayer.team_id}`,
-      position: this.mapPositionIdToName(apiPlayer.position_id),
+      id: data.id.toString(),
+      team: `Team ${data.team_id}`,
+      position: this.mapPositionIdToName(data.position_id),
       height: heightString,
-      weight: apiPlayer.weight,
-      shoots: apiPlayer.shoots === 'R' ? 'Right Shot' : 'Left Shot',
-      jerseyNumber: apiPlayer.number,  // Changed from jersey_number to number
-      firstName: apiPlayer.first_name,
-      lastName: apiPlayer.last_name,
-      birthYear: this.dateStringToYear(apiPlayer.birth_year),  // Convert date string to year
-      shotsOnGoal: apiPlayer.shots_on_goal,  // Now available in API
-      shotSprayChart: '', // Not available in current API schema
-      gamesPlayed: apiPlayer.games_played,
-      goals: apiPlayer.goals,
-      assists: apiPlayer.assists,
-      points: apiPlayer.points,
-      scoringChances: apiPlayer.scoring_chances,
-      blockedShots: apiPlayer.blocked_shots,
-      penaltiesDrawn: apiPlayer.penalties_drawn,
+      weight: data.weight,
+      shoots: data.shoots === 'R' ? 'Right Shot' : 'Left Shot',
+      jerseyNumber: data.number,
+      firstName: data.first_name,
+      lastName: data.last_name,
+      birthYear: this.dateStringToYear(data.birth_year),
+      shotsOnGoal: data.shots_on_goal || 0,
+      shotSprayChart: '',
+      gamesPlayed: data.games_played || 0,
+      goals: data.goals || 0,
+      assists: data.assists || 0,
+      points: data.points || 0,
+      scoringChances: data.scoring_chances || 0,
+      blockedShots: data.blocked_shots || 0,
+      penaltiesDrawn: data.penalties_drawn || 0,
       level: 'Professional',
       rink: {
         facilityName: 'Default Facility',
@@ -157,79 +161,82 @@ export class PlayerService {
         city: 'City',
         address: 'Address'
       },
-      createdAt: new Date() // Set creation date for newly created items
+      createdAt: new Date()
     };
   }
 
-  private toApiUpdateFormat(playerData: Partial<Player>): Partial<PlayerApiIn> {
-    const updateData: Partial<PlayerApiIn> = {};
+  private toApiUpdateFormat(playerData: Partial<Player>, photo?: string): PlayerApiPatch {
+    const dataUpdate: Partial<PlayerApiInData> = {};
     
     // Only include fields that are provided and exist in the API
     if (playerData.height) {
-      updateData.height = this.parseHeightToInches(playerData.height);
+      dataUpdate.height = this.parseHeightToInches(playerData.height);
     }
     if (playerData.weight !== undefined) {
-      updateData.weight = playerData.weight;
+      dataUpdate.weight = playerData.weight;
     }
     if (playerData.shoots) {
-      updateData.shoots = playerData.shoots === 'Right Shot' ? 'R' : 'L';
+      dataUpdate.shoots = playerData.shoots === 'Right Shot' ? 'R' : 'L';
     }
     if (playerData.jerseyNumber !== undefined) {
-      updateData.number = playerData.jerseyNumber;  // Changed from jersey_number to number
+      dataUpdate.number = playerData.jerseyNumber;  // Changed from jersey_number to number
     }
     if (playerData.firstName) {
-      updateData.first_name = playerData.firstName;
+      dataUpdate.first_name = playerData.firstName;
     }
     if (playerData.lastName) {
-      updateData.last_name = playerData.lastName;
+      dataUpdate.last_name = playerData.lastName;
     }
     if (playerData.birthYear) {
-      updateData.birth_year = this.yearToDateString(playerData.birthYear);
+      dataUpdate.birth_year = this.yearToDateString(playerData.birthYear);
     }
     if (playerData.position) {
-      updateData.position_id = this.mapPositionNameToId(playerData.position);
-    }
-    if (playerData.goals !== undefined) {
-      updateData.goals = playerData.goals;
-    }
-    if (playerData.assists !== undefined) {
-      updateData.assists = playerData.assists;
-    }
-    if (playerData.points !== undefined) {
-      updateData.points = playerData.points;
-    }
-    if (playerData.scoringChances !== undefined) {
-      updateData.scoring_chances = playerData.scoringChances;
-    }
-    if (playerData.blockedShots !== undefined) {
-      updateData.blocked_shots = playerData.blockedShots;
+      dataUpdate.position_id = this.mapPositionNameToId(playerData.position);
     }
     if (playerData.penaltiesDrawn !== undefined) {
-      updateData.penalties_drawn = playerData.penaltiesDrawn;
+      dataUpdate.penalties_drawn = playerData.penaltiesDrawn;
     }
     
-    return updateData;
+    const patchData: PlayerApiPatch = {};
+    if (Object.keys(dataUpdate).length > 0) {
+      patchData.data = dataUpdate;
+    }
+    if (photo !== undefined) {
+      patchData.photo = photo;
+    }
+    
+    return patchData;
   }
 
-  private toApiInFormat(playerData: Partial<Player>, teamId: number): PlayerApiIn {
+  private toApiInFormat(playerData: Partial<Player>, teamId: number, photo = ''): PlayerApiIn {
     const heightInches = this.parseHeightToInches(playerData.height || "6'0\"");
     
     return {
-      team_id: teamId,
-      position_id: this.mapPositionNameToId(playerData.position || 'Center'),
-      height: heightInches,
-      weight: playerData.weight || 180,
-      shoots: playerData.shoots === 'Right Shot' ? 'R' : 'L',
-      number: playerData.jerseyNumber || 0,  // Changed from jersey_number to number
-      first_name: playerData.firstName || '',
-      last_name: playerData.lastName || '',
-      birth_year: this.yearToDateString(playerData.birthYear || new Date().getFullYear() - 25),
-      goals: playerData.goals || 0,
-      assists: playerData.assists || 0,
-      points: playerData.points || 0,
-      scoring_chances: playerData.scoringChances || 0,
-      blocked_shots: playerData.blockedShots || 0,
-      penalties_drawn: playerData.penaltiesDrawn || 0
+      photo: photo,
+      data: {
+        team_id: teamId,
+        position_id: this.mapPositionNameToId(playerData.position || 'Center'),
+        height: heightInches,
+        weight: playerData.weight || 180,
+        shoots: playerData.shoots === 'Right Shot' ? 'R' : 'L',
+        number: playerData.jerseyNumber || 0,
+        first_name: playerData.firstName || '',
+        last_name: playerData.lastName || '',
+        birth_year: this.yearToDateString(playerData.birthYear || new Date().getFullYear() - 25),
+        player_bio: (playerData as any).playerBiography,
+        birthplace_country: (playerData as any).country,
+        birthplace_region: this.extractRegion((playerData as any).birthplace),
+        birthplace_city: this.extractCity((playerData as any).birthplace),
+        address_country: (playerData as any).country,
+        address_region: this.extractRegion((playerData as any).address),
+        address_city: this.extractCity((playerData as any).address),
+        penalties_drawn: playerData.penaltiesDrawn,
+        penalty_minutes: 0,
+        faceoffs: 0,
+        faceoffs_won: 0,
+        turnovers: 0,
+        analysis: undefined
+      }
     };
   }
 
@@ -283,5 +290,31 @@ export class PlayerService {
       'Right Defense': 5
     };
     return positionMap[position] || 2;
+  }
+
+  /**
+   * Combine location parts into a single string
+   */
+  private combineLocation(city?: string, region?: string, country?: string): string {
+    const parts = [city, region, country].filter(p => p && p.trim());
+    return parts.join(', ');
+  }
+
+  /**
+   * Extract city from location string
+   */
+  private extractCity(location?: string): string | undefined {
+    if (!location) return undefined;
+    const parts = location.split(',').map(p => p.trim());
+    return parts[0] || undefined;
+  }
+
+  /**
+   * Extract region from location string
+   */
+  private extractRegion(location?: string): string | undefined {
+    if (!location) return undefined;
+    const parts = location.split(',').map(p => p.trim());
+    return parts[1] || undefined;
   }
 }

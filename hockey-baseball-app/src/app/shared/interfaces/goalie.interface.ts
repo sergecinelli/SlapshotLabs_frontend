@@ -6,7 +6,7 @@ export interface GoalieRink {
 }
 
 // API Schema interfaces - matching backend
-export interface GoalieApiIn {
+export interface GoalieApiInData {
   team_id: number;
   height: number;  // Height in inches
   weight: number;  // Weight in lbs
@@ -15,12 +15,26 @@ export interface GoalieApiIn {
   first_name: string;
   last_name: string;
   birth_year: string;  // Date format: YYYY-MM-DD
+  player_bio?: string;
+  birthplace_country?: string;
+  birthplace_region?: string;
+  birthplace_city?: string;
+  address_country?: string;
+  address_region?: string;
+  address_city?: string;
   wins: number;
   losses: number;
-  position_id: number;  // Position ID, 0 by default for goalies
+  penalty_minutes?: number;
+  analysis?: string;
 }
 
-export interface GoalieApiOut {
+// POST request format with photo and data wrapper
+export interface GoalieApiIn {
+  photo?: string;
+  data: GoalieApiInData;
+}
+
+export interface GoalieApiOutData {
   id: number;
   team_id: number;
   height: number;  // Height in inches
@@ -30,19 +44,40 @@ export interface GoalieApiOut {
   first_name: string;
   last_name: string;
   birth_year: string;  // Date format
+  player_bio?: string;
+  birthplace_country?: string;
+  birthplace_region?: string;
+  birthplace_city?: string;
+  address_country?: string;
+  address_region?: string;
+  address_city?: string;
   wins: number;
   losses: number;
-  position_id: number;
-  shots_on_goal: number;
-  saves: number;
-  goals_against: number;
-  games_played: number;
-  goals: number;
-  assists: number;
-  short_handed_goals_against: number;
-  power_play_goals_against: number;
-  shots_on_goal_per_game: number;
-  points: number;
+  penalty_minutes?: number;
+  analysis?: string;
+  shots_on_goal?: number;
+  saves?: number;
+  goals_against?: number;
+  games_played?: number;
+  goals?: number;
+  assists?: number;
+  save_percents?: number;
+  short_handed_goals_against?: number;
+  power_play_goals_against?: number;
+  shots_on_goal_per_game?: number;
+  points?: number;
+}
+
+// GET response format with photo and data wrapper
+export interface GoalieApiOut {
+  photo: string;
+  data: GoalieApiOutData;
+}
+
+// PATCH request format (partial update)
+export interface GoalieApiPatch {
+  photo?: string;
+  data?: Partial<GoalieApiInData>;
 }
 
 // Frontend interface - keeping existing structure for compatibility

@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
 import { map, catchError, switchMap } from 'rxjs/operators';
-import { Goalie, GoalieTableData, GoalieApiOut, GoalieApiIn } from '../shared/interfaces/goalie.interface';
+import { Goalie, GoalieTableData, GoalieApiOut, GoalieApiIn, GoalieApiPatch, GoalieApiInData } from '../shared/interfaces/goalie.interface';
 import { ApiService } from './api.service';
 import { GoalieDataMapper } from '../shared/utils/goalie-data-mapper';
 
@@ -12,9 +12,12 @@ export class GoalieService {
   private apiService = inject(ApiService);
 
   getGoalies(): Observable<GoalieTableData> {
-    return this.apiService.get<GoalieApiOut[]>('/hockey/goalie/list').pipe(
+    return this.apiService.get<any[]>('/hockey/goalie/list').pipe(
       map(apiGoalies => {
-        const goalies = GoalieDataMapper.fromApiOutArrayFormat(apiGoalies);
+        // /list endpoint returns flat objects without photo wrapper
+        const goalies = apiGoalies.map(apiGoalie => 
+          GoalieDataMapper.fromApiOutFormat({ photo: '', data: apiGoalie })
+        );
         return {
           goalies: goalies,
           total: goalies.length
@@ -64,9 +67,9 @@ export class GoalieService {
     );
   }
 
-  addGoalie(goalieData: Partial<Goalie>): Observable<Goalie> {
-    // Transform frontend data to API format
-    const apiGoalieData = GoalieDataMapper.toApiInFormat(goalieData, 1); // Default team_id = 1
+  addGoalie(goalieData: Partial<Goalie>, photo = ''): Observable<Goalie> {
+    // Transform frontend data to API format with photo wrapper
+    const apiGoalieData = GoalieDataMapper.toApiInFormat(goalieData, 1, photo); // Default team_id = 1
     
     return this.apiService.post<{ id: number }>('/hockey/goalie', apiGoalieData).pipe(
       map(response => {
@@ -97,7 +100,7 @@ export class GoalieService {
     );
   }
 
-  updateGoalie(id: string, goalieData: Partial<Goalie>): Observable<Goalie> {
+  updateGoalie(id: string, goalieData: Partial<Goalie>, photo?: string): Observable<Goalie> {
     // Convert string ID to number for API call
     const numericId = parseInt(id, 10);
     if (isNaN(numericId)) {
@@ -106,7 +109,7 @@ export class GoalieService {
     }
 
     // Transform frontend data to API format for partial update
-    const apiUpdateData = this.toApiPatchFormat(goalieData);
+    const apiUpdateData = this.toApiPatchFormat(goalieData, photo);
     
     return this.apiService.patch<void>(`/hockey/goalie/${numericId}`, apiUpdateData).pipe(
       switchMap(() => {
@@ -137,38 +140,46 @@ export class GoalieService {
     return `${year}-01-01`;
   }
 
-  private toApiPatchFormat(goalieData: Partial<Goalie>): Partial<GoalieApiIn> {
-    const updateData: Partial<GoalieApiIn> = {};
+  private toApiPatchFormat(goalieData: Partial<Goalie>, photo?: string): GoalieApiPatch {
+    const dataUpdate: Partial<GoalieApiInData> = {};
     
     // Only include fields that are provided and exist in the API
     if (goalieData.height) {
-      updateData.height = GoalieDataMapper.heightStringToInches(goalieData.height);
+      dataUpdate.height = GoalieDataMapper.heightStringToInches(goalieData.height);
     }
     if (goalieData.weight !== undefined) {
-      updateData.weight = goalieData.weight;
+      dataUpdate.weight = goalieData.weight;
     }
     if (goalieData.shoots) {
-      updateData.shoots = GoalieDataMapper.shootsToApiFormat(goalieData.shoots);
+      dataUpdate.shoots = GoalieDataMapper.shootsToApiFormat(goalieData.shoots);
     }
     if (goalieData.jerseyNumber !== undefined) {
-      updateData.jersey_number = goalieData.jerseyNumber;
+      dataUpdate.jersey_number = goalieData.jerseyNumber;
     }
     if (goalieData.firstName) {
-      updateData.first_name = goalieData.firstName;
+      dataUpdate.first_name = goalieData.firstName;
     }
     if (goalieData.lastName) {
-      updateData.last_name = goalieData.lastName;
+      dataUpdate.last_name = goalieData.lastName;
     }
     if (goalieData.birthYear) {
-      updateData.birth_year = this.yearToDateString(goalieData.birthYear);
+      dataUpdate.birth_year = this.yearToDateString(goalieData.birthYear);
     }
     if (goalieData.wins !== undefined) {
-      updateData.wins = goalieData.wins;
+      dataUpdate.wins = goalieData.wins;
     }
     if (goalieData.losses !== undefined) {
-      updateData.losses = goalieData.losses;
+      dataUpdate.losses = goalieData.losses;
     }
     
-    return updateData;
+    const patchData: GoalieApiPatch = {};
+    if (Object.keys(dataUpdate).length > 0) {
+      patchData.data = dataUpdate;
+    }
+    if (photo !== undefined) {
+      patchData.photo = photo;
+    }
+    
+    return patchData;
   }
 }

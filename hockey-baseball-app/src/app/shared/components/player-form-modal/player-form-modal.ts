@@ -168,8 +168,21 @@ export class PlayerFormModalComponent implements OnInit {
   }
 
   private populateForm(player: Player): void {
+    // Find the team ID by matching team name
+    let teamId = '';
+    const matchingTeam = this.teamOptions.find(opt => opt.label === player.team);
+    if (matchingTeam) {
+      teamId = matchingTeam.value;
+    } else {
+      // Fallback: try to extract team ID from team string like "Team 1"
+      const teamIdMatch = player.team.match(/Team (\d+)/);
+      if (teamIdMatch && teamIdMatch[1]) {
+        teamId = teamIdMatch[1];
+      }
+    }
+    
     this.playerForm.patchValue({
-      team: player.team,
+      team: teamId,
       birthYear: player.birthYear,
       jerseyNumber: player.jerseyNumber,
       firstName: player.firstName,
@@ -188,8 +201,12 @@ export class PlayerFormModalComponent implements OnInit {
     if (this.playerForm.valid) {
       const formValue = this.playerForm.value;
       
+      // Convert team ID back to team name
+      const selectedTeam = this.teamOptions.find(opt => opt.value === formValue.team);
+      const teamName = selectedTeam ? selectedTeam.label : formValue.team;
+      
       const playerData: Partial<Player> = {
-        team: formValue.team,
+        team: teamName,
         birthYear: formValue.birthYear,
         jerseyNumber: formValue.jerseyNumber,
         firstName: formValue.firstName,

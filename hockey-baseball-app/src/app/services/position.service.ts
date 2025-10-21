@@ -20,7 +20,7 @@ export class PositionService {
   private apiService = inject(ApiService);
 
   getPositions(): Observable<PositionOption[]> {
-    return this.apiService.get<Position[]>('/hockey/position/list').pipe(
+    return this.apiService.get<Position[]>('/hockey/player-position/list').pipe(
       map(positions => 
         positions.map(position => ({
           value: position.name,
