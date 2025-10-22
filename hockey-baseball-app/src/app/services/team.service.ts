@@ -73,9 +73,21 @@ export class TeamService {
     const formData = new FormData();
     formData.append('data', JSON.stringify(apiTeamData));
     
-    // Add logo file if provided
+    // Add logo file if provided (file will be converted to base64 by the backend)
     if (logoFile) {
-      formData.append('logo', logoFile);
+      formData.append('logo', logoFile, logoFile.name);
+    } else if (teamData.logo && teamData.logo.startsWith('data:')) {
+      // If logo is already base64, convert it to Blob and append
+      const base64Data = teamData.logo.split(',')[1];
+      const contentType = teamData.logo.match(/data:(.*?);/)![1];
+      const byteCharacters = atob(base64Data);
+      const byteNumbers = new Array(byteCharacters.length);
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      }
+      const byteArray = new Uint8Array(byteNumbers);
+      const blob = new Blob([byteArray], { type: contentType });
+      formData.append('logo', blob, 'logo.' + contentType.split('/')[1]);
     }
     
     return this.apiService.postMultipart<{ id: number }>('/hockey/team', formData).pipe(
@@ -102,7 +114,7 @@ export class TeamService {
     );
   }
 
-  updateTeam(id: string, teamData: Partial<Team>, logoFile?: File): Observable<Team> {
+  updateTeam(id: string, teamData: Partial<Team>, logoFile?: File, logoRemoved?: boolean): Observable<Team> {
     // Convert string ID to number for API call
     const numericId = parseInt(id, 10);
     if (isNaN(numericId)) {
@@ -116,9 +128,26 @@ export class TeamService {
     const formData = new FormData();
     formData.append('data', JSON.stringify(apiUpdateData));
     
-    // Add logo file if provided
+    // Add logo file if provided (file will be converted to base64 by the backend)
     if (logoFile) {
-      formData.append('logo', logoFile);
+      if (logoRemoved) {
+        // Send empty file to signal logo deletion
+        formData.append('logo', logoFile, '');
+      } else {
+        formData.append('logo', logoFile, logoFile.name);
+      }
+    } else if (teamData.logo && teamData.logo.startsWith('data:')) {
+      // If logo is already base64, convert it to Blob and append
+      const base64Data = teamData.logo.split(',')[1];
+      const contentType = teamData.logo.match(/data:(.*?);/)![1];
+      const byteCharacters = atob(base64Data);
+      const byteNumbers = new Array(byteCharacters.length);
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      }
+      const byteArray = new Uint8Array(byteNumbers);
+      const blob = new Blob([byteArray], { type: contentType });
+      formData.append('logo', blob, 'logo.' + contentType.split('/')[1]);
     }
     
     return this.apiService.patchMultipart<void>(`/hockey/team/${numericId}`, formData).pipe(

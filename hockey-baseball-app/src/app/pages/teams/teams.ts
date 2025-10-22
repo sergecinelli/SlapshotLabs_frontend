@@ -235,8 +235,9 @@ export class TeamsComponent implements OnInit {
     });
   }
 
-  private addTeam(teamData: Partial<Team>): void {
-    this.teamService.addTeam(teamData).subscribe({
+  private addTeam(teamData: Partial<Team> & { logoFile?: File; logoRemoved?: boolean }): void {
+    const { logoFile, logoRemoved, ...team } = teamData;
+    this.teamService.addTeam(team, logoFile).subscribe({
       next: (newTeam) => {
         const currentTeams = this.teams();
         // Add new team at the beginning (newest first)
@@ -254,8 +255,9 @@ export class TeamsComponent implements OnInit {
     });
   }
 
-  private updateTeam(teamData: Partial<Team>): void {
-    this.teamService.updateTeam(teamData.id!, teamData).subscribe({
+  private updateTeam(teamData: Partial<Team> & { logoFile?: File; logoRemoved?: boolean }): void {
+    const { logoFile, logoRemoved, ...team } = teamData;
+    this.teamService.updateTeam(team.id!, team, logoFile, logoRemoved).subscribe({
       next: (updatedTeam) => {
         const currentTeams = this.teams();
         const index = currentTeams.findIndex(t => t.id === updatedTeam.id);

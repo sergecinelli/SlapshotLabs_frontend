@@ -50,6 +50,16 @@ export class TeamFormModalComponent implements OnInit {
   levelOptions: { value: string; label: string }[] = [];
   divisionOptions: { value: string; label: string }[] = [];
 
+  // Image picker properties
+  selectedFile: File | null = null;
+  imagePreview: string | null = null;
+  imageError: string | null = null;
+  isDragging = false;
+  isImageLoading = false;
+  logoRemoved = false; // Track if user explicitly removed the logo
+  readonly MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+  readonly ALLOWED_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+
   constructor() {
     const data = this.data;
 
@@ -161,6 +171,150 @@ export class TeamFormModalComponent implements OnInit {
       city: team.city,
       logo: team.logo
     });
+    
+    // Set existing logo as preview if available
+    if (team.logo && team.logo !== '/assets/icons/teams.svg' && !team.logo.includes('/assets/')) {
+      this.isImageLoading = true;
+      this.imagePreview = team.logo;
+    }
+  }
+
+  /**
+   * Handle image load success
+   */
+  onImageLoad(): void {
+    this.isImageLoading = false;
+  }
+
+  /**
+   * Handle image load error - fallback to upload placeholder
+   */
+  onImageError(): void {
+    console.warn('Failed to load team logo, using default upload view');
+    this.isImageLoading = false;
+    this.imagePreview = null;
+    this.teamForm.patchValue({ logo: '' });
+  }
+
+  /**
+   * Handle file selection from input
+   */
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) {
+      return;
+    }
+
+    const file = input.files[0];
+    this.validateAndProcessFile(file);
+  }
+
+  /**
+   * Validate file and convert to base64
+   */
+  private validateAndProcessFile(file: File): void {
+    this.imageError = null;
+    this.logoRemoved = false; // Reset removed flag when new file is selected
+
+    // Validate file type
+    if (!this.ALLOWED_TYPES.includes(file.type)) {
+      this.imageError = 'Invalid file type. Please upload a JPEG, PNG, GIF, or WebP image.';
+      this.selectedFile = null;
+      this.imagePreview = null;
+      return;
+    }
+
+    // Validate file size
+    if (file.size > this.MAX_FILE_SIZE) {
+      this.imageError = `File size exceeds ${this.MAX_FILE_SIZE / (1024 * 1024)}MB limit.`;
+      this.selectedFile = null;
+      this.imagePreview = null;
+      return;
+    }
+
+    // Store the file and create preview
+    this.selectedFile = file;
+    this.convertFileToBase64(file);
+  }
+
+  /**
+   * Convert file to base64 for preview and storage
+   */
+  private convertFileToBase64(file: File): void {
+    this.isImageLoading = true;
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.imagePreview = reader.result as string;
+      // Update form control with base64 data
+      this.teamForm.patchValue({ logo: reader.result as string });
+      this.isImageLoading = false;
+    };
+    reader.onerror = () => {
+      this.imageError = 'Failed to read file. Please try again.';
+      this.selectedFile = null;
+      this.imagePreview = null;
+      this.isImageLoading = false;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  /**
+   * Remove selected image
+   */
+  removeImage(): void {
+    this.selectedFile = null;
+    this.imagePreview = null;
+    this.imageError = null;
+    this.isImageLoading = false;
+    this.logoRemoved = true; // Mark that logo was explicitly removed
+    this.teamForm.patchValue({ logo: '' });
+    
+    // Reset file input
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    if (fileInput) {
+      fileInput.value = '';
+    }
+  }
+
+  /**
+   * Trigger file input click
+   */
+  triggerFileInput(): void {
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    fileInput?.click();
+  }
+
+  /**
+   * Handle drag over event
+   */
+  onDragOver(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragging = true;
+  }
+
+  /**
+   * Handle drag leave event
+   */
+  onDragLeave(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragging = false;
+  }
+
+  /**
+   * Handle drop event
+   */
+  onDrop(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragging = false;
+
+    const files = event.dataTransfer?.files;
+    if (files && files.length > 0) {
+      const file = files[0];
+      this.validateAndProcessFile(file);
+    }
   }
 
   onSubmit(): void {
@@ -171,7 +325,7 @@ export class TeamFormModalComponent implements OnInit {
     if (this.teamForm.valid) {
       const formValue = this.teamForm.value;
       
-      const teamData: Partial<Team> = {
+      const teamData: Partial<Team> & { logoFile?: File; logoRemoved?: boolean } = {
         name: formValue.name,
         group: formValue.group,
         level: formValue.level,
@@ -182,6 +336,16 @@ export class TeamFormModalComponent implements OnInit {
 
       if (this.isEditMode && this.data.team) {
         teamData.id = this.data.team.id;
+      }
+
+      // Include the file if one was selected
+      if (this.selectedFile) {
+        teamData.logoFile = this.selectedFile;
+      } else if (this.logoRemoved) {
+        // If logo was removed, create an empty blob to signal deletion
+        const emptyBlob = new Blob([], { type: 'application/octet-stream' });
+        teamData.logoFile = new File([emptyBlob], 'empty.dat');
+        teamData.logoRemoved = true;
       }
 
       this.dialogRef.close(teamData);

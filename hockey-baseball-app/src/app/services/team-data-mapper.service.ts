@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { Team, TeamApiIn, TeamApiOut } from '../shared/interfaces/team.interface';
 import { TeamOptionsService } from './team-options.service';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -19,7 +20,7 @@ export class TeamDataMapperService {
       level: this.teamOptionsService.getLevelName(apiTeam.level_id),
       division: this.teamOptionsService.getDivisionName(apiTeam.division_id),
       city: apiTeam.city || '',
-      logo: '/assets/icons/teams.svg',  // Default logo since API doesn't return it directly
+      logo: `${environment.apiUrl}/hockey/team/${apiTeam.id}/logo`,  // Logo fetched from separate endpoint
       createdAt: new Date()
     };
   }
@@ -46,13 +47,16 @@ export class TeamDataMapperService {
     if (team.name) {
       updateData.name = team.name;
     }
+    if (team.group) {
+      updateData.age_group = team.group;
+    }
     if (team.level) {
       updateData.level_id = this.teamOptionsService.getLevelId(team.level);
     }
     if (team.division) {
       updateData.division_id = this.teamOptionsService.getDivisionId(team.division);
     }
-    if (team.city) {
+    if (team.city !== undefined) {
       updateData.city = team.city;
     }
     
