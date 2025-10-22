@@ -18,11 +18,11 @@ export interface PlayerApiInData {
   birth_year: string;  // Date format: YYYY-MM-DD
   player_bio?: string;
   birthplace_country?: string;
-  birthplace_region?: string;
-  birthplace_city?: string;
   address_country?: string;
   address_region?: string;
   address_city?: string;
+  address_street?: string;
+  address_postal_code?: string;
   penalties_drawn?: number;
   penalty_minutes?: number;
   faceoffs?: number;
@@ -50,11 +50,11 @@ export interface PlayerApiOutData {
   birth_year: string;  // Date format
   player_bio?: string;
   birthplace_country?: string;
-  birthplace_region?: string;
-  birthplace_city?: string;
   address_country?: string;
   address_region?: string;
   address_city?: string;
+  address_street?: string;
+  address_postal_code?: string;
   penalties_drawn?: number;
   penalty_minutes?: number;
   faceoffs?: number;

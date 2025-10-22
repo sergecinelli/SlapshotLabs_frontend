@@ -71,10 +71,25 @@ export class GoalieService {
   }
 
   addGoalie(goalieData: Partial<Goalie>, photo = ''): Observable<Goalie> {
-    // Transform frontend data to API format with photo wrapper
-    const apiGoalieData = GoalieDataMapper.toApiInFormat(goalieData, 1, photo); // Default team_id = 1
+    // Extract team ID from goalieData or default to 1
+    const teamId = (goalieData as Record<string, unknown>)['teamId'] as string | undefined;
+    const numericTeamId = teamId ? parseInt(teamId, 10) : 1;
     
-    return this.apiService.post<{ id: number }>('/hockey/goalie', apiGoalieData).pipe(
+    // Transform frontend data to API format
+    const apiGoalieData = GoalieDataMapper.toApiInFormat(goalieData, numericTeamId, photo);
+    
+    // Create FormData for multipart/form-data request
+    const formData = new FormData();
+    
+    // Add photo if provided
+    if (photo) {
+      formData.append('photo', photo);
+    }
+    
+    // Add data as JSON string
+    formData.append('data', JSON.stringify(apiGoalieData.data));
+    
+    return this.apiService.postMultipart<{ id: number }>('/hockey/goalie', formData).pipe(
       map(response => {
         // Create a complete goalie object with the returned ID
         const newGoalie: Goalie = {
@@ -84,12 +99,6 @@ export class GoalieService {
           team: goalieData.team || 'Team 1',
           level: goalieData.level || 'Professional',
           position: 'Goalie',
-          rink: goalieData.rink || {
-            facilityName: 'Default Facility',
-            rinkName: 'Main Rink',
-            city: 'City',
-            address: 'Address'
-          },
           createdAt: new Date() // Set creation date
         } as Goalie;
         
@@ -145,6 +154,15 @@ export class GoalieService {
 
   private toApiPatchFormat(goalieData: Partial<Goalie>, photo?: string): GoalieApiPatch {
     const dataUpdate: Partial<GoalieApiInData> = {};
+    
+    // Include team_id if provided
+    const teamId = (goalieData as Record<string, unknown>)['teamId'] as string | undefined;
+    if (teamId) {
+      const numericTeamId = parseInt(teamId, 10);
+      if (!isNaN(numericTeamId)) {
+        dataUpdate.team_id = numericTeamId;
+      }
+    }
     
     // Only include fields that are provided and exist in the API
     if (goalieData.height) {

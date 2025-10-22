@@ -136,11 +136,44 @@
         </div>
         <mat-divider class="section-divider"></mat-divider>
         <div class="form-row">
-          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field full-width">
-            <mat-label class="uppercase text-custom-secondary">Address</mat-label>
-            <input matInput formControlName="address" placeholder="Enter full address (city, province/state, country)">
-            <mat-error *ngIf="playerForm.get('address')?.errors && playerForm.get('address')?.touched">
-              {{ getErrorMessage('address') }}
+          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+            <mat-label class="uppercase text-custom-secondary">Country</mat-label>
+            <input matInput formControlName="addressCountry" placeholder="Enter country">
+            <mat-error *ngIf="playerForm.get('addressCountry')?.errors && playerForm.get('addressCountry')?.touched">
+              {{ getErrorMessage('addressCountry') }}
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+            <mat-label class="uppercase text-custom-secondary">State/Province</mat-label>
+            <input matInput formControlName="addressRegion" placeholder="Enter state or province">
+            <mat-error *ngIf="playerForm.get('addressRegion')?.errors && playerForm.get('addressRegion')?.touched">
+              {{ getErrorMessage('addressRegion') }}
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+            <mat-label class="uppercase text-custom-secondary">City</mat-label>
+            <input matInput formControlName="addressCity" placeholder="Enter city">
+            <mat-error *ngIf="playerForm.get('addressCity')?.errors && playerForm.get('addressCity')?.touched">
+              {{ getErrorMessage('addressCity') }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+        <div class="form-row">
+          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+            <mat-label class="uppercase text-custom-secondary">Street Address</mat-label>
+            <input matInput formControlName="addressStreet" placeholder="Enter street address">
+            <mat-error *ngIf="playerForm.get('addressStreet')?.errors && playerForm.get('addressStreet')?.touched">
+              {{ getErrorMessage('addressStreet') }}
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+            <mat-label class="uppercase text-custom-secondary">Postal Code</mat-label>
+            <input matInput formControlName="addressPostalCode" placeholder="Enter postal code">
+            <mat-error *ngIf="playerForm.get('addressPostalCode')?.errors && playerForm.get('addressPostalCode')?.touched">
+              {{ getErrorMessage('addressPostalCode') }}
             </mat-error>
           </mat-form-field>
         </div>

@@ -17,11 +17,11 @@ export interface GoalieApiInData {
   birth_year: string;  // Date format: YYYY-MM-DD
   player_bio?: string;
   birthplace_country?: string;
-  birthplace_region?: string;
-  birthplace_city?: string;
   address_country?: string;
   address_region?: string;
   address_city?: string;
+  address_street?: string;
+  address_postal_code?: string;
   wins: number;
   losses: number;
   penalty_minutes?: number;
@@ -46,11 +46,11 @@ export interface GoalieApiOutData {
   birth_year: string;  // Date format
   player_bio?: string;
   birthplace_country?: string;
-  birthplace_region?: string;
-  birthplace_city?: string;
   address_country?: string;
   address_region?: string;
   address_city?: string;
+  address_street?: string;
+  address_postal_code?: string;
   wins: number;
   losses: number;
   penalty_minutes?: number;
@@ -101,7 +101,6 @@ export interface Goalie {
   saves: number;
   goalsAgainst: number;
   shotsOnGoalPerGame: number;
-  rink: GoalieRink;
   gamesPlayed: number;
   wins: number;
   losses: number;

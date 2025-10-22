@@ -162,7 +162,11 @@ export class GoalieFormModalComponent implements OnInit {
       weight: ['', [Validators.min(1)]],
       shoots: [this.shootsOptions[0]?.value || ''],
       birthplace: [''],
-      address: [''],
+      addressCountry: [''],
+      addressRegion: [''],
+      addressCity: [''],
+      addressStreet: [''],
+      addressPostalCode: [''],
       playerBiography: ['']
     });
   }
@@ -192,7 +196,11 @@ export class GoalieFormModalComponent implements OnInit {
       weight: goalie.weight,
       shoots: goalie.shoots,
       birthplace: goalie.birthplace,
-      address: goalie.address,
+      addressCountry: (goalie as Record<string, unknown>)['addressCountry'],
+      addressRegion: (goalie as Record<string, unknown>)['addressRegion'],
+      addressCity: (goalie as Record<string, unknown>)['addressCity'],
+      addressStreet: (goalie as Record<string, unknown>)['addressStreet'],
+      addressPostalCode: (goalie as Record<string, unknown>)['addressPostalCode'],
       playerBiography: goalie.playerBiography
     });
   }
@@ -204,9 +212,11 @@ export class GoalieFormModalComponent implements OnInit {
       // Convert team ID back to team name
       const selectedTeam = this.teamOptions.find(opt => opt.value === formValue.team);
       const teamName = selectedTeam ? selectedTeam.label : formValue.team;
+      const teamId = formValue.team; // Keep the team ID
       
       const goalieData: Partial<Goalie> = {
         team: teamName,
+        ...(teamId && { teamId: teamId }),
         birthYear: formValue.birthYear,
         jerseyNumber: formValue.jerseyNumber,
         firstName: formValue.firstName,
@@ -216,7 +226,11 @@ export class GoalieFormModalComponent implements OnInit {
         weight: formValue.weight,
         shoots: formValue.shoots,
         birthplace: formValue.birthplace,
-        address: formValue.address,
+        addressCountry: formValue.addressCountry,
+        addressRegion: formValue.addressRegion,
+        addressCity: formValue.addressCity,
+        addressStreet: formValue.addressStreet,
+        addressPostalCode: formValue.addressPostalCode,
         playerBiography: formValue.playerBiography,
         // Set default values for fields not in form
         level: '',
@@ -286,7 +300,11 @@ export class GoalieFormModalComponent implements OnInit {
       weight: 'Weight',
       shoots: 'Shoots',
       birthplace: 'Birthplace',
-      address: 'Address',
+      addressCountry: 'Country',
+      addressRegion: 'State/Province',
+      addressCity: 'City',
+      addressStreet: 'Street Address',
+      addressPostalCode: 'Postal Code',
       playerBiography: 'Player Biography'
     };
     return labels[fieldName] || fieldName;

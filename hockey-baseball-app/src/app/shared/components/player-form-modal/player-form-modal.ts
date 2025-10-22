@@ -162,7 +162,11 @@ export class PlayerFormModalComponent implements OnInit {
       weight: ['', [Validators.min(1)]],
       shoots: [this.shootsOptions[0]?.value || ''],
       birthplace: [''],
-      address: [''],
+      addressCountry: [''],
+      addressRegion: [''],
+      addressCity: [''],
+      addressStreet: [''],
+      addressPostalCode: [''],
       playerBiography: ['']
     });
   }
@@ -192,7 +196,11 @@ export class PlayerFormModalComponent implements OnInit {
       weight: player.weight,
       shoots: player.shoots,
       birthplace: (player as Record<string, unknown>)['birthplace'],
-      address: (player as Record<string, unknown>)['address'],
+      addressCountry: (player as Record<string, unknown>)['addressCountry'],
+      addressRegion: (player as Record<string, unknown>)['addressRegion'],
+      addressCity: (player as Record<string, unknown>)['addressCity'],
+      addressStreet: (player as Record<string, unknown>)['addressStreet'],
+      addressPostalCode: (player as Record<string, unknown>)['addressPostalCode'],
       playerBiography: (player as Record<string, unknown>)['playerBiography']
     });
   }
@@ -204,9 +212,11 @@ export class PlayerFormModalComponent implements OnInit {
       // Convert team ID back to team name
       const selectedTeam = this.teamOptions.find(opt => opt.value === formValue.team);
       const teamName = selectedTeam ? selectedTeam.label : formValue.team;
+      const teamId = formValue.team; // Keep the team ID
       
       const playerData: Partial<Player> = {
         team: teamName,
+        ...(teamId && { teamId: teamId }),
         birthYear: formValue.birthYear,
         jerseyNumber: formValue.jerseyNumber,
         firstName: formValue.firstName,
@@ -218,7 +228,11 @@ export class PlayerFormModalComponent implements OnInit {
         // Add new fields
         ...{
           birthplace: formValue.birthplace,
-          address: formValue.address,
+          addressCountry: formValue.addressCountry,
+          addressRegion: formValue.addressRegion,
+          addressCity: formValue.addressCity,
+          addressStreet: formValue.addressStreet,
+          addressPostalCode: formValue.addressPostalCode,
           playerBiography: formValue.playerBiography
         },
         // Set default values for fields not in form
@@ -285,7 +299,11 @@ export class PlayerFormModalComponent implements OnInit {
       weight: 'Weight',
       shoots: 'Shoots',
       birthplace: 'Birthplace',
-      address: 'Address',
+      addressCountry: 'Country',
+      addressRegion: 'State/Province',
+      addressCity: 'City',
+      addressStreet: 'Street Address',
+      addressPostalCode: 'Postal Code',
       playerBiography: 'Player Biography'
     };
     return labels[fieldName] || fieldName;

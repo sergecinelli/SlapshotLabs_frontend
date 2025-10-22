@@ -76,16 +76,16 @@ export class GoalieDataMapper {
         last_name: goalie.lastName || '',
         birth_year: this.yearToDateString(goalie.birthYear || new Date().getFullYear()),
         player_bio: goalie.playerBiography,
-        birthplace_country: goalie.country,
-        birthplace_region: goalie.address ? this.extractRegion(goalie.birthplace) : undefined,
-        birthplace_city: this.extractCity(goalie.birthplace),
-        address_country: goalie.country,
-        address_region: this.extractRegion(goalie.address),
-        address_city: this.extractCity(goalie.address),
+        birthplace_country: (goalie as Record<string, unknown>)['birthplace'] as string | undefined,
+        address_country: (goalie as Record<string, unknown>)['addressCountry'] as string | undefined,
+        address_region: (goalie as Record<string, unknown>)['addressRegion'] as string | undefined,
+        address_city: (goalie as Record<string, unknown>)['addressCity'] as string | undefined,
+        address_street: (goalie as Record<string, unknown>)['addressStreet'] as string | undefined,
+        address_postal_code: (goalie as Record<string, unknown>)['addressPostalCode'] as string | undefined,
         wins: goalie.wins || 0,
         losses: goalie.losses || 0,
         penalty_minutes: 0,
-        analysis: undefined
+        analysis: 'Some analysis'
       }
     };
   }
@@ -111,9 +111,12 @@ export class GoalieDataMapper {
       lastName: data.last_name,
       birthYear: this.dateStringToYear(data.birth_year),
       playerBiography: data.player_bio,
-      birthplace: this.combineLocation(data.birthplace_city, data.birthplace_region, data.birthplace_country),
-      address: this.combineLocation(data.address_city, data.address_region, data.address_country),
-      country: data.birthplace_country || data.address_country,
+      birthplace: data.birthplace_country,
+      addressCountry: data.address_country,
+      addressRegion: data.address_region,
+      addressCity: data.address_city,
+      addressStreet: data.address_street,
+      addressPostalCode: data.address_postal_code,
       shotsOnGoal: data.shots_on_goal || 0,
       saves: data.saves || 0,
       goalsAgainst: data.goals_against || 0,
@@ -166,37 +169,4 @@ export class GoalieDataMapper {
     return date.getFullYear();
   }
 
-  /**
-   * Combine location parts into a single string
-   * @param city - City name
-   * @param region - Region/state/province
-   * @param country - Country name
-   * @returns Combined location string
-   */
-  private static combineLocation(city?: string, region?: string, country?: string): string {
-    const parts = [city, region, country].filter(p => p && p.trim());
-    return parts.join(', ');
-  }
-
-  /**
-   * Extract city from location string
-   * @param location - Location string like "City, Region, Country"
-   * @returns City name
-   */
-  private static extractCity(location?: string): string | undefined {
-    if (!location) return undefined;
-    const parts = location.split(',').map(p => p.trim());
-    return parts[0] || undefined;
-  }
-
-  /**
-   * Extract region from location string
-   * @param location - Location string like "City, Region, Country"
-   * @returns Region name
-   */
-  private static extractRegion(location?: string): string | undefined {
-    if (!location) return undefined;
-    const parts = location.split(',').map(p => p.trim());
-    return parts[1] || undefined;
-  }
 }

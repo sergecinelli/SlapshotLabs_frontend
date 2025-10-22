@@ -70,10 +70,25 @@ export class PlayerService {
   }
 
   addPlayer(playerData: Partial<Player>, photo = ''): Observable<Player> {
-    // Transform frontend data to API format with photo wrapper
-    const apiPlayerData = this.toApiInFormat(playerData, 1, photo); // Default team_id = 1
+    // Extract team ID from playerData or default to 1
+    const teamId = (playerData as Record<string, unknown>)['teamId'] as string | undefined;
+    const numericTeamId = teamId ? parseInt(teamId, 10) : 1;
     
-    return this.apiService.post<{ id: number }>('/hockey/player', apiPlayerData).pipe(
+    // Transform frontend data to API format
+    const apiPlayerData = this.toApiInFormat(playerData, numericTeamId, photo);
+    
+    // Create FormData for multipart/form-data request
+    const formData = new FormData();
+    
+    // Add photo if provided
+    if (photo) {
+      formData.append('photo', photo);
+    }
+    
+    // Add data as JSON string
+    formData.append('data', JSON.stringify(apiPlayerData.data));
+    
+    return this.apiService.postMultipart<{ id: number }>('/hockey/player', formData).pipe(
       map(response => {
         // Create a complete player object with the returned ID
         const newPlayer: Player = {
@@ -171,6 +186,15 @@ export class PlayerService {
   private toApiUpdateFormat(playerData: Partial<Player>, photo?: string): PlayerApiPatch {
     const dataUpdate: Partial<PlayerApiInData> = {};
     
+    // Include team_id if provided
+    const teamId = (playerData as Record<string, unknown>)['teamId'] as string | undefined;
+    if (teamId) {
+      const numericTeamId = parseInt(teamId, 10);
+      if (!isNaN(numericTeamId)) {
+        dataUpdate.team_id = numericTeamId;
+      }
+    }
+    
     // Only include fields that are provided and exist in the API
     if (playerData.height) {
       dataUpdate.height = this.parseHeightToInches(playerData.height);
@@ -227,12 +251,12 @@ export class PlayerService {
         last_name: playerData.lastName || '',
         birth_year: this.yearToDateString(playerData.birthYear || new Date().getFullYear() - 25),
         player_bio: (playerData as Record<string, unknown>)['playerBiography'] as string | undefined,
-        birthplace_country: (playerData as Record<string, unknown>)['country'] as string | undefined,
-        birthplace_region: this.extractRegion((playerData as Record<string, unknown>)['birthplace'] as string | undefined),
-        birthplace_city: this.extractCity((playerData as Record<string, unknown>)['birthplace'] as string | undefined),
-        address_country: (playerData as Record<string, unknown>)['country'] as string | undefined,
-        address_region: this.extractRegion((playerData as Record<string, unknown>)['address'] as string | undefined),
-        address_city: this.extractCity((playerData as Record<string, unknown>)['address'] as string | undefined),
+        birthplace_country: (playerData as Record<string, unknown>)['birthplace'] as string | undefined,
+        address_country: (playerData as Record<string, unknown>)['addressCountry'] as string | undefined,
+        address_region: (playerData as Record<string, unknown>)['addressRegion'] as string | undefined,
+        address_city: (playerData as Record<string, unknown>)['addressCity'] as string | undefined,
+        address_street: (playerData as Record<string, unknown>)['addressStreet'] as string | undefined,
+        address_postal_code: (playerData as Record<string, unknown>)['addressPostalCode'] as string | undefined,
         penalties_drawn: playerData.penaltiesDrawn,
         penalty_minutes: 0,
         faceoffs: 0,
@@ -295,29 +319,4 @@ export class PlayerService {
     return positionMap[position] || 2;
   }
 
-  /**
-   * Combine location parts into a single string
-   */
-  private combineLocation(city?: string, region?: string, country?: string): string {
-    const parts = [city, region, country].filter(p => p && p.trim());
-    return parts.join(', ');
-  }
-
-  /**
-   * Extract city from location string
-   */
-  private extractCity(location?: string): string | undefined {
-    if (!location) return undefined;
-    const parts = location.split(',').map(p => p.trim());
-    return parts[0] || undefined;
-  }
-
-  /**
-   * Extract region from location string
-   */
-  private extractRegion(location?: string): string | undefined {
-    if (!location) return undefined;
-    const parts = location.split(',').map(p => p.trim());
-    return parts[1] || undefined;
-  }
 }
