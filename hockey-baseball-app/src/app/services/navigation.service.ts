@@ -64,6 +64,11 @@ export class NavigationService {
       label: 'Video Library',
       path: '/video-library',
       icon: 'video'
+    },
+    {
+      label: 'Live Dashboard',
+      path: '/live-dashboard',
+      icon: 'online_prediction'
     }
   ]);
 

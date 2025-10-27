@@ -1,0 +1,378 @@
+<div class="p-6 pt-0 space-y-6">
+  <!-- Page Header -->
+  <app-page-header title="Live Dashboard"></app-page-header>
+
+  <!-- Tournament Info Header -->
+  <div class="bg-gray-700 text-white px-6 py-2 rounded-md flex justify-between items-center">
+    <div>
+      <span class="font-medium text-lg">{{ tournamentName() }}</span>
+    </div>
+    <div class="text-center">
+      <div class="font-semibold">{{ tournamentType() }}</div>
+      <div>{{ tournamentCategory() }}</div>
+    </div>
+    <div class="text-right">
+      <div>{{ tournamentDate() }}</div>
+      <div class="text-sm">{{ arenaInfo() }}</div>
+    </div>
+  </div>
+
+  <!-- Game Score Section -->
+  <div class="bg-white rounded-lg shadow-lg border border-gray-200 pb-4">
+    <div class="flex justify-center items-center gap-8 mb-6">
+      <!-- Away Team -->
+      <div class="flex items-center justify-around gap-4 text-right">
+        <div>
+          <div class="text-xs text-gray-500">
+            U11A <span class="font-bold text-custom-dark ml-3 uppercase">Visitor</span>
+          </div>
+          <div class="font-semibold text-base tracking-wider max-w-56">{{ awayTeam().name }}</div>
+          <div class="text-sm font-medium">{{ awayTeam().record }}</div>
+        </div>
+        <div class="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center">
+          <span class="text-3xl font-bold">{{ awayTeam().logo }}</span>
+        </div>
+      </div>
+
+      <!-- Score -->
+      <div class="flex-col gap-0 mb-14">
+        <div class="text-center mb-4">
+          <h2 class="text-2xl font-bold">FINAL</h2>
+        </div>
+        <div class="flex items-center gap-2">
+          <div class="text-center">
+            <div class="text-8xl font-bold">{{ awayTeam().score }}</div>
+            <div class="text-sm text-gray-500">SOG: {{ awayTeam().sog }}</div>
+          </div>
+          <div class="text-[72px] text-custom-dark mx-2">⁃</div>
+          <div class="text-center">
+            <div class="text-8xl font-bold">{{ homeTeam().score }}</div>
+            <div class="text-sm text-gray-500">SOG: {{ homeTeam().sog }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Home Team -->
+      <div class="flex items-center gap-4">
+        <div class="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center">
+          <span class="text-3xl font-bold">{{ homeTeam().logo }}</span>
+        </div>
+        <div>
+          <div class="text-xs text-gray-500">
+            U11A <span class="font-bold text-custom-dark ml-3 uppercase">Home</span>
+          </div>
+          <div class="font-semibold text-base tracking-wider max-w-56">{{ homeTeam().name }}</div>
+          <div class="text-sm font-medium">{{ homeTeam().record }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats Section - Two Team Boxes Side by Side -->
+  <div class="grid grid-cols-2 gap-4">
+    <!-- Away Team Stats Box -->
+    <div class="bg-white rounded-lg shadow-lg border border-gray-200 p-4">
+      <div class="text-center mb-4">
+        <div class="text-sm font-bold text-gray-900">{{ awayTeam().name }}</div>
+      </div>
+      
+        <div class="space-y-3">
+          <!-- Faceoff Win % -->
+          <div class="border border-gray-300 rounded p-3">
+            <div class="text-xs text-gray-600 mb-2 font-semibold">Faceoff Win %</div>
+            <div class="text-lg font-bold">{{ awayStats().faceoffWinPct }}%</div>
+          </div>
+
+          <!-- Defensive Zone Exit -->
+          <div class="border border-gray-300 rounded p-3">
+            <div class="text-xs text-gray-600 mb-2 font-semibold">Defensive Zone Exit</div>
+            <div class="grid grid-cols-5 gap-1 text-center">
+              <div>
+                <div class="text-[9px] text-gray-500">Long</div>
+                <div class="text-sm font-semibold">0</div>
+              </div>
+              <div>
+                <div class="text-[9px] text-gray-500">Skate</div>
+                <div class="text-sm font-semibold">0</div>
+              </div>
+              <div>
+                <div class="text-[9px] text-gray-500">SO&Win</div>
+                <div class="text-sm font-semibold">0</div>
+              </div>
+              <div>
+                <div class="text-[9px] text-gray-500">SO&Lose</div>
+                <div class="text-sm font-semibold">0</div>
+              </div>
+              <div>
+                <div class="text-[9px] text-gray-500">Pass</div>
+                <div class="text-sm font-semibold">0</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Offensive Zone Entry -->
+          <div class="border border-gray-300 rounded p-3">
+            <div class="text-xs text-gray-600 mb-2 font-semibold">Offensive Zone Entry</div>
+            <div class="grid grid-cols-4 gap-1 text-center">
+              <div>
+                <div class="text-[9px] text-gray-500">Pass</div>
+                <div class="text-sm font-semibold">0</div>
+              </div>
+              <div>
+                <div class="text-[9px] text-gray-500">Dump/W</div>
+                <div class="text-sm font-semibold">{{ awayStats().offensiveZoneEntry.dump }}</div>
+              </div>
+              <div>
+                <div class="text-[9px] text-gray-500">Dump/L</div>
+                <div class="text-sm font-semibold">{{ awayStats().offensiveZoneEntry.carry }}</div>
+              </div>
+              <div>
+                <div class="text-[9px] text-gray-500">Skated</div>
+                <div class="text-sm font-semibold">{{ awayStats().offensiveZoneEntry.skated }}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Shots -->
+          <div class="border border-gray-300 rounded p-3">
+            <div class="text-xs text-gray-600 mb-2 font-semibold">Shots</div>
+            <div class="grid grid-cols-4 gap-1 text-center">
+              <div>
+                <div class="text-[9px] text-gray-500">Shots on Goal</div>
+                <div class="text-sm font-semibold">{{ awayStats().shots.shotsOnGoal }}</div>
+              </div>
+              <div>
+                <div class="text-[9px] text-gray-500">Missed Net</div>
+                <div class="text-sm font-semibold">{{ awayStats().shots.missedNet }}</div>
+              </div>
+              <div>
+                <div class="text-[9px] text-gray-500">Scoring Chances</div>
+                <div class="text-sm font-semibold">{{ awayStats().shots.scoringChances }}</div>
+              </div>
+              <div>
+                <div class="text-[9px] text-gray-500">Blocked</div>
+                <div class="text-sm font-semibold">{{ awayStats().shots.blocked }}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Turnovers -->
+          <div class="border border-gray-300 rounded p-3">
+            <div class="text-xs text-gray-600 mb-2 font-semibold">Turnovers</div>
+            <div class="grid grid-cols-3 gap-2 text-center">
+              <div>
+                <div class="text-[9px] text-gray-500 mb-1">Off Zone</div>
+                <button (click)="incrementTurnover('away', 'offZone')" class="w-full bg-green-500 hover:bg-green-600 text-white rounded-full h-6 mb-1 flex items-center justify-center">
+                  <span class="text-lg font-bold">+</span>
+                </button>
+                <div class="text-sm font-semibold my-1">{{ awayStats().turnovers.offZone }}</div>
+                <button (click)="decrementTurnover('away', 'offZone')" class="w-full bg-red-500 hover:bg-red-600 text-white rounded-full h-6 flex items-center justify-center">
+                  <span class="text-lg font-bold">−</span>
+                </button>
+              </div>
+              <div>
+                <div class="text-[9px] text-gray-500 mb-1">Neutral Zone</div>
+                <button (click)="incrementTurnover('away', 'neutralZone')" class="w-full bg-green-500 hover:bg-green-600 text-white rounded-full h-6 mb-1 flex items-center justify-center">
+                  <span class="text-lg font-bold">+</span>
+                </button>
+                <div class="text-sm font-semibold my-1">{{ awayStats().turnovers.neutralZone }}</div>
+                <button (click)="decrementTurnover('away', 'neutralZone')" class="w-full bg-red-500 hover:bg-red-600 text-white rounded-full h-6 flex items-center justify-center">
+                  <span class="text-lg font-bold">−</span>
+                </button>
+              </div>
+              <div>
+                <div class="text-[9px] text-gray-500 mb-1">Def. Zone</div>
+                <button (click)="incrementTurnover('away', 'defZone')" class="w-full bg-green-500 hover:bg-green-600 text-white rounded-full h-6 mb-1 flex items-center justify-center">
+                  <span class="text-lg font-bold">+</span>
+                </button>
+                <div class="text-sm font-semibold my-1">{{ awayStats().turnovers.defZone }}</div>
+                <button (click)="decrementTurnover('away', 'defZone')" class="w-full bg-red-500 hover:bg-red-600 text-white rounded-full h-6 flex items-center justify-center">
+                  <span class="text-lg font-bold">−</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Home Team Stats Box -->
+      <div class="bg-white rounded-lg shadow-lg border border-gray-200 p-4">
+        <div class="text-center mb-4">
+          <div class="text-sm font-bold text-gray-900">{{ homeTeam().name }}</div>
+        </div>
+        
+        <div class="space-y-3">
+          <!-- Faceoff Win % -->
+          <div class="border border-gray-300 rounded p-3">
+            <div class="text-xs text-gray-600 mb-2 font-semibold">Faceoff Win %</div>
+            <div class="text-lg font-bold">{{ homeStats().faceoffWinPct }}%</div>
+          </div>
+
+          <!-- Defensive Zone Exit -->
+          <div class="border border-gray-300 rounded p-3">
+            <div class="text-xs text-gray-600 mb-2 font-semibold">Defensive Zone Exit</div>
+            <div class="grid grid-cols-5 gap-1 text-center">
+              <div>
+                <div class="text-[9px] text-gray-500">Long</div>
+                <div class="text-sm font-semibold">0</div>
+              </div>
+              <div>
+                <div class="text-[9px] text-gray-500">Skate</div>
+                <div class="text-sm font-semibold">0</div>
+              </div>
+              <div>
+                <div class="text-[9px] text-gray-500">SO&Win</div>
+                <div class="text-sm font-semibold">0</div>
+              </div>
+              <div>
+                <div class="text-[9px] text-gray-500">SO&Lose</div>
+                <div class="text-sm font-semibold">0</div>
+              </div>
+              <div>
+                <div class="text-[9px] text-gray-500">Pass</div>
+                <div class="text-sm font-semibold">0</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Offensive Zone Entry -->
+          <div class="border border-gray-300 rounded p-3">
+            <div class="text-xs text-gray-600 mb-2 font-semibold">Offensive Zone Entry</div>
+            <div class="grid grid-cols-4 gap-1 text-center">
+              <div>
+                <div class="text-[9px] text-gray-500">Pass</div>
+                <div class="text-sm font-semibold">0</div>
+              </div>
+              <div>
+                <div class="text-[9px] text-gray-500">Dump/W</div>
+                <div class="text-sm font-semibold">{{ homeStats().offensiveZoneEntry.dump }}</div>
+              </div>
+              <div>
+                <div class="text-[9px] text-gray-500">Dump/L</div>
+                <div class="text-sm font-semibold">{{ homeStats().offensiveZoneEntry.carry }}</div>
+              </div>
+              <div>
+                <div class="text-[9px] text-gray-500">Skated</div>
+                <div class="text-sm font-semibold">{{ homeStats().offensiveZoneEntry.skated }}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Shots -->
+          <div class="border border-gray-300 rounded p-3">
+            <div class="text-xs text-gray-600 mb-2 font-semibold">Shots</div>
+            <div class="grid grid-cols-4 gap-1 text-center">
+              <div>
+                <div class="text-[9px] text-gray-500">Shots on Goal</div>
+                <div class="text-sm font-semibold">{{ homeStats().shots.shotsOnGoal }}</div>
+              </div>
+              <div>
+                <div class="text-[9px] text-gray-500">Missed Net</div>
+                <div class="text-sm font-semibold">{{ homeStats().shots.missedNet }}</div>
+              </div>
+              <div>
+                <div class="text-[9px] text-gray-500">Scoring Chances</div>
+                <div class="text-sm font-semibold">{{ homeStats().shots.scoringChances }}</div>
+              </div>
+              <div>
+                <div class="text-[9px] text-gray-500">Blocked</div>
+                <div class="text-sm font-semibold">{{ homeStats().shots.blocked }}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Turnovers -->
+          <div class="border border-gray-300 rounded p-3">
+            <div class="text-xs text-gray-600 mb-2 font-semibold">Turnovers</div>
+            <div class="grid grid-cols-3 gap-2 text-center">
+              <div>
+                <div class="text-[9px] text-gray-500 mb-1">Off Zone</div>
+                <button (click)="incrementTurnover('home', 'offZone')" class="w-full bg-green-500 hover:bg-green-600 text-white rounded-full h-6 mb-1 flex items-center justify-center">
+                  <span class="text-lg font-bold">+</span>
+                </button>
+                <div class="text-sm font-semibold my-1">{{ homeStats().turnovers.offZone }}</div>
+                <button (click)="decrementTurnover('home', 'offZone')" class="w-full bg-red-500 hover:bg-red-600 text-white rounded-full h-6 flex items-center justify-center">
+                  <span class="text-lg font-bold">−</span>
+                </button>
+              </div>
+              <div>
+                <div class="text-[9px] text-gray-500 mb-1">Neutral Zone</div>
+                <button (click)="incrementTurnover('home', 'neutralZone')" class="w-full bg-green-500 hover:bg-green-600 text-white rounded-full h-6 mb-1 flex items-center justify-center">
+                  <span class="text-lg font-bold">+</span>
+                </button>
+                <div class="text-sm font-semibold my-1">{{ homeStats().turnovers.neutralZone }}</div>
+                <button (click)="decrementTurnover('home', 'neutralZone')" class="w-full bg-red-500 hover:bg-red-600 text-white rounded-full h-6 flex items-center justify-center">
+                  <span class="text-lg font-bold">−</span>
+                </button>
+              </div>
+              <div>
+                <div class="text-[9px] text-gray-500 mb-1">Def. Zone</div>
+                <button (click)="incrementTurnover('home', 'defZone')" class="w-full bg-green-500 hover:bg-green-600 text-white rounded-full h-6 mb-1 flex items-center justify-center">
+                  <span class="text-lg font-bold">+</span>
+                </button>
+                <div class="text-sm font-semibold my-1">{{ homeStats().turnovers.defZone }}</div>
+                <button (click)="decrementTurnover('home', 'defZone')" class="w-full bg-red-500 hover:bg-red-600 text-white rounded-full h-6 flex items-center justify-center">
+                  <span class="text-lg font-bold">−</span>
+                </button>
+              </div>
+            </div>
+          </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Events Section (Full Width) -->
+  <div class="bg-white rounded-lg shadow-lg border border-gray-200">
+    <div class="px-6 pt-4 pb-2 border-b border-gray-200">
+      <h2 class="text-xl font-semibold text-gray-900">Game Events</h2>
+    </div>
+
+    <!-- Events Table -->
+    <div class="overflow-x-auto">
+      <table class="w-full">
+        <thead class="bg-gray-50 border-b border-gray-200">
+          <tr>
+            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Time</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Team</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Event</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Player</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Description</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          @for (event of gameEvents(); track event.id) {
+            @if (event.period) {
+              <tr class="bg-gray-700">
+                <td class="px-4 py-3 text-xs font-medium text-white" colspan="6">
+                  {{ event.period }} Period
+                </td>
+              </tr>
+            } @else {
+              <tr class="hover:bg-gray-50 transition-colors">
+                <td class="px-4 py-3 text-sm text-gray-900">{{ event.time }}</td>
+                <td class="px-4 py-3 text-sm text-gray-900">{{ event.team }}</td>
+                <td class="px-4 py-3 text-sm text-gray-900">{{ event.event }}</td>
+                <td class="px-4 py-3 text-sm text-gray-900">{{ event.player }}</td>
+                <td class="px-4 py-3 text-sm text-gray-900">{{ event.description }}</td>
+                  <td class="px-4 py-3 text-sm">
+                    <div class="flex gap-1">
+                      <button mat-icon-button color="primary" matTooltip="Video">
+                        <mat-icon>videocam</mat-icon>
+                      </button>
+                      <button mat-icon-button color="primary" matTooltip="Edit">
+                        <mat-icon>edit</mat-icon>
+                      </button>
+                      <button mat-icon-button color="warn" matTooltip="Delete">
+                        <mat-icon>delete</mat-icon>
+                      </button>
+                    </div>
+                  </td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
