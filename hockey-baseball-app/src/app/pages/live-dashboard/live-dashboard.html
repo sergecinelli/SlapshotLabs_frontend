@@ -77,16 +77,18 @@
       </div>
       
         <div class="space-y-3">
-          <!-- Faceoff Win % -->
-          <div class="border border-gray-300 rounded p-3">
-            <div class="text-xs text-gray-600 mb-2 font-semibold">Faceoff Win %</div>
-            <div class="text-lg font-bold">{{ awayStats().faceoffWinPct }}%</div>
-          </div>
+          <!-- Faceoff Win % and Defensive Zone Exit Row -->
+          <div class="grid grid-cols-[auto_2.5fr] gap-3">
+            <!-- Faceoff Win % -->
+            <div class="border border-gray-300 rounded p-3">
+              <div class="text-xs text-gray-600 mb-2 font-semibold">Faceoff Win %</div>
+              <div class="text-lg font-bold">{{ awayStats().faceoffWinPct }}%</div>
+            </div>
 
-          <!-- Defensive Zone Exit -->
-          <div class="border border-gray-300 rounded p-3">
-            <div class="text-xs text-gray-600 mb-2 font-semibold">Defensive Zone Exit</div>
-            <div class="grid grid-cols-5 gap-1 text-center">
+            <!-- Defensive Zone Exit -->
+            <div class="border border-gray-300 rounded p-3">
+              <div class="text-xs text-gray-600 mb-2 font-semibold">Defensive Zone Exit</div>
+              <div class="grid grid-cols-5 gap-1 text-center">
               <div>
                 <div class="text-[9px] text-gray-500">Long</div>
                 <div class="text-sm font-semibold">0</div>
@@ -108,6 +110,7 @@
                 <div class="text-sm font-semibold">0</div>
               </div>
             </div>
+          </div>
           </div>
 
           <!-- Offensive Zone Entry -->
@@ -162,31 +165,31 @@
             <div class="grid grid-cols-3 gap-2 text-center">
               <div>
                 <div class="text-[9px] text-gray-500 mb-1">Off Zone</div>
-                <button (click)="incrementTurnover('away', 'offZone')" class="w-full bg-green-500 hover:bg-green-600 text-white rounded-full h-6 mb-1 flex items-center justify-center">
+                <button (click)="incrementTurnover('away', 'offZone')" class="w-[60px] mx-auto bg-green-500 hover:bg-green-600 text-white rounded-full h-6 mb-1 flex items-center justify-center">
                   <span class="text-lg font-bold">+</span>
                 </button>
                 <div class="text-sm font-semibold my-1">{{ awayStats().turnovers.offZone }}</div>
-                <button (click)="decrementTurnover('away', 'offZone')" class="w-full bg-red-500 hover:bg-red-600 text-white rounded-full h-6 flex items-center justify-center">
+                <button (click)="decrementTurnover('away', 'offZone')" class="w-[60px] mx-auto bg-red-500 hover:bg-red-600 text-white rounded-full h-6 flex items-center justify-center">
                   <span class="text-lg font-bold">−</span>
                 </button>
               </div>
               <div>
                 <div class="text-[9px] text-gray-500 mb-1">Neutral Zone</div>
-                <button (click)="incrementTurnover('away', 'neutralZone')" class="w-full bg-green-500 hover:bg-green-600 text-white rounded-full h-6 mb-1 flex items-center justify-center">
+                <button (click)="incrementTurnover('away', 'neutralZone')" class="w-[60px] mx-auto bg-green-500 hover:bg-green-600 text-white rounded-full h-6 mb-1 flex items-center justify-center">
                   <span class="text-lg font-bold">+</span>
                 </button>
                 <div class="text-sm font-semibold my-1">{{ awayStats().turnovers.neutralZone }}</div>
-                <button (click)="decrementTurnover('away', 'neutralZone')" class="w-full bg-red-500 hover:bg-red-600 text-white rounded-full h-6 flex items-center justify-center">
+                <button (click)="decrementTurnover('away', 'neutralZone')" class="w-[60px] mx-auto bg-red-500 hover:bg-red-600 text-white rounded-full h-6 flex items-center justify-center">
                   <span class="text-lg font-bold">−</span>
                 </button>
               </div>
               <div>
                 <div class="text-[9px] text-gray-500 mb-1">Def. Zone</div>
-                <button (click)="incrementTurnover('away', 'defZone')" class="w-full bg-green-500 hover:bg-green-600 text-white rounded-full h-6 mb-1 flex items-center justify-center">
+                <button (click)="incrementTurnover('away', 'defZone')" class="w-[60px] mx-auto bg-green-500 hover:bg-green-600 text-white rounded-full h-6 mb-1 flex items-center justify-center">
                   <span class="text-lg font-bold">+</span>
                 </button>
                 <div class="text-sm font-semibold my-1">{{ awayStats().turnovers.defZone }}</div>
-                <button (click)="decrementTurnover('away', 'defZone')" class="w-full bg-red-500 hover:bg-red-600 text-white rounded-full h-6 flex items-center justify-center">
+                <button (click)="decrementTurnover('away', 'defZone')" class="w-[60px] mx-auto bg-red-500 hover:bg-red-600 text-white rounded-full h-6 flex items-center justify-center">
                   <span class="text-lg font-bold">−</span>
                 </button>
               </div>
@@ -202,16 +205,18 @@
         </div>
         
         <div class="space-y-3">
-          <!-- Faceoff Win % -->
-          <div class="border border-gray-300 rounded p-3">
-            <div class="text-xs text-gray-600 mb-2 font-semibold">Faceoff Win %</div>
-            <div class="text-lg font-bold">{{ homeStats().faceoffWinPct }}%</div>
-          </div>
+          <!-- Faceoff Win % and Defensive Zone Exit Row -->
+          <div class="grid grid-cols-[auto_2.5fr] gap-3">
+            <!-- Faceoff Win % -->
+            <div class="border border-gray-300 rounded p-3">
+              <div class="text-xs text-gray-600 mb-2 font-semibold">Faceoff Win %</div>
+              <div class="text-lg font-bold">{{ homeStats().faceoffWinPct }}%</div>
+            </div>
 
-          <!-- Defensive Zone Exit -->
-          <div class="border border-gray-300 rounded p-3">
-            <div class="text-xs text-gray-600 mb-2 font-semibold">Defensive Zone Exit</div>
-            <div class="grid grid-cols-5 gap-1 text-center">
+            <!-- Defensive Zone Exit -->
+            <div class="border border-gray-300 rounded p-3">
+              <div class="text-xs text-gray-600 mb-2 font-semibold">Defensive Zone Exit</div>
+              <div class="grid grid-cols-5 gap-1 text-center">
               <div>
                 <div class="text-[9px] text-gray-500">Long</div>
                 <div class="text-sm font-semibold">0</div>
@@ -233,6 +238,7 @@
                 <div class="text-sm font-semibold">0</div>
               </div>
             </div>
+          </div>
           </div>
 
           <!-- Offensive Zone Entry -->
@@ -287,36 +293,37 @@
             <div class="grid grid-cols-3 gap-2 text-center">
               <div>
                 <div class="text-[9px] text-gray-500 mb-1">Off Zone</div>
-                <button (click)="incrementTurnover('home', 'offZone')" class="w-full bg-green-500 hover:bg-green-600 text-white rounded-full h-6 mb-1 flex items-center justify-center">
+                <button (click)="incrementTurnover('home', 'offZone')" class="w-[60px] bg-green-500 hover:bg-green-600 text-white rounded-full h-6 mb-1 flex items-center justify-center mx-auto">
                   <span class="text-lg font-bold">+</span>
                 </button>
                 <div class="text-sm font-semibold my-1">{{ homeStats().turnovers.offZone }}</div>
-                <button (click)="decrementTurnover('home', 'offZone')" class="w-full bg-red-500 hover:bg-red-600 text-white rounded-full h-6 flex items-center justify-center">
+                <button (click)="decrementTurnover('home', 'offZone')" class="w-[60px] mx-auto bg-red-500 hover:bg-red-600 text-white rounded-full h-6 flex items-center justify-center">
                   <span class="text-lg font-bold">−</span>
                 </button>
               </div>
               <div>
                 <div class="text-[9px] text-gray-500 mb-1">Neutral Zone</div>
-                <button (click)="incrementTurnover('home', 'neutralZone')" class="w-full bg-green-500 hover:bg-green-600 text-white rounded-full h-6 mb-1 flex items-center justify-center">
+                <button (click)="incrementTurnover('home', 'neutralZone')" class="w-[60px] mx-auto bg-green-500 hover:bg-green-600 text-white rounded-full h-6 mb-1 flex items-center justify-center">
                   <span class="text-lg font-bold">+</span>
                 </button>
                 <div class="text-sm font-semibold my-1">{{ homeStats().turnovers.neutralZone }}</div>
-                <button (click)="decrementTurnover('home', 'neutralZone')" class="w-full bg-red-500 hover:bg-red-600 text-white rounded-full h-6 flex items-center justify-center">
+                <button (click)="decrementTurnover('home', 'neutralZone')" class="w-[60px] mx-auto bg-red-500 hover:bg-red-600 text-white rounded-full h-6 flex items-center justify-center">
                   <span class="text-lg font-bold">−</span>
                 </button>
               </div>
               <div>
                 <div class="text-[9px] text-gray-500 mb-1">Def. Zone</div>
-                <button (click)="incrementTurnover('home', 'defZone')" class="w-full bg-green-500 hover:bg-green-600 text-white rounded-full h-6 mb-1 flex items-center justify-center">
+                <button (click)="incrementTurnover('home', 'defZone')" class="w-[60px] mx-auto bg-green-500 hover:bg-green-600 text-white rounded-full h-6 mb-1 flex items-center justify-center">
                   <span class="text-lg font-bold">+</span>
                 </button>
                 <div class="text-sm font-semibold my-1">{{ homeStats().turnovers.defZone }}</div>
-                <button (click)="decrementTurnover('home', 'defZone')" class="w-full bg-red-500 hover:bg-red-600 text-white rounded-full h-6 flex items-center justify-center">
+                <button (click)="decrementTurnover('home', 'defZone')" class="w-[60px] mx-auto bg-red-500 hover:bg-red-600 text-white rounded-full h-6 flex items-center justify-center">
                   <span class="text-lg font-bold">−</span>
                 </button>
               </div>
             </div>
           </div>
+        </div>
       </div>
     </div>
   </div>
@@ -375,4 +382,3 @@
       </table>
     </div>
   </div>
-</div>

@@ -68,7 +68,7 @@ export class NavigationService {
     {
       label: 'Live Dashboard',
       path: '/live-dashboard',
-      icon: 'online_prediction'
+      icon: 'live'
     }
   ]);
 
