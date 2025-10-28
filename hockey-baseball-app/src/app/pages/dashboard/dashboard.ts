@@ -4,7 +4,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header';
 import { ActionButtonComponent } from '../../shared/components/action-button/action-button';
 import { ScheduleService } from '../../services/schedule.service';
-import { Schedule, GameStatus } from '../../shared/interfaces/schedule.interface';
+import { Schedule, GameStatus, GameType } from '../../shared/interfaces/schedule.interface';
 import { PlayerFormModalComponent, PlayerFormModalData } from '../../shared/components/player-form-modal/player-form-modal';
 import { TeamFormModalComponent, TeamFormModalData } from '../../shared/components/team-form-modal/team-form-modal';
 import { GoalieFormModalComponent, GoalieFormModalData } from '../../shared/components/goalie-form-modal/goalie-form-modal';
@@ -31,17 +31,30 @@ export class DashboardComponent implements OnInit {
 
   private loadGames(): void {
     this.loading.set(true);
-    this.scheduleService.getSchedules().subscribe({
+    this.scheduleService.getDashboardGames().subscribe({
       next: (data) => {
-        // Filter upcoming games (not started) - exactly 5
-        const upcoming = data.schedules
-          .filter(game => game.status === GameStatus.NotStarted)
-          .slice(0, 5);
+        // Map API response to Schedule interface
+        const mapGameToSchedule = (game: any): Schedule => ({
+          id: game.id.toString(),
+          homeTeam: `Team ${game.home_team_id}`, // TODO: Map to actual team names
+          homeGoals: game.home_goals,
+          homeTeamGoalie: `Goalie ${game.home_team_goalie_id}`, // TODO: Map to actual goalie names
+          awayTeam: `Team ${game.away_team_id}`,
+          awayGoals: game.away_goals,
+          awayTeamGoalie: `Goalie ${game.away_team_goalie_id}`,
+          gameType: game.game_type_group as GameType,
+          tournamentName: game.tournament_name,
+          date: game.date,
+          time: game.time,
+          rink: `Rink ${game.rink_id}`, // TODO: Map to actual rink name
+          status: game.status === 0 ? GameStatus.NotStarted : 
+                  game.status === 1 ? GameStatus.GameInProgress : 
+                  GameStatus.GameOver,
+          events: []
+        });
         
-        // Filter completed games (game over) - exactly 5  
-        const completed = data.schedules
-          .filter(game => game.status === GameStatus.GameOver)
-          .slice(0, 5);
+        const upcoming = data.upcoming_games.map(mapGameToSchedule);
+        const completed = data.previous_games.map(mapGameToSchedule);
         
         this.upcomingGames.set(upcoming);
         this.gameResults.set(completed);

@@ -1,5 +1,6 @@
-import { Injectable } from '@angular/core';
-import { Observable, of, delay } from 'rxjs';
+import { Injectable, inject } from '@angular/core';
+import { Observable, of, delay, map } from 'rxjs';
+import { ApiService } from './api.service';
 import { 
   Schedule, 
   GameType, 
@@ -13,6 +14,7 @@ import {
   providedIn: 'root'
 })
 export class ScheduleService {
+  private apiService = inject(ApiService);
   private mockSchedules: Schedule[] = [
     {
       id: '1',
@@ -293,7 +295,24 @@ export class ScheduleService {
   ];
 
   getSchedules(): Observable<{ schedules: Schedule[] }> {
+    // Use mock data for now - will replace with API call
     return of({ schedules: this.mockSchedules }).pipe(delay(500));
+  }
+
+  getDashboardGames(): Observable<{ upcoming_games: any[], previous_games: any[] }> {
+    return this.apiService.get<{ upcoming_games: any[], previous_games: any[] }>('/hockey/games-dashboard');
+  }
+
+  getGameList(): Observable<any[]> {
+    return this.apiService.get<any[]>('/hockey/game/list');
+  }
+
+  createGame(gameData: any): Observable<any> {
+    return this.apiService.post<any>('/hockey/game', gameData);
+  }
+
+  updateGame(gameId: number, gameData: any): Observable<any> {
+    return this.apiService.patch<any>(`/hockey/game/${gameId}`, gameData);
   }
 
   getScheduleById(id: string): Observable<Schedule | null> {

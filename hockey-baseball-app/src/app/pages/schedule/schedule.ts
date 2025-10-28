@@ -6,7 +6,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header';
 import { DataTableComponent, TableColumn, TableAction } from '../../shared/components/data-table/data-table';
 import { ScheduleService } from '../../services/schedule.service';
-import { Schedule } from '../../shared/interfaces/schedule.interface';
+import { Schedule, GameStatus, GameType } from '../../shared/interfaces/schedule.interface';
 import { ScheduleFormModalComponent, ScheduleFormModalData } from '../../shared/components/schedule-form-modal/schedule-form-modal';
 
 @Component({
@@ -75,9 +75,29 @@ export class ScheduleComponent implements OnInit {
 
   private loadSchedules(): void {
     this.loading.set(true);
-    this.scheduleService.getSchedules().subscribe({
-      next: (data) => {
-        this.schedules.set(data.schedules);
+    this.scheduleService.getGameList().subscribe({
+      next: (games) => {
+        // Map API response to Schedule interface
+        const mappedSchedules: Schedule[] = games.map(game => ({
+          id: game.id.toString(),
+          homeTeam: `Team ${game.home_team_id}`, // TODO: Map to actual team names
+          homeGoals: game.home_goals,
+          homeTeamGoalie: `Goalie ${game.home_team_goalie_id}`, // TODO: Map to actual goalie names
+          awayTeam: `Team ${game.away_team_id}`,
+          awayGoals: game.away_goals,
+          awayTeamGoalie: `Goalie ${game.away_team_goalie_id}`,
+          gameType: game.game_type_group as GameType,
+          tournamentName: game.tournament_name,
+          date: game.date,
+          time: game.time,
+          rink: `Rink ${game.rink_id}`, // TODO: Map to actual rink name
+          status: game.status === 0 ? GameStatus.NotStarted : 
+                  game.status === 1 ? GameStatus.GameInProgress : 
+                  GameStatus.GameOver,
+          events: []
+        }));
+        
+        this.schedules.set(mappedSchedules);
         this.loading.set(false);
       },
       error: (error) => {
@@ -136,18 +156,14 @@ export class ScheduleComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.scheduleService.updateSchedule(schedule.id, result).subscribe({
-          next: (updatedSchedule) => {
-            const schedules = this.schedules();
-            const index = schedules.findIndex(s => s.id === schedule.id);
-            if (index !== -1) {
-              schedules[index] = updatedSchedule;
-              this.schedules.set([...schedules]);
-            }
-            console.log('Schedule updated successfully');
+        const gameId = parseInt(schedule.id);
+        this.scheduleService.updateGame(gameId, result).subscribe({
+          next: () => {
+            console.log('Game updated successfully');
+            this.loadSchedules(); // Reload the list
           },
           error: (error) => {
-            console.error('Error updating schedule:', error);
+            console.error('Error updating game:', error);
           }
         });
       }
@@ -184,14 +200,13 @@ export class ScheduleComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.scheduleService.addSchedule(result).subscribe({
-          next: (newSchedule) => {
-            const updatedSchedules = [...this.schedules(), newSchedule];
-            this.schedules.set(updatedSchedules);
-            console.log('Schedule added successfully');
+        this.scheduleService.createGame(result).subscribe({
+          next: () => {
+            console.log('Game added successfully');
+            this.loadSchedules(); // Reload the list
           },
           error: (error) => {
-            console.error('Error adding schedule:', error);
+            console.error('Error adding game:', error);
           }
         });
       }
