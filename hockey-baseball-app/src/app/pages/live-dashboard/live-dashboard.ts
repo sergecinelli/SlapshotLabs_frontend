@@ -16,7 +16,15 @@ interface Team {
 
 interface GameStats {
   faceoffWinPct: number;
+  defensiveZoneExit: {
+    long: number;
+    skate: number;
+    soWin: number;
+    soLose: number;
+    pass: number;
+  };
   offensiveZoneEntry: {
+    pass: number;
     dump: number;
     carry: number;
     skated: number;
@@ -81,7 +89,15 @@ export class LiveDashboardComponent {
   // Mock stats
   homeStats = signal<GameStats>({
     faceoffWinPct: 40,
+    defensiveZoneExit: {
+      long: 0,
+      skate: 0,
+      soWin: 0,
+      soLose: 0,
+      pass: 0
+    },
     offensiveZoneEntry: {
+      pass: 0,
       dump: 7,
       carry: 2,
       skated: 7
@@ -101,7 +117,15 @@ export class LiveDashboardComponent {
 
   awayStats = signal<GameStats>({
     faceoffWinPct: 60,
+    defensiveZoneExit: {
+      long: 0,
+      skate: 0,
+      soWin: 0,
+      soLose: 0,
+      pass: 0
+    },
     offensiveZoneEntry: {
+      pass: 0,
       dump: 3,
       carry: 4,
       skated: 4
@@ -177,6 +201,104 @@ export class LiveDashboardComponent {
     }
   ]);
 
+  // Defensive Zone Exit increment/decrement methods
+  incrementDefensiveZoneExit(team: 'away' | 'home', type: 'long' | 'skate' | 'soWin' | 'soLose' | 'pass'): void {
+    if (team === 'away') {
+      const currentStats = this.awayStats();
+      this.awayStats.set({
+        ...currentStats,
+        defensiveZoneExit: {
+          ...currentStats.defensiveZoneExit,
+          [type]: currentStats.defensiveZoneExit[type] + 1
+        }
+      });
+    } else {
+      const currentStats = this.homeStats();
+      this.homeStats.set({
+        ...currentStats,
+        defensiveZoneExit: {
+          ...currentStats.defensiveZoneExit,
+          [type]: currentStats.defensiveZoneExit[type] + 1
+        }
+      });
+    }
+  }
+
+  decrementDefensiveZoneExit(team: 'away' | 'home', type: 'long' | 'skate' | 'soWin' | 'soLose' | 'pass'): void {
+    if (team === 'away') {
+      const currentStats = this.awayStats();
+      if (currentStats.defensiveZoneExit[type] > 0) {
+        this.awayStats.set({
+          ...currentStats,
+          defensiveZoneExit: {
+            ...currentStats.defensiveZoneExit,
+            [type]: currentStats.defensiveZoneExit[type] - 1
+          }
+        });
+      }
+    } else {
+      const currentStats = this.homeStats();
+      if (currentStats.defensiveZoneExit[type] > 0) {
+        this.homeStats.set({
+          ...currentStats,
+          defensiveZoneExit: {
+            ...currentStats.defensiveZoneExit,
+            [type]: currentStats.defensiveZoneExit[type] - 1
+          }
+        });
+      }
+    }
+  }
+
+  // Offensive Zone Entry increment/decrement methods
+  incrementOffensiveZoneEntry(team: 'away' | 'home', type: 'pass' | 'dump' | 'carry' | 'skated'): void {
+    if (team === 'away') {
+      const currentStats = this.awayStats();
+      this.awayStats.set({
+        ...currentStats,
+        offensiveZoneEntry: {
+          ...currentStats.offensiveZoneEntry,
+          [type]: currentStats.offensiveZoneEntry[type] + 1
+        }
+      });
+    } else {
+      const currentStats = this.homeStats();
+      this.homeStats.set({
+        ...currentStats,
+        offensiveZoneEntry: {
+          ...currentStats.offensiveZoneEntry,
+          [type]: currentStats.offensiveZoneEntry[type] + 1
+        }
+      });
+    }
+  }
+
+  decrementOffensiveZoneEntry(team: 'away' | 'home', type: 'pass' | 'dump' | 'carry' | 'skated'): void {
+    if (team === 'away') {
+      const currentStats = this.awayStats();
+      if (currentStats.offensiveZoneEntry[type] > 0) {
+        this.awayStats.set({
+          ...currentStats,
+          offensiveZoneEntry: {
+            ...currentStats.offensiveZoneEntry,
+            [type]: currentStats.offensiveZoneEntry[type] - 1
+          }
+        });
+      }
+    } else {
+      const currentStats = this.homeStats();
+      if (currentStats.offensiveZoneEntry[type] > 0) {
+        this.homeStats.set({
+          ...currentStats,
+          offensiveZoneEntry: {
+            ...currentStats.offensiveZoneEntry,
+            [type]: currentStats.offensiveZoneEntry[type] - 1
+          }
+        });
+      }
+    }
+  }
+
   // Turnover increment/decrement methods
   incrementTurnover(team: 'away' | 'home', zone: 'offZone' | 'neutralZone' | 'defZone'): void {
     if (team === 'away') {
@@ -227,20 +349,12 @@ export class LiveDashboardComponent {
   }
 
   // Event action button methods (placeholders for now)
-  onGoalAssist(): void {
-    console.log('Goal + Assist button clicked - modal will open here');
+  onShots(): void {
+    console.log('Shots button clicked - modal will open here');
   }
 
   onTurnover(): void {
     console.log('Turnover button clicked - modal will open here');
-  }
-
-  onShotOnGoal(): void {
-    console.log('Shot on Goal button clicked - modal will open here');
-  }
-
-  onScoringChance(): void {
-    console.log('Scoring Chance button clicked - modal will open here');
   }
 
   onFaceoff(): void {

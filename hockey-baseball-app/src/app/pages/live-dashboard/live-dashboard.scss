@@ -1,1 +1,23 @@
 // Live Dashboard specific styles
+
+.stat-increment-btn {
+  width: 60px;
+  height: 28px;
+  @apply mx-auto bg-green-500 hover:bg-green-600 text-white rounded-full mb-1 flex items-center justify-center cursor-pointer transition-colors;
+  
+  span {
+    font-size: 18px;
+    font-weight: bold;
+  }
+}
+
+.stat-decrement-btn {
+  width: 60px;
+  height: 28px;
+  @apply mx-auto bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center cursor-pointer transition-colors;
+  
+  span {
+    font-size: 18px;
+    font-weight: bold;
+  }
+}

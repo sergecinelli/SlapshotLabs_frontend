@@ -90,24 +90,54 @@
               <div class="text-xs text-gray-600 mb-2 font-semibold">Defensive Zone Exit</div>
               <div class="grid grid-cols-5 gap-1 text-center">
               <div>
-                <div class="text-[9px] text-gray-500">Long</div>
-                <div class="text-sm font-semibold">0</div>
+                <div class="text-[9px] text-gray-500 mb-1">Long</div>
+                <button (click)="incrementDefensiveZoneExit('away', 'long')" class="stat-increment-btn">
+                  <span>+</span>
+                </button>
+                <div class="text-sm font-semibold my-1">{{ awayStats().defensiveZoneExit.long }}</div>
+                <button (click)="decrementDefensiveZoneExit('away', 'long')" class="stat-decrement-btn">
+                  <span>−</span>
+                </button>
               </div>
               <div>
-                <div class="text-[9px] text-gray-500">Skate</div>
-                <div class="text-sm font-semibold">0</div>
+                <div class="text-[9px] text-gray-500 mb-1">Skate</div>
+                <button (click)="incrementDefensiveZoneExit('away', 'skate')" class="stat-increment-btn">
+                  <span>+</span>
+                </button>
+                <div class="text-sm font-semibold my-1">{{ awayStats().defensiveZoneExit.skate }}</div>
+                <button (click)="decrementDefensiveZoneExit('away', 'skate')" class="stat-decrement-btn">
+                  <span>−</span>
+                </button>
               </div>
               <div>
-                <div class="text-[9px] text-gray-500">SO&Win</div>
-                <div class="text-sm font-semibold">0</div>
+                <div class="text-[9px] text-gray-500 mb-1">SO&Win</div>
+                <button (click)="incrementDefensiveZoneExit('away', 'soWin')" class="stat-increment-btn">
+                  <span>+</span>
+                </button>
+                <div class="text-sm font-semibold my-1">{{ awayStats().defensiveZoneExit.soWin }}</div>
+                <button (click)="decrementDefensiveZoneExit('away', 'soWin')" class="stat-decrement-btn">
+                  <span>−</span>
+                </button>
               </div>
               <div>
-                <div class="text-[9px] text-gray-500">SO&Lose</div>
-                <div class="text-sm font-semibold">0</div>
+                <div class="text-[9px] text-gray-500 mb-1">SO&Lose</div>
+                <button (click)="incrementDefensiveZoneExit('away', 'soLose')" class="stat-increment-btn">
+                  <span>+</span>
+                </button>
+                <div class="text-sm font-semibold my-1">{{ awayStats().defensiveZoneExit.soLose }}</div>
+                <button (click)="decrementDefensiveZoneExit('away', 'soLose')" class="stat-decrement-btn">
+                  <span>−</span>
+                </button>
               </div>
               <div>
-                <div class="text-[9px] text-gray-500">Pass</div>
-                <div class="text-sm font-semibold">0</div>
+                <div class="text-[9px] text-gray-500 mb-1">Pass</div>
+                <button (click)="incrementDefensiveZoneExit('away', 'pass')" class="stat-increment-btn">
+                  <span>+</span>
+                </button>
+                <div class="text-sm font-semibold my-1">{{ awayStats().defensiveZoneExit.pass }}</div>
+                <button (click)="decrementDefensiveZoneExit('away', 'pass')" class="stat-decrement-btn">
+                  <span>−</span>
+                </button>
               </div>
             </div>
           </div>
@@ -118,20 +148,44 @@
             <div class="text-xs text-gray-600 mb-2 font-semibold">Offensive Zone Entry</div>
             <div class="grid grid-cols-4 gap-1 text-center">
               <div>
-                <div class="text-[9px] text-gray-500">Pass</div>
-                <div class="text-sm font-semibold">0</div>
+                <div class="text-[9px] text-gray-500 mb-1">Pass</div>
+                <button (click)="incrementOffensiveZoneEntry('away', 'pass')" class="stat-increment-btn">
+                  <span>+</span>
+                </button>
+                <div class="text-sm font-semibold my-1">{{ awayStats().offensiveZoneEntry.pass }}</div>
+                <button (click)="decrementOffensiveZoneEntry('away', 'pass')" class="stat-decrement-btn">
+                  <span>−</span>
+                </button>
               </div>
               <div>
-                <div class="text-[9px] text-gray-500">Dump/W</div>
-                <div class="text-sm font-semibold">{{ awayStats().offensiveZoneEntry.dump }}</div>
+                <div class="text-[9px] text-gray-500 mb-1">Dump/W</div>
+                <button (click)="incrementOffensiveZoneEntry('away', 'dump')" class="stat-increment-btn">
+                  <span>+</span>
+                </button>
+                <div class="text-sm font-semibold my-1">{{ awayStats().offensiveZoneEntry.dump }}</div>
+                <button (click)="decrementOffensiveZoneEntry('away', 'dump')" class="stat-decrement-btn">
+                  <span>−</span>
+                </button>
               </div>
               <div>
-                <div class="text-[9px] text-gray-500">Dump/L</div>
-                <div class="text-sm font-semibold">{{ awayStats().offensiveZoneEntry.carry }}</div>
+                <div class="text-[9px] text-gray-500 mb-1">Dump/L</div>
+                <button (click)="incrementOffensiveZoneEntry('away', 'carry')" class="stat-increment-btn">
+                  <span>+</span>
+                </button>
+                <div class="text-sm font-semibold my-1">{{ awayStats().offensiveZoneEntry.carry }}</div>
+                <button (click)="decrementOffensiveZoneEntry('away', 'carry')" class="stat-decrement-btn">
+                  <span>−</span>
+                </button>
               </div>
               <div>
-                <div class="text-[9px] text-gray-500">Skated</div>
-                <div class="text-sm font-semibold">{{ awayStats().offensiveZoneEntry.skated }}</div>
+                <div class="text-[9px] text-gray-500 mb-1">Skated</div>
+                <button (click)="incrementOffensiveZoneEntry('away', 'skated')" class="stat-increment-btn">
+                  <span>+</span>
+                </button>
+                <div class="text-sm font-semibold my-1">{{ awayStats().offensiveZoneEntry.skated }}</div>
+                <button (click)="decrementOffensiveZoneEntry('away', 'skated')" class="stat-decrement-btn">
+                  <span>−</span>
+                </button>
               </div>
             </div>
           </div>
@@ -164,34 +218,16 @@
             <div class="text-xs text-gray-600 mb-2 font-semibold">Turnovers</div>
             <div class="grid grid-cols-3 gap-2 text-center">
               <div>
-                <div class="text-[9px] text-gray-500 mb-1">Off Zone</div>
-                <button (click)="incrementTurnover('away', 'offZone')" class="w-[60px] mx-auto bg-green-500 hover:bg-green-600 text-white rounded-full h-6 mb-1 flex items-center justify-center">
-                  <span class="text-lg font-bold">+</span>
-                </button>
-                <div class="text-sm font-semibold my-1">{{ awayStats().turnovers.offZone }}</div>
-                <button (click)="decrementTurnover('away', 'offZone')" class="w-[60px] mx-auto bg-red-500 hover:bg-red-600 text-white rounded-full h-6 flex items-center justify-center">
-                  <span class="text-lg font-bold">−</span>
-                </button>
+                <div class="text-[9px] text-gray-500">Off Zone</div>
+                <div class="text-sm font-semibold">{{ awayStats().turnovers.offZone }}</div>
               </div>
               <div>
-                <div class="text-[9px] text-gray-500 mb-1">Neutral Zone</div>
-                <button (click)="incrementTurnover('away', 'neutralZone')" class="w-[60px] mx-auto bg-green-500 hover:bg-green-600 text-white rounded-full h-6 mb-1 flex items-center justify-center">
-                  <span class="text-lg font-bold">+</span>
-                </button>
-                <div class="text-sm font-semibold my-1">{{ awayStats().turnovers.neutralZone }}</div>
-                <button (click)="decrementTurnover('away', 'neutralZone')" class="w-[60px] mx-auto bg-red-500 hover:bg-red-600 text-white rounded-full h-6 flex items-center justify-center">
-                  <span class="text-lg font-bold">−</span>
-                </button>
+                <div class="text-[9px] text-gray-500">Neutral Zone</div>
+                <div class="text-sm font-semibold">{{ awayStats().turnovers.neutralZone }}</div>
               </div>
               <div>
-                <div class="text-[9px] text-gray-500 mb-1">Def. Zone</div>
-                <button (click)="incrementTurnover('away', 'defZone')" class="w-[60px] mx-auto bg-green-500 hover:bg-green-600 text-white rounded-full h-6 mb-1 flex items-center justify-center">
-                  <span class="text-lg font-bold">+</span>
-                </button>
-                <div class="text-sm font-semibold my-1">{{ awayStats().turnovers.defZone }}</div>
-                <button (click)="decrementTurnover('away', 'defZone')" class="w-[60px] mx-auto bg-red-500 hover:bg-red-600 text-white rounded-full h-6 flex items-center justify-center">
-                  <span class="text-lg font-bold">−</span>
-                </button>
+                <div class="text-[9px] text-gray-500">Def. Zone</div>
+                <div class="text-sm font-semibold">{{ awayStats().turnovers.defZone }}</div>
               </div>
             </div>
           </div>
@@ -218,24 +254,54 @@
               <div class="text-xs text-gray-600 mb-2 font-semibold">Defensive Zone Exit</div>
               <div class="grid grid-cols-5 gap-1 text-center">
               <div>
-                <div class="text-[9px] text-gray-500">Long</div>
-                <div class="text-sm font-semibold">0</div>
+                <div class="text-[9px] text-gray-500 mb-1">Long</div>
+                <button (click)="incrementDefensiveZoneExit('home', 'long')" class="stat-increment-btn">
+                  <span>+</span>
+                </button>
+                <div class="text-sm font-semibold my-1">{{ homeStats().defensiveZoneExit.long }}</div>
+                <button (click)="decrementDefensiveZoneExit('home', 'long')" class="stat-decrement-btn">
+                  <span>−</span>
+                </button>
               </div>
               <div>
-                <div class="text-[9px] text-gray-500">Skate</div>
-                <div class="text-sm font-semibold">0</div>
+                <div class="text-[9px] text-gray-500 mb-1">Skate</div>
+                <button (click)="incrementDefensiveZoneExit('home', 'skate')" class="stat-increment-btn">
+                  <span>+</span>
+                </button>
+                <div class="text-sm font-semibold my-1">{{ homeStats().defensiveZoneExit.skate }}</div>
+                <button (click)="decrementDefensiveZoneExit('home', 'skate')" class="stat-decrement-btn">
+                  <span>−</span>
+                </button>
               </div>
               <div>
-                <div class="text-[9px] text-gray-500">SO&Win</div>
-                <div class="text-sm font-semibold">0</div>
+                <div class="text-[9px] text-gray-500 mb-1">SO&Win</div>
+                <button (click)="incrementDefensiveZoneExit('home', 'soWin')" class="stat-increment-btn">
+                  <span>+</span>
+                </button>
+                <div class="text-sm font-semibold my-1">{{ homeStats().defensiveZoneExit.soWin }}</div>
+                <button (click)="decrementDefensiveZoneExit('home', 'soWin')" class="stat-decrement-btn">
+                  <span>−</span>
+                </button>
               </div>
               <div>
-                <div class="text-[9px] text-gray-500">SO&Lose</div>
-                <div class="text-sm font-semibold">0</div>
+                <div class="text-[9px] text-gray-500 mb-1">SO&Lose</div>
+                <button (click)="incrementDefensiveZoneExit('home', 'soLose')" class="stat-increment-btn">
+                  <span>+</span>
+                </button>
+                <div class="text-sm font-semibold my-1">{{ homeStats().defensiveZoneExit.soLose }}</div>
+                <button (click)="decrementDefensiveZoneExit('home', 'soLose')" class="stat-decrement-btn">
+                  <span>−</span>
+                </button>
               </div>
               <div>
-                <div class="text-[9px] text-gray-500">Pass</div>
-                <div class="text-sm font-semibold">0</div>
+                <div class="text-[9px] text-gray-500 mb-1">Pass</div>
+                <button (click)="incrementDefensiveZoneExit('home', 'pass')" class="stat-increment-btn">
+                  <span>+</span>
+                </button>
+                <div class="text-sm font-semibold my-1">{{ homeStats().defensiveZoneExit.pass }}</div>
+                <button (click)="decrementDefensiveZoneExit('home', 'pass')" class="stat-decrement-btn">
+                  <span>−</span>
+                </button>
               </div>
             </div>
           </div>
@@ -246,20 +312,44 @@
             <div class="text-xs text-gray-600 mb-2 font-semibold">Offensive Zone Entry</div>
             <div class="grid grid-cols-4 gap-1 text-center">
               <div>
-                <div class="text-[9px] text-gray-500">Pass</div>
-                <div class="text-sm font-semibold">0</div>
+                <div class="text-[9px] text-gray-500 mb-1">Pass</div>
+                <button (click)="incrementOffensiveZoneEntry('home', 'pass')" class="stat-increment-btn">
+                  <span>+</span>
+                </button>
+                <div class="text-sm font-semibold my-1">{{ homeStats().offensiveZoneEntry.pass }}</div>
+                <button (click)="decrementOffensiveZoneEntry('home', 'pass')" class="stat-decrement-btn">
+                  <span>−</span>
+                </button>
               </div>
               <div>
-                <div class="text-[9px] text-gray-500">Dump/W</div>
-                <div class="text-sm font-semibold">{{ homeStats().offensiveZoneEntry.dump }}</div>
+                <div class="text-[9px] text-gray-500 mb-1">Dump/W</div>
+                <button (click)="incrementOffensiveZoneEntry('home', 'dump')" class="stat-increment-btn">
+                  <span>+</span>
+                </button>
+                <div class="text-sm font-semibold my-1">{{ homeStats().offensiveZoneEntry.dump }}</div>
+                <button (click)="decrementOffensiveZoneEntry('home', 'dump')" class="stat-decrement-btn">
+                  <span>−</span>
+                </button>
               </div>
               <div>
-                <div class="text-[9px] text-gray-500">Dump/L</div>
-                <div class="text-sm font-semibold">{{ homeStats().offensiveZoneEntry.carry }}</div>
+                <div class="text-[9px] text-gray-500 mb-1">Dump/L</div>
+                <button (click)="incrementOffensiveZoneEntry('home', 'carry')" class="stat-increment-btn">
+                  <span>+</span>
+                </button>
+                <div class="text-sm font-semibold my-1">{{ homeStats().offensiveZoneEntry.carry }}</div>
+                <button (click)="decrementOffensiveZoneEntry('home', 'carry')" class="stat-decrement-btn">
+                  <span>−</span>
+                </button>
               </div>
               <div>
-                <div class="text-[9px] text-gray-500">Skated</div>
-                <div class="text-sm font-semibold">{{ homeStats().offensiveZoneEntry.skated }}</div>
+                <div class="text-[9px] text-gray-500 mb-1">Skated</div>
+                <button (click)="incrementOffensiveZoneEntry('home', 'skated')" class="stat-increment-btn">
+                  <span>+</span>
+                </button>
+                <div class="text-sm font-semibold my-1">{{ homeStats().offensiveZoneEntry.skated }}</div>
+                <button (click)="decrementOffensiveZoneEntry('home', 'skated')" class="stat-decrement-btn">
+                  <span>−</span>
+                </button>
               </div>
             </div>
           </div>
@@ -292,34 +382,16 @@
             <div class="text-xs text-gray-600 mb-2 font-semibold">Turnovers</div>
             <div class="grid grid-cols-3 gap-2 text-center">
               <div>
-                <div class="text-[9px] text-gray-500 mb-1">Off Zone</div>
-                <button (click)="incrementTurnover('home', 'offZone')" class="w-[60px] bg-green-500 hover:bg-green-600 text-white rounded-full h-6 mb-1 flex items-center justify-center mx-auto">
-                  <span class="text-lg font-bold">+</span>
-                </button>
-                <div class="text-sm font-semibold my-1">{{ homeStats().turnovers.offZone }}</div>
-                <button (click)="decrementTurnover('home', 'offZone')" class="w-[60px] mx-auto bg-red-500 hover:bg-red-600 text-white rounded-full h-6 flex items-center justify-center">
-                  <span class="text-lg font-bold">−</span>
-                </button>
+                <div class="text-[9px] text-gray-500">Off Zone</div>
+                <div class="text-sm font-semibold">{{ homeStats().turnovers.offZone }}</div>
               </div>
               <div>
-                <div class="text-[9px] text-gray-500 mb-1">Neutral Zone</div>
-                <button (click)="incrementTurnover('home', 'neutralZone')" class="w-[60px] mx-auto bg-green-500 hover:bg-green-600 text-white rounded-full h-6 mb-1 flex items-center justify-center">
-                  <span class="text-lg font-bold">+</span>
-                </button>
-                <div class="text-sm font-semibold my-1">{{ homeStats().turnovers.neutralZone }}</div>
-                <button (click)="decrementTurnover('home', 'neutralZone')" class="w-[60px] mx-auto bg-red-500 hover:bg-red-600 text-white rounded-full h-6 flex items-center justify-center">
-                  <span class="text-lg font-bold">−</span>
-                </button>
+                <div class="text-[9px] text-gray-500">Neutral Zone</div>
+                <div class="text-sm font-semibold">{{ homeStats().turnovers.neutralZone }}</div>
               </div>
               <div>
-                <div class="text-[9px] text-gray-500 mb-1">Def. Zone</div>
-                <button (click)="incrementTurnover('home', 'defZone')" class="w-[60px] mx-auto bg-green-500 hover:bg-green-600 text-white rounded-full h-6 mb-1 flex items-center justify-center">
-                  <span class="text-lg font-bold">+</span>
-                </button>
-                <div class="text-sm font-semibold my-1">{{ homeStats().turnovers.defZone }}</div>
-                <button (click)="decrementTurnover('home', 'defZone')" class="w-[60px] mx-auto bg-red-500 hover:bg-red-600 text-white rounded-full h-6 flex items-center justify-center">
-                  <span class="text-lg font-bold">−</span>
-                </button>
+                <div class="text-[9px] text-gray-500">Def. Zone</div>
+                <div class="text-sm font-semibold">{{ homeStats().turnovers.defZone }}</div>
               </div>
             </div>
           </div>
@@ -338,20 +410,12 @@
     <div class="px-6 py-4 border-b border-gray-200">
       <div class="flex flex-wrap gap-4 justify-center">
         <app-action-button 
-          label="Goal + Assist"
-          (buttonClick)="onGoalAssist()">
+          label="Shots"
+          (buttonClick)="onShots()">
         </app-action-button>
         <app-action-button 
           label="Turnover"
           (buttonClick)="onTurnover()">
-        </app-action-button>
-        <app-action-button 
-          label="Shot on Goal"
-          (buttonClick)="onShotOnGoal()">
-        </app-action-button>
-        <app-action-button 
-          label="Scoring Chance"
-          (buttonClick)="onScoringChance()">
         </app-action-button>
         <app-action-button 
           label="Faceoff"
