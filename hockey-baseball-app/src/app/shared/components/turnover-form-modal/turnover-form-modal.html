@@ -1,0 +1,131 @@
+<div class="turnover-form-modal">
+  <h2 mat-dialog-title class="modal-title">
+    <mat-icon class="title-icon">swap_horiz</mat-icon>
+    Turnover
+  </h2>
+
+  <mat-dialog-content class="modal-content">
+    <form [formGroup]="turnoverForm" class="turnover-form">
+      
+      <!-- Turnover Information Section -->
+      <div class="form-section">
+        <div class="section-header">
+          <span class="section-title">Turnover Information</span>
+        </div>
+        <mat-divider class="section-divider"></mat-divider>
+        
+        <div class="form-row">
+          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+            <mat-label class="uppercase text-custom-secondary">Team that turned the puck over</mat-label>
+            <mat-select formControlName="team" placeholder="Select team" (selectionChange)="onTeamChange()">
+              <mat-option *ngFor="let team of teamOptions" [value]="team.value">
+                <span class="font-semibold">{{ team.logo }}</span> - {{ team.label }}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="turnoverForm.get('team')?.errors && turnoverForm.get('team')?.touched">
+              {{ getErrorMessage('team') }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+            <mat-label class="uppercase text-custom-secondary">Player that turned the puck over</mat-label>
+            <mat-select formControlName="player" placeholder="Select player">
+              <mat-option *ngFor="let player of playerOptions" [value]="player.value">
+                {{ player.label }}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="turnoverForm.get('player')?.errors && turnoverForm.get('player')?.touched">
+              {{ getErrorMessage('player') }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+            <mat-label class="uppercase text-custom-secondary">Period</mat-label>
+            <mat-select formControlName="period" placeholder="Select period">
+              <mat-option *ngFor="let period of periodOptions" [value]="period.value">
+                {{ period.label }}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="turnoverForm.get('period')?.errors && turnoverForm.get('period')?.touched">
+              {{ getErrorMessage('period') }}
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+            <mat-label class="uppercase text-custom-secondary">Time</mat-label>
+            <input matInput formControlName="time" placeholder="mm:ss (e.g., 12:45)" maxlength="5">
+            <mat-error *ngIf="turnoverForm.get('time')?.errors && turnoverForm.get('time')?.touched">
+              {{ getErrorMessage('time') }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- YouTube Link Section -->
+      <div class="form-section">
+        <div class="section-header">
+          <span class="section-title">Add YouTube Link</span>
+        </div>
+        <mat-divider class="section-divider"></mat-divider>
+        
+        <div class="form-row">
+          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field full-width">
+            <mat-label class="uppercase text-custom-secondary">YouTube Link</mat-label>
+            <input matInput formControlName="youtubeLink" placeholder="Copy and paste YouTube link">
+            <mat-error *ngIf="turnoverForm.get('youtubeLink')?.errors && turnoverForm.get('youtubeLink')?.touched">
+              {{ getErrorMessage('youtubeLink') }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+      </div>
+
+            <!-- Set Location Section -->
+      <div class="form-section">
+        <div class="section-header">
+          <span class="section-title">Set Location</span>
+        </div>
+        <mat-divider class="section-divider"></mat-divider>
+        
+        <div class="zone-labels">
+          <span class="zone-label">Defending zone</span>
+          <span class="zone-label">Neutral zone</span>
+          <span class="zone-label">Attacking zone</span>
+        </div>
+
+        <div class="rink-container">
+          <div class="rink-wrapper" (click)="onRinkClick($event)">
+            <img src="/assets/images/hockey-rink.svg" alt="Hockey Rink" class="hockey-rink-image">
+            <div *ngIf="puckLocation" 
+                 class="puck-marker" 
+                 [style.left.%]="puckLocation.x" 
+                 [style.top.%]="puckLocation.y">
+            </div>
+          </div>
+          
+          <div *ngIf="puckLocation" class="selected-zone">
+            Selected zone: <strong>{{ puckLocation.zone | titlecase }}</strong>
+          </div>
+          
+          <div *ngIf="turnoverForm.get('location')?.errors?.['required'] && turnoverForm.get('location')?.touched" class="location-error">
+            Please click on the rink to set the turnover location
+          </div>
+        </div>
+      </div>
+
+    </form>
+  </mat-dialog-content>
+
+  <mat-dialog-actions class="modal-actions">
+    <button mat-stroked-button (click)="onCancel()" class="cancel-btn">
+      Cancel
+    </button>
+    <button mat-raised-button color="primary" (click)="onSubmit()" class="submit-btn" [disabled]="turnoverForm.invalid">
+      <mat-icon>save</mat-icon>
+      Add Turnover
+    </button>
+  </mat-dialog-actions>
+</div>

@@ -1,11 +1,12 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatDialog } from '@angular/material/dialog';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header';
 import { ActionButtonComponent } from '../../shared/components/action-button/action-button';
-
+import { TurnoverFormModalComponent } from '../../shared/components/turnover-form-modal/turnover-form-modal';
 interface Team {
   name: string;
   logo: string;
@@ -55,11 +56,12 @@ interface GameEvent {
 @Component({
   selector: 'app-live-dashboard',
   standalone: true,
-  imports: [CommonModule, PageHeaderComponent, MatIconModule, MatButtonModule, MatTooltipModule, ActionButtonComponent],
+  imports: [CommonModule, PageHeaderComponent, MatIconModule, MatButtonModule, MatTooltipModule],
   templateUrl: './live-dashboard.html',
   styleUrl: './live-dashboard.scss'
 })
 export class LiveDashboardComponent {
+  private dialog = inject(MatDialog);
   // Mock tournament data
   tournamentName = signal('LITE5');
   tournamentType = signal('U11B3');
@@ -354,7 +356,20 @@ export class LiveDashboardComponent {
   }
 
   onTurnover(): void {
-    console.log('Turnover button clicked - modal will open here');
+    const dialogRef = this.dialog.open(TurnoverFormModalComponent, {
+      width: '800px',
+      panelClass: 'turnover-form-modal-dialog',
+      disableClose: false,
+      autoFocus: true
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        console.log('Turnover data:', result);
+        // Here you can handle the turnover data
+        // For example, add it to game events or update stats
+      }
+    });
   }
 
   onFaceoff(): void {
