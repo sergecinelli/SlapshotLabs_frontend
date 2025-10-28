@@ -334,6 +334,40 @@
       <h2 class="text-xl font-semibold text-gray-900">Game Events</h2>
     </div>
 
+    <!-- Event Action Buttons -->
+    <div class="px-6 py-4 border-b border-gray-200">
+      <div class="flex flex-wrap gap-4 justify-center">
+        <app-action-button 
+          label="Goal + Assist"
+          (buttonClick)="onGoalAssist()">
+        </app-action-button>
+        <app-action-button 
+          label="Turnover"
+          (buttonClick)="onTurnover()">
+        </app-action-button>
+        <app-action-button 
+          label="Shot on Goal"
+          (buttonClick)="onShotOnGoal()">
+        </app-action-button>
+        <app-action-button 
+          label="Scoring Chance"
+          (buttonClick)="onScoringChance()">
+        </app-action-button>
+        <app-action-button 
+          label="Faceoff"
+          (buttonClick)="onFaceoff()">
+        </app-action-button>
+        <app-action-button 
+          label="Goalie Change"
+          (buttonClick)="onGoalieChange()">
+        </app-action-button>
+        <app-action-button 
+          label="Penalty"
+          (buttonClick)="onPenalty()">
+        </app-action-button>
+      </div>
+    </div>
+
     <!-- Events Table -->
     <div class="overflow-x-auto">
       <table class="w-full">

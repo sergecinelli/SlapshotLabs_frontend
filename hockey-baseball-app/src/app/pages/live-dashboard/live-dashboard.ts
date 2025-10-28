@@ -4,6 +4,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header';
+import { ActionButtonComponent } from '../../shared/components/action-button/action-button';
 
 interface Team {
   name: string;
@@ -46,7 +47,7 @@ interface GameEvent {
 @Component({
   selector: 'app-live-dashboard',
   standalone: true,
-  imports: [CommonModule, PageHeaderComponent, MatIconModule, MatButtonModule, MatTooltipModule],
+  imports: [CommonModule, PageHeaderComponent, MatIconModule, MatButtonModule, MatTooltipModule, ActionButtonComponent],
   templateUrl: './live-dashboard.html',
   styleUrl: './live-dashboard.scss'
 })
@@ -223,5 +224,34 @@ export class LiveDashboardComponent {
         });
       }
     }
+  }
+
+  // Event action button methods (placeholders for now)
+  onGoalAssist(): void {
+    console.log('Goal + Assist button clicked - modal will open here');
+  }
+
+  onTurnover(): void {
+    console.log('Turnover button clicked - modal will open here');
+  }
+
+  onShotOnGoal(): void {
+    console.log('Shot on Goal button clicked - modal will open here');
+  }
+
+  onScoringChance(): void {
+    console.log('Scoring Chance button clicked - modal will open here');
+  }
+
+  onFaceoff(): void {
+    console.log('Faceoff button clicked - modal will open here');
+  }
+
+  onGoalieChange(): void {
+    console.log('Goalie Change button clicked - modal will open here');
+  }
+
+  onPenalty(): void {
+    console.log('Penalty button clicked - modal will open here');
   }
 }
