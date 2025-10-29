@@ -102,10 +102,17 @@ export class TurnoverFormModalComponent {
     }
   }
 
-  onTeamChange(): void {
+  selectTeam(teamValue: string): void {
+    this.turnoverForm.patchValue({ team: teamValue });
+    this.turnoverForm.get('team')?.markAsTouched();
     // When team changes, update available players
     // This will be implemented with real data later
-    console.log('Team changed:', this.turnoverForm.get('team')?.value);
+    console.log('Team changed:', teamValue);
+  }
+
+  selectPlayer(playerValue: string): void {
+    this.turnoverForm.patchValue({ player: playerValue });
+    this.turnoverForm.get('player')?.markAsTouched();
   }
 
   onRinkClick(event: MouseEvent): void {

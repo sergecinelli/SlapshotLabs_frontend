@@ -14,32 +14,41 @@
         </div>
         <mat-divider class="section-divider"></mat-divider>
         
-        <div class="form-row">
-          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
-            <mat-label class="uppercase text-custom-secondary">Team that turned the puck over</mat-label>
-            <mat-select formControlName="team" placeholder="Select team" (selectionChange)="onTeamChange()">
-              <mat-option *ngFor="let team of teamOptions" [value]="team.value">
-                <span class="font-semibold">{{ team.logo }}</span> - {{ team.label }}
-              </mat-option>
-            </mat-select>
-            <mat-error *ngIf="turnoverForm.get('team')?.errors && turnoverForm.get('team')?.touched">
-              {{ getErrorMessage('team') }}
-            </mat-error>
-          </mat-form-field>
+        <div class="team-selection-container">
+          <label class="team-selection-label uppercase text-custom-secondary">Team that turned the puck over</label>
+          <div class="team-buttons">
+            <button 
+              *ngFor="let team of teamOptions" 
+              type="button"
+              class="team-button"
+              [class.selected]="turnoverForm.get('team')?.value === team.value"
+              (click)="selectTeam(team.value)">
+              <div class="team-avatar">
+                <span class="avatar-text">{{ team.logo }}</span>
+              </div>
+              <div class="team-name">{{ team.label }}</div>
+            </button>
+          </div>
+          <div *ngIf="turnoverForm.get('team')?.errors && turnoverForm.get('team')?.touched" class="team-error">
+            {{ getErrorMessage('team') }}
+          </div>
         </div>
 
-        <div class="form-row">
-          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
-            <mat-label class="uppercase text-custom-secondary">Player that turned the puck over</mat-label>
-            <mat-select formControlName="player" placeholder="Select player">
-              <mat-option *ngFor="let player of playerOptions" [value]="player.value">
-                {{ player.label }}
-              </mat-option>
-            </mat-select>
-            <mat-error *ngIf="turnoverForm.get('player')?.errors && turnoverForm.get('player')?.touched">
-              {{ getErrorMessage('player') }}
-            </mat-error>
-          </mat-form-field>
+        <div class="player-selection-container">
+          <label class="player-selection-label uppercase text-custom-secondary">Player that turned the puck over</label>
+          <div class="player-buttons">
+            <button 
+              *ngFor="let player of playerOptions" 
+              type="button"
+              class="player-button"
+              [class.selected]="turnoverForm.get('player')?.value === player.value"
+              (click)="selectPlayer(player.value)">
+              <div class="player-name">{{ player.label }}</div>
+            </button>
+          </div>
+          <div *ngIf="turnoverForm.get('player')?.errors && turnoverForm.get('player')?.touched" class="player-error">
+            {{ getErrorMessage('player') }}
+          </div>
         </div>
 
         <div class="form-row">
