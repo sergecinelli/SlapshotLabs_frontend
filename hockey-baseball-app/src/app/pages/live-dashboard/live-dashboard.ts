@@ -56,7 +56,7 @@ interface GameEvent {
 @Component({
   selector: 'app-live-dashboard',
   standalone: true,
-  imports: [CommonModule, PageHeaderComponent, MatIconModule, MatButtonModule, MatTooltipModule],
+  imports: [CommonModule, PageHeaderComponent, ActionButtonComponent, MatIconModule, MatButtonModule, MatTooltipModule],
   templateUrl: './live-dashboard.html',
   styleUrl: './live-dashboard.scss'
 })

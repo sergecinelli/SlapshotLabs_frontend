@@ -231,28 +231,6 @@
               </div>
             </div>
           </div>
-
-          <!-- Game Event Actions -->
-          <div class="border border-gray-300 rounded p-3">
-            <div class="text-xs text-gray-600 mb-2 font-semibold">Quick Actions</div>
-            <div class="flex flex-wrap gap-2 justify-center">
-              <button (click)="onShots()" class="game-event-btn">
-                Shots
-              </button>
-              <button (click)="onTurnover()" class="game-event-btn">
-                Turnover
-              </button>
-              <button (click)="onFaceoff()" class="game-event-btn">
-                Faceoff
-              </button>
-              <button (click)="onGoalieChange()" class="game-event-btn">
-                Goalie
-              </button>
-              <button (click)="onPenalty()" class="game-event-btn">
-                Penalty
-              </button>
-            </div>
-          </div>
         </div>
       </div>
 
@@ -417,30 +395,37 @@
               </div>
             </div>
           </div>
-
-          <!-- Game Event Actions -->
-          <div class="border border-gray-300 rounded p-3">
-            <div class="text-xs text-gray-600 mb-2 font-semibold">Quick Actions</div>
-            <div class="flex flex-wrap gap-2 justify-center">
-              <button (click)="onShots()" class="game-event-btn">
-                Shots
-              </button>
-              <button (click)="onTurnover()" class="game-event-btn">
-                Turnover
-              </button>
-              <button (click)="onFaceoff()" class="game-event-btn">
-                Faceoff
-              </button>
-              <button (click)="onGoalieChange()" class="game-event-btn">
-                Goalie
-              </button>
-              <button (click)="onPenalty()" class="game-event-btn">
-                Penalty
-              </button>
-            </div>
-          </div>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- Game Event Actions (Unified Section) -->
+  <div class="bg-white rounded-lg shadow-lg border border-gray-200 p-4">
+    <div class="text-center mb-4">
+      <div class="text-sm font-bold text-gray-900">Quick Actions</div>
+    </div>
+    <div class="flex flex-wrap gap-3 justify-center">
+      <app-action-button 
+        label="Shots" 
+        (buttonClick)="onShots()">
+      </app-action-button>
+      <app-action-button 
+        label="Turnover" 
+        (buttonClick)="onTurnover()">
+      </app-action-button>
+      <app-action-button 
+        label="Faceoff" 
+        (buttonClick)="onFaceoff()">
+      </app-action-button>
+      <app-action-button 
+        label="Goalie Change" 
+        (buttonClick)="onGoalieChange()">
+      </app-action-button>
+      <app-action-button 
+        label="Penalty" 
+        (buttonClick)="onPenalty()">
+      </app-action-button>
     </div>
   </div>
 
