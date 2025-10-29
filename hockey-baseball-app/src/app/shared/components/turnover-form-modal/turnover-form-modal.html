@@ -57,7 +57,7 @@
 
           <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
             <mat-label class="uppercase text-custom-secondary">Time</mat-label>
-            <input matInput formControlName="time" placeholder="mm:ss (e.g., 12:45)" maxlength="5">
+            <input matInput formControlName="time" placeholder="mm:ss" maxlength="5">
             <mat-error *ngIf="turnoverForm.get('time')?.errors && turnoverForm.get('time')?.touched">
               {{ getErrorMessage('time') }}
             </mat-error>
@@ -75,7 +75,7 @@
         <div class="form-row">
           <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field full-width">
             <mat-label class="uppercase text-custom-secondary">YouTube Link</mat-label>
-            <input matInput formControlName="youtubeLink" placeholder="Copy and paste YouTube link">
+            <input matInput formControlName="youtubeLink" placeholder="YouTube link">
             <mat-error *ngIf="turnoverForm.get('youtubeLink')?.errors && turnoverForm.get('youtubeLink')?.touched">
               {{ getErrorMessage('youtubeLink') }}
             </mat-error>

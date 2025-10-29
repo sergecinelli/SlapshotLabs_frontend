@@ -23,22 +23,10 @@ export class ArenaService {
   }
 
   /**
-   * Fetch rinks for a specific arena
-   */
-  getRinksByArena(arenaId: number): Observable<Rink[]> {
-    return this.apiService.get<Rink[]>(`/hockey/arena/${arenaId}/rinks`).pipe(
-      catchError(error => {
-        console.error('Failed to fetch rinks:', error);
-        return throwError(() => error);
-      })
-    );
-  }
-
-  /**
-   * Fetch all rinks
+   * Fetch all rinks from the API
    */
   getAllRinks(): Observable<Rink[]> {
-    return this.apiService.get<Rink[]>('/hockey/rink/list').pipe(
+    return this.apiService.get<Rink[]>('/hockey/arena-rink/list').pipe(
       catchError(error => {
         console.error('Failed to fetch all rinks:', error);
         return throwError(() => error);

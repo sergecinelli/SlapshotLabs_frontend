@@ -60,7 +60,6 @@ export class ScheduleFormModalComponent implements OnInit {
   teams: Team[] = [];
   arenas: Arena[] = [];
   rinks: Rink[] = [];
-  filteredRinks: Rink[] = [];
   goalies: Goalie[] = [];
   gameTypes: GameTypeResponse[] = [];
   gamePeriods: GamePeriodResponse[] = [];
@@ -70,7 +69,6 @@ export class ScheduleFormModalComponent implements OnInit {
   rinkOptions: { value: number; label: string }[] = [];
   goalieOptions: { value: string; label: string }[] = [];
   gameTypeOptions: { value: number; label: string }[] = [];
-  gamePeriodOptions: { value: number; label: string }[] = [];
 
   statusOptions = [
     { value: 0, label: 'Not Started' },
@@ -100,9 +98,9 @@ export class ScheduleFormModalComponent implements OnInit {
       tournamentName: [''],
       status: [0, [Validators.required]],
       date: ['', [Validators.required]],
-      time: ['', [Validators.required]],
+      time: ['', [Validators.required, Validators.pattern(/^(1[0-2]|0?[1-9]):[0-5][0-9]\s*(AM|PM|am|pm)$/)]],
+      arena: ['', [Validators.required]],
       rink: ['', [Validators.required]],
-      gamePeriod: [''],
       gameTypeGroup: [''],
       homeFaceoffWin: [0, [Validators.min(0)]],
       awayFaceoffWin: [0, [Validators.min(0)]]
@@ -133,11 +131,8 @@ export class ScheduleFormModalComponent implements OnInit {
 
         this.teamOptions = this.transformTeamsToOptions(this.teams);
         this.arenaOptions = this.arenaService.transformArenasToOptions(this.arenas);
-        this.rinkOptions = this.arenaService.transformRinksToOptions(this.rinks);
-        this.filteredRinks = this.rinks;
         this.goalieOptions = this.transformGoaliesToOptions(this.goalies);
         this.gameTypeOptions = this.gameMetadataService.transformGameTypesToOptions(this.gameTypes);
-        this.gamePeriodOptions = this.gameMetadataService.transformGamePeriodsToOptions(this.gamePeriods);
 
         // Set default values
         this.setDefaultValues();
@@ -214,14 +209,14 @@ export class ScheduleFormModalComponent implements OnInit {
         defaultValues['gameType'] = this.gameTypeOptions[0].value;
       }
       
-      // Set default game period
-      if (this.gamePeriodOptions.length > 0) {
-        defaultValues['gamePeriod'] = this.gamePeriodOptions[0].value;
-      }
-      
-      // Set default rink value
-      if (this.rinkOptions.length > 0) {
-        defaultValues['rink'] = this.rinkOptions[0].value;
+      // Set default arena value
+      if (this.arenaOptions.length > 0) {
+        defaultValues['arena'] = this.arenaOptions[0].value;
+        // Filter rinks based on first arena and set default rink
+        this.filterRinksByArena(this.arenaOptions[0].value);
+        if (this.rinkOptions.length > 0) {
+          defaultValues['rink'] = this.rinkOptions[0].value;
+        }
       }
       
       // Set default date and time (tomorrow at 7 PM)
@@ -229,7 +224,7 @@ export class ScheduleFormModalComponent implements OnInit {
       tomorrow.setDate(tomorrow.getDate() + 1);
       tomorrow.setHours(19, 0, 0, 0); // 7 PM
       defaultValues['date'] = tomorrow.toISOString().slice(0, 10);
-      defaultValues['time'] = '19:00:00';
+      defaultValues['time'] = '7:00 PM';
 
       this.scheduleForm.patchValue(defaultValues);
     }
@@ -251,20 +246,14 @@ export class ScheduleFormModalComponent implements OnInit {
       { value: '2', label: 'Goalie B (Team B)' }
     ];
 
-    this.rinkOptions = [
-      { value: 1, label: 'Rink 1' },
-      { value: 2, label: 'Rink 2' }
+    this.arenaOptions = [
+      { value: 1, label: 'Arena 1' },
+      { value: 2, label: 'Arena 2' }
     ];
 
     this.gameTypeOptions = [
       { value: 1, label: 'Regular Season' },
       { value: 2, label: 'Playoff' }
-    ];
-
-    this.gamePeriodOptions = [
-      { value: 1, label: '1st Period' },
-      { value: 2, label: '2nd Period' },
-      { value: 3, label: '3rd Period' }
     ];
   }
 
@@ -278,6 +267,14 @@ export class ScheduleFormModalComponent implements OnInit {
     const homeGoalieId = this.extractIdFromString(schedule.homeTeamGoalie);
     const rinkId = this.extractIdFromString(schedule.rink);
     
+    // Find the arena for this rink
+    const rink = this.rinks.find(r => r.id === parseInt(rinkId));
+    const arenaId = rink?.arena_id;
+    
+    if (arenaId) {
+      this.filterRinksByArena(arenaId);
+    }
+    
     this.scheduleForm.patchValue({
       awayTeam: awayTeamId,
       homeTeam: homeTeamId,
@@ -286,11 +283,11 @@ export class ScheduleFormModalComponent implements OnInit {
       awayTeamGoalie: awayGoalieId,
       homeTeamGoalie: homeGoalieId,
       date: schedule.date,
-      time: schedule.time,
+      time: this.convertTo12Hour(schedule.time),
+      arena: arenaId,
       rink: rinkId,
       tournamentName: schedule.tournamentName || '',
       status: this.mapStatusToNumber(schedule.status)
-      // gameType and gamePeriod would need to be stored in the original data
     });
   }
 
@@ -338,9 +335,8 @@ export class ScheduleFormModalComponent implements OnInit {
         tournament_name: formValue.tournamentName || '',
         status: formValue.status,
         date: formValue.date,
-        time: formValue.time,
+        time: this.convertTo24Hour(formValue.time),
         rink_id: formValue.rink,
-        game_period_id: formValue.gamePeriod || null,
         game_type_group: formValue.gameTypeGroup || '',
         home_faceoff_win: formValue.homeFaceoffWin,
         away_faceoff_win: formValue.awayFaceoffWin
@@ -370,6 +366,12 @@ export class ScheduleFormModalComponent implements OnInit {
       if (control.errors['required']) {
         return `${this.getFieldLabel(fieldName)} is required`;
       }
+      if (control.errors['pattern']) {
+        if (fieldName === 'time') {
+          return 'Time must be in format h:mm AM/PM (e.g., 7:00 PM)';
+        }
+        return `${this.getFieldLabel(fieldName)} format is invalid`;
+      }
     }
     return '';
   }
@@ -378,13 +380,84 @@ export class ScheduleFormModalComponent implements OnInit {
     const labels: Record<string, string> = {
       visitingTeam: 'Visiting Team',
       homeTeam: 'Home Team',
-      startTime: 'Start Time',
+      awayTeam: 'Away Team',
+      date: 'Date',
+      time: 'Time',
       arena: 'Arena',
       rink: 'Rink',
       gameType: 'Game Type',
       status: 'Status'
     };
     return labels[fieldName] || fieldName;
+  }
+
+  /**
+   * Handle arena selection change and filter rinks
+   */
+  onArenaChange(arenaId: number): void {
+    this.filterRinksByArena(arenaId);
+    // Reset rink selection when arena changes
+    this.scheduleForm.patchValue({ rink: '' });
+  }
+
+  /**
+   * Filter rinks based on selected arena
+   */
+  private filterRinksByArena(arenaId: number): void {
+    const filteredRinks = this.rinks.filter(rink => rink.arena_id === arenaId);
+    this.rinkOptions = this.arenaService.transformRinksToOptions(filteredRinks);
+  }
+
+  /**
+   * Convert 24-hour time format to 12-hour AM/PM format
+   * @param time24 Time in format HH:mm:ss or HH:mm
+   * @returns Time in format h:mm AM/PM
+   */
+  private convertTo12Hour(time24: string): string {
+    if (!time24) return '';
+    
+    const [hours24Str, minutes] = time24.split(':');
+    const hours24 = parseInt(hours24Str);
+    
+    if (hours24 === 0) {
+      return `12:${minutes} AM`;
+    } else if (hours24 < 12) {
+      return `${hours24}:${minutes} AM`;
+    } else if (hours24 === 12) {
+      return `12:${minutes} PM`;
+    } else {
+      return `${hours24 - 12}:${minutes} PM`;
+    }
+  }
+
+  /**
+   * Convert 12-hour AM/PM format to 24-hour format
+   * @param time12 Time in format h:mm AM/PM
+   * @returns Time in format HH:mm:ss
+   */
+  private convertTo24Hour(time12: string): string {
+    if (!time12) return '';
+    
+    const timePattern = /(\d{1,2}):(\d{2})\s*(AM|PM)/i;
+    const match = time12.match(timePattern);
+    
+    if (!match) {
+      // If format is invalid, return as-is
+      return time12;
+    }
+    
+    let hours = parseInt(match[1]);
+    const minutes = match[2];
+    const period = match[3].toUpperCase();
+    
+    if (period === 'AM') {
+      if (hours === 12) hours = 0;
+    } else {
+      if (hours !== 12) hours += 12;
+    }
+    
+    const hours24 = hours.toString().padStart(2, '0');
+    return `${hours24}:${minutes}:00`;
   }
 
   /**

@@ -75,7 +75,7 @@
 
           <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
             <mat-label class="uppercase text-custom-secondary">Time</mat-label>
-            <input matInput type="time" formControlName="time">
+            <input matInput type="text" formControlName="time" placeholder="e.g., 7:00 PM">
             <mat-error *ngIf="scheduleForm.get('time')?.errors && scheduleForm.get('time')?.touched">
               {{ getErrorMessage('time') }}
             </mat-error>
@@ -91,7 +91,19 @@
         <mat-divider class="section-divider"></mat-divider>
         
         <div class="form-row">
-          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field full-width">
+          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+            <mat-label class="uppercase text-custom-secondary">Arena</mat-label>
+            <mat-select formControlName="arena" (selectionChange)="onArenaChange($event.value)">
+              <mat-option *ngFor="let option of arenaOptions" [value]="option.value">
+                {{ option.label }}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="scheduleForm.get('arena')?.errors && scheduleForm.get('arena')?.touched">
+              {{ getErrorMessage('arena') }}
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
             <mat-label class="uppercase text-custom-secondary">Rink</mat-label>
             <mat-select formControlName="rink">
               <mat-option *ngFor="let option of rinkOptions" [value]="option.value">
@@ -123,15 +135,6 @@
             <mat-error *ngIf="scheduleForm.get('gameType')?.errors && scheduleForm.get('gameType')?.touched">
               {{ getErrorMessage('gameType') }}
             </mat-error>
-          </mat-form-field>
-
-          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
-            <mat-label class="uppercase text-custom-secondary">Game Period</mat-label>
-            <mat-select formControlName="gamePeriod">
-              <mat-option *ngFor="let option of gamePeriodOptions" [value]="option.value">
-                {{ option.label }}
-              </mat-option>
-            </mat-select>
           </mat-form-field>
         </div>
 
