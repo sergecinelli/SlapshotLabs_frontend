@@ -1,0 +1,255 @@
+<div class="shot-form-modal">
+  <h2 mat-dialog-title class="modal-title">
+    <mat-icon class="title-icon">sports_hockey</mat-icon>
+    Shot
+  </h2>
+
+  <mat-dialog-content class="modal-content">
+    <form [formGroup]="shotForm" class="shot-form">
+      
+      <!-- Shot Type Section -->
+      <div class="form-section">
+        <div class="section-header">
+          <span class="section-title">Shot Information</span>
+        </div>
+        <mat-divider class="section-divider"></mat-divider>
+        
+        <div class="shot-type-container">
+          <label class="shot-type-label uppercase text-custom-secondary">Type of Shot</label>
+          <div class="shot-type-buttons">
+            <button 
+              *ngFor="let type of shotTypeOptions" 
+              type="button"
+              class="shot-type-button"
+              [class.selected]="shotForm.get('shotType')?.value === type.value"
+              (click)="selectShotType(type.value)">
+              <div class="type-name">{{ type.label }}</div>
+            </button>
+          </div>
+          <div *ngIf="shotForm.get('shotType')?.errors && shotForm.get('shotType')?.touched" class="error-message">
+            {{ getErrorMessage('shotType') }}
+          </div>
+        </div>
+
+        <!-- Scoring Chance Checkbox (only visible when NOT a goal) -->
+        <div *ngIf="showScoringChance" class="scoring-chance-container">
+          <mat-checkbox formControlName="isScoringChance" class="scoring-chance-checkbox">
+            Scoring Chance
+          </mat-checkbox>
+        </div>
+      </div>
+
+      <!-- Goal Section -->
+      <div *ngIf="isGoal" class="form-section">
+        <div class="section-header">
+          <span class="section-title">Goal Details</span>
+        </div>
+        <mat-divider class="section-divider"></mat-divider>
+        
+        <div class="team-selection-container">
+          <label class="team-selection-label uppercase text-custom-secondary">Team that Scored a Goal</label>
+          <div class="team-buttons">
+            <button 
+              *ngFor="let team of teamOptions" 
+              type="button"
+              class="team-button"
+              [class.selected]="shotForm.get('scoringTeam')?.value === team.value"
+              (click)="selectTeam(team.value, 'scoringTeam')">
+              <div class="team-avatar">
+                <span class="avatar-text">{{ team.logo }}</span>
+              </div>
+              <div class="team-name">{{ team.label }}</div>
+            </button>
+          </div>
+          <div *ngIf="shotForm.get('scoringTeam')?.errors && shotForm.get('scoringTeam')?.touched" class="error-message">
+            {{ getErrorMessage('scoringTeam') }}
+          </div>
+        </div>
+
+        <div class="player-selection-container">
+          <label class="player-selection-label uppercase text-custom-secondary">Player That scored a Goal</label>
+          <div class="player-buttons">
+            <button 
+              *ngFor="let player of playerOptions" 
+              type="button"
+              class="player-button"
+              [class.selected]="shotForm.get('scoringPlayer')?.value === player.value"
+              (click)="selectPlayer(player.value, 'scoringPlayer')">
+              <div class="player-name">{{ player.label }}</div>
+            </button>
+          </div>
+          <div *ngIf="shotForm.get('scoringPlayer')?.errors && shotForm.get('scoringPlayer')?.touched" class="error-message">
+            {{ getErrorMessage('scoringPlayer') }}
+          </div>
+        </div>
+
+        <div class="player-selection-container">
+          <label class="player-selection-label uppercase text-custom-secondary">Player that got Assist</label>
+          <div class="player-buttons">
+            <button 
+              *ngFor="let player of playerOptions" 
+              type="button"
+              class="player-button"
+              [class.selected]="shotForm.get('assistPlayer')?.value === player.value"
+              (click)="selectPlayer(player.value, 'assistPlayer')">
+              <div class="player-name">{{ player.label }}</div>
+            </button>
+          </div>
+        </div>
+
+        <div class="goalie-selection-container">
+          <label class="goalie-selection-label uppercase text-custom-secondary">Goalie that got Scored On</label>
+          <div class="goalie-buttons">
+            <button 
+              *ngFor="let goalie of goalieOptions" 
+              type="button"
+              class="goalie-button"
+              [class.selected]="shotForm.get('goalieScored')?.value === goalie.value"
+              (click)="selectGoalie(goalie.value, 'goalieScored')">
+              <div class="goalie-name">{{ goalie.label }}</div>
+            </button>
+          </div>
+          <div *ngIf="shotForm.get('goalieScored')?.errors && shotForm.get('goalieScored')?.touched" class="error-message">
+            {{ getErrorMessage('goalieScored') }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Save/Missed/Blocked Section -->
+      <div *ngIf="isNonGoal" class="form-section">
+        <div class="section-header">
+          <span class="section-title">Shot Details</span>
+        </div>
+        <mat-divider class="section-divider"></mat-divider>
+        
+        <div class="team-selection-container">
+          <label class="team-selection-label uppercase text-custom-secondary">Team that shot the puck</label>
+          <div class="team-buttons">
+            <button 
+              *ngFor="let team of teamOptions" 
+              type="button"
+              class="team-button"
+              [class.selected]="shotForm.get('shootingTeam')?.value === team.value"
+              (click)="selectTeam(team.value, 'shootingTeam')">
+              <div class="team-avatar">
+                <span class="avatar-text">{{ team.logo }}</span>
+              </div>
+              <div class="team-name">{{ team.label }}</div>
+            </button>
+          </div>
+          <div *ngIf="shotForm.get('shootingTeam')?.errors && shotForm.get('shootingTeam')?.touched" class="error-message">
+            {{ getErrorMessage('shootingTeam') }}
+          </div>
+        </div>
+
+        <div class="player-selection-container">
+          <label class="player-selection-label uppercase text-custom-secondary">Player that shot the puck</label>
+          <div class="player-buttons">
+            <button 
+              *ngFor="let player of playerOptions" 
+              type="button"
+              class="player-button"
+              [class.selected]="shotForm.get('shootingPlayer')?.value === player.value"
+              (click)="selectPlayer(player.value, 'shootingPlayer')">
+              <div class="player-name">{{ player.label }}</div>
+            </button>
+          </div>
+          <div *ngIf="shotForm.get('shootingPlayer')?.errors && shotForm.get('shootingPlayer')?.touched" class="error-message">
+            {{ getErrorMessage('shootingPlayer') }}
+          </div>
+        </div>
+
+        <div class="goalie-selection-container">
+          <label class="goalie-selection-label uppercase text-custom-secondary">Goalie in Net</label>
+          <div class="goalie-buttons">
+            <button 
+              *ngFor="let goalie of goalieOptions" 
+              type="button"
+              class="goalie-button"
+              [class.selected]="shotForm.get('goalieInNet')?.value === goalie.value"
+              (click)="selectGoalie(goalie.value, 'goalieInNet')">
+              <div class="goalie-name">{{ goalie.label }}</div>
+            </button>
+          </div>
+          <div *ngIf="shotForm.get('goalieInNet')?.errors && shotForm.get('goalieInNet')?.touched" class="error-message">
+            {{ getErrorMessage('goalieInNet') }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Scoring Chance Note -->
+      <div *ngIf="isScoringChance" class="form-section">
+        <div class="section-header">
+          <span class="section-title">Scoring Chance Details</span>
+        </div>
+        <mat-divider class="section-divider"></mat-divider>
+        
+        <div class="form-row">
+          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field full-width">
+            <mat-label class="uppercase text-custom-secondary">Note</mat-label>
+            <textarea matInput formControlName="scoringChanceNote" placeholder="Description about the scoring chance" rows="3"></textarea>
+            <mat-error *ngIf="shotForm.get('scoringChanceNote')?.errors && shotForm.get('scoringChanceNote')?.touched">
+              {{ getErrorMessage('scoringChanceNote') }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Period and Time Section -->
+      <div class="form-section">
+        <div class="section-header">
+          <span class="section-title">Time Information</span>
+        </div>
+        <mat-divider class="section-divider"></mat-divider>
+        
+        <div class="form-row">
+          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+            <mat-label class="uppercase text-custom-secondary">Period</mat-label>
+            <mat-select formControlName="period" placeholder="Select period">
+              <mat-option *ngFor="let period of periodOptions" [value]="period.value">
+                {{ period.label }}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="shotForm.get('period')?.errors && shotForm.get('period')?.touched">
+              {{ getErrorMessage('period') }}
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+            <mat-label class="uppercase text-custom-secondary">Time</mat-label>
+            <input matInput formControlName="time" placeholder="mm:ss" maxlength="5">
+            <mat-error *ngIf="shotForm.get('time')?.errors && shotForm.get('time')?.touched">
+              {{ getErrorMessage('time') }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- YouTube Link Section -->
+      <div class="form-section">
+        <div class="section-header">
+          <span class="section-title">Add YouTube Link</span>
+        </div>
+        <mat-divider class="section-divider"></mat-divider>
+        
+        <div class="form-row">
+          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field full-width">
+            <mat-label class="uppercase text-custom-secondary">YouTube Link</mat-label>
+            <input matInput formControlName="youtubeLink" placeholder="YouTube link">
+          </mat-form-field>
+        </div>
+      </div>
+
+    </form>
+  </mat-dialog-content>
+
+  <mat-dialog-actions class="modal-actions">
+    <button mat-stroked-button (click)="onCancel()" class="cancel-btn">
+      Cancel
+    </button>
+    <button mat-raised-button color="primary" (click)="onSubmit()" class="submit-btn" [disabled]="shotForm.invalid">
+      <mat-icon>save</mat-icon>
+      Add Shot
+    </button>
+  </mat-dialog-actions>
+</div>

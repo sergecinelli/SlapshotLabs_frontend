@@ -7,6 +7,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header';
 import { ActionButtonComponent } from '../../shared/components/action-button/action-button';
 import { TurnoverFormModalComponent } from '../../shared/components/turnover-form-modal/turnover-form-modal';
+import { ShotFormModalComponent } from '../../shared/components/shot-form-modal/shot-form-modal';
 interface Team {
   name: string;
   logo: string;
@@ -352,7 +353,20 @@ export class LiveDashboardComponent {
 
   // Event action button methods (placeholders for now)
   onShots(): void {
-    console.log('Shots button clicked - modal will open here');
+    const dialogRef = this.dialog.open(ShotFormModalComponent, {
+      width: '800px',
+      panelClass: 'shot-form-modal-dialog',
+      disableClose: false,
+      autoFocus: true
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        console.log('Shot data:', result);
+        // Here you can handle the shot data
+        // For example, add it to game events or update stats
+      }
+    });
   }
 
   onTurnover(): void {
