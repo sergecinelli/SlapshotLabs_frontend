@@ -236,7 +236,7 @@ export class TeamsComponent implements OnInit {
   }
 
   private addTeam(teamData: Partial<Team> & { logoFile?: File; logoRemoved?: boolean }): void {
-    const { logoFile, logoRemoved, ...team } = teamData;
+    const { logoFile, ...team } = teamData;
     this.teamService.addTeam(team, logoFile).subscribe({
       next: (newTeam) => {
         const currentTeams = this.teams();

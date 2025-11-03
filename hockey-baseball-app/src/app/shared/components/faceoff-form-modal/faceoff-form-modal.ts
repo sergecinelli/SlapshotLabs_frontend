@@ -14,8 +14,6 @@ import { TeamService } from '../../../services/team.service';
 import { PlayerService } from '../../../services/player.service';
 import { GameMetadataService } from '../../../services/game-metadata.service';
 import { GameEventService, FaceoffEventRequest } from '../../../services/game-event.service';
-import { Team } from '../../interfaces/team.interface';
-import { Player } from '../../interfaces/player.interface';
 
 export interface FaceoffFormData {
   winnerTeamLogo: string;
@@ -65,9 +63,9 @@ export class FaceoffFormModalComponent implements OnInit {
 
   // Data to be loaded from API
   teamOptions: { value: number; label: string; logo?: string }[] = [];
-  playersByTeam: Record<number, Array<{ value: number; label: string }>> = {};
-  winnerPlayerOptions: Array<{ value: number; label: string }> = [];
-  loserPlayerOptions: Array<{ value: number; label: string }> = [];
+  playersByTeam: Record<number, { value: number; label: string }[]> = {};
+  winnerPlayerOptions: { value: number; label: string }[] = [];
+  loserPlayerOptions: { value: number; label: string }[] = [];
   periodOptions: { value: number; label: string }[] = [];
   
   isLoadingTeams = false;

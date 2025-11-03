@@ -10,7 +10,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
-import { Schedule, GameType, GameStatus } from '../../interfaces/schedule.interface';
+import { Schedule, GameStatus } from '../../interfaces/schedule.interface';
 import { Team } from '../../interfaces/team.interface';
 import { Arena, Rink } from '../../interfaces/arena.interface';
 import { Goalie } from '../../interfaces/goalie.interface';
@@ -324,7 +324,7 @@ export class ScheduleFormModalComponent implements OnInit {
       const formValue = this.scheduleForm.value;
       
       // Create API request body
-      const gameData = {
+      const gameData: Record<string, unknown> & { id?: number } = {
         home_team_id: parseInt(formValue.homeTeam),
         home_goals: formValue.homeGoals,
         home_team_goalie_id: parseInt(formValue.homeTeamGoalie),
@@ -344,7 +344,7 @@ export class ScheduleFormModalComponent implements OnInit {
 
       // If edit mode, include the game ID
       if (this.isEditMode && this.data.schedule) {
-        (gameData as any).id = parseInt(this.data.schedule.id);
+        gameData.id = parseInt(this.data.schedule.id);
       }
 
       this.dialogRef.close(gameData);

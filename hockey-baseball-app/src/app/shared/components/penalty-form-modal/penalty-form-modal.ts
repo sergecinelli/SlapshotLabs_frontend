@@ -14,8 +14,6 @@ import { TeamService } from '../../../services/team.service';
 import { PlayerService } from '../../../services/player.service';
 import { GameMetadataService } from '../../../services/game-metadata.service';
 import { GameEventService, PenaltyEventRequest } from '../../../services/game-event.service';
-import { Team } from '../../interfaces/team.interface';
-import { Player } from '../../interfaces/player.interface';
 
 export interface PenaltyFormData {
   teamLogo: string;
@@ -63,8 +61,8 @@ export class PenaltyFormModalComponent implements OnInit {
 
   // Data to be loaded from API
   teamOptions: { value: number; label: string; logo?: string }[] = [];
-  playersByTeam: Record<number, Array<{ value: number; label: string }>> = {};
-  playerOptions: Array<{ value: number; label: string }> = [];
+  playersByTeam: Record<number, { value: number; label: string }[]> = {};
+  playerOptions: { value: number; label: string }[] = [];
   periodOptions: { value: number; label: string }[] = [];
 
   isLoadingTeams = false;

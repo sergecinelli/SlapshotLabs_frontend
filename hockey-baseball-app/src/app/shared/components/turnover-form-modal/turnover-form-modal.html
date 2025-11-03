@@ -15,7 +15,7 @@
         <mat-divider class="section-divider"></mat-divider>
         
         <div class="team-selection-container">
-          <label class="team-selection-label uppercase text-custom-secondary">Team that turned the puck over</label>
+          <div class="team-selection-label uppercase text-custom-secondary">Team that turned the puck over</div>
           <div *ngIf="isLoadingTeams" class="loading-message">Loading teams...</div>
           <div class="team-buttons" *ngIf="!isLoadingTeams">
             <button 
@@ -36,7 +36,7 @@
         </div>
 
         <div class="player-selection-container">
-          <label class="player-selection-label uppercase text-custom-secondary">Player that turned the puck over</label>
+          <div class="player-selection-label uppercase text-custom-secondary">Player that turned the puck over</div>
           <div *ngIf="isLoadingPlayers" class="loading-message">Loading players...</div>
           <div class="player-buttons" *ngIf="!isLoadingPlayers">
             <button 

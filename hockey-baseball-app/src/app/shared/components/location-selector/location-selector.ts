@@ -24,13 +24,17 @@ export interface PuckLocation {
   ]
 })
 export class LocationSelectorComponent implements ControlValueAccessor {
-  @Input() showTitle: boolean = true;
-  @Input() showDivider: boolean = true;
+  @Input() showTitle = true;
+  @Input() showDivider = true;
   @Output() locationChange = new EventEmitter<PuckLocation | null>();
 
   puckLocation: PuckLocation | null = null;
-  private onChange: (value: string) => void = () => {};
-  private onTouched: () => void = () => {};
+  private onChange: (value: string) => void = () => {
+    // Intentionally empty
+  };
+  private onTouched: () => void = () => {
+    // Intentionally empty
+  };
 
   onRinkClick(event: MouseEvent): void {
     const target = event.currentTarget as HTMLElement;
@@ -76,7 +80,7 @@ export class LocationSelectorComponent implements ControlValueAccessor {
     this.onTouched = fn;
   }
 
-  setDisabledState?(isDisabled: boolean): void {
+  setDisabledState?(): void {
     // Handle disabled state if needed
   }
 }

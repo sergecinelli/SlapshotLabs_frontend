@@ -13,8 +13,6 @@ import { TeamService } from '../../../services/team.service';
 import { GoalieService } from '../../../services/goalie.service';
 import { GameMetadataService } from '../../../services/game-metadata.service';
 import { GameEventService, GoalieChangeEventRequest } from '../../../services/game-event.service';
-import { Team } from '../../interfaces/team.interface';
-import { Goalie } from '../../interfaces/goalie.interface';
 
 export interface GoalieChangeFormData {
   teamLogo: string;
@@ -58,8 +56,8 @@ export class GoalieChangeFormModalComponent implements OnInit {
 
   // Data to be loaded from API
   teamOptions: { value: number; label: string; logo?: string }[] = [];
-  goaliesByTeam: Record<number, Array<{ value: number; label: string }>> = {};
-  goalieOptions: Array<{ value: number; label: string }> = [];
+  goaliesByTeam: Record<number, { value: number; label: string }[]> = {};
+  goalieOptions: { value: number; label: string }[] = [];
   periodOptions: { value: number; label: string }[] = [];
 
   isLoadingTeams = false;

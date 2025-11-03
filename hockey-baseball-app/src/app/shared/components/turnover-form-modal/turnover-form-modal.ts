@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, Input } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatDialogRef, MatDialogModule, MAT_DIALOG_DATA } from '@angular/material/dialog';
@@ -18,8 +18,6 @@ import { TeamService } from '../../../services/team.service';
 import { PlayerService } from '../../../services/player.service';
 import { GameMetadataService } from '../../../services/game-metadata.service';
 import { GameEventService, TurnoverEventRequest } from '../../../services/game-event.service';
-import { Team } from '../../interfaces/team.interface';
-import { Player } from '../../interfaces/player.interface';
 
 export interface TurnoverFormData {
   teamLogo: string;

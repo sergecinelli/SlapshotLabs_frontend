@@ -87,8 +87,8 @@ export class GameEventService {
   /**
    * Create a new game event
    */
-  createGameEvent(eventData: GameEventRequest): Observable<any> {
-    return this.apiService.post<any>('/hockey/game-event', eventData).pipe(
+  createGameEvent(eventData: GameEventRequest): Observable<{ id: number; success: boolean }> {
+    return this.apiService.post<{ id: number; success: boolean }>('/hockey/game-event', eventData).pipe(
       catchError(error => {
         console.error('Failed to create game event:', error);
         return throwError(() => error);
@@ -99,8 +99,8 @@ export class GameEventService {
   /**
    * Update an existing game event
    */
-  updateGameEvent(eventId: number, eventData: Partial<GameEventRequest>): Observable<any> {
-    return this.apiService.patch<any>(`/hockey/game-event/${eventId}`, eventData).pipe(
+  updateGameEvent(eventId: number, eventData: Partial<GameEventRequest>): Observable<{ success: boolean }> {
+    return this.apiService.patch<{ success: boolean }>(`/hockey/game-event/${eventId}`, eventData).pipe(
       catchError(error => {
         console.error('Failed to update game event:', error);
         return throwError(() => error);
@@ -111,7 +111,7 @@ export class GameEventService {
   /**
    * Create a turnover event with only required fields
    */
-  createTurnoverEvent(turnoverData: TurnoverEventRequest): Observable<any> {
+  createTurnoverEvent(turnoverData: TurnoverEventRequest): Observable<{ id: number; success: boolean }> {
     const eventData: GameEventRequest = {
       game_id: turnoverData.game_id,
       event_name_id: turnoverData.event_name_id,
@@ -131,7 +131,7 @@ export class GameEventService {
   /**
    * Create a faceoff event with required fields
    */
-  createFaceoffEvent(faceoffData: FaceoffEventRequest): Observable<any> {
+  createFaceoffEvent(faceoffData: FaceoffEventRequest): Observable<{ id: number; success: boolean }> {
     const eventData: GameEventRequest = {
       game_id: faceoffData.game_id,
       event_name_id: faceoffData.event_name_id,
@@ -153,7 +153,7 @@ export class GameEventService {
   /**
    * Create a goalie change event with required fields
    */
-  createGoalieChangeEvent(goalieChangeData: GoalieChangeEventRequest): Observable<any> {
+  createGoalieChangeEvent(goalieChangeData: GoalieChangeEventRequest): Observable<{ id: number; success: boolean }> {
     const eventData: GameEventRequest = {
       game_id: goalieChangeData.game_id,
       event_name_id: goalieChangeData.event_name_id,
@@ -170,7 +170,7 @@ export class GameEventService {
   /**
    * Create a penalty event with required fields
    */
-  createPenaltyEvent(penaltyData: PenaltyEventRequest): Observable<any> {
+  createPenaltyEvent(penaltyData: PenaltyEventRequest): Observable<{ id: number; success: boolean }> {
     const eventData: GameEventRequest = {
       game_id: penaltyData.game_id,
       event_name_id: penaltyData.event_name_id,
