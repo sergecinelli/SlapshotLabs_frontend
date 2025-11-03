@@ -72,6 +72,7 @@ export class LiveDashboardComponent {
   turnoverEventId = 1; // This should be the ID for "Turnover" event type from game-event-name API
   faceoffEventId = 2; // This should be the ID for "Faceoff" event type from game-event-name API
   goalieChangeEventId = 3; // This should be the ID for "Goalie Change" event type from game-event-name API
+  penaltyEventId = 4; // This should be the ID for "Penalty" event type from game-event-name API
   
   // Mock tournament data
   tournamentName = signal('LITE5');
@@ -447,7 +448,11 @@ export class LiveDashboardComponent {
       width: '800px',
       panelClass: 'penalty-form-modal-dialog',
       disableClose: false,
-      autoFocus: true
+      autoFocus: true,
+      data: {
+        gameId: this.gameId,
+        penaltyEventId: this.penaltyEventId
+      }
     });
 
     dialogRef.afterClosed().subscribe(result => {

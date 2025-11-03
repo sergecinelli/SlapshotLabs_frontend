@@ -1,7 +1,7 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { MatDialogRef, MatDialogModule } from '@angular/material/dialog';
+import { MatDialogRef, MatDialogModule, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -9,6 +9,13 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
 import { LocationSelectorComponent, PuckLocation } from '../location-selector/location-selector';
+
+import { TeamService } from '../../../services/team.service';
+import { PlayerService } from '../../../services/player.service';
+import { GameMetadataService } from '../../../services/game-metadata.service';
+import { GameEventService, PenaltyEventRequest } from '../../../services/game-event.service';
+import { Team } from '../../interfaces/team.interface';
+import { Player } from '../../interfaces/player.interface';
 
 export interface PenaltyFormData {
   teamLogo: string;
@@ -39,47 +46,42 @@ export interface PenaltyFormData {
   templateUrl: './penalty-form-modal.html',
   styleUrl: './penalty-form-modal.scss'
 })
-export class PenaltyFormModalComponent {
+export class PenaltyFormModalComponent implements OnInit {
   private fb = inject(FormBuilder);
   private dialogRef = inject<MatDialogRef<PenaltyFormModalComponent>>(MatDialogRef);
+  private teamService = inject(TeamService);
+  private playerService = inject(PlayerService);
+  private gameMetadataService = inject(GameMetadataService);
+  private gameEventService = inject(GameEventService);
+  private dialogData = inject<{ gameId: number; penaltyEventId: number }>(MAT_DIALOG_DATA);
+
+  gameId: number;
+  penaltyEventId: number;
 
   penaltyForm: FormGroup;
   puckLocation: PuckLocation | null = null;
 
-  // Mock data for now - to be replaced with real data
-  teamOptions = [
-    { value: 'team1', label: 'BURLINGTON JR RAIDERS BLACK', logo: 'BRB' },
-    { value: 'team2', label: 'WATERLOO WOLVES', logo: 'WW' }
-  ];
+  // Data to be loaded from API
+  teamOptions: { value: number; label: string; logo?: string }[] = [];
+  playersByTeam: Record<number, Array<{ value: number; label: string }>> = {};
+  playerOptions: Array<{ value: number; label: string }> = [];
+  periodOptions: { value: number; label: string }[] = [];
 
-  // Mock players by team - will be populated based on selected team
-  playersByTeam: Record<string, Array<{ value: string; label: string }>> = {
-    team1: [
-      { value: 'player1', label: 'Player 1' },
-      { value: 'player2', label: 'Player 2' },
-      { value: 'player3', label: 'Player 3' },
-      { value: 'player4', label: 'Player 4' }
-    ],
-    team2: [
-      { value: 'player5', label: 'Player 5' },
-      { value: 'player6', label: 'Player 6' },
-      { value: 'player7', label: 'Player 7' },
-      { value: 'player8', label: 'Player 8' }
-    ]
-  };
-
-  playerOptions: Array<{ value: string; label: string }> = [];
-
-  periodOptions = [
-    { value: '1', label: '1st Period' },
-    { value: '2', label: '2nd Period' },
-    { value: '3', label: '3rd Period' }
-  ];
+  isLoadingTeams = false;
+  isLoadingPlayers = false;
+  isLoadingPeriods = false;
+  isSubmitting = false;
 
   constructor() {
     this.penaltyForm = this.createForm();
-    this.setDefaultValues();
+    this.gameId = this.dialogData.gameId;
+    this.penaltyEventId = this.dialogData.penaltyEventId;
     this.setupTeamChangeListener();
+  }
+
+  ngOnInit(): void {
+    this.loadTeams();
+    this.loadPeriods();
   }
 
   private createForm(): FormGroup {
@@ -94,45 +96,101 @@ export class PenaltyFormModalComponent {
     });
   }
 
-  private setDefaultValues(): void {
-    // Set first available options as defaults
-    if (this.teamOptions.length > 0) {
-      this.penaltyForm.patchValue({
-        team: this.teamOptions[0].value
-      });
-      // Initialize player list based on default team
-      this.updatePlayers(this.teamOptions[0].value);
+  private loadTeams(): void {
+    this.isLoadingTeams = true;
+    this.teamService.getTeams().subscribe({
+      next: (response) => {
+        this.teamOptions = response.teams.map(team => ({
+          value: parseInt(team.id),
+          label: team.name,
+          logo: team.logo
+        }));
+        this.isLoadingTeams = false;
+        
+        // Set default team after teams are loaded
+        if (this.teamOptions.length > 0) {
+          this.penaltyForm.patchValue({
+            team: this.teamOptions[0].value
+          });
+          // Load players for default team
+          this.loadPlayersForTeam(this.teamOptions[0].value);
+        }
+      },
+      error: (error) => {
+        console.error('Failed to load teams:', error);
+        this.isLoadingTeams = false;
+      }
+    });
+  }
+
+  private loadPeriods(): void {
+    this.isLoadingPeriods = true;
+    this.gameMetadataService.getGamePeriods().subscribe({
+      next: (periods) => {
+        this.periodOptions = this.gameMetadataService.transformGamePeriodsToOptions(periods);
+        this.isLoadingPeriods = false;
+        if (this.periodOptions.length > 0) {
+          this.penaltyForm.patchValue({ period: this.periodOptions[0].value });
+        }
+      },
+      error: (error) => {
+        console.error('Failed to load periods:', error);
+        this.isLoadingPeriods = false;
+      }
+    });
+  }
+
+  private loadPlayersForTeam(teamId: number): void {
+    this.isLoadingPlayers = true;
+    
+    // Check if we already have players cached for this team
+    if (this.playersByTeam[teamId]) {
+      this.playerOptions = this.playersByTeam[teamId];
+      this.isLoadingPlayers = false;
+      if (this.playerOptions.length > 0) {
+        this.penaltyForm.patchValue({ player: this.playerOptions[0].value });
+      }
+      return;
     }
-    if (this.periodOptions.length > 0) {
-      this.penaltyForm.patchValue({
-        period: this.periodOptions[0].value
-      });
-    }
+    
+    this.playerService.getPlayersByTeam(teamId).subscribe({
+      next: (players) => {
+        const playerOptions = players.map(player => ({
+          value: parseInt(player.id),
+          label: `${player.firstName} ${player.lastName}`
+        }));
+        
+        // Cache the players
+        this.playersByTeam[teamId] = playerOptions;
+        this.playerOptions = playerOptions;
+        this.isLoadingPlayers = false;
+        
+        if (this.playerOptions.length > 0) {
+          this.penaltyForm.patchValue({ player: this.playerOptions[0].value });
+        } else {
+          this.penaltyForm.patchValue({ player: '' });
+        }
+      },
+      error: (error) => {
+        console.error(`Failed to load players for team ${teamId}:`, error);
+        this.isLoadingPlayers = false;
+      }
+    });
   }
 
   private setupTeamChangeListener(): void {
     // When team changes, update available players
     this.penaltyForm.get('team')?.valueChanges.subscribe(team => {
-      this.updatePlayers(team);
+      this.loadPlayersForTeam(team);
     });
   }
 
-  private updatePlayers(teamValue: string): void {
-    this.playerOptions = this.playersByTeam[teamValue] || [];
-    // Reset player selection when team changes
-    if (this.playerOptions.length > 0) {
-      this.penaltyForm.patchValue({ player: this.playerOptions[0].value });
-    } else {
-      this.penaltyForm.patchValue({ player: '' });
-    }
-  }
-
-  selectTeam(teamValue: string): void {
+  selectTeam(teamValue: number): void {
     this.penaltyForm.patchValue({ team: teamValue });
     this.penaltyForm.get('team')?.markAsTouched();
   }
 
-  selectPlayer(playerValue: string): void {
+  selectPlayer(playerValue: number): void {
     this.penaltyForm.patchValue({ player: playerValue });
     this.penaltyForm.get('player')?.markAsTouched();
   }
@@ -145,26 +203,63 @@ export class PenaltyFormModalComponent {
   }
 
   onSubmit(): void {
-    if (this.penaltyForm.valid) {
+    if (this.penaltyForm.valid && !this.isSubmitting) {
+      this.isSubmitting = true;
       const formValue = this.penaltyForm.value;
       
-      // Find selected team and player
-      const selectedTeam = this.teamOptions.find(t => t.value === formValue.team);
-      const selectedPlayer = this.playerOptions.find(p => p.value === formValue.player);
+      // Convert time from mm:ss to ISO duration format
+      const [minutes, seconds] = formValue.time.split(':').map((v: string) => parseInt(v, 10));
+      const isoTime = new Date();
+      isoTime.setHours(0, minutes, seconds, 0);
       
-      const penaltyData: PenaltyFormData = {
-        teamLogo: selectedTeam?.logo || '',
-        teamName: selectedTeam?.label || '',
-        playerName: selectedPlayer?.label || '',
-        penaltyLength: formValue.penaltyLength,
-        period: formValue.period,
-        time: formValue.time,
-        youtubeLink: formValue.youtubeLink,
-        location: this.puckLocation || undefined
+      // Convert penalty length to ISO duration format
+      const [penaltyMinutes, penaltySeconds] = formValue.penaltyLength.split(':').map((v: string) => parseInt(v, 10));
+      const isoPenaltyLength = new Date();
+      isoPenaltyLength.setHours(0, penaltyMinutes, penaltySeconds, 0);
+      
+      const penaltyRequest: PenaltyEventRequest = {
+        game_id: this.gameId,
+        event_name_id: this.penaltyEventId,
+        team_id: formValue.team,
+        player_id: formValue.player,
+        period_id: formValue.period,
+        time: isoTime.toISOString(),
+        time_length: isoPenaltyLength.toISOString(),
+        youtube_link: formValue.youtubeLink || undefined,
+        ice_top_offset: this.puckLocation?.y as number | undefined,
+        ice_left_offset: this.puckLocation?.x as number | undefined,
+        zone: this.puckLocation?.zone
       };
 
-      this.dialogRef.close(penaltyData);
-    } else {
+      this.gameEventService.createPenaltyEvent(penaltyRequest).subscribe({
+        next: (response) => {
+          console.log('Penalty event created:', response);
+          
+          // Find selected team and player for display
+          const selectedTeam = this.teamOptions.find(t => t.value === formValue.team);
+          const selectedPlayer = this.playerOptions.find(p => p.value === formValue.player);
+          
+          const penaltyData: PenaltyFormData = {
+            teamLogo: selectedTeam?.logo || '',
+            teamName: selectedTeam?.label || '',
+            playerName: selectedPlayer?.label || '',
+            penaltyLength: formValue.penaltyLength,
+            period: formValue.period.toString(),
+            time: formValue.time,
+            youtubeLink: formValue.youtubeLink,
+            location: this.puckLocation || undefined
+          };
+          
+          this.isSubmitting = false;
+          this.dialogRef.close(penaltyData);
+        },
+        error: (error) => {
+          console.error('Failed to create penalty event:', error);
+          this.isSubmitting = false;
+          // Optionally show error message to user
+        }
+      });
+    } else if (!this.penaltyForm.valid) {
       // Mark all fields as touched to show validation errors
       Object.keys(this.penaltyForm.controls).forEach(key => {
         this.penaltyForm.get(key)?.markAsTouched();

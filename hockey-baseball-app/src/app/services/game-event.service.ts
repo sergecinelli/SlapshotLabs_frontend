@@ -64,6 +64,20 @@ export interface GoalieChangeEventRequest {
   note?: string;
 }
 
+export interface PenaltyEventRequest {
+  game_id: number;
+  event_name_id: number;
+  team_id: number;
+  player_id: number;
+  period_id: number;
+  time: string;
+  time_length: string;
+  youtube_link?: string;
+  ice_top_offset?: number;
+  ice_left_offset?: number;
+  zone?: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -148,6 +162,27 @@ export class GameEventService {
       period_id: goalieChangeData.period_id,
       time: goalieChangeData.time,
       note: goalieChangeData.note
+    };
+
+    return this.createGameEvent(eventData);
+  }
+
+  /**
+   * Create a penalty event with required fields
+   */
+  createPenaltyEvent(penaltyData: PenaltyEventRequest): Observable<any> {
+    const eventData: GameEventRequest = {
+      game_id: penaltyData.game_id,
+      event_name_id: penaltyData.event_name_id,
+      team_id: penaltyData.team_id,
+      player_id: penaltyData.player_id,
+      period_id: penaltyData.period_id,
+      time: penaltyData.time,
+      time_length: penaltyData.time_length,
+      youtube_link: penaltyData.youtube_link,
+      ice_top_offset: penaltyData.ice_top_offset,
+      ice_left_offset: penaltyData.ice_left_offset,
+      zone: penaltyData.zone
     };
 
     return this.createGameEvent(eventData);
