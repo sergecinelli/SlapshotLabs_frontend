@@ -30,6 +30,23 @@ export class GoalieService {
     );
   }
 
+  getGoaliesByTeam(teamId: number): Observable<Goalie[]> {
+    return this.apiService.get<GoalieApiOutData[]>('/hockey/goalie/list').pipe(
+      map(apiGoalies => {
+        // Filter goalies by team and map to frontend format
+        return apiGoalies
+          .filter(apiGoalie => apiGoalie.team_id === teamId)
+          .map(apiGoalie => 
+            GoalieDataMapper.fromApiOutFormat({ photo: '', data: apiGoalie })
+          );
+      }),
+      catchError(error => {
+        console.error(`Failed to fetch goalies for team ${teamId}:`, error);
+        return throwError(() => error);
+      })
+    );
+  }
+
   getGoalieById(id: string): Observable<Goalie | undefined> {
     // Convert string ID to number for API call
     const numericId = parseInt(id, 10);

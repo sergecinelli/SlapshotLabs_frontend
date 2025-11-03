@@ -54,6 +54,16 @@ export interface FaceoffEventRequest {
   is_faceoff_won: boolean;
 }
 
+export interface GoalieChangeEventRequest {
+  game_id: number;
+  event_name_id: number;
+  team_id: number;
+  goalie_id: number;
+  period_id: number;
+  time: string;
+  note?: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -121,6 +131,23 @@ export class GameEventService {
       ice_left_offset: faceoffData.ice_left_offset,
       zone: faceoffData.zone,
       is_faceoff_won: faceoffData.is_faceoff_won
+    };
+
+    return this.createGameEvent(eventData);
+  }
+
+  /**
+   * Create a goalie change event with required fields
+   */
+  createGoalieChangeEvent(goalieChangeData: GoalieChangeEventRequest): Observable<any> {
+    const eventData: GameEventRequest = {
+      game_id: goalieChangeData.game_id,
+      event_name_id: goalieChangeData.event_name_id,
+      team_id: goalieChangeData.team_id,
+      goalie_id: goalieChangeData.goalie_id,
+      period_id: goalieChangeData.period_id,
+      time: goalieChangeData.time,
+      note: goalieChangeData.note
     };
 
     return this.createGameEvent(eventData);
