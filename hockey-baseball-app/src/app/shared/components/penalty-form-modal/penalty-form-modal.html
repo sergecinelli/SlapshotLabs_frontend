@@ -1,0 +1,129 @@
+<div class="penalty-form-modal">
+  <h2 mat-dialog-title class="modal-title">
+    <mat-icon class="title-icon">warning</mat-icon>
+    Penalty
+  </h2>
+
+  <mat-dialog-content class="modal-content">
+    <form [formGroup]="penaltyForm" class="penalty-form">
+      
+      <!-- Penalty Information Section -->
+      <div class="form-section">
+        <div class="section-header">
+          <span class="section-title">Penalty Information</span>
+        </div>
+        <mat-divider class="section-divider"></mat-divider>
+        
+        <div class="team-selection-container">
+          <label class="team-selection-label uppercase text-custom-secondary">Team that had the penalty</label>
+          <div class="team-buttons">
+            <button 
+              *ngFor="let team of teamOptions" 
+              type="button"
+              class="team-button"
+              [class.selected]="penaltyForm.get('team')?.value === team.value"
+              (click)="selectTeam(team.value)">
+              <div class="team-avatar">
+                <span class="avatar-text">{{ team.logo }}</span>
+              </div>
+              <div class="team-name">{{ team.label }}</div>
+            </button>
+          </div>
+          <div *ngIf="penaltyForm.get('team')?.errors && penaltyForm.get('team')?.touched" class="team-error">
+            {{ getErrorMessage('team') }}
+          </div>
+        </div>
+
+        <div class="player-selection-container">
+          <label class="player-selection-label uppercase text-custom-secondary">Player that had the penalty</label>
+          <div class="player-buttons">
+            <button 
+              *ngFor="let player of playerOptions" 
+              type="button"
+              class="player-button"
+              [class.selected]="penaltyForm.get('player')?.value === player.value"
+              (click)="selectPlayer(player.value)">
+              <div class="player-name">{{ player.label }}</div>
+            </button>
+          </div>
+          <div *ngIf="penaltyForm.get('player')?.errors && penaltyForm.get('player')?.touched" class="player-error">
+            {{ getErrorMessage('player') }}
+          </div>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+            <mat-label class="uppercase text-custom-secondary">Length of Penalty</mat-label>
+            <input matInput formControlName="penaltyLength" placeholder="mm:ss" maxlength="5">
+            <mat-error *ngIf="penaltyForm.get('penaltyLength')?.errors && penaltyForm.get('penaltyLength')?.touched">
+              {{ getErrorMessage('penaltyLength') }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+            <mat-label class="uppercase text-custom-secondary">Period</mat-label>
+            <mat-select formControlName="period" placeholder="Select period">
+              <mat-option *ngFor="let period of periodOptions" [value]="period.value">
+                {{ period.label }}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="penaltyForm.get('period')?.errors && penaltyForm.get('period')?.touched">
+              {{ getErrorMessage('period') }}
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+            <mat-label class="uppercase text-custom-secondary">Time</mat-label>
+            <input matInput formControlName="time" placeholder="mm:ss" maxlength="5">
+            <mat-error *ngIf="penaltyForm.get('time')?.errors && penaltyForm.get('time')?.touched">
+              {{ getErrorMessage('time') }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- YouTube Link Section -->
+      <div class="form-section">
+        <div class="section-header">
+          <span class="section-title">Add YouTube Link</span>
+        </div>
+        <mat-divider class="section-divider"></mat-divider>
+        
+        <div class="form-row">
+          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field full-width">
+            <mat-label class="uppercase text-custom-secondary">YouTube Link</mat-label>
+            <input matInput formControlName="youtubeLink" placeholder="YouTube link">
+            <mat-error *ngIf="penaltyForm.get('youtubeLink')?.errors && penaltyForm.get('youtubeLink')?.touched">
+              {{ getErrorMessage('youtubeLink') }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Set Location Section -->
+      <div class="form-section">
+        <app-location-selector 
+          formControlName="location"
+          (locationChange)="onLocationChange($event)">
+        </app-location-selector>
+        
+        <div *ngIf="penaltyForm.get('location')?.errors?.['required'] && penaltyForm.get('location')?.touched" class="location-error">
+          Please click on the rink to set the penalty location
+        </div>
+      </div>
+
+    </form>
+  </mat-dialog-content>
+
+  <mat-dialog-actions class="modal-actions">
+    <button mat-stroked-button (click)="onCancel()" class="cancel-btn">
+      Cancel
+    </button>
+    <button mat-raised-button color="primary" (click)="onSubmit()" class="submit-btn" [disabled]="penaltyForm.invalid">
+      <mat-icon>save</mat-icon>
+      Add Penalty
+    </button>
+  </mat-dialog-actions>
+</div>

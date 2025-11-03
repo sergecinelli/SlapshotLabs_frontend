@@ -10,6 +10,7 @@ import { TurnoverFormModalComponent } from '../../shared/components/turnover-for
 import { ShotFormModalComponent } from '../../shared/components/shot-form-modal/shot-form-modal';
 import { FaceoffFormModalComponent } from '../../shared/components/faceoff-form-modal/faceoff-form-modal';
 import { GoalieChangeFormModalComponent } from '../../shared/components/goalie-change-form-modal/goalie-change-form-modal';
+import { PenaltyFormModalComponent } from '../../shared/components/penalty-form-modal/penalty-form-modal';
 interface Team {
   name: string;
   logo: string;
@@ -423,6 +424,19 @@ export class LiveDashboardComponent {
   }
 
   onPenalty(): void {
-    console.log('Penalty button clicked - modal will open here');
+    const dialogRef = this.dialog.open(PenaltyFormModalComponent, {
+      width: '800px',
+      panelClass: 'penalty-form-modal-dialog',
+      disableClose: false,
+      autoFocus: true
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        console.log('Penalty data:', result);
+        // Here you can handle the penalty data
+        // For example, add it to game events
+      }
+    });
   }
 }
