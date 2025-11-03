@@ -70,6 +70,7 @@ export class LiveDashboardComponent {
   // TODO: Replace with actual game ID from route or service
   gameId = 1; // This should come from the route or be fetched from the API
   turnoverEventId = 1; // This should be the ID for "Turnover" event type from game-event-name API
+  faceoffEventId = 2; // This should be the ID for "Faceoff" event type from game-event-name API
   
   // Mock tournament data
   tournamentName = signal('LITE5');
@@ -403,7 +404,11 @@ export class LiveDashboardComponent {
       width: '800px',
       panelClass: 'faceoff-form-modal-dialog',
       disableClose: false,
-      autoFocus: true
+      autoFocus: true,
+      data: {
+        gameId: this.gameId,
+        faceoffEventId: this.faceoffEventId
+      }
     });
 
     dialogRef.afterClosed().subscribe(result => {

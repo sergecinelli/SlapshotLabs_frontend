@@ -16,7 +16,8 @@
         
         <div class="team-selection-container">
           <label class="team-selection-label uppercase text-custom-secondary">Team</label>
-          <div class="team-buttons">
+          <div *ngIf="isLoadingTeams" class="loading-message">Loading teams...</div>
+          <div class="team-buttons" *ngIf="!isLoadingTeams">
             <button 
               *ngFor="let team of teamOptions" 
               type="button"
@@ -36,7 +37,8 @@
 
         <div class="player-selection-container">
           <label class="player-selection-label uppercase text-custom-secondary">Player</label>
-          <div class="player-buttons">
+          <div *ngIf="isLoadingWinnerPlayers" class="loading-message">Loading players...</div>
+          <div class="player-buttons" *ngIf="!isLoadingWinnerPlayers">
             <button 
               *ngFor="let player of winnerPlayerOptions" 
               type="button"
@@ -61,7 +63,8 @@
         
         <div class="team-selection-container">
           <label class="team-selection-label uppercase text-custom-secondary">Team</label>
-          <div class="team-buttons">
+          <div *ngIf="isLoadingTeams" class="loading-message">Loading teams...</div>
+          <div class="team-buttons" *ngIf="!isLoadingTeams">
             <button 
               *ngFor="let team of teamOptions" 
               type="button"
@@ -81,7 +84,8 @@
 
         <div class="player-selection-container">
           <label class="player-selection-label uppercase text-custom-secondary">Player</label>
-          <div class="player-buttons">
+          <div *ngIf="isLoadingLoserPlayers" class="loading-message">Loading players...</div>
+          <div class="player-buttons" *ngIf="!isLoadingLoserPlayers">
             <button 
               *ngFor="let player of loserPlayerOptions" 
               type="button"
@@ -161,12 +165,12 @@
   </mat-dialog-content>
 
   <mat-dialog-actions class="modal-actions">
-    <button mat-stroked-button (click)="onCancel()" class="cancel-btn">
+    <button mat-stroked-button (click)="onCancel()" class="cancel-btn" [disabled]="isSubmitting">
       Cancel
     </button>
-    <button mat-raised-button color="primary" (click)="onSubmit()" class="submit-btn" [disabled]="faceoffForm.invalid">
+    <button mat-raised-button color="primary" (click)="onSubmit()" class="submit-btn" [disabled]="faceoffForm.invalid || isSubmitting">
       <mat-icon>save</mat-icon>
-      Add Faceoff
+      {{ isSubmitting ? 'Saving...' : 'Add Faceoff' }}
     </button>
   </mat-dialog-actions>
 </div>

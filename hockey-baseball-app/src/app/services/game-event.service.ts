@@ -39,6 +39,21 @@ export interface TurnoverEventRequest {
   zone?: string;
 }
 
+export interface FaceoffEventRequest {
+  game_id: number;
+  event_name_id: number;
+  team_id: number;
+  player_id: number;
+  player_2_id: number;
+  period_id: number;
+  time: string;
+  youtube_link?: string;
+  ice_top_offset?: number;
+  ice_left_offset?: number;
+  zone?: string;
+  is_faceoff_won: boolean;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -84,6 +99,28 @@ export class GameEventService {
       ice_top_offset: turnoverData.ice_top_offset,
       ice_left_offset: turnoverData.ice_left_offset,
       zone: turnoverData.zone
+    };
+
+    return this.createGameEvent(eventData);
+  }
+
+  /**
+   * Create a faceoff event with required fields
+   */
+  createFaceoffEvent(faceoffData: FaceoffEventRequest): Observable<any> {
+    const eventData: GameEventRequest = {
+      game_id: faceoffData.game_id,
+      event_name_id: faceoffData.event_name_id,
+      team_id: faceoffData.team_id,
+      player_id: faceoffData.player_id,
+      player_2_id: faceoffData.player_2_id,
+      period_id: faceoffData.period_id,
+      time: faceoffData.time,
+      youtube_link: faceoffData.youtube_link,
+      ice_top_offset: faceoffData.ice_top_offset,
+      ice_left_offset: faceoffData.ice_left_offset,
+      zone: faceoffData.zone,
+      is_faceoff_won: faceoffData.is_faceoff_won
     };
 
     return this.createGameEvent(eventData);
