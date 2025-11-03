@@ -8,6 +8,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
+import { LocationSelectorComponent, PuckLocation } from '../location-selector/location-selector';
 
 export interface TurnoverFormData {
   teamLogo: string;
@@ -15,12 +16,8 @@ export interface TurnoverFormData {
   playerNames: string[];
   period: string;
   time: string;
-}
-
-export interface PuckLocation {
-  x: number;
-  y: number;
-  zone: 'defending' | 'neutral' | 'attacking';
+  location?: PuckLocation;
+  youtubeLink?: string;
 }
 
 @Component({
@@ -35,7 +32,8 @@ export interface PuckLocation {
     MatInputModule,
     MatSelectModule,
     MatIconModule,
-    MatDividerModule
+    MatDividerModule,
+    LocationSelectorComponent
   ],
   templateUrl: './turnover-form-modal.html',
   styleUrl: './turnover-form-modal.scss'
@@ -115,29 +113,11 @@ export class TurnoverFormModalComponent {
     this.turnoverForm.get('player')?.markAsTouched();
   }
 
-  onRinkClick(event: MouseEvent): void {
-    const target = event.currentTarget as HTMLElement;
-    const rect = target.getBoundingClientRect();
-    const x = event.clientX - rect.left;
-    const y = event.clientY - rect.top;
-    
-    // Calculate percentage positions
-    const xPercent = (x / rect.width) * 100;
-    const yPercent = (y / rect.height) * 100;
-    
-    // Determine zone based on x position
-    // Defending zone: 0-33.33%, Neutral zone: 33.33-66.66%, Attacking zone: 66.66-100%
-    let zone: 'defending' | 'neutral' | 'attacking';
-    if (xPercent < 33.33) {
-      zone = 'defending';
-    } else if (xPercent < 66.66) {
-      zone = 'neutral';
-    } else {
-      zone = 'attacking';
+  onLocationChange(location: PuckLocation | null): void {
+    this.puckLocation = location;
+    if (location) {
+      this.turnoverForm.patchValue({ location: location.zone });
     }
-    
-    this.puckLocation = { x: xPercent, y: yPercent, zone };
-    this.turnoverForm.patchValue({ location: zone });
   }
 
   onSubmit(): void {
@@ -150,13 +130,13 @@ export class TurnoverFormModalComponent {
       // Find selected player
       const selectedPlayer = this.playerOptions.find(p => p.value === formValue.player);
       
-      const turnoverData = {
+      const turnoverData: TurnoverFormData = {
         teamLogo: selectedTeam?.logo || '',
         teamName: selectedTeam?.label || '',
-        playerName: selectedPlayer?.label || '',
+        playerNames: [selectedPlayer?.label || ''],
         period: formValue.period,
         time: formValue.time,
-        location: this.puckLocation,
+        location: this.puckLocation || undefined,
         youtubeLink: formValue.youtubeLink
       };
 

@@ -1,0 +1,87 @@
+.location-selector {
+  width: 100%;
+
+  .section-header {
+    margin-bottom: 8px;
+    
+    .section-title {
+      color: var(--color-dark);
+      font-size: 1rem;
+      font-weight: 500;
+      margin: 0;
+      padding: 0;
+    }
+  }
+  
+  .section-divider {
+    margin-bottom: 16px;
+    border-top-color: var(--color-primary) !important;
+    border-top-width: 2px !important;
+    transform: translateZ(0);
+    will-change: transform;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+  
+  .zone-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    padding: 0 8px;
+    
+    .zone-label {
+      flex: 1;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--color-dark);
+      text-transform: capitalize;
+    }
+  }
+  
+  .rink-container {
+    width: 100%;
+    
+    .rink-wrapper {
+      width: 100%;
+      max-width: 100%;
+      position: relative;
+      cursor: crosshair;
+      border-radius: 8px;
+      overflow: hidden;
+      
+      .hockey-rink-image {
+        width: 100%;
+        height: auto;
+        display: block;
+        user-select: none;
+        pointer-events: none;
+      }
+      
+      .puck-marker {
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        background-color: #d86ecc;
+        border: 2px solid #000;
+        border-radius: 50%;
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+        z-index: 10;
+      }
+    }
+    
+    .selected-zone {
+      margin-top: 12px;
+      padding: 8px 12px;
+      background-color: #f3f4f6;
+      border-radius: 6px;
+      font-size: 14px;
+      color: var(--color-dark);
+      
+      strong {
+        color: var(--color-primary);
+      }
+    }
+  }
+}

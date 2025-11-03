@@ -1,0 +1,172 @@
+<div class="faceoff-form-modal">
+  <h2 mat-dialog-title class="modal-title">
+    <mat-icon class="title-icon">sports_hockey</mat-icon>
+    Faceoff
+  </h2>
+
+  <mat-dialog-content class="modal-content">
+    <form [formGroup]="faceoffForm" class="faceoff-form">
+      
+      <!-- Faceoff Winner Section -->
+      <div class="form-section">
+        <div class="section-header">
+          <span class="section-title">Faceoff Winner</span>
+        </div>
+        <mat-divider class="section-divider"></mat-divider>
+        
+        <div class="team-selection-container">
+          <label class="team-selection-label uppercase text-custom-secondary">Team</label>
+          <div class="team-buttons">
+            <button 
+              *ngFor="let team of teamOptions" 
+              type="button"
+              class="team-button"
+              [class.selected]="faceoffForm.get('winnerTeam')?.value === team.value"
+              (click)="selectWinnerTeam(team.value)">
+              <div class="team-avatar">
+                <span class="avatar-text">{{ team.logo }}</span>
+              </div>
+              <div class="team-name">{{ team.label }}</div>
+            </button>
+          </div>
+          <div *ngIf="faceoffForm.get('winnerTeam')?.errors && faceoffForm.get('winnerTeam')?.touched" class="team-error">
+            {{ getErrorMessage('winnerTeam') }}
+          </div>
+        </div>
+
+        <div class="player-selection-container">
+          <label class="player-selection-label uppercase text-custom-secondary">Player</label>
+          <div class="player-buttons">
+            <button 
+              *ngFor="let player of winnerPlayerOptions" 
+              type="button"
+              class="player-button"
+              [class.selected]="faceoffForm.get('winnerPlayer')?.value === player.value"
+              (click)="selectWinnerPlayer(player.value)">
+              <div class="player-name">{{ player.label }}</div>
+            </button>
+          </div>
+          <div *ngIf="faceoffForm.get('winnerPlayer')?.errors && faceoffForm.get('winnerPlayer')?.touched" class="player-error">
+            {{ getErrorMessage('winnerPlayer') }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Faceoff Loser Section -->
+      <div class="form-section">
+        <div class="section-header">
+          <span class="section-title">Faceoff Loser</span>
+        </div>
+        <mat-divider class="section-divider"></mat-divider>
+        
+        <div class="team-selection-container">
+          <label class="team-selection-label uppercase text-custom-secondary">Team</label>
+          <div class="team-buttons">
+            <button 
+              *ngFor="let team of teamOptions" 
+              type="button"
+              class="team-button"
+              [class.selected]="faceoffForm.get('loserTeam')?.value === team.value"
+              (click)="selectLoserTeam(team.value)">
+              <div class="team-avatar">
+                <span class="avatar-text">{{ team.logo }}</span>
+              </div>
+              <div class="team-name">{{ team.label }}</div>
+            </button>
+          </div>
+          <div *ngIf="faceoffForm.get('loserTeam')?.errors && faceoffForm.get('loserTeam')?.touched" class="team-error">
+            {{ getErrorMessage('loserTeam') }}
+          </div>
+        </div>
+
+        <div class="player-selection-container">
+          <label class="player-selection-label uppercase text-custom-secondary">Player</label>
+          <div class="player-buttons">
+            <button 
+              *ngFor="let player of loserPlayerOptions" 
+              type="button"
+              class="player-button"
+              [class.selected]="faceoffForm.get('loserPlayer')?.value === player.value"
+              (click)="selectLoserPlayer(player.value)">
+              <div class="player-name">{{ player.label }}</div>
+            </button>
+          </div>
+          <div *ngIf="faceoffForm.get('loserPlayer')?.errors && faceoffForm.get('loserPlayer')?.touched" class="player-error">
+            {{ getErrorMessage('loserPlayer') }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Period and Time Section -->
+      <div class="form-section">
+        <div class="section-header">
+          <span class="section-title">Faceoff Details</span>
+        </div>
+        <mat-divider class="section-divider"></mat-divider>
+        
+        <div class="form-row">
+          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+            <mat-label class="uppercase text-custom-secondary">Period</mat-label>
+            <mat-select formControlName="period" placeholder="Select period">
+              <mat-option *ngFor="let period of periodOptions" [value]="period.value">
+                {{ period.label }}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="faceoffForm.get('period')?.errors && faceoffForm.get('period')?.touched">
+              {{ getErrorMessage('period') }}
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+            <mat-label class="uppercase text-custom-secondary">Time</mat-label>
+            <input matInput formControlName="time" placeholder="mm:ss" maxlength="5">
+            <mat-error *ngIf="faceoffForm.get('time')?.errors && faceoffForm.get('time')?.touched">
+              {{ getErrorMessage('time') }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- YouTube Link Section -->
+      <div class="form-section">
+        <div class="section-header">
+          <span class="section-title">Add YouTube Link</span>
+        </div>
+        <mat-divider class="section-divider"></mat-divider>
+        
+        <div class="form-row">
+          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field full-width">
+            <mat-label class="uppercase text-custom-secondary">YouTube Link</mat-label>
+            <input matInput formControlName="youtubeLink" placeholder="YouTube link">
+            <mat-error *ngIf="faceoffForm.get('youtubeLink')?.errors && faceoffForm.get('youtubeLink')?.touched">
+              {{ getErrorMessage('youtubeLink') }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Set Location Section -->
+      <div class="form-section">
+        <app-location-selector 
+          formControlName="location"
+          (locationChange)="onLocationChange($event)">
+        </app-location-selector>
+        
+        <div *ngIf="faceoffForm.get('location')?.errors?.['required'] && faceoffForm.get('location')?.touched" class="location-error">
+          Please click on the rink to set the faceoff location
+        </div>
+      </div>
+
+    </form>
+  </mat-dialog-content>
+
+  <mat-dialog-actions class="modal-actions">
+    <button mat-stroked-button (click)="onCancel()" class="cancel-btn">
+      Cancel
+    </button>
+    <button mat-raised-button color="primary" (click)="onSubmit()" class="submit-btn" [disabled]="faceoffForm.invalid">
+      <mat-icon>save</mat-icon>
+      Add Faceoff
+    </button>
+  </mat-dialog-actions>
+</div>

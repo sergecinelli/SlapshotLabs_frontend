@@ -8,6 +8,7 @@ import { PageHeaderComponent } from '../../shared/components/page-header/page-he
 import { ActionButtonComponent } from '../../shared/components/action-button/action-button';
 import { TurnoverFormModalComponent } from '../../shared/components/turnover-form-modal/turnover-form-modal';
 import { ShotFormModalComponent } from '../../shared/components/shot-form-modal/shot-form-modal';
+import { FaceoffFormModalComponent } from '../../shared/components/faceoff-form-modal/faceoff-form-modal';
 interface Team {
   name: string;
   logo: string;
@@ -387,7 +388,20 @@ export class LiveDashboardComponent {
   }
 
   onFaceoff(): void {
-    console.log('Faceoff button clicked - modal will open here');
+    const dialogRef = this.dialog.open(FaceoffFormModalComponent, {
+      width: '800px',
+      panelClass: 'faceoff-form-modal-dialog',
+      disableClose: false,
+      autoFocus: true
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        console.log('Faceoff data:', result);
+        // Here you can handle the faceoff data
+        // For example, add it to game events or update stats
+      }
+    });
   }
 
   onGoalieChange(): void {

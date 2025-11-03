@@ -1,4 +1,4 @@
-.turnover-form-modal {
+.faceoff-form-modal {
   width: 100%;
   max-width: 800px;
   background-color: white;
@@ -66,7 +66,7 @@
     will-change: scroll-position;
     backface-visibility: hidden;
     
-    .turnover-form {
+    .faceoff-form {
       .form-section {
         margin-bottom: 0px;
         
@@ -313,7 +313,7 @@
   }
 }
 
-::ng-deep .turnover-form-modal-dialog {
+::ng-deep .faceoff-form-modal-dialog {
   max-width: none !important;
   .cdk-overlay-backdrop {
     background-color: rgba(0, 0, 0, 0.5) !important;
@@ -335,14 +335,14 @@
 }
 
 @media (max-width: 768px) {
-  .turnover-form-modal {
+  .faceoff-form-modal {
     max-width: 95vw;
     
     .modal-content {
       padding: 16px;
       max-height: 70vh;
       
-      .turnover-form {
+      .faceoff-form {
         .form-section {
           margin-bottom: 12px;
           
