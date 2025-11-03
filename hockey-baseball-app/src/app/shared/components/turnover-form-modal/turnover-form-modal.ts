@@ -1,7 +1,7 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { MatDialogRef, MatDialogModule } from '@angular/material/dialog';
+import { MatDialogRef, MatDialogModule, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -9,6 +9,17 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
 import { LocationSelectorComponent, PuckLocation } from '../location-selector/location-selector';
+
+interface PuckLocationWithCoords extends PuckLocation {
+  top?: number;
+  left?: number;
+}
+import { TeamService } from '../../../services/team.service';
+import { PlayerService } from '../../../services/player.service';
+import { GameMetadataService } from '../../../services/game-metadata.service';
+import { GameEventService, TurnoverEventRequest } from '../../../services/game-event.service';
+import { Team } from '../../interfaces/team.interface';
+import { Player } from '../../interfaces/player.interface';
 
 export interface TurnoverFormData {
   teamLogo: string;
@@ -38,36 +49,40 @@ export interface TurnoverFormData {
   templateUrl: './turnover-form-modal.html',
   styleUrl: './turnover-form-modal.scss'
 })
-export class TurnoverFormModalComponent {
+export class TurnoverFormModalComponent implements OnInit {
   private fb = inject(FormBuilder);
   private dialogRef = inject<MatDialogRef<TurnoverFormModalComponent>>(MatDialogRef);
+  private teamService = inject(TeamService);
+  private playerService = inject(PlayerService);
+  private gameMetadataService = inject(GameMetadataService);
+  private gameEventService = inject(GameEventService);
+  private dialogData = inject<{ gameId: number; turnoverEventId: number }>(MAT_DIALOG_DATA);
+
+  gameId: number;
+  turnoverEventId: number;
 
   turnoverForm: FormGroup;
   puckLocation: PuckLocation | null = null;
 
-  // Mock data for now - to be replaced with real data
-  teamOptions = [
-    { value: 'team1', label: 'BURLINGTON JR RAIDERS BLACK', logo: 'BRB' },
-    { value: 'team2', label: 'WATERLOO WOLVES', logo: 'WW' }
-  ];
-
-  // Mock players - will be populated based on selected team
-  playerOptions = [
-    { value: 'player1', label: 'Player 1' },
-    { value: 'player2', label: 'Player 2' },
-    { value: 'player3', label: 'Player 3' },
-    { value: 'player4', label: 'Player 4' }
-  ];
-
-  periodOptions = [
-    { value: '1', label: '1st Period' },
-    { value: '2', label: '2nd Period' },
-    { value: '3', label: '3rd Period' }
-  ];
+  // Data to be loaded from API
+  teamOptions: { value: number; label: string; logo?: string }[] = [];
+  playerOptions: { value: number; label: string }[] = [];
+  periodOptions: { value: number; label: string }[] = [];
+  
+  isLoadingTeams = false;
+  isLoadingPlayers = false;
+  isLoadingPeriods = false;
+  isSubmitting = false;
 
   constructor() {
     this.turnoverForm = this.createForm();
-    this.setDefaultValues();
+    this.gameId = this.dialogData.gameId;
+    this.turnoverEventId = this.dialogData.turnoverEventId;
+  }
+
+  ngOnInit(): void {
+    this.loadTeams();
+    this.loadPeriods();
   }
 
   private createForm(): FormGroup {
@@ -81,34 +96,75 @@ export class TurnoverFormModalComponent {
     });
   }
 
-  private setDefaultValues(): void {
-    // Set first available options as defaults
-    if (this.teamOptions.length > 0) {
-      this.turnoverForm.patchValue({
-        team: this.teamOptions[0].value
-      });
-    }
-    if (this.playerOptions.length > 0) {
-      this.turnoverForm.patchValue({
-        player: this.playerOptions[0].value
-      });
-    }
-    if (this.periodOptions.length > 0) {
-      this.turnoverForm.patchValue({
-        period: this.periodOptions[0].value
-      });
-    }
+  private loadTeams(): void {
+    this.isLoadingTeams = true;
+    this.teamService.getTeams().subscribe({
+      next: (response) => {
+        this.teamOptions = response.teams.map(team => ({
+          value: parseInt(team.id),
+          label: team.name,
+          logo: team.logo
+        }));
+        this.isLoadingTeams = false;
+        if (this.teamOptions.length > 0) {
+          this.turnoverForm.patchValue({ team: this.teamOptions[0].value });
+          this.loadPlayersForTeam(this.teamOptions[0].value);
+        }
+      },
+      error: (error) => {
+        console.error('Failed to load teams:', error);
+        this.isLoadingTeams = false;
+      }
+    });
   }
 
-  selectTeam(teamValue: string): void {
+  private loadPeriods(): void {
+    this.isLoadingPeriods = true;
+    this.gameMetadataService.getGamePeriods().subscribe({
+      next: (periods) => {
+        this.periodOptions = this.gameMetadataService.transformGamePeriodsToOptions(periods);
+        this.isLoadingPeriods = false;
+        if (this.periodOptions.length > 0) {
+          this.turnoverForm.patchValue({ period: this.periodOptions[0].value });
+        }
+      },
+      error: (error) => {
+        console.error('Failed to load periods:', error);
+        this.isLoadingPeriods = false;
+      }
+    });
+  }
+
+  private loadPlayersForTeam(teamId: number): void {
+    this.isLoadingPlayers = true;
+    this.playerService.getPlayersByTeam(teamId).subscribe({
+      next: (players) => {
+        this.playerOptions = players.map(player => ({
+          value: parseInt(player.id),
+          label: `${player.firstName} ${player.lastName}`
+        }));
+        this.isLoadingPlayers = false;
+        if (this.playerOptions.length > 0) {
+          this.turnoverForm.patchValue({ player: this.playerOptions[0].value });
+        } else {
+          this.turnoverForm.patchValue({ player: '' });
+        }
+      },
+      error: (error) => {
+        console.error('Failed to load players:', error);
+        this.isLoadingPlayers = false;
+      }
+    });
+  }
+
+  selectTeam(teamValue: number): void {
     this.turnoverForm.patchValue({ team: teamValue });
     this.turnoverForm.get('team')?.markAsTouched();
     // When team changes, update available players
-    // This will be implemented with real data later
-    console.log('Team changed:', teamValue);
+    this.loadPlayersForTeam(teamValue);
   }
 
-  selectPlayer(playerValue: string): void {
+  selectPlayer(playerValue: number): void {
     this.turnoverForm.patchValue({ player: playerValue });
     this.turnoverForm.get('player')?.markAsTouched();
   }
@@ -121,27 +177,56 @@ export class TurnoverFormModalComponent {
   }
 
   onSubmit(): void {
-    if (this.turnoverForm.valid) {
+    if (this.turnoverForm.valid && !this.isSubmitting) {
+      this.isSubmitting = true;
       const formValue = this.turnoverForm.value;
       
-      // Find selected team
-      const selectedTeam = this.teamOptions.find(t => t.value === formValue.team);
+      // Convert time from mm:ss to ISO duration format (PT__M__S)
+      const [minutes, seconds] = formValue.time.split(':').map((v: string) => parseInt(v, 10));
+      const isoTime = new Date();
+      isoTime.setHours(0, minutes, seconds, 0);
       
-      // Find selected player
-      const selectedPlayer = this.playerOptions.find(p => p.value === formValue.player);
-      
-      const turnoverData: TurnoverFormData = {
-        teamLogo: selectedTeam?.logo || '',
-        teamName: selectedTeam?.label || '',
-        playerNames: [selectedPlayer?.label || ''],
-        period: formValue.period,
-        time: formValue.time,
-        location: this.puckLocation || undefined,
-        youtubeLink: formValue.youtubeLink
+      const turnoverRequest: TurnoverEventRequest = {
+        game_id: this.gameId,
+        event_name_id: this.turnoverEventId,
+        team_id: formValue.team,
+        player_id: formValue.player,
+        period_id: formValue.period,
+        time: isoTime.toISOString(),
+        youtube_link: formValue.youtubeLink || undefined,
+        ice_top_offset: (this.puckLocation as PuckLocationWithCoords)?.top,
+        ice_left_offset: (this.puckLocation as PuckLocationWithCoords)?.left,
+        zone: this.puckLocation?.zone
       };
 
-      this.dialogRef.close(turnoverData);
-    } else {
+      this.gameEventService.createTurnoverEvent(turnoverRequest).subscribe({
+        next: (response) => {
+          console.log('Turnover event created:', response);
+          
+          // Find selected team and player for display
+          const selectedTeam = this.teamOptions.find(t => t.value === formValue.team);
+          const selectedPlayer = this.playerOptions.find(p => p.value === formValue.player);
+          
+          const turnoverData: TurnoverFormData = {
+            teamLogo: selectedTeam?.logo || '',
+            teamName: selectedTeam?.label || '',
+            playerNames: [selectedPlayer?.label || ''],
+            period: formValue.period.toString(),
+            time: formValue.time,
+            location: this.puckLocation || undefined,
+            youtubeLink: formValue.youtubeLink
+          };
+          
+          this.isSubmitting = false;
+          this.dialogRef.close(turnoverData);
+        },
+        error: (error) => {
+          console.error('Failed to create turnover event:', error);
+          this.isSubmitting = false;
+          // Optionally show error message to user
+        }
+      });
+    } else if (!this.turnoverForm.valid) {
       // Mark all fields as touched to show validation errors
       Object.keys(this.turnoverForm.controls).forEach(key => {
         this.turnoverForm.get(key)?.markAsTouched();

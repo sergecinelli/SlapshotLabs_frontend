@@ -66,6 +66,11 @@ interface GameEvent {
 })
 export class LiveDashboardComponent {
   private dialog = inject(MatDialog);
+  
+  // TODO: Replace with actual game ID from route or service
+  gameId = 1; // This should come from the route or be fetched from the API
+  turnoverEventId = 1; // This should be the ID for "Turnover" event type from game-event-name API
+  
   // Mock tournament data
   tournamentName = signal('LITE5');
   tournamentType = signal('U11B3');
@@ -377,7 +382,11 @@ export class LiveDashboardComponent {
       width: '800px',
       panelClass: 'turnover-form-modal-dialog',
       disableClose: false,
-      autoFocus: true
+      autoFocus: true,
+      data: {
+        gameId: this.gameId,
+        turnoverEventId: this.turnoverEventId
+      }
     });
 
     dialogRef.afterClosed().subscribe(result => {

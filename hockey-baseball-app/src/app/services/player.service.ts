@@ -29,6 +29,21 @@ export class PlayerService {
     );
   }
 
+  getPlayersByTeam(teamId: number): Observable<Player[]> {
+    return this.apiService.get<PlayerApiOutData[]>('/hockey/player/list').pipe(
+      map(apiPlayers => {
+        // Filter by team_id and convert to frontend format
+        return apiPlayers
+          .filter(apiPlayer => apiPlayer.team_id === teamId)
+          .map(apiPlayer => this.fromApiOutFormat({ photo: '', data: apiPlayer }));
+      }),
+      catchError(error => {
+        console.error(`Failed to fetch players for team ${teamId}:`, error);
+        return throwError(() => error);
+      })
+    );
+  }
+
   getPlayerById(id: string): Observable<Player | undefined> {
     // Convert string ID to number for API call
     const numericId = parseInt(id, 10);

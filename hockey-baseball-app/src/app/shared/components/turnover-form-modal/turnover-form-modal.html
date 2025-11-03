@@ -16,7 +16,8 @@
         
         <div class="team-selection-container">
           <label class="team-selection-label uppercase text-custom-secondary">Team that turned the puck over</label>
-          <div class="team-buttons">
+          <div *ngIf="isLoadingTeams" class="loading-message">Loading teams...</div>
+          <div class="team-buttons" *ngIf="!isLoadingTeams">
             <button 
               *ngFor="let team of teamOptions" 
               type="button"
@@ -36,7 +37,8 @@
 
         <div class="player-selection-container">
           <label class="player-selection-label uppercase text-custom-secondary">Player that turned the puck over</label>
-          <div class="player-buttons">
+          <div *ngIf="isLoadingPlayers" class="loading-message">Loading players...</div>
+          <div class="player-buttons" *ngIf="!isLoadingPlayers">
             <button 
               *ngFor="let player of playerOptions" 
               type="button"
@@ -108,12 +110,12 @@
   </mat-dialog-content>
 
   <mat-dialog-actions class="modal-actions">
-    <button mat-stroked-button (click)="onCancel()" class="cancel-btn">
+    <button mat-stroked-button (click)="onCancel()" class="cancel-btn" [disabled]="isSubmitting">
       Cancel
     </button>
-    <button mat-raised-button color="primary" (click)="onSubmit()" class="submit-btn" [disabled]="turnoverForm.invalid">
+    <button mat-raised-button color="primary" (click)="onSubmit()" class="submit-btn" [disabled]="turnoverForm.invalid || isSubmitting">
       <mat-icon>save</mat-icon>
-      Add Turnover
+      {{ isSubmitting ? 'Saving...' : 'Add Turnover' }}
     </button>
   </mat-dialog-actions>
 </div>

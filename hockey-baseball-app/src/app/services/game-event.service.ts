@@ -1,0 +1,91 @@
+import { Injectable, inject } from '@angular/core';
+import { Observable, throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+import { ApiService } from './api.service';
+
+export interface GameEventRequest {
+  game_id: number;
+  event_name_id: number;
+  time: string;
+  period_id: number;
+  team_id: number;
+  player_id?: number;
+  player_2_id?: number;
+  goalie_id?: number;
+  shot_type_id?: number;
+  is_scoring_chance?: boolean;
+  ice_top_offset?: number;
+  ice_left_offset?: number;
+  net_top_offset?: number;
+  net_left_offset?: number;
+  goal_type?: string;
+  zone?: string;
+  note?: string;
+  is_faceoff_won?: boolean;
+  time_length?: string;
+  youtube_link?: string;
+}
+
+export interface TurnoverEventRequest {
+  game_id: number;
+  event_name_id: number;
+  team_id: number;
+  player_id: number;
+  period_id: number;
+  time: string;
+  youtube_link?: string;
+  ice_top_offset?: number;
+  ice_left_offset?: number;
+  zone?: string;
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class GameEventService {
+  private apiService = inject(ApiService);
+
+  /**
+   * Create a new game event
+   */
+  createGameEvent(eventData: GameEventRequest): Observable<any> {
+    return this.apiService.post<any>('/hockey/game-event', eventData).pipe(
+      catchError(error => {
+        console.error('Failed to create game event:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  /**
+   * Update an existing game event
+   */
+  updateGameEvent(eventId: number, eventData: Partial<GameEventRequest>): Observable<any> {
+    return this.apiService.patch<any>(`/hockey/game-event/${eventId}`, eventData).pipe(
+      catchError(error => {
+        console.error('Failed to update game event:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  /**
+   * Create a turnover event with only required fields
+   */
+  createTurnoverEvent(turnoverData: TurnoverEventRequest): Observable<any> {
+    const eventData: GameEventRequest = {
+      game_id: turnoverData.game_id,
+      event_name_id: turnoverData.event_name_id,
+      team_id: turnoverData.team_id,
+      player_id: turnoverData.player_id,
+      period_id: turnoverData.period_id,
+      time: turnoverData.time,
+      youtube_link: turnoverData.youtube_link,
+      ice_top_offset: turnoverData.ice_top_offset,
+      ice_left_offset: turnoverData.ice_left_offset,
+      zone: turnoverData.zone
+    };
+
+    return this.createGameEvent(eventData);
+  }
+}
