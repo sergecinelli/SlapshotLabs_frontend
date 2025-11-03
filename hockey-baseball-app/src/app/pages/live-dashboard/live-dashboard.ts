@@ -9,6 +9,7 @@ import { ActionButtonComponent } from '../../shared/components/action-button/act
 import { TurnoverFormModalComponent } from '../../shared/components/turnover-form-modal/turnover-form-modal';
 import { ShotFormModalComponent } from '../../shared/components/shot-form-modal/shot-form-modal';
 import { FaceoffFormModalComponent } from '../../shared/components/faceoff-form-modal/faceoff-form-modal';
+import { GoalieChangeFormModalComponent } from '../../shared/components/goalie-change-form-modal/goalie-change-form-modal';
 interface Team {
   name: string;
   logo: string;
@@ -405,7 +406,20 @@ export class LiveDashboardComponent {
   }
 
   onGoalieChange(): void {
-    console.log('Goalie Change button clicked - modal will open here');
+    const dialogRef = this.dialog.open(GoalieChangeFormModalComponent, {
+      width: '800px',
+      panelClass: 'goalie-change-form-modal-dialog',
+      disableClose: false,
+      autoFocus: true
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        console.log('Goalie change data:', result);
+        // Here you can handle the goalie change data
+        // For example, add it to game events
+      }
+    });
   }
 
   onPenalty(): void {

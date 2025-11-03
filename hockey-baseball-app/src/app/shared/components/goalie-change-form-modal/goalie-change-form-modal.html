@@ -1,0 +1,121 @@
+<div class="goalie-change-form-modal">
+  <h2 mat-dialog-title class="modal-title">
+    <mat-icon class="title-icon">sports</mat-icon>
+    Goalie Change
+  </h2>
+
+  <mat-dialog-content class="modal-content">
+    <form [formGroup]="goalieChangeForm" class="goalie-change-form">
+      
+      <!-- Team Selection Section -->
+      <div class="form-section">
+        <div class="section-header">
+          <span class="section-title">Select the Team that Changed their Goalie</span>
+        </div>
+        <mat-divider class="section-divider"></mat-divider>
+        
+        <div class="team-selection-container">
+          <div class="team-buttons">
+            <button 
+              *ngFor="let team of teamOptions" 
+              type="button"
+              class="team-button"
+              [class.selected]="goalieChangeForm.get('team')?.value === team.value"
+              (click)="selectTeam(team.value)">
+              <div class="team-avatar">
+                <span class="avatar-text">{{ team.logo }}</span>
+              </div>
+              <div class="team-name">{{ team.label }}</div>
+            </button>
+          </div>
+          <div *ngIf="goalieChangeForm.get('team')?.errors && goalieChangeForm.get('team')?.touched" class="team-error">
+            {{ getErrorMessage('team') }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Goalie Selection Section -->
+      <div class="form-section">
+        <div class="section-header">
+          <span class="section-title">Select Goalie</span>
+        </div>
+        <mat-divider class="section-divider"></mat-divider>
+        
+        <div class="goalie-selection-container">
+          <div class="goalie-buttons">
+            <button 
+              *ngFor="let goalie of goalieOptions" 
+              type="button"
+              class="goalie-button"
+              [class.selected]="goalieChangeForm.get('goalie')?.value === goalie.value"
+              (click)="selectGoalie(goalie.value)">
+              <div class="goalie-name">{{ goalie.label }}</div>
+            </button>
+          </div>
+          <div *ngIf="goalieChangeForm.get('goalie')?.errors && goalieChangeForm.get('goalie')?.touched" class="goalie-error">
+            {{ getErrorMessage('goalie') }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Period and Time Section -->
+      <div class="form-section">
+        <div class="section-header">
+          <span class="section-title">Game Details</span>
+        </div>
+        <mat-divider class="section-divider"></mat-divider>
+        
+        <div class="form-row">
+          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+            <mat-label class="uppercase text-custom-secondary">Period</mat-label>
+            <mat-select formControlName="period" placeholder="Select period">
+              <mat-option *ngFor="let period of periodOptions" [value]="period.value">
+                {{ period.label }}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="goalieChangeForm.get('period')?.errors && goalieChangeForm.get('period')?.touched">
+              {{ getErrorMessage('period') }}
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+            <mat-label class="uppercase text-custom-secondary">Time</mat-label>
+            <input matInput formControlName="time" placeholder="mm:ss" maxlength="5">
+            <mat-error *ngIf="goalieChangeForm.get('time')?.errors && goalieChangeForm.get('time')?.touched">
+              {{ getErrorMessage('time') }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Note Section -->
+      <div class="form-section">
+        <div class="section-header">
+          <span class="section-title">Note</span>
+        </div>
+        <mat-divider class="section-divider"></mat-divider>
+        
+        <div class="form-row">
+          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field full-width">
+            <mat-label class="uppercase text-custom-secondary">Note</mat-label>
+            <textarea matInput formControlName="note" placeholder="Describe why the goalie was pulled" rows="3"></textarea>
+            <mat-error *ngIf="goalieChangeForm.get('note')?.errors && goalieChangeForm.get('note')?.touched">
+              {{ getErrorMessage('note') }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+      </div>
+
+    </form>
+  </mat-dialog-content>
+
+  <mat-dialog-actions class="modal-actions">
+    <button mat-stroked-button (click)="onCancel()" class="cancel-btn">
+      Cancel
+    </button>
+    <button mat-raised-button color="primary" (click)="onSubmit()" class="submit-btn" [disabled]="goalieChangeForm.invalid">
+      <mat-icon>save</mat-icon>
+      Add Goalie Change
+    </button>
+  </mat-dialog-actions>
+</div>
