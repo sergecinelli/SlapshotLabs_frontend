@@ -9,6 +9,11 @@ export interface PuckLocation {
   zone: 'defending' | 'neutral' | 'attacking';
 }
 
+export interface Team {
+  name: string;
+  logo?: string;
+}
+
 @Component({
   selector: 'app-location-selector',
   standalone: true,
@@ -26,6 +31,8 @@ export interface PuckLocation {
 export class LocationSelectorComponent implements ControlValueAccessor {
   @Input() showTitle = true;
   @Input() showDivider = true;
+  @Input() team1?: Team;
+  @Input() team2?: Team;
   @Output() locationChange = new EventEmitter<PuckLocation | null>();
 
   puckLocation: PuckLocation | null = null;

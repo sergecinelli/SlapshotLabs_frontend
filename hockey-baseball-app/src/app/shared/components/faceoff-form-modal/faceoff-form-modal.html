@@ -25,7 +25,7 @@
               [class.selected]="faceoffForm.get('winnerTeam')?.value === team.value"
               (click)="selectWinnerTeam(team.value)">
               <div class="team-avatar">
-                <span class="avatar-text">{{ team.logo }}</span>
+                <img *ngIf="team.value" [src]="getTeamLogoUrl(team.value)" [alt]="team.label" class="team-logo-img" />
               </div>
               <div class="team-name">{{ team.label }}</div>
             </button>
@@ -72,7 +72,7 @@
               [class.selected]="faceoffForm.get('loserTeam')?.value === team.value"
               (click)="selectLoserTeam(team.value)">
               <div class="team-avatar">
-                <span class="avatar-text">{{ team.logo }}</span>
+                <img *ngIf="team.value" [src]="getTeamLogoUrl(team.value)" [alt]="team.label" class="team-logo-img" />
               </div>
               <div class="team-name">{{ team.label }}</div>
             </button>
@@ -153,6 +153,8 @@
       <div class="form-section">
         <app-location-selector 
           formControlName="location"
+          [team1]="winnerTeamData"
+          [team2]="loserTeamData"
           (locationChange)="onLocationChange($event)">
         </app-location-selector>
         

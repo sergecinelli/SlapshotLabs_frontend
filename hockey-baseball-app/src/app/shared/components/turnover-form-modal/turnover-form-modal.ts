@@ -8,7 +8,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
-import { LocationSelectorComponent, PuckLocation } from '../location-selector/location-selector';
+import { LocationSelectorComponent, PuckLocation, Team } from '../location-selector/location-selector';
 
 interface PuckLocationWithCoords extends PuckLocation {
   top?: number;
@@ -18,6 +18,7 @@ import { TeamService } from '../../../services/team.service';
 import { PlayerService } from '../../../services/player.service';
 import { GameMetadataService } from '../../../services/game-metadata.service';
 import { GameEventService, TurnoverEventRequest } from '../../../services/game-event.service';
+import { environment } from '../../../../environments/environment';
 
 export interface TurnoverFormData {
   teamLogo: string;
@@ -259,5 +260,35 @@ export class TurnoverFormModalComponent implements OnInit {
       youtubeLink: 'YouTube Link'
     };
     return labels[fieldName] || fieldName;
+  }
+
+  get selectedTeamData(): Team | undefined {
+    const selectedTeamId = this.turnoverForm.get('team')?.value;
+    if (!selectedTeamId) return undefined;
+    
+    const team = this.teamOptions.find(t => t.value === selectedTeamId);
+    if (!team) return undefined;
+    
+    return {
+      name: team.label,
+      logo: `${environment.apiUrl}/hockey/team/${selectedTeamId}/logo`
+    };
+  }
+
+  get otherTeamData(): Team | undefined {
+    const selectedTeamId = this.turnoverForm.get('team')?.value;
+    if (!selectedTeamId) return undefined;
+    
+    const otherTeam = this.teamOptions.find(t => t.value !== selectedTeamId);
+    if (!otherTeam) return undefined;
+    
+    return {
+      name: otherTeam.label,
+      logo: `${environment.apiUrl}/hockey/team/${otherTeam.value}/logo`
+    };
+  }
+
+  getTeamLogoUrl(teamId: number): string {
+    return `${environment.apiUrl}/hockey/team/${teamId}/logo`;
   }
 }

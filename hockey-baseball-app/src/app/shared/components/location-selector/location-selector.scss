@@ -25,6 +25,43 @@
 
   .rink-container {
     width: 100%;
+    background: white;
+
+    .teams-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      gap: 16px;
+
+      .team {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 500;
+        color: var(--color-dark);
+
+        &.team-left {
+          flex-direction: row;
+        }
+
+        &.team-right {
+          flex-direction: row-reverse;
+        }
+
+        .team-logo {
+          width: 32px;
+          height: 32px;
+          object-fit: cover;
+          border-radius: 50%;
+          background-color: #f3f4f6;
+        }
+
+        .team-name {
+          font-size: 14px;
+        }
+      }
+    }
 
     .rink-wrapper {
       width: 100%;
@@ -33,6 +70,8 @@
       cursor: crosshair;
       border-radius: 8px;
       overflow: hidden;
+      background: white;
+      border: none !important;
 
       .hockey-rink-image {
         width: 100%;

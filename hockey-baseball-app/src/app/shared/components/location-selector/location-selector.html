@@ -5,6 +5,16 @@
   <mat-divider *ngIf="showDivider" class="section-divider"></mat-divider>
 
   <div class="rink-container">
+    <div *ngIf="team1 || team2" class="teams-header">
+      <div class="team team-left" *ngIf="team1">
+        <img *ngIf="team1.logo" [src]="team1.logo" [alt]="team1.name" class="team-logo" />
+        <span class="team-name">{{ team1.name }}</span>
+      </div>
+      <div class="team team-right" *ngIf="team2">
+        <span class="team-name">{{ team2.name }}</span>
+        <img *ngIf="team2.logo" [src]="team2.logo" [alt]="team2.name" class="team-logo" />
+      </div>
+    </div>
     <button type="button" class="rink-wrapper" (click)="onRinkClick($event)">
       <img src="/assets/images/hockey-rink.svg" alt="Hockey Rink" class="hockey-rink-image" />
       <div

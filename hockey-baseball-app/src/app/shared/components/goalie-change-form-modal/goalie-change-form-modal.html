@@ -23,7 +23,7 @@
               [class.selected]="goalieChangeForm.get('team')?.value === team.value"
               (click)="selectTeam(team.value)">
               <div class="team-avatar">
-                <span class="avatar-text">{{ team.logo }}</span>
+                <img *ngIf="team.value" [src]="getTeamLogoUrl(team.value)" [alt]="team.label" class="team-logo-img" />
               </div>
               <div class="team-name">{{ team.label }}</div>
             </button>

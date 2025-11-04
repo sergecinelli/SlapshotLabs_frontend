@@ -13,6 +13,7 @@ import { TeamService } from '../../../services/team.service';
 import { GoalieService } from '../../../services/goalie.service';
 import { GameMetadataService } from '../../../services/game-metadata.service';
 import { GameEventService, GoalieChangeEventRequest } from '../../../services/game-event.service';
+import { environment } from '../../../../environments/environment';
 
 export interface GoalieChangeFormData {
   teamLogo: string;
@@ -266,5 +267,9 @@ export class GoalieChangeFormModalComponent implements OnInit {
       note: 'Note'
     };
     return labels[fieldName] || fieldName;
+  }
+
+  getTeamLogoUrl(teamId: number): string {
+    return `${environment.apiUrl}/hockey/team/${teamId}/logo`;
   }
 }

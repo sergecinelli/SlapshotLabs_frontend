@@ -8,12 +8,13 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
-import { LocationSelectorComponent, PuckLocation } from '../location-selector/location-selector';
+import { LocationSelectorComponent, PuckLocation, Team } from '../location-selector/location-selector';
 
 import { TeamService } from '../../../services/team.service';
 import { PlayerService } from '../../../services/player.service';
 import { GameMetadataService } from '../../../services/game-metadata.service';
 import { GameEventService, FaceoffEventRequest } from '../../../services/game-event.service';
+import { environment } from '../../../../environments/environment';
 
 export interface FaceoffFormData {
   winnerTeamLogo: string;
@@ -358,5 +359,35 @@ export class FaceoffFormModalComponent implements OnInit {
       youtubeLink: 'YouTube Link'
     };
     return labels[fieldName] || fieldName;
+  }
+
+  get winnerTeamData(): Team | undefined {
+    const winnerTeamId = this.faceoffForm.get('winnerTeam')?.value;
+    if (!winnerTeamId) return undefined;
+    
+    const team = this.teamOptions.find(t => t.value === winnerTeamId);
+    if (!team) return undefined;
+    
+    return {
+      name: team.label,
+      logo: `${environment.apiUrl}/hockey/team/${winnerTeamId}/logo`
+    };
+  }
+
+  get loserTeamData(): Team | undefined {
+    const loserTeamId = this.faceoffForm.get('loserTeam')?.value;
+    if (!loserTeamId) return undefined;
+    
+    const team = this.teamOptions.find(t => t.value === loserTeamId);
+    if (!team) return undefined;
+    
+    return {
+      name: team.label,
+      logo: `${environment.apiUrl}/hockey/team/${loserTeamId}/logo`
+    };
+  }
+
+  getTeamLogoUrl(teamId: number): string {
+    return `${environment.apiUrl}/hockey/team/${teamId}/logo`;
   }
 }
