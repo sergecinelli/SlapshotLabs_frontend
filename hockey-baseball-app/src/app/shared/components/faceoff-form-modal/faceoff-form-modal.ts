@@ -54,7 +54,13 @@ export class FaceoffFormModalComponent implements OnInit {
   private playerService = inject(PlayerService);
   private gameMetadataService = inject(GameMetadataService);
   private gameEventService = inject(GameEventService);
-  private dialogData = inject<{ gameId: number; faceoffEventId: number }>(MAT_DIALOG_DATA);
+  private dialogData = inject<{ 
+    gameId: number; 
+    faceoffEventId: number; 
+    periodOptions?: { value: number; label: string }[]; 
+    teamOptions?: { value: number; label: string; logo?: string }[];
+    playerOptions?: { value: number; label: string; teamId: number }[];
+  }>(MAT_DIALOG_DATA);
 
   gameId: number;
   faceoffEventId: number;
@@ -83,8 +89,37 @@ export class FaceoffFormModalComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.loadTeams();
-    this.loadPeriods();
+    // Use teams from dialog data if available, otherwise fetch from API
+    if (this.dialogData.teamOptions && this.dialogData.teamOptions.length > 0) {
+      this.teamOptions = this.dialogData.teamOptions;
+      if (this.teamOptions.length > 1) {
+        this.faceoffForm.patchValue({
+          winnerTeam: this.teamOptions[0].value,
+          loserTeam: this.teamOptions[1].value
+        });
+        
+        // If playerOptions are provided, filter for each team
+        if (this.dialogData.playerOptions && this.dialogData.playerOptions.length > 0) {
+          this.filterPlayersForTeam(this.teamOptions[0].value, 'winner');
+          this.filterPlayersForTeam(this.teamOptions[1].value, 'loser');
+        } else {
+          this.loadPlayersForTeam(this.teamOptions[0].value, 'winner');
+          this.loadPlayersForTeam(this.teamOptions[1].value, 'loser');
+        }
+      }
+    } else {
+      this.loadTeams();
+    }
+    
+    // Use periods from dialog data if available, otherwise fetch from API
+    if (this.dialogData.periodOptions && this.dialogData.periodOptions.length > 0) {
+      this.periodOptions = this.dialogData.periodOptions;
+      if (this.periodOptions.length > 0) {
+        this.faceoffForm.patchValue({ period: this.periodOptions[0].value });
+      }
+    } else {
+      this.loadPeriods();
+    }
   }
 
   private createForm(): FormGroup {
@@ -144,6 +179,39 @@ export class FaceoffFormModalComponent implements OnInit {
         this.isLoadingPeriods = false;
       }
     });
+  }
+
+  /**
+   * Filter players from pre-loaded player options based on team
+   */
+  private filterPlayersForTeam(teamId: number, teamType: 'winner' | 'loser'): void {
+    if (this.dialogData.playerOptions) {
+      const filteredPlayers = this.dialogData.playerOptions
+        .filter(player => player.teamId === teamId)
+        .map(player => ({
+          value: player.value,
+          label: player.label
+        }));
+      
+      // Cache the filtered players
+      this.playersByTeam[teamId] = filteredPlayers;
+      
+      if (teamType === 'winner') {
+        this.winnerPlayerOptions = filteredPlayers;
+        if (this.winnerPlayerOptions.length > 0) {
+          this.faceoffForm.patchValue({ winnerPlayer: this.winnerPlayerOptions[0].value });
+        } else {
+          this.faceoffForm.patchValue({ winnerPlayer: '' });
+        }
+      } else {
+        this.loserPlayerOptions = filteredPlayers;
+        if (this.loserPlayerOptions.length > 0) {
+          this.faceoffForm.patchValue({ loserPlayer: this.loserPlayerOptions[0].value });
+        } else {
+          this.faceoffForm.patchValue({ loserPlayer: '' });
+        }
+      }
+    }
   }
 
   private loadPlayersForTeam(teamId: number, teamType: 'winner' | 'loser'): void {
@@ -211,15 +279,25 @@ export class FaceoffFormModalComponent implements OnInit {
   }
 
   private setupTeamChangeListeners(): void {
+    const usePreloadedPlayers = this.dialogData.playerOptions && this.dialogData.playerOptions.length > 0;
+    
     // When winner team changes, automatically set loser team to the opposite and update players
     this.faceoffForm.get('winnerTeam')?.valueChanges.subscribe(winnerTeam => {
       const loserTeam = this.teamOptions.find(t => t.value !== winnerTeam);
       if (loserTeam) {
         this.faceoffForm.patchValue({ loserTeam: loserTeam.value }, { emitEvent: false });
         // Manually update loser players since we disabled event emission
-        this.loadPlayersForTeam(loserTeam.value, 'loser');
+        if (usePreloadedPlayers) {
+          this.filterPlayersForTeam(loserTeam.value, 'loser');
+        } else {
+          this.loadPlayersForTeam(loserTeam.value, 'loser');
+        }
       }
-      this.loadPlayersForTeam(winnerTeam, 'winner');
+      if (usePreloadedPlayers) {
+        this.filterPlayersForTeam(winnerTeam, 'winner');
+      } else {
+        this.loadPlayersForTeam(winnerTeam, 'winner');
+      }
     });
 
     // When loser team changes, automatically set winner team to the opposite and update players
@@ -228,9 +306,17 @@ export class FaceoffFormModalComponent implements OnInit {
       if (winnerTeam) {
         this.faceoffForm.patchValue({ winnerTeam: winnerTeam.value }, { emitEvent: false });
         // Manually update winner players since we disabled event emission
-        this.loadPlayersForTeam(winnerTeam.value, 'winner');
+        if (usePreloadedPlayers) {
+          this.filterPlayersForTeam(winnerTeam.value, 'winner');
+        } else {
+          this.loadPlayersForTeam(winnerTeam.value, 'winner');
+        }
       }
-      this.loadPlayersForTeam(loserTeam, 'loser');
+      if (usePreloadedPlayers) {
+        this.filterPlayersForTeam(loserTeam, 'loser');
+      } else {
+        this.loadPlayersForTeam(loserTeam, 'loser');
+      }
     });
   }
 
@@ -253,6 +339,11 @@ export class FaceoffFormModalComponent implements OnInit {
   selectLoserPlayer(playerValue: number): void {
     this.faceoffForm.patchValue({ loserPlayer: playerValue });
     this.faceoffForm.get('loserPlayer')?.markAsTouched();
+  }
+
+  selectPeriod(periodValue: number): void {
+    this.faceoffForm.patchValue({ period: periodValue });
+    this.faceoffForm.get('period')?.markAsTouched();
   }
 
   onLocationChange(location: PuckLocation | null): void {

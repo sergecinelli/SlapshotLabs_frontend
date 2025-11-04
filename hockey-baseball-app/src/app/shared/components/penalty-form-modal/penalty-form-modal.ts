@@ -52,7 +52,13 @@ export class PenaltyFormModalComponent implements OnInit {
   private playerService = inject(PlayerService);
   private gameMetadataService = inject(GameMetadataService);
   private gameEventService = inject(GameEventService);
-  private dialogData = inject<{ gameId: number; penaltyEventId: number }>(MAT_DIALOG_DATA);
+  private dialogData = inject<{ 
+    gameId: number; 
+    penaltyEventId: number; 
+    periodOptions?: { value: number; label: string }[]; 
+    teamOptions?: { value: number; label: string; logo?: string }[];
+    playerOptions?: { value: number; label: string; teamId: number }[];
+  }>(MAT_DIALOG_DATA);
 
   gameId: number;
   penaltyEventId: number;
@@ -79,8 +85,32 @@ export class PenaltyFormModalComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.loadTeams();
-    this.loadPeriods();
+    // Use teams from dialog data if available, otherwise fetch from API
+    if (this.dialogData.teamOptions && this.dialogData.teamOptions.length > 0) {
+      this.teamOptions = this.dialogData.teamOptions;
+      if (this.teamOptions.length > 0) {
+        this.penaltyForm.patchValue({ team: this.teamOptions[0].value });
+        
+        // If playerOptions are provided, filter for selected team
+        if (this.dialogData.playerOptions && this.dialogData.playerOptions.length > 0) {
+          this.filterPlayersForTeam(this.teamOptions[0].value);
+        } else {
+          this.loadPlayersForTeam(this.teamOptions[0].value);
+        }
+      }
+    } else {
+      this.loadTeams();
+    }
+    
+    // Use periods from dialog data if available, otherwise fetch from API
+    if (this.dialogData.periodOptions && this.dialogData.periodOptions.length > 0) {
+      this.periodOptions = this.dialogData.periodOptions;
+      if (this.periodOptions.length > 0) {
+        this.penaltyForm.patchValue({ period: this.periodOptions[0].value });
+      }
+    } else {
+      this.loadPeriods();
+    }
   }
 
   private createForm(): FormGroup {
@@ -177,10 +207,40 @@ export class PenaltyFormModalComponent implements OnInit {
     });
   }
 
+  /**
+   * Filter players from pre-loaded player options based on team
+   */
+  private filterPlayersForTeam(teamId: number): void {
+    if (this.dialogData.playerOptions) {
+      const filteredPlayers = this.dialogData.playerOptions
+        .filter(player => player.teamId === teamId)
+        .map(player => ({
+          value: player.value,
+          label: player.label
+        }));
+      
+      // Cache the filtered players
+      this.playersByTeam[teamId] = filteredPlayers;
+      this.playerOptions = filteredPlayers;
+      
+      if (this.playerOptions.length > 0) {
+        this.penaltyForm.patchValue({ player: this.playerOptions[0].value });
+      } else {
+        this.penaltyForm.patchValue({ player: '' });
+      }
+    }
+  }
+
   private setupTeamChangeListener(): void {
+    const usePreloadedPlayers = this.dialogData.playerOptions && this.dialogData.playerOptions.length > 0;
+    
     // When team changes, update available players
     this.penaltyForm.get('team')?.valueChanges.subscribe(team => {
-      this.loadPlayersForTeam(team);
+      if (usePreloadedPlayers) {
+        this.filterPlayersForTeam(team);
+      } else {
+        this.loadPlayersForTeam(team);
+      }
     });
   }
 
@@ -192,6 +252,11 @@ export class PenaltyFormModalComponent implements OnInit {
   selectPlayer(playerValue: number): void {
     this.penaltyForm.patchValue({ player: playerValue });
     this.penaltyForm.get('player')?.markAsTouched();
+  }
+
+  selectPeriod(periodValue: number): void {
+    this.penaltyForm.patchValue({ period: periodValue });
+    this.penaltyForm.get('period')?.markAsTouched();
   }
 
   onLocationChange(location: PuckLocation | null): void {

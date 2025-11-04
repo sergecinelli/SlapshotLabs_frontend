@@ -188,6 +188,9 @@
               padding: 32px;
               cursor: pointer;
               transition: background-color 0.2s ease;
+              width: 100%;
+              background-color: transparent;
+              border: none;
               
               &:hover {
                 background-color: rgba(217, 28, 51, 0.05);

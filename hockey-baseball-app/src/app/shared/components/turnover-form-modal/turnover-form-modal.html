@@ -53,18 +53,25 @@
           </div>
         </div>
 
+        <div class="period-selection-container">
+          <div class="period-selection-label uppercase text-custom-secondary">Period</div>
+          <div *ngIf="isLoadingPeriods" class="loading-message">Loading periods...</div>
+          <div class="period-buttons" *ngIf="!isLoadingPeriods">
+            <button 
+              *ngFor="let period of periodOptions" 
+              type="button"
+              class="period-button"
+              [class.selected]="turnoverForm.get('period')?.value === period.value"
+              (click)="selectPeriod(period.value)">
+              <div class="period-name">{{ period.label }}</div>
+            </button>
+          </div>
+          <div *ngIf="turnoverForm.get('period')?.errors && turnoverForm.get('period')?.touched" class="period-error">
+            {{ getErrorMessage('period') }}
+          </div>
+        </div>
+
         <div class="form-row">
-          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
-            <mat-label class="uppercase text-custom-secondary">Period</mat-label>
-            <mat-select formControlName="period" placeholder="Select period">
-              <mat-option *ngFor="let period of periodOptions" [value]="period.value">
-                {{ period.label }}
-              </mat-option>
-            </mat-select>
-            <mat-error *ngIf="turnoverForm.get('period')?.errors && turnoverForm.get('period')?.touched">
-              {{ getErrorMessage('period') }}
-            </mat-error>
-          </mat-form-field>
 
           <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
             <mat-label class="uppercase text-custom-secondary">Time</mat-label>

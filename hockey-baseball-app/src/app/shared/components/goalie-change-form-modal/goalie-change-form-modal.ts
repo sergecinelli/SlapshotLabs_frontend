@@ -48,7 +48,13 @@ export class GoalieChangeFormModalComponent implements OnInit {
   private goalieService = inject(GoalieService);
   private gameMetadataService = inject(GameMetadataService);
   private gameEventService = inject(GameEventService);
-  private dialogData = inject<{ gameId: number; goalieChangeEventId: number }>(MAT_DIALOG_DATA);
+  private dialogData = inject<{ 
+    gameId: number; 
+    goalieChangeEventId: number; 
+    periodOptions?: { value: number; label: string }[]; 
+    teamOptions?: { value: number; label: string; logo?: string }[];
+    goalieOptions?: { value: number; label: string; teamId: number }[];
+  }>(MAT_DIALOG_DATA);
 
   gameId: number;
   goalieChangeEventId: number;
@@ -74,8 +80,32 @@ export class GoalieChangeFormModalComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.loadTeams();
-    this.loadPeriods();
+    // Use teams from dialog data if available, otherwise fetch from API
+    if (this.dialogData.teamOptions && this.dialogData.teamOptions.length > 0) {
+      this.teamOptions = this.dialogData.teamOptions;
+      if (this.teamOptions.length > 0) {
+        this.goalieChangeForm.patchValue({ team: this.teamOptions[0].value });
+        
+        // If goalieOptions are provided, filter for selected team
+        if (this.dialogData.goalieOptions && this.dialogData.goalieOptions.length > 0) {
+          this.filterGoaliesForTeam(this.teamOptions[0].value);
+        } else {
+          this.loadGoaliesForTeam(this.teamOptions[0].value);
+        }
+      }
+    } else {
+      this.loadTeams();
+    }
+    
+    // Use periods from dialog data if available, otherwise fetch from API
+    if (this.dialogData.periodOptions && this.dialogData.periodOptions.length > 0) {
+      this.periodOptions = this.dialogData.periodOptions;
+      if (this.periodOptions.length > 0) {
+        this.goalieChangeForm.patchValue({ period: this.periodOptions[0].value });
+      }
+    } else {
+      this.loadPeriods();
+    }
   }
 
   private createForm(): FormGroup {
@@ -170,10 +200,40 @@ export class GoalieChangeFormModalComponent implements OnInit {
     });
   }
 
+  /**
+   * Filter goalies from pre-loaded goalie options based on team
+   */
+  private filterGoaliesForTeam(teamId: number): void {
+    if (this.dialogData.goalieOptions) {
+      const filteredGoalies = this.dialogData.goalieOptions
+        .filter(goalie => goalie.teamId === teamId)
+        .map(goalie => ({
+          value: goalie.value,
+          label: goalie.label
+        }));
+      
+      // Cache the filtered goalies
+      this.goaliesByTeam[teamId] = filteredGoalies;
+      this.goalieOptions = filteredGoalies;
+      
+      if (this.goalieOptions.length > 0) {
+        this.goalieChangeForm.patchValue({ goalie: this.goalieOptions[0].value });
+      } else {
+        this.goalieChangeForm.patchValue({ goalie: '' });
+      }
+    }
+  }
+
   private setupTeamChangeListener(): void {
+    const usePreloadedGoalies = this.dialogData.goalieOptions && this.dialogData.goalieOptions.length > 0;
+    
     // When team changes, update available goalies
     this.goalieChangeForm.get('team')?.valueChanges.subscribe(team => {
-      this.loadGoaliesForTeam(team);
+      if (usePreloadedGoalies) {
+        this.filterGoaliesForTeam(team);
+      } else {
+        this.loadGoaliesForTeam(team);
+      }
     });
   }
 
@@ -185,6 +245,11 @@ export class GoalieChangeFormModalComponent implements OnInit {
   selectGoalie(goalieValue: number): void {
     this.goalieChangeForm.patchValue({ goalie: goalieValue });
     this.goalieChangeForm.get('goalie')?.markAsTouched();
+  }
+
+  selectPeriod(periodValue: number): void {
+    this.goalieChangeForm.patchValue({ period: periodValue });
+    this.goalieChangeForm.get('period')?.markAsTouched();
   }
 
   onSubmit(): void {

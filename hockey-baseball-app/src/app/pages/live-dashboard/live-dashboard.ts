@@ -1,4 +1,4 @@
-import { Component, signal, inject } from '@angular/core';
+import { Component, signal, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -11,6 +11,11 @@ import { ShotFormModalComponent } from '../../shared/components/shot-form-modal/
 import { FaceoffFormModalComponent } from '../../shared/components/faceoff-form-modal/faceoff-form-modal';
 import { GoalieChangeFormModalComponent } from '../../shared/components/goalie-change-form-modal/goalie-change-form-modal';
 import { PenaltyFormModalComponent } from '../../shared/components/penalty-form-modal/penalty-form-modal';
+import { GameMetadataService, GamePeriodResponse } from '../../services/game-metadata.service';
+import { TeamService } from '../../services/team.service';
+import { PlayerService } from '../../services/player.service';
+import { GoalieService } from '../../services/goalie.service';
+import { forkJoin } from 'rxjs';
 interface Team {
   name: string;
   logo: string;
@@ -64,8 +69,12 @@ interface GameEvent {
   templateUrl: './live-dashboard.html',
   styleUrl: './live-dashboard.scss'
 })
-export class LiveDashboardComponent {
+export class LiveDashboardComponent implements OnInit {
   private dialog = inject(MatDialog);
+  private gameMetadataService = inject(GameMetadataService);
+  private teamService = inject(TeamService);
+  private playerService = inject(PlayerService);
+  private goalieService = inject(GoalieService);
   
   // TODO: Replace with actual game ID from route or service
   gameId = 1; // This should come from the route or be fetched from the API
@@ -73,6 +82,24 @@ export class LiveDashboardComponent {
   faceoffEventId = 2; // This should be the ID for "Faceoff" event type from game-event-name API
   goalieChangeEventId = 3; // This should be the ID for "Goalie Change" event type from game-event-name API
   penaltyEventId = 4; // This should be the ID for "Penalty" event type from game-event-name API
+  
+  // TODO: Replace with actual team IDs from game data
+  homeTeamId = 1; // This should come from the game API
+  awayTeamId = 2; // This should come from the game API
+  
+  // Game periods fetched from API
+  gamePeriods: GamePeriodResponse[] = [];
+  periodOptions: { value: number; label: string }[] = [];
+  
+  // Teams fetched from API (only home and away)
+  teamOptions: { value: number; label: string; logo?: string }[] = [];
+  
+  // Players and goalies for both teams
+  playerOptions: { value: number; label: string; teamId: number }[] = [];
+  goalieOptions: { value: number; label: string; teamId: number }[] = [];
+  
+  // Loading state
+  isLoadingGameData = true;
   
   // Mock tournament data
   tournamentName = signal('LITE5');
@@ -156,6 +183,124 @@ export class LiveDashboardComponent {
       defZone: 0
     }
   });
+
+  ngOnInit(): void {
+    this.loadGameData();
+  }
+
+  /**
+   * Load all game data (periods, teams, players, goalies)
+   * First loads periods and teams, then loads players/goalies for the correct teams
+   */
+  private loadGameData(): void {
+    // First, load periods and teams in parallel
+    forkJoin({
+      periods: this.gameMetadataService.getGamePeriods(),
+      teams: this.teamService.getTeams()
+    }).subscribe({
+      next: ({ periods, teams }) => {
+        // Set periods
+        this.gamePeriods = periods;
+        this.periodOptions = this.gameMetadataService.transformGamePeriodsToOptions(periods);
+        
+        // Filter and set only home and away teams
+        const allTeams = teams.teams;
+        
+        let homeTeam = allTeams.find(t => parseInt(t.id) === this.homeTeamId);
+        let awayTeam = allTeams.find(t => parseInt(t.id) === this.awayTeamId);
+        
+        // If specific teams not found, use first 2 teams from the list
+        if (!homeTeam || !awayTeam) {
+          if (allTeams.length >= 2) {
+            homeTeam = allTeams[0];
+            awayTeam = allTeams[1];
+            // Update the IDs so player/goalie fetch works
+            this.homeTeamId = parseInt(homeTeam.id);
+            this.awayTeamId = parseInt(awayTeam.id);
+          } else if (allTeams.length === 1) {
+            homeTeam = allTeams[0];
+            awayTeam = allTeams[0]; // Use same team twice if only one exists
+            this.homeTeamId = parseInt(homeTeam.id);
+            this.awayTeamId = parseInt(homeTeam.id);
+          }
+        }
+        
+        this.teamOptions = [];
+        if (homeTeam) {
+          this.teamOptions.push({
+            value: parseInt(homeTeam.id),
+            label: homeTeam.name,
+            logo: homeTeam.logo
+          });
+        }
+        if (awayTeam && awayTeam.id !== homeTeam?.id) {
+          this.teamOptions.push({
+            value: parseInt(awayTeam.id),
+            label: awayTeam.name,
+            logo: awayTeam.logo
+          });
+        } else if (awayTeam && awayTeam.id === homeTeam?.id && allTeams.length > 1) {
+          // If away team is same as home, try to find a different one
+          const differentTeam = allTeams.find(t => t.id !== homeTeam?.id);
+          if (differentTeam) {
+            this.teamOptions.push({
+              value: parseInt(differentTeam.id),
+              label: differentTeam.name,
+              logo: differentTeam.logo
+            });
+          }
+        }
+        
+        // Now load players and goalies for the correct teams
+        forkJoin({
+          homeTeamPlayers: this.playerService.getPlayersByTeam(this.homeTeamId),
+          awayTeamPlayers: this.playerService.getPlayersByTeam(this.awayTeamId),
+          homeTeamGoalies: this.goalieService.getGoaliesByTeam(this.homeTeamId),
+          awayTeamGoalies: this.goalieService.getGoaliesByTeam(this.awayTeamId)
+        }).subscribe({
+          next: ({ homeTeamPlayers, awayTeamPlayers, homeTeamGoalies, awayTeamGoalies }) => {
+            // Set players from both teams
+            this.playerOptions = [
+              ...homeTeamPlayers.map(player => ({
+                value: parseInt(player.id),
+                label: `${player.firstName} ${player.lastName}`,
+                teamId: this.homeTeamId
+              })),
+              ...awayTeamPlayers.map(player => ({
+                value: parseInt(player.id),
+                label: `${player.firstName} ${player.lastName}`,
+                teamId: this.awayTeamId
+              }))
+            ];
+            
+            // Set goalies from both teams
+            this.goalieOptions = [
+              ...homeTeamGoalies.map(goalie => ({
+                value: parseInt(goalie.id),
+                label: `${goalie.firstName} ${goalie.lastName}`,
+                teamId: this.homeTeamId
+              })),
+              ...awayTeamGoalies.map(goalie => ({
+                value: parseInt(goalie.id),
+                label: `${goalie.firstName} ${goalie.lastName}`,
+                teamId: this.awayTeamId
+              }))
+            ];
+            
+            this.isLoadingGameData = false;
+          },
+          error: (error) => {
+            console.error('Failed to load players/goalies:', error);
+            this.isLoadingGameData = false;
+          }
+        });
+      },
+      error: (error) => {
+        console.error('Failed to load game data:', error);
+        this.isLoadingGameData = false;
+      }
+    });
+  }
 
   // Mock game events
   gameEvents = signal<GameEvent[]>([
@@ -364,11 +509,21 @@ export class LiveDashboardComponent {
 
   // Event action button methods (placeholders for now)
   onShots(): void {
+    if (this.isLoadingGameData) {
+      return;
+    }
     const dialogRef = this.dialog.open(ShotFormModalComponent, {
       width: '800px',
       panelClass: 'shot-form-modal-dialog',
       disableClose: false,
-      autoFocus: true
+      autoFocus: true,
+      data: {
+        gameId: this.gameId,
+        periodOptions: this.periodOptions,
+        teamOptions: this.teamOptions,
+        playerOptions: this.playerOptions,
+        goalieOptions: this.goalieOptions
+      }
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -381,6 +536,9 @@ export class LiveDashboardComponent {
   }
 
   onTurnover(): void {
+    if (this.isLoadingGameData) {
+      return;
+    }
     const dialogRef = this.dialog.open(TurnoverFormModalComponent, {
       width: '800px',
       panelClass: 'turnover-form-modal-dialog',
@@ -388,7 +546,10 @@ export class LiveDashboardComponent {
       autoFocus: true,
       data: {
         gameId: this.gameId,
-        turnoverEventId: this.turnoverEventId
+        turnoverEventId: this.turnoverEventId,
+        periodOptions: this.periodOptions,
+        teamOptions: this.teamOptions,
+        playerOptions: this.playerOptions
       }
     });
 
@@ -402,6 +563,9 @@ export class LiveDashboardComponent {
   }
 
   onFaceoff(): void {
+    if (this.isLoadingGameData) {
+      return;
+    }
     const dialogRef = this.dialog.open(FaceoffFormModalComponent, {
       width: '800px',
       panelClass: 'faceoff-form-modal-dialog',
@@ -409,7 +573,10 @@ export class LiveDashboardComponent {
       autoFocus: true,
       data: {
         gameId: this.gameId,
-        faceoffEventId: this.faceoffEventId
+        faceoffEventId: this.faceoffEventId,
+        periodOptions: this.periodOptions,
+        teamOptions: this.teamOptions,
+        playerOptions: this.playerOptions
       }
     });
 
@@ -423,6 +590,9 @@ export class LiveDashboardComponent {
   }
 
   onGoalieChange(): void {
+    if (this.isLoadingGameData) {
+      return;
+    }
     const dialogRef = this.dialog.open(GoalieChangeFormModalComponent, {
       width: '800px',
       panelClass: 'goalie-change-form-modal-dialog',
@@ -430,7 +600,10 @@ export class LiveDashboardComponent {
       autoFocus: true,
       data: {
         gameId: this.gameId,
-        goalieChangeEventId: this.goalieChangeEventId
+        goalieChangeEventId: this.goalieChangeEventId,
+        periodOptions: this.periodOptions,
+        teamOptions: this.teamOptions,
+        goalieOptions: this.goalieOptions
       }
     });
 
@@ -444,6 +617,9 @@ export class LiveDashboardComponent {
   }
 
   onPenalty(): void {
+    if (this.isLoadingGameData) {
+      return;
+    }
     const dialogRef = this.dialog.open(PenaltyFormModalComponent, {
       width: '800px',
       panelClass: 'penalty-form-modal-dialog',
@@ -451,14 +627,16 @@ export class LiveDashboardComponent {
       autoFocus: true,
       data: {
         gameId: this.gameId,
-        penaltyEventId: this.penaltyEventId
+        penaltyEventId: this.penaltyEventId,
+        periodOptions: this.periodOptions,
+        teamOptions: this.teamOptions,
+        playerOptions: this.playerOptions
       }
     });
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         console.log('Penalty data:', result);
-        // Here you can handle the penalty data
         // For example, add it to game events
       }
     });

@@ -55,7 +55,13 @@ export class TurnoverFormModalComponent implements OnInit {
   private playerService = inject(PlayerService);
   private gameMetadataService = inject(GameMetadataService);
   private gameEventService = inject(GameEventService);
-  private dialogData = inject<{ gameId: number; turnoverEventId: number }>(MAT_DIALOG_DATA);
+  private dialogData = inject<{ 
+    gameId: number; 
+    turnoverEventId: number; 
+    periodOptions?: { value: number; label: string }[]; 
+    teamOptions?: { value: number; label: string; logo?: string }[];
+    playerOptions?: { value: number; label: string; teamId: number }[];
+  }>(MAT_DIALOG_DATA);
 
   gameId: number;
   turnoverEventId: number;
@@ -80,8 +86,32 @@ export class TurnoverFormModalComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.loadTeams();
-    this.loadPeriods();
+    // Use teams from dialog data if available, otherwise fetch from API
+    if (this.dialogData.teamOptions && this.dialogData.teamOptions.length > 0) {
+      this.teamOptions = this.dialogData.teamOptions;
+      if (this.teamOptions.length > 0) {
+        this.turnoverForm.patchValue({ team: this.teamOptions[0].value });
+        
+        // If playerOptions are provided, filter for selected team
+        if (this.dialogData.playerOptions && this.dialogData.playerOptions.length > 0) {
+          this.filterPlayersForTeam(this.teamOptions[0].value);
+        } else {
+          this.loadPlayersForTeam(this.teamOptions[0].value);
+        }
+      }
+    } else {
+      this.loadTeams();
+    }
+    
+    // Use periods from dialog data if available, otherwise fetch from API
+    if (this.dialogData.periodOptions && this.dialogData.periodOptions.length > 0) {
+      this.periodOptions = this.dialogData.periodOptions;
+      if (this.periodOptions.length > 0) {
+        this.turnoverForm.patchValue({ period: this.periodOptions[0].value });
+      }
+    } else {
+      this.loadPeriods();
+    }
   }
 
   private createForm(): FormGroup {
@@ -160,12 +190,41 @@ export class TurnoverFormModalComponent implements OnInit {
     this.turnoverForm.patchValue({ team: teamValue });
     this.turnoverForm.get('team')?.markAsTouched();
     // When team changes, update available players
-    this.loadPlayersForTeam(teamValue);
+    if (this.dialogData.playerOptions && this.dialogData.playerOptions.length > 0) {
+      this.filterPlayersForTeam(teamValue);
+    } else {
+      this.loadPlayersForTeam(teamValue);
+    }
+  }
+
+  /**
+   * Filter players from pre-loaded player options based on team
+   */
+  private filterPlayersForTeam(teamId: number): void {
+    if (this.dialogData.playerOptions) {
+      this.playerOptions = this.dialogData.playerOptions
+        .filter(player => player.teamId === teamId)
+        .map(player => ({
+          value: player.value,
+          label: player.label
+        }));
+      
+      if (this.playerOptions.length > 0) {
+        this.turnoverForm.patchValue({ player: this.playerOptions[0].value });
+      } else {
+        this.turnoverForm.patchValue({ player: '' });
+      }
+    }
   }
 
   selectPlayer(playerValue: number): void {
     this.turnoverForm.patchValue({ player: playerValue });
     this.turnoverForm.get('player')?.markAsTouched();
+  }
+
+  selectPeriod(periodValue: number): void {
+    this.turnoverForm.patchValue({ period: periodValue });
+    this.turnoverForm.get('period')?.markAsTouched();
   }
 
   onLocationChange(location: PuckLocation | null): void {

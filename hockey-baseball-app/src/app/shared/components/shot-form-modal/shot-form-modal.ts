@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { MatDialogRef, MatDialogModule } from '@angular/material/dialog';
+import { MatDialogRef, MatDialogModule, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -50,6 +50,13 @@ export interface ShotFormData {
 export class ShotFormModalComponent {
   private fb = inject(FormBuilder);
   private dialogRef = inject<MatDialogRef<ShotFormModalComponent>>(MatDialogRef);
+  private dialogData = inject<{ 
+    gameId?: number; 
+    periodOptions?: { value: number; label: string }[];
+    teamOptions?: { value: number; label: string; logo?: string }[];
+    playerOptions?: { value: number; label: string; teamId: number }[];
+    goalieOptions?: { value: number; label: string; teamId: number }[];
+  }>(MAT_DIALOG_DATA, { optional: true });
 
   shotForm: FormGroup;
 
@@ -71,7 +78,7 @@ export class ShotFormModalComponent {
     { value: 'goalie2', label: 'Goalie 2' }
   ];
 
-  periodOptions = [
+  periodOptions: { value: number | string; label: string }[] = [
     { value: '1', label: '1st Period' },
     { value: '2', label: '2nd Period' },
     { value: '3', label: '3rd Period' }
@@ -85,6 +92,36 @@ export class ShotFormModalComponent {
   ];
 
   constructor() {
+    // Use periods from dialog data if available
+    if (this.dialogData?.periodOptions && this.dialogData.periodOptions.length > 0) {
+      this.periodOptions = this.dialogData.periodOptions;
+    }
+    
+    // Use teams from dialog data if available
+    if (this.dialogData?.teamOptions && this.dialogData.teamOptions.length > 0) {
+      this.teamOptions = this.dialogData.teamOptions.map(team => ({
+        value: team.value.toString(),
+        label: team.label,
+        logo: team.logo || ''
+      }));
+    }
+    
+    // Use players from dialog data if available
+    if (this.dialogData?.playerOptions && this.dialogData.playerOptions.length > 0) {
+      this.playerOptions = this.dialogData.playerOptions.map(player => ({
+        value: player.value.toString(),
+        label: player.label
+      }));
+    }
+    
+    // Use goalies from dialog data if available
+    if (this.dialogData?.goalieOptions && this.dialogData.goalieOptions.length > 0) {
+      this.goalieOptions = this.dialogData.goalieOptions.map(goalie => ({
+        value: goalie.value.toString(),
+        label: goalie.label
+      }));
+    }
+    
     this.shotForm = this.createForm();
     this.setDefaultValues();
     this.setupConditionalValidation();
