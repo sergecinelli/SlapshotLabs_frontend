@@ -15,6 +15,12 @@ export interface GamePeriodResponse {
   description?: string;
 }
 
+export interface ShotTypeResponse {
+  id: number;
+  name: string;
+  description?: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -62,6 +68,28 @@ export class GameMetadataService {
     return gamePeriods.map(period => ({
       value: period.id,
       label: period.name
+    }));
+  }
+
+  /**
+   * Fetch all shot types from the API
+   */
+  getShotTypes(): Observable<ShotTypeResponse[]> {
+    return this.apiService.get<ShotTypeResponse[]>('/hockey/shot-type/list').pipe(
+      catchError(error => {
+        console.error('Failed to fetch shot types:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  /**
+   * Transform shot types to dropdown options
+   */
+  transformShotTypesToOptions(shotTypes: ShotTypeResponse[]): { value: number; label: string }[] {
+    return shotTypes.map(type => ({
+      value: type.id,
+      label: type.name
     }));
   }
 }

@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatDialogRef, MatDialogModule, MAT_DIALOG_DATA } from '@angular/material/dialog';
@@ -9,6 +9,8 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { GameEventService, ShotEventRequest } from '../../../services/game-event.service';
+import { environment } from '../../../../environments/environment';
 
 export interface ShotFormData {
   shotType: 'save' | 'goal' | 'missed' | 'blocked';
@@ -47,118 +49,96 @@ export interface ShotFormData {
   templateUrl: './shot-form-modal.html',
   styleUrl: './shot-form-modal.scss'
 })
-export class ShotFormModalComponent {
+export class ShotFormModalComponent implements OnInit {
   private fb = inject(FormBuilder);
   private dialogRef = inject<MatDialogRef<ShotFormModalComponent>>(MatDialogRef);
+  private gameEventService = inject(GameEventService);
   private dialogData = inject<{ 
-    gameId?: number; 
+    gameId: number;
+    shotEventId: number;
     periodOptions?: { value: number; label: string }[];
+    shotTypeOptions?: { value: number; label: string }[];
     teamOptions?: { value: number; label: string; logo?: string }[];
     playerOptions?: { value: number; label: string; teamId: number }[];
     goalieOptions?: { value: number; label: string; teamId: number }[];
-  }>(MAT_DIALOG_DATA, { optional: true });
+  }>(MAT_DIALOG_DATA);
+
+  gameId: number;
+  shotEventId: number;
 
   shotForm: FormGroup;
 
-  // Mock data - to be replaced with real data
-  teamOptions = [
-    { value: 'team1', label: 'BURLINGTON JR RAIDERS BLACK', logo: 'BRB' },
-    { value: 'team2', label: 'WATERLOO WOLVES', logo: 'WW' }
-  ];
-
-  playerOptions = [
-    { value: 'player1', label: 'Player 1' },
-    { value: 'player2', label: 'Player 2' },
-    { value: 'player3', label: 'Player 3' },
-    { value: 'player4', label: 'Player 4' }
-  ];
-
-  goalieOptions = [
-    { value: 'goalie1', label: 'Goalie 1' },
-    { value: 'goalie2', label: 'Goalie 2' }
-  ];
-
-  periodOptions: { value: number | string; label: string }[] = [
-    { value: '1', label: '1st Period' },
-    { value: '2', label: '2nd Period' },
-    { value: '3', label: '3rd Period' }
-  ];
-
-  shotTypeOptions = [
-    { value: 'save', label: 'Save' },
-    { value: 'goal', label: 'Goal' },
-    { value: 'missed', label: 'Missed the net' },
-    { value: 'blocked', label: 'Blocked' }
-  ];
+  // Data arrays
+  teamOptions: { value: number; label: string; logo?: string }[] = [];
+  periodOptions: { value: number; label: string }[] = [];
+  shotTypeOptions: { value: number; label: string }[] = [];
+  
+  // Filtered options based on selected team
+  playerOptions: { value: number; label: string }[] = [];
+  goalieOptions: { value: number; label: string }[] = [];
+  
+  // Loading states
+  isSubmitting = false;
 
   constructor() {
-    // Use periods from dialog data if available
-    if (this.dialogData?.periodOptions && this.dialogData.periodOptions.length > 0) {
+    this.shotForm = this.createForm();
+    this.gameId = this.dialogData.gameId;
+    this.shotEventId = this.dialogData.shotEventId;
+    this.setupConditionalValidation();
+  }
+
+  ngOnInit(): void {
+    // Load data from dialog
+    if (this.dialogData.periodOptions) {
       this.periodOptions = this.dialogData.periodOptions;
     }
     
-    // Use teams from dialog data if available
-    if (this.dialogData?.teamOptions && this.dialogData.teamOptions.length > 0) {
-      this.teamOptions = this.dialogData.teamOptions.map(team => ({
-        value: team.value.toString(),
-        label: team.label,
-        logo: team.logo || ''
-      }));
+    if (this.dialogData.shotTypeOptions) {
+      this.shotTypeOptions = this.dialogData.shotTypeOptions;
     }
     
-    // Use players from dialog data if available
-    if (this.dialogData?.playerOptions && this.dialogData.playerOptions.length > 0) {
-      this.playerOptions = this.dialogData.playerOptions.map(player => ({
-        value: player.value.toString(),
-        label: player.label
-      }));
+    if (this.dialogData.teamOptions) {
+      this.teamOptions = this.dialogData.teamOptions;
     }
     
-    // Use goalies from dialog data if available
-    if (this.dialogData?.goalieOptions && this.dialogData.goalieOptions.length > 0) {
-      this.goalieOptions = this.dialogData.goalieOptions.map(goalie => ({
-        value: goalie.value.toString(),
-        label: goalie.label
-      }));
+    // Set defaults
+    if (this.shotTypeOptions.length > 0) {
+      this.shotForm.patchValue({ shotType: this.shotTypeOptions[0].value });
     }
     
-    this.shotForm = this.createForm();
-    this.setDefaultValues();
-    this.setupConditionalValidation();
+    if (this.periodOptions.length > 0) {
+      this.shotForm.patchValue({ period: this.periodOptions[0].value });
+    }
+    
+    if (this.teamOptions.length > 0) {
+      // Set first team for goal/non-goal scenarios
+      this.shotForm.patchValue({ 
+        scoringTeam: this.teamOptions[0].value,
+        shootingTeam: this.teamOptions[0].value
+      });
+      this.filterPlayersAndGoaliesForTeam(this.teamOptions[0].value);
+    }
   }
 
   private createForm(): FormGroup {
     return this.fb.group({
-      shotType: ['', Validators.required],
+      shotType: [null as number | null, Validators.required],
       isScoringChance: [false],
-      period: ['', Validators.required],
+      period: [null as number | null, Validators.required],
       time: ['', [Validators.required, Validators.pattern(/^([0-5]?[0-9]):([0-5][0-9])$/)]],
       youtubeLink: [''],
       // Goal fields
-      scoringTeam: [''],
-      scoringPlayer: [''],
-      assistPlayer: [''],
-      goalieScored: [''],
+      scoringTeam: [null as number | null],
+      scoringPlayer: [null as number | null],
+      assistPlayer: [null as number | null],
+      goalieScored: [null as number | null],
       // Save/Missed/Blocked fields
-      shootingTeam: [''],
-      shootingPlayer: [''],
-      goalieInNet: [''],
+      shootingTeam: [null as number | null],
+      shootingPlayer: [null as number | null],
+      goalieInNet: [null as number | null],
       // Scoring chance note
       scoringChanceNote: ['']
     });
-  }
-
-  private setDefaultValues(): void {
-    if (this.shotTypeOptions.length > 0) {
-      this.shotForm.patchValue({
-        shotType: this.shotTypeOptions[0].value
-      });
-    }
-    if (this.periodOptions.length > 0) {
-      this.shotForm.patchValue({
-        period: this.periodOptions[0].value
-      });
-    }
   }
 
   private setupConditionalValidation(): void {
@@ -171,7 +151,46 @@ export class ShotFormModalComponent {
     });
   }
 
-  private updateValidators(shotType: string): void {
+  private filterPlayersAndGoaliesForTeam(teamId: number): void {
+    if (this.dialogData.playerOptions) {
+      this.playerOptions = this.dialogData.playerOptions
+        .filter(p => p.teamId === teamId)
+        .map(p => ({ value: p.value, label: p.label }));
+    }
+    
+    if (this.dialogData.goalieOptions) {
+      this.goalieOptions = this.dialogData.goalieOptions
+        .filter(g => g.teamId === teamId)
+        .map(g => ({ value: g.value, label: g.label }));
+    }
+    
+    // Set defaults
+    if (this.playerOptions.length > 0) {
+      this.shotForm.patchValue({
+        scoringPlayer: this.playerOptions[0].value,
+        shootingPlayer: this.playerOptions[0].value
+      });
+    }
+    
+    if (this.goalieOptions.length > 0) {
+      // Find opposite team's goalie
+      const oppositeTeam = this.teamOptions.find(t => t.value !== teamId);
+      if (oppositeTeam && this.dialogData.goalieOptions) {
+        const oppositeGoalies = this.dialogData.goalieOptions
+          .filter(g => g.teamId === oppositeTeam.value)
+          .map(g => ({ value: g.value, label: g.label }));
+        
+        if (oppositeGoalies.length > 0) {
+          this.shotForm.patchValue({
+            goalieScored: oppositeGoalies[0].value,
+            goalieInNet: oppositeGoalies[0].value
+          });
+        }
+      }
+    }
+  }
+
+  private updateValidators(shotType: number | null): void {
     // Clear all conditional validators first
     this.shotForm.get('scoringTeam')?.clearValidators();
     this.shotForm.get('scoringPlayer')?.clearValidators();
@@ -181,13 +200,16 @@ export class ShotFormModalComponent {
     this.shotForm.get('shootingPlayer')?.clearValidators();
     this.shotForm.get('goalieInNet')?.clearValidators();
 
-    if (shotType === 'goal') {
+    // Check if shot type is Goal (id: 3 according to API)
+    const goalShotType = this.shotTypeOptions.find(st => st.label.toLowerCase() === 'goal');
+    
+    if (shotType === goalShotType?.value) {
       // Goal fields are required
       this.shotForm.get('scoringTeam')?.setValidators([Validators.required]);
       this.shotForm.get('scoringPlayer')?.setValidators([Validators.required]);
       this.shotForm.get('goalieScored')?.setValidators([Validators.required]);
       // Assist is optional
-    } else if (shotType === 'save' || shotType === 'missed' || shotType === 'blocked') {
+    } else if (shotType !== null) {
       // Save/Missed/Blocked fields are required
       this.shotForm.get('shootingTeam')?.setValidators([Validators.required]);
       this.shotForm.get('shootingPlayer')?.setValidators([Validators.required]);
@@ -211,12 +233,15 @@ export class ShotFormModalComponent {
   }
 
   get isGoal(): boolean {
-    return this.shotForm.get('shotType')?.value === 'goal';
+    const shotType = this.shotForm.get('shotType')?.value;
+    const goalShotType = this.shotTypeOptions.find(st => st.label.toLowerCase() === 'goal');
+    return shotType === goalShotType?.value;
   }
 
   get isNonGoal(): boolean {
     const shotType = this.shotForm.get('shotType')?.value;
-    return shotType === 'save' || shotType === 'missed' || shotType === 'blocked';
+    const goalShotType = this.shotTypeOptions.find(st => st.label.toLowerCase() === 'goal');
+    return shotType !== null && shotType !== goalShotType?.value;
   }
 
   get showScoringChance(): boolean {
@@ -227,59 +252,79 @@ export class ShotFormModalComponent {
     return this.shotForm.get('isScoringChance')?.value === true;
   }
 
-  selectShotType(shotType: string): void {
+  selectShotType(shotType: number): void {
     this.shotForm.patchValue({ shotType });
     this.shotForm.get('shotType')?.markAsTouched();
     // Reset scoring chance when switching to goal
-    if (shotType === 'goal') {
+    const goalShotType = this.shotTypeOptions.find(st => st.label.toLowerCase() === 'goal');
+    if (shotType === goalShotType?.value) {
       this.shotForm.patchValue({ isScoringChance: false });
     }
   }
 
-  selectTeam(teamValue: string, fieldName: string): void {
+  selectTeam(teamValue: number, fieldName: string): void {
     this.shotForm.patchValue({ [fieldName]: teamValue });
     this.shotForm.get(fieldName)?.markAsTouched();
+    // Filter players/goalies when team changes
+    this.filterPlayersAndGoaliesForTeam(teamValue);
   }
 
-  selectPlayer(playerValue: string, fieldName: string): void {
+  selectPeriod(periodValue: number): void {
+    this.shotForm.patchValue({ period: periodValue });
+    this.shotForm.get('period')?.markAsTouched();
+  }
+
+  selectPlayer(playerValue: number, fieldName: string): void {
     this.shotForm.patchValue({ [fieldName]: playerValue });
     this.shotForm.get(fieldName)?.markAsTouched();
   }
 
-  selectGoalie(goalieValue: string, fieldName: string): void {
+  selectGoalie(goalieValue: number, fieldName: string): void {
     this.shotForm.patchValue({ [fieldName]: goalieValue });
     this.shotForm.get(fieldName)?.markAsTouched();
   }
 
+  getTeamLogoUrl(teamId: number): string {
+    return `${environment.apiUrl}/hockey/team/${teamId}/logo`;
+  }
+
   onSubmit(): void {
-    if (this.shotForm.valid) {
+    if (this.shotForm.valid && !this.isSubmitting) {
+      this.isSubmitting = true;
       const formValue = this.shotForm.value;
       
-      const shotData: ShotFormData = {
-        shotType: formValue.shotType,
-        isScoringChance: formValue.isScoringChance,
-        period: formValue.period,
-        time: formValue.time,
-        youtubeLink: formValue.youtubeLink
+      // Convert time from mm:ss to ISO duration format
+      const [minutes, seconds] = formValue.time.split(':').map((v: string) => parseInt(v, 10));
+      const isoTime = new Date();
+      isoTime.setHours(0, minutes, seconds, 0);
+      
+      const shotRequest: ShotEventRequest = {
+        game_id: this.gameId,
+        event_name_id: this.shotEventId,
+        team_id: this.isGoal ? formValue.scoringTeam : formValue.shootingTeam,
+        player_id: this.isGoal ? formValue.scoringPlayer : formValue.shootingPlayer,
+        player_2_id: this.isGoal ? formValue.assistPlayer : undefined,
+        shot_type_id: formValue.shotType,
+        goalie_id: this.isGoal ? formValue.goalieScored : formValue.goalieInNet,
+        period_id: formValue.period,
+        time: isoTime.toISOString(),
+        youtube_link: formValue.youtubeLink || undefined,
+        is_scoring_chance: formValue.isScoringChance,
+        note: formValue.isScoringChance ? formValue.scoringChanceNote : undefined
       };
 
-      if (this.isGoal) {
-        shotData.scoringTeam = formValue.scoringTeam;
-        shotData.scoringPlayer = formValue.scoringPlayer;
-        shotData.assistPlayer = formValue.assistPlayer;
-        shotData.goalieScored = formValue.goalieScored;
-      } else {
-        shotData.shootingTeam = formValue.shootingTeam;
-        shotData.shootingPlayer = formValue.shootingPlayer;
-        shotData.goalieInNet = formValue.goalieInNet;
-      }
-
-      if (this.isScoringChance) {
-        shotData.scoringChanceNote = formValue.scoringChanceNote;
-      }
-
-      this.dialogRef.close(shotData);
-    } else {
+      this.gameEventService.createShotEvent(shotRequest).subscribe({
+        next: (response) => {
+          console.log('Shot event created:', response);
+          this.isSubmitting = false;
+          this.dialogRef.close(response);
+        },
+        error: (error) => {
+          console.error('Failed to create shot event:', error);
+          this.isSubmitting = false;
+        }
+      });
+    } else if (!this.shotForm.valid) {
       Object.keys(this.shotForm.controls).forEach(key => {
         this.shotForm.get(key)?.markAsTouched();
       });

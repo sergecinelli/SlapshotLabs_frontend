@@ -56,7 +56,7 @@
               [class.selected]="shotForm.get('scoringTeam')?.value === team.value"
               (click)="selectTeam(team.value, 'scoringTeam')">
               <div class="team-avatar">
-                <span class="avatar-text">{{ team.logo }}</span>
+                <img *ngIf="team.value" [src]="getTeamLogoUrl(team.value)" [alt]="team.label" class="team-logo-img" />
               </div>
               <div class="team-name">{{ team.label }}</div>
             </button>
@@ -132,7 +132,7 @@
               [class.selected]="shotForm.get('shootingTeam')?.value === team.value"
               (click)="selectTeam(team.value, 'shootingTeam')">
               <div class="team-avatar">
-                <span class="avatar-text">{{ team.logo }}</span>
+                <img *ngIf="team.value" [src]="getTeamLogoUrl(team.value)" [alt]="team.label" class="team-logo-img" />
               </div>
               <div class="team-name">{{ team.label }}</div>
             </button>
@@ -202,18 +202,24 @@
         </div>
         <mat-divider class="section-divider"></mat-divider>
         
+        <div class="period-selection-container">
+          <div class="period-selection-label uppercase text-custom-secondary">Period</div>
+          <div class="period-buttons">
+            <button 
+              *ngFor="let period of periodOptions" 
+              type="button"
+              class="period-button"
+              [class.selected]="shotForm.get('period')?.value === period.value"
+              (click)="selectPeriod(period.value)">
+              <div class="period-name">{{ period.label }}</div>
+            </button>
+          </div>
+          <div *ngIf="shotForm.get('period')?.errors && shotForm.get('period')?.touched" class="period-error">
+            {{ getErrorMessage('period') }}
+          </div>
+        </div>
+
         <div class="form-row">
-          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
-            <mat-label class="uppercase text-custom-secondary">Period</mat-label>
-            <mat-select formControlName="period" placeholder="Select period">
-              <mat-option *ngFor="let period of periodOptions" [value]="period.value">
-                {{ period.label }}
-              </mat-option>
-            </mat-select>
-            <mat-error *ngIf="shotForm.get('period')?.errors && shotForm.get('period')?.touched">
-              {{ getErrorMessage('period') }}
-            </mat-error>
-          </mat-form-field>
 
           <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
             <mat-label class="uppercase text-custom-secondary">Time</mat-label>
@@ -247,9 +253,9 @@
     <button mat-stroked-button (click)="onCancel()" class="cancel-btn">
       Cancel
     </button>
-    <button mat-raised-button color="primary" (click)="onSubmit()" class="submit-btn" [disabled]="shotForm.invalid">
+    <button mat-raised-button color="primary" (click)="onSubmit()" class="submit-btn" [disabled]="shotForm.invalid || isSubmitting">
       <mat-icon>save</mat-icon>
-      Add Shot
+      {{ isSubmitting ? 'Saving...' : 'Add Shot' }}
     </button>
   </mat-dialog-actions>
 </div>

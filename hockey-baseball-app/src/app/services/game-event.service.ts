@@ -78,6 +78,21 @@ export interface PenaltyEventRequest {
   zone?: string;
 }
 
+export interface ShotEventRequest {
+  game_id: number;
+  event_name_id: number;
+  team_id: number;
+  player_id: number;
+  player_2_id?: number; // Assist player (for goals only)
+  shot_type_id: number;
+  goalie_id: number;
+  period_id: number;
+  time: string;
+  youtube_link?: string;
+  is_scoring_chance?: boolean;
+  note?: string; // Scoring chance note
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -183,6 +198,28 @@ export class GameEventService {
       ice_top_offset: penaltyData.ice_top_offset,
       ice_left_offset: penaltyData.ice_left_offset,
       zone: penaltyData.zone
+    };
+
+    return this.createGameEvent(eventData);
+  }
+
+  /**
+   * Create a shot event with required fields
+   */
+  createShotEvent(shotData: ShotEventRequest): Observable<{ id: number; success: boolean }> {
+    const eventData: GameEventRequest = {
+      game_id: shotData.game_id,
+      event_name_id: shotData.event_name_id,
+      team_id: shotData.team_id,
+      player_id: shotData.player_id,
+      player_2_id: shotData.player_2_id,
+      shot_type_id: shotData.shot_type_id,
+      goalie_id: shotData.goalie_id,
+      period_id: shotData.period_id,
+      time: shotData.time,
+      youtube_link: shotData.youtube_link,
+      is_scoring_chance: shotData.is_scoring_chance,
+      note: shotData.note
     };
 
     return this.createGameEvent(eventData);

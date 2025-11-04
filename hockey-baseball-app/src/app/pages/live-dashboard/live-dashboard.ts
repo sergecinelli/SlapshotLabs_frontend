@@ -82,14 +82,16 @@ export class LiveDashboardComponent implements OnInit {
   faceoffEventId = 2; // This should be the ID for "Faceoff" event type from game-event-name API
   goalieChangeEventId = 3; // This should be the ID for "Goalie Change" event type from game-event-name API
   penaltyEventId = 4; // This should be the ID for "Penalty" event type from game-event-name API
+  shotEventId = 5; // This should be the ID for "Shot" event type from game-event-name API
   
   // TODO: Replace with actual team IDs from game data
   homeTeamId = 1; // This should come from the game API
   awayTeamId = 2; // This should come from the game API
   
-  // Game periods fetched from API
+  // Game periods and shot types fetched from API
   gamePeriods: GamePeriodResponse[] = [];
   periodOptions: { value: number; label: string }[] = [];
+  shotTypeOptions: { value: number; label: string }[] = [];
   
   // Teams fetched from API (only home and away)
   teamOptions: { value: number; label: string; logo?: string }[] = [];
@@ -193,15 +195,19 @@ export class LiveDashboardComponent implements OnInit {
    * First loads periods and teams, then loads players/goalies for the correct teams
    */
   private loadGameData(): void {
-    // First, load periods and teams in parallel
+    // First, load periods, shot types, and teams in parallel
     forkJoin({
       periods: this.gameMetadataService.getGamePeriods(),
+      shotTypes: this.gameMetadataService.getShotTypes(),
       teams: this.teamService.getTeams()
     }).subscribe({
-      next: ({ periods, teams }) => {
+      next: ({ periods, shotTypes, teams }) => {
         // Set periods
         this.gamePeriods = periods;
         this.periodOptions = this.gameMetadataService.transformGamePeriodsToOptions(periods);
+        
+        // Set shot types
+        this.shotTypeOptions = this.gameMetadataService.transformShotTypesToOptions(shotTypes);
         
         // Filter and set only home and away teams
         const allTeams = teams.teams;
@@ -519,7 +525,9 @@ export class LiveDashboardComponent implements OnInit {
       autoFocus: true,
       data: {
         gameId: this.gameId,
+        shotEventId: this.shotEventId,
         periodOptions: this.periodOptions,
+        shotTypeOptions: this.shotTypeOptions,
         teamOptions: this.teamOptions,
         playerOptions: this.playerOptions,
         goalieOptions: this.goalieOptions
