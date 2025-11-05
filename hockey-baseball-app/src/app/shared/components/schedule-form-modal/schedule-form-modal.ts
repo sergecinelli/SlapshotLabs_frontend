@@ -68,6 +68,8 @@ export class ScheduleFormModalComponent implements OnInit {
   arenaOptions: { value: number; label: string }[] = [];
   rinkOptions: { value: number; label: string }[] = [];
   goalieOptions: { value: string; label: string }[] = [];
+  awayGoalieOptions: { value: string; label: string }[] = [];
+  homeGoalieOptions: { value: string; label: string }[] = [];
   gameTypeOptions: { value: number; label: string }[] = [];
 
   statusOptions = [
@@ -193,15 +195,23 @@ export class ScheduleFormModalComponent implements OnInit {
 
       // Set default team values
       if (this.teamOptions.length > 0) {
-        defaultValues['awayTeam'] = this.teamOptions[0].value;
+        const awayTeamId = this.teamOptions[0].value;
+        defaultValues['awayTeam'] = awayTeamId;
         // Set different team for home team if available
-        defaultValues['homeTeam'] = this.teamOptions.length > 1 ? this.teamOptions[1].value : this.teamOptions[0].value;
-      }
-      
-      // Set default goalie values
-      if (this.goalieOptions.length > 0) {
-        defaultValues['homeTeamGoalie'] = this.goalieOptions[0].value;
-        defaultValues['awayTeamGoalie'] = this.goalieOptions.length > 1 ? this.goalieOptions[1].value : this.goalieOptions[0].value;
+        const homeTeamId = this.teamOptions.length > 1 ? this.teamOptions[1].value : this.teamOptions[0].value;
+        defaultValues['homeTeam'] = homeTeamId;
+        
+        // Filter goalies based on selected teams
+        this.filterGoaliesByTeam(awayTeamId, 'away');
+        this.filterGoaliesByTeam(homeTeamId, 'home');
+        
+        // Set default goalie values from filtered lists
+        if (this.awayGoalieOptions.length > 0) {
+          defaultValues['awayTeamGoalie'] = this.awayGoalieOptions[0].value;
+        }
+        if (this.homeGoalieOptions.length > 0) {
+          defaultValues['homeTeamGoalie'] = this.homeGoalieOptions[0].value;
+        }
       }
       
       // Set default game type
@@ -273,6 +283,14 @@ export class ScheduleFormModalComponent implements OnInit {
     
     if (arenaId) {
       this.filterRinksByArena(arenaId);
+    }
+    
+    // Filter goalies based on selected teams
+    if (awayTeamId) {
+      this.filterGoaliesByTeam(awayTeamId, 'away');
+    }
+    if (homeTeamId) {
+      this.filterGoaliesByTeam(homeTeamId, 'home');
     }
     
     this.scheduleForm.patchValue({
@@ -398,6 +416,70 @@ export class ScheduleFormModalComponent implements OnInit {
     this.filterRinksByArena(arenaId);
     // Reset rink selection when arena changes
     this.scheduleForm.patchValue({ rink: '' });
+  }
+
+  /**
+   * Filter goalies based on selected team
+   */
+  private filterGoaliesByTeam(teamId: string, teamType: 'away' | 'home'): void {
+    const filteredGoalies = this.goalies.filter(goalie => {
+      // Extract team name from goalie.team (format: "Team Name (Group - Level)")
+      const team = this.teams.find(t => t.id === teamId);
+      if (!team) return false;
+      
+      // Check if goalie's team matches the selected team
+      return goalie.team === team.name || goalie.team.includes(team.name);
+    });
+    
+    const options = this.transformGoaliesToOptions(filteredGoalies);
+    
+    if (teamType === 'away') {
+      this.awayGoalieOptions = options;
+    } else {
+      this.homeGoalieOptions = options;
+    }
+  }
+
+  /**
+   * Handle away team selection change
+   */
+  onAwayTeamChange(teamId: string): void {
+    this.filterGoaliesByTeam(teamId, 'away');
+    // Reset away goalie selection
+    if (this.awayGoalieOptions.length > 0) {
+      this.scheduleForm.patchValue({ awayTeamGoalie: this.awayGoalieOptions[0].value });
+    } else {
+      this.scheduleForm.patchValue({ awayTeamGoalie: '' });
+    }
+  }
+
+  /**
+   * Handle home team selection change
+   */
+  onHomeTeamChange(teamId: string): void {
+    this.filterGoaliesByTeam(teamId, 'home');
+    // Reset home goalie selection
+    if (this.homeGoalieOptions.length > 0) {
+      this.scheduleForm.patchValue({ homeTeamGoalie: this.homeGoalieOptions[0].value });
+    } else {
+      this.scheduleForm.patchValue({ homeTeamGoalie: '' });
+    }
+  }
+
+  /**
+   * Select game type (radio button style)
+   */
+  selectGameType(value: number): void {
+    this.scheduleForm.patchValue({ gameType: value });
+    this.scheduleForm.get('gameType')?.markAsTouched();
+  }
+
+  /**
+   * Select status (radio button style)
+   */
+  selectStatus(value: number): void {
+    this.scheduleForm.patchValue({ status: value });
+    this.scheduleForm.get('status')?.markAsTouched();
   }
 
   /**

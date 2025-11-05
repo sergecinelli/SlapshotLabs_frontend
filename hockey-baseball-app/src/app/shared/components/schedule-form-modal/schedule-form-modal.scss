@@ -1,3 +1,5 @@
+@import '../../styles/radio-button-selection';
+
 .schedule-form-modal {
   width: 100%;
   max-width: 800px;
@@ -117,6 +119,10 @@
             }
           }
         }
+        
+        // Use shared radio button styles
+        @include selection-container('game-type');
+        @include selection-container('status');
       }
     }
   }

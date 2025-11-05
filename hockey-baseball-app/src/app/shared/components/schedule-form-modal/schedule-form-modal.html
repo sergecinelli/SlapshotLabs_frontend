@@ -21,7 +21,7 @@
         <div class="form-row">
           <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
             <mat-label class="uppercase text-custom-secondary">Away Team</mat-label>
-            <mat-select formControlName="awayTeam">
+            <mat-select formControlName="awayTeam" (selectionChange)="onAwayTeamChange($event.value)">
               <mat-option *ngFor="let option of teamOptions" [value]="option.value">
                 {{ option.label }}
               </mat-option>
@@ -34,7 +34,7 @@
           <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
             <mat-label class="uppercase text-custom-secondary">Away Goalie</mat-label>
             <mat-select formControlName="awayTeamGoalie">
-              <mat-option *ngFor="let option of goalieOptions" [value]="option.value">
+              <mat-option *ngFor="let option of awayGoalieOptions" [value]="option.value">
                 {{ option.label }}
               </mat-option>
             </mat-select>
@@ -44,7 +44,7 @@
         <div class="form-row">
           <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
             <mat-label class="uppercase text-custom-secondary">Home Team</mat-label>
-            <mat-select formControlName="homeTeam">
+            <mat-select formControlName="homeTeam" (selectionChange)="onHomeTeamChange($event.value)">
               <mat-option *ngFor="let option of teamOptions" [value]="option.value">
                 {{ option.label }}
               </mat-option>
@@ -57,7 +57,7 @@
           <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
             <mat-label class="uppercase text-custom-secondary">Home Goalie</mat-label>
             <mat-select formControlName="homeTeamGoalie">
-              <mat-option *ngFor="let option of goalieOptions" [value]="option.value">
+              <mat-option *ngFor="let option of homeGoalieOptions" [value]="option.value">
                 {{ option.label }}
               </mat-option>
             </mat-select>
@@ -124,36 +124,45 @@
         </div>
         <mat-divider class="section-divider"></mat-divider>
         
-        <div class="form-row">
-          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
-            <mat-label class="uppercase text-custom-secondary">Game Type</mat-label>
-            <mat-select formControlName="gameType">
-              <mat-option *ngFor="let option of gameTypeOptions" [value]="option.value">
-                {{ option.label }}
-              </mat-option>
-            </mat-select>
-            <mat-error *ngIf="scheduleForm.get('gameType')?.errors && scheduleForm.get('gameType')?.touched">
-              {{ getErrorMessage('gameType') }}
-            </mat-error>
-          </mat-form-field>
+        <div class="game-type-selection-container">
+          <div class="game-type-selection-label uppercase text-custom-secondary">Game Type</div>
+          <div *ngIf="isLoading" class="loading-message">Loading game types...</div>
+          <div class="game-type-buttons" *ngIf="!isLoading">
+            <button 
+              *ngFor="let option of gameTypeOptions" 
+              type="button"
+              class="game-type-button"
+              [class.selected]="scheduleForm.get('gameType')?.value === option.value"
+              (click)="selectGameType(option.value)">
+              <div class="game-type-name">{{ option.label }}</div>
+            </button>
+          </div>
+          <div *ngIf="scheduleForm.get('gameType')?.errors && scheduleForm.get('gameType')?.touched" class="game-type-error">
+            {{ getErrorMessage('gameType') }}
+          </div>
+        </div>
+
+        <div class="status-selection-container">
+          <div class="status-selection-label uppercase text-custom-secondary">Status</div>
+          <div class="status-buttons">
+            <button 
+              *ngFor="let option of statusOptions" 
+              type="button"
+              class="status-button"
+              [class.selected]="scheduleForm.get('status')?.value === option.value"
+              (click)="selectStatus(option.value)">
+              <div class="status-name">{{ option.label }}</div>
+            </button>
+          </div>
+          <div *ngIf="scheduleForm.get('status')?.errors && scheduleForm.get('status')?.touched" class="status-error">
+            {{ getErrorMessage('status') }}
+          </div>
         </div>
 
         <div class="form-row">
           <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
             <mat-label class="uppercase text-custom-secondary">Tournament Name</mat-label>
             <input matInput formControlName="tournamentName">
-          </mat-form-field>
-
-          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
-            <mat-label class="uppercase text-custom-secondary">Status</mat-label>
-            <mat-select formControlName="status">
-              <mat-option *ngFor="let option of statusOptions" [value]="option.value">
-                {{ option.label }}
-              </mat-option>
-            </mat-select>
-            <mat-error *ngIf="scheduleForm.get('status')?.errors && scheduleForm.get('status')?.touched">
-              {{ getErrorMessage('status') }}
-            </mat-error>
           </mat-form-field>
         </div>
       </div>
