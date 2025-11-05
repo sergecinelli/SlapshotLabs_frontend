@@ -1,11 +1,11 @@
 <div class="location-selector">
   <div *ngIf="showTitle" class="section-header">
-    <span class="section-title">Set Location</span>
+    <span class="section-title">{{ title }}</span>
   </div>
   <mat-divider *ngIf="showDivider" class="section-divider"></mat-divider>
 
   <div class="rink-container">
-    <div *ngIf="team1 || team2" class="teams-header">
+    <div *ngIf="showTeams && (team1 || team2)" class="teams-header">
       <div class="team team-left" *ngIf="team1">
         <img *ngIf="team1.logo" [src]="team1.logo" [alt]="team1.name" class="team-logo" />
         <span class="team-name">{{ team1.name }}</span>
@@ -15,13 +15,13 @@
         <img *ngIf="team2.logo" [src]="team2.logo" [alt]="team2.name" class="team-logo" />
       </div>
     </div>
-    <button type="button" class="rink-wrapper" (click)="onRinkClick($event)">
-      <img src="/assets/images/hockey-rink.svg" alt="Hockey Rink" class="hockey-rink-image" />
+    <button type="button" class="rink-wrapper" [style.max-width]="maxWidth" (click)="onRinkClick($event)">
+      <img [src]="imageUrl" alt="Location" class="hockey-rink-image" />
       <div
         *ngIf="puckLocation"
         class="puck-marker"
-        [style.left.%]="puckLocation.x"
-        [style.top.%]="puckLocation.y"
+        [style.left.%]="puckLocation.x / 10"
+        [style.top.%]="puckLocation.y / 10"
       ></div>
     </button>
   </div>

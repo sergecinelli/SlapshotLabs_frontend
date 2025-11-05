@@ -4,8 +4,8 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { MatDividerModule } from '@angular/material/divider';
 
 export interface PuckLocation {
-  x: number;
-  y: number;
+  x: number; // 0-1000
+  y: number; // 0-1000
   zone: 'defending' | 'neutral' | 'attacking';
 }
 
@@ -31,6 +31,10 @@ export interface Team {
 export class LocationSelectorComponent implements ControlValueAccessor {
   @Input() showTitle = true;
   @Input() showDivider = true;
+  @Input() title = 'Set Location';
+  @Input() imageUrl = '/assets/images/hockey-rink.svg';
+  @Input() maxWidth = '100%';
+  @Input() showTeams = true;
   @Input() team1?: Team;
   @Input() team2?: Team;
   @Output() locationChange = new EventEmitter<PuckLocation | null>();
@@ -49,22 +53,26 @@ export class LocationSelectorComponent implements ControlValueAccessor {
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
     
-    // Calculate percentage positions
-    const xPercent = (x / rect.width) * 100;
-    const yPercent = (y / rect.height) * 100;
+    // Calculate positions from 0-1000
+    const xCoord = Math.round((x / rect.width) * 1000);
+    const yCoord = Math.round((y / rect.height) * 1000);
+    
+    // Clamp values to 0-1000 range
+    const clampedX = Math.max(0, Math.min(1000, xCoord));
+    const clampedY = Math.max(0, Math.min(1000, yCoord));
     
     // Determine zone based on x position
-    // Defending zone: 0-33.33%, Neutral zone: 33.33-66.66%, Attacking zone: 66.66-100%
+    // Defending zone: 0-333, Neutral zone: 333-666, Attacking zone: 666-1000
     let zone: 'defending' | 'neutral' | 'attacking';
-    if (xPercent < 33.33) {
+    if (clampedX < 333) {
       zone = 'defending';
-    } else if (xPercent < 66.66) {
+    } else if (clampedX < 666) {
       zone = 'neutral';
     } else {
       zone = 'attacking';
     }
     
-    this.puckLocation = { x: xPercent, y: yPercent, zone };
+    this.puckLocation = { x: clampedX, y: clampedY, zone };
     this.onChange(zone);
     this.onTouched();
     this.locationChange.emit(this.puckLocation);

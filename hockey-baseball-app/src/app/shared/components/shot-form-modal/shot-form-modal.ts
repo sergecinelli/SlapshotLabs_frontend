@@ -11,6 +11,8 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { GameEventService, ShotEventRequest } from '../../../services/game-event.service';
 import { environment } from '../../../../environments/environment';
+import { ShotLocationSelectorComponent, ShotLocation } from '../shot-location-selector/shot-location-selector';
+import { Team } from '../location-selector/location-selector';
 
 export interface ShotFormData {
   shotType: 'save' | 'goal' | 'missed' | 'blocked';
@@ -44,7 +46,8 @@ export interface ShotFormData {
     MatSelectModule,
     MatIconModule,
     MatDividerModule,
-    MatCheckboxModule
+    MatCheckboxModule,
+    ShotLocationSelectorComponent
   ],
   templateUrl: './shot-form-modal.html',
   styleUrl: './shot-form-modal.scss'
@@ -79,6 +82,9 @@ export class ShotFormModalComponent implements OnInit {
   
   // Loading states
   isSubmitting = false;
+  
+  // Shot location
+  shotLocation: ShotLocation | null = null;
 
   constructor() {
     this.shotForm = this.createForm();
@@ -287,6 +293,28 @@ export class ShotFormModalComponent implements OnInit {
   getTeamLogoUrl(teamId: number): string {
     return `${environment.apiUrl}/hockey/team/${teamId}/logo`;
   }
+  
+  onShotLocationChange(location: ShotLocation | null): void {
+    this.shotLocation = location;
+  }
+  
+  get team1Data(): Team | undefined {
+    if (this.teamOptions.length < 1) return undefined;
+    const team = this.teamOptions[0];
+    return {
+      name: team.label,
+      logo: this.getTeamLogoUrl(team.value)
+    };
+  }
+  
+  get team2Data(): Team | undefined {
+    if (this.teamOptions.length < 2) return undefined;
+    const team = this.teamOptions[1];
+    return {
+      name: team.label,
+      logo: this.getTeamLogoUrl(team.value)
+    };
+  }
 
   onSubmit(): void {
     if (this.shotForm.valid && !this.isSubmitting) {
@@ -310,7 +338,11 @@ export class ShotFormModalComponent implements OnInit {
         time: isoTime.toISOString(),
         youtube_link: formValue.youtubeLink || undefined,
         is_scoring_chance: formValue.isScoringChance,
-        note: formValue.isScoringChance ? formValue.scoringChanceNote : undefined
+        note: formValue.isScoringChance ? formValue.scoringChanceNote : undefined,
+        ice_top_offset: this.shotLocation?.rinkLocation.y,
+        ice_left_offset: this.shotLocation?.rinkLocation.x,
+        net_top_offset: this.shotLocation?.netLocation?.y,
+        net_left_offset: this.shotLocation?.netLocation?.x
       };
 
       this.gameEventService.createShotEvent(shotRequest).subscribe({

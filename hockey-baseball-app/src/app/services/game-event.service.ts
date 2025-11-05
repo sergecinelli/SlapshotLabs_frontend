@@ -91,6 +91,10 @@ export interface ShotEventRequest {
   youtube_link?: string;
   is_scoring_chance?: boolean;
   note?: string; // Scoring chance note
+  ice_top_offset?: number;
+  ice_left_offset?: number;
+  net_top_offset?: number;
+  net_left_offset?: number;
 }
 
 @Injectable({
@@ -219,7 +223,11 @@ export class GameEventService {
       time: shotData.time,
       youtube_link: shotData.youtube_link,
       is_scoring_chance: shotData.is_scoring_chance,
-      note: shotData.note
+      note: shotData.note,
+      ice_top_offset: shotData.ice_top_offset,
+      ice_left_offset: shotData.ice_left_offset,
+      net_top_offset: shotData.net_top_offset,
+      net_left_offset: shotData.net_left_offset
     };
 
     return this.createGameEvent(eventData);

@@ -231,6 +231,15 @@
         </div>
       </div>
 
+      <!-- Shot Location Section -->
+      <div class="form-section">
+        <app-shot-location-selector
+          [team1]="team1Data"
+          [team2]="team2Data"
+          (locationChange)="onShotLocationChange($event)"
+        ></app-shot-location-selector>
+      </div>
+
       <!-- YouTube Link Section -->
       <div class="form-section">
         <div class="section-header">
