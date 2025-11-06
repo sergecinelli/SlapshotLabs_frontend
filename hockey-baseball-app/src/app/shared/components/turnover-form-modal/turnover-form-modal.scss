@@ -1,4 +1,4 @@
-@import '../../styles/radio-button-selection';
+@use '../../styles/radio-button-selection';
 
 .turnover-form-modal {
   width: 100%;
@@ -99,10 +99,10 @@
         }
         
         // Use shared radio button styles
-        @include team-selection-container;
-        @include period-selection-container;
-        @include player-selection-container;
-        
+        @include radio-button-selection.team-selection-container;
+        @include radio-button-selection.period-selection-container;
+        @include radio-button-selection.player-selection-container;
+
         .form-row {
           display: flex;
           column-gap: 16px;

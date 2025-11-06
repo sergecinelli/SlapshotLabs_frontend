@@ -1,4 +1,4 @@
-@import '../../styles/radio-button-selection';
+@use '../../styles/radio-button-selection';
 
 .player-form-modal {
   width: 100%;
@@ -125,9 +125,9 @@
         }
         
         // Use shared radio button styles
-        @include selection-container('shoots');
-        @include selection-container('position');
-        
+        @include radio-button-selection.shoots-selection-container;
+        @include radio-button-selection.position-selection-container;
+
         // Override shoots and position buttons to be horizontal
         .shoots-selection-container {
           .shoots-buttons {

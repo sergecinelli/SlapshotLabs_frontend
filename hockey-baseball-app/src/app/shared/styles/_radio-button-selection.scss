@@ -380,3 +380,23 @@
     }
   }
 }
+
+// Shoots selection (Left/Right)
+@mixin shoots-selection-container {
+  @include selection-container('shoots');
+}
+
+// Position selection
+@mixin position-selection-container {
+  @include selection-container('position');
+}
+
+// Game type selection
+@mixin game-type-selection-container {
+  @include selection-container('game-type');
+}
+
+// Status selection
+@mixin status-selection-container {
+  @include selection-container('status');
+}

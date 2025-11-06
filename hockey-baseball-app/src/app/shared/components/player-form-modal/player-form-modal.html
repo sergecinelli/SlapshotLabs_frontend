@@ -79,7 +79,12 @@
                 *ngFor="let option of positionOptions" 
                 class="position-button"
                 [class.selected]="playerForm.get('position')?.value === option.value"
-                (click)="playerForm.patchValue({position: option.value})">
+                (click)="playerForm.patchValue({position: option.value})"
+                (keydown.enter)="playerForm.patchValue({position: option.value})"
+                (keydown.space)="playerForm.patchValue({position: option.value})"
+                tabindex="0"
+                role="button"
+                [attr.aria-pressed]="playerForm.get('position')?.value === option.value">
                 <span class="position-name">{{ option.label }}</span>
               </div>
             </div>
@@ -130,7 +135,12 @@
                 *ngFor="let option of shootsOptions" 
                 class="shoots-button"
                 [class.selected]="playerForm.get('shoots')?.value === option.value"
-                (click)="playerForm.patchValue({shoots: option.value})">
+                (click)="playerForm.patchValue({shoots: option.value})"
+                (keydown.enter)="playerForm.patchValue({shoots: option.value})"
+                (keydown.space)="playerForm.patchValue({shoots: option.value})"
+                tabindex="0"
+                role="button"
+                [attr.aria-pressed]="playerForm.get('shoots')?.value === option.value">
                 <span class="shoots-name">{{ option.label }}</span>
               </div>
             </div>

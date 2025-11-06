@@ -1,4 +1,4 @@
-@import '../../styles/radio-button-selection';
+@use '../../styles/radio-button-selection';
 
 .goalie-change-form-modal {
   width: 100%;
@@ -99,9 +99,9 @@
         }
         
         // Use shared radio button styles
-        @include team-selection-container;
-        @include goalie-selection-container;
-        
+        @include radio-button-selection.team-selection-container;
+        @include radio-button-selection.goalie-selection-container;
+
         .form-row {
           display: flex;
           column-gap: 16px;

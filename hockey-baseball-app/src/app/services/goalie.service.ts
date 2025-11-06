@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
 import { map, catchError, switchMap } from 'rxjs/operators';
-import { Goalie, GoalieTableData, GoalieApiPatch, GoalieApiInData, GoalieApiOutData } from '../shared/interfaces/goalie.interface';
+import { Goalie, GoalieTableData, GoalieApiInData, GoalieApiOutData } from '../shared/interfaces/goalie.interface';
 import { ApiService } from './api.service';
 import { GoalieDataMapper } from '../shared/utils/goalie-data-mapper';
 

@@ -1,4 +1,4 @@
-@import '../../styles/radio-button-selection';
+@use '../../styles/radio-button-selection';
 
 .schedule-form-modal {
   width: 100%;
@@ -121,8 +121,8 @@
         }
         
         // Use shared radio button styles
-        @include selection-container('game-type');
-        @include selection-container('status');
+        @include radio-button-selection.game-type-selection-container;
+        @include radio-button-selection.status-selection-container;
       }
     }
   }

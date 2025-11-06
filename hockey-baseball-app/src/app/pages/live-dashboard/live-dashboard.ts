@@ -19,7 +19,7 @@ import { GameMetadataService, GamePeriodResponse } from '../../services/game-met
 import { TeamService } from '../../services/team.service';
 import { PlayerService } from '../../services/player.service';
 import { GoalieService } from '../../services/goalie.service';
-import { LiveGameService, LiveGameData, GameDetails } from '../../services/live-game.service';
+import { LiveGameService, LiveGameData, GameDetails, GameEvent as ServiceGameEvent } from '../../services/live-game.service';
 import { ArenaService } from '../../services/arena.service';
 import { Rink } from '../../shared/interfaces/arena.interface';
 import { environment } from '../../../environments/environment';
@@ -116,7 +116,7 @@ export class LiveDashboardComponent implements OnInit {
   isLoadingGameData = true;
   
   // Current period ID for dropdown
-  currentPeriodId: number = 1;
+  currentPeriodId = 1;
   
   // Game start time (used to compute elapsed times for events)
   private gameStartTime: Date | null = null;
@@ -295,7 +295,7 @@ export class LiveDashboardComponent implements OnInit {
   /**
    * Update game header information (period, game type, date/time, arena)
    */
-  private updateGameHeaderInfo(gameDetails: GameDetails, gameTypes: any[], rinks: Rink[]): void {
+  private updateGameHeaderInfo(gameDetails: GameDetails, gameTypes: { id: number; name: string }[], rinks: Rink[]): void {
     // Update period
     const currentPeriod = this.gamePeriods.find(p => p.id === gameDetails.game_period_id);
     this.period.set(currentPeriod ? currentPeriod.name : 'Unknown Period');
@@ -327,9 +327,9 @@ export class LiveDashboardComponent implements OnInit {
   /**
    * Update game events from live data, grouped by period
    */
-  private updateGameEvents(liveData: LiveGameData, periods: any[], teams: any[]): void {
+  private updateGameEvents(liveData: LiveGameData, periods: { id: number; name: string }[], teams: { id: string; name: string }[]): void {
     // Group events by period
-    const eventsByPeriod = new Map<number, any[]>();
+    const eventsByPeriod = new Map<number, ServiceGameEvent[]>();
     
     liveData.events.forEach(event => {
       if (!eventsByPeriod.has(event.period_id)) {
@@ -434,7 +434,7 @@ export class LiveDashboardComponent implements OnInit {
   /**
    * Load players and goalies for both teams
    */
-  private loadPlayersAndGoalies(liveData: LiveGameData, periods: any[], teams: any[]): void {
+  private loadPlayersAndGoalies(liveData: LiveGameData, periods: { id: number; name: string }[], teams: { id: string; name: string }[]): void {
     forkJoin({
       homeTeamPlayers: this.playerService.getPlayersByTeam(this.homeTeamId),
       awayTeamPlayers: this.playerService.getPlayersByTeam(this.awayTeamId),

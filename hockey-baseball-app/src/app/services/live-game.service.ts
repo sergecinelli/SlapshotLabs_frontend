@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { Observable, of, catchError, map } from 'rxjs';
+import { Observable, of, catchError } from 'rxjs';
 import { ApiService } from './api.service';
 
 export interface DefensiveZoneExit {
