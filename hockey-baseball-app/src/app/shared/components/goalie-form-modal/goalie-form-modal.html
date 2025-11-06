@@ -70,17 +70,23 @@
             </mat-error>
           </mat-form-field>
 
-          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
-            <mat-label class="uppercase text-custom-secondary">Position:</mat-label>
-            <mat-select formControlName="position" placeholder="Select position">
-              <mat-option *ngFor="let option of positionOptions" [value]="option.value">
-                {{ option.label }}
-              </mat-option>
-            </mat-select>
-            <mat-error *ngIf="goalieForm.get('position')?.errors && goalieForm.get('position')?.touched">
+          <!-- Position Radio Buttons -->
+          <div class="position-selection-container">
+            <span class="position-selection-label uppercase text-custom-secondary">Position:</span>
+            <div *ngIf="isLoading" class="loading-message">Loading positions...</div>
+            <div class="position-buttons" *ngIf="!isLoading">
+              <div 
+                *ngFor="let option of positionOptions" 
+                class="position-button"
+                [class.selected]="goalieForm.get('position')?.value === option.value"
+                (click)="goalieForm.patchValue({position: option.value})">
+                <span class="position-name">{{ option.label }}</span>
+              </div>
+            </div>
+            <div class="position-error" *ngIf="goalieForm.get('position')?.errors && goalieForm.get('position')?.touched">
               {{ getErrorMessage('position') }}
-            </mat-error>
-          </mat-form-field>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -108,24 +114,30 @@
           </mat-form-field>
 
           <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
-            <mat-label class="uppercase text-custom-secondary">Shoots (R/L)</mat-label>
-            <mat-select formControlName="shoots" placeholder="Select shooting hand">
-              <mat-option *ngFor="let option of shootsOptions" [value]="option.value">
-                {{ option.label }}
-              </mat-option>
-            </mat-select>
-            <mat-error *ngIf="goalieForm.get('shoots')?.errors && goalieForm.get('shoots')?.touched">
-              {{ getErrorMessage('shoots') }}
-            </mat-error>
-          </mat-form-field>
-
-          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
             <mat-label class="uppercase text-custom-secondary">Birthplace:</mat-label>
             <input matInput formControlName="birthplace" placeholder="Enter birthplace">
             <mat-error *ngIf="goalieForm.get('birthplace')?.errors && goalieForm.get('birthplace')?.touched">
               {{ getErrorMessage('birthplace') }}
             </mat-error>
           </mat-form-field>
+        </div>
+        <div class="form-row">
+          <!-- Shoots Radio Buttons -->
+          <div class="shoots-selection-container">
+            <span class="shoots-selection-label uppercase text-custom-secondary">Shoots (R/L)</span>
+            <div class="shoots-buttons">
+              <div 
+                *ngFor="let option of shootsOptions" 
+                class="shoots-button"
+                [class.selected]="goalieForm.get('shoots')?.value === option.value"
+                (click)="goalieForm.patchValue({shoots: option.value})">
+                <span class="shoots-name">{{ option.label }}</span>
+              </div>
+            </div>
+            <div class="shoots-error" *ngIf="goalieForm.get('shoots')?.errors && goalieForm.get('shoots')?.touched">
+              {{ getErrorMessage('shoots') }}
+            </div>
+          </div>
         </div>
       </div>
 
