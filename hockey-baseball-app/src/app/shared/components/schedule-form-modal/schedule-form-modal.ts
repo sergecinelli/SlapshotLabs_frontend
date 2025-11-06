@@ -14,15 +14,24 @@ import { Schedule, GameStatus } from '../../interfaces/schedule.interface';
 import { Team } from '../../interfaces/team.interface';
 import { Arena, Rink } from '../../interfaces/arena.interface';
 import { Goalie } from '../../interfaces/goalie.interface';
+import { Player } from '../../interfaces/player.interface';
 import { TeamService } from '../../../services/team.service';
 import { ArenaService } from '../../../services/arena.service';
-import { GameMetadataService, GameTypeResponse, GamePeriodResponse } from '../../../services/game-metadata.service';
+import { GameMetadataService, GameTypeResponse, GamePeriodResponse, GameTypeName } from '../../../services/game-metadata.service';
 import { GoalieService } from '../../../services/goalie.service';
+import { PlayerService } from '../../../services/player.service';
 import { forkJoin } from 'rxjs';
 
 export interface ScheduleFormModalData {
   schedule?: Schedule;
   isEditMode: boolean;
+  teams?: Team[];
+  arenas?: Arena[];
+  rinks?: Rink[];
+  goalies?: Goalie[];
+  players?: Player[];
+  gameTypes?: GameTypeResponse[];
+  gamePeriods?: GamePeriodResponse[];
 }
 
 @Component({
@@ -51,6 +60,7 @@ export class ScheduleFormModalComponent implements OnInit {
   private arenaService = inject(ArenaService);
   private gameMetadataService = inject(GameMetadataService);
   private goalieService = inject(GoalieService);
+  private playerService = inject(PlayerService);
   data = inject<ScheduleFormModalData>(MAT_DIALOG_DATA);
 
   scheduleForm: FormGroup;
@@ -61,6 +71,7 @@ export class ScheduleFormModalComponent implements OnInit {
   arenas: Arena[] = [];
   rinks: Rink[] = [];
   goalies: Goalie[] = [];
+  players: Player[] = [];
   gameTypes: GameTypeResponse[] = [];
   gamePeriods: GamePeriodResponse[] = [];
 
@@ -71,6 +82,8 @@ export class ScheduleFormModalComponent implements OnInit {
   awayGoalieOptions: { value: string; label: string }[] = [];
   homeGoalieOptions: { value: string; label: string }[] = [];
   gameTypeOptions: { value: number; label: string }[] = [];
+  gameTypeNameOptions: { value: number; label: string }[] = [];
+  selectedGameType: GameTypeResponse | null = null;
 
   statusOptions = [
     { value: 0, label: 'Not Started' },
@@ -104,60 +117,92 @@ export class ScheduleFormModalComponent implements OnInit {
       arena: ['', [Validators.required]],
       rink: ['', [Validators.required]],
       gameTypeGroup: [''],
+      gameTypeName: [''],
       homeFaceoffWin: [0, [Validators.min(0)]],
       awayFaceoffWin: [0, [Validators.min(0)]]
     });
   }
 
   /**
-   * Load dropdown options from API
+   * Load dropdown options from API or use provided data
    */
   private loadOptions(): void {
     this.isLoading = true;
 
-    forkJoin({
-      teams: this.teamService.getTeams(),
-      arenas: this.arenaService.getArenas(),
-      rinks: this.arenaService.getAllRinks(),
-      goalies: this.goalieService.getGoalies(),
-      gameTypes: this.gameMetadataService.getGameTypes(),
-      gamePeriods: this.gameMetadataService.getGamePeriods()
-    }).subscribe({
-      next: ({ teams, arenas, rinks, goalies, gameTypes, gamePeriods }) => {
-        this.teams = teams.teams;
-        this.arenas = arenas;
-        this.rinks = rinks;
-        this.goalies = goalies.goalies;
-        this.gameTypes = gameTypes;
-        this.gamePeriods = gamePeriods;
+    // Check if data was provided from parent component
+    if (this.data.teams && this.data.arenas && this.data.rinks && 
+        this.data.goalies && this.data.players && this.data.gameTypes && this.data.gamePeriods) {
+      // Use provided data
+      this.teams = this.data.teams;
+      this.arenas = this.data.arenas;
+      this.rinks = this.data.rinks;
+      this.goalies = this.data.goalies;
+      this.players = this.data.players;
+      this.gameTypes = this.data.gameTypes;
+      this.gamePeriods = this.data.gamePeriods;
 
-        this.teamOptions = this.transformTeamsToOptions(this.teams);
-        this.arenaOptions = this.arenaService.transformArenasToOptions(this.arenas);
-        this.goalieOptions = this.transformGoaliesToOptions(this.goalies);
-        this.gameTypeOptions = this.gameMetadataService.transformGameTypesToOptions(this.gameTypes);
+      this.teamOptions = this.transformTeamsToOptions(this.teams);
+      this.arenaOptions = this.arenaService.transformArenasToOptions(this.arenas);
+      this.goalieOptions = this.transformGoaliesToOptions(this.goalies);
+      this.gameTypeOptions = this.gameMetadataService.transformGameTypesToOptions(this.gameTypes);
 
-        // Set default values
-        this.setDefaultValues();
+      // Set default values
+      this.setDefaultValues();
 
-        // If in edit mode, populate the form
-        if (this.isEditMode && this.data.schedule) {
-          this.populateForm(this.data.schedule);
-        }
-
-        this.isLoading = false;
-      },
-      error: (error) => {
-        console.error('Failed to load options:', error);
-        this.useFallbackOptions();
-        this.setDefaultValues();
-
-        if (this.isEditMode && this.data.schedule) {
-          this.populateForm(this.data.schedule);
-        }
-
-        this.isLoading = false;
+      // If in edit mode, populate the form
+      if (this.isEditMode && this.data.schedule) {
+        this.populateForm(this.data.schedule);
       }
-    });
+
+      this.isLoading = false;
+    } else {
+      // Fetch from API if data not provided
+      forkJoin({
+        teams: this.teamService.getTeams(),
+        arenas: this.arenaService.getArenas(),
+        rinks: this.arenaService.getAllRinks(),
+        goalies: this.goalieService.getGoalies(),
+        players: this.playerService.getPlayers(),
+        gameTypes: this.gameMetadataService.getGameTypes(),
+        gamePeriods: this.gameMetadataService.getGamePeriods()
+      }).subscribe({
+        next: ({ teams, arenas, rinks, goalies, players, gameTypes, gamePeriods }) => {
+          this.teams = teams.teams;
+          this.arenas = arenas;
+          this.rinks = rinks;
+          this.goalies = goalies.goalies;
+          this.players = players.players;
+          this.gameTypes = gameTypes;
+          this.gamePeriods = gamePeriods;
+
+          this.teamOptions = this.transformTeamsToOptions(this.teams);
+          this.arenaOptions = this.arenaService.transformArenasToOptions(this.arenas);
+          this.goalieOptions = this.transformGoaliesToOptions(this.goalies);
+          this.gameTypeOptions = this.gameMetadataService.transformGameTypesToOptions(this.gameTypes);
+
+          // Set default values
+          this.setDefaultValues();
+
+          // If in edit mode, populate the form
+          if (this.isEditMode && this.data.schedule) {
+            this.populateForm(this.data.schedule);
+          }
+
+          this.isLoading = false;
+        },
+        error: (error) => {
+          console.error('Failed to load options:', error);
+          this.useFallbackOptions();
+          this.setDefaultValues();
+
+          if (this.isEditMode && this.data.schedule) {
+            this.populateForm(this.data.schedule);
+          }
+
+          this.isLoading = false;
+        }
+      });
+    }
   }
 
   /**
@@ -217,6 +262,7 @@ export class ScheduleFormModalComponent implements OnInit {
       // Set default game type
       if (this.gameTypeOptions.length > 0) {
         defaultValues['gameType'] = this.gameTypeOptions[0].value;
+        this.onGameTypeChange(this.gameTypeOptions[0].value);
       }
       
       // Set default arena value
@@ -341,23 +387,45 @@ export class ScheduleFormModalComponent implements OnInit {
     if (this.scheduleForm.valid) {
       const formValue = this.scheduleForm.value;
       
+      const homeTeamId = parseInt(formValue.homeTeam);
+      const awayTeamId = parseInt(formValue.awayTeam);
+      
+      // Get all goalies and players for home and away teams
+      const homeGoalies = this.goalies
+        .filter(g => g.teamId === homeTeamId)
+        .map(g => parseInt(g.id));
+      const awayGoalies = this.goalies
+        .filter(g => g.teamId === awayTeamId)
+        .map(g => parseInt(g.id));
+      const homePlayers = this.players
+        .filter(p => p.teamId === homeTeamId)
+        .map(p => parseInt(p.id));
+      const awayPlayers = this.players
+        .filter(p => p.teamId === awayTeamId)
+        .map(p => parseInt(p.id));
+      
+      // Get the game period with the lowest order (first period)
+      const defaultGamePeriod = this.gamePeriods.length > 0
+        ? this.gamePeriods.reduce((min, period) => (period as any).order < (min as any).order ? period : min)
+        : null;
+      
       // Create API request body
       const gameData: Record<string, unknown> & { id?: number } = {
-        home_team_id: parseInt(formValue.homeTeam),
-        home_goals: formValue.homeGoals,
-        home_team_goalie_id: parseInt(formValue.homeTeamGoalie),
-        away_team_id: parseInt(formValue.awayTeam),
-        away_goals: formValue.awayGoals,
-        away_team_goalie_id: parseInt(formValue.awayTeamGoalie),
+        home_team_id: homeTeamId,
+        home_team_goalie_id: parseInt(formValue.homeTeamGoalie) || 0,
+        away_team_id: awayTeamId,
+        away_team_goalie_id: parseInt(formValue.awayTeamGoalie) || 0,
         game_type_id: formValue.gameType,
-        tournament_name: formValue.tournamentName || '',
+        game_type_name_id: formValue.gameTypeName ? parseInt(formValue.gameTypeName) : 0,
         status: formValue.status,
         date: formValue.date,
         time: this.convertTo24Hour(formValue.time),
         rink_id: formValue.rink,
-        game_type_group: formValue.gameTypeGroup || '',
-        home_faceoff_win: formValue.homeFaceoffWin,
-        away_faceoff_win: formValue.awayFaceoffWin
+        home_goalies: homeGoalies,
+        away_goalies: awayGoalies,
+        home_players: homePlayers,
+        away_players: awayPlayers,
+        game_period_id: defaultGamePeriod ? defaultGamePeriod.id : 0
       };
 
       // If edit mode, include the game ID
@@ -470,6 +538,26 @@ export class ScheduleFormModalComponent implements OnInit {
   selectGameType(value: number): void {
     this.scheduleForm.patchValue({ gameType: value });
     this.scheduleForm.get('gameType')?.markAsTouched();
+    this.onGameTypeChange(value);
+  }
+  
+  /**
+   * Handle game type change to update game type names
+   */
+  onGameTypeChange(gameTypeId: number): void {
+    this.selectedGameType = this.gameTypes.find(gt => gt.id === gameTypeId) || null;
+    
+    if (this.selectedGameType && this.selectedGameType.game_type_names.length > 0) {
+      this.gameTypeNameOptions = this.selectedGameType.game_type_names.map(name => ({
+        value: name.id,
+        label: name.name
+      }));
+      // Set first game type name as default
+      this.scheduleForm.patchValue({ gameTypeName: this.gameTypeNameOptions[0].value });
+    } else {
+      this.gameTypeNameOptions = [];
+      this.scheduleForm.patchValue({ gameTypeName: '' });
+    }
   }
 
   /**

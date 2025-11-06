@@ -3,10 +3,16 @@ import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { ApiService } from './api.service';
 
+export interface GameTypeName {
+  id: number;
+  name: string;
+}
+
 export interface GameTypeResponse {
   id: number;
   name: string;
   description?: string;
+  game_type_names: GameTypeName[];
 }
 
 export interface GamePeriodResponse {
