@@ -1,9 +1,13 @@
 import { Component, signal, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatSelectModule } from '@angular/material/select';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatDialog } from '@angular/material/dialog';
+import { ActivatedRoute } from '@angular/router';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header';
 import { ActionButtonComponent } from '../../shared/components/action-button/action-button';
 import { TurnoverFormModalComponent } from '../../shared/components/turnover-form-modal/turnover-form-modal';
@@ -15,6 +19,10 @@ import { GameMetadataService, GamePeriodResponse } from '../../services/game-met
 import { TeamService } from '../../services/team.service';
 import { PlayerService } from '../../services/player.service';
 import { GoalieService } from '../../services/goalie.service';
+import { LiveGameService, LiveGameData, GameDetails } from '../../services/live-game.service';
+import { ArenaService } from '../../services/arena.service';
+import { Rink } from '../../shared/interfaces/arena.interface';
+import { environment } from '../../../environments/environment';
 import { forkJoin } from 'rxjs';
 interface Team {
   name: string;
@@ -53,10 +61,11 @@ interface GameStats {
 }
 
 interface GameEvent {
-  id: number;
+  id: number | string;
   period: string;
   time: string;
   team: string;
+  teamId?: number;
   event: string;
   player: string;
   description: string;
@@ -65,19 +74,22 @@ interface GameEvent {
 @Component({
   selector: 'app-live-dashboard',
   standalone: true,
-  imports: [CommonModule, PageHeaderComponent, ActionButtonComponent, MatIconModule, MatButtonModule, MatTooltipModule],
+  imports: [CommonModule, FormsModule, PageHeaderComponent, ActionButtonComponent, MatIconModule, MatButtonModule, MatTooltipModule, MatSelectModule, MatFormFieldModule],
   templateUrl: './live-dashboard.html',
   styleUrl: './live-dashboard.scss'
 })
 export class LiveDashboardComponent implements OnInit {
   private dialog = inject(MatDialog);
+  private route = inject(ActivatedRoute);
   private gameMetadataService = inject(GameMetadataService);
   private teamService = inject(TeamService);
   private playerService = inject(PlayerService);
   private goalieService = inject(GoalieService);
+  private liveGameService = inject(LiveGameService);
+  private arenaService = inject(ArenaService);
   
-  // TODO: Replace with actual game ID from route or service
-  gameId = 1; // This should come from the route or be fetched from the API
+  // Game ID from route parameter
+  gameId = 1;
   turnoverEventId = 1; // This should be the ID for "Turnover" event type from game-event-name API
   faceoffEventId = 2; // This should be the ID for "Faceoff" event type from game-event-name API
   goalieChangeEventId = 3; // This should be the ID for "Goalie Change" event type from game-event-name API
@@ -102,6 +114,12 @@ export class LiveDashboardComponent implements OnInit {
   
   // Loading state
   isLoadingGameData = true;
+  
+  // Current period ID for dropdown
+  currentPeriodId: number = 1;
+  
+  // Game start time (used to compute elapsed times for events)
+  private gameStartTime: Date | null = null;
   
   // Mock tournament data
   tournamentName = signal('LITE5');
@@ -187,126 +205,359 @@ export class LiveDashboardComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    this.loadGameData();
+    // Get game ID from route parameter
+    this.route.params.subscribe(params => {
+      const gameIdParam = params['gameId'];
+      if (gameIdParam) {
+        this.gameId = parseInt(gameIdParam, 10);
+      }
+      this.loadFullGameData();
+    });
   }
 
   /**
-   * Load all game data (periods, teams, players, goalies)
-   * First loads periods and teams, then loads players/goalies for the correct teams
+   * Load full game data including details, live data, teams, rinks, etc.
    */
-  private loadGameData(): void {
-    // First, load periods, shot types, and teams in parallel
+  private loadFullGameData(): void {
     forkJoin({
+      gameDetails: this.liveGameService.getGameDetails(this.gameId),
+      liveData: this.liveGameService.getLiveGameData(this.gameId),
       periods: this.gameMetadataService.getGamePeriods(),
       shotTypes: this.gameMetadataService.getShotTypes(),
-      teams: this.teamService.getTeams()
+      gameTypes: this.gameMetadataService.getGameTypes(),
+      teams: this.teamService.getTeams(),
+      rinks: this.arenaService.getAllRinks()
     }).subscribe({
-      next: ({ periods, shotTypes, teams }) => {
-        // Set periods
+      next: ({ gameDetails, liveData, periods, shotTypes, gameTypes, teams, rinks }) => {
+        // Set team IDs from game details
+        this.homeTeamId = gameDetails.home_team_id;
+        this.awayTeamId = gameDetails.away_team_id;
+
+        // Set periods and shot types
         this.gamePeriods = periods;
         this.periodOptions = this.gameMetadataService.transformGamePeriodsToOptions(periods);
-        
-        // Set shot types
         this.shotTypeOptions = this.gameMetadataService.transformShotTypesToOptions(shotTypes);
-        
-        // Filter and set only home and away teams
+
+        // Update game header information
+        this.updateGameHeaderInfo(gameDetails, gameTypes, rinks);
+
+        // Get team information
         const allTeams = teams.teams;
-        
-        let homeTeam = allTeams.find(t => parseInt(t.id) === this.homeTeamId);
-        let awayTeam = allTeams.find(t => parseInt(t.id) === this.awayTeamId);
-        
-        // If specific teams not found, use first 2 teams from the list
-        if (!homeTeam || !awayTeam) {
-          if (allTeams.length >= 2) {
-            homeTeam = allTeams[0];
-            awayTeam = allTeams[1];
-            // Update the IDs so player/goalie fetch works
-            this.homeTeamId = parseInt(homeTeam.id);
-            this.awayTeamId = parseInt(awayTeam.id);
-          } else if (allTeams.length === 1) {
-            homeTeam = allTeams[0];
-            awayTeam = allTeams[0]; // Use same team twice if only one exists
-            this.homeTeamId = parseInt(homeTeam.id);
-            this.awayTeamId = parseInt(homeTeam.id);
-          }
-        }
-        
-        this.teamOptions = [];
-        if (homeTeam) {
-          this.teamOptions.push({
-            value: parseInt(homeTeam.id),
-            label: homeTeam.name,
-            logo: homeTeam.logo
+        const homeTeamData = allTeams.find(t => parseInt(t.id) === this.homeTeamId);
+        const awayTeamData = allTeams.find(t => parseInt(t.id) === this.awayTeamId);
+
+        if (homeTeamData && awayTeamData) {
+          // Update team signals with real data
+          this.homeTeam.set({
+            name: homeTeamData.name,
+            logo: `${environment.apiUrl}/hockey/team/${homeTeamData.id}/logo`,
+            score: liveData.home_goals,
+            record: '(0 - 0 - 0)', // TODO: Get from API when available
+            sog: liveData.home_shots.shots_on_goal
           });
-        }
-        if (awayTeam && awayTeam.id !== homeTeam?.id) {
-          this.teamOptions.push({
-            value: parseInt(awayTeam.id),
-            label: awayTeam.name,
-            logo: awayTeam.logo
+
+          this.awayTeam.set({
+            name: awayTeamData.name,
+            logo: `${environment.apiUrl}/hockey/team/${awayTeamData.id}/logo`,
+            score: liveData.away_goals,
+            record: '(0 - 0 - 0)', // TODO: Get from API when available
+            sog: liveData.away_shots.shots_on_goal
           });
-        } else if (awayTeam && awayTeam.id === homeTeam?.id && allTeams.length > 1) {
-          // If away team is same as home, try to find a different one
-          const differentTeam = allTeams.find(t => t.id !== homeTeam?.id);
-          if (differentTeam) {
-            this.teamOptions.push({
-              value: parseInt(differentTeam.id),
-              label: differentTeam.name,
-              logo: differentTeam.logo
-            });
-          }
+
+          // Set team options for dropdowns
+          this.teamOptions = [
+            {
+              value: parseInt(homeTeamData.id),
+              label: homeTeamData.name,
+              logo: homeTeamData.logo
+            },
+            {
+              value: parseInt(awayTeamData.id),
+              label: awayTeamData.name,
+              logo: awayTeamData.logo
+            }
+          ];
         }
-        
-        // Now load players and goalies for the correct teams
-        forkJoin({
-          homeTeamPlayers: this.playerService.getPlayersByTeam(this.homeTeamId),
-          awayTeamPlayers: this.playerService.getPlayersByTeam(this.awayTeamId),
-          homeTeamGoalies: this.goalieService.getGoaliesByTeam(this.homeTeamId),
-          awayTeamGoalies: this.goalieService.getGoaliesByTeam(this.awayTeamId)
-        }).subscribe({
-          next: ({ homeTeamPlayers, awayTeamPlayers, homeTeamGoalies, awayTeamGoalies }) => {
-            // Set players from both teams
-            this.playerOptions = [
-              ...homeTeamPlayers.map(player => ({
-                value: parseInt(player.id),
-                label: `${player.firstName} ${player.lastName}`,
-                teamId: this.homeTeamId
-              })),
-              ...awayTeamPlayers.map(player => ({
-                value: parseInt(player.id),
-                label: `${player.firstName} ${player.lastName}`,
-                teamId: this.awayTeamId
-              }))
-            ];
-            
-            // Set goalies from both teams
-            this.goalieOptions = [
-              ...homeTeamGoalies.map(goalie => ({
-                value: parseInt(goalie.id),
-                label: `${goalie.firstName} ${goalie.lastName}`,
-                teamId: this.homeTeamId
-              })),
-              ...awayTeamGoalies.map(goalie => ({
-                value: parseInt(goalie.id),
-                label: `${goalie.firstName} ${goalie.lastName}`,
-                teamId: this.awayTeamId
-              }))
-            ];
-            
-            this.isLoadingGameData = false;
-          },
-          error: (error) => {
-            console.error('Failed to load players/goalies:', error);
-            this.isLoadingGameData = false;
-          }
-        });
+
+        // Update stats from live data
+        this.updateStatsFromLiveData(liveData);
+
+        // Load players and goalies for both teams, then update events
+        this.loadPlayersAndGoalies(liveData, periods, allTeams);
       },
       error: (error) => {
-        console.error('Failed to load game data:', error);
+        console.error('Failed to load full game data:', error);
         this.isLoadingGameData = false;
       }
     });
   }
+
+  /**
+   * Update game header information (period, game type, date/time, arena)
+   */
+  private updateGameHeaderInfo(gameDetails: GameDetails, gameTypes: any[], rinks: Rink[]): void {
+    // Update period
+    const currentPeriod = this.gamePeriods.find(p => p.id === gameDetails.game_period_id);
+    this.period.set(currentPeriod ? currentPeriod.name : 'Unknown Period');
+    this.currentPeriodId = gameDetails.game_period_id;
+
+    // Update game type
+    const gameType = gameTypes.find(t => t.id === gameDetails.game_type_id);
+    this.tournamentCategory.set(gameType ? gameType.name : 'Unknown');
+
+    // Update date and time
+    const gameDate = new Date(gameDetails.date + 'T' + gameDetails.time);
+    this.gameStartTime = gameDate;
+    this.tournamentDate.set(gameDate.toLocaleString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true
+    }));
+
+    // Update rink/arena info
+    const rink = rinks.find(r => r.id === gameDetails.rink_id);
+    if (rink) {
+      this.arenaInfo.set(rink.name);
+    }
+  }
+
+  /**
+   * Update game events from live data, grouped by period
+   */
+  private updateGameEvents(liveData: LiveGameData, periods: any[], teams: any[]): void {
+    // Group events by period
+    const eventsByPeriod = new Map<number, any[]>();
+    
+    liveData.events.forEach(event => {
+      if (!eventsByPeriod.has(event.period_id)) {
+        eventsByPeriod.set(event.period_id, []);
+      }
+      eventsByPeriod.get(event.period_id)!.push(event);
+    });
+
+    // Create flat array with period headers and events
+    const groupedEvents: GameEvent[] = [];
+    
+    // Sort periods
+    const sortedPeriods = Array.from(eventsByPeriod.keys()).sort((a, b) => a - b);
+    
+    sortedPeriods.forEach(periodId => {
+      const period = periods.find(p => p.id === periodId);
+      const periodEvents = eventsByPeriod.get(periodId) || [];
+      
+      // Add period header
+      groupedEvents.push({
+        id: `period-${periodId}`,
+        period: period ? period.name : `Period ${periodId}`,
+        time: '',
+        team: '',
+        event: '',
+        player: '',
+        description: ''
+      });
+      
+      // Add events for this period
+      periodEvents.forEach(event => {
+        const team = teams.find(t => parseInt(t.id) === event.team_id);
+        const eventTime = new Date(event.time);
+        
+        // Find player name from playerOptions
+        let playerName = 'Unknown Player';
+        if (event.player_id) {
+          const player = this.playerOptions.find(p => p.value === event.player_id);
+          if (player) {
+            playerName = player.label;
+          } else {
+            // Try goalies if not found in players
+            const goalie = this.goalieOptions.find(g => g.value === event.player_id);
+            if (goalie) {
+              playerName = goalie.label;
+            } else {
+              playerName = `Player ${event.player_id}`;
+            }
+          }
+        }
+        
+        groupedEvents.push({
+          id: event.id,
+          period: '', // Empty string for actual events (not headers)
+          time: this.formatElapsedTime(eventTime),
+          team: team ? team.name : 'Unknown Team',
+          teamId: event.team_id,
+          event: this.getEventName(event.event_name_id),
+          player: playerName,
+          description: event.note || event.goal_type || ''
+        });
+      });
+    });
+
+    this.gameEvents.set(groupedEvents);
+  }
+
+  /**
+   * Format elapsed time since game start as M:SS
+   */
+  private formatElapsedTime(eventTime: Date): string {
+    if (!this.gameStartTime) return '0:00';
+    const diffMs = Math.max(0, eventTime.getTime() - this.gameStartTime.getTime());
+    const totalSeconds = Math.floor(diffMs / 1000);
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    const secondsStr = seconds < 10 ? `0${seconds}` : `${seconds}`;
+    return `${minutes}:${secondsStr}`;
+  }
+
+  /**
+   * Get team logo URL
+   */
+  getTeamLogoUrl(teamId: number): string {
+    return `${environment.apiUrl}/hockey/team/${teamId}/logo`;
+  }
+
+  /**
+   * Get event name from event_name_id
+   */
+  private getEventName(eventNameId: number): string {
+    const eventNames: Record<number, string> = {
+      1: 'GOAL',
+      2: 'FACEOFF',
+      3: 'GOALIE CHANGE',
+      4: 'PENALTY',
+      5: 'SHOT'
+    };
+    return eventNames[eventNameId] || 'UNKNOWN EVENT';
+  }
+
+  /**
+   * Load players and goalies for both teams
+   */
+  private loadPlayersAndGoalies(liveData: LiveGameData, periods: any[], teams: any[]): void {
+    forkJoin({
+      homeTeamPlayers: this.playerService.getPlayersByTeam(this.homeTeamId),
+      awayTeamPlayers: this.playerService.getPlayersByTeam(this.awayTeamId),
+      homeTeamGoalies: this.goalieService.getGoaliesByTeam(this.homeTeamId),
+      awayTeamGoalies: this.goalieService.getGoaliesByTeam(this.awayTeamId)
+    }).subscribe({
+      next: ({ homeTeamPlayers, awayTeamPlayers, homeTeamGoalies, awayTeamGoalies }) => {
+        // Set players from both teams
+        this.playerOptions = [
+          ...homeTeamPlayers.map(player => ({
+            value: parseInt(player.id),
+            label: `${player.firstName} ${player.lastName}`,
+            teamId: this.homeTeamId
+          })),
+          ...awayTeamPlayers.map(player => ({
+            value: parseInt(player.id),
+            label: `${player.firstName} ${player.lastName}`,
+            teamId: this.awayTeamId
+          }))
+        ];
+
+        // Set goalies from both teams
+        this.goalieOptions = [
+          ...homeTeamGoalies.map(goalie => ({
+            value: parseInt(goalie.id),
+            label: `${goalie.firstName} ${goalie.lastName}`,
+            teamId: this.homeTeamId
+          })),
+          ...awayTeamGoalies.map(goalie => ({
+            value: parseInt(goalie.id),
+            label: `${goalie.firstName} ${goalie.lastName}`,
+            teamId: this.awayTeamId
+          }))
+        ];
+
+        // Now update game events with player names
+        this.updateGameEvents(liveData, periods, teams);
+
+        this.isLoadingGameData = false;
+      },
+      error: (error) => {
+        console.error('Failed to load players/goalies:', error);
+        this.isLoadingGameData = false;
+      }
+    });
+  }
+
+  /**
+   * Update component stats from live game data
+   */
+  private updateStatsFromLiveData(liveData: LiveGameData): void {
+    // Update goals
+    this.homeTeam.update(team => ({ ...team, score: liveData.home_goals }));
+    this.awayTeam.update(team => ({ ...team, score: liveData.away_goals }));
+
+    // Calculate faceoff win percentages
+    const totalFaceoffs = liveData.home_faceoff_win + liveData.away_faceoff_win;
+    const homeFaceoffPct = totalFaceoffs > 0 ? Math.round((liveData.home_faceoff_win / totalFaceoffs) * 100) : 0;
+    const awayFaceoffPct = totalFaceoffs > 0 ? Math.round((liveData.away_faceoff_win / totalFaceoffs) * 100) : 0;
+
+    // Update home stats
+    this.homeStats.set({
+      faceoffWinPct: homeFaceoffPct,
+      defensiveZoneExit: {
+        long: liveData.home_defensive_zone_exit.icing,
+        skate: liveData.home_defensive_zone_exit.skate_out,
+        soWin: liveData.home_defensive_zone_exit.so_win,
+        soLose: liveData.home_defensive_zone_exit.so_lose,
+        pass: liveData.home_defensive_zone_exit.passes
+      },
+      offensiveZoneEntry: {
+        pass: liveData.home_offensive_zone_entry.pass_in,
+        dump: liveData.home_offensive_zone_entry.dump_win + liveData.home_offensive_zone_entry.dump_lose,
+        carry: 0, // Not in API response, keeping existing logic
+        skated: liveData.home_offensive_zone_entry.skate_in
+      },
+      shots: {
+        shotsOnGoal: liveData.home_shots.shots_on_goal,
+        missedNet: liveData.home_shots.missed_net,
+        scoringChances: liveData.home_shots.scoring_chance,
+        blocked: liveData.home_shots.blocked
+      },
+      turnovers: {
+        offZone: liveData.home_turnovers.off_zone,
+        neutralZone: liveData.home_turnovers.neutral_zone,
+        defZone: liveData.home_turnovers.def_zone
+      }
+    });
+
+    // Update away stats
+    this.awayStats.set({
+      faceoffWinPct: awayFaceoffPct,
+      defensiveZoneExit: {
+        long: liveData.away_defensive_zone_exit.icing,
+        skate: liveData.away_defensive_zone_exit.skate_out,
+        soWin: liveData.away_defensive_zone_exit.so_win,
+        soLose: liveData.away_defensive_zone_exit.so_lose,
+        pass: liveData.away_defensive_zone_exit.passes
+      },
+      offensiveZoneEntry: {
+        pass: liveData.away_offensive_zone_entry.pass_in,
+        dump: liveData.away_offensive_zone_entry.dump_win + liveData.away_offensive_zone_entry.dump_lose,
+        carry: 0, // Not in API response, keeping existing logic
+        skated: liveData.away_offensive_zone_entry.skate_in
+      },
+      shots: {
+        shotsOnGoal: liveData.away_shots.shots_on_goal,
+        missedNet: liveData.away_shots.missed_net,
+        scoringChances: liveData.away_shots.scoring_chance,
+        blocked: liveData.away_shots.blocked
+      },
+      turnovers: {
+        offZone: liveData.away_turnovers.off_zone,
+        neutralZone: liveData.away_turnovers.neutral_zone,
+        defZone: liveData.away_turnovers.def_zone
+      }
+    });
+
+    // Update shots on goal for teams
+    this.homeTeam.update(team => ({ ...team, sog: liveData.home_shots.shots_on_goal }));
+    this.awayTeam.update(team => ({ ...team, sog: liveData.away_shots.shots_on_goal }));
+  }
+
 
   // Mock game events
   gameEvents = signal<GameEvent[]>([
@@ -622,6 +873,18 @@ export class LiveDashboardComponent implements OnInit {
         // For example, add it to game events
       }
     });
+  }
+
+  /**
+   * Handle period change from dropdown
+   */
+  onPeriodChange(periodId: number): void {
+    const selectedPeriod = this.gamePeriods.find(p => p.id === periodId);
+    if (selectedPeriod) {
+      this.period.set(selectedPeriod.name);
+      // TODO: Update game period on backend if needed
+      console.log('Period changed to:', selectedPeriod.name);
+    }
   }
 
   onPenalty(): void {

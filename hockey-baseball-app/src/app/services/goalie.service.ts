@@ -137,10 +137,25 @@ export class GoalieService {
       return throwError(() => new Error(`Invalid goalie ID: ${id}`));
     }
 
-    // Transform frontend data to API format for partial update
-    const apiUpdateData = this.toApiPatchFormat(goalieData, photo);
+    // Extract team ID from goalieData
+    const teamId = (goalieData as Record<string, unknown>)['teamId'] as string | undefined;
+    const numericTeamId = teamId ? parseInt(teamId, 10) : 1;
     
-    return this.apiService.patch<void>(`/hockey/goalie/${numericId}`, apiUpdateData).pipe(
+    // Transform frontend data to API format
+    const apiUpdateData = this.toApiPatchFormat(goalieData, numericTeamId);
+    
+    // Create FormData for multipart/form-data request
+    const formData = new FormData();
+    
+    // Add photo if provided
+    if (photo) {
+      formData.append('photo', photo);
+    }
+    
+    // Add data as JSON string
+    formData.append('data', JSON.stringify(apiUpdateData));
+    
+    return this.apiService.patchMultipart<void>(`/hockey/goalie/${numericId}`, formData).pipe(
       switchMap(() => {
         // After successful update, fetch the updated goalie data
         return this.getGoalieById(id);
@@ -169,55 +184,25 @@ export class GoalieService {
     return `${year}-01-01`;
   }
 
-  private toApiPatchFormat(goalieData: Partial<Goalie>, photo?: string): GoalieApiPatch {
-    const dataUpdate: Partial<GoalieApiInData> = {};
-    
-    // Include team_id if provided
-    const teamId = (goalieData as Record<string, unknown>)['teamId'] as string | undefined;
-    if (teamId) {
-      const numericTeamId = parseInt(teamId, 10);
-      if (!isNaN(numericTeamId)) {
-        dataUpdate.team_id = numericTeamId;
-      }
-    }
-    
-    // Only include fields that are provided and exist in the API
-    if (goalieData.height) {
-      dataUpdate.height = GoalieDataMapper.heightStringToInches(goalieData.height);
-    }
-    if (goalieData.weight !== undefined) {
-      dataUpdate.weight = goalieData.weight;
-    }
-    if (goalieData.shoots) {
-      dataUpdate.shoots = GoalieDataMapper.shootsToApiFormat(goalieData.shoots);
-    }
-    if (goalieData.jerseyNumber !== undefined) {
-      dataUpdate.jersey_number = goalieData.jerseyNumber;
-    }
-    if (goalieData.firstName) {
-      dataUpdate.first_name = goalieData.firstName;
-    }
-    if (goalieData.lastName) {
-      dataUpdate.last_name = goalieData.lastName;
-    }
-    if (goalieData.birthYear) {
-      dataUpdate.birth_year = this.yearToDateString(goalieData.birthYear);
-    }
-    if (goalieData.wins !== undefined) {
-      dataUpdate.wins = goalieData.wins;
-    }
-    if (goalieData.losses !== undefined) {
-      dataUpdate.losses = goalieData.losses;
-    }
-    
-    const patchData: GoalieApiPatch = {};
-    if (Object.keys(dataUpdate).length > 0) {
-      patchData.data = dataUpdate;
-    }
-    if (photo !== undefined) {
-      patchData.photo = photo;
-    }
-    
-    return patchData;
+  private toApiPatchFormat(goalieData: Partial<Goalie>, teamId: number): GoalieApiInData {
+    // Include all fields for PATCH (backend expects full data object)
+    return {
+      team_id: teamId,
+      height: goalieData.height ? GoalieDataMapper.heightStringToInches(goalieData.height) : 0,
+      weight: goalieData.weight ?? 0,
+      shoots: goalieData.shoots ? GoalieDataMapper.shootsToApiFormat(goalieData.shoots) : 'R',
+      number: goalieData.jerseyNumber ?? 0,
+      first_name: goalieData.firstName ?? '',
+      last_name: goalieData.lastName ?? '',
+      birth_year: goalieData.birthYear ? this.yearToDateString(goalieData.birthYear) : this.yearToDateString(new Date().getFullYear()),
+      player_bio: goalieData.playerBiography,
+      birthplace_country: (goalieData as Record<string, unknown>)['birthplace'] as string | undefined,
+      address_country: (goalieData as Record<string, unknown>)['addressCountry'] as string | undefined,
+      address_region: (goalieData as Record<string, unknown>)['addressRegion'] as string | undefined,
+      address_city: (goalieData as Record<string, unknown>)['addressCity'] as string | undefined,
+      address_street: (goalieData as Record<string, unknown>)['addressStreet'] as string | undefined,
+      address_postal_code: (goalieData as Record<string, unknown>)['addressPostalCode'] as string | undefined,
+      analysis: 'Some analysis'
+    };
   }
 }

@@ -18,8 +18,8 @@
         <mat-divider class="section-divider"></mat-divider>
         <div class="form-row">
           <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
-            <mat-label class="uppercase text-custom-secondary">Team (drop down list of teams)</mat-label>
-            <mat-select formControlName="team" placeholder="Select team">
+            <mat-label class="uppercase text-custom-secondary">Team</mat-label>
+            <mat-select formControlName="team">
               <mat-option *ngFor="let team of teamOptions" [value]="team.value">
                 {{ team.label }}
               </mat-option>

@@ -11,7 +11,7 @@ export interface GoalieApiInData {
   height: number;  // Height in inches
   weight: number;  // Weight in lbs
   shoots: string;  // "R" for Right Shot, "L" for Left Shot
-  jersey_number: number;
+  number: number;  // Jersey number
   first_name: string;
   last_name: string;
   birth_year: string;  // Date format: YYYY-MM-DD
@@ -22,9 +22,6 @@ export interface GoalieApiInData {
   address_city?: string;
   address_street?: string;
   address_postal_code?: string;
-  wins: number;
-  losses: number;
-  penalty_minutes?: number;
   analysis?: string;
 }
 
@@ -40,7 +37,7 @@ export interface GoalieApiOutData {
   height: number;  // Height in inches
   weight: number;  // Weight in lbs
   shoots: string;  // "R" for Right Shot, "L" for Left Shot
-  jersey_number: number;
+  number: number;  // Jersey number
   first_name: string;
   last_name: string;
   birth_year: string;  // Date format

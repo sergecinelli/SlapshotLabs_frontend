@@ -55,7 +55,7 @@ export const routes: Routes = [
       { path: 'schedule', component: ScheduleComponent },
       { path: 'analytics', component: AnalyticsComponent },
       { path: 'video-library', component: VideoLibraryComponent },
-      { path: 'live-dashboard', component: LiveDashboardComponent },
+      { path: 'live-dashboard/:gameId', component: LiveDashboardComponent },
     ]
   },
   

@@ -67,7 +67,7 @@ export class NavigationService {
     },
     {
       label: 'Live Dashboard',
-      path: '/live-dashboard',
+      path: '/live-dashboard/10',
       icon: 'live'
     }
   ]);

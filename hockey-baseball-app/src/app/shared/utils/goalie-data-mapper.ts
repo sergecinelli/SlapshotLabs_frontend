@@ -71,7 +71,7 @@ export class GoalieDataMapper {
         height: this.heightStringToInches(goalie.height || ''),
         weight: goalie.weight || 0,
         shoots: this.shootsToApiFormat(goalie.shoots || 'Right Shot'),
-        jersey_number: goalie.jerseyNumber || 0,
+        number: goalie.jerseyNumber || 0,
         first_name: goalie.firstName || '',
         last_name: goalie.lastName || '',
         birth_year: this.yearToDateString(goalie.birthYear || new Date().getFullYear()),
@@ -82,9 +82,6 @@ export class GoalieDataMapper {
         address_city: (goalie as Record<string, unknown>)['addressCity'] as string | undefined,
         address_street: (goalie as Record<string, unknown>)['addressStreet'] as string | undefined,
         address_postal_code: (goalie as Record<string, unknown>)['addressPostalCode'] as string | undefined,
-        wins: goalie.wins || 0,
-        losses: goalie.losses || 0,
-        penalty_minutes: 0,
         analysis: 'Some analysis'
       }
     };
@@ -106,7 +103,7 @@ export class GoalieDataMapper {
       height: this.inchesToHeightString(data.height),
       weight: data.weight,
       shoots: this.shootsFromApiFormat(data.shoots),
-      jerseyNumber: data.jersey_number,
+      jerseyNumber: data.number,
       firstName: data.first_name,
       lastName: data.last_name,
       birthYear: this.dateStringToYear(data.birth_year),

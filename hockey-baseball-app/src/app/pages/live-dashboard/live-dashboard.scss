@@ -25,3 +25,34 @@
 .game-event-btn {
   @apply px-5 py-2.5 text-base font-semibold bg-blue-500 hover:bg-blue-600 text-white rounded cursor-pointer transition-colors;
 }
+
+// Period select dropdown styling
+::ng-deep .period-select-field {
+  .mat-mdc-form-field-subscript-wrapper {
+    display: none;
+  }
+  
+  .mat-mdc-text-field-wrapper {
+    padding: 0;
+  }
+  
+  .mat-mdc-form-field-infix {
+    padding: 0;
+    border: none;
+    min-height: auto;
+  }
+  
+  .mat-mdc-select {
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 2rem;
+  }
+  
+  .mat-mdc-select-value {
+    text-align: center;
+  }
+  
+  .mat-mdc-form-field-underline {
+    display: none;
+  }
+}

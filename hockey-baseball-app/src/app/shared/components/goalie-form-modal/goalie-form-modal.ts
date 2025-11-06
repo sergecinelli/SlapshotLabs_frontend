@@ -152,7 +152,7 @@ export class GoalieFormModalComponent implements OnInit {
 
   private createForm(): FormGroup {
     return this.fb.group({
-      team: [''],
+      team: ['', [Validators.required]],
       birthYear: ['', [Validators.min(1900), Validators.max(new Date().getFullYear())]],
       jerseyNumber: ['', [Validators.min(1), Validators.max(99)]],
       firstName: ['', [Validators.required]],
@@ -216,7 +216,7 @@ export class GoalieFormModalComponent implements OnInit {
       
       const goalieData: Partial<Goalie> = {
         team: teamName,
-        ...(teamId && { teamId: teamId }),
+        teamId: teamId,  // Always include teamId
         birthYear: formValue.birthYear,
         jerseyNumber: formValue.jerseyNumber,
         firstName: formValue.firstName,
