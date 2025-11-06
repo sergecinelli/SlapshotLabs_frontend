@@ -422,13 +422,11 @@ export class ScheduleFormModalComponent implements OnInit {
    * Filter goalies based on selected team
    */
   private filterGoaliesByTeam(teamId: string, teamType: 'away' | 'home'): void {
+    const numericTeamId = parseInt(teamId, 10);
+    
     const filteredGoalies = this.goalies.filter(goalie => {
-      // Extract team name from goalie.team (format: "Team Name (Group - Level)")
-      const team = this.teams.find(t => t.id === teamId);
-      if (!team) return false;
-      
-      // Check if goalie's team matches the selected team
-      return goalie.team === team.name || goalie.team.includes(team.name);
+      // Filter by teamId from API data
+      return goalie.teamId === numericTeamId;
     });
     
     const options = this.transformGoaliesToOptions(filteredGoalies);

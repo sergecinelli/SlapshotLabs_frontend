@@ -80,6 +80,7 @@ export interface GoalieApiPatch {
 // Frontend interface - keeping existing structure for compatibility
 export interface Goalie {
   id: string;
+  teamId?: number;  // Team ID from API
   team: string;
   level: string;
   position: string;

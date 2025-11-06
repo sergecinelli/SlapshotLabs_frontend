@@ -69,29 +69,6 @@
               {{ getErrorMessage('lastName') }}
             </mat-error>
           </mat-form-field>
-
-          <!-- Position Radio Buttons -->
-          <div class="position-selection-container">
-            <span class="position-selection-label uppercase text-custom-secondary">Position:</span>
-            <div *ngIf="isLoading" class="loading-message">Loading positions...</div>
-            <div class="position-buttons" *ngIf="!isLoading">
-              <div 
-                *ngFor="let option of positionOptions" 
-                class="position-button"
-                [class.selected]="goalieForm.get('position')?.value === option.value"
-                (click)="goalieForm.patchValue({position: option.value})"
-                (keydown.enter)="goalieForm.patchValue({position: option.value})"
-                (keydown.space)="goalieForm.patchValue({position: option.value})"
-                tabindex="0"
-                role="button"
-                [attr.aria-pressed]="goalieForm.get('position')?.value === option.value">
-                <span class="position-name">{{ option.label }}</span>
-              </div>
-            </div>
-            <div class="position-error" *ngIf="goalieForm.get('position')?.errors && goalieForm.get('position')?.touched">
-              {{ getErrorMessage('position') }}
-            </div>
-          </div>
         </div>
       </div>
 

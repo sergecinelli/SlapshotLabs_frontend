@@ -94,6 +94,7 @@ export interface PlayerApiPatch {
 // Frontend interface - keeping structure similar to goalies
 export interface Player {
   id: string;
+  teamId?: number;  // Team ID from API
   team: string;
   position: 'Left Wing' | 'Center' | 'Right Wing' | 'Left Defense' | 'Right Defense';
   height: string;  // e.g., "5'6""

@@ -97,6 +97,7 @@ export class GoalieDataMapper {
     const data = apiGoalie.data;
     return {
       id: data.id.toString(),
+      teamId: data.team_id,  // Store team ID from API
       team: teamName || `Team ${data.team_id}`,
       level: 'Professional', // Default value since not in API
       position: 'Goalie',

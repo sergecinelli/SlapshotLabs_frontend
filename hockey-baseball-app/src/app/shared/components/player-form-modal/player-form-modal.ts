@@ -8,14 +8,16 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
-import { forkJoin } from 'rxjs';
+import { forkJoin, of } from 'rxjs';
 import { Player } from '../../interfaces/player.interface';
+import { Team } from '../../interfaces/team.interface';
 import { TeamService } from '../../../services/team.service';
 import { PositionService, PositionOption } from '../../../services/position.service';
 
 export interface PlayerFormModalData {
   player?: Player;
   isEditMode: boolean;
+  teams?: Team[];  // Optional: pass teams to avoid redundant API calls
 }
 
 export interface TeamOption {
@@ -73,9 +75,14 @@ export class PlayerFormModalComponent implements OnInit {
   private loadFormData(): void {
     this.isLoading = true;
     
+    // Use provided teams or fetch from API
+    const teamsObservable = this.data.teams 
+      ? of({ teams: this.data.teams, total: this.data.teams.length })
+      : this.teamService.getTeams();
+    
     // Fetch teams and positions concurrently
     forkJoin({
-      teams: this.teamService.getTeams(),
+      teams: teamsObservable,
       positions: this.positionService.getPositions()
     }).subscribe({
       next: ({ teams, positions }) => {

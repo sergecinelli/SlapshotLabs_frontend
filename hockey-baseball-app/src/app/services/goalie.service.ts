@@ -1,22 +1,30 @@
 import { Injectable, inject } from '@angular/core';
-import { Observable, throwError } from 'rxjs';
+import { Observable, throwError, forkJoin } from 'rxjs';
 import { map, catchError, switchMap } from 'rxjs/operators';
 import { Goalie, GoalieTableData, GoalieApiInData, GoalieApiOutData } from '../shared/interfaces/goalie.interface';
 import { ApiService } from './api.service';
 import { GoalieDataMapper } from '../shared/utils/goalie-data-mapper';
+import { TeamService } from './team.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class GoalieService {
   private apiService = inject(ApiService);
+  private teamService = inject(TeamService);
 
   getGoalies(): Observable<GoalieTableData> {
-    return this.apiService.get<GoalieApiOutData[]>('/hockey/goalie/list').pipe(
-      map(apiGoalies => {
-        // /list endpoint returns flat objects without photo wrapper
+    return forkJoin({
+      goalies: this.apiService.get<GoalieApiOutData[]>('/hockey/goalie/list'),
+      teams: this.teamService.getTeams()
+    }).pipe(
+      map(({ goalies: apiGoalies, teams }) => {
+        // Create team ID to name mapping
+        const teamMap = new Map(teams.teams.map(t => [parseInt(t.id), t.name]));
+        
+        // Map goalies with team names
         const goalies = apiGoalies.map(apiGoalie => 
-          GoalieDataMapper.fromApiOutFormat({ photo: '', data: apiGoalie })
+          GoalieDataMapper.fromApiOutFormat({ photo: '', data: apiGoalie }, teamMap.get(apiGoalie.team_id))
         );
         return {
           goalies: goalies,
@@ -55,10 +63,15 @@ export class GoalieService {
       return throwError(() => new Error(`Invalid goalie ID: ${id}`));
     }
 
-    return this.apiService.get<GoalieApiOutData>(`/hockey/goalie/${numericId}`).pipe(
-      map(apiGoalie => {
+    return forkJoin({
+      goalie: this.apiService.get<GoalieApiOutData>(`/hockey/goalie/${numericId}`),
+      teams: this.teamService.getTeams()
+    }).pipe(
+      map(({ goalie: apiGoalie, teams }) => {
+        // Create team ID to name mapping
+        const teamMap = new Map(teams.teams.map(t => [parseInt(t.id), t.name]));
         // Single goalie endpoint returns flat object without photo wrapper
-        return GoalieDataMapper.fromApiOutFormat({ photo: '', data: apiGoalie });
+        return GoalieDataMapper.fromApiOutFormat({ photo: '', data: apiGoalie }, teamMap.get(apiGoalie.team_id));
       }),
       catchError(error => {
         console.error(`Failed to fetch goalie with ID ${id}:`, error);
@@ -107,18 +120,14 @@ export class GoalieService {
     formData.append('data', JSON.stringify(apiGoalieData.data));
     
     return this.apiService.postMultipart<{ id: number }>('/hockey/goalie', formData).pipe(
-      map(response => {
-        // Create a complete goalie object with the returned ID
-        const newGoalie: Goalie = {
-          id: response.id.toString(),
-          ...goalieData,
-          // Ensure all required fields are present
-          team: goalieData.team || 'Team 1',
-          level: goalieData.level || 'Professional',
-          position: 'Goalie',
-          createdAt: new Date() // Set creation date
-        } as Goalie;
-        
+      switchMap(response => {
+        // Fetch the newly created goalie to get proper team name mapping
+        return this.getGoalieById(response.id.toString());
+      }),
+      map(newGoalie => {
+        if (!newGoalie) {
+          throw new Error('Failed to fetch newly created goalie');
+        }
         console.log(`Added new goalie:`, newGoalie);
         return newGoalie;
       }),

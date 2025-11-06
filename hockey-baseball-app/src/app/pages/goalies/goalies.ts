@@ -8,7 +8,9 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header';
 import { DataTableComponent, TableColumn, TableAction } from '../../shared/components/data-table/data-table';
 import { GoalieService } from '../../services/goalie.service';
+import { TeamService } from '../../services/team.service';
 import { Goalie } from '../../shared/interfaces/goalie.interface';
+import { Team } from '../../shared/interfaces/team.interface';
 import { GoalieFormModalComponent, GoalieFormModalData } from '../../shared/components/goalie-form-modal/goalie-form-modal';
 
 @Component({
@@ -46,11 +48,13 @@ import { GoalieFormModalComponent, GoalieFormModalData } from '../../shared/comp
 })
 export class GoaliesComponent implements OnInit {
   private goalieService = inject(GoalieService);
+  private teamService = inject(TeamService);
   private http = inject(HttpClient);
   private dialog = inject(MatDialog);
   private snackBar = inject(MatSnackBar);
 
   goalies = signal<Goalie[]>([]);
+  teams: Team[] = [];  // Store teams to pass to modals
   loading = signal(true);
 
   tableColumns: TableColumn[] = [
@@ -96,10 +100,23 @@ export class GoaliesComponent implements OnInit {
         const sortedGoalies = this.sortByDate(data.goalies, 'desc');
         this.goalies.set(sortedGoalies);
         this.loading.set(false);
+        // Fetch all teams separately for modals
+        this.loadTeams();
       },
       error: (error) => {
         console.error('Error loading goalies:', error);
         this.loading.set(false);
+      }
+    });
+  }
+
+  private loadTeams(): void {
+    this.teamService.getTeams().subscribe({
+      next: (data) => {
+        this.teams = data.teams;
+      },
+      error: (error) => {
+        console.error('Error loading teams:', error);
       }
     });
   }
@@ -224,7 +241,8 @@ export class GoaliesComponent implements OnInit {
       width: '800px',
       maxWidth: '95vw',
       data: {
-        isEditMode: false
+        isEditMode: false,
+        teams: this.teams
       } as GoalieFormModalData,
       panelClass: 'goalie-form-modal-dialog',
       disableClose: true
@@ -262,7 +280,8 @@ export class GoaliesComponent implements OnInit {
       maxWidth: '95vw',
       data: {
         goalie: goalie,
-        isEditMode: true
+        isEditMode: true,
+        teams: this.teams
       } as GoalieFormModalData,
       panelClass: 'goalie-form-modal-dialog',
       disableClose: true

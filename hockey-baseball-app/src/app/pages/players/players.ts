@@ -8,7 +8,9 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header';
 import { DataTableComponent, TableColumn, TableAction } from '../../shared/components/data-table/data-table';
 import { PlayerService } from '../../services/player.service';
+import { TeamService } from '../../services/team.service';
 import { Player } from '../../shared/interfaces/player.interface';
+import { Team } from '../../shared/interfaces/team.interface';
 import { PlayerFormModalComponent, PlayerFormModalData } from '../../shared/components/player-form-modal/player-form-modal';
 
 @Component({
@@ -46,11 +48,13 @@ import { PlayerFormModalComponent, PlayerFormModalData } from '../../shared/comp
 })
 export class PlayersComponent implements OnInit {
   private playerService = inject(PlayerService);
+  private teamService = inject(TeamService);
   private http = inject(HttpClient);
   private dialog = inject(MatDialog);
   private snackBar = inject(MatSnackBar);
 
   players = signal<Player[]>([]);
+  teams: Team[] = [];  // Store teams to pass to modals
   loading = signal(true);
 
   tableColumns: TableColumn[] = [
@@ -92,10 +96,23 @@ export class PlayersComponent implements OnInit {
         const sortedPlayers = this.sortByDate(data.players, 'desc');
         this.players.set(sortedPlayers);
         this.loading.set(false);
+        // Fetch all teams separately for modals
+        this.loadTeams();
       },
       error: (error) => {
         console.error('Error loading players:', error);
         this.loading.set(false);
+      }
+    });
+  }
+
+  private loadTeams(): void {
+    this.teamService.getTeams().subscribe({
+      next: (data) => {
+        this.teams = data.teams;
+      },
+      error: (error) => {
+        console.error('Error loading teams:', error);
       }
     });
   }
@@ -220,7 +237,8 @@ export class PlayersComponent implements OnInit {
       width: '800px',
       maxWidth: '95vw',
       data: {
-        isEditMode: false
+        isEditMode: false,
+        teams: this.teams
       } as PlayerFormModalData,
       panelClass: 'player-form-modal-dialog',
       disableClose: true
@@ -258,7 +276,8 @@ export class PlayersComponent implements OnInit {
       maxWidth: '95vw',
       data: {
         player: player,
-        isEditMode: true
+        isEditMode: true,
+        teams: this.teams
       } as PlayerFormModalData,
       panelClass: 'player-form-modal-dialog',
       disableClose: true

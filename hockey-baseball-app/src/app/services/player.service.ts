@@ -1,21 +1,29 @@
 import { Injectable, inject } from '@angular/core';
-import { Observable, throwError } from 'rxjs';
+import { Observable, throwError, forkJoin } from 'rxjs';
 import { map, catchError, switchMap } from 'rxjs/operators';
 import { Player, PlayerTableData, PlayerApiOut, PlayerApiIn, PlayerApiPatch, PlayerApiInData, PlayerApiOutData } from '../shared/interfaces/player.interface';
 import { ApiService } from './api.service';
+import { TeamService } from './team.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PlayerService {
   private apiService = inject(ApiService);
+  private teamService = inject(TeamService);
 
   getPlayers(): Observable<PlayerTableData> {
-    return this.apiService.get<PlayerApiOutData[]>('/hockey/player/list').pipe(
-      map(apiPlayers => {
-        // /list endpoint returns flat objects without photo wrapper
+    return forkJoin({
+      players: this.apiService.get<PlayerApiOutData[]>('/hockey/player/list'),
+      teams: this.teamService.getTeams()
+    }).pipe(
+      map(({ players: apiPlayers, teams }) => {
+        // Create team ID to name mapping
+        const teamMap = new Map(teams.teams.map(t => [parseInt(t.id), t.name]));
+        
+        // Map players with team names
         const players = apiPlayers.map(apiPlayer => 
-          this.fromApiOutFormat({ photo: '', data: apiPlayer })
+          this.fromApiOutFormat({ photo: '', data: apiPlayer }, teamMap.get(apiPlayer.team_id))
         );
         return {
           players: players,
@@ -52,10 +60,15 @@ export class PlayerService {
       return throwError(() => new Error(`Invalid player ID: ${id}`));
     }
 
-    return this.apiService.get<PlayerApiOutData>(`/hockey/player/${numericId}`).pipe(
-      map(apiPlayer => {
+    return forkJoin({
+      player: this.apiService.get<PlayerApiOutData>(`/hockey/player/${numericId}`),
+      teams: this.teamService.getTeams()
+    }).pipe(
+      map(({ player: apiPlayer, teams }) => {
+        // Create team ID to name mapping
+        const teamMap = new Map(teams.teams.map(t => [parseInt(t.id), t.name]));
         // Single player endpoint returns flat object without photo wrapper
-        return this.fromApiOutFormat({ photo: '', data: apiPlayer });
+        return this.fromApiOutFormat({ photo: '', data: apiPlayer }, teamMap.get(apiPlayer.team_id));
       }),
       catchError(error => {
         console.error(`Failed to fetch player with ID ${id}:`, error);
@@ -104,24 +117,14 @@ export class PlayerService {
     formData.append('data', JSON.stringify(apiPlayerData.data));
     
     return this.apiService.postMultipart<{ id: number }>('/hockey/player', formData).pipe(
-      map(response => {
-        // Create a complete player object with the returned ID
-        const newPlayer: Player = {
-          id: response.id.toString(),
-          ...playerData,
-          // Ensure all required fields are present
-          team: playerData.team || 'Team 1',
-          level: playerData.level || 'Professional',
-          position: playerData.position || 'Center',
-          rink: playerData.rink || {
-            facilityName: 'Default Facility',
-            rinkName: 'Main Rink',
-            city: 'City',
-            address: 'Address'
-          },
-          createdAt: new Date() // Set creation date
-        } as Player;
-        
+      switchMap(response => {
+        // Fetch the newly created player to get proper team name mapping
+        return this.getPlayerById(response.id.toString());
+      }),
+      map(newPlayer => {
+        if (!newPlayer) {
+          throw new Error('Failed to fetch newly created player');
+        }
         console.log(`Added new player:`, newPlayer);
         return newPlayer;
       }),
@@ -161,7 +164,7 @@ export class PlayerService {
     );
   }
 
-  private fromApiOutFormat(apiPlayer: PlayerApiOut): Player {
+  private fromApiOutFormat(apiPlayer: PlayerApiOut, teamName?: string): Player {
     const data = apiPlayer.data;
     const heightFeet = Math.floor(data.height / 12);
     const heightInches = data.height % 12;
@@ -169,7 +172,8 @@ export class PlayerService {
 
     return {
       id: data.id.toString(),
-      team: `Team ${data.team_id}`,
+      teamId: data.team_id,  // Store team ID from API
+      team: teamName || `Team ${data.team_id}`,
       position: this.mapPositionIdToName(data.position_id),
       height: heightString,
       weight: data.weight,
