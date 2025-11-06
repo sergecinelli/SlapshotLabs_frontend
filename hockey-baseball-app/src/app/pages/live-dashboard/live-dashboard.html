@@ -24,7 +24,7 @@
       <div class="flex items-center justify-around gap-4 text-right">
         <div>
           <div class="text-xs text-gray-500">
-            U11A <span class="font-bold text-custom-dark ml-3 uppercase">Visitor</span>
+            {{ awayTeam().teamLevel }} <span class="font-bold text-custom-dark ml-3 uppercase">Visitor</span>
           </div>
           <div class="font-semibold text-base tracking-wider max-w-56">{{ awayTeam().name }}</div>
           <div class="text-sm font-medium">{{ awayTeam().record }}</div>
@@ -68,7 +68,7 @@
         </div>
         <div>
           <div class="text-xs text-gray-500">
-            U11A <span class="font-bold text-custom-dark ml-3 uppercase">Home</span>
+            {{ homeTeam().teamLevel }} <span class="font-bold text-custom-dark ml-3 uppercase">Home</span>
           </div>
           <div class="font-semibold text-base tracking-wider max-w-56">{{ homeTeam().name }}</div>
           <div class="text-sm font-medium">{{ homeTeam().record }}</div>
@@ -485,7 +485,7 @@
                       <button mat-icon-button color="primary" matTooltip="Edit">
                         <mat-icon>edit</mat-icon>
                       </button>
-                      <button mat-icon-button color="warn" matTooltip="Delete">
+                      <button mat-icon-button color="warn" matTooltip="Delete" (click)="onDeleteEvent(event.id)">
                         <mat-icon>delete</mat-icon>
                       </button>
                     </div>

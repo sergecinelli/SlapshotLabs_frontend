@@ -128,6 +128,18 @@ export class GameEventService {
   }
 
   /**
+   * Delete a game event
+   */
+  deleteGameEvent(eventId: number): Observable<void> {
+    return this.apiService.delete<void>(`/hockey/game-event/${eventId}`).pipe(
+      catchError(error => {
+        console.error('Failed to delete game event:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  /**
    * Create a turnover event with only required fields
    */
   createTurnoverEvent(turnoverData: TurnoverEventRequest): Observable<{ id: number; success: boolean }> {

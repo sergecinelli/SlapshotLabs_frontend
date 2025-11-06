@@ -22,6 +22,8 @@ import { GoalieService } from '../../services/goalie.service';
 import { LiveGameService, LiveGameData, GameDetails, GameEvent as ServiceGameEvent } from '../../services/live-game.service';
 import { ArenaService } from '../../services/arena.service';
 import { Rink } from '../../shared/interfaces/arena.interface';
+import { TeamOptionsService } from '../../services/team-options.service';
+import { GameEventService } from '../../services/game-event.service';
 import { environment } from '../../../environments/environment';
 import { forkJoin } from 'rxjs';
 interface Team {
@@ -30,6 +32,7 @@ interface Team {
   score: number;
   record: string;
   sog: number;
+  teamLevel?: string;
 }
 
 interface GameStats {
@@ -87,6 +90,8 @@ export class LiveDashboardComponent implements OnInit {
   private goalieService = inject(GoalieService);
   private liveGameService = inject(LiveGameService);
   private arenaService = inject(ArenaService);
+  private teamOptionsService = inject(TeamOptionsService);
+  private gameEventService = inject(GameEventService);
   
   // Game ID from route parameter
   gameId = 1;
@@ -134,7 +139,8 @@ export class LiveDashboardComponent implements OnInit {
     logo: 'BRB',
     score: 2,
     record: '(0 - 1 - 0)',
-    sog: 0
+    sog: 0,
+    teamLevel: ''
   });
 
   awayTeam = signal<Team>({
@@ -142,7 +148,8 @@ export class LiveDashboardComponent implements OnInit {
     logo: 'WW',
     score: 1,
     record: '(0 - 0 - 0)',
-    sog: 0
+    sog: 0,
+    teamLevel: ''
   });
 
   period = signal('2ND Period');
@@ -226,9 +233,10 @@ export class LiveDashboardComponent implements OnInit {
       shotTypes: this.gameMetadataService.getShotTypes(),
       gameTypes: this.gameMetadataService.getGameTypes(),
       teams: this.teamService.getTeams(),
-      rinks: this.arenaService.getAllRinks()
+      rinks: this.arenaService.getAllRinks(),
+      teamLevels: this.teamOptionsService.getTeamLevels()
     }).subscribe({
-      next: ({ gameDetails, liveData, periods, shotTypes, gameTypes, teams, rinks }) => {
+      next: ({ gameDetails, liveData, periods, shotTypes, gameTypes, teams, rinks, teamLevels }) => {
         // Set team IDs from game details
         this.homeTeamId = gameDetails.home_team_id;
         this.awayTeamId = gameDetails.away_team_id;
@@ -247,13 +255,18 @@ export class LiveDashboardComponent implements OnInit {
         const awayTeamData = allTeams.find(t => parseInt(t.id) === this.awayTeamId);
 
         if (homeTeamData && awayTeamData) {
+          // Get team level names from API data
+          const homeTeamLevel = this.teamOptionsService.getLevelName(parseInt(homeTeamData.level));
+          const awayTeamLevel = this.teamOptionsService.getLevelName(parseInt(awayTeamData.level));
+          
           // Update team signals with real data
           this.homeTeam.set({
             name: homeTeamData.name,
             logo: `${environment.apiUrl}/hockey/team/${homeTeamData.id}/logo`,
             score: liveData.home_goals,
             record: '(0 - 0 - 0)', // TODO: Get from API when available
-            sog: liveData.home_shots.shots_on_goal
+            sog: liveData.home_shots.shots_on_goal,
+            teamLevel: homeTeamLevel
           });
 
           this.awayTeam.set({
@@ -261,7 +274,8 @@ export class LiveDashboardComponent implements OnInit {
             logo: `${environment.apiUrl}/hockey/team/${awayTeamData.id}/logo`,
             score: liveData.away_goals,
             record: '(0 - 0 - 0)', // TODO: Get from API when available
-            sog: liveData.away_shots.shots_on_goal
+            sog: liveData.away_shots.shots_on_goal,
+            teamLevel: awayTeamLevel
           });
 
           // Set team options for dropdowns
@@ -911,5 +925,29 @@ export class LiveDashboardComponent implements OnInit {
         // For example, add it to game events
       }
     });
+  }
+
+  /**
+   * Delete a game event
+   */
+  onDeleteEvent(eventId: number | string): void {
+    // Skip if it's a period header (string ID)
+    if (typeof eventId === 'string') {
+      return;
+    }
+
+    if (confirm('Are you sure you want to delete this event?')) {
+      this.gameEventService.deleteGameEvent(eventId).subscribe({
+        next: () => {
+          console.log(`Event ${eventId} deleted successfully`);
+          // Reload game data to refresh the events list
+          this.loadFullGameData();
+        },
+        error: (error) => {
+          console.error('Failed to delete event:', error);
+          alert('Failed to delete event. Please try again.');
+        }
+      });
+    }
   }
 }
