@@ -51,6 +51,11 @@
               (click)="selectGoalie(goalie.value)">
               <div class="goalie-name">{{ goalie.label }}</div>
             </button>
+            <button type="button" class="goalie-button"
+              [class.selected]="goalieChangeForm.get('goalie')?.value === null || goalieChangeForm.get('goalie')?.value === ''"
+              (click)="selectGoalie(null)">
+              <div class="goalie-name">No Goalie</div>
+            </button>
           </div>
           <div *ngIf="goalieChangeForm.get('goalie')?.errors && goalieChangeForm.get('goalie')?.touched" class="goalie-error">
             {{ getErrorMessage('goalie') }}

@@ -54,6 +54,10 @@ export class GoalieChangeFormModalComponent implements OnInit {
     periodOptions?: { value: number; label: string }[]; 
     teamOptions?: { value: number; label: string; logo?: string }[];
     goalieOptions?: { value: number; label: string; teamId: number }[];
+    homeTeamId?: number;
+    awayTeamId?: number;
+    homeStartGoalieId?: number;
+    awayStartGoalieId?: number;
   }>(MAT_DIALOG_DATA);
 
   gameId: number;
@@ -111,7 +115,7 @@ export class GoalieChangeFormModalComponent implements OnInit {
   private createForm(): FormGroup {
     return this.fb.group({
       team: ['', Validators.required],
-      goalie: ['', Validators.required],
+      goalie: [''], // optional to allow "No Goalie"
       period: ['', Validators.required],
       time: ['', [Validators.required, Validators.pattern(/^([0-5]?[0-9]):([0-5][0-9])$/)]],
       note: ['']
@@ -170,7 +174,9 @@ export class GoalieChangeFormModalComponent implements OnInit {
       this.goalieOptions = this.goaliesByTeam[teamId];
       this.isLoadingGoalies = false;
       if (this.goalieOptions.length > 0) {
-        this.goalieChangeForm.patchValue({ goalie: this.goalieOptions[0].value });
+        const defaultId = this.pickStartGoalieId(teamId);
+        const found = this.goalieOptions.find(g => g.value === defaultId);
+        this.goalieChangeForm.patchValue({ goalie: found ? found.value : this.goalieOptions[0].value });
       }
       return;
     }
@@ -188,7 +194,9 @@ export class GoalieChangeFormModalComponent implements OnInit {
         this.isLoadingGoalies = false;
         
         if (this.goalieOptions.length > 0) {
-          this.goalieChangeForm.patchValue({ goalie: this.goalieOptions[0].value });
+          const defaultId = this.pickStartGoalieId(teamId);
+          const found = this.goalieOptions.find(g => g.value === defaultId);
+          this.goalieChangeForm.patchValue({ goalie: found ? found.value : this.goalieOptions[0].value });
         } else {
           this.goalieChangeForm.patchValue({ goalie: '' });
         }
@@ -217,13 +225,23 @@ export class GoalieChangeFormModalComponent implements OnInit {
       this.goalieOptions = filteredGoalies;
       
       if (this.goalieOptions.length > 0) {
-        this.goalieChangeForm.patchValue({ goalie: this.goalieOptions[0].value });
+        const defaultId = this.pickStartGoalieId(teamId);
+        const found = this.goalieOptions.find(g => g.value === defaultId);
+        this.goalieChangeForm.patchValue({ goalie: found ? found.value : this.goalieOptions[0].value });
       } else {
         this.goalieChangeForm.patchValue({ goalie: '' });
       }
     }
   }
 
+  private pickStartGoalieId(teamId: number | string | null | undefined): number | undefined {
+    if (teamId == null) return undefined;
+    const idNum = typeof teamId === 'string' ? parseInt(teamId, 10) : teamId;
+    if (this.dialogData.homeTeamId != null && idNum === this.dialogData.homeTeamId) return this.dialogData.homeStartGoalieId;
+    if (this.dialogData.awayTeamId != null && idNum === this.dialogData.awayTeamId) return this.dialogData.awayStartGoalieId;
+    return undefined;
+  }
+ 
   private setupTeamChangeListener(): void {
     const usePreloadedGoalies = this.dialogData.goalieOptions && this.dialogData.goalieOptions.length > 0;
     
@@ -242,7 +260,7 @@ export class GoalieChangeFormModalComponent implements OnInit {
     this.goalieChangeForm.get('team')?.markAsTouched();
   }
 
-  selectGoalie(goalieValue: number): void {
+  selectGoalie(goalieValue: number | null): void {
     this.goalieChangeForm.patchValue({ goalie: goalieValue });
     this.goalieChangeForm.get('goalie')?.markAsTouched();
   }
@@ -262,11 +280,13 @@ export class GoalieChangeFormModalComponent implements OnInit {
       const isoTime = new Date();
       isoTime.setHours(0, minutes, seconds, 0);
       
+      const goalieId = (typeof formValue.goalie === 'number' && !isNaN(formValue.goalie)) ? formValue.goalie : undefined;
+
       const goalieChangeRequest: GoalieChangeEventRequest = {
         game_id: this.gameId,
         event_name_id: this.goalieChangeEventId,
         team_id: formValue.team,
-        goalie_id: formValue.goalie,
+        ...(goalieId !== undefined && { goalie_id: goalieId }),
         period_id: formValue.period,
         time: isoTime.toISOString(),
         note: formValue.note || undefined

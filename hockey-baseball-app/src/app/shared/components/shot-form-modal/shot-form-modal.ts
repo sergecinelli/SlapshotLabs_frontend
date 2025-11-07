@@ -65,6 +65,10 @@ export class ShotFormModalComponent implements OnInit {
     playerOptions?: { value: number; label: string; teamId: number }[];
     goalieOptions?: { value: number; label: string; teamId: number }[];
     gameStartTimeIso?: string;
+    homeTeamId?: number;
+    awayTeamId?: number;
+    homeStartGoalieId?: number;
+    awayStartGoalieId?: number;
   }>(MAT_DIALOG_DATA);
 
   gameId: number;
@@ -174,8 +178,16 @@ export class ShotFormModalComponent implements OnInit {
         .map(g => ({ value: g.value, label: g.label }));
       this.goalieOptions = oppositeGoalies;
 
-      // Set defaults for goalie fields to first opposite goalie if available
-      if (oppositeGoalies.length > 0) {
+      // Prefer starting goalie of the opposite team if present
+      const desiredStartId = teamId === this.dialogData.homeTeamId ? this.dialogData.awayStartGoalieId : this.dialogData.homeStartGoalieId;
+      const defaultOpp = oppositeGoalies.find(g => g.value === desiredStartId);
+
+      if (defaultOpp) {
+        this.shotForm.patchValue({
+          goalieScored: defaultOpp.value,
+          goalieInNet: defaultOpp.value
+        });
+      } else if (oppositeGoalies.length > 0) {
         this.shotForm.patchValue({
           goalieScored: oppositeGoalies[0].value,
           goalieInNet: oppositeGoalies[0].value
@@ -209,16 +221,15 @@ export class ShotFormModalComponent implements OnInit {
     const goalShotType = this.shotTypeOptions.find(st => st.label.toLowerCase() === 'goal');
     
     if (shotType === goalShotType?.value) {
-      // Goal fields are required
+      // Goal fields are required (goalie optional to allow "No Goalie")
       this.shotForm.get('scoringTeam')?.setValidators([Validators.required]);
       this.shotForm.get('scoringPlayer')?.setValidators([Validators.required]);
-      this.shotForm.get('goalieScored')?.setValidators([Validators.required]);
-      // Assist is optional
+      // Assist is optional and goalieScored optional
     } else if (shotType !== null) {
-      // Save/Missed/Blocked fields are required
+      // Save/Missed/Blocked fields are required (goalie optional to allow "No Goalie")
       this.shotForm.get('shootingTeam')?.setValidators([Validators.required]);
       this.shotForm.get('shootingPlayer')?.setValidators([Validators.required]);
-      this.shotForm.get('goalieInNet')?.setValidators([Validators.required]);
+      // goalieInNet optional
     }
 
     // Update validity
@@ -291,7 +302,7 @@ export class ShotFormModalComponent implements OnInit {
     this.shotForm.get(fieldName)?.markAsTouched();
   }
 
-  selectGoalie(goalieValue: number, fieldName: string): void {
+  selectGoalie(goalieValue: number | null, fieldName: string): void {
     this.shotForm.patchValue({ [fieldName]: goalieValue });
     this.shotForm.get(fieldName)?.markAsTouched();
   }
@@ -335,6 +346,8 @@ export class ShotFormModalComponent implements OnInit {
       const iso = tmp.toISOString();
       const timeOfDay = iso.substring(iso.indexOf('T') + 1); // HH:mm:ss.SSSZ
       
+      const goalieId: number | undefined = (this.isGoal ? formValue.goalieScored : formValue.goalieInNet) ?? undefined;
+
       const shotRequest: ShotEventRequest = {
         game_id: this.gameId,
         event_name_id: this.shotEventId,
@@ -342,7 +355,7 @@ export class ShotFormModalComponent implements OnInit {
         player_id: this.isGoal ? formValue.scoringPlayer : formValue.shootingPlayer,
         player_2_id: this.isGoal ? formValue.assistPlayer : undefined,
         shot_type_id: formValue.shotType,
-        goalie_id: this.isGoal ? formValue.goalieScored : formValue.goalieInNet,
+        goalie_id: goalieId,
         period_id: formValue.period,
         time: timeOfDay,
         youtube_link: formValue.youtubeLink || undefined,

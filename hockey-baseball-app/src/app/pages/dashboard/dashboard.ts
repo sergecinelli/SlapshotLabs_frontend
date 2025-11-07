@@ -34,14 +34,14 @@ export class DashboardComponent implements OnInit {
     this.scheduleService.getDashboardGames().subscribe({
       next: (data) => {
         // Map API response to Schedule interface
-        const mapGameToSchedule = (game: { id: number; home_team_id: number; home_goals: number; home_team_goalie_id: number; away_team_id: number; away_goals: number; away_team_goalie_id: number; game_type_group: string; tournament_name?: string; date: string; time: string; rink_id: number; status: number }): Schedule => ({
+        const mapGameToSchedule = (game: { id: number; home_team_id: number; home_goals: number; home_start_goalie_id: number; away_team_id: number; away_goals: number; away_start_goalie_id: number; game_type_group: string; tournament_name?: string; date: string; time: string; rink_id: number; status: number }): Schedule => ({
           id: game.id.toString(),
           homeTeam: `Team ${game.home_team_id}`, // TODO: Map to actual team names
           homeGoals: game.home_goals,
-          homeTeamGoalie: `Goalie ${game.home_team_goalie_id}`, // TODO: Map to actual goalie names
+          homeTeamGoalie: `Goalie ${game.home_start_goalie_id}`, // TODO: Map to actual goalie names
           awayTeam: `Team ${game.away_team_id}`,
           awayGoals: game.away_goals,
-          awayTeamGoalie: `Goalie ${game.away_team_goalie_id}`,
+          awayTeamGoalie: `Goalie ${game.away_start_goalie_id}`,
           gameType: game.game_type_group as GameType,
           tournamentName: game.tournament_name,
           date: game.date,

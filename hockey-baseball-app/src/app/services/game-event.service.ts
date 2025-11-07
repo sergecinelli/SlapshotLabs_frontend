@@ -58,7 +58,7 @@ export interface GoalieChangeEventRequest {
   game_id: number;
   event_name_id: number;
   team_id: number;
-  goalie_id: number;
+  goalie_id?: number | undefined;
   period_id: number;
   time: string;
   note?: string;
@@ -85,7 +85,7 @@ export interface ShotEventRequest {
   player_id: number;
   player_2_id?: number; // Assist player (for goals only)
   shot_type_id: number;
-  goalie_id: number;
+  goalie_id?: number | undefined;
   period_id: number;
   time: string;
   youtube_link?: string;

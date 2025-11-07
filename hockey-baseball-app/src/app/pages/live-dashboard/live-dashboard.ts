@@ -225,6 +225,10 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
   private homeOffensiveZoneEntryId?: number;
   private awayOffensiveZoneEntryId?: number;
 
+  // Starting goalies for defaults in forms
+  private homeStartGoalieId?: number;
+  private awayStartGoalieId?: number;
+ 
   ngOnInit(): void {
     // Get game ID from route parameter
     this.route.params.subscribe(params => {
@@ -278,6 +282,9 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
 
         // Update game header information from extra
         this.updateGameHeaderFromExtra(gameExtra, gameTypes, rinks, arenas, allTeams);
+        // Store starting goalies for default selections
+        this.homeStartGoalieId = gameExtra.home_start_goalie_id;
+        this.awayStartGoalieId = gameExtra.away_start_goalie_id;
         const homeTeamData = allTeams.find(t => parseInt(t.id) === this.homeTeamId);
         const awayTeamData = allTeams.find(t => parseInt(t.id) === this.awayTeamId);
 
@@ -874,7 +881,11 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
         teamOptions: this.teamOptions,
         playerOptions: this.playerOptions,
         goalieOptions: this.goalieOptions,
-        gameStartTimeIso: this.gameStartTime ? this.gameStartTime.toISOString() : undefined
+        gameStartTimeIso: this.gameStartTime ? this.gameStartTime.toISOString() : undefined,
+        homeTeamId: this.homeTeamId,
+        awayTeamId: this.awayTeamId,
+        homeStartGoalieId: this.homeStartGoalieId,
+        awayStartGoalieId: this.awayStartGoalieId
       }
     });
 
@@ -955,7 +966,11 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
         goalieChangeEventId: this.goalieChangeEventId,
         periodOptions: this.periodOptions,
         teamOptions: this.teamOptions,
-        goalieOptions: this.goalieOptions
+        goalieOptions: this.goalieOptions,
+        homeTeamId: this.homeTeamId,
+        awayTeamId: this.awayTeamId,
+        homeStartGoalieId: this.homeStartGoalieId,
+        awayStartGoalieId: this.awayStartGoalieId
       }
     });
 
