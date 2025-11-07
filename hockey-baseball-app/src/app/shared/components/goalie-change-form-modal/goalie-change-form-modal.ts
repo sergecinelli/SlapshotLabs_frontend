@@ -50,7 +50,8 @@ export class GoalieChangeFormModalComponent implements OnInit {
   private gameEventService = inject(GameEventService);
   private dialogData = inject<{ 
     gameId: number; 
-    goalieChangeEventId: number; 
+    goalieChangeEventId: number;
+    pullGoalieEventId: number;
     periodOptions?: { value: number; label: string }[]; 
     teamOptions?: { value: number; label: string; logo?: string }[];
     goalieOptions?: { value: number; label: string; teamId: number }[];
@@ -62,6 +63,7 @@ export class GoalieChangeFormModalComponent implements OnInit {
 
   gameId: number;
   goalieChangeEventId: number;
+  pullGoalieEventId: number;
 
   goalieChangeForm: FormGroup;
 
@@ -80,6 +82,7 @@ export class GoalieChangeFormModalComponent implements OnInit {
     this.goalieChangeForm = this.createForm();
     this.gameId = this.dialogData.gameId;
     this.goalieChangeEventId = this.dialogData.goalieChangeEventId;
+    this.pullGoalieEventId = this.dialogData.pullGoalieEventId;
     this.setupTeamChangeListener();
   }
 
@@ -282,9 +285,13 @@ export class GoalieChangeFormModalComponent implements OnInit {
       
       const goalieId = (typeof formValue.goalie === 'number' && !isNaN(formValue.goalie)) ? formValue.goalie : undefined;
 
+      // Use pullGoalieEventId if no goalie is selected (pulling the goalie)
+      // Use goalieChangeEventId if a goalie is selected (regular goalie change)
+      const eventNameId = goalieId === undefined ? this.pullGoalieEventId : this.goalieChangeEventId;
+
       const goalieChangeRequest: GoalieChangeEventRequest = {
         game_id: this.gameId,
-        event_name_id: this.goalieChangeEventId,
+        event_name_id: eventNameId,
         team_id: formValue.team,
         ...(goalieId !== undefined && { goalie_id: goalieId }),
         period_id: formValue.period,

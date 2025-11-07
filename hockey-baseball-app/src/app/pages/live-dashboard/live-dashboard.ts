@@ -26,6 +26,7 @@ import { Arena, Rink } from '../../shared/interfaces/arena.interface';
 import { Team } from '../../shared/interfaces/team.interface';
 import { TeamOptionsService } from '../../services/team-options.service';
 import { GameEventService } from '../../services/game-event.service';
+import { GameEventNameService, GameEventName } from '../../services/game-event-name.service';
 import { ScheduleService } from '../../services/schedule.service';
 import { environment } from '../../../environments/environment';
 import { forkJoin, interval, Subscription } from 'rxjs';
@@ -98,6 +99,7 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
   private arenaService = inject(ArenaService);
   private teamOptionsService = inject(TeamOptionsService);
   private gameEventService = inject(GameEventService);
+  private gameEventNameService = inject(GameEventNameService);
   private scheduleService = inject(ScheduleService);
   
   // Polling subscription for live data
@@ -105,11 +107,15 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
   
   // Game ID from route parameter
   gameId = 1;
-  turnoverEventId = 1; // This should be the ID for "Turnover" event type from game-event-name API
-  faceoffEventId = 2; // This should be the ID for "Faceoff" event type from game-event-name API
-  goalieChangeEventId = 3; // This should be the ID for "Goalie Change" event type from game-event-name API
-  penaltyEventId = 4; // This should be the ID for "Penalty" event type from game-event-name API
-  shotEventId = 5; // This should be the ID for "Shot" event type from game-event-name API
+  
+  // Event name IDs - loaded from API
+  eventNameIds: Record<string, number> = {};
+  shotOnGoalEventId = 0;
+  turnoverEventId = 0;
+  faceoffEventId = 0;
+  goalieChangeEventId = 0; // Regular goalie change
+  pullGoalieEventId = 0; // Pull the goalie (change to No Goalie)
+  penaltyEventId = 0;
   
   // TODO: Replace with actual team IDs from game data
   homeTeamId = 1; // This should come from the game API
@@ -265,9 +271,10 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
       teams: this.teamService.getTeams(),
       arenas: this.arenaService.getArenas(),
       rinks: this.arenaService.getAllRinks(),
-      teamLevels: this.teamOptionsService.getTeamLevels()
+      teamLevels: this.teamOptionsService.getTeamLevels(),
+      eventNames: this.gameEventNameService.getGameEventNames()
     }).subscribe({
-      next: ({ gameExtra, periods, shotTypes, gameTypes, teams, arenas, rinks, teamLevels }) => {
+      next: ({ gameExtra, periods, shotTypes, gameTypes, teams, arenas, rinks, teamLevels, eventNames }) => {
         // Check if game status is "Not Started" (1)
         if (gameExtra.status === 1) {
           this.router.navigate(['/dashboard']);
@@ -281,6 +288,19 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
         // Set team IDs from game extra
         this.homeTeamId = gameExtra.home_team_id;
         this.awayTeamId = gameExtra.away_team_id;
+
+        // Map event names to IDs
+        eventNames.forEach(event => {
+          this.eventNameIds[event.name] = event.id;
+        });
+        
+        // Set specific event IDs for forms
+        this.shotOnGoalEventId = this.eventNameIds['Shot on Goal'] || 0;
+        this.turnoverEventId = this.eventNameIds['Turnover'] || 0;
+        this.faceoffEventId = this.eventNameIds['Faceoff'] || 0;
+        this.goalieChangeEventId = this.eventNameIds['Goalie Change'] || 0;
+        this.pullGoalieEventId = this.eventNameIds['Pull the Goalie'] || 0;
+        this.penaltyEventId = this.eventNameIds['Penalty'] || 0;
 
         // Set periods and shot types
         this.gamePeriods = periods;
@@ -548,14 +568,9 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
    * Get event name from event_name_id
    */
   private getEventName(eventNameId: number): string {
-    const eventNames: Record<number, string> = {
-      1: 'GOAL',
-      2: 'FACEOFF',
-      3: 'GOALIE CHANGE',
-      4: 'PENALTY',
-      5: 'SHOT'
-    };
-    return eventNames[eventNameId] || 'UNKNOWN EVENT';
+    // Find the event name by ID from our loaded event names
+    const entry = Object.entries(this.eventNameIds).find(([_, id]) => id === eventNameId);
+    return entry ? entry[0].toUpperCase() : 'UNKNOWN EVENT';
   }
 
   /**
@@ -889,7 +904,7 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
       autoFocus: true,
       data: {
         gameId: this.gameId,
-        shotEventId: this.shotEventId,
+        shotEventId: this.shotOnGoalEventId,
         periodOptions: this.periodOptions,
         shotTypeOptions: this.shotTypeOptions,
         teamOptions: this.teamOptions,
@@ -978,6 +993,7 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
       data: {
         gameId: this.gameId,
         goalieChangeEventId: this.goalieChangeEventId,
+        pullGoalieEventId: this.pullGoalieEventId,
         periodOptions: this.periodOptions,
         teamOptions: this.teamOptions,
         goalieOptions: this.goalieOptions,
