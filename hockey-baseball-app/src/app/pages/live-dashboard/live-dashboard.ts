@@ -26,6 +26,7 @@ import { Arena, Rink } from '../../shared/interfaces/arena.interface';
 import { Team } from '../../shared/interfaces/team.interface';
 import { TeamOptionsService } from '../../services/team-options.service';
 import { GameEventService } from '../../services/game-event.service';
+import { ScheduleService } from '../../services/schedule.service';
 import { environment } from '../../../environments/environment';
 import { forkJoin, interval, Subscription } from 'rxjs';
 import { switchMap, startWith } from 'rxjs/operators';
@@ -97,6 +98,7 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
   private arenaService = inject(ArenaService);
   private teamOptionsService = inject(TeamOptionsService);
   private gameEventService = inject(GameEventService);
+  private scheduleService = inject(ScheduleService);
   
   // Polling subscription for live data
   private liveDataPollingSubscription?: Subscription;
@@ -127,6 +129,10 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
   
   // Loading state
   isLoadingGameData = true;
+  
+  // Game status flags
+  isGameOver = false;
+  pageTitle = signal('Live Dashboard');
   
   // Current period ID for dropdown
   currentPeriodId = 1;
@@ -268,6 +274,10 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
           return;
         }
         
+        // Set game status flags
+        this.isGameOver = gameExtra.status === 3;
+        this.pageTitle.set(this.isGameOver ? 'Game Dashboard' : 'Live Dashboard');
+        
         // Set team IDs from game extra
         this.homeTeamId = gameExtra.home_team_id;
         this.awayTeamId = gameExtra.away_team_id;
@@ -378,8 +388,12 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
   private updateGameHeaderFromExtra(gameExtra: GameExtra, gameTypes: { id: number; name: string }[], rinks: Rink[], arenas: Arena[], teams: Team[]): void {
     // Update period
     const currentPeriod = this.gamePeriods.find(p => p.id === gameExtra.game_period_id);
-    this.period.set(currentPeriod ? currentPeriod.name : 'Unknown Period');
     this.currentPeriodId = gameExtra.game_period_id;
+    if (this.isGameOver) {
+      this.period.set('Final');
+    } else {
+      this.period.set(currentPeriod ? currentPeriod.name : 'Unknown Period');
+    }
 
     // tournamentCategory - game type by game_type_id
     const gameType = gameTypes.find(t => t.id === gameExtra.game_type_id);
@@ -987,12 +1001,27 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
    * Handle period change from dropdown
    */
   onPeriodChange(periodId: number): void {
+    if (this.isGameOver) { return; }
     const selectedPeriod = this.gamePeriods.find(p => p.id === periodId);
-    if (selectedPeriod) {
-      this.period.set(selectedPeriod.name);
-      // TODO: Update game period on backend if needed
-      console.log('Period changed to:', selectedPeriod.name);
-    }
+    if (!selectedPeriod) { return; }
+
+    const prevPeriodId = this.currentPeriodId;
+    const prevPeriodName = this.period();
+
+    // Optimistic UI update
+    this.currentPeriodId = periodId;
+    this.period.set(selectedPeriod.name);
+
+    this.scheduleService.updateGame(this.gameId, { game_period_id: periodId }).subscribe({
+      next: () => this.refreshLiveDataOnce(),
+      error: (e) => {
+        console.error('Failed to update game period:', e);
+        // Revert UI on error
+        this.currentPeriodId = prevPeriodId;
+        this.period.set(prevPeriodName);
+        alert('Failed to update period. Please try again.');
+      }
+    });
   }
 
   onPenalty(): void {

@@ -1,6 +1,6 @@
 <div class="p-6 pt-0 space-y-6">
   <!-- Page Header -->
-  <app-page-header title="Live Dashboard"></app-page-header>
+  <app-page-header [title]="pageTitle()"></app-page-header>
 
   <!-- Loading Spinner -->
   <div *ngIf="isLoadingGameData" class="flex items-center justify-center min-h-[60vh]">
@@ -47,16 +47,21 @@
       <!-- Score -->
       <div class="flex-col gap-0 mb-14">
         <div class="text-center mb-4">
-          <mat-form-field class="period-select-field">
-            <mat-select 
-              [(ngModel)]="currentPeriodId" 
-              (selectionChange)="onPeriodChange($event.value)"
-              [panelClass]="'period-select-panel'">
-              <mat-option *ngFor="let period of periodOptions" [value]="period.value">
-                {{ period.label }}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
+          <ng-container *ngIf="!isGameOver; else finalLabel">
+            <mat-form-field class="period-select-field">
+              <mat-select 
+                [(ngModel)]="currentPeriodId" 
+                (selectionChange)="onPeriodChange($event.value)"
+                [panelClass]="'period-select-panel'">
+                <mat-option *ngFor="let period of periodOptions" [value]="period.value">
+                  {{ period.label }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </ng-container>
+          <ng-template #finalLabel>
+            <div class="text-xl font-semibold">Final</div>
+          </ng-template>
         </div>
         <div class="flex items-center gap-2">
           <div class="text-center">
