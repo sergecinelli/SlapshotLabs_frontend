@@ -1,5 +1,6 @@
 import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
@@ -60,6 +61,7 @@ export class ScheduleComponent implements OnInit {
   private playerService = inject(PlayerService);
   private gameMetadataService = inject(GameMetadataService);
   private dialog = inject(MatDialog);
+  private router = inject(Router);
 
   schedules = signal<Schedule[]>([]);
   loading = signal(true);
@@ -72,6 +74,9 @@ export class ScheduleComponent implements OnInit {
   players: Player[] = [];
   gameTypes: any[] = [];
   gamePeriods: any[] = [];
+  
+  // Store raw game data for edit mode
+  rawGames: Map<string, any> = new Map();
 
   tableColumns: TableColumn[] = [
     { key: 'homeTeam', label: 'Home Team', sortable: true, width: '150px' },
@@ -89,6 +94,15 @@ export class ScheduleComponent implements OnInit {
   ];
 
   tableActions: TableAction[] = [
+    { 
+      label: 'Dashboard', 
+      action: 'dashboard', 
+      variant: 'primary',
+      condition: (item: Record<string, unknown>) => {
+        const status = item['status'] as GameStatus;
+        return status === GameStatus.GameInProgress || status === GameStatus.GameOver;
+      }
+    },
     { label: 'Edit', action: 'edit', variant: 'secondary' },
     { label: 'Delete', action: 'delete', variant: 'danger' }
   ];
@@ -128,6 +142,11 @@ export class ScheduleComponent implements OnInit {
           const arena = this.arenas.find(a => a.id === r.arena_id);
           return [r.id, arena ? `${arena.name} - ${r.name}` : r.name];
         }));
+        
+        // Store raw game data for edit mode
+        schedules.forEach(game => {
+          this.rawGames.set(game.id.toString(), game);
+        });
         
         // Map API response to Schedule interface
         const mappedSchedules: Schedule[] = schedules.map(game => ({
@@ -170,6 +189,11 @@ export class ScheduleComponent implements OnInit {
           return [r.id, arena ? `${arena.name} - ${r.name}` : r.name];
         }));
         
+        // Store raw game data for edit mode
+        games.forEach(game => {
+          this.rawGames.set(game.id.toString(), game);
+        });
+        
         const mappedSchedules: Schedule[] = games.map(game => ({
           id: game.id.toString(),
           homeTeam: teamMap.get(game.home_team_id) || `Team ${game.home_team_id}`,
@@ -202,6 +226,9 @@ export class ScheduleComponent implements OnInit {
     const schedule = item as Schedule;
     
     switch (action) {
+      case 'dashboard':
+        this.openLiveDashboard(schedule);
+        break;
       case 'edit':
         this.editSchedule(schedule);
         break;
@@ -233,12 +260,15 @@ export class ScheduleComponent implements OnInit {
   }
 
   private editSchedule(schedule: Schedule): void {
+    const rawGameData = this.rawGames.get(schedule.id);
+    
     const dialogRef = this.dialog.open(ScheduleFormModalComponent, {
       width: '800px',
       maxWidth: '95vw',
       disableClose: true,
       data: {
         schedule: schedule,
+        gameData: rawGameData, // Pass raw API data
         isEditMode: true,
         teams: this.teams,
         arenas: this.arenas,
@@ -282,6 +312,13 @@ export class ScheduleComponent implements OnInit {
         }
       });
     }
+  }
+
+  private openLiveDashboard(schedule: Schedule): void {
+    const url = this.router.serializeUrl(
+      this.router.createUrlTree(['/live-dashboard', schedule.id])
+    );
+    window.open(url, '_blank');
   }
 
   openAddScheduleModal(): void {

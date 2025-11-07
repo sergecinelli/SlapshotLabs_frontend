@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { Observable, of, catchError } from 'rxjs';
+import { Observable } from 'rxjs';
 import { ApiService } from './api.service';
 
 export interface DefensiveZoneExit {
@@ -78,6 +78,33 @@ export interface LiveGameData {
   events: GameEvent[];
 }
 
+export interface TeamRecord {
+  wins: number;
+  losses: number;
+  ties: number;
+}
+
+export interface GameExtra {
+  id: number;
+  home_team_id: number;
+  home_start_goalie_id: number;
+  home_goals: number;
+  away_team_id: number;
+  away_start_goalie_id: number;
+  away_goals: number;
+  game_type_id: number;
+  game_type_name: string;
+  status: number;
+  date: string;
+  time: string;
+  season_id: number;
+  arena_id: number;
+  rink_id: number;
+  game_period_id: number;
+  home_team_game_type_record: TeamRecord;
+  away_team_game_type_record: TeamRecord;
+}
+
 export interface GameDetails {
   id: number;
   home_team_id: number;
@@ -104,218 +131,24 @@ export class LiveGameService {
   private apiService = inject(ApiService);
 
   /**
+   * Get game extra data (static data that doesn't change)
+   */
+  getGameExtra(gameId: number): Observable<GameExtra> {
+    return this.apiService.get<GameExtra>(`/hockey/game/${gameId}/extra`);
+  }
+
+  /**
    * Get game details for a specific game
+   * @deprecated Use getGameExtra instead
    */
   getGameDetails(gameId: number): Observable<GameDetails> {
-    return this.apiService.get<GameDetails>(`/hockey/game/${gameId}`).pipe(
-      catchError((error) => {
-        console.warn('Failed to load game details, using mock data:', error);
-        return of(this.getMockGameDetails(gameId));
-      })
-    );
+    return this.apiService.get<GameDetails>(`/hockey/game/${gameId}`);
   }
 
   /**
-   * Get live game data for a specific game
-   * Falls back to mock data if API returns no data or fails
+   * Get live game data for a specific game (should be polled)
    */
   getLiveGameData(gameId: number): Observable<LiveGameData> {
-    return this.apiService.get<LiveGameData>(`/hockey/game/${gameId}/live_data`).pipe(
-      catchError((error) => {
-        console.warn('Failed to load live game data, using mock data:', error);
-        return of(this.getMockLiveGameData(gameId));
-      })
-    );
-  }
-
-  /**
-   * Returns mock game details
-   */
-  private getMockGameDetails(gameId: number): GameDetails {
-    return {
-      id: gameId,
-      home_team_id: 22,
-      home_team_goalie_id: 205,
-      away_team_id: 24,
-      away_team_goalie_id: 203,
-      game_type_id: 1,
-      game_type_name_id: 1,
-      status: 2,
-      date: '2025-11-05',
-      time: '23:55:05.406Z',
-      rink_id: 1,
-      home_goalies: [205],
-      away_goalies: [203],
-      home_players: [202],
-      away_players: [204],
-      game_period_id: 7
-    };
-  }
-
-  /**
-   * Returns mock live game data
-   */
-  private getMockLiveGameData(gameId: number): LiveGameData {
-    return {
-      game_period_id: 7,
-      home_goalie_id: 205,
-      away_goalie_id: 203,
-      home_goals: 2,
-      away_goals: 1,
-      home_faceoff_win: 8,
-      away_faceoff_win: 12,
-      home_defensive_zone_exit: {
-        icing: 3,
-        skate_out: 5,
-        so_win: 2,
-        so_lose: 1,
-        passes: 7,
-        id: 1
-      },
-      away_defensive_zone_exit: {
-        icing: 2,
-        skate_out: 6,
-        so_win: 3,
-        so_lose: 2,
-        passes: 9,
-        id: 2
-      },
-      home_offensive_zone_entry: {
-        pass_in: 8,
-        dump_win: 4,
-        dump_lose: 3,
-        skate_in: 6,
-        id: 3
-      },
-      away_offensive_zone_entry: {
-        pass_in: 10,
-        dump_win: 5,
-        dump_lose: 2,
-        skate_in: 7,
-        id: 4
-      },
-      home_shots: {
-        shots_on_goal: 15,
-        saves: 10,
-        missed_net: 4,
-        scoring_chance: 8,
-        blocked: 3,
-        id: 5
-      },
-      away_shots: {
-        shots_on_goal: 12,
-        saves: 13,
-        missed_net: 5,
-        scoring_chance: 6,
-        blocked: 2,
-        id: 6
-      },
-      home_turnovers: {
-        off_zone: 2,
-        neutral_zone: 3,
-        def_zone: 1,
-        id: 7
-      },
-      away_turnovers: {
-        off_zone: 3,
-        neutral_zone: 2,
-        def_zone: 2,
-        id: 8
-      },
-      events: [
-        {
-          game_id: gameId,
-          event_name_id: 1,
-          time: '2025-11-06T00:05:26.078Z',
-          period_id: 7,
-          team_id: 22,
-          player_id: 202,
-          player_2_id: 0,
-          goalie_id: 203,
-          shot_type_id: 1,
-          is_scoring_chance: true,
-          ice_top_offset: 50,
-          ice_left_offset: 25,
-          net_top_offset: 10,
-          net_left_offset: 5,
-          goal_type: 'Even Strength',
-          zone: 'Offensive',
-          note: 'Top shelf',
-          is_faceoff_won: true,
-          time_length: 'PT5M',
-          youtube_link: '',
-          id: 1
-        },
-        {
-          game_id: gameId,
-          event_name_id: 4,
-          time: '2025-11-06T00:10:15.000Z',
-          period_id: 7,
-          team_id: 24,
-          player_id: 204,
-          player_2_id: 0,
-          goalie_id: 0,
-          shot_type_id: 0,
-          is_scoring_chance: false,
-          ice_top_offset: 0,
-          ice_left_offset: 0,
-          net_top_offset: 0,
-          net_left_offset: 0,
-          goal_type: '',
-          zone: 'Defensive',
-          note: 'Tripping',
-          is_faceoff_won: false,
-          time_length: 'PT2M',
-          youtube_link: '',
-          id: 2
-        },
-        {
-          game_id: gameId,
-          event_name_id: 1,
-          time: '2025-11-06T00:18:30.000Z',
-          period_id: 7,
-          team_id: 22,
-          player_id: 202,
-          player_2_id: 0,
-          goalie_id: 203,
-          shot_type_id: 2,
-          is_scoring_chance: true,
-          ice_top_offset: 45,
-          ice_left_offset: 30,
-          net_top_offset: 8,
-          net_left_offset: 12,
-          goal_type: 'Power Play',
-          zone: 'Offensive',
-          note: 'One-timer',
-          is_faceoff_won: false,
-          time_length: 'PT3M',
-          youtube_link: '',
-          id: 3
-        },
-        {
-          game_id: gameId,
-          event_name_id: 1,
-          time: '2025-11-06T00:22:45.000Z',
-          period_id: 7,
-          team_id: 24,
-          player_id: 204,
-          player_2_id: 0,
-          goalie_id: 205,
-          shot_type_id: 3,
-          is_scoring_chance: true,
-          ice_top_offset: 48,
-          ice_left_offset: 28,
-          net_top_offset: 6,
-          net_left_offset: 8,
-          goal_type: 'Even Strength',
-          zone: 'Offensive',
-          note: 'Breakaway',
-          is_faceoff_won: true,
-          time_length: 'PT1M',
-          youtube_link: '',
-          id: 4
-        }
-      ]
-    };
+    return this.apiService.get<LiveGameData>(`/hockey/game/${gameId}/live_data`);
   }
 }

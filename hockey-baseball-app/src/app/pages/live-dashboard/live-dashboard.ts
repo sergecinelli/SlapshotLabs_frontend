@@ -1,4 +1,4 @@
-import { Component, signal, inject, OnInit } from '@angular/core';
+import { Component, signal, inject, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
@@ -6,6 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header';
@@ -19,14 +20,17 @@ import { GameMetadataService, GamePeriodResponse } from '../../services/game-met
 import { TeamService } from '../../services/team.service';
 import { PlayerService } from '../../services/player.service';
 import { GoalieService } from '../../services/goalie.service';
-import { LiveGameService, LiveGameData, GameDetails, GameEvent as ServiceGameEvent } from '../../services/live-game.service';
+import { LiveGameService, LiveGameData, GameExtra, GameEvent as ServiceGameEvent } from '../../services/live-game.service';
 import { ArenaService } from '../../services/arena.service';
-import { Rink } from '../../shared/interfaces/arena.interface';
+import { Arena, Rink } from '../../shared/interfaces/arena.interface';
+import { Team } from '../../shared/interfaces/team.interface';
 import { TeamOptionsService } from '../../services/team-options.service';
 import { GameEventService } from '../../services/game-event.service';
 import { environment } from '../../../environments/environment';
-import { forkJoin } from 'rxjs';
-interface Team {
+import { forkJoin, interval, Subscription } from 'rxjs';
+import { switchMap, startWith } from 'rxjs/operators';
+
+interface TeamDisplay {
   name: string;
   logo: string;
   score: number;
@@ -77,11 +81,11 @@ interface GameEvent {
 @Component({
   selector: 'app-live-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule, PageHeaderComponent, ActionButtonComponent, MatIconModule, MatButtonModule, MatTooltipModule, MatSelectModule, MatFormFieldModule],
+  imports: [CommonModule, FormsModule, PageHeaderComponent, ActionButtonComponent, MatIconModule, MatButtonModule, MatTooltipModule, MatSelectModule, MatFormFieldModule, MatProgressSpinnerModule],
   templateUrl: './live-dashboard.html',
   styleUrl: './live-dashboard.scss'
 })
-export class LiveDashboardComponent implements OnInit {
+export class LiveDashboardComponent implements OnInit, OnDestroy {
   private dialog = inject(MatDialog);
   private route = inject(ActivatedRoute);
   private gameMetadataService = inject(GameMetadataService);
@@ -92,6 +96,9 @@ export class LiveDashboardComponent implements OnInit {
   private arenaService = inject(ArenaService);
   private teamOptionsService = inject(TeamOptionsService);
   private gameEventService = inject(GameEventService);
+  
+  // Polling subscription for live data
+  private liveDataPollingSubscription?: Subscription;
   
   // Game ID from route parameter
   gameId = 1;
@@ -126,37 +133,37 @@ export class LiveDashboardComponent implements OnInit {
   // Game start time (used to compute elapsed times for events)
   private gameStartTime: Date | null = null;
   
-  // Mock tournament data
-  tournamentName = signal('LITE5');
-  tournamentType = signal('U11B3');
-  tournamentCategory = signal('Tournament');
-  tournamentDate = signal('Apr 4, 2025, 4:35 PM');
-  arenaInfo = signal('Earl Nicholas Arena - C');
+  // Tournament/game header data
+  tournamentName = signal('');
+  tournamentType = signal('');
+  tournamentCategory = signal('');
+  tournamentDate = signal('');
+  arenaInfo = signal('');
   
-  // Mock game data
-  homeTeam = signal<Team>({
-    name: 'BURLINGTON JR RAIDERS BLACK',
-    logo: 'BRB',
-    score: 2,
-    record: '(0 - 1 - 0)',
+  // Team data
+  homeTeam = signal<TeamDisplay>({
+    name: '',
+    logo: '',
+    score: 0,
+    record: '',
     sog: 0,
     teamLevel: ''
   });
 
-  awayTeam = signal<Team>({
-    name: 'WATERLOO WOLVES',
-    logo: 'WW',
-    score: 1,
-    record: '(0 - 0 - 0)',
+  awayTeam = signal<TeamDisplay>({
+    name: '',
+    logo: '',
+    score: 0,
+    record: '',
     sog: 0,
     teamLevel: ''
   });
 
-  period = signal('2ND Period');
+  period = signal('');
   
-  // Mock stats
+  // Game statistics
   homeStats = signal<GameStats>({
-    faceoffWinPct: 40,
+    faceoffWinPct: 0,
     defensiveZoneExit: {
       long: 0,
       skate: 0,
@@ -166,9 +173,9 @@ export class LiveDashboardComponent implements OnInit {
     },
     offensiveZoneEntry: {
       pass: 0,
-      dump: 7,
-      carry: 2,
-      skated: 7
+      dump: 0,
+      carry: 0,
+      skated: 0
     },
     shots: {
       shotsOnGoal: 0,
@@ -184,7 +191,7 @@ export class LiveDashboardComponent implements OnInit {
   });
 
   awayStats = signal<GameStats>({
-    faceoffWinPct: 60,
+    faceoffWinPct: 0,
     defensiveZoneExit: {
       long: 0,
       skate: 0,
@@ -194,9 +201,9 @@ export class LiveDashboardComponent implements OnInit {
     },
     offensiveZoneEntry: {
       pass: 0,
-      dump: 3,
-      carry: 4,
-      skated: 4
+      dump: 0,
+      carry: 0,
+      skated: 0
     },
     shots: {
       shotsOnGoal: 0,
@@ -218,39 +225,46 @@ export class LiveDashboardComponent implements OnInit {
       if (gameIdParam) {
         this.gameId = parseInt(gameIdParam, 10);
       }
-      this.loadFullGameData();
+      this.loadInitialGameData();
     });
   }
 
+  ngOnDestroy(): void {
+    // Clean up polling subscription
+    if (this.liveDataPollingSubscription) {
+      this.liveDataPollingSubscription.unsubscribe();
+    }
+  }
+
   /**
-   * Load full game data including details, live data, teams, rinks, etc.
+   * Load initial game data (static data from /extra endpoint)
    */
-  private loadFullGameData(): void {
+  loadInitialGameData(): void {
     forkJoin({
-      gameDetails: this.liveGameService.getGameDetails(this.gameId),
-      liveData: this.liveGameService.getLiveGameData(this.gameId),
+      gameExtra: this.liveGameService.getGameExtra(this.gameId),
       periods: this.gameMetadataService.getGamePeriods(),
       shotTypes: this.gameMetadataService.getShotTypes(),
       gameTypes: this.gameMetadataService.getGameTypes(),
       teams: this.teamService.getTeams(),
+      arenas: this.arenaService.getArenas(),
       rinks: this.arenaService.getAllRinks(),
       teamLevels: this.teamOptionsService.getTeamLevels()
     }).subscribe({
-      next: ({ gameDetails, liveData, periods, shotTypes, gameTypes, teams, rinks, teamLevels }) => {
-        // Set team IDs from game details
-        this.homeTeamId = gameDetails.home_team_id;
-        this.awayTeamId = gameDetails.away_team_id;
+      next: ({ gameExtra, periods, shotTypes, gameTypes, teams, arenas, rinks, teamLevels }) => {
+        // Set team IDs from game extra
+        this.homeTeamId = gameExtra.home_team_id;
+        this.awayTeamId = gameExtra.away_team_id;
 
         // Set periods and shot types
         this.gamePeriods = periods;
         this.periodOptions = this.gameMetadataService.transformGamePeriodsToOptions(periods);
         this.shotTypeOptions = this.gameMetadataService.transformShotTypesToOptions(shotTypes);
 
-        // Update game header information
-        this.updateGameHeaderInfo(gameDetails, gameTypes, rinks);
-
         // Get team information
         const allTeams = teams.teams;
+
+        // Update game header information from extra
+        this.updateGameHeaderFromExtra(gameExtra, gameTypes, rinks, arenas, allTeams);
         const homeTeamData = allTeams.find(t => parseInt(t.id) === this.homeTeamId);
         const awayTeamData = allTeams.find(t => parseInt(t.id) === this.awayTeamId);
 
@@ -259,22 +273,26 @@ export class LiveDashboardComponent implements OnInit {
           const homeTeamLevel = this.teamOptionsService.getLevelName(parseInt(homeTeamData.level));
           const awayTeamLevel = this.teamOptionsService.getLevelName(parseInt(awayTeamData.level));
           
+          // Format team records
+          const homeRecord = `(${gameExtra.home_team_game_type_record.wins} - ${gameExtra.home_team_game_type_record.losses} - ${gameExtra.home_team_game_type_record.ties})`;
+          const awayRecord = `(${gameExtra.away_team_game_type_record.wins} - ${gameExtra.away_team_game_type_record.losses} - ${gameExtra.away_team_game_type_record.ties})`;
+          
           // Update team signals with real data
           this.homeTeam.set({
             name: homeTeamData.name,
             logo: `${environment.apiUrl}/hockey/team/${homeTeamData.id}/logo`,
-            score: liveData.home_goals,
-            record: '(0 - 0 - 0)', // TODO: Get from API when available
-            sog: liveData.home_shots.shots_on_goal,
+            score: gameExtra.home_goals,
+            record: homeRecord,
+            sog: 0, // Will be updated from live data
             teamLevel: homeTeamLevel
           });
 
           this.awayTeam.set({
             name: awayTeamData.name,
             logo: `${environment.apiUrl}/hockey/team/${awayTeamData.id}/logo`,
-            score: liveData.away_goals,
-            record: '(0 - 0 - 0)', // TODO: Get from API when available
-            sog: liveData.away_shots.shots_on_goal,
+            score: gameExtra.away_goals,
+            record: awayRecord,
+            sog: 0, // Will be updated from live data
             teamLevel: awayTeamLevel
           });
 
@@ -293,34 +311,66 @@ export class LiveDashboardComponent implements OnInit {
           ];
         }
 
-        // Update stats from live data
-        this.updateStatsFromLiveData(liveData);
-
-        // Load players and goalies for both teams, then update events
-        this.loadPlayersAndGoalies(liveData, periods, allTeams);
+        // Load players and goalies for both teams
+        this.loadPlayersAndGoalies(allTeams);
+        
+        // Start polling for live data
+        this.startLiveDataPolling();
+        
+        // Set loading to false after all data is loaded
+        this.isLoadingGameData = false;
       },
       error: (error) => {
-        console.error('Failed to load full game data:', error);
+        console.error('Failed to load initial game data:', error);
         this.isLoadingGameData = false;
       }
     });
   }
 
   /**
-   * Update game header information (period, game type, date/time, arena)
+   * Start polling live data every minute
    */
-  private updateGameHeaderInfo(gameDetails: GameDetails, gameTypes: { id: number; name: string }[], rinks: Rink[]): void {
-    // Update period
-    const currentPeriod = this.gamePeriods.find(p => p.id === gameDetails.game_period_id);
-    this.period.set(currentPeriod ? currentPeriod.name : 'Unknown Period');
-    this.currentPeriodId = gameDetails.game_period_id;
+  private startLiveDataPolling(): void {
+    // Poll every 60 seconds (1 minute), starting immediately
+    this.liveDataPollingSubscription = interval(60000)
+      .pipe(
+        startWith(0), // Start immediately
+        switchMap(() => this.liveGameService.getLiveGameData(this.gameId))
+      )
+      .subscribe({
+        next: (liveData) => {
+          this.updateStatsFromLiveData(liveData);
+          this.updateGameEvents(liveData, this.gamePeriods, this.teamOptions.map(t => ({ id: t.value.toString(), name: t.label })));
+        },
+        error: (error) => {
+          console.error('Failed to poll live game data:', error);
+        }
+      });
+  }
 
-    // Update game type
-    const gameType = gameTypes.find(t => t.id === gameDetails.game_type_id);
+  /**
+   * Update game header information from extra data
+   */
+  private updateGameHeaderFromExtra(gameExtra: GameExtra, gameTypes: { id: number; name: string }[], rinks: Rink[], arenas: Arena[], teams: Team[]): void {
+    // Update period
+    const currentPeriod = this.gamePeriods.find(p => p.id === gameExtra.game_period_id);
+    this.period.set(currentPeriod ? currentPeriod.name : 'Unknown Period');
+    this.currentPeriodId = gameExtra.game_period_id;
+
+    // tournamentCategory - game type by game_type_id
+    const gameType = gameTypes.find(t => t.id === gameExtra.game_type_id);
     this.tournamentCategory.set(gameType ? gameType.name : 'Unknown');
 
+    // tournamentName - game_type_name from API
+    this.tournamentName.set(gameExtra.game_type_name || '');
+
+    // tournamentType - team's age_group
+    const homeTeam = teams.find(t => parseInt(t.id) === gameExtra.home_team_id);
+    const ageGroup = homeTeam?.group || '';
+    this.tournamentType.set(ageGroup);
+
     // Update date and time
-    const gameDate = new Date(gameDetails.date + 'T' + gameDetails.time);
+    const gameDate = new Date(gameExtra.date + 'T' + gameExtra.time);
     this.gameStartTime = gameDate;
     this.tournamentDate.set(gameDate.toLocaleString('en-US', {
       year: 'numeric',
@@ -331,10 +381,12 @@ export class LiveDashboardComponent implements OnInit {
       hour12: true
     }));
 
-    // Update rink/arena info
-    const rink = rinks.find(r => r.id === gameDetails.rink_id);
+    // arenaInfo - format: "Arena - Rink"
+    const rink = rinks.find(r => r.id === gameExtra.rink_id);
     if (rink) {
-      this.arenaInfo.set(rink.name);
+      const arena = arenas.find(a => a.id === rink.arena_id);
+      const arenaName = arena?.name || 'Unknown Arena';
+      this.arenaInfo.set(`${arenaName} - ${rink.name}`);
     }
   }
 
@@ -448,7 +500,7 @@ export class LiveDashboardComponent implements OnInit {
   /**
    * Load players and goalies for both teams
    */
-  private loadPlayersAndGoalies(liveData: LiveGameData, periods: { id: number; name: string }[], teams: { id: string; name: string }[]): void {
+  private loadPlayersAndGoalies(teams: { id: string; name: string }[]): void {
     forkJoin({
       homeTeamPlayers: this.playerService.getPlayersByTeam(this.homeTeamId),
       awayTeamPlayers: this.playerService.getPlayersByTeam(this.awayTeamId),
@@ -483,15 +535,9 @@ export class LiveDashboardComponent implements OnInit {
             teamId: this.awayTeamId
           }))
         ];
-
-        // Now update game events with player names
-        this.updateGameEvents(liveData, periods, teams);
-
-        this.isLoadingGameData = false;
       },
       error: (error) => {
         console.error('Failed to load players/goalies:', error);
-        this.isLoadingGameData = false;
       }
     });
   }
@@ -573,63 +619,8 @@ export class LiveDashboardComponent implements OnInit {
   }
 
 
-  // Mock game events
-  gameEvents = signal<GameEvent[]>([
-    {
-      id: 1,
-      period: '1ST',
-      time: '8:53',
-      team: '[Logo] Name',
-      event: 'GOAL (Short Handed Goal)',
-      player: 'Joe Smith',
-      description: 'Breakaway'
-    },
-    {
-      id: 2,
-      period: '',
-      time: '3:53',
-      team: '[Logo] Name',
-      event: 'PENALTY (2 min, Elbowing)',
-      player: 'Sam Harrison',
-      description: 'Tripping Penalty'
-    },
-    {
-      id: 3,
-      period: '2ND',
-      time: '8:53',
-      team: '[Logo] Name',
-      event: 'GOAL (Short Handed Goal)',
-      player: 'Joe Smith',
-      description: 'Breakaway'
-    },
-    {
-      id: 4,
-      period: '',
-      time: '3:53',
-      team: '[Logo] Name',
-      event: 'PENALTY (2 min, Elbowing)',
-      player: 'Sam Harrison',
-      description: 'Tripping Penalty'
-    },
-    {
-      id: 5,
-      period: '',
-      time: '8:53',
-      team: '[Logo] Name',
-      event: 'GOAL (Short Handed Goal)',
-      player: 'Joe Smith',
-      description: 'Breakaway'
-    },
-    {
-      id: 6,
-      period: '',
-      time: '3:53',
-      team: '[Logo] Name',
-      event: 'PENALTY (2 min, Elbowing)',
-      player: 'Sam Harrison',
-      description: 'Tripping Penalty'
-    }
-  ]);
+  // Game events (loaded from API)
+  gameEvents = signal<GameEvent[]>([]);
 
   // Defensive Zone Exit increment/decrement methods
   incrementDefensiveZoneExit(team: 'away' | 'home', type: 'long' | 'skate' | 'soWin' | 'soLose' | 'pass'): void {
@@ -941,7 +932,7 @@ export class LiveDashboardComponent implements OnInit {
         next: () => {
           console.log(`Event ${eventId} deleted successfully`);
           // Reload game data to refresh the events list
-          this.loadFullGameData();
+          this.loadInitialGameData();
         },
         error: (error) => {
           console.error('Failed to delete event:', error);

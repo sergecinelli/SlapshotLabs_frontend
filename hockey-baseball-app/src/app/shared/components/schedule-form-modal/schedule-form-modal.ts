@@ -22,8 +22,31 @@ import { GoalieService } from '../../../services/goalie.service';
 import { PlayerService } from '../../../services/player.service';
 import { forkJoin } from 'rxjs';
 
+export interface GameData {
+  id: number;
+  home_team_id: number;
+  home_goals: number;
+  home_start_goalie_id?: number;
+  home_team_goalie_id?: number;
+  away_team_id: number;
+  away_goals: number;
+  away_start_goalie_id?: number;
+  away_team_goalie_id?: number;
+  game_type_id: number;
+  game_type_name?: string;
+  status: number;
+  date: string;
+  time: string;
+  season_id?: number;
+  arena_id?: number;
+  rink_id: number;
+  game_period_id?: number;
+  tournament_name?: string;
+}
+
 export interface ScheduleFormModalData {
   schedule?: Schedule;
+  gameData?: GameData; // Raw API data for edit mode
   isEditMode: boolean;
   teams?: Team[];
   arenas?: Arena[];
@@ -314,45 +337,88 @@ export class ScheduleFormModalComponent implements OnInit {
   }
 
   private populateForm(schedule: Schedule): void {
-    // Since schedule comes from the mapped API response,
-    // we need to extract the IDs from the mapped strings
-    // Team IDs are in format "Team {id}" due to TODO mapping
-    const awayTeamId = this.extractIdFromString(schedule.awayTeam);
-    const homeTeamId = this.extractIdFromString(schedule.homeTeam);
-    const awayGoalieId = this.extractIdFromString(schedule.awayTeamGoalie);
-    const homeGoalieId = this.extractIdFromString(schedule.homeTeamGoalie);
-    const rinkId = this.extractIdFromString(schedule.rink);
-    
-    // Find the arena for this rink
-    const rink = this.rinks.find(r => r.id === parseInt(rinkId));
-    const arenaId = rink?.arena_id;
-    
-    if (arenaId) {
-      this.filterRinksByArena(arenaId);
+    // Use raw game data if available (preferred for edit mode)
+    if (this.data.gameData) {
+      const game = this.data.gameData;
+      
+      // Use home_start_goalie_id or home_team_goalie_id
+      const homeGoalieId = game.home_start_goalie_id || game.home_team_goalie_id || 0;
+      const awayGoalieId = game.away_start_goalie_id || game.away_team_goalie_id || 0;
+      
+      // Find the arena for this rink
+      const rink = this.rinks.find(r => r.id === game.rink_id);
+      const arenaId = rink?.arena_id;
+      
+      if (arenaId) {
+        this.filterRinksByArena(arenaId);
+      }
+      
+      // Filter goalies based on selected teams
+      this.filterGoaliesByTeam(game.away_team_id.toString(), 'away');
+      this.filterGoaliesByTeam(game.home_team_id.toString(), 'home');
+      
+      // Find the game type by matching game_type_name with game type names
+      let gameTypeId = game.game_type_id;
+      
+      this.scheduleForm.patchValue({
+        awayTeam: game.away_team_id.toString(),
+        homeTeam: game.home_team_id.toString(),
+        homeGoals: game.home_goals,
+        awayGoals: game.away_goals,
+        awayTeamGoalie: awayGoalieId > 0 ? awayGoalieId.toString() : '',
+        homeTeamGoalie: homeGoalieId > 0 ? homeGoalieId.toString() : '',
+        date: game.date,
+        time: this.convertTo12Hour(game.time),
+        arena: arenaId,
+        rink: game.rink_id,
+        tournamentName: game.tournament_name || '',
+        status: game.status,
+        gameType: gameTypeId
+      });
+      
+      // Trigger game type change to populate game type names
+      if (gameTypeId) {
+        this.onGameTypeChange(gameTypeId);
+      }
+    } else {
+      // Fallback: extract from mapped strings (less reliable)
+      const awayTeamId = this.extractIdFromString(schedule.awayTeam);
+      const homeTeamId = this.extractIdFromString(schedule.homeTeam);
+      const awayGoalieId = this.extractIdFromString(schedule.awayTeamGoalie);
+      const homeGoalieId = this.extractIdFromString(schedule.homeTeamGoalie);
+      const rinkId = this.extractIdFromString(schedule.rink);
+      
+      // Find the arena for this rink
+      const rink = this.rinks.find(r => r.id === parseInt(rinkId));
+      const arenaId = rink?.arena_id;
+      
+      if (arenaId) {
+        this.filterRinksByArena(arenaId);
+      }
+      
+      // Filter goalies based on selected teams
+      if (awayTeamId) {
+        this.filterGoaliesByTeam(awayTeamId, 'away');
+      }
+      if (homeTeamId) {
+        this.filterGoaliesByTeam(homeTeamId, 'home');
+      }
+      
+      this.scheduleForm.patchValue({
+        awayTeam: awayTeamId,
+        homeTeam: homeTeamId,
+        homeGoals: schedule.homeGoals,
+        awayGoals: schedule.awayGoals,
+        awayTeamGoalie: awayGoalieId,
+        homeTeamGoalie: homeGoalieId,
+        date: schedule.date,
+        time: this.convertTo12Hour(schedule.time),
+        arena: arenaId,
+        rink: rinkId,
+        tournamentName: schedule.tournamentName || '',
+        status: this.mapStatusToNumber(schedule.status)
+      });
     }
-    
-    // Filter goalies based on selected teams
-    if (awayTeamId) {
-      this.filterGoaliesByTeam(awayTeamId, 'away');
-    }
-    if (homeTeamId) {
-      this.filterGoaliesByTeam(homeTeamId, 'home');
-    }
-    
-    this.scheduleForm.patchValue({
-      awayTeam: awayTeamId,
-      homeTeam: homeTeamId,
-      homeGoals: schedule.homeGoals,
-      awayGoals: schedule.awayGoals,
-      awayTeamGoalie: awayGoalieId,
-      homeTeamGoalie: homeGoalieId,
-      date: schedule.date,
-      time: this.convertTo12Hour(schedule.time),
-      arena: arenaId,
-      rink: rinkId,
-      tournamentName: schedule.tournamentName || '',
-      status: this.mapStatusToNumber(schedule.status)
-    });
   }
 
   /**

@@ -2,8 +2,18 @@
   <!-- Page Header -->
   <app-page-header title="Live Dashboard"></app-page-header>
 
-  <!-- Tournament Info Header -->
-  <div class="bg-gray-700 text-white px-6 py-2 rounded-md flex justify-between items-center">
+  <!-- Loading Spinner -->
+  <div *ngIf="isLoadingGameData" class="flex items-center justify-center min-h-[60vh]">
+    <div class="text-center">
+      <mat-spinner diameter="60" class="mx-auto"></mat-spinner>
+      <p class="mt-4 text-gray-600 text-lg">Loading game data...</p>
+    </div>
+  </div>
+
+  <!-- All content wrapped to hide while loading -->
+  <div *ngIf="!isLoadingGameData" class="space-y-6">
+    <!-- Tournament Info Header -->
+    <div class="bg-gray-700 text-white px-6 py-2 rounded-md flex justify-between items-center">
     <div>
       <span class="font-medium text-lg">{{ tournamentName() }}</span>
     </div>
@@ -410,7 +420,7 @@
   </div>
 
   <!-- Game Event Actions (Unified Section) -->
-  <div class="bg-white rounded-lg shadow-lg border border-gray-200 p-4">
+  <div *ngIf="!isLoadingGameData" class=" p-4">
     <div class="flex flex-wrap gap-3 justify-center">
       <app-action-button 
         label="Shots" 
@@ -436,7 +446,7 @@
   </div>
 
   <!-- Events Section (Full Width) -->
-  <div class="bg-white rounded-lg shadow-lg border border-gray-200">
+  <div *ngIf="!isLoadingGameData" class="bg-white rounded-lg shadow-lg border border-gray-200">
     <div class="px-6 pt-4 pb-2 border-b border-gray-200">
       <h2 class="text-xl font-semibold text-gray-900">Game Events</h2>
     </div>
@@ -456,44 +466,57 @@
           </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
-          @for (event of gameEvents(); track event.id) {
-            @if (event.period) {
-              <tr class="bg-gray-700">
-                <td class="px-4 py-3 text-xs font-medium text-white" colspan="6">
-                  {{ event.period }} Period
-                </td>
-              </tr>
-            } @else {
-              <tr class="hover:bg-gray-50 transition-colors">
-                <td class="px-4 py-3 text-sm text-gray-900">{{ event.time }}</td>
-                <td class="px-4 py-3">
-                  <div class="flex items-center gap-2">
-                    <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden flex-shrink-0">
-                      <img *ngIf="event.teamId" [src]="getTeamLogoUrl(event.teamId)" [alt]="event.team" class="w-full h-full object-cover" />
-                    </div>
-                    <span class="text-sm text-gray-900">{{ event.team }}</span>
-                  </div>
-                </td>
-                <td class="px-4 py-3 text-sm text-gray-900">{{ event.event }}</td>
-                <td class="px-4 py-3 text-sm text-gray-900">{{ event.player }}</td>
-                <td class="px-4 py-3 text-sm text-gray-900">{{ event.description }}</td>
-                  <td class="px-4 py-3 text-sm">
-                    <div class="flex gap-1">
-                      <button mat-icon-button color="primary" matTooltip="Video">
-                        <mat-icon>videocam</mat-icon>
-                      </button>
-                      <button mat-icon-button color="primary" matTooltip="Edit">
-                        <mat-icon>edit</mat-icon>
-                      </button>
-                      <button mat-icon-button color="warn" matTooltip="Delete" (click)="onDeleteEvent(event.id)">
-                        <mat-icon>delete</mat-icon>
-                      </button>
+          @if (gameEvents().length === 0) {
+            <tr>
+              <td colspan="6" class="px-4 py-8 text-center text-gray-500">
+                <div class="flex flex-col items-center justify-center">
+                  <mat-icon class="text-gray-400 mb-2" style="font-size: 48px; width: 48px; height: 48px;">event_note</mat-icon>
+                  <p class="text-lg font-medium">No game events yet</p>
+                  <p class="text-sm">Events will appear here as the game progresses</p>
+                </div>
+              </td>
+            </tr>
+          } @else {
+            @for (event of gameEvents(); track event.id) {
+              @if (event.period) {
+                <tr class="bg-gray-700">
+                  <td class="px-4 py-3 text-xs font-medium text-white" colspan="6">
+                    {{ event.period }} Period
+                  </td>
+                </tr>
+              } @else {
+                <tr class="hover:bg-gray-50 transition-colors">
+                  <td class="px-4 py-3 text-sm text-gray-900">{{ event.time }}</td>
+                  <td class="px-4 py-3">
+                    <div class="flex items-center gap-2">
+                      <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden flex-shrink-0">
+                        <img *ngIf="event.teamId" [src]="getTeamLogoUrl(event.teamId)" [alt]="event.team" class="w-full h-full object-cover" />
+                      </div>
+                      <span class="text-sm text-gray-900">{{ event.team }}</span>
                     </div>
                   </td>
-              </tr>
+                  <td class="px-4 py-3 text-sm text-gray-900">{{ event.event }}</td>
+                  <td class="px-4 py-3 text-sm text-gray-900">{{ event.player }}</td>
+                  <td class="px-4 py-3 text-sm text-gray-900">{{ event.description }}</td>
+                    <td class="px-4 py-3 text-sm">
+                      <div class="flex gap-1">
+                        <button mat-icon-button color="primary" matTooltip="Video">
+                          <mat-icon>videocam</mat-icon>
+                        </button>
+                        <button mat-icon-button color="primary" matTooltip="Edit">
+                          <mat-icon>edit</mat-icon>
+                        </button>
+                        <button mat-icon-button color="warn" matTooltip="Delete" (click)="onDeleteEvent(event.id)">
+                          <mat-icon>delete</mat-icon>
+                        </button>
+                      </div>
+                    </td>
+                </tr>
+              }
             }
           }
         </tbody>
       </table>
     </div>
   </div>
+  </div><!-- End content wrapper -->

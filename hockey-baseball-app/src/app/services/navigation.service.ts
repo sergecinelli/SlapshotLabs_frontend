@@ -65,11 +65,11 @@ export class NavigationService {
       path: '/video-library',
       icon: 'video'
     },
-    {
+    /*{
       label: 'Live Dashboard',
       path: '/live-dashboard/10',
       icon: 'live'
-    }
+    }*/
   ]);
 
   // Getters for signals
