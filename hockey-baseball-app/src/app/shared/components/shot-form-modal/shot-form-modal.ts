@@ -64,6 +64,7 @@ export class ShotFormModalComponent implements OnInit {
     teamOptions?: { value: number; label: string; logo?: string }[];
     playerOptions?: { value: number; label: string; teamId: number }[];
     goalieOptions?: { value: number; label: string; teamId: number }[];
+    gameStartTimeIso?: string;
   }>(MAT_DIALOG_DATA);
 
   gameId: number;
@@ -158,41 +159,39 @@ export class ShotFormModalComponent implements OnInit {
   }
 
   private filterPlayersAndGoaliesForTeam(teamId: number): void {
+    // Players should be from the selected team
     if (this.dialogData.playerOptions) {
       this.playerOptions = this.dialogData.playerOptions
         .filter(p => p.teamId === teamId)
         .map(p => ({ value: p.value, label: p.label }));
     }
-    
-    if (this.dialogData.goalieOptions) {
-      this.goalieOptions = this.dialogData.goalieOptions
-        .filter(g => g.teamId === teamId)
+
+    // Goalies should be from the OPPOSITE team
+    const oppositeTeam = this.teamOptions.find(t => t.value !== teamId);
+    if (oppositeTeam && this.dialogData.goalieOptions) {
+      const oppositeGoalies = this.dialogData.goalieOptions
+        .filter(g => g.teamId === oppositeTeam.value)
         .map(g => ({ value: g.value, label: g.label }));
+      this.goalieOptions = oppositeGoalies;
+
+      // Set defaults for goalie fields to first opposite goalie if available
+      if (oppositeGoalies.length > 0) {
+        this.shotForm.patchValue({
+          goalieScored: oppositeGoalies[0].value,
+          goalieInNet: oppositeGoalies[0].value
+        });
+      }
+    } else {
+      // No opposite team found; clear goalies list
+      this.goalieOptions = [];
     }
-    
-    // Set defaults
+
+    // Set default players for the selected team
     if (this.playerOptions.length > 0) {
       this.shotForm.patchValue({
         scoringPlayer: this.playerOptions[0].value,
         shootingPlayer: this.playerOptions[0].value
       });
-    }
-    
-    if (this.goalieOptions.length > 0) {
-      // Find opposite team's goalie
-      const oppositeTeam = this.teamOptions.find(t => t.value !== teamId);
-      if (oppositeTeam && this.dialogData.goalieOptions) {
-        const oppositeGoalies = this.dialogData.goalieOptions
-          .filter(g => g.teamId === oppositeTeam.value)
-          .map(g => ({ value: g.value, label: g.label }));
-        
-        if (oppositeGoalies.length > 0) {
-          this.shotForm.patchValue({
-            goalieScored: oppositeGoalies[0].value,
-            goalieInNet: oppositeGoalies[0].value
-          });
-        }
-      }
     }
   }
 
@@ -265,13 +264,20 @@ export class ShotFormModalComponent implements OnInit {
     const goalShotType = this.shotTypeOptions.find(st => st.label.toLowerCase() === 'goal');
     if (shotType === goalShotType?.value) {
       this.shotForm.patchValue({ isScoringChance: false });
+      // Ensure goalie list reflects opposite of scoring team
+      const teamId = this.shotForm.get('scoringTeam')?.value;
+      if (teamId) this.filterPlayersAndGoaliesForTeam(teamId);
+    } else {
+      // Ensure goalie list reflects opposite of shooting team
+      const teamId = this.shotForm.get('shootingTeam')?.value;
+      if (teamId) this.filterPlayersAndGoaliesForTeam(teamId);
     }
   }
 
   selectTeam(teamValue: number, fieldName: string): void {
     this.shotForm.patchValue({ [fieldName]: teamValue });
     this.shotForm.get(fieldName)?.markAsTouched();
-    // Filter players/goalies when team changes
+    // Filter players for the selected team and set goalie list to the opposite team
     this.filterPlayersAndGoaliesForTeam(teamValue);
   }
 
@@ -321,10 +327,13 @@ export class ShotFormModalComponent implements OnInit {
       this.isSubmitting = true;
       const formValue = this.shotForm.value;
       
-      // Convert time from mm:ss to ISO duration format
+      // Build absolute event time-of-day string in format HH:mm:ss.SSSZ
       const [minutes, seconds] = formValue.time.split(':').map((v: string) => parseInt(v, 10));
-      const isoTime = new Date();
-      isoTime.setHours(0, minutes, seconds, 0);
+
+      // Always send as 00:mm:ss.000Z regardless of game start time
+      const tmp = new Date(Date.UTC(1970, 0, 1, 0, minutes, seconds, 0));
+      const iso = tmp.toISOString();
+      const timeOfDay = iso.substring(iso.indexOf('T') + 1); // HH:mm:ss.SSSZ
       
       const shotRequest: ShotEventRequest = {
         game_id: this.gameId,
@@ -335,7 +344,7 @@ export class ShotFormModalComponent implements OnInit {
         shot_type_id: formValue.shotType,
         goalie_id: this.isGoal ? formValue.goalieScored : formValue.goalieInNet,
         period_id: formValue.period,
-        time: isoTime.toISOString(),
+        time: timeOfDay,
         youtube_link: formValue.youtubeLink || undefined,
         is_scoring_chance: formValue.isScoringChance,
         note: formValue.isScoringChance ? formValue.scoringChanceNote : undefined,

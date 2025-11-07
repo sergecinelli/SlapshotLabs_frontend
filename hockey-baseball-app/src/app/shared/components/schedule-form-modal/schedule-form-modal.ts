@@ -109,9 +109,9 @@ export class ScheduleFormModalComponent implements OnInit {
   selectedGameType: GameTypeResponse | null = null;
 
   statusOptions = [
-    { value: 0, label: 'Not Started' },
-    { value: 1, label: 'Game in Progress' },
-    { value: 2, label: 'Game Over' }
+    { value: 1, label: 'Not Started' },
+    { value: 2, label: 'Game in Progress' },
+    { value: 3, label: 'Game Over' }
   ];
 
   constructor() {
@@ -134,7 +134,7 @@ export class ScheduleFormModalComponent implements OnInit {
       awayTeamGoalie: [''],
       gameType: ['', [Validators.required]],
       tournamentName: [''],
-      status: [0, [Validators.required]],
+      status: [1, [Validators.required]],
       date: ['', [Validators.required]],
       time: ['', [Validators.required, Validators.pattern(/^(1[0-2]|0?[1-9]):[0-5][0-9]\s*(AM|PM|am|pm)$/)]],
       arena: ['', [Validators.required]],
@@ -433,16 +433,8 @@ export class ScheduleFormModalComponent implements OnInit {
    * Map GameStatus enum to numeric status
    */
   private mapStatusToNumber(status: GameStatus): number {
-    switch (status) {
-      case GameStatus.NotStarted:
-        return 0;
-      case GameStatus.GameInProgress:
-        return 1;
-      case GameStatus.GameOver:
-        return 2;
-      default:
-        return 0;
-    }
+    // GameStatus enum now directly represents API values (1, 2, 3)
+    return status;
   }
 
   onSubmit(): void {

@@ -34,9 +34,9 @@ export enum GameType {
 }
 
 export enum GameStatus {
-  GameInProgress = 'Game in Progress',
-  NotStarted = 'Not Started',
-  GameOver = 'Game Over'
+  NotStarted = 1,
+  GameInProgress = 2,
+  GameOver = 3
 }
 
 export enum GameEventType {

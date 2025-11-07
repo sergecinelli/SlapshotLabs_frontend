@@ -155,13 +155,23 @@ export class DataTableComponent<T extends Record<string, unknown> = Record<strin
 
   // Custom rendering methods for schedule-specific fields
   getStatusBadgeClass(status: unknown): string {
-    const statusStr = String(status || '');
-    const statusMap: Record<string, string> = {
-      'Game in Progress': 'status-badge game-in-progress',
-      'Not Started': 'status-badge not-started', 
-      'Game Over': 'status-badge game-over'
+    const statusNum = Number(status);
+    const statusMap: Record<number, string> = {
+      1: 'status-badge not-started',
+      2: 'status-badge game-in-progress',
+      3: 'status-badge game-over'
     };
-    return statusMap[statusStr] || 'status-badge';
+    return statusMap[statusNum] || 'status-badge';
+  }
+
+  getStatusLabel(status: unknown): string {
+    const statusNum = Number(status);
+    const statusLabelMap: Record<number, string> = {
+      1: 'Not Started',
+      2: 'Game in Progress',
+      3: 'Game Over'
+    };
+    return statusLabelMap[statusNum] || String(status);
   }
 
   getGameTypeBadgeClass(gameType: unknown): string {

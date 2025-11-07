@@ -315,6 +315,10 @@ export class ScheduleService {
     return this.apiService.patch<{ success: boolean }>(`/hockey/game/${gameId}`, gameData);
   }
 
+  deleteGame(gameId: number): Observable<{ success: boolean }> {
+    return this.apiService.delete<{ success: boolean }>(`/hockey/game/${gameId}`);
+  }
+
   getScheduleById(id: string): Observable<Schedule | null> {
     const schedule = this.mockSchedules.find(s => s.id === id);
     return of(schedule || null).pipe(delay(300));

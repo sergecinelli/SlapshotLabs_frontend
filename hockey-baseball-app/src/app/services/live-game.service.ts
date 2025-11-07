@@ -149,6 +149,26 @@ export class LiveGameService {
    * Get live game data for a specific game (should be polled)
    */
   getLiveGameData(gameId: number): Observable<LiveGameData> {
-    return this.apiService.get<LiveGameData>(`/hockey/game/${gameId}/live_data`);
+    return this.apiService.get<LiveGameData>(`/hockey/game/${gameId}/live-data`);
+  }
+
+  /**
+   * Update a defensive zone exit row by ID with partial fields
+   */
+  updateDefensiveZoneExit(
+    defensiveZoneExitId: number,
+    patch: Partial<Pick<DefensiveZoneExit, 'icing' | 'skate_out' | 'so_win' | 'so_lose' | 'passes'>>
+  ): Observable<DefensiveZoneExit> {
+    return this.apiService.patch<DefensiveZoneExit>(`/hockey/game/defensive-zone-exit/${defensiveZoneExitId}`, patch);
+  }
+
+  /**
+   * Update an offensive zone entry row by ID with partial fields
+   */
+  updateOffensiveZoneEntry(
+    offensiveZoneEntryId: number,
+    patch: Partial<Pick<OffensiveZoneEntry, 'pass_in' | 'dump_win' | 'dump_lose' | 'skate_in'>>
+  ): Observable<OffensiveZoneEntry> {
+    return this.apiService.patch<OffensiveZoneEntry>(`/hockey/game/offensive-zone-entry/${offensiveZoneEntryId}`, patch);
   }
 }

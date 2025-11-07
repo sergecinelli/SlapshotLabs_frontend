@@ -8,7 +8,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDialog } from '@angular/material/dialog';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header';
 import { ActionButtonComponent } from '../../shared/components/action-button/action-button';
 import { TurnoverFormModalComponent } from '../../shared/components/turnover-form-modal/turnover-form-modal';
@@ -88,6 +88,7 @@ interface GameEvent {
 export class LiveDashboardComponent implements OnInit, OnDestroy {
   private dialog = inject(MatDialog);
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
   private gameMetadataService = inject(GameMetadataService);
   private teamService = inject(TeamService);
   private playerService = inject(PlayerService);
@@ -173,8 +174,8 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
     },
     offensiveZoneEntry: {
       pass: 0,
-      dump: 0,
-      carry: 0,
+      dump: 0, // Dump Win
+      carry: 0, // Dump Lose
       skated: 0
     },
     shots: {
@@ -201,8 +202,8 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
     },
     offensiveZoneEntry: {
       pass: 0,
-      dump: 0,
-      carry: 0,
+      dump: 0, // Dump Win
+      carry: 0, // Dump Lose
       skated: 0
     },
     shots: {
@@ -217,6 +218,12 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
       defZone: 0
     }
   });
+
+  // IDs for patching zone exit/entry rows
+  private homeDefensiveZoneExitId?: number;
+  private awayDefensiveZoneExitId?: number;
+  private homeOffensiveZoneEntryId?: number;
+  private awayOffensiveZoneEntryId?: number;
 
   ngOnInit(): void {
     // Get game ID from route parameter
@@ -251,6 +258,12 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
       teamLevels: this.teamOptionsService.getTeamLevels()
     }).subscribe({
       next: ({ gameExtra, periods, shotTypes, gameTypes, teams, arenas, rinks, teamLevels }) => {
+        // Check if game status is "Not Started" (1)
+        if (gameExtra.status === 1) {
+          this.router.navigate(['/dashboard']);
+          return;
+        }
+        
         // Set team IDs from game extra
         this.homeTeamId = gameExtra.home_team_id;
         this.awayTeamId = gameExtra.away_team_id;
@@ -316,13 +329,13 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
         
         // Start polling for live data
         this.startLiveDataPolling();
-        
-        // Set loading to false after all data is loaded
-        this.isLoadingGameData = false;
+        // Note: keep isLoadingGameData=true until first live-data arrives
       },
       error: (error) => {
         console.error('Failed to load initial game data:', error);
-        this.isLoadingGameData = false;
+        // If game not found or error loading, redirect to dashboard
+        console.warn('Game not found or error loading game data, redirecting to dashboard');
+        this.router.navigate(['/dashboard']);
       }
     });
   }
@@ -341,6 +354,10 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
         next: (liveData) => {
           this.updateStatsFromLiveData(liveData);
           this.updateGameEvents(liveData, this.gamePeriods, this.teamOptions.map(t => ({ id: t.value.toString(), name: t.label })));
+          // First successful live-data load ends loading state
+          if (this.isLoadingGameData) {
+            this.isLoadingGameData = false;
+          }
         },
         error: (error) => {
           console.error('Failed to poll live game data:', error);
@@ -428,7 +445,7 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
       // Add events for this period
       periodEvents.forEach(event => {
         const team = teams.find(t => parseInt(t.id) === event.team_id);
-        const eventTime = new Date(event.time);
+        const eventTime = this.parseEventTime(event.time);
         
         // Find player name from playerOptions
         let playerName = 'Unknown Player';
@@ -461,6 +478,29 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
     });
 
     this.gameEvents.set(groupedEvents);
+  }
+
+  /**
+   * Parse event time which may be either a full ISO string or a time-of-day string like HH:mm:ss.SSSZ
+   */
+  private parseEventTime(timeStr: string): Date {
+    if (timeStr.includes('T')) {
+      return new Date(timeStr);
+    }
+    // Expect a time-of-day string like HH:mm:ss.SSSZ (hours may be 00)
+    const m = timeStr.match(/^(\d{2}):(\d{2}):(\d{2})(\.(\d{3}))?Z?$/);
+    if (m && this.gameStartTime) {
+      const hh = parseInt(m[1], 10);
+      const mm = parseInt(m[2], 10);
+      const ss = parseInt(m[3], 10);
+      const ms = m[5] ? parseInt(m[5], 10) : 0;
+      const offsetMs = ((hh * 3600 + mm * 60 + ss) * 1000) + ms;
+      return new Date(this.gameStartTime.getTime() + offsetMs);
+    }
+    // Fallback: combine with game date
+    const base = this.gameStartTime ? new Date(this.gameStartTime) : new Date();
+    const datePart = base.toISOString().split('T')[0];
+    return new Date(`${datePart}T${timeStr}`);
   }
 
   /**
@@ -555,6 +595,12 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
     const homeFaceoffPct = totalFaceoffs > 0 ? Math.round((liveData.home_faceoff_win / totalFaceoffs) * 100) : 0;
     const awayFaceoffPct = totalFaceoffs > 0 ? Math.round((liveData.away_faceoff_win / totalFaceoffs) * 100) : 0;
 
+    // Capture row IDs for patching
+    this.homeDefensiveZoneExitId = liveData.home_defensive_zone_exit?.id;
+    this.awayDefensiveZoneExitId = liveData.away_defensive_zone_exit?.id;
+    this.homeOffensiveZoneEntryId = liveData.home_offensive_zone_entry?.id;
+    this.awayOffensiveZoneEntryId = liveData.away_offensive_zone_entry?.id;
+
     // Update home stats
     this.homeStats.set({
       faceoffWinPct: homeFaceoffPct,
@@ -567,8 +613,8 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
       },
       offensiveZoneEntry: {
         pass: liveData.home_offensive_zone_entry.pass_in,
-        dump: liveData.home_offensive_zone_entry.dump_win + liveData.home_offensive_zone_entry.dump_lose,
-        carry: 0, // Not in API response, keeping existing logic
+        dump: liveData.home_offensive_zone_entry.dump_win,
+        carry: liveData.home_offensive_zone_entry.dump_lose,
         skated: liveData.home_offensive_zone_entry.skate_in
       },
       shots: {
@@ -596,8 +642,8 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
       },
       offensiveZoneEntry: {
         pass: liveData.away_offensive_zone_entry.pass_in,
-        dump: liveData.away_offensive_zone_entry.dump_win + liveData.away_offensive_zone_entry.dump_lose,
-        carry: 0, // Not in API response, keeping existing logic
+        dump: liveData.away_offensive_zone_entry.dump_win,
+        carry: liveData.away_offensive_zone_entry.dump_lose,
         skated: liveData.away_offensive_zone_entry.skate_in
       },
       shots: {
@@ -622,102 +668,143 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
   // Game events (loaded from API)
   gameEvents = signal<GameEvent[]>([]);
 
-  // Defensive Zone Exit increment/decrement methods
+  // Helpers to map UI keys to API fields
+  private mapDefensiveField(type: 'long' | 'skate' | 'soWin' | 'soLose' | 'pass') {
+    const mapping: Record<typeof type, 'icing' | 'skate_out' | 'so_win' | 'so_lose' | 'passes'> = {
+      long: 'icing',
+      skate: 'skate_out',
+      soWin: 'so_win',
+      soLose: 'so_lose',
+      pass: 'passes'
+    } as const;
+    return mapping[type];
+  }
+
+  private mapOffensiveField(type: 'pass' | 'dump' | 'carry' | 'skated') {
+    const mapping: Record<typeof type, 'pass_in' | 'dump_win' | 'dump_lose' | 'skate_in'> = {
+      pass: 'pass_in',
+      dump: 'dump_win',
+      carry: 'dump_lose',
+      skated: 'skate_in'
+    } as const;
+    return mapping[type];
+  }
+
+  private refreshLiveDataOnce(): void {
+    this.liveGameService.getLiveGameData(this.gameId).subscribe({
+      next: (liveData) => this.updateStatsFromLiveData(liveData),
+      error: (e) => console.error('Failed to refresh live data:', e)
+    });
+  }
+
+  // Defensive Zone Exit increment/decrement methods (with backend PATCH)
   incrementDefensiveZoneExit(team: 'away' | 'home', type: 'long' | 'skate' | 'soWin' | 'soLose' | 'pass'): void {
-    if (team === 'away') {
-      const currentStats = this.awayStats();
-      this.awayStats.set({
-        ...currentStats,
-        defensiveZoneExit: {
-          ...currentStats.defensiveZoneExit,
-          [type]: currentStats.defensiveZoneExit[type] + 1
-        }
-      });
-    } else {
-      const currentStats = this.homeStats();
-      this.homeStats.set({
-        ...currentStats,
-        defensiveZoneExit: {
-          ...currentStats.defensiveZoneExit,
-          [type]: currentStats.defensiveZoneExit[type] + 1
-        }
-      });
-    }
+    this.updateDefensiveZoneExit(team, type, +1);
   }
 
   decrementDefensiveZoneExit(team: 'away' | 'home', type: 'long' | 'skate' | 'soWin' | 'soLose' | 'pass'): void {
-    if (team === 'away') {
-      const currentStats = this.awayStats();
-      if (currentStats.defensiveZoneExit[type] > 0) {
-        this.awayStats.set({
-          ...currentStats,
-          defensiveZoneExit: {
-            ...currentStats.defensiveZoneExit,
-            [type]: currentStats.defensiveZoneExit[type] - 1
-          }
-        });
-      }
-    } else {
-      const currentStats = this.homeStats();
-      if (currentStats.defensiveZoneExit[type] > 0) {
-        this.homeStats.set({
-          ...currentStats,
-          defensiveZoneExit: {
-            ...currentStats.defensiveZoneExit,
-            [type]: currentStats.defensiveZoneExit[type] - 1
-          }
-        });
-      }
-    }
+    this.updateDefensiveZoneExit(team, type, -1);
   }
 
-  // Offensive Zone Entry increment/decrement methods
-  incrementOffensiveZoneEntry(team: 'away' | 'home', type: 'pass' | 'dump' | 'carry' | 'skated'): void {
-    if (team === 'away') {
-      const currentStats = this.awayStats();
+  private updateDefensiveZoneExit(team: 'away' | 'home', type: 'long' | 'skate' | 'soWin' | 'soLose' | 'pass', delta: 1 | -1): void {
+    const field = this.mapDefensiveField(type);
+    const isAway = team === 'away';
+    const stats = isAway ? this.awayStats() : this.homeStats();
+    const current = stats.defensiveZoneExit[type];
+    const next = Math.max(0, current + delta);
+
+    // Optimistic UI update
+    if (isAway) {
       this.awayStats.set({
-        ...currentStats,
-        offensiveZoneEntry: {
-          ...currentStats.offensiveZoneEntry,
-          [type]: currentStats.offensiveZoneEntry[type] + 1
-        }
+        ...stats,
+        defensiveZoneExit: { ...stats.defensiveZoneExit, [type]: next }
       });
     } else {
-      const currentStats = this.homeStats();
       this.homeStats.set({
-        ...currentStats,
-        offensiveZoneEntry: {
-          ...currentStats.offensiveZoneEntry,
-          [type]: currentStats.offensiveZoneEntry[type] + 1
-        }
+        ...stats,
+        defensiveZoneExit: { ...stats.defensiveZoneExit, [type]: next }
       });
     }
+
+    const rowId = isAway ? this.awayDefensiveZoneExitId : this.homeDefensiveZoneExitId;
+    if (!rowId && rowId !== 0) {
+      console.warn('Defensive zone exit row id is missing; skipping PATCH');
+      return;
+    }
+
+    this.liveGameService.updateDefensiveZoneExit(rowId!, { [field]: next } as any).subscribe({
+      next: () => this.refreshLiveDataOnce(),
+      error: (e) => {
+        console.error('Failed to update defensive zone exit:', e);
+        // Revert UI on error
+        if (isAway) {
+          this.awayStats.update(s => ({
+            ...s,
+            defensiveZoneExit: { ...s.defensiveZoneExit, [type]: current }
+          }));
+        } else {
+          this.homeStats.update(s => ({
+            ...s,
+            defensiveZoneExit: { ...s.defensiveZoneExit, [type]: current }
+          }));
+        }
+      }
+    });
+  }
+
+  // Offensive Zone Entry increment/decrement methods (with backend PATCH)
+  incrementOffensiveZoneEntry(team: 'away' | 'home', type: 'pass' | 'dump' | 'carry' | 'skated'): void {
+    this.updateOffensiveZoneEntry(team, type, +1);
   }
 
   decrementOffensiveZoneEntry(team: 'away' | 'home', type: 'pass' | 'dump' | 'carry' | 'skated'): void {
-    if (team === 'away') {
-      const currentStats = this.awayStats();
-      if (currentStats.offensiveZoneEntry[type] > 0) {
-        this.awayStats.set({
-          ...currentStats,
-          offensiveZoneEntry: {
-            ...currentStats.offensiveZoneEntry,
-            [type]: currentStats.offensiveZoneEntry[type] - 1
-          }
-        });
-      }
+    this.updateOffensiveZoneEntry(team, type, -1);
+  }
+
+  private updateOffensiveZoneEntry(team: 'away' | 'home', type: 'pass' | 'dump' | 'carry' | 'skated', delta: 1 | -1): void {
+    const field = this.mapOffensiveField(type);
+    const isAway = team === 'away';
+    const stats = isAway ? this.awayStats() : this.homeStats();
+    const current = stats.offensiveZoneEntry[type];
+    const next = Math.max(0, current + delta);
+
+    // Optimistic UI update
+    if (isAway) {
+      this.awayStats.set({
+        ...stats,
+        offensiveZoneEntry: { ...stats.offensiveZoneEntry, [type]: next }
+      });
     } else {
-      const currentStats = this.homeStats();
-      if (currentStats.offensiveZoneEntry[type] > 0) {
-        this.homeStats.set({
-          ...currentStats,
-          offensiveZoneEntry: {
-            ...currentStats.offensiveZoneEntry,
-            [type]: currentStats.offensiveZoneEntry[type] - 1
-          }
-        });
-      }
+      this.homeStats.set({
+        ...stats,
+        offensiveZoneEntry: { ...stats.offensiveZoneEntry, [type]: next }
+      });
     }
+
+    const rowId = isAway ? this.awayOffensiveZoneEntryId : this.homeOffensiveZoneEntryId;
+    if (!rowId && rowId !== 0) {
+      console.warn('Offensive zone entry row id is missing; skipping PATCH');
+      return;
+    }
+
+    this.liveGameService.updateOffensiveZoneEntry(rowId!, { [field]: next } as any).subscribe({
+      next: () => this.refreshLiveDataOnce(),
+      error: (e) => {
+        console.error('Failed to update offensive zone entry:', e);
+        // Revert UI on error
+        if (isAway) {
+          this.awayStats.update(s => ({
+            ...s,
+            offensiveZoneEntry: { ...s.offensiveZoneEntry, [type]: current }
+          }));
+        } else {
+          this.homeStats.update(s => ({
+            ...s,
+            offensiveZoneEntry: { ...s.offensiveZoneEntry, [type]: current }
+          }));
+        }
+      }
+    });
   }
 
   // Turnover increment/decrement methods
@@ -786,7 +873,8 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
         shotTypeOptions: this.shotTypeOptions,
         teamOptions: this.teamOptions,
         playerOptions: this.playerOptions,
-        goalieOptions: this.goalieOptions
+        goalieOptions: this.goalieOptions,
+        gameStartTimeIso: this.gameStartTime ? this.gameStartTime.toISOString() : undefined
       }
     });
 

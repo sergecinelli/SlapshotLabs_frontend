@@ -162,8 +162,8 @@ export class ScheduleComponent implements OnInit {
           date: game.date,
           time: game.time,
           rink: rinkMap.get(game.rink_id) || `Rink ${game.rink_id}`,
-          status: game.status === 0 ? GameStatus.NotStarted : 
-                  game.status === 1 ? GameStatus.GameInProgress : 
+          status: game.status === 1 ? GameStatus.NotStarted : 
+                  game.status === 2 ? GameStatus.GameInProgress : 
                   GameStatus.GameOver,
           events: []
         }));
@@ -207,8 +207,8 @@ export class ScheduleComponent implements OnInit {
           date: game.date,
           time: game.time,
           rink: rinkMap.get(game.rink_id) || `Rink ${game.rink_id}`,
-          status: game.status === 0 ? GameStatus.NotStarted : 
-                  game.status === 1 ? GameStatus.GameInProgress : 
+          status: game.status === 1 ? GameStatus.NotStarted : 
+                  game.status === 2 ? GameStatus.GameInProgress : 
                   GameStatus.GameOver,
           events: []
         }));
@@ -299,16 +299,20 @@ export class ScheduleComponent implements OnInit {
 
   private deleteSchedule(schedule: Schedule): void {
     if (confirm(`Are you sure you want to delete the game between ${schedule.homeTeam} and ${schedule.awayTeam}?`)) {
-      this.scheduleService.deleteSchedule(schedule.id).subscribe({
-        next: (success) => {
-          if (success) {
-            const updatedSchedules = this.schedules().filter(s => s.id !== schedule.id);
-            this.schedules.set(updatedSchedules);
-            console.log('Schedule deleted successfully');
+      const gameId = parseInt(schedule.id);
+      this.scheduleService.deleteGame(gameId).subscribe({
+        next: (response) => {
+          if (response.success) {
+            console.log('Game deleted successfully');
+            this.loadSchedules(); // Reload the list from API
+          } else {
+            console.error('Failed to delete game');
+            alert('Failed to delete game. Please try again.');
           }
         },
         error: (error) => {
-          console.error('Error deleting schedule:', error);
+          console.error('Error deleting game:', error);
+          alert('Error deleting game. Please try again.');
         }
       });
     }

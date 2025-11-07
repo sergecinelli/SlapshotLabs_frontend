@@ -82,7 +82,7 @@
             @case ('custom') {
               @if (column.key === 'status') {
                 <span [class]="getStatusBadgeClass(getCellValue(element, column))">
-                  {{ getCellValue(element, column) }}
+                  {{ getStatusLabel(getCellValue(element, column)) }}
                 </span>
               } @else if (column.key === 'gameType') {
                 <span [class]="getGameTypeBadgeClass(getCellValue(element, column))">
