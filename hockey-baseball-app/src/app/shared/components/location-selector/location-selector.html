@@ -24,5 +24,12 @@
         [style.top.%]="puckLocation.y / 10"
       ></div>
     </button>
+    <button 
+      *ngIf="showClearButton && puckLocation" 
+      type="button" 
+      class="clear-location-btn"
+      (click)="onClearLocation()">
+      Clear
+    </button>
   </div>
 </div>

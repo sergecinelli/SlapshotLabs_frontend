@@ -69,10 +69,32 @@ export class ShotFormModalComponent implements OnInit {
     awayTeamId?: number;
     homeStartGoalieId?: number;
     awayStartGoalieId?: number;
+    // Edit mode fields
+    isEditMode?: boolean;
+    eventId?: number;
+    existingData?: {
+      periodId?: number;
+      time?: string;
+      teamId?: number;
+      playerId?: number;
+      player2Id?: number;
+      goalieId?: number;
+      shotTypeId?: number;
+      isScoringChance?: boolean;
+      note?: string;
+      youtubeLink?: string;
+      iceTopOffset?: number;
+      iceLeftOffset?: number;
+      netTopOffset?: number;
+      netLeftOffset?: number;
+      zone?: string;
+    };
   }>(MAT_DIALOG_DATA);
 
   gameId: number;
   shotEventId: number;
+  isEditMode = false;
+  eventId?: number;
 
   shotForm: FormGroup;
 
@@ -95,6 +117,8 @@ export class ShotFormModalComponent implements OnInit {
     this.shotForm = this.createForm();
     this.gameId = this.dialogData.gameId;
     this.shotEventId = this.dialogData.shotEventId;
+    this.isEditMode = this.dialogData.isEditMode || false;
+    this.eventId = this.dialogData.eventId;
     this.setupConditionalValidation();
   }
 
@@ -112,22 +136,66 @@ export class ShotFormModalComponent implements OnInit {
       this.teamOptions = this.dialogData.teamOptions;
     }
     
-    // Set defaults
-    if (this.shotTypeOptions.length > 0) {
-      this.shotForm.patchValue({ shotType: this.shotTypeOptions[0].value });
-    }
-    
-    if (this.periodOptions.length > 0) {
-      this.shotForm.patchValue({ period: this.periodOptions[0].value });
-    }
-    
-    if (this.teamOptions.length > 0) {
-      // Set first team for goal/non-goal scenarios
-      this.shotForm.patchValue({ 
-        scoringTeam: this.teamOptions[0].value,
-        shootingTeam: this.teamOptions[0].value
+    // Edit mode: populate with existing data
+    if (this.isEditMode && this.dialogData.existingData) {
+      const existing = this.dialogData.existingData;
+      
+      // Restore shot location if available and not (0,0)
+      if (existing.iceTopOffset !== undefined && existing.iceLeftOffset !== undefined &&
+          !(existing.iceTopOffset === 0 && existing.iceLeftOffset === 0)) {
+        this.shotLocation = {
+          rinkLocation: {
+            x: existing.iceLeftOffset,
+            y: existing.iceTopOffset,
+            zone: existing.zone as 'defending' | 'neutral' | 'attacking' ?? 'defending'
+          },
+          netLocation: (existing.netTopOffset !== undefined && existing.netLeftOffset !== undefined &&
+                       !(existing.netTopOffset === 0 && existing.netLeftOffset === 0)) ? {
+            x: existing.netLeftOffset,
+            y: existing.netTopOffset
+          } : undefined
+        };
+      }
+      
+      // Populate form
+      this.shotForm.patchValue({
+        shotType: existing.shotTypeId,
+        period: existing.periodId,
+        time: existing.time,
+        youtubeLink: existing.youtubeLink || '',
+        isScoringChance: existing.isScoringChance || false,
+        scoringChanceNote: existing.note || '',
+        // Set team and player fields
+        scoringTeam: existing.teamId,
+        shootingTeam: existing.teamId,
+        scoringPlayer: existing.playerId,
+        shootingPlayer: existing.playerId,
+        assistPlayer: existing.player2Id,
+        goalieScored: existing.goalieId,
+        goalieInNet: existing.goalieId
       });
-      this.filterPlayersAndGoaliesForTeam(this.teamOptions[0].value);
+      
+      if (existing.teamId) {
+        this.filterPlayersAndGoaliesForTeam(existing.teamId);
+      }
+    } else {
+      // Create mode: Set defaults
+      if (this.shotTypeOptions.length > 0) {
+        this.shotForm.patchValue({ shotType: this.shotTypeOptions[0].value });
+      }
+      
+      if (this.periodOptions.length > 0) {
+        this.shotForm.patchValue({ period: this.periodOptions[0].value });
+      }
+      
+      if (this.teamOptions.length > 0) {
+        // Set first team for goal/non-goal scenarios
+        this.shotForm.patchValue({ 
+          scoringTeam: this.teamOptions[0].value,
+          shootingTeam: this.teamOptions[0].value
+        });
+        this.filterPlayersAndGoaliesForTeam(this.teamOptions[0].value);
+      }
     }
   }
 
@@ -367,17 +435,33 @@ export class ShotFormModalComponent implements OnInit {
         net_left_offset: this.shotLocation?.netLocation?.x
       };
 
-      this.gameEventService.createShotEvent(shotRequest).subscribe({
-        next: (response) => {
-          console.log('Shot event created:', response);
-          this.isSubmitting = false;
-          this.dialogRef.close(response);
-        },
-        error: (error) => {
-          console.error('Failed to create shot event:', error);
-          this.isSubmitting = false;
-        }
-      });
+      // Edit or create based on mode
+      if (this.isEditMode && this.eventId) {
+        this.gameEventService.updateGameEvent(this.eventId, shotRequest).subscribe({
+          next: (response) => {
+            console.log('Shot event updated:', response);
+            this.isSubmitting = false;
+            this.dialogRef.close(response);
+          },
+          error: (error) => {
+            console.error('Failed to update shot event:', error);
+            this.isSubmitting = false;
+            alert('Failed to update shot event. Please try again.');
+          }
+        });
+      } else {
+        this.gameEventService.createShotEvent(shotRequest).subscribe({
+          next: (response) => {
+            console.log('Shot event created:', response);
+            this.isSubmitting = false;
+            this.dialogRef.close(response);
+          },
+          error: (error) => {
+            console.error('Failed to create shot event:', error);
+            this.isSubmitting = false;
+          }
+        });
+      }
     } else if (!this.shotForm.valid) {
       Object.keys(this.shotForm.controls).forEach(key => {
         this.shotForm.get(key)?.markAsTouched();

@@ -35,8 +35,14 @@ export class LocationSelectorComponent implements ControlValueAccessor {
   @Input() imageUrl = '/assets/images/hockey-rink.svg';
   @Input() maxWidth = '100%';
   @Input() showTeams = true;
+  @Input() showClearButton = false;
   @Input() team1?: Team;
   @Input() team2?: Team;
+  @Input() set initialLocation(value: PuckLocation | null) {
+    if (value && !(value.x === 0 && value.y === 0)) {
+      this.puckLocation = value;
+    }
+  }
   @Output() locationChange = new EventEmitter<PuckLocation | null>();
 
   puckLocation: PuckLocation | null = null;
@@ -76,6 +82,13 @@ export class LocationSelectorComponent implements ControlValueAccessor {
     this.onChange(zone);
     this.onTouched();
     this.locationChange.emit(this.puckLocation);
+  }
+
+  onClearLocation(): void {
+    this.puckLocation = null;
+    this.onChange('');
+    this.onTouched();
+    this.locationChange.emit(null);
   }
 
   // ControlValueAccessor implementation

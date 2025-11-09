@@ -78,6 +78,8 @@ interface GameEvent {
   event: string;
   player: string;
   description: string;
+  eventNameId?: number; // Added to track event type for editing
+  rawEventData?: ServiceGameEvent; // Store full event data for editing
 }
 
 @Component({
@@ -513,7 +515,9 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
           teamId: event.team_id,
           event: this.getEventName(event.event_name_id),
           player: playerName,
-          description: event.note || event.goal_type || ''
+          description: event.note || event.goal_type || '',
+          eventNameId: event.event_name_id,
+          rawEventData: event
         });
       });
     });
@@ -733,6 +737,19 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
     });
   }
 
+  /**
+   * Refresh live data including stats and events
+   */
+  private refreshLiveData(): void {
+    this.liveGameService.getLiveGameData(this.gameId).subscribe({
+      next: (liveData) => {
+        this.updateStatsFromLiveData(liveData);
+        this.updateGameEvents(liveData, this.gamePeriods, this.teamOptions.map(t => ({ id: t.value.toString(), name: t.label })));
+      },
+      error: (e) => console.error('Failed to refresh live data:', e)
+    });
+  }
+
   // Defensive Zone Exit increment/decrement methods (with backend PATCH)
   incrementDefensiveZoneExit(team: 'away' | 'home', type: 'long' | 'skate' | 'soWin' | 'soLose' | 'pass'): void {
     this.updateDefensiveZoneExit(team, type, +1);
@@ -921,8 +938,8 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         console.log('Shot data:', result);
-        // Here you can handle the shot data
-        // For example, add it to game events or update stats
+        // Refresh live data to update stats and events
+        this.refreshLiveData();
       }
     });
   }
@@ -948,8 +965,8 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         console.log('Turnover data:', result);
-        // Here you can handle the turnover data
-        // For example, add it to game events or update stats
+        // Refresh live data to update stats and events
+        this.refreshLiveData();
       }
     });
   }
@@ -975,8 +992,8 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         console.log('Faceoff data:', result);
-        // Here you can handle the faceoff data
-        // For example, add it to game events or update stats
+        // Refresh live data to update stats and events
+        this.refreshLiveData();
       }
     });
   }
@@ -1007,8 +1024,8 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         console.log('Goalie change data:', result);
-        // Here you can handle the goalie change data
-        // For example, add it to game events
+        // Refresh live data to update stats and events
+        this.refreshLiveData();
       }
     });
   }
@@ -1061,7 +1078,275 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         console.log('Penalty data:', result);
-        // For example, add it to game events
+        // Refresh live data to update stats and events
+        this.refreshLiveData();
+      }
+    });
+  }
+
+  /**
+   * Edit a game event based on its type
+   */
+  onEditEvent(event: GameEvent): void {
+    // Skip if it's a period header (string ID)
+    if (typeof event.id === 'string' || !event.eventNameId || !event.rawEventData) {
+      return;
+    }
+
+    // Determine which modal to open based on event type
+    if (event.eventNameId === this.shotOnGoalEventId) {
+      this.openShotEditModal(event);
+    } else if (event.eventNameId === this.turnoverEventId) {
+      this.openTurnoverEditModal(event);
+    } else if (event.eventNameId === this.faceoffEventId) {
+      this.openFaceoffEditModal(event);
+    } else if (event.eventNameId === this.goalieChangeEventId || event.eventNameId === this.pullGoalieEventId) {
+      this.openGoalieChangeEditModal(event);
+    } else if (event.eventNameId === this.penaltyEventId) {
+      this.openPenaltyEditModal(event);
+    } else {
+      console.warn('Unknown event type for editing:', event.eventNameId);
+      alert('This event type cannot be edited yet.');
+    }
+  }
+
+  private openShotEditModal(event: GameEvent): void {
+    const rawEvent = event.rawEventData!;
+    
+    // Convert time back to mm:ss format
+    const eventTime = this.parseEventTime(rawEvent.time);
+    const timeString = this.formatElapsedTime(eventTime);
+    
+    const dialogRef = this.dialog.open(ShotFormModalComponent, {
+      width: '800px',
+      panelClass: 'shot-form-modal-dialog',
+      disableClose: false,
+      autoFocus: true,
+      data: {
+        gameId: this.gameId,
+        shotEventId: this.shotOnGoalEventId,
+        periodOptions: this.periodOptions,
+        shotTypeOptions: this.shotTypeOptions,
+        teamOptions: this.teamOptions,
+        playerOptions: this.playerOptions,
+        goalieOptions: this.goalieOptions,
+        gameStartTimeIso: this.gameStartTime ? this.gameStartTime.toISOString() : undefined,
+        homeTeamId: this.homeTeamId,
+        awayTeamId: this.awayTeamId,
+        homeStartGoalieId: this.homeStartGoalieId,
+        awayStartGoalieId: this.awayStartGoalieId,
+        // Edit mode data
+        isEditMode: true,
+        eventId: rawEvent.id,
+        existingData: {
+          periodId: rawEvent.period_id,
+          time: timeString,
+          teamId: rawEvent.team_id,
+          playerId: rawEvent.player_id,
+          player2Id: rawEvent.player_2_id,
+          goalieId: rawEvent.goalie_id,
+          shotTypeId: rawEvent.shot_type_id,
+          isScoringChance: rawEvent.is_scoring_chance,
+          note: rawEvent.note,
+          youtubeLink: rawEvent.youtube_link,
+          iceTopOffset: rawEvent.ice_top_offset,
+          iceLeftOffset: rawEvent.ice_left_offset,
+          netTopOffset: rawEvent.net_top_offset,
+          netLeftOffset: rawEvent.net_left_offset
+        }
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        console.log('Shot event updated:', result);
+        this.refreshLiveData();
+      }
+    });
+  }
+
+  private openTurnoverEditModal(event: GameEvent): void {
+    const rawEvent = event.rawEventData!;
+    
+    // Convert time back to mm:ss format
+    const eventTime = this.parseEventTime(rawEvent.time);
+    const timeString = this.formatElapsedTime(eventTime);
+    
+    const dialogRef = this.dialog.open(TurnoverFormModalComponent, {
+      width: '800px',
+      panelClass: 'turnover-form-modal-dialog',
+      disableClose: false,
+      autoFocus: true,
+      data: {
+        gameId: this.gameId,
+        turnoverEventId: this.turnoverEventId,
+        periodOptions: this.periodOptions,
+        teamOptions: this.teamOptions,
+        playerOptions: this.playerOptions,
+        // Edit mode data
+        isEditMode: true,
+        eventId: rawEvent.id,
+        existingData: {
+          periodId: rawEvent.period_id,
+          time: timeString,
+          teamId: rawEvent.team_id,
+          playerId: rawEvent.player_id,
+          zone: rawEvent.zone,
+          youtubeLink: rawEvent.youtube_link,
+          iceTopOffset: rawEvent.ice_top_offset,
+          iceLeftOffset: rawEvent.ice_left_offset
+        }
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        console.log('Turnover event updated:', result);
+        this.refreshLiveData();
+      }
+    });
+  }
+
+  private openFaceoffEditModal(event: GameEvent): void {
+    const rawEvent = event.rawEventData!;
+    
+    // Convert time back to mm:ss format
+    const eventTime = this.parseEventTime(rawEvent.time);
+    const timeString = this.formatElapsedTime(eventTime);
+    
+    const dialogRef = this.dialog.open(FaceoffFormModalComponent, {
+      width: '800px',
+      panelClass: 'faceoff-form-modal-dialog',
+      disableClose: false,
+      autoFocus: true,
+      data: {
+        gameId: this.gameId,
+        faceoffEventId: this.faceoffEventId,
+        periodOptions: this.periodOptions,
+        teamOptions: this.teamOptions,
+        playerOptions: this.playerOptions,
+        // Edit mode data
+        isEditMode: true,
+        eventId: rawEvent.id,
+        existingData: {
+          periodId: rawEvent.period_id,
+          time: timeString,
+          winnerTeamId: rawEvent.team_id,
+          winnerPlayerId: rawEvent.player_id,
+          loserPlayerId: rawEvent.player_2_id,
+          zone: rawEvent.zone,
+          youtubeLink: rawEvent.youtube_link,
+          iceTopOffset: rawEvent.ice_top_offset,
+          iceLeftOffset: rawEvent.ice_left_offset,
+          isFaceoffWon: rawEvent.is_faceoff_won
+        }
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        console.log('Faceoff event updated:', result);
+        this.refreshLiveData();
+      }
+    });
+  }
+
+  private openGoalieChangeEditModal(event: GameEvent): void {
+    const rawEvent = event.rawEventData!;
+    
+    // Convert time back to mm:ss format
+    const eventTime = this.parseEventTime(rawEvent.time);
+    const timeString = this.formatElapsedTime(eventTime);
+    
+    const dialogRef = this.dialog.open(GoalieChangeFormModalComponent, {
+      width: '800px',
+      panelClass: 'goalie-change-form-modal-dialog',
+      disableClose: false,
+      autoFocus: true,
+      data: {
+        gameId: this.gameId,
+        goalieChangeEventId: this.goalieChangeEventId,
+        pullGoalieEventId: this.pullGoalieEventId,
+        periodOptions: this.periodOptions,
+        teamOptions: this.teamOptions,
+        goalieOptions: this.goalieOptions,
+        homeTeamId: this.homeTeamId,
+        awayTeamId: this.awayTeamId,
+        homeStartGoalieId: this.homeStartGoalieId,
+        awayStartGoalieId: this.awayStartGoalieId,
+        // Edit mode data
+        isEditMode: true,
+        eventId: rawEvent.id,
+        existingData: {
+          periodId: rawEvent.period_id,
+          time: timeString,
+          teamId: rawEvent.team_id,
+          goalieId: rawEvent.goalie_id,
+          note: rawEvent.note
+        }
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        console.log('Goalie change event updated:', result);
+        this.refreshLiveData();
+      }
+    });
+  }
+
+  private openPenaltyEditModal(event: GameEvent): void {
+    const rawEvent = event.rawEventData!;
+    
+    // Convert time back to mm:ss format
+    const eventTime = this.parseEventTime(rawEvent.time);
+    const timeString = this.formatElapsedTime(eventTime);
+    
+    // Convert time_length to mm:ss format
+    let penaltyTimeString = '2:00'; // default
+    if (rawEvent.time_length) {
+      try {
+        const lengthDate = new Date(rawEvent.time_length);
+        const minutes = lengthDate.getUTCMinutes();
+        const seconds = lengthDate.getUTCSeconds();
+        penaltyTimeString = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+      } catch (e) {
+        console.warn('Failed to parse penalty time_length:', rawEvent.time_length);
+      }
+    }
+    
+    const dialogRef = this.dialog.open(PenaltyFormModalComponent, {
+      width: '800px',
+      panelClass: 'penalty-form-modal-dialog',
+      disableClose: false,
+      autoFocus: true,
+      data: {
+        gameId: this.gameId,
+        penaltyEventId: this.penaltyEventId,
+        periodOptions: this.periodOptions,
+        teamOptions: this.teamOptions,
+        playerOptions: this.playerOptions,
+        // Edit mode data
+        isEditMode: true,
+        eventId: rawEvent.id,
+        existingData: {
+          periodId: rawEvent.period_id,
+          time: timeString,
+          teamId: rawEvent.team_id,
+          playerId: rawEvent.player_id,
+          penaltyLength: penaltyTimeString,
+          zone: rawEvent.zone,
+          youtubeLink: rawEvent.youtube_link,
+          iceTopOffset: rawEvent.ice_top_offset,
+          iceLeftOffset: rawEvent.ice_left_offset
+        }
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        console.log('Penalty event updated:', result);
+        this.refreshLiveData();
       }
     });
   }
@@ -1079,8 +1364,8 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
       this.gameEventService.deleteGameEvent(eventId).subscribe({
         next: () => {
           console.log(`Event ${eventId} deleted successfully`);
-          // Reload game data to refresh the events list
-          this.loadInitialGameData();
+          // Refresh live data to update stats and events
+          this.refreshLiveData();
         },
         error: (error) => {
           console.error('Failed to delete event:', error);

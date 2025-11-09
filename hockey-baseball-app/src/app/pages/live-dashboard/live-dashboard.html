@@ -486,7 +486,7 @@
               @if (event.period) {
                 <tr class="bg-gray-700">
                   <td class="px-4 py-3 text-xs font-medium text-white" colspan="6">
-                    {{ event.period }} Period
+                    {{ event.period }}
                   </td>
                 </tr>
               } @else {
@@ -508,7 +508,7 @@
                         <button mat-icon-button color="primary" matTooltip="Video">
                           <mat-icon>videocam</mat-icon>
                         </button>
-                        <button mat-icon-button color="primary" matTooltip="Edit">
+                        <button mat-icon-button color="primary" matTooltip="Edit" (click)="onEditEvent(event)">
                           <mat-icon>edit</mat-icon>
                         </button>
                         <button mat-icon-button color="warn" matTooltip="Delete" (click)="onDeleteEvent(event.id)">

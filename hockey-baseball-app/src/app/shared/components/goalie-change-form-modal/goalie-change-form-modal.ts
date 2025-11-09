@@ -59,11 +59,23 @@ export class GoalieChangeFormModalComponent implements OnInit {
     awayTeamId?: number;
     homeStartGoalieId?: number;
     awayStartGoalieId?: number;
+    // Edit mode fields
+    isEditMode?: boolean;
+    eventId?: number;
+    existingData?: {
+      periodId?: number;
+      time?: string;
+      teamId?: number;
+      goalieId?: number;
+      note?: string;
+    };
   }>(MAT_DIALOG_DATA);
 
   gameId: number;
   goalieChangeEventId: number;
   pullGoalieEventId: number;
+  isEditMode = false;
+  eventId?: number;
 
   goalieChangeForm: FormGroup;
 
@@ -83,35 +95,61 @@ export class GoalieChangeFormModalComponent implements OnInit {
     this.gameId = this.dialogData.gameId;
     this.goalieChangeEventId = this.dialogData.goalieChangeEventId;
     this.pullGoalieEventId = this.dialogData.pullGoalieEventId;
+    this.isEditMode = this.dialogData.isEditMode || false;
+    this.eventId = this.dialogData.eventId;
     this.setupTeamChangeListener();
   }
 
   ngOnInit(): void {
-    // Use teams from dialog data if available, otherwise fetch from API
+    // Load options
     if (this.dialogData.teamOptions && this.dialogData.teamOptions.length > 0) {
       this.teamOptions = this.dialogData.teamOptions;
+    } else {
+      this.loadTeams();
+    }
+    
+    if (this.dialogData.periodOptions && this.dialogData.periodOptions.length > 0) {
+      this.periodOptions = this.dialogData.periodOptions;
+    } else {
+      this.loadPeriods();
+    }
+    
+    // Edit mode: populate with existing data
+    if (this.isEditMode && this.dialogData.existingData) {
+      const existing = this.dialogData.existingData;
+      
+      // Populate form
+      this.goalieChangeForm.patchValue({
+        team: existing.teamId,
+        goalie: existing.goalieId,
+        period: existing.periodId,
+        time: existing.time,
+        note: existing.note || ''
+      });
+      
+      // Load goalies for the existing team
+      if (existing.teamId) {
+        if (this.dialogData.goalieOptions && this.dialogData.goalieOptions.length > 0) {
+          this.filterGoaliesForTeam(existing.teamId);
+        } else {
+          this.loadGoaliesForTeam(existing.teamId);
+        }
+      }
+    } else {
+      // Create mode: Set defaults
       if (this.teamOptions.length > 0) {
         this.goalieChangeForm.patchValue({ team: this.teamOptions[0].value });
         
-        // If goalieOptions are provided, filter for selected team
         if (this.dialogData.goalieOptions && this.dialogData.goalieOptions.length > 0) {
           this.filterGoaliesForTeam(this.teamOptions[0].value);
         } else {
           this.loadGoaliesForTeam(this.teamOptions[0].value);
         }
       }
-    } else {
-      this.loadTeams();
-    }
-    
-    // Use periods from dialog data if available, otherwise fetch from API
-    if (this.dialogData.periodOptions && this.dialogData.periodOptions.length > 0) {
-      this.periodOptions = this.dialogData.periodOptions;
+      
       if (this.periodOptions.length > 0) {
         this.goalieChangeForm.patchValue({ period: this.periodOptions[0].value });
       }
-    } else {
-      this.loadPeriods();
     }
   }
 
@@ -299,32 +337,47 @@ export class GoalieChangeFormModalComponent implements OnInit {
         note: formValue.note || undefined
       };
 
-      this.gameEventService.createGoalieChangeEvent(goalieChangeRequest).subscribe({
-        next: (response) => {
-          console.log('Goalie change event created:', response);
-          
-          // Find selected team and goalie for display
-          const selectedTeam = this.teamOptions.find(t => t.value === formValue.team);
-          const selectedGoalie = this.goalieOptions.find(g => g.value === formValue.goalie);
-          
-          const goalieChangeData: GoalieChangeFormData = {
-            teamLogo: selectedTeam?.logo || '',
-            teamName: selectedTeam?.label || '',
-            goalieName: selectedGoalie?.label || '',
-            period: formValue.period.toString(),
-            time: formValue.time,
-            note: formValue.note
-          };
-          
-          this.isSubmitting = false;
-          this.dialogRef.close(goalieChangeData);
-        },
-        error: (error) => {
-          console.error('Failed to create goalie change event:', error);
-          this.isSubmitting = false;
-          // Optionally show error message to user
-        }
-      });
+      // Edit or create based on mode
+      if (this.isEditMode && this.eventId) {
+        this.gameEventService.updateGameEvent(this.eventId, goalieChangeRequest).subscribe({
+          next: (response) => {
+            console.log('Goalie change event updated:', response);
+            this.isSubmitting = false;
+            this.dialogRef.close(response);
+          },
+          error: (error) => {
+            console.error('Failed to update goalie change event:', error);
+            this.isSubmitting = false;
+            alert('Failed to update goalie change event. Please try again.');
+          }
+        });
+      } else {
+        this.gameEventService.createGoalieChangeEvent(goalieChangeRequest).subscribe({
+          next: (response) => {
+            console.log('Goalie change event created:', response);
+            
+            // Find selected team and goalie for display
+            const selectedTeam = this.teamOptions.find(t => t.value === formValue.team);
+            const selectedGoalie = this.goalieOptions.find(g => g.value === formValue.goalie);
+            
+            const goalieChangeData: GoalieChangeFormData = {
+              teamLogo: selectedTeam?.logo || '',
+              teamName: selectedTeam?.label || '',
+              goalieName: selectedGoalie?.label || '',
+              period: formValue.period.toString(),
+              time: formValue.time,
+              note: formValue.note
+            };
+            
+            this.isSubmitting = false;
+            this.dialogRef.close(goalieChangeData);
+          },
+          error: (error) => {
+            console.error('Failed to create goalie change event:', error);
+            this.isSubmitting = false;
+          }
+        });
+      }
     } else if (!this.goalieChangeForm.valid) {
       // Mark all fields as touched to show validation errors
       Object.keys(this.goalieChangeForm.controls).forEach(key => {

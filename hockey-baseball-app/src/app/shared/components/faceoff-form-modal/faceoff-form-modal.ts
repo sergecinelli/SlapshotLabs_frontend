@@ -60,10 +60,27 @@ export class FaceoffFormModalComponent implements OnInit {
     periodOptions?: { value: number; label: string }[]; 
     teamOptions?: { value: number; label: string; logo?: string }[];
     playerOptions?: { value: number; label: string; teamId: number }[];
+    // Edit mode fields
+    isEditMode?: boolean;
+    eventId?: number;
+    existingData?: {
+      periodId?: number;
+      time?: string;
+      winnerTeamId?: number;
+      winnerPlayerId?: number;
+      loserPlayerId?: number;
+      zone?: string;
+      youtubeLink?: string;
+      iceTopOffset?: number;
+      iceLeftOffset?: number;
+      isFaceoffWon?: boolean;
+    };
   }>(MAT_DIALOG_DATA);
 
   gameId: number;
   faceoffEventId: number;
+  isEditMode = false;
+  eventId?: number;
 
   faceoffForm: FormGroup;
   puckLocation: PuckLocation | null = null;
@@ -85,20 +102,74 @@ export class FaceoffFormModalComponent implements OnInit {
     this.faceoffForm = this.createForm();
     this.gameId = this.dialogData.gameId;
     this.faceoffEventId = this.dialogData.faceoffEventId;
+    this.isEditMode = this.dialogData.isEditMode || false;
+    this.eventId = this.dialogData.eventId;
     this.setupTeamChangeListeners();
   }
 
   ngOnInit(): void {
-    // Use teams from dialog data if available, otherwise fetch from API
+    // Load options
     if (this.dialogData.teamOptions && this.dialogData.teamOptions.length > 0) {
       this.teamOptions = this.dialogData.teamOptions;
+    } else {
+      this.loadTeams();
+    }
+    
+    if (this.dialogData.periodOptions && this.dialogData.periodOptions.length > 0) {
+      this.periodOptions = this.dialogData.periodOptions;
+    } else {
+      this.loadPeriods();
+    }
+    
+    // Edit mode: populate with existing data
+    if (this.isEditMode && this.dialogData.existingData) {
+      const existing = this.dialogData.existingData;
+      
+      // Restore location if available
+      if (existing.iceTopOffset !== undefined && existing.iceLeftOffset !== undefined && existing.zone) {
+        this.puckLocation = {
+          x: existing.iceLeftOffset,
+          y: existing.iceTopOffset,
+          zone: existing.zone as 'defending' | 'neutral' | 'attacking' ?? 'defending'
+        };
+      }
+      
+      // Find loser team (opposite of winner)
+      const loserTeam = this.teamOptions.find(t => t.value !== existing.winnerTeamId);
+      
+      // Populate form
+      this.faceoffForm.patchValue({
+        winnerTeam: existing.winnerTeamId,
+        loserTeam: loserTeam?.value,
+        winnerPlayer: existing.winnerPlayerId,
+        loserPlayer: existing.loserPlayerId,
+        period: existing.periodId,
+        time: existing.time,
+        location: existing.zone,
+        youtubeLink: existing.youtubeLink || ''
+      });
+      
+      // Load players for both teams
+      if (existing.winnerTeamId) {
+        if (this.dialogData.playerOptions && this.dialogData.playerOptions.length > 0) {
+          this.filterPlayersForTeam(existing.winnerTeamId, 'winner');
+        } else {
+          this.loadPlayersForTeam(existing.winnerTeamId, 'winner');
+        }
+      }
+      if (loserTeam && this.dialogData.playerOptions && this.dialogData.playerOptions.length > 0) {
+        this.filterPlayersForTeam(loserTeam.value, 'loser');
+      } else if (loserTeam) {
+        this.loadPlayersForTeam(loserTeam.value, 'loser');
+      }
+    } else {
+      // Create mode: Set defaults
       if (this.teamOptions.length > 1) {
         this.faceoffForm.patchValue({
           winnerTeam: this.teamOptions[0].value,
           loserTeam: this.teamOptions[1].value
         });
         
-        // If playerOptions are provided, filter for each team
         if (this.dialogData.playerOptions && this.dialogData.playerOptions.length > 0) {
           this.filterPlayersForTeam(this.teamOptions[0].value, 'winner');
           this.filterPlayersForTeam(this.teamOptions[1].value, 'loser');
@@ -107,18 +178,10 @@ export class FaceoffFormModalComponent implements OnInit {
           this.loadPlayersForTeam(this.teamOptions[1].value, 'loser');
         }
       }
-    } else {
-      this.loadTeams();
-    }
-    
-    // Use periods from dialog data if available, otherwise fetch from API
-    if (this.dialogData.periodOptions && this.dialogData.periodOptions.length > 0) {
-      this.periodOptions = this.dialogData.periodOptions;
+      
       if (this.periodOptions.length > 0) {
         this.faceoffForm.patchValue({ period: this.periodOptions[0].value });
       }
-    } else {
-      this.loadPeriods();
     }
   }
 
@@ -381,38 +444,53 @@ export class FaceoffFormModalComponent implements OnInit {
         is_faceoff_won: true
       };
 
-      this.gameEventService.createFaceoffEvent(faceoffRequest).subscribe({
-        next: (response) => {
-          console.log('Faceoff event created:', response);
-          
-          // Find selected teams and players for display
-          const winnerTeam = this.teamOptions.find(t => t.value === formValue.winnerTeam);
-          const loserTeam = this.teamOptions.find(t => t.value === formValue.loserTeam);
-          const winnerPlayer = this.winnerPlayerOptions.find(p => p.value === formValue.winnerPlayer);
-          const loserPlayer = this.loserPlayerOptions.find(p => p.value === formValue.loserPlayer);
-          
-          const faceoffData: FaceoffFormData = {
-            winnerTeamLogo: winnerTeam?.logo || '',
-            winnerTeamName: winnerTeam?.label || '',
-            winnerPlayerName: winnerPlayer?.label || '',
-            loserTeamLogo: loserTeam?.logo || '',
-            loserTeamName: loserTeam?.label || '',
-            loserPlayerName: loserPlayer?.label || '',
-            period: formValue.period.toString(),
-            time: formValue.time,
-            location: this.puckLocation || undefined,
-            youtubeLink: formValue.youtubeLink
-          };
-          
-          this.isSubmitting = false;
-          this.dialogRef.close(faceoffData);
-        },
-        error: (error) => {
-          console.error('Failed to create faceoff event:', error);
-          this.isSubmitting = false;
-          // Optionally show error message to user
-        }
-      });
+      // Edit or create based on mode
+      if (this.isEditMode && this.eventId) {
+        this.gameEventService.updateGameEvent(this.eventId, faceoffRequest).subscribe({
+          next: (response) => {
+            console.log('Faceoff event updated:', response);
+            this.isSubmitting = false;
+            this.dialogRef.close(response);
+          },
+          error: (error) => {
+            console.error('Failed to update faceoff event:', error);
+            this.isSubmitting = false;
+            alert('Failed to update faceoff event. Please try again.');
+          }
+        });
+      } else {
+        this.gameEventService.createFaceoffEvent(faceoffRequest).subscribe({
+          next: (response) => {
+            console.log('Faceoff event created:', response);
+            
+            // Find selected teams and players for display
+            const winnerTeam = this.teamOptions.find(t => t.value === formValue.winnerTeam);
+            const loserTeam = this.teamOptions.find(t => t.value === formValue.loserTeam);
+            const winnerPlayer = this.winnerPlayerOptions.find(p => p.value === formValue.winnerPlayer);
+            const loserPlayer = this.loserPlayerOptions.find(p => p.value === formValue.loserPlayer);
+            
+            const faceoffData: FaceoffFormData = {
+              winnerTeamLogo: winnerTeam?.logo || '',
+              winnerTeamName: winnerTeam?.label || '',
+              winnerPlayerName: winnerPlayer?.label || '',
+              loserTeamLogo: loserTeam?.logo || '',
+              loserTeamName: loserTeam?.label || '',
+              loserPlayerName: loserPlayer?.label || '',
+              period: formValue.period.toString(),
+              time: formValue.time,
+              location: this.puckLocation || undefined,
+              youtubeLink: formValue.youtubeLink
+            };
+            
+            this.isSubmitting = false;
+            this.dialogRef.close(faceoffData);
+          },
+          error: (error) => {
+            console.error('Failed to create faceoff event:', error);
+            this.isSubmitting = false;
+          }
+        });
+      }
     } else if (!this.faceoffForm.valid) {
       // Mark all fields as touched to show validation errors
       Object.keys(this.faceoffForm.controls).forEach(key => {

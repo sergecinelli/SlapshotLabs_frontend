@@ -61,10 +61,25 @@ export class TurnoverFormModalComponent implements OnInit {
     periodOptions?: { value: number; label: string }[]; 
     teamOptions?: { value: number; label: string; logo?: string }[];
     playerOptions?: { value: number; label: string; teamId: number }[];
+    // Edit mode fields
+    isEditMode?: boolean;
+    eventId?: number;
+    existingData?: {
+      periodId?: number;
+      time?: string;
+      teamId?: number;
+      playerId?: number;
+      zone?: string;
+      youtubeLink?: string;
+      iceTopOffset?: number;
+      iceLeftOffset?: number;
+    };
   }>(MAT_DIALOG_DATA);
 
   gameId: number;
   turnoverEventId: number;
+  isEditMode = false;
+  eventId?: number;
 
   turnoverForm: FormGroup;
   puckLocation: PuckLocation | null = null;
@@ -83,34 +98,70 @@ export class TurnoverFormModalComponent implements OnInit {
     this.turnoverForm = this.createForm();
     this.gameId = this.dialogData.gameId;
     this.turnoverEventId = this.dialogData.turnoverEventId;
+    this.isEditMode = this.dialogData.isEditMode || false;
+    this.eventId = this.dialogData.eventId;
   }
 
   ngOnInit(): void {
-    // Use teams from dialog data if available, otherwise fetch from API
+    // Load options
     if (this.dialogData.teamOptions && this.dialogData.teamOptions.length > 0) {
       this.teamOptions = this.dialogData.teamOptions;
+    } else {
+      this.loadTeams();
+    }
+    
+    if (this.dialogData.periodOptions && this.dialogData.periodOptions.length > 0) {
+      this.periodOptions = this.dialogData.periodOptions;
+    } else {
+      this.loadPeriods();
+    }
+    
+    // Edit mode: populate with existing data
+    if (this.isEditMode && this.dialogData.existingData) {
+      const existing = this.dialogData.existingData;
+      
+      // Restore location if available
+      if (existing.iceTopOffset !== undefined && existing.iceLeftOffset !== undefined && existing.zone) {
+        this.puckLocation = {
+          x: existing.iceLeftOffset,
+          y: existing.iceTopOffset,
+          zone: existing.zone as 'defending' | 'neutral' | 'attacking' ?? 'defending'
+        };
+      }
+      
+      // Populate form
+      this.turnoverForm.patchValue({
+        team: existing.teamId,
+        player: existing.playerId,
+        period: existing.periodId,
+        time: existing.time,
+        location: existing.zone,
+        youtubeLink: existing.youtubeLink || ''
+      });
+      
+      // Filter players for the existing team
+      if (existing.teamId) {
+        if (this.dialogData.playerOptions && this.dialogData.playerOptions.length > 0) {
+          this.filterPlayersForTeam(existing.teamId);
+        } else {
+          this.loadPlayersForTeam(existing.teamId);
+        }
+      }
+    } else {
+      // Create mode: Set defaults
       if (this.teamOptions.length > 0) {
         this.turnoverForm.patchValue({ team: this.teamOptions[0].value });
         
-        // If playerOptions are provided, filter for selected team
         if (this.dialogData.playerOptions && this.dialogData.playerOptions.length > 0) {
           this.filterPlayersForTeam(this.teamOptions[0].value);
         } else {
           this.loadPlayersForTeam(this.teamOptions[0].value);
         }
       }
-    } else {
-      this.loadTeams();
-    }
-    
-    // Use periods from dialog data if available, otherwise fetch from API
-    if (this.dialogData.periodOptions && this.dialogData.periodOptions.length > 0) {
-      this.periodOptions = this.dialogData.periodOptions;
+      
       if (this.periodOptions.length > 0) {
         this.turnoverForm.patchValue({ period: this.periodOptions[0].value });
       }
-    } else {
-      this.loadPeriods();
     }
   }
 
@@ -257,33 +308,48 @@ export class TurnoverFormModalComponent implements OnInit {
         zone: this.puckLocation?.zone
       };
 
-      this.gameEventService.createTurnoverEvent(turnoverRequest).subscribe({
-        next: (response) => {
-          console.log('Turnover event created:', response);
-          
-          // Find selected team and player for display
-          const selectedTeam = this.teamOptions.find(t => t.value === formValue.team);
-          const selectedPlayer = this.playerOptions.find(p => p.value === formValue.player);
-          
-          const turnoverData: TurnoverFormData = {
-            teamLogo: selectedTeam?.logo || '',
-            teamName: selectedTeam?.label || '',
-            playerNames: [selectedPlayer?.label || ''],
-            period: formValue.period.toString(),
-            time: formValue.time,
-            location: this.puckLocation || undefined,
-            youtubeLink: formValue.youtubeLink
-          };
-          
-          this.isSubmitting = false;
-          this.dialogRef.close(turnoverData);
-        },
-        error: (error) => {
-          console.error('Failed to create turnover event:', error);
-          this.isSubmitting = false;
-          // Optionally show error message to user
-        }
-      });
+      // Edit or create based on mode
+      if (this.isEditMode && this.eventId) {
+        this.gameEventService.updateGameEvent(this.eventId, turnoverRequest).subscribe({
+          next: (response) => {
+            console.log('Turnover event updated:', response);
+            this.isSubmitting = false;
+            this.dialogRef.close(response);
+          },
+          error: (error) => {
+            console.error('Failed to update turnover event:', error);
+            this.isSubmitting = false;
+            alert('Failed to update turnover event. Please try again.');
+          }
+        });
+      } else {
+        this.gameEventService.createTurnoverEvent(turnoverRequest).subscribe({
+          next: (response) => {
+            console.log('Turnover event created:', response);
+            
+            // Find selected team and player for display
+            const selectedTeam = this.teamOptions.find(t => t.value === formValue.team);
+            const selectedPlayer = this.playerOptions.find(p => p.value === formValue.player);
+            
+            const turnoverData: TurnoverFormData = {
+              teamLogo: selectedTeam?.logo || '',
+              teamName: selectedTeam?.label || '',
+              playerNames: [selectedPlayer?.label || ''],
+              period: formValue.period.toString(),
+              time: formValue.time,
+              location: this.puckLocation || undefined,
+              youtubeLink: formValue.youtubeLink
+            };
+            
+            this.isSubmitting = false;
+            this.dialogRef.close(turnoverData);
+          },
+          error: (error) => {
+            console.error('Failed to create turnover event:', error);
+            this.isSubmitting = false;
+          }
+        });
+      }
     } else if (!this.turnoverForm.valid) {
       // Mark all fields as touched to show validation errors
       Object.keys(this.turnoverForm.controls).forEach(key => {

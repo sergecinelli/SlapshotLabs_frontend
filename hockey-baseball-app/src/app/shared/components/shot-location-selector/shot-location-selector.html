@@ -12,6 +12,7 @@
         [showTeams]="true"
         [team1]="team1"
         [team2]="team2"
+        [initialLocation]="initialRinkLocation"
         (locationChange)="onRinkLocationChange($event)"
       ></app-location-selector>
     </div>
@@ -22,6 +23,8 @@
         [showDivider]="false"
         [showTeams]="false"
         [imageUrl]="'/assets/images/net.svg'"
+        [showClearButton]="true"
+        [initialLocation]="initialNetLocation"
         (locationChange)="onNetLocationChange($event)"
       ></app-location-selector>
     </div>
