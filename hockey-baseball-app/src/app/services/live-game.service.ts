@@ -53,7 +53,6 @@ export interface GameEvent {
   goal_type: string;
   zone: string;
   note: string;
-  is_faceoff_won: boolean;
   time_length: string;
   youtube_link: string;
   id: number;

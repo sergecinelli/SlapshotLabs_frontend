@@ -21,7 +21,6 @@ export interface GameEventRequest {
   goal_type?: string;
   zone?: string;
   note?: string;
-  is_faceoff_won?: boolean;
   time_length?: string;
   youtube_link?: string;
 }
@@ -51,7 +50,6 @@ export interface FaceoffEventRequest {
   ice_top_offset?: number;
   ice_left_offset?: number;
   zone?: string;
-  is_faceoff_won: boolean;
 }
 
 export interface GoalieChangeEventRequest {
@@ -175,7 +173,6 @@ export class GameEventService {
       ice_top_offset: faceoffData.ice_top_offset,
       ice_left_offset: faceoffData.ice_left_offset,
       zone: faceoffData.zone,
-      is_faceoff_won: faceoffData.is_faceoff_won
     };
 
     return this.createGameEvent(eventData);

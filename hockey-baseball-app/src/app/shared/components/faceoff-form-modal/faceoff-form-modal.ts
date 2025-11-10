@@ -427,9 +427,6 @@ export class FaceoffFormModalComponent implements OnInit {
       const iso = tmp.toISOString();
       const timeOfDay = iso.substring(iso.indexOf('T') + 1);
       
-      // Determine which team won (is_faceoff_won is true for winner team)
-      // Submit the faceoff event with winner's team and both players
-      
       const faceoffRequest: FaceoffEventRequest = {
         game_id: this.gameId,
         event_name_id: this.faceoffEventId,
@@ -441,8 +438,7 @@ export class FaceoffFormModalComponent implements OnInit {
         youtube_link: formValue.youtubeLink || undefined,
         ice_top_offset: this.puckLocation?.y as number | undefined,
         ice_left_offset: this.puckLocation?.x as number | undefined,
-        zone: this.puckLocation?.zone,
-        is_faceoff_won: true
+        zone: this.puckLocation?.zone
       };
 
       // Edit or create based on mode

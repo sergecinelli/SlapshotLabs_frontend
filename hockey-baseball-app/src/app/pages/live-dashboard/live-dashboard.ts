@@ -1283,8 +1283,7 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
           zone: rawEvent.zone,
           youtubeLink: rawEvent.youtube_link,
           iceTopOffset: rawEvent.ice_top_offset,
-          iceLeftOffset: rawEvent.ice_left_offset,
-          isFaceoffWon: rawEvent.is_faceoff_won
+          iceLeftOffset: rawEvent.ice_left_offset
         }
       }
     });
