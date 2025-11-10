@@ -91,11 +91,6 @@ export class PlayerProfileComponent implements OnInit {
     return apg.toFixed(2);
   }
 
-  // Mock data methods
-  getCountry(): string {
-    return 'Canada'; // Default mock country
-  }
-
   getAddress(): string {
     return this.player?.rink?.address || 'Toronto, ON';
   }

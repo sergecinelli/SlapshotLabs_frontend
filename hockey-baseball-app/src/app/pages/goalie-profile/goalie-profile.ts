@@ -94,7 +94,6 @@ export class GoalieProfileComponent implements OnInit {
     return winPercentage.toFixed(1);
   }
   
-  // Mock data methods
   getCountry(): string {
     // Return default mocked country value
     // If goalie has country data, use it, otherwise default to Canada
