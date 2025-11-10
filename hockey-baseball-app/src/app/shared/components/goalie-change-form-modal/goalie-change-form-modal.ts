@@ -360,7 +360,8 @@ export class GoalieChangeFormModalComponent implements OnInit {
           next: (response) => {
             console.log('Goalie change event updated:', response);
             this.isSubmitting = false;
-            this.dialogRef.close(response);
+            // Ensure caller always receives a truthy value to trigger refresh
+            this.dialogRef.close(true);
           },
           error: (error) => {
             console.error('Failed to update goalie change event:', error);

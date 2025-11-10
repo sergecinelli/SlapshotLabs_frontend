@@ -19,6 +19,7 @@ export interface GamePeriodResponse {
   id: number;
   name: string;
   description?: string;
+  order?: number;
 }
 
 export interface ShotTypeResponse {

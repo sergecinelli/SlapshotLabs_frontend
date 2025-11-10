@@ -162,6 +162,7 @@
           formControlName="location"
           [team1]="winnerTeamData"
           [team2]="loserTeamData"
+          [initialLocation]="puckLocation"
           (locationChange)="onLocationChange($event)">
         </app-location-selector>
         

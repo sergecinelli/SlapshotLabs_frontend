@@ -330,10 +330,11 @@ export class PenaltyFormModalComponent implements OnInit {
       const iso = tmp.toISOString();
       const timeOfDay = iso.substring(iso.indexOf('T') + 1);
       
-      // Convert penalty length to ISO duration format
+      // Convert penalty length to ISO 8601 duration (timedelta) format, e.g., PT2M30S
       const [penaltyMinutes, penaltySeconds] = formValue.penaltyLength.split(':').map((v: string) => parseInt(v, 10));
-      const isoPenaltyLength = new Date();
-      isoPenaltyLength.setHours(0, penaltyMinutes, penaltySeconds, 0);
+      const mm = isNaN(penaltyMinutes) ? 0 : penaltyMinutes;
+      const ss = isNaN(penaltySeconds) ? 0 : penaltySeconds;
+      const timeLengthDuration = `PT${mm > 0 ? mm + 'M' : ''}${ss > 0 ? ss + 'S' : '0S'}`;
       
       const penaltyRequest: PenaltyEventRequest = {
         game_id: this.gameId,
@@ -342,7 +343,7 @@ export class PenaltyFormModalComponent implements OnInit {
         player_id: formValue.player,
         period_id: formValue.period,
         time: timeOfDay,
-        time_length: isoPenaltyLength.toISOString(),
+        time_length: timeLengthDuration,
         youtube_link: formValue.youtubeLink || undefined,
         ice_top_offset: this.puckLocation?.y as number | undefined,
         ice_left_offset: this.puckLocation?.x as number | undefined,
@@ -355,7 +356,8 @@ export class PenaltyFormModalComponent implements OnInit {
           next: (response) => {
             console.log('Penalty event updated:', response);
             this.isSubmitting = false;
-            this.dialogRef.close(response);
+            // Ensure caller always receives a truthy value to trigger refresh
+            this.dialogRef.close(true);
           },
           error: (error) => {
             console.error('Failed to update penalty event:', error);

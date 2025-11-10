@@ -78,6 +78,8 @@ interface GameEvent {
   event: string;
   player: string;
   description: string;
+  // For shot events
+  shotType?: 'save' | 'goal' | 'missed' | 'blocked';
   eventNameId?: number; // Added to track event type for editing
   rawEventData?: ServiceGameEvent; // Store full event data for editing
 }
@@ -452,7 +454,7 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
   /**
    * Update game events from live data, grouped by period
    */
-  private updateGameEvents(liveData: LiveGameData, periods: { id: number; name: string }[], teams: { id: string; name: string }[]): void {
+  private updateGameEvents(liveData: LiveGameData, periods: GamePeriodResponse[], teams: { id: string; name: string }[]): void {
     // Group events by period
     const eventsByPeriod = new Map<number, ServiceGameEvent[]>();
     
@@ -466,8 +468,13 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
     // Create flat array with period headers and events
     const groupedEvents: GameEvent[] = [];
     
-    // Sort periods
-    const sortedPeriods = Array.from(eventsByPeriod.keys()).sort((a, b) => a - b);
+    // Sort periods using backend-provided order (fallback to id)
+    const periodOrderMap = new Map<number, number>(periods.map(p => [p.id, (p.order ?? p.id)]));
+    const sortedPeriods = Array.from(eventsByPeriod.keys()).sort((a, b) => {
+      const oa = periodOrderMap.get(a) ?? a;
+      const ob = periodOrderMap.get(b) ?? b;
+      return oa - ob;
+    });
     
     sortedPeriods.forEach(periodId => {
       const period = periods.find(p => p.id === periodId);
@@ -515,15 +522,21 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
           }
         }
         
+        // Determine shot type category for shot events
+        const isShotEvent = event.event_name_id === this.shotOnGoalEventId;
+        const shotTypeCategory = isShotEvent ? this.mapShotType(event.shot_type_id) : undefined;
+
         groupedEvents.push({
           id: event.id,
           period: '', // Empty string for actual events (not headers)
           time: this.formatElapsedTime(eventTime),
           team: team ? team.name : 'Unknown Team',
           teamId: event.team_id,
-          event: this.getEventName(event.event_name_id),
+          // Show shotType in Event column for shot events; otherwise show event name
+          event: shotTypeCategory?.toUpperCase() ?? this.getEventName(event.event_name_id),
           player: playerName,
           description: event.note || event.goal_type || '',
+          shotType: shotTypeCategory,
           eventNameId: event.event_name_id,
           rawEventData: event
         });
@@ -583,6 +596,26 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
     // Find the event name by ID from our loaded event names
     const entry = Object.entries(this.eventNameIds).find(([_, id]) => id === eventNameId);
     return entry ? entry[0].toUpperCase() : 'UNKNOWN EVENT';
+  }
+
+  /**
+   * Map shot_type_id to one of: 'save' | 'goal' | 'missed' | 'blocked'
+   */
+  private mapShotType(shotTypeId?: number): 'save' | 'goal' | 'missed' | 'blocked' | undefined {
+    if (!shotTypeId) return undefined;
+    const st = this.shotTypeOptions.find(s => s.value === shotTypeId);
+    if (!st) return undefined;
+    const name = st.label.trim().toLowerCase();
+    if (name === 'goal') return 'goal';
+    if (name === 'save' || name === 'saved') return 'save';
+    if (name === 'blocked' || name === 'block') return 'blocked';
+    if (name === 'missed' || name === 'missed net' || name === 'miss') return 'missed';
+    // Fallback heuristics
+    if (name.includes('goal')) return 'goal';
+    if (name.includes('save')) return 'save';
+    if (name.includes('block')) return 'blocked';
+    if (name.includes('miss')) return 'missed';
+    return undefined;
   }
 
   /**
@@ -1315,16 +1348,42 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
     const eventTime = this.parseEventTime(rawEvent.time);
     const timeString = this.formatElapsedTime(eventTime);
     
-    // Convert time_length to mm:ss format
+    // Convert time_length to mm:ss for edit modal input. Supports ISO 8601 duration (PT..), mm:ss, HH:mm:ss[.SSS][Z], or full ISO.
     let penaltyTimeString = '2:00'; // default
     if (rawEvent.time_length) {
-      try {
-        const lengthDate = new Date(rawEvent.time_length);
-        const minutes = lengthDate.getUTCMinutes();
-        const seconds = lengthDate.getUTCSeconds();
+      const dur = rawEvent.time_length;
+      // Try ISO 8601 duration PT#M#S
+      const isoMatch = dur.match(/^P(T)?(?:(\d+)M)?(?:(\d+)S)?$/);
+      if (isoMatch) {
+        const minutes = isoMatch[2] ? parseInt(isoMatch[2], 10) : 0;
+        const seconds = isoMatch[3] ? parseInt(isoMatch[3], 10) : 0;
         penaltyTimeString = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-      } catch (e) {
-        console.warn('Failed to parse penalty time_length:', rawEvent.time_length);
+      } else {
+        // Try mm:ss directly
+        const msMatch = dur.match(/^([0-5]?\d):([0-5]\d)$/);
+        if (msMatch) {
+          const minutes = parseInt(msMatch[1], 10);
+          const seconds = parseInt(msMatch[2], 10);
+          penaltyTimeString = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        } else {
+          // Try time-of-day HH:mm:ss...
+          const tMatch = dur.match(/^(\d{2}):(\d{2}):(\d{2})/);
+          if (tMatch) {
+            const minutes = parseInt(tMatch[2], 10);
+            const seconds = parseInt(tMatch[3], 10);
+            penaltyTimeString = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+          } else {
+            // Fallback: try Date parse only if valid
+            const lengthDate = new Date(dur);
+            if (!isNaN(lengthDate.getTime())) {
+              const minutes = lengthDate.getUTCMinutes();
+              const seconds = lengthDate.getUTCSeconds();
+              penaltyTimeString = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            } else {
+              console.warn('Unrecognized penalty time_length format:', dur);
+            }
+          }
+        }
       }
     }
     

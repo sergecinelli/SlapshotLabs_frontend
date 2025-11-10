@@ -451,7 +451,8 @@ export class ShotFormModalComponent implements OnInit {
           next: (response) => {
             console.log('Shot event updated:', response);
             this.isSubmitting = false;
-            this.dialogRef.close(response);
+            // Ensure caller always receives a truthy value to trigger refresh
+            this.dialogRef.close(true);
           },
           error: (error) => {
             console.error('Failed to update shot event:', error);

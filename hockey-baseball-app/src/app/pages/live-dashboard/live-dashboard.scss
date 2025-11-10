@@ -56,3 +56,11 @@
     display: none;
   }
 }
+
+// Make goal-row background cover all cells, even with table dividers
+.goal-row td {
+  @apply bg-red-100;
+}
+.goal-row:hover td {
+  @apply bg-red-200;
+}
