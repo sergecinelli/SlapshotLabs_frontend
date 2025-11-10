@@ -6,8 +6,10 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatTableModule } from '@angular/material/table';
+import { MatDialog } from '@angular/material/dialog';
 import { PlayerService } from '../../services/player.service';
 import { Player, PlayerSeasonStats, PlayerRecentGameStats } from '../../shared/interfaces/player.interface';
+import { PlayerFormModalComponent } from '../../shared/components/player-form-modal/player-form-modal';
 
 @Component({
   selector: 'app-player-profile',
@@ -27,6 +29,7 @@ export class PlayerProfileComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private playerService = inject(PlayerService);
+  private dialog = inject(MatDialog);
 
   player: Player | null = null;
   loading = true;
@@ -96,8 +99,41 @@ export class PlayerProfileComponent implements OnInit {
   }
 
   onEditProfile(): void {
-    console.log('Edit player profile clicked');
-    // TODO: Open edit modal or navigate to edit page
+    if (!this.player) return;
+
+    const dialogRef = this.dialog.open(PlayerFormModalComponent, {
+      width: '800px',
+      maxWidth: '95vw',
+      data: {
+        player: this.player,
+        isEditMode: true
+      },
+      panelClass: 'player-form-modal-dialog',
+      disableClose: true
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.updatePlayer(result);
+      }
+    });
+  }
+
+  private updatePlayer(playerData: Partial<Player>): void {
+    if (!this.player?.id) return;
+
+    this.loading = true;
+    this.playerService.updatePlayer(this.player.id, playerData).subscribe({
+      next: (updatedPlayer) => {
+        console.log('Player updated successfully:', updatedPlayer);
+        this.player = updatedPlayer;
+        this.loading = false;
+      },
+      error: (error) => {
+        console.error('Error updating player:', error);
+        this.loading = false;
+      }
+    });
   }
 
   onRequestAnalysis(): void {

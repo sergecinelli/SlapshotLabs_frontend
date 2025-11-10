@@ -145,7 +145,20 @@ export class PlayerService {
 
     const apiUpdateData = this.toApiUpdateFormat(playerData, photo);
     
-    return this.apiService.patch<void>(`/hockey/player/${numericId}`, apiUpdateData).pipe(
+    // Create FormData for multipart/form-data request
+    const formData = new FormData();
+    
+    // Add photo if provided
+    if (photo !== undefined) {
+      formData.append('photo', photo);
+    }
+    
+    // Add data as JSON string if there are data updates
+    if (apiUpdateData.data && Object.keys(apiUpdateData.data).length > 0) {
+      formData.append('data', JSON.stringify(apiUpdateData.data));
+    }
+    
+    return this.apiService.patchMultipart<void>(`/hockey/player/${numericId}`, formData).pipe(
       switchMap(() => {
         // After successful update, fetch the updated player data
         return this.getPlayerById(id);

@@ -73,20 +73,22 @@ export class TeamOptionsService {
 
   /**
    * Transform team levels to dropdown options
+   * Using ID as value for proper selection
    */
   transformLevelsToOptions(levels: TeamLevel[]): { value: string; label: string }[] {
     return levels.map(level => ({
-      value: level.name,
+      value: level.id.toString(),
       label: level.name
     }));
   }
 
   /**
    * Transform divisions to dropdown options
+   * Using ID as value for proper selection
    */
   transformDivisionsToOptions(divisions: Division[]): { value: string; label: string }[] {
     return divisions.map(division => ({
-      value: division.name,
+      value: division.id.toString(),
       label: division.name
     }));
   }

@@ -18,7 +18,9 @@ export class TeamDataMapperService {
       name: apiTeam.name,
       group: apiTeam.age_group || '1U',  // Use age_group as group
       level: this.teamOptionsService.getLevelName(apiTeam.level_id),
+      levelId: apiTeam.level_id,  // Store ID for form selection
       division: this.teamOptionsService.getDivisionName(apiTeam.division_id),
+      divisionId: apiTeam.division_id,  // Store ID for form selection
       city: apiTeam.city || '',
       logo: `${environment.apiUrl}/hockey/team/${apiTeam.id}/logo`,  // Logo fetched from separate endpoint
       createdAt: new Date()
@@ -50,10 +52,16 @@ export class TeamDataMapperService {
     if (team.group) {
       updateData.age_group = team.group;
     }
-    if (team.level) {
+    // Use levelId if available (from form), otherwise derive from level name
+    if (team.levelId !== undefined) {
+      updateData.level_id = team.levelId;
+    } else if (team.level) {
       updateData.level_id = this.teamOptionsService.getLevelId(team.level);
     }
-    if (team.division) {
+    // Use divisionId if available (from form), otherwise derive from division name
+    if (team.divisionId !== undefined) {
+      updateData.division_id = team.divisionId;
+    } else if (team.division) {
       updateData.division_id = this.teamOptionsService.getDivisionId(team.division);
     }
     if (team.city !== undefined) {

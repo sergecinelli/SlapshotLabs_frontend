@@ -6,8 +6,10 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatTableModule } from '@angular/material/table';
+import { MatDialog } from '@angular/material/dialog';
 import { TeamService } from '../../services/team.service';
 import { Team } from '../../shared/interfaces/team.interface';
+import { TeamFormModalComponent } from '../../shared/components/team-form-modal/team-form-modal';
 
 // Additional interfaces for team profile specific data
 export interface TeamGame {
@@ -65,6 +67,7 @@ export class TeamProfileComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private teamService = inject(TeamService);
+  private dialog = inject(MatDialog);
 
   team: Team | null = null;
   loading = true;
@@ -109,8 +112,43 @@ export class TeamProfileComponent implements OnInit {
   }
 
   onEditTeamProfile(): void {
-    console.log('Edit team profile clicked');
-    // TODO: Open edit modal or navigate to edit page
+    if (!this.team) return;
+
+    const dialogRef = this.dialog.open(TeamFormModalComponent, {
+      width: '800px',
+      maxWidth: '95vw',
+      data: {
+        team: this.team,
+        isEditMode: true
+      },
+      panelClass: 'team-form-modal-dialog',
+      disableClose: true
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.updateTeam(result);
+      }
+    });
+  }
+
+  private updateTeam(teamData: Partial<Team> & { logoFile?: File; logoRemoved?: boolean }): void {
+    if (!this.team?.id) return;
+
+    this.loading = true;
+    const { logoFile, logoRemoved, ...team } = teamData;
+    
+    this.teamService.updateTeam(this.team.id, team, logoFile, logoRemoved).subscribe({
+      next: (updatedTeam) => {
+        console.log('Team updated successfully:', updatedTeam);
+        this.team = updatedTeam;
+        this.loading = false;
+      },
+      error: (error) => {
+        console.error('Error updating team:', error);
+        this.loading = false;
+      }
+    });
   }
 
   onRequestTeamAnalysis(): void {

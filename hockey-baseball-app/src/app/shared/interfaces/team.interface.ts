@@ -22,7 +22,9 @@ export interface Team {
   name: string;
   group: string;
   level: string;
+  levelId?: number;  // Store level ID for form selection
   division: string;
+  divisionId?: number;  // Store division ID for form selection
   city: string;
   logo: string;
   createdAt?: Date;  // Creation date for sorting

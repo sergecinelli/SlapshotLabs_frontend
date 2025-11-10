@@ -163,14 +163,21 @@ export class TeamFormModalComponent implements OnInit {
   }
 
   private populateForm(team: Team): void {
+    console.log('Populating form with team:', team);
+    console.log('Level options:', this.levelOptions);
+    console.log('Division options:', this.divisionOptions);
+    console.log('Team levelId:', team.levelId, 'divisionId:', team.divisionId);
+    
     this.teamForm.patchValue({
       name: team.name,
       group: team.group,
-      level: team.level,
-      division: team.division,
+      level: team.levelId?.toString() || this.levelOptions[0]?.value || '',
+      division: team.divisionId?.toString() || this.divisionOptions[0]?.value || '',
       city: team.city,
       logo: team.logo
     });
+    
+    console.log('Form values after patch:', this.teamForm.value);
     
     // Set existing logo as preview if available
     if (team.logo && team.logo !== '/assets/icons/teams.svg' && !team.logo.includes('/assets/')) {
@@ -325,11 +332,17 @@ export class TeamFormModalComponent implements OnInit {
     if (this.teamForm.valid) {
       const formValue = this.teamForm.value;
       
+      // Find the selected level and division names for display
+      const selectedLevel = this.levelOptions.find(opt => opt.value === formValue.level);
+      const selectedDivision = this.divisionOptions.find(opt => opt.value === formValue.division);
+      
       const teamData: Partial<Team> & { logoFile?: File; logoRemoved?: boolean } = {
         name: formValue.name,
         group: formValue.group,
-        level: formValue.level,
-        division: formValue.division,
+        level: selectedLevel?.label || '',
+        levelId: parseInt(formValue.level, 10),
+        division: selectedDivision?.label || '',
+        divisionId: parseInt(formValue.division, 10),
         city: formValue.city,
         logo: formValue.logo || '/assets/icons/teams.svg'
       };

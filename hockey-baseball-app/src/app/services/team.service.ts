@@ -124,6 +124,10 @@ export class TeamService {
 
     const apiUpdateData = this.teamDataMapper.toApiUpdateFormat(teamData);
     
+    console.log('Updating team with data:', apiUpdateData);
+    console.log('Logo file:', logoFile);
+    console.log('Logo removed:', logoRemoved);
+    
     // Create FormData for multipart request
     const formData = new FormData();
     formData.append('data', JSON.stringify(apiUpdateData));
@@ -149,6 +153,11 @@ export class TeamService {
       const blob = new Blob([byteArray], { type: contentType });
       formData.append('logo', blob, 'logo.' + contentType.split('/')[1]);
     }
+    
+    console.log('FormData entries:');
+    formData.forEach((value, key) => {
+      console.log(key, ':', value instanceof File ? `File: ${value.name}` : value);
+    });
     
     return this.apiService.patchMultipart<void>(`/hockey/team/${numericId}`, formData).pipe(
       switchMap(() => {

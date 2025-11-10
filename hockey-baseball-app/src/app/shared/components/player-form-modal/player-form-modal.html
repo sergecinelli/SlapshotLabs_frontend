@@ -120,7 +120,7 @@
 
           <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
             <mat-label class="uppercase text-custom-secondary">Birthplace:</mat-label>
-            <input matInput formControlName="birthplace" placeholder="Enter birthplace">
+            <input matInput formControlName="birthplace" placeholder="Country Born In">
             <mat-error *ngIf="playerForm.get('birthplace')?.errors && playerForm.get('birthplace')?.touched">
               {{ getErrorMessage('birthplace') }}
             </mat-error>
