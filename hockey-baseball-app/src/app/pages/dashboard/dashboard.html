@@ -46,9 +46,22 @@
           <div>
             @for (game of upcomingGames(); track game.id; let i = $index) {
               @if (i < 5) {
-                <div class="game-item">
-                  <div class="game-line">
-                    {{ game.date }} - {{ game.time }} - {{ game.homeTeam }} at {{ game.awayTeam }}
+                <div class="game-item flex items-center py-3 border-b border-gray-100 last:border-b-0">
+                  <div class="flex-1 flex items-center gap-4">
+                    <span class="text-sm text-gray-600 min-w-[120px]">{{ game.date }} - {{ game.time }}</span>
+                    <div class="flex items-center gap-2">
+                      @if (game.awayTeamLogo) {
+                        <img [src]="game.awayTeamLogo" [alt]="game.awayTeam" class="w-8 h-8 rounded-full object-contain border border-gray-200 bg-white p-1" />
+                      }
+                      <span class="font-medium text-gray-900">{{ game.awayTeam }}</span>
+                    </div>
+                    <span class="text-gray-500">at</span>
+                    <div class="flex items-center gap-2">
+                      @if (game.homeTeamLogo) {
+                        <img [src]="game.homeTeamLogo" [alt]="game.homeTeam" class="w-8 h-8 rounded-full object-contain border border-gray-200 bg-white p-1" />
+                      }
+                      <span class="font-medium text-gray-900">{{ game.homeTeam }}</span>
+                    </div>
                   </div>
                 </div>
               }
@@ -76,9 +89,24 @@
           <div>
             @for (game of gameResults(); track game.id; let i = $index) {
               @if (i < 5) {
-                <div class="game-item">
-                  <div class="game-line">
-                    {{ game.date }} - {{ game.time }} - {{ game.homeTeam }} [{{ game.homeGoals }}] at {{ game.awayTeam }} [{{ game.awayGoals }}]
+                <div class="game-item flex items-center py-3 border-b border-gray-100 last:border-b-0">
+                  <div class="flex-1 flex items-center gap-4">
+                    <span class="text-sm text-gray-600 min-w-[120px]">{{ game.date }} - {{ game.time }}</span>
+                    <div class="flex items-center gap-2">
+                      @if (game.awayTeamLogo) {
+                        <img [src]="game.awayTeamLogo" [alt]="game.awayTeam" class="w-8 h-8 rounded-full object-contain border border-gray-200 bg-white p-1" />
+                      }
+                      <span class="font-medium text-gray-900">{{ game.awayTeam }}</span>
+                      <span class="text-lg font-bold text-gray-900">{{ game.awayGoals }}</span>
+                    </div>
+                    <span class="text-gray-500">at</span>
+                    <div class="flex items-center gap-2">
+                      @if (game.homeTeamLogo) {
+                        <img [src]="game.homeTeamLogo" [alt]="game.homeTeam" class="w-8 h-8 rounded-full object-contain border border-gray-200 bg-white p-1" />
+                      }
+                      <span class="font-medium text-gray-900">{{ game.homeTeam }}</span>
+                      <span class="text-lg font-bold text-gray-900">{{ game.homeGoals }}</span>
+                    </div>
                   </div>
                 </div>
               }

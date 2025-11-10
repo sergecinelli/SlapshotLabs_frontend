@@ -8,6 +8,7 @@ import { ScheduleService } from '../../services/schedule.service';
 import { TeamService } from '../../services/team.service';
 import { PlayerService } from '../../services/player.service';
 import { GoalieService } from '../../services/goalie.service';
+import { ApiService } from '../../services/api.service';
 import { Schedule, GameStatus, GameType } from '../../shared/interfaces/schedule.interface';
 import { Team } from '../../shared/interfaces/team.interface';
 import { Player } from '../../shared/interfaces/player.interface';
@@ -16,6 +17,7 @@ import { PlayerFormModalComponent, PlayerFormModalData } from '../../shared/comp
 import { TeamFormModalComponent, TeamFormModalData } from '../../shared/components/team-form-modal/team-form-modal';
 import { GoalieFormModalComponent, GoalieFormModalData } from '../../shared/components/goalie-form-modal/goalie-form-modal';
 import { ScheduleFormModalComponent, ScheduleFormModalData } from '../../shared/components/schedule-form-modal/schedule-form-modal';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-dashboard',
@@ -29,50 +31,72 @@ export class DashboardComponent implements OnInit {
   private teamService = inject(TeamService);
   private playerService = inject(PlayerService);
   private goalieService = inject(GoalieService);
+  private apiService = inject(ApiService);
   private dialog = inject(MatDialog);
   private router = inject(Router);
 
   upcomingGames = signal<Schedule[]>([]);
   gameResults = signal<Schedule[]>([]);
   loading = signal(true);
+  teams = signal<Team[]>([]);
+  teamsMap = new Map<number, Team>();
 
   ngOnInit(): void {
-    this.loadGames();
+    this.loadData();
   }
 
-  private loadGames(): void {
+  private loadData(): void {
     this.loading.set(true);
-    this.scheduleService.getDashboardGames().subscribe({
-      next: (data) => {
-        // Map API response to Schedule interface
-        const mapGameToSchedule = (game: { id: number; home_team_id: number; home_goals: number; home_start_goalie_id: number; away_team_id: number; away_goals: number; away_start_goalie_id: number; game_type_group: string; tournament_name?: string; date: string; time: string; rink_id: number; status: number }): Schedule => ({
-          id: game.id.toString(),
-          homeTeam: `Team ${game.home_team_id}`, // TODO: Map to actual team names
-          homeGoals: game.home_goals,
-          homeTeamGoalie: `Goalie ${game.home_start_goalie_id}`, // TODO: Map to actual goalie names
-          awayTeam: `Team ${game.away_team_id}`,
-          awayGoals: game.away_goals,
-          awayTeamGoalie: `Goalie ${game.away_start_goalie_id}`,
-          gameType: game.game_type_group as GameType,
-          tournamentName: game.tournament_name,
-          date: game.date,
-          time: game.time,
-          rink: `Rink ${game.rink_id}`, // TODO: Map to actual rink name
-          status: game.status === 0 ? GameStatus.NotStarted : 
-                  game.status === 1 ? GameStatus.GameInProgress : 
-                  GameStatus.GameOver,
-          events: []
-        });
+    
+    // Load teams and games concurrently
+    forkJoin({
+      teams: this.teamService.getTeams(),
+      games: this.scheduleService.getDashboardGames()
+    }).subscribe({
+      next: ({ teams, games }) => {
+        // Store teams and create mapping
+        this.teams.set(teams.teams);
+        this.teamsMap = new Map(teams.teams.map(team => [parseInt(team.id), team]));
         
-        const upcoming = data.upcoming_games.map(mapGameToSchedule);
-        const completed = data.previous_games.map(mapGameToSchedule);
+        // Map API response to Schedule interface
+        const mapGameToSchedule = (game: { id: number; home_team_id: number; home_goals: number; home_start_goalie_id: number; away_team_id: number; away_goals: number; away_start_goalie_id: number; game_type_group: string; tournament_name?: string; date: string; time: string; rink_id: number; status: number }): Schedule => {
+          const homeTeam = this.teamsMap.get(game.home_team_id);
+          const awayTeam = this.teamsMap.get(game.away_team_id);
+          const apiUrl = this.apiService.getBaseUrl();
+          
+          return {
+            id: game.id.toString(),
+            homeTeam: homeTeam?.name || `Team ${game.home_team_id}`,
+            homeTeamId: game.home_team_id,
+            homeTeamLogo: `${apiUrl}/hockey/team/${game.home_team_id}/logo`,
+            homeGoals: game.home_goals,
+            homeTeamGoalie: `Goalie ${game.home_start_goalie_id}`, // TODO: Map to actual goalie names
+            awayTeam: awayTeam?.name || `Team ${game.away_team_id}`,
+            awayTeamId: game.away_team_id,
+            awayTeamLogo: `${apiUrl}/hockey/team/${game.away_team_id}/logo`,
+            awayGoals: game.away_goals,
+            awayTeamGoalie: `Goalie ${game.away_start_goalie_id}`,
+            gameType: game.game_type_group as GameType,
+            tournamentName: game.tournament_name,
+            date: game.date,
+            time: game.time,
+            rink: `Rink ${game.rink_id}`, // TODO: Map to actual rink name
+            status: game.status === 0 ? GameStatus.NotStarted : 
+                    game.status === 1 ? GameStatus.GameInProgress : 
+                    GameStatus.GameOver,
+            events: []
+          };
+        };
+        
+        const upcoming = games.upcoming_games.map(mapGameToSchedule);
+        const completed = games.previous_games.map(mapGameToSchedule);
         
         this.upcomingGames.set(upcoming);
         this.gameResults.set(completed);
         this.loading.set(false);
       },
       error: (error) => {
-        console.error('Error loading games:', error);
+        console.error('Error loading data:', error);
         this.loading.set(false);
       }
     });
@@ -197,9 +221,7 @@ export class DashboardComponent implements OnInit {
     // TODO: Implement highlight reel creation functionality
   }
 
-  getTeamLogo(teamName: string): string {
-    // TODO: Implement actual team logo logic
-    // For now, return a placeholder or team initial
-    return teamName.charAt(0).toUpperCase();
+  getTeamById(teamId: number): Team | undefined {
+    return this.teamsMap.get(teamId);
   }
 }

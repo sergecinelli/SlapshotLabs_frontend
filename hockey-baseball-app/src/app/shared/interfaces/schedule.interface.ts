@@ -1,9 +1,13 @@
 export interface Schedule extends Record<string, unknown> {
   id: string;
   homeTeam: string;
+  homeTeamId?: number;
+  homeTeamLogo?: string;
   homeGoals: number;
   homeTeamGoalie: string;
   awayTeam: string;
+  awayTeamId?: number;
+  awayTeamLogo?: string;
   awayGoals: number;
   awayTeamGoalie: string;
   gameType: GameType;
