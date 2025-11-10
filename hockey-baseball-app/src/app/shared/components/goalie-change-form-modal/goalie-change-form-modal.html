@@ -70,19 +70,25 @@
         </div>
         <mat-divider class="section-divider"></mat-divider>
         
-        <div class="form-row">
-          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
-            <mat-label class="uppercase text-custom-secondary">Period</mat-label>
-            <mat-select formControlName="period" placeholder="Select period">
-              <mat-option *ngFor="let period of periodOptions" [value]="period.value">
-                {{ period.label }}
-              </mat-option>
-            </mat-select>
-            <mat-error *ngIf="goalieChangeForm.get('period')?.errors && goalieChangeForm.get('period')?.touched">
-              {{ getErrorMessage('period') }}
-            </mat-error>
-          </mat-form-field>
+        <div class="period-selection-container">
+          <div class="period-selection-label uppercase text-custom-secondary">Period</div>
+          <div *ngIf="isLoadingPeriods" class="loading-message">Loading periods...</div>
+          <div class="period-buttons" *ngIf="!isLoadingPeriods">
+            <button 
+              *ngFor="let period of periodOptions" 
+              type="button"
+              class="period-button"
+              [class.selected]="goalieChangeForm.get('period')?.value === period.value"
+              (click)="selectPeriod(period.value)">
+              <div class="period-name">{{ period.label }}</div>
+            </button>
+          </div>
+          <div *ngIf="goalieChangeForm.get('period')?.errors && goalieChangeForm.get('period')?.touched" class="period-error">
+            {{ getErrorMessage('period') }}
+          </div>
+        </div>
 
+        <div class="form-row">
           <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
             <mat-label class="uppercase text-custom-secondary">Time</mat-label>
             <input matInput formControlName="time" placeholder="mm:ss" maxlength="5">
