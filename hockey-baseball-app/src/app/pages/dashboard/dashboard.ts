@@ -1,10 +1,17 @@
 import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header';
 import { ActionButtonComponent } from '../../shared/components/action-button/action-button';
 import { ScheduleService } from '../../services/schedule.service';
+import { TeamService } from '../../services/team.service';
+import { PlayerService } from '../../services/player.service';
+import { GoalieService } from '../../services/goalie.service';
 import { Schedule, GameStatus, GameType } from '../../shared/interfaces/schedule.interface';
+import { Team } from '../../shared/interfaces/team.interface';
+import { Player } from '../../shared/interfaces/player.interface';
+import { Goalie } from '../../shared/interfaces/goalie.interface';
 import { PlayerFormModalComponent, PlayerFormModalData } from '../../shared/components/player-form-modal/player-form-modal';
 import { TeamFormModalComponent, TeamFormModalData } from '../../shared/components/team-form-modal/team-form-modal';
 import { GoalieFormModalComponent, GoalieFormModalData } from '../../shared/components/goalie-form-modal/goalie-form-modal';
@@ -19,7 +26,11 @@ import { ScheduleFormModalComponent, ScheduleFormModalData } from '../../shared/
 })
 export class DashboardComponent implements OnInit {
   private scheduleService = inject(ScheduleService);
+  private teamService = inject(TeamService);
+  private playerService = inject(PlayerService);
+  private goalieService = inject(GoalieService);
   private dialog = inject(MatDialog);
+  private router = inject(Router);
 
   upcomingGames = signal<Schedule[]>([]);
   gameResults = signal<Schedule[]>([]);
@@ -79,7 +90,20 @@ export class DashboardComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        console.log('Team added successfully');
+        this.addTeam(result);
+      }
+    });
+  }
+
+  private addTeam(teamData: Partial<Team> & { logoFile?: File; logoRemoved?: boolean }): void {
+    const { logoFile, ...team } = teamData;
+    this.teamService.addTeam(team, logoFile).subscribe({
+      next: (newTeam) => {
+        console.log('Team added successfully:', newTeam);
+        this.router.navigate(['/teams']);
+      },
+      error: (error) => {
+        console.error('Error adding team:', error);
       }
     });
   }
@@ -95,7 +119,19 @@ export class DashboardComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        console.log('Player added successfully');
+        this.addPlayer(result);
+      }
+    });
+  }
+
+  private addPlayer(playerData: Partial<Player>): void {
+    this.playerService.addPlayer(playerData).subscribe({
+      next: (newPlayer) => {
+        console.log('Player added successfully:', newPlayer);
+        this.router.navigate(['/players']);
+      },
+      error: (error) => {
+        console.error('Error adding player:', error);
       }
     });
   }
@@ -111,7 +147,19 @@ export class DashboardComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        console.log('Goalie added successfully');
+        this.addGoalie(result);
+      }
+    });
+  }
+
+  private addGoalie(goalieData: Partial<Goalie>): void {
+    this.goalieService.addGoalie(goalieData).subscribe({
+      next: (newGoalie) => {
+        console.log('Goalie added successfully:', newGoalie);
+        this.router.navigate(['/goalies']);
+      },
+      error: (error) => {
+        console.error('Error adding goalie:', error);
       }
     });
   }
@@ -127,8 +175,19 @@ export class DashboardComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
+        this.addGame(result);
+      }
+    });
+  }
+
+  private addGame(gameData: Record<string, unknown>): void {
+    this.scheduleService.createGame(gameData).subscribe({
+      next: () => {
         console.log('Game added successfully');
-        this.loadGames(); // Refresh games list
+        this.router.navigate(['/schedule']);
+      },
+      error: (error) => {
+        console.error('Error adding game:', error);
       }
     });
   }
