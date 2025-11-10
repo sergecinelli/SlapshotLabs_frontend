@@ -421,10 +421,11 @@ export class FaceoffFormModalComponent implements OnInit {
       this.isSubmitting = true;
       const formValue = this.faceoffForm.value;
       
-      // Convert time from mm:ss to ISO duration format
+      // Convert mm:ss to time-of-day like shots (HH:mm:ss.SSSZ with 00 hours)
       const [minutes, seconds] = formValue.time.split(':').map((v: string) => parseInt(v, 10));
-      const isoTime = new Date();
-      isoTime.setHours(0, minutes, seconds, 0);
+      const tmp = new Date(Date.UTC(1970, 0, 1, 0, minutes, seconds, 0));
+      const iso = tmp.toISOString();
+      const timeOfDay = iso.substring(iso.indexOf('T') + 1);
       
       // Determine which team won (is_faceoff_won is true for winner team)
       // Submit the faceoff event with winner's team and both players
@@ -436,7 +437,7 @@ export class FaceoffFormModalComponent implements OnInit {
         player_id: formValue.winnerPlayer,
         player_2_id: formValue.loserPlayer,
         period_id: formValue.period,
-        time: isoTime.toISOString(),
+        time: timeOfDay,
         youtube_link: formValue.youtubeLink || undefined,
         ice_top_offset: this.puckLocation?.y as number | undefined,
         ice_left_offset: this.puckLocation?.x as number | undefined,

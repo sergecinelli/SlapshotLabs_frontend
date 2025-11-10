@@ -124,7 +124,7 @@
     </button>
     <button mat-raised-button color="primary" (click)="onSubmit()" class="submit-btn" [disabled]="turnoverForm.invalid || isSubmitting">
       <mat-icon>save</mat-icon>
-      {{ isSubmitting ? 'Saving...' : 'Add Turnover' }}
+      {{ isSubmitting ? 'Saving...' : (isEditMode ? 'Save Turnover' : 'Add Turnover') }}
     </button>
   </mat-dialog-actions>
 </div>

@@ -123,9 +123,9 @@
     <button mat-stroked-button (click)="onCancel()" class="cancel-btn">
       Cancel
     </button>
-    <button mat-raised-button color="primary" (click)="onSubmit()" class="submit-btn" [disabled]="penaltyForm.invalid">
+    <button mat-raised-button color="primary" (click)="onSubmit()" class="submit-btn" [disabled]="penaltyForm.invalid || isSubmitting">
       <mat-icon>save</mat-icon>
-      Add Penalty
+      {{ isSubmitting ? 'Saving...' : (isEditMode ? 'Save Penalty' : 'Add Penalty') }}
     </button>
   </mat-dialog-actions>
 </div>

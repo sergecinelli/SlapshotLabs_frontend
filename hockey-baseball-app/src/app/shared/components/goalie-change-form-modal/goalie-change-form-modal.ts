@@ -121,13 +121,13 @@ export class GoalieChangeFormModalComponent implements OnInit {
       // Populate form
       this.goalieChangeForm.patchValue({
         team: existing.teamId,
-        goalie: existing.goalieId,
+        goalie: existing.goalieId ?? null, // preserve "No Goalie" in edit mode
         period: existing.periodId,
         time: existing.time,
         note: existing.note || ''
       });
       
-      // Load goalies for the existing team
+      // Load goalies for the existing team (do not override selected goalie in edit mode)
       if (existing.teamId) {
         if (this.dialogData.goalieOptions && this.dialogData.goalieOptions.length > 0) {
           this.filterGoaliesForTeam(existing.teamId);
@@ -215,9 +215,13 @@ export class GoalieChangeFormModalComponent implements OnInit {
       this.goalieOptions = this.goaliesByTeam[teamId];
       this.isLoadingGoalies = false;
       if (this.goalieOptions.length > 0) {
-        const defaultId = this.pickStartGoalieId(teamId);
-        const found = this.goalieOptions.find(g => g.value === defaultId);
-        this.goalieChangeForm.patchValue({ goalie: found ? found.value : this.goalieOptions[0].value });
+        const current = this.goalieChangeForm.get('goalie')?.value;
+        const hasCurrent = this.goalieOptions.some(g => g.value === current);
+        if (!(this.isEditMode && (current === null || hasCurrent))) {
+          const defaultId = this.pickStartGoalieId(teamId);
+          const found = this.goalieOptions.find(g => g.value === defaultId);
+          this.goalieChangeForm.patchValue({ goalie: found ? found.value : this.goalieOptions[0].value });
+        }
       }
       return;
     }
@@ -235,9 +239,15 @@ export class GoalieChangeFormModalComponent implements OnInit {
         this.isLoadingGoalies = false;
         
         if (this.goalieOptions.length > 0) {
-          const defaultId = this.pickStartGoalieId(teamId);
-          const found = this.goalieOptions.find(g => g.value === defaultId);
-          this.goalieChangeForm.patchValue({ goalie: found ? found.value : this.goalieOptions[0].value });
+          const current = this.goalieChangeForm.get('goalie')?.value;
+          const hasCurrent = this.goalieOptions.some(g => g.value === current);
+          if (this.isEditMode && (current === null || hasCurrent)) {
+            // keep existing selection (including "No Goalie")
+          } else {
+            const defaultId = this.pickStartGoalieId(teamId);
+            const found = this.goalieOptions.find(g => g.value === defaultId);
+            this.goalieChangeForm.patchValue({ goalie: found ? found.value : this.goalieOptions[0].value });
+          }
         } else {
           this.goalieChangeForm.patchValue({ goalie: '' });
         }
@@ -266,9 +276,15 @@ export class GoalieChangeFormModalComponent implements OnInit {
       this.goalieOptions = filteredGoalies;
       
       if (this.goalieOptions.length > 0) {
-        const defaultId = this.pickStartGoalieId(teamId);
-        const found = this.goalieOptions.find(g => g.value === defaultId);
-        this.goalieChangeForm.patchValue({ goalie: found ? found.value : this.goalieOptions[0].value });
+        const current = this.goalieChangeForm.get('goalie')?.value;
+        const hasCurrent = this.goalieOptions.some(g => g.value === current);
+        if (this.isEditMode && (current === null || hasCurrent)) {
+          // keep existing selection (including "No Goalie")
+        } else {
+          const defaultId = this.pickStartGoalieId(teamId);
+          const found = this.goalieOptions.find(g => g.value === defaultId);
+          this.goalieChangeForm.patchValue({ goalie: found ? found.value : this.goalieOptions[0].value });
+        }
       } else {
         this.goalieChangeForm.patchValue({ goalie: '' });
       }
@@ -316,10 +332,11 @@ export class GoalieChangeFormModalComponent implements OnInit {
       this.isSubmitting = true;
       const formValue = this.goalieChangeForm.value;
       
-      // Convert time from mm:ss to ISO duration format
+      // Convert mm:ss to time-of-day like shots (HH:mm:ss.SSSZ with 00 hours)
       const [minutes, seconds] = formValue.time.split(':').map((v: string) => parseInt(v, 10));
-      const isoTime = new Date();
-      isoTime.setHours(0, minutes, seconds, 0);
+      const tmp = new Date(Date.UTC(1970, 0, 1, 0, minutes, seconds, 0));
+      const iso = tmp.toISOString();
+      const timeOfDay = iso.substring(iso.indexOf('T') + 1);
       
       const goalieId = (typeof formValue.goalie === 'number' && !isNaN(formValue.goalie)) ? formValue.goalie : undefined;
 
@@ -333,7 +350,7 @@ export class GoalieChangeFormModalComponent implements OnInit {
         team_id: formValue.team,
         ...(goalieId !== undefined && { goalie_id: goalieId }),
         period_id: formValue.period,
-        time: isoTime.toISOString(),
+        time: timeOfDay,
         note: formValue.note || undefined
       };
 

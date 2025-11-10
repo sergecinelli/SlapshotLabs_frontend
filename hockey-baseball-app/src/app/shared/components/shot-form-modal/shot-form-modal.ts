@@ -176,7 +176,7 @@ export class ShotFormModalComponent implements OnInit {
       });
       
       if (existing.teamId) {
-        this.filterPlayersAndGoaliesForTeam(existing.teamId);
+        this.filterPlayersAndGoaliesForTeam(existing.teamId, true);
       }
     } else {
       // Create mode: Set defaults
@@ -230,7 +230,7 @@ export class ShotFormModalComponent implements OnInit {
     });
   }
 
-  private filterPlayersAndGoaliesForTeam(teamId: number): void {
+  private filterPlayersAndGoaliesForTeam(teamId: number, skipGoalieDefault = false): void {
     // Players should be from the selected team
     if (this.dialogData.playerOptions) {
       this.playerOptions = this.dialogData.playerOptions
@@ -246,20 +246,23 @@ export class ShotFormModalComponent implements OnInit {
         .map(g => ({ value: g.value, label: g.label }));
       this.goalieOptions = oppositeGoalies;
 
-      // Prefer starting goalie of the opposite team if present
-      const desiredStartId = teamId === this.dialogData.homeTeamId ? this.dialogData.awayStartGoalieId : this.dialogData.homeStartGoalieId;
-      const defaultOpp = oppositeGoalies.find(g => g.value === desiredStartId);
+      // Only set default goalie if not skipping (i.e., not in edit mode with existing data)
+      if (!skipGoalieDefault) {
+        // Prefer starting goalie of the opposite team if present
+        const desiredStartId = teamId === this.dialogData.homeTeamId ? this.dialogData.awayStartGoalieId : this.dialogData.homeStartGoalieId;
+        const defaultOpp = oppositeGoalies.find(g => g.value === desiredStartId);
 
-      if (defaultOpp) {
-        this.shotForm.patchValue({
-          goalieScored: defaultOpp.value,
-          goalieInNet: defaultOpp.value
-        });
-      } else if (oppositeGoalies.length > 0) {
-        this.shotForm.patchValue({
-          goalieScored: oppositeGoalies[0].value,
-          goalieInNet: oppositeGoalies[0].value
-        });
+        if (defaultOpp) {
+          this.shotForm.patchValue({
+            goalieScored: defaultOpp.value,
+            goalieInNet: defaultOpp.value
+          });
+        } else if (oppositeGoalies.length > 0) {
+          this.shotForm.patchValue({
+            goalieScored: oppositeGoalies[0].value,
+            goalieInNet: oppositeGoalies[0].value
+          });
+        }
       }
     } else {
       // No opposite team found; clear goalies list
@@ -276,33 +279,40 @@ export class ShotFormModalComponent implements OnInit {
   }
 
   private updateValidators(shotType: number | null): void {
-    // Clear all conditional validators first
-    this.shotForm.get('scoringTeam')?.clearValidators();
-    this.shotForm.get('scoringPlayer')?.clearValidators();
-    this.shotForm.get('assistPlayer')?.clearValidators();
-    this.shotForm.get('goalieScored')?.clearValidators();
-    this.shotForm.get('shootingTeam')?.clearValidators();
-    this.shotForm.get('shootingPlayer')?.clearValidators();
-    this.shotForm.get('goalieInNet')?.clearValidators();
+    // Only the conditional controls need validator changes
+    const conditionalControls = [
+      'scoringTeam',
+      'scoringPlayer',
+      'assistPlayer',
+      'goalieScored',
+      'shootingTeam',
+      'shootingPlayer',
+      'goalieInNet',
+    ];
 
-    // Check if shot type is Goal (id: 3 according to API)
+    // Clear conditional validators
+    conditionalControls.forEach(name => {
+      this.shotForm.get(name)?.clearValidators();
+    });
+
+    // Check if shot type is Goal
     const goalShotType = this.shotTypeOptions.find(st => st.label.toLowerCase() === 'goal');
-    
+
     if (shotType === goalShotType?.value) {
-      // Goal fields are required (goalie optional to allow "No Goalie")
+      // Goal fields are required
       this.shotForm.get('scoringTeam')?.setValidators([Validators.required]);
       this.shotForm.get('scoringPlayer')?.setValidators([Validators.required]);
-      // Assist is optional and goalieScored optional
+      // assistPlayer and goalieScored remain optional
     } else if (shotType !== null) {
-      // Save/Missed/Blocked fields are required (goalie optional to allow "No Goalie")
+      // Non-goal fields are required
       this.shotForm.get('shootingTeam')?.setValidators([Validators.required]);
       this.shotForm.get('shootingPlayer')?.setValidators([Validators.required]);
-      // goalieInNet optional
+      // goalieInNet remains optional
     }
 
-    // Update validity
-    Object.keys(this.shotForm.controls).forEach(key => {
-      this.shotForm.get(key)?.updateValueAndValidity();
+    // Recompute validity without emitting to avoid feedback loop
+    conditionalControls.forEach(name => {
+      this.shotForm.get(name)?.updateValueAndValidity({ emitEvent: false });
     });
   }
 
@@ -313,7 +323,7 @@ export class ShotFormModalComponent implements OnInit {
     } else {
       noteControl?.clearValidators();
     }
-    noteControl?.updateValueAndValidity();
+    noteControl?.updateValueAndValidity({ emitEvent: false });
   }
 
   get isGoal(): boolean {

@@ -363,12 +363,11 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
           ];
         }
 
-        // Load players and goalies for both teams
+        // Load players and goalies for both teams, then start polling
         this.loadPlayersAndGoalies(allTeams);
         
-        // Start polling for live data
-        this.startLiveDataPolling();
-        // Note: keep isLoadingGameData=true until first live-data arrives
+        // Note: startLiveDataPolling is now called from within loadPlayersAndGoalies
+        // after players are loaded to avoid race conditions
       },
       error: (error) => {
         console.error('Failed to load initial game data:', error);
@@ -473,6 +472,14 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
     sortedPeriods.forEach(periodId => {
       const period = periods.find(p => p.id === periodId);
       const periodEvents = eventsByPeriod.get(periodId) || [];
+
+      // Sort events within the period by time (then by id for stability)
+      const sortedEvents = periodEvents.slice().sort((a, b) => {
+        const ta = this.parseEventTime(a.time).getTime();
+        const tb = this.parseEventTime(b.time).getTime();
+        if (ta !== tb) return ta - tb;
+        return (a.id || 0) - (b.id || 0);
+      });
       
       // Add period header
       groupedEvents.push({
@@ -486,12 +493,12 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
       });
       
       // Add events for this period
-      periodEvents.forEach(event => {
+      sortedEvents.forEach(event => {
         const team = teams.find(t => parseInt(t.id) === event.team_id);
         const eventTime = this.parseEventTime(event.time);
         
         // Find player name from playerOptions
-        let playerName = 'Unknown Player';
+        let playerName = '';
         if (event.player_id) {
           const player = this.playerOptions.find(p => p.value === event.player_id);
           if (player) {
@@ -502,7 +509,8 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
             if (goalie) {
               playerName = goalie.label;
             } else {
-              playerName = `Player ${event.player_id}`;
+              // Player not found - leave empty rather than showing ID
+              playerName = '';
             }
           }
         }
@@ -615,9 +623,14 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
             teamId: this.awayTeamId
           }))
         ];
+        
+        // Start polling for live data after players are loaded
+        this.startLiveDataPolling();
       },
       error: (error) => {
         console.error('Failed to load players/goalies:', error);
+        // Start polling even if players failed to load
+        this.startLiveDataPolling();
       }
     });
   }

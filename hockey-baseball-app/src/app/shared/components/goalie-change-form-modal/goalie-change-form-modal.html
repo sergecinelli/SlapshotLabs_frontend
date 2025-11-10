@@ -118,9 +118,9 @@
     <button mat-stroked-button (click)="onCancel()" class="cancel-btn">
       Cancel
     </button>
-    <button mat-raised-button color="primary" (click)="onSubmit()" class="submit-btn" [disabled]="goalieChangeForm.invalid">
+    <button mat-raised-button color="primary" (click)="onSubmit()" class="submit-btn" [disabled]="goalieChangeForm.invalid || isSubmitting">
       <mat-icon>save</mat-icon>
-      Add Goalie Change
+      {{ isSubmitting ? 'Saving...' : (isEditMode ? 'Save Goalie Change' : 'Add Goalie Change') }}
     </button>
   </mat-dialog-actions>
 </div>

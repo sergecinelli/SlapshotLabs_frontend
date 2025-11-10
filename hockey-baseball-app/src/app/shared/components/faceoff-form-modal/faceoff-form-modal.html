@@ -179,7 +179,7 @@
     </button>
     <button mat-raised-button color="primary" (click)="onSubmit()" class="submit-btn" [disabled]="faceoffForm.invalid || isSubmitting">
       <mat-icon>save</mat-icon>
-      {{ isSubmitting ? 'Saving...' : 'Add Faceoff' }}
+      {{ isSubmitting ? 'Saving...' : (isEditMode ? 'Save Faceoff' : 'Add Faceoff') }}
     </button>
   </mat-dialog-actions>
 </div>
