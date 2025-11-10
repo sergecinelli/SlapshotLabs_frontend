@@ -118,7 +118,6 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
   turnoverEventId = 0;
   faceoffEventId = 0;
   goalieChangeEventId = 0; // Regular goalie change
-  pullGoalieEventId = 0; // Pull the goalie (change to No Goalie)
   penaltyEventId = 0;
   
   // TODO: Replace with actual team IDs from game data
@@ -303,7 +302,6 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
         this.turnoverEventId = this.eventNameIds['Turnover'] || 0;
         this.faceoffEventId = this.eventNameIds['Faceoff'] || 0;
         this.goalieChangeEventId = this.eventNameIds['Goalie Change'] || 0;
-        this.pullGoalieEventId = this.eventNameIds['Pull the Goalie'] || 0;
         this.penaltyEventId = this.eventNameIds['Penalty'] || 0;
 
         // Set periods and shot types
@@ -1056,7 +1054,6 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
       data: {
         gameId: this.gameId,
         goalieChangeEventId: this.goalieChangeEventId,
-        pullGoalieEventId: this.pullGoalieEventId,
         periodOptions: this.periodOptions,
         teamOptions: this.teamOptions,
         goalieOptions: this.goalieOptions,
@@ -1146,8 +1143,6 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
       this.openTurnoverEditModal(event);
     } else if (event.eventNameId === this.faceoffEventId) {
       this.openFaceoffEditModal(event);
-    } else if (event.eventNameId === this.goalieChangeEventId || event.eventNameId === this.pullGoalieEventId) {
-      this.openGoalieChangeEditModal(event);
     } else if (event.eventNameId === this.penaltyEventId) {
       this.openPenaltyEditModal(event);
     } else {
@@ -1311,7 +1306,6 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
       data: {
         gameId: this.gameId,
         goalieChangeEventId: this.goalieChangeEventId,
-        pullGoalieEventId: this.pullGoalieEventId,
         periodOptions: this.periodOptions,
         teamOptions: this.teamOptions,
         goalieOptions: this.goalieOptions,

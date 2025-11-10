@@ -52,7 +52,6 @@ export enum GameEventType {
   Turnover = 'Turnover',
   FaceoffWin = 'Faceoff Win',
   FaceoffLoss = 'Faceoff Loss',
-  PullTheGoalie = 'Pull the Goalie (this is when the goalie is removed from the net and there is no goalie in the net)',
   GoalieChange = 'Goalie Change (change the goalie that is in the game)'
 }
 

@@ -467,6 +467,7 @@ export class ScheduleFormModalComponent implements OnInit {
         ? this.gamePeriods.reduce((min, period) => (period as any).order < (min as any).order ? period : min)
         : null;
       
+      const hasGameTypeName = !!formValue.gameTypeName;
       // Create API request body
       const gameData: Record<string, unknown> & { id?: number } = {
         home_team_id: homeTeamId,
@@ -474,7 +475,7 @@ export class ScheduleFormModalComponent implements OnInit {
         away_team_id: awayTeamId,
         away_team_goalie_id: parseInt(formValue.awayTeamGoalie) || 0,
         game_type_id: formValue.gameType,
-        game_type_name_id: formValue.gameTypeName ? parseInt(formValue.gameTypeName) : 0,
+        ...(hasGameTypeName ? { game_type_name_id: parseInt(formValue.gameTypeName) } : {}),
         status: formValue.status,
         date: formValue.date,
         time: this.convertTo24Hour(formValue.time),
