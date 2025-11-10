@@ -290,10 +290,13 @@ export class TurnoverFormModalComponent implements OnInit {
       this.isSubmitting = true;
       const formValue = this.turnoverForm.value;
       
-      // Convert time from mm:ss to ISO duration format (PT__M__S)
+      // Convert time from mm:ss to time-of-day format HH:mm:ss.SSSZ
       const [minutes, seconds] = formValue.time.split(':').map((v: string) => parseInt(v, 10));
-      const isoTime = new Date();
-      isoTime.setHours(0, minutes, seconds, 0);
+      
+      // Always send as 00:mm:ss.000Z regardless of game start time
+      const tmp = new Date(Date.UTC(1970, 0, 1, 0, minutes, seconds, 0));
+      const iso = tmp.toISOString();
+      const timeOfDay = iso.substring(iso.indexOf('T') + 1); // HH:mm:ss.SSSZ
       
       const turnoverRequest: TurnoverEventRequest = {
         game_id: this.gameId,
@@ -301,7 +304,7 @@ export class TurnoverFormModalComponent implements OnInit {
         team_id: formValue.team,
         player_id: formValue.player,
         period_id: formValue.period,
-        time: isoTime.toISOString(),
+        time: timeOfDay,
         youtube_link: formValue.youtubeLink || undefined,
         ice_top_offset: (this.puckLocation as PuckLocationWithCoords)?.top,
         ice_left_offset: (this.puckLocation as PuckLocationWithCoords)?.left,
