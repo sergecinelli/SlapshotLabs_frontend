@@ -1,0 +1,84 @@
+<div class="highlight-reel-form-modal">
+  <h2 mat-dialog-title class="modal-title">
+    <mat-icon class="title-icon">video_library</mat-icon>
+    {{ isEditMode ? 'Edit Highlight Reel' : 'Create Highlight Reel' }}
+  </h2>
+
+  <mat-dialog-content class="modal-content">
+    <div *ngIf="isLoading" class="loading-container">
+      <mat-spinner diameter="32"></mat-spinner>
+    </div>
+
+    <form *ngIf="!isLoading" [formGroup]="form" class="form">
+      <div class="form-row">
+        <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+          <mat-label class="uppercase text-custom-secondary">Name</mat-label>
+          <input matInput formControlName="name" placeholder="Enter reel name">
+        </mat-form-field>
+      </div>
+
+      <div class="form-row">
+        <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+          <mat-label class="uppercase text-custom-secondary">Description</mat-label>
+          <textarea matInput formControlName="description" rows="3" placeholder="Short description"></textarea>
+        </mat-form-field>
+      </div>
+
+      <div class="section-header">
+        <span class="section-title">Games</span>
+      </div>
+
+      <mat-accordion>
+        <mat-expansion-panel *ngFor="let game of games()" (opened)="onPanelOpened(game)">
+          <mat-expansion-panel-header>
+            <mat-panel-title>{{ game.label }}</mat-panel-title>
+          </mat-expansion-panel-header>
+
+          <div *ngIf="game.loading" class="py-4 px-2">
+            <mat-spinner diameter="24"></mat-spinner>
+          </div>
+
+          <div *ngIf="!game.loading">
+            <div *ngIf="game.events.length === 0" class="text-gray-500 px-2 py-2">No events.</div>
+            <div class="event-list">
+              <div class="event-row header" *ngIf="game.events.length > 0">
+                <div class="col time">Time</div>
+                <div class="col team">Team</div>
+                <div class="col event">Event</div>
+                <div class="col player">Player</div>
+                <div class="col desc">Description</div>
+              </div>
+              <ng-container *ngFor="let row of groupedEvents(game)">
+                <div class="event-row period-row" *ngIf="row.header">
+                  <div class="period-label">{{ row.header }}</div>
+                </div>
+                <div class="event-row" *ngIf="!row.header && row.ev as ev">
+                  <div class="col time">{{ timeOf(game, ev) }}</div>
+                  <div class="col team">
+                    <div class="team-cell">
+                      <div class="logo">
+                        <img [src]="getTeamLogoUrl(ev.team_id)" [alt]="teamNameOf(game, ev)" />
+                      </div>
+                      <span class="team-name">{{ teamNameOf(game, ev) }}</span>
+                    </div>
+                  </div>
+                  <div class="col event">{{ eventTextOf(ev) }}</div>
+                  <div class="col player">{{ playerNameOf(game, ev) }}</div>
+                  <div class="col desc">{{ descriptionOf(ev) }}</div>
+                </div>
+              </ng-container>
+            </div>
+          </div>
+        </mat-expansion-panel>
+      </mat-accordion>
+    </form>
+  </mat-dialog-content>
+
+  <mat-dialog-actions class="modal-actions">
+    <button mat-stroked-button (click)="onCancel()" class="cancel-btn">Cancel</button>
+    <button mat-raised-button color="primary" (click)="onSubmit()" class="submit-btn" [disabled]="form.invalid">
+      <mat-icon>save</mat-icon>
+      {{ isEditMode ? 'Update Highlight Reel' : 'Create Highlight Reel' }}
+    </button>
+  </mat-dialog-actions>
+</div>

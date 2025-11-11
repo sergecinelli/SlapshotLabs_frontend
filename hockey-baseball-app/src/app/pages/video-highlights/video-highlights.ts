@@ -2,15 +2,17 @@ import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header';
 import { DataTableComponent, TableAction, TableColumn } from '../../shared/components/data-table/data-table';
 import { HighlightsService } from '../../services/highlights.service';
-import { HighlightReelApi, HighlightReelRow } from '../../shared/interfaces/highlight-reel.interface';
+import { HighlightReelApi, HighlightReelRow, HighlightReelUpsertPayload } from '../../shared/interfaces/highlight-reel.interface';
+import { HighlightReelFormModalComponent, HighlightReelFormModalData } from '../../shared/components/highlight-reel-form-modal/highlight-reel-form-modal';
 
 @Component({
   selector: 'app-video-highlights',
   standalone: true,
-  imports: [CommonModule, PageHeaderComponent, DataTableComponent, MatButtonModule, MatIconModule],
+  imports: [CommonModule, PageHeaderComponent, DataTableComponent, MatButtonModule, MatIconModule, MatDialogModule],
   template: `
     <div class="p-6 pt-0">
       <app-page-header title="Video Highlights"></app-page-header>
@@ -42,6 +44,7 @@ import { HighlightReelApi, HighlightReelRow } from '../../shared/interfaces/high
 })
 export class VideoHighlightsComponent implements OnInit {
   private highlightsService = inject(HighlightsService);
+  private dialog = inject(MatDialog);
 
   rows = signal<HighlightReelRow[]>([]);
   loading = signal(true);
@@ -145,7 +148,29 @@ export class VideoHighlightsComponent implements OnInit {
   }
 
   openCreateHighlightModal(): void {
-    console.log('Open create highlight reel');
-    // TODO: open create dialog or navigate to creation form
+    const dialogRef = this.dialog.open(HighlightReelFormModalComponent, {
+      width: '900px',
+      maxWidth: '95vw',
+      disableClose: true,
+      data: {
+        isEditMode: false
+      } as HighlightReelFormModalData,
+      panelClass: 'schedule-form-modal-dialog'
+    });
+
+    dialogRef.afterClosed().subscribe((result?: HighlightReelUpsertPayload) => {
+      if (result) {
+        this.loading.set(true);
+        this.highlightsService.createHighlightReel(result).subscribe({
+          next: () => {
+            this.loadHighlights();
+          },
+          error: (error) => {
+            console.error('Error creating highlight reel:', error);
+            this.loading.set(false);
+          }
+        });
+      }
+    });
   }
 }
