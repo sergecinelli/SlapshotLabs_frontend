@@ -5,7 +5,7 @@
   </h2>
 
   <mat-dialog-content class="modal-content">
-    <div *ngIf="isLoading" class="loading-container">
+    <div *ngIf="isLoading" class="loading-container flex items-center justify-center">
       <mat-spinner diameter="32"></mat-spinner>
     </div>
 
@@ -34,8 +34,8 @@
             <mat-panel-title>{{ game.label }}</mat-panel-title>
           </mat-expansion-panel-header>
 
-          <div *ngIf="game.loading" class="py-4 px-2">
-            <mat-spinner diameter="24"></mat-spinner>
+          <div *ngIf="game.loading" class="py-4 w-full flex items-center justify-center">
+            <mat-spinner diameter="24" class="mx-auto"></mat-spinner>
           </div>
 
           <div *ngIf="!game.loading">

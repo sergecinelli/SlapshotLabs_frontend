@@ -302,13 +302,8 @@ export class ScheduleComponent implements OnInit {
       const gameId = parseInt(schedule.id);
       this.scheduleService.deleteGame(gameId).subscribe({
         next: (response) => {
-          if (response.success) {
-            console.log('Game deleted successfully');
-            this.loadSchedules(); // Reload the list from API
-          } else {
-            console.error('Failed to delete game');
-            alert('Failed to delete game. Please try again.');
-          }
+          console.log('Game deleted successfully', response);
+          this.loadSchedules(); // Always reload the list after successful API call
         },
         error: (error) => {
           console.error('Error deleting game:', error);

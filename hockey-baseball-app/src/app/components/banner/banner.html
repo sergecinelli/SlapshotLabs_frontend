@@ -1,0 +1,7 @@
+@if (bannerItem(); as item) {
+  <button class="live-banner" (click)="goToLiveDashboard()" title="Go To LIVE Game Dashboard">
+    <span class="label">On Now:</span>
+    <span class="match">{{ item.away_team_name }} @ {{ item.home_team_name }}</span>
+    <span class="cta">- Go To LIVE Game Dashboard</span>
+  </button>
+}

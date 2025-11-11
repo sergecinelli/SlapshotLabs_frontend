@@ -78,7 +78,12 @@
   <!-- Main Content Area -->
   <div class="flex-1 flex flex-col overflow-hidden">
     <!-- Header -->
-    <header class="bg-white h-[104px] flex justify-end">
+    <header class="bg-white h-[104px] flex justify-between">
+      <!-- Left: Live banner -->
+      <div class="bg-white px-6 py-6 flex items-center w-full">
+        <app-live-banner class="w-full"></app-live-banner>
+      </div>
+      <!-- Right: Support / Alerts / Logout -->
       <div class="bg-white px-6 py-6 flex items-center justify-end">
         <div class="flex items-center space-x-6  my-auto">
           <a href="#" class="flex items-center space-x-2 text-custom-secondary hover:text-custom-dark font-medium text-sm">

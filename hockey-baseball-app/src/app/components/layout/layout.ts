@@ -4,11 +4,12 @@ import { CommonModule } from '@angular/common';
 import { NavigationService, NavigationItem } from '../../services/navigation.service';
 import { IconService } from '../../services/icon.service';
 import { AuthService } from '../../services/auth.service';
+import { BannerComponent } from '../banner/banner';
 
 @Component({
   selector: 'app-layout',
   standalone: true,
-  imports: [CommonModule, RouterOutlet],
+  imports: [CommonModule, RouterOutlet, BannerComponent],
   templateUrl: './layout.html',
   styleUrl: './layout.scss'
 })

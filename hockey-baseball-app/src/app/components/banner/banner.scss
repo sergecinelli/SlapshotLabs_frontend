@@ -1,0 +1,28 @@
+.live-banner {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  width: 100%;
+  justify-items: center;
+  justify-content: center;
+  max-width: 800px;
+  border: 1px solid #4F4E55;
+  border-radius: 8px;
+  background: #fff;
+  color: #dc2626;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.live-banner .label {
+  font-weight: 700;
+}
+
+.live-banner .match {
+  font-weight: 500;
+}
+
+.live-banner .cta {
+  font-weight: 600;
+}
