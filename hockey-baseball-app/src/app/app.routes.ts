@@ -22,6 +22,7 @@ import { ScheduleComponent } from './pages/schedule/schedule';
 import { AnalyticsComponent } from './pages/analytics/analytics';
 import { VideoLibraryComponent } from './pages/video-library/video-library';
 import { LiveDashboardComponent } from './pages/live-dashboard/live-dashboard';
+import { VideoHighlightsComponent } from './pages/video-highlights/video-highlights';
 
 export const routes: Routes = [
   // Authentication routes
@@ -55,6 +56,7 @@ export const routes: Routes = [
       { path: 'schedule', component: ScheduleComponent },
       { path: 'analytics', component: AnalyticsComponent },
       { path: 'video-library', component: VideoLibraryComponent },
+      { path: 'highlights', component: VideoHighlightsComponent },
       { path: 'live-dashboard/:gameId', component: LiveDashboardComponent },
     ]
   },

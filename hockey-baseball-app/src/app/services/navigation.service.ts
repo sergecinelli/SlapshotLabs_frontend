@@ -65,6 +65,11 @@ export class NavigationService {
       path: '/video-library',
       icon: 'video'
     },
+    {
+      label: 'Video Highlights',
+      path: '/highlights',
+      icon: 'highlights'
+    },
     /*{
       label: 'Live Dashboard',
       path: '/live-dashboard/10',
