@@ -5,6 +5,11 @@ import { Goalie, GoalieTableData, GoalieApiInData, GoalieApiOutData } from '../s
 import { ApiService } from './api.service';
 import { GoalieDataMapper } from '../shared/utils/goalie-data-mapper';
 import { TeamService } from './team.service';
+import { isDefaultGoalieName } from '../shared/constants/goalie.constants';
+
+export interface GetGoaliesOptions {
+  excludeDefault?: boolean;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +18,7 @@ export class GoalieService {
   private apiService = inject(ApiService);
   private teamService = inject(TeamService);
 
-  getGoalies(): Observable<GoalieTableData> {
+  getGoalies(options?: GetGoaliesOptions): Observable<GoalieTableData> {
     return forkJoin({
       goalies: this.apiService.get<GoalieApiOutData[]>('/hockey/goalie/list'),
       teams: this.teamService.getTeams()
@@ -23,12 +28,17 @@ export class GoalieService {
         const teamMap = new Map(teams.teams.map(t => [parseInt(t.id), t.name]));
         
         // Map goalies with team names
-        const goalies = apiGoalies.map(apiGoalie => 
+        let mapped = apiGoalies.map(apiGoalie => 
           GoalieDataMapper.fromApiOutFormat({ photo: '', data: apiGoalie }, teamMap.get(apiGoalie.team_id))
         );
+
+        if (options?.excludeDefault) {
+          mapped = mapped.filter(g => !isDefaultGoalieName(g.firstName, g.lastName));
+        }
+
         return {
-          goalies: goalies,
-          total: goalies.length
+          goalies: mapped,
+          total: mapped.length
         };
       }),
       catchError(error => {
@@ -38,13 +48,17 @@ export class GoalieService {
     );
   }
 
-  getGoaliesByTeam(teamId: number): Observable<Goalie[]> {
+  getGoaliesByTeam(teamId: number, options?: GetGoaliesOptions): Observable<Goalie[]> {
     return this.apiService.get<GoalieApiOutData[]>(`/hockey/goalie/list?team_id=${teamId}`).pipe(
       map(apiGoalies => {
         // Map goalies to frontend format
-        return apiGoalies.map(apiGoalie => 
+        let goalies = apiGoalies.map(apiGoalie => 
           GoalieDataMapper.fromApiOutFormat({ photo: '', data: apiGoalie })
         );
+        if (options?.excludeDefault) {
+          goalies = goalies.filter(g => !isDefaultGoalieName(g.firstName, g.lastName));
+        }
+        return goalies;
       }),
       catchError(error => {
         console.error(`Failed to fetch goalies for team ${teamId}:`, error);

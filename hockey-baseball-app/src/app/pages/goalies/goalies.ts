@@ -94,7 +94,7 @@ export class GoaliesComponent implements OnInit {
 
   private loadGoalies(): void {
     this.loading.set(true);
-    this.goalieService.getGoalies().subscribe({
+    this.goalieService.getGoalies({ excludeDefault: true }).subscribe({
       next: (data) => {
         // Sort by creation date (newest to oldest) by default
         const sortedGoalies = this.sortByDate(data.goalies, 'desc');

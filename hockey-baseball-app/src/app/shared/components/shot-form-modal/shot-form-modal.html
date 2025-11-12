@@ -108,11 +108,6 @@
               (click)="selectGoalie(goalie.value, 'goalieScored')">
               <div class="goalie-name">{{ goalie.label }}</div>
             </button>
-            <button type="button" class="goalie-button"
-              [class.selected]="shotForm.get('goalieScored')?.value === null"
-              (click)="selectGoalie(null, 'goalieScored')">
-              <div class="goalie-name">No Goalie</div>
-            </button>
           </div>
           <div *ngIf="shotForm.get('goalieScored')?.errors && shotForm.get('goalieScored')?.touched" class="error-message">
             {{ getErrorMessage('goalieScored') }}
@@ -174,11 +169,6 @@
               [class.selected]="shotForm.get('goalieInNet')?.value === goalie.value"
               (click)="selectGoalie(goalie.value, 'goalieInNet')">
               <div class="goalie-name">{{ goalie.label }}</div>
-            </button>
-            <button type="button" class="goalie-button"
-              [class.selected]="shotForm.get('goalieInNet')?.value === null"
-              (click)="selectGoalie(null, 'goalieInNet')">
-              <div class="goalie-name">No Goalie</div>
             </button>
           </div>
           <div *ngIf="shotForm.get('goalieInNet')?.errors && shotForm.get('goalieInNet')?.touched" class="error-message">

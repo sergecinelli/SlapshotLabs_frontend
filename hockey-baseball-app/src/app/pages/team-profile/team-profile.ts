@@ -129,7 +129,7 @@ export class TeamProfileComponent implements OnInit {
     // Fetch both players and goalies in parallel
     forkJoin({
       players: this.playerService.getPlayersByTeam(teamId),
-      goalies: this.goalieService.getGoaliesByTeam(teamId)
+      goalies: this.goalieService.getGoaliesByTeam(teamId, { excludeDefault: true })
     }).subscribe({
       next: ({ players, goalies }) => {
         console.log('Players loaded:', players);

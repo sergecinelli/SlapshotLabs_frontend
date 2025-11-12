@@ -118,7 +118,7 @@ export class GoalieChangeFormModalComponent implements OnInit {
       // Populate form
       this.goalieChangeForm.patchValue({
         team: existing.teamId,
-        goalie: existing.goalieId ?? null, // preserve "No Goalie" in edit mode
+        goalie: existing.goalieId,
         period: existing.periodId,
         time: existing.time,
         note: existing.note || ''
@@ -153,7 +153,7 @@ export class GoalieChangeFormModalComponent implements OnInit {
   private createForm(): FormGroup {
     return this.fb.group({
       team: ['', Validators.required],
-      goalie: [''], // optional to allow "No Goalie"
+      goalie: ['', Validators.required],
       period: ['', Validators.required],
       time: ['', [Validators.required, Validators.pattern(/^([0-5]?[0-9]):([0-5][0-9])$/)]],
       note: ['']
@@ -239,7 +239,6 @@ export class GoalieChangeFormModalComponent implements OnInit {
           const current = this.goalieChangeForm.get('goalie')?.value;
           const hasCurrent = this.goalieOptions.some(g => g.value === current);
           if (this.isEditMode && (current === null || hasCurrent)) {
-            // keep existing selection (including "No Goalie")
           } else {
             const defaultId = this.pickStartGoalieId(teamId);
             const found = this.goalieOptions.find(g => g.value === defaultId);
@@ -276,7 +275,6 @@ export class GoalieChangeFormModalComponent implements OnInit {
         const current = this.goalieChangeForm.get('goalie')?.value;
         const hasCurrent = this.goalieOptions.some(g => g.value === current);
         if (this.isEditMode && (current === null || hasCurrent)) {
-          // keep existing selection (including "No Goalie")
         } else {
           const defaultId = this.pickStartGoalieId(teamId);
           const found = this.goalieOptions.find(g => g.value === defaultId);
@@ -314,7 +312,7 @@ export class GoalieChangeFormModalComponent implements OnInit {
     this.goalieChangeForm.get('team')?.markAsTouched();
   }
 
-  selectGoalie(goalieValue: number | null): void {
+  selectGoalie(goalieValue: number): void {
     this.goalieChangeForm.patchValue({ goalie: goalieValue });
     this.goalieChangeForm.get('goalie')?.markAsTouched();
   }
