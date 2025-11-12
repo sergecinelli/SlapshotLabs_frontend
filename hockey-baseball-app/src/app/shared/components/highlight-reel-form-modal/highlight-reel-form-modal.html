@@ -24,53 +24,95 @@
         </mat-form-field>
       </div>
 
-      <div class="section-header">
-        <span class="section-title">Games</span>
-      </div>
+      <div class="two-column-layout">
+        <!-- Left Column: Games List -->
+        <div class="column games-column">
+          <mat-accordion>
+            <mat-expansion-panel *ngFor="let game of games()" (opened)="onPanelOpened(game)">
+              <mat-expansion-panel-header>
+                <mat-panel-title>{{ game.label }}</mat-panel-title>
+              </mat-expansion-panel-header>
 
-      <mat-accordion>
-        <mat-expansion-panel *ngFor="let game of games()" (opened)="onPanelOpened(game)">
-          <mat-expansion-panel-header>
-            <mat-panel-title>{{ game.label }}</mat-panel-title>
-          </mat-expansion-panel-header>
-
-          <div *ngIf="game.loading" class="py-4 w-full flex items-center justify-center">
-            <mat-spinner diameter="24" class="mx-auto"></mat-spinner>
-          </div>
-
-          <div *ngIf="!game.loading">
-            <div *ngIf="game.events.length === 0" class="text-gray-500 px-2 py-2">No events.</div>
-            <div class="event-list">
-              <div class="event-row header" *ngIf="game.events.length > 0">
-                <div class="col time">Time</div>
-                <div class="col team">Team</div>
-                <div class="col event">Event</div>
-                <div class="col player">Player</div>
-                <div class="col desc">Description</div>
+              <div *ngIf="game.loading" class="py-4 w-full flex items-center justify-center">
+                <mat-spinner diameter="24" class="mx-auto"></mat-spinner>
               </div>
-              <ng-container *ngFor="let row of groupedEvents(game)">
-                <div class="event-row period-row" *ngIf="row.header">
-                  <div class="period-label">{{ row.header }}</div>
-                </div>
-                <div class="event-row" *ngIf="!row.header && row.ev as ev">
-                  <div class="col time">{{ timeOf(game, ev) }}</div>
-                  <div class="col team">
-                    <div class="team-cell">
-                      <div class="logo">
-                        <img [src]="getTeamLogoUrl(ev.team_id)" [alt]="teamNameOf(game, ev)" />
-                      </div>
-                      <span class="team-name">{{ teamNameOf(game, ev) }}</span>
-                    </div>
+
+              <div *ngIf="!game.loading">
+                <div *ngIf="game.events.length === 0" class="text-gray-500 px-2 py-2">No events.</div>
+                <div class="event-list">
+                  <div class="event-row header" *ngIf="game.events.length > 0">
+                    <div class="col time">Time</div>
+                    <div class="col team">Team</div>
+                    <div class="col event">Event</div>
+                    <div class="col player">Player</div>
+                    <div class="col desc">Description</div>
                   </div>
-                  <div class="col event">{{ eventTextOf(ev) }}</div>
-                  <div class="col player">{{ playerNameOf(game, ev) }}</div>
-                  <div class="col desc">{{ descriptionOf(ev) }}</div>
+                  <ng-container *ngFor="let row of groupedEvents(game)">
+                    <div class="event-row period-row" *ngIf="row.header">
+                      <div class="period-label">{{ row.header }}</div>
+                    </div>
+                    <div 
+                      class="event-row clickable" 
+                      *ngIf="!row.header && row.ev as ev"
+                      (click)="onEventClick(game, ev)"
+                      [class.selected]="isEventSelected(ev.id)">
+                      <div class="col time">{{ timeOf(game, ev) }}</div>
+                      <div class="col team">
+                        <div class="team-cell">
+                          <div class="logo">
+                            <img [src]="getTeamLogoUrl(ev.team_id)" [alt]="teamNameOf(game, ev)" />
+                          </div>
+                          <span class="team-name">{{ teamNameOf(game, ev) }}</span>
+                        </div>
+                      </div>
+                      <div class="col event">{{ eventTextOf(ev) }}</div>
+                      <div class="col player">{{ playerNameOf(game, ev) }}</div>
+                      <div class="col desc">{{ descriptionOf(ev) }}</div>
+                    </div>
+                  </ng-container>
                 </div>
-              </ng-container>
+              </div>
+            </mat-expansion-panel>
+          </mat-accordion>
+        </div>
+
+        <!-- Right Column: Selected Events Table -->
+        <div class="column selected-column">
+          <div class="selected-events-table">
+            <div *ngIf="selectedEvents().length === 0" class="empty-state">
+              <mat-icon>info</mat-icon>
+              <p>Click events from the games list to add them here</p>
+            </div>
+
+            <div *ngIf="selectedEvents().length > 0" class="table-wrapper">
+              <div class="table-header">
+                <div class="th name">Name</div>
+                <div class="th description">Description</div>
+                <div class="th date">Date</div>
+                <div class="th period-time">Period/Time</div>
+                <div class="th actions">Actions</div>
+              </div>
+              <div class="table-body">
+                <div class="table-row" *ngFor="let event of selectedEvents()">
+                  <div class="td name">{{ event.eventName }}</div>
+                  <div class="td description">{{ event.description || '-' }}</div>
+                  <div class="td date">{{ event.date }}</div>
+                  <div class="td period-time">{{ event.periodTime }}</div>
+                  <div class="td actions">
+                    <button 
+                      mat-icon-button 
+                      color="warn" 
+                      (click)="removeSelectedEvent(event.id)"
+                      title="Remove">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-        </mat-expansion-panel>
-      </mat-accordion>
+        </div>
+      </div>
     </form>
   </mat-dialog-content>
 

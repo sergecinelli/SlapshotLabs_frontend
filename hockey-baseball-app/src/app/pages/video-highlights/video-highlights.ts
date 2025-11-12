@@ -149,7 +149,7 @@ export class VideoHighlightsComponent implements OnInit {
 
   openCreateHighlightModal(): void {
     const dialogRef = this.dialog.open(HighlightReelFormModalComponent, {
-      width: '900px',
+      width: '1400px',
       maxWidth: '95vw',
       disableClose: true,
       data: {

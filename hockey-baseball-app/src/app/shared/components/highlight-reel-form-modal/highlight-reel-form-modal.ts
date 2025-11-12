@@ -20,7 +20,7 @@ import { forkJoin } from 'rxjs';
 
 export interface HighlightReelFormModalData {
   isEditMode: boolean;
-  reel?: { id: number; name: string; description: string; game_event_ids?: number[] };
+  reel?: { id: number; name: string; description: string };
 }
 
 interface GameListItem {
@@ -68,8 +68,18 @@ export class HighlightReelFormModalComponent implements OnInit {
   isLoading = true;
 
   games = signal<GameListItem[]>([]);
+  selectedEvents = signal<Array<{
+    id: number;
+    gameEventId: number;
+    eventName: string;
+    description: string;
+    date: string;
+    periodTime: string;
+    gameLabel: string;
+  }>>([]);
   private eventNameMap = new Map<number, string>();
   private teamNameMap = new Map<number, string>();
+  private nextSelectedEventId = 1;
 
   constructor() {
     this.isEditMode = this.data.isEditMode;
@@ -134,29 +144,29 @@ export class HighlightReelFormModalComponent implements OnInit {
     // Load events + player/goalie names for the game's teams
     forkJoin({
       liveData: this.liveGameService.getLiveGameData(game.id),
-      homePlayers: this.playerService.getPlayersByTeam(game.homeTeamId),
-      awayPlayers: this.playerService.getPlayersByTeam(game.awayTeamId),
-      homeGoalies: this.goalieService.getGoaliesByTeam(game.homeTeamId),
-      awayGoalies: this.goalieService.getGoaliesByTeam(game.awayTeamId)
-    }).subscribe({
-      next: ({ liveData, homePlayers, awayPlayers, homeGoalies, awayGoalies }) => {
-        const playerMap = new Map<number, string>();
-        [...homePlayers, ...awayPlayers].forEach(p => playerMap.set(parseInt(p.id), `${p.firstName} ${p.lastName}`));
-        const goalieMap = new Map<number, string>();
-        [...homeGoalies, ...awayGoalies].forEach(g => goalieMap.set(parseInt(g.id), `${g.firstName} ${g.lastName}`));
+          homePlayers: this.playerService.getPlayersByTeam(game.homeTeamId),
+          awayPlayers: this.playerService.getPlayersByTeam(game.awayTeamId),
+          homeGoalies: this.goalieService.getGoaliesByTeam(game.homeTeamId),
+          awayGoalies: this.goalieService.getGoaliesByTeam(game.awayTeamId)
+        }).subscribe({
+          next: ({ liveData, homePlayers, awayPlayers, homeGoalies, awayGoalies }) => {
+            const playerMap = new Map<number, string>();
+            [...homePlayers, ...awayPlayers].forEach(p => playerMap.set(parseInt(p.id), `${p.firstName} ${p.lastName}`));
+            const goalieMap = new Map<number, string>();
+            [...homeGoalies, ...awayGoalies].forEach(g => goalieMap.set(parseInt(g.id), `${g.firstName} ${g.lastName}`));
 
-        game.events = liveData.events || [];
-        game.playerNameMap = playerMap;
-        game.goalieNameMap = goalieMap;
-        game.loaded = true;
-        game.loading = false;
-      },
-      error: () => {
-        game.events = [];
-        game.loaded = true;
-        game.loading = false;
-      }
-    });
+            game.events = (liveData.events || []).map(event => ({ ...event, date: (liveData as any).date }));
+            game.playerNameMap = playerMap;
+            game.goalieNameMap = goalieMap;
+            game.loaded = true;
+            game.loading = false;
+          },
+          error: () => {
+            game.events = [];
+            game.loaded = true;
+            game.loading = false;
+          }
+        });
   }
 
   getTeamLogoUrl(teamId: number): string {
@@ -208,6 +218,37 @@ export class HighlightReelFormModalComponent implements OnInit {
     return hh * 3600 + mm * 60 + ss;
   }
 
+  isEventSelected(gameEventId: number): boolean {
+    return this.selectedEvents().some(e => e.gameEventId === gameEventId);
+  }
+
+  onEventClick(game: GameListItem, ev: LiveGameEvent): void {
+    if (this.isEventSelected(ev.id)) {
+      // Remove from selected
+      const updated = this.selectedEvents().filter(e => e.gameEventId !== ev.id);
+      this.selectedEvents.set(updated);
+    } else {
+      // Add to selected
+      const periodLabel = ev.period_id ? `P${ev.period_id}` : 'P?';
+      const timeLabel = this.timeOf(game, ev);
+      const newSelection = {
+        id: this.nextSelectedEventId++,
+        gameEventId: ev.id,
+        eventName: this.eventTextOf(ev),
+        description: this.descriptionOf(ev) || this.playerNameOf(game, ev),
+        date: (ev as any).date?.toString() || new Date().toISOString().split('T')[0],
+        periodTime: `${periodLabel} / ${timeLabel}`,
+        gameLabel: game.label
+      };
+      this.selectedEvents.set([...this.selectedEvents(), newSelection]);
+    }
+  }
+
+  removeSelectedEvent(id: number): void {
+    const updated = this.selectedEvents().filter(e => e.id !== id);
+    this.selectedEvents.set(updated);
+  }
+
   groupedEvents(game: GameListItem): Array<{ header?: string; ev?: LiveGameEvent }> {
     if (!game.events || game.events.length === 0) return [];
     const byPeriod = new Map<number, LiveGameEvent[]>();
@@ -235,8 +276,7 @@ export class HighlightReelFormModalComponent implements OnInit {
     if (this.form.invalid) return;
     const payload: HighlightReelUpsertPayload = {
       name: this.form.value.name || '',
-      description: this.form.value.description || '',
-      game_events: []
+      description: this.form.value.description || ''
     };
     this.dialogRef.close(payload);
   }
