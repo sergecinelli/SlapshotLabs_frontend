@@ -3,22 +3,38 @@
 .stat-increment-btn {
   width: 60px;
   height: 28px;
-  @apply mx-auto bg-green-500 hover:bg-green-600 text-white rounded-full mb-1 flex items-center justify-center cursor-pointer transition-colors;
+  @apply mx-auto mb-1 flex items-center justify-center cursor-pointer transition-opacity;
+  border: none;
+  background: none;
+  padding: 0;
   
-  span {
-    font-size: 18px;
-    font-weight: bold;
+  &:hover {
+    opacity: 0.8;
+  }
+  
+  img {
+    width: 100%;
+    height: 100%;
+    display: block;
   }
 }
 
 .stat-decrement-btn {
   width: 60px;
   height: 28px;
-  @apply mx-auto bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center cursor-pointer transition-colors;
+  @apply mx-auto flex items-center justify-center cursor-pointer transition-opacity;
+  border: none;
+  background: none;
+  padding: 0;
   
-  span {
-    font-size: 18px;
-    font-weight: bold;
+  &:hover {
+    opacity: 0.8;
+  }
+  
+  img {
+    width: 100%;
+    height: 100%;
+    display: block;
   }
 }
 

@@ -317,7 +317,7 @@ export class ScheduleComponent implements OnInit {
     const url = this.router.serializeUrl(
       this.router.createUrlTree(['/live-dashboard', schedule.id])
     );
-    window.open(url, '_blank');
+    window.location.assign(url);
   }
 
   openAddScheduleModal(): void {
