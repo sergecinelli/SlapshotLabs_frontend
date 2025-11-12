@@ -39,14 +39,12 @@ export class GoalieService {
   }
 
   getGoaliesByTeam(teamId: number): Observable<Goalie[]> {
-    return this.apiService.get<GoalieApiOutData[]>('/hockey/goalie/list').pipe(
+    return this.apiService.get<GoalieApiOutData[]>(`/hockey/goalie/list?team_id=${teamId}`).pipe(
       map(apiGoalies => {
-        // Filter goalies by team and map to frontend format
-        return apiGoalies
-          .filter(apiGoalie => apiGoalie.team_id === teamId)
-          .map(apiGoalie => 
-            GoalieDataMapper.fromApiOutFormat({ photo: '', data: apiGoalie })
-          );
+        // Map goalies to frontend format
+        return apiGoalies.map(apiGoalie => 
+          GoalieDataMapper.fromApiOutFormat({ photo: '', data: apiGoalie })
+        );
       }),
       catchError(error => {
         console.error(`Failed to fetch goalies for team ${teamId}:`, error);
@@ -189,8 +187,8 @@ export class GoalieService {
    * @returns Date string in YYYY-MM-DD format
    */
   private yearToDateString(year: number): string {
-    // Use January 1st of the given year
-    return `${year}-01-01`;
+    // Use February 1st of the given year
+    return `${year}-02-01`;
   }
 
   private toApiPatchFormat(goalieData: Partial<Goalie>, teamId: number): GoalieApiInData {
@@ -203,7 +201,7 @@ export class GoalieService {
       number: goalieData.jerseyNumber ?? 0,
       first_name: goalieData.firstName ?? '',
       last_name: goalieData.lastName ?? '',
-      birth_year: goalieData.birthYear ? this.yearToDateString(goalieData.birthYear) : this.yearToDateString(new Date().getFullYear()),
+      birth_year: goalieData.birthYear ? this.yearToDateString(goalieData.birthYear) : this.yearToDateString(new Date().getUTCFullYear()),
       player_bio: goalieData.playerBiography,
       birthplace_country: (goalieData as Record<string, unknown>)['birthplace'] as string | undefined,
       address_country: (goalieData as Record<string, unknown>)['addressCountry'] as string | undefined,

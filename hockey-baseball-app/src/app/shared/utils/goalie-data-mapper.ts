@@ -153,8 +153,8 @@ export class GoalieDataMapper {
    * @returns Date string in YYYY-MM-DD format
    */
   private static yearToDateString(year: number): string {
-    // Use January 1st of the given year
-    return `${year}-01-01`;
+    // Use February 1st of the given year
+    return `${year}-02-01`;
   }
 
   /**
@@ -164,7 +164,6 @@ export class GoalieDataMapper {
    */
   private static dateStringToYear(dateString: string): number {
     const date = new Date(dateString);
-    return date.getFullYear();
+    return date.getUTCFullYear();
   }
-
 }

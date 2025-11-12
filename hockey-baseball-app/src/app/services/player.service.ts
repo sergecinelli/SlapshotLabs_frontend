@@ -38,12 +38,10 @@ export class PlayerService {
   }
 
   getPlayersByTeam(teamId: number): Observable<Player[]> {
-    return this.apiService.get<PlayerApiOutData[]>('/hockey/player/list').pipe(
+    return this.apiService.get<PlayerApiOutData[]>(`/hockey/player/list?team_id=${teamId}`).pipe(
       map(apiPlayers => {
-        // Filter by team_id and convert to frontend format
-        return apiPlayers
-          .filter(apiPlayer => apiPlayer.team_id === teamId)
-          .map(apiPlayer => this.fromApiOutFormat({ photo: '', data: apiPlayer }));
+        // Convert to frontend format
+        return apiPlayers.map(apiPlayer => this.fromApiOutFormat({ photo: '', data: apiPlayer }));
       }),
       catchError(error => {
         console.error(`Failed to fetch players for team ${teamId}:`, error);
@@ -316,7 +314,7 @@ export class PlayerService {
    */
   private yearToDateString(year: number): string {
     // Use January 1st of the given year
-    return `${year}-01-01`;
+    return `${year}-02-01`;
   }
 
   /**
@@ -326,16 +324,17 @@ export class PlayerService {
    */
   private dateStringToYear(dateString: string): number {
     const date = new Date(dateString);
-    return date.getFullYear();
+    return date.getUTCFullYear();
   }
 
-  private mapPositionIdToName(positionId: number): 'Left Wing' | 'Center' | 'Right Wing' | 'Left Defense' | 'Right Defense' {
-    const positionMap: Record<number, 'Left Wing' | 'Center' | 'Right Wing' | 'Left Defense' | 'Right Defense'> = {
+  private mapPositionIdToName(positionId: number): 'Left Wing' | 'Center' | 'Right Wing' | 'Left Defense' | 'Right Defense' | 'Goalie' {
+    const positionMap: Record<number, 'Left Wing' | 'Center' | 'Right Wing' | 'Left Defense' | 'Right Defense' | 'Goalie'> = {
       1: 'Left Wing',
       2: 'Center',
       3: 'Right Wing',
       4: 'Left Defense',
-      5: 'Right Defense'
+      5: 'Right Defense',
+      6: 'Goalie'
     };
     return positionMap[positionId] || 'Center';
   }
@@ -346,9 +345,9 @@ export class PlayerService {
       'Center': 2,
       'Right Wing': 3,
       'Left Defense': 4,
-      'Right Defense': 5
+      'Right Defense': 5,
+      'Goalie': 6
     };
     return positionMap[position] || 2;
   }
-
 }

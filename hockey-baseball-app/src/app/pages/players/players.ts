@@ -208,23 +208,7 @@ export class PlayersComponent implements OnInit {
     
     console.log('Opening URL:', url);
     
-    // Try to open the new tab
-    const newTab = window.open(url, '_blank');
-    
-    // Check if popup was blocked
-    if (!newTab || newTab.closed || typeof newTab.closed === 'undefined') {
-      console.warn('Popup blocked! Trying alternative method.');
-      // Fallback: create a link and click it
-      const link = document.createElement('a');
-      link.href = url;
-      link.target = '_blank';
-      link.rel = 'noopener noreferrer';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    } else {
-      console.log('New tab opened successfully');
-    }
+    window.location.assign(url);
   }
 
   private viewShotSprayChart(player: Player): void {

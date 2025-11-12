@@ -10,6 +10,8 @@ import { DataTableComponent, TableColumn, TableAction } from '../../shared/compo
 import { TeamService } from '../../services/team.service';
 import { Team } from '../../shared/interfaces/team.interface';
 import { TeamFormModalComponent, TeamFormModalData } from '../../shared/components/team-form-modal/team-form-modal';
+import { TeamOptionsService } from '../../services/team-options.service';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-teams',
@@ -49,6 +51,7 @@ export class TeamsComponent implements OnInit {
   private http = inject(HttpClient);
   private dialog = inject(MatDialog);
   private snackBar = inject(MatSnackBar);
+  private teamOptionsService = inject(TeamOptionsService);
 
   teams = signal<Team[]>([]);
   loading = signal(true);
@@ -72,7 +75,22 @@ export class TeamsComponent implements OnInit {
   ];
 
   ngOnInit(): void {
-    this.loadTeams();
+    // Load team options first to populate the mapping, then load teams
+    this.loading.set(true);
+    forkJoin({
+      levels: this.teamOptionsService.getTeamLevels(),
+      divisions: this.teamOptionsService.getDivisions()
+    }).subscribe({
+      next: () => {
+        // Options loaded, now fetch teams with correct mappings
+        this.loadTeams();
+      },
+      error: (error) => {
+        console.error('Error loading team options:', error);
+        // Still try to load teams even if options fail
+        this.loadTeams();
+      }
+    });
   }
 
   private loadTeams(): void {
@@ -179,23 +197,7 @@ export class TeamsComponent implements OnInit {
     
     console.log('Opening URL:', url);
     
-    // Try to open the new tab
-    const newTab = window.open(url, '_blank');
-    
-    // Check if popup was blocked
-    if (!newTab || newTab.closed || typeof newTab.closed === 'undefined') {
-      console.warn('Popup blocked! Trying alternative method.');
-      // Fallback: create a link and click it
-      const link = document.createElement('a');
-      link.href = url;
-      link.target = '_blank';
-      link.rel = 'noopener noreferrer';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    } else {
-      console.log('New tab opened successfully');
-    }
+    window.location.assign(url);
   }
 
   openAddTeamModal(): void {

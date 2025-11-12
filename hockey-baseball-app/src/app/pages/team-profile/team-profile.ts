@@ -8,8 +8,13 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatTableModule } from '@angular/material/table';
 import { MatDialog } from '@angular/material/dialog';
 import { TeamService } from '../../services/team.service';
+import { PlayerService } from '../../services/player.service';
+import { GoalieService } from '../../services/goalie.service';
 import { Team } from '../../shared/interfaces/team.interface';
+import { Player } from '../../shared/interfaces/player.interface';
+import { Goalie } from '../../shared/interfaces/goalie.interface';
 import { TeamFormModalComponent } from '../../shared/components/team-form-modal/team-form-modal';
+import { forkJoin } from 'rxjs';
 
 // Additional interfaces for team profile specific data
 export interface TeamGame {
@@ -67,10 +72,14 @@ export class TeamProfileComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private teamService = inject(TeamService);
+  private playerService = inject(PlayerService);
+  private goalieService = inject(GoalieService);
   private dialog = inject(MatDialog);
 
   team: Team | null = null;
+  roster: (Player | Goalie)[] = [];
   loading = true;
+  loadingRoster = false;
   currentSeasonIndex = 0;
   
   // Table column definitions
@@ -97,6 +106,8 @@ export class TeamProfileComponent implements OnInit {
         if (team) {
           console.log('Team loaded successfully:', team);
           this.team = team;
+          // Load roster data (players + goalies) for this team
+          this.loadRoster(parseInt(id, 10));
         } else {
           console.error(`Team not found with ID: ${id}`);
           this.router.navigate(['/teams']);
@@ -107,6 +118,31 @@ export class TeamProfileComponent implements OnInit {
         console.error('Error loading team:', error);
         this.loading = false;
         this.router.navigate(['/teams']);
+      }
+    });
+  }
+
+  private loadRoster(teamId: number): void {
+    this.loadingRoster = true;
+    console.log(`Loading roster for team ID: ${teamId}`);
+    
+    // Fetch both players and goalies in parallel
+    forkJoin({
+      players: this.playerService.getPlayersByTeam(teamId),
+      goalies: this.goalieService.getGoaliesByTeam(teamId)
+    }).subscribe({
+      next: ({ players, goalies }) => {
+        console.log('Players loaded:', players);
+        console.log('Goalies loaded:', goalies);
+        // Combine players and goalies into one roster
+        this.roster = [...players, ...goalies];
+        this.loadingRoster = false;
+      },
+      error: (error) => {
+        console.error('Error loading roster:', error);
+        this.loadingRoster = false;
+        // Keep roster empty on error
+        this.roster = [];
       }
     });
   }
@@ -361,29 +397,7 @@ export class TeamProfileComponent implements OnInit {
     return '';
   }
 
-  getTeamRoster(): TeamPlayer[] {
-    return [
-      { id: '1', jerseyNumber: 34, firstName: 'Auston', lastName: 'Matthews', position: 'C', height: '6\'3"', weight: 220, shoots: 'L', birthYear: 1997, team: 'Toronto Maple Leafs' },
-      { id: '2', jerseyNumber: 16, firstName: 'Mitchell', lastName: 'Marner', position: 'RW', height: '6\'0"', weight: 180, shoots: 'R', birthYear: 1997, team: 'Toronto Maple Leafs' },
-      { id: '3', jerseyNumber: 88, firstName: 'William', lastName: 'Nylander', position: 'RW', height: '6\'1"', weight: 196, shoots: 'R', birthYear: 1996, team: 'Toronto Maple Leafs' },
-      { id: '4', jerseyNumber: 11, firstName: 'Max', lastName: 'Domi', position: 'C', height: '5\'10"', weight: 194, shoots: 'L', birthYear: 1995, team: 'Toronto Maple Leafs' },
-      { id: '5', jerseyNumber: 23, firstName: 'Matthew', lastName: 'Knies', position: 'LW', height: '6\'3"', weight: 227, shoots: 'L', birthYear: 2002, team: 'Toronto Maple Leafs' },
-      { id: '6', jerseyNumber: 29, firstName: 'Pontus', lastName: 'Holmberg', position: 'C', height: '6\'0"', weight: 190, shoots: 'R', birthYear: 1999, team: 'Toronto Maple Leafs' },
-      { id: '7', jerseyNumber: 74, firstName: 'Bobby', lastName: 'McMann', position: 'LW', height: '6\'2"', weight: 208, shoots: 'L', birthYear: 1996, team: 'Toronto Maple Leafs' },
-      { id: '8', jerseyNumber: 89, firstName: 'Nicholas', lastName: 'Robertson', position: 'LW', height: '5\'9"', weight: 164, shoots: 'L', birthYear: 2001, team: 'Toronto Maple Leafs' },
-      { id: '9', jerseyNumber: 18, firstName: 'Steven', lastName: 'Lorentz', position: 'C', height: '6\'4"', weight: 200, shoots: 'R', birthYear: 1996, team: 'Toronto Maple Leafs' },
-      { id: '10', jerseyNumber: 24, firstName: 'Connor', lastName: 'Dewar', position: 'C', height: '6\'0"', weight: 187, shoots: 'L', birthYear: 1999, team: 'Toronto Maple Leafs' },
-      { id: '11', jerseyNumber: 2, firstName: 'Jake', lastName: 'McCabe', position: 'D', height: '6\'1"', weight: 204, shoots: 'L', birthYear: 1993, team: 'Toronto Maple Leafs' },
-      { id: '12', jerseyNumber: 22, firstName: 'Morgan', lastName: 'Rielly', position: 'D', height: '6\'1"', weight: 222, shoots: 'L', birthYear: 1994, team: 'Toronto Maple Leafs' },
-      { id: '13', jerseyNumber: 8, firstName: 'Chris', lastName: 'Tanev', position: 'D', height: '6\'2"', weight: 196, shoots: 'R', birthYear: 1989, team: 'Toronto Maple Leafs' },
-      { id: '14', jerseyNumber: 95, firstName: 'Oliver', lastName: 'Ekman-Larsson', position: 'D', height: '6\'2"', weight: 192, shoots: 'L', birthYear: 1991, team: 'Toronto Maple Leafs' },
-      { id: '15', jerseyNumber: 25, firstName: 'Conor', lastName: 'Timmins', position: 'D', height: '6\'2"', weight: 194, shoots: 'R', birthYear: 1998, team: 'Toronto Maple Leafs' },
-      { id: '16', jerseyNumber: 37, firstName: 'Timothy', lastName: 'Liljegren', position: 'D', height: '6\'0"', weight: 192, shoots: 'R', birthYear: 1999, team: 'Toronto Maple Leafs' },
-      { id: '17', jerseyNumber: 46, firstName: 'Simon', lastName: 'Benoit', position: 'D', height: '6\'4"', weight: 198, shoots: 'L', birthYear: 1998, team: 'Toronto Maple Leafs' },
-      { id: '18', jerseyNumber: 3, firstName: 'Jani', lastName: 'Hakanpää', position: 'D', height: '6\'7"', weight: 222, shoots: 'R', birthYear: 1992, team: 'Toronto Maple Leafs' },
-      { id: '19', jerseyNumber: 60, firstName: 'Joseph', lastName: 'Woll', position: 'G', height: '6\'4"', weight: 203, shoots: 'L', birthYear: 1998, team: 'Toronto Maple Leafs' },
-      { id: '20', jerseyNumber: 36, firstName: 'Anthony', lastName: 'Stolarz', position: 'G', height: '6\'6"', weight: 243, shoots: 'L', birthYear: 1994, team: 'Toronto Maple Leafs' },
-      { id: '21', jerseyNumber: 31, firstName: 'Matt', lastName: 'Murray', position: 'G', height: '6\'4"', weight: 178, shoots: 'L', birthYear: 1994, team: 'Toronto Maple Leafs' }
-    ];
+  getTeamRoster(): (Player | Goalie)[] {
+    return this.roster;
   }
 }

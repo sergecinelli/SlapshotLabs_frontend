@@ -96,7 +96,7 @@ export interface Player {
   id: string;
   teamId?: number;  // Team ID from API
   team: string;
-  position: 'Left Wing' | 'Center' | 'Right Wing' | 'Left Defense' | 'Right Defense';
+  position: 'Left Wing' | 'Center' | 'Right Wing' | 'Left Defense' | 'Right Defense' | 'Goalie';
   height: string;  // e.g., "5'6""
   weight: number;  // in lbs
   shoots: 'Right Shot' | 'Left Shot';

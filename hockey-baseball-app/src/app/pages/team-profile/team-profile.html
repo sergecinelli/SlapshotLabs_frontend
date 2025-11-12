@@ -227,7 +227,18 @@
         </mat-card-title>
       </mat-card-header>
       <mat-card-content>
-        <div class="table-container">
+        <!-- Loading state -->
+        <div *ngIf="loadingRoster" class="loading-container">
+          <p>Loading roster...</p>
+        </div>
+        
+        <!-- Empty state -->
+        <div *ngIf="!loadingRoster && getTeamRoster().length === 0" class="empty-container">
+          <p>No players found for this team.</p>
+        </div>
+        
+        <!-- Roster table -->
+        <div *ngIf="!loadingRoster && getTeamRoster().length > 0" class="table-container">
           <table mat-table [dataSource]="getTeamRoster()" class="roster-table">
             
             <!-- Jersey Number Column -->
