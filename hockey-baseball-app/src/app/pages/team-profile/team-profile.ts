@@ -99,12 +99,10 @@ export class TeamProfileComponent implements OnInit {
 
   private loadTeam(id: string): void {
     this.loading = true;
-    console.log(`Loading team with ID: ${id}`);
     
     this.teamService.getTeamById(id).subscribe({
       next: (team) => {
         if (team) {
-          console.log('Team loaded successfully:', team);
           this.team = team;
           // Load roster data (players + goalies) for this team
           this.loadRoster(parseInt(id, 10));
@@ -124,16 +122,13 @@ export class TeamProfileComponent implements OnInit {
 
   private loadRoster(teamId: number): void {
     this.loadingRoster = true;
-    console.log(`Loading roster for team ID: ${teamId}`);
     
     // Fetch both players and goalies in parallel
     forkJoin({
       players: this.playerService.getPlayersByTeam(teamId),
-      goalies: this.goalieService.getGoaliesByTeam(teamId, { excludeDefault: true })
+      goalies: this.goalieService.getGoaliesByTeam(teamId, { excludeDefault: false })
     }).subscribe({
       next: ({ players, goalies }) => {
-        console.log('Players loaded:', players);
-        console.log('Goalies loaded:', goalies);
         // Combine players and goalies into one roster
         this.roster = [...players, ...goalies];
         this.loadingRoster = false;
@@ -176,7 +171,6 @@ export class TeamProfileComponent implements OnInit {
     
     this.teamService.updateTeam(this.team.id, team, logoFile, logoRemoved).subscribe({
       next: (updatedTeam) => {
-        console.log('Team updated successfully:', updatedTeam);
         this.team = updatedTeam;
         this.loading = false;
       },
