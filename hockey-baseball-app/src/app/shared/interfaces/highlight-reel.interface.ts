@@ -11,11 +11,11 @@ export interface HighlightReelApi {
 export interface HighlightApi {
   id: number;
   game_event_id: number;
-  event_name: string;
-  note: string;
-  youtube_link: string;
-  date: string; // ISO date string (e.g., 2025-11-11)
-  time: string;
+  event_name?: string;
+  note?: string;
+  youtube_link?: string;
+  date?: string; // ISO date string (e.g., 2025-11-11)
+  time?: string;
   order: number;
   is_custom: boolean;
 }
@@ -45,4 +45,13 @@ export interface HighlightReelRow extends Record<string, unknown> {
 export interface HighlightReelUpsertPayload {
   name: string;
   description: string;
+  highlights: {
+    game_event_id: number;
+    event_name?: string;
+    note?: string;
+    youtube_link?: string;
+    date?: string; // ISO date string (e.g., 2025-11-11)
+    time?: string; // ISO time string (e.g., "23:19:20.985Z")
+    order: number;
+  }[];
 }

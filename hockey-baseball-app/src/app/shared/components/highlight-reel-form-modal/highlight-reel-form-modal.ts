@@ -16,7 +16,8 @@ import { GoalieService } from '../../../services/goalie.service';
 import { LiveGameService, GameEvent as LiveGameEvent } from '../../../services/live-game.service';
 import { GameEventNameService } from '../../../services/game-event-name.service';
 import { GameMetadataService, GamePeriodResponse } from '../../../services/game-metadata.service';
-import { HighlightReelUpsertPayload } from '../../interfaces/highlight-reel.interface';
+import { HighlightsService } from '../../../services/highlights.service';
+import { HighlightReelUpsertPayload, HighlightApi } from '../../interfaces/highlight-reel.interface';
 import { environment } from '../../../../environments/environment';
 import { forkJoin } from 'rxjs';
 
@@ -65,6 +66,7 @@ export class HighlightReelFormModalComponent implements OnInit {
   private liveGameService = inject(LiveGameService);
   private gameEventNameService = inject(GameEventNameService);
   private gameMetadataService = inject(GameMetadataService);
+  private highlightsService = inject(HighlightsService);
   data = inject<HighlightReelFormModalData>(MAT_DIALOG_DATA);
 
   form: FormGroup;
@@ -75,11 +77,13 @@ export class HighlightReelFormModalComponent implements OnInit {
   selectedEvents = signal<Array<{
     id: number;
     gameEventId: number;
-    eventName: string;
-    description: string;
-    date: string;
-    periodTime: string;
-    gameLabel: string;
+    eventName?: string;
+    description?: string;
+    date?: string | undefined;
+    periodTime?: string;
+    gameLabel?: string;
+    // Full event data for payload
+    fullEvent: LiveGameEvent;
   }>>([]);
   private eventNameMap = new Map<number, string>();
   private teamNameMap = new Map<number, string>();
@@ -97,6 +101,45 @@ export class HighlightReelFormModalComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadStaticData();
+    
+    // Load existing highlights in edit mode
+    if (this.isEditMode && this.data.reel?.id) {
+      this.loadExistingHighlights();
+    }
+  }
+
+  private loadExistingHighlights(): void {
+    if (!this.data.reel?.id) return;
+    
+    this.highlightsService.getHighlights(this.data.reel.id).subscribe({
+      next: (highlights) => {
+        // Convert existing highlights to selected events format
+        const selectedItems = highlights
+          .sort((a, b) => a.order - b.order)
+          .map((highlight) => ({
+            id: this.nextSelectedEventId++,
+            gameEventId: highlight.game_event_id,
+            eventName: highlight.event_name?.toUpperCase() || '',
+            description: highlight.note || '-',
+            date: highlight.date,
+            periodTime: highlight.time, // Will show as-is from API
+            gameLabel: '', // Not available from highlight data
+            fullEvent: {
+              id: highlight.game_event_id,
+              event_name_id: 0,
+              note: highlight.note,
+              youtube_link: highlight.youtube_link,
+              time: highlight.time,
+              date: highlight.date,
+            } as LiveGameEvent
+          }));
+        
+        this.selectedEvents.set(selectedItems);
+      },
+      error: (error) => {
+        console.error('Error loading existing highlights:', error);
+      }
+    });
   }
 
   private loadStaticData(): void {
@@ -268,7 +311,8 @@ export class HighlightReelFormModalComponent implements OnInit {
         description: this.descriptionOf(ev) || this.playerNameOf(game, ev),
         date: (ev as any).date?.toString() || new Date().toISOString().split('T')[0],
         periodTime: `${periodName} / ${timeLabel}`,
-        gameLabel: game.label
+        gameLabel: game.label,
+        fullEvent: ev
       };
       this.selectedEvents.set([...this.selectedEvents(), newSelection]);
     }
@@ -317,9 +361,25 @@ export class HighlightReelFormModalComponent implements OnInit {
 
   onSubmit(): void {
     if (this.form.invalid) return;
+    
+    // Build highlights array from selected events with proper order
+    const highlights = this.selectedEvents().map((selectedEvent, index) => {
+      const ev = selectedEvent.fullEvent;
+      return {
+        game_event_id: ev.id,
+        //event_name: this.eventNameMap.get(ev.event_name_id) || '',
+        //note: ev.note || '',
+        //youtube_link: ev.youtube_link || '',
+        //date: selectedEvent.date,
+        //time: ev.time?.toString() || new Date().toISOString(),
+        order: index
+      };
+    });
+
     const payload: HighlightReelUpsertPayload = {
       name: this.form.value.name || '',
-      description: this.form.value.description || ''
+      description: this.form.value.description || '',
+      highlights: highlights
     };
     this.dialogRef.close(payload);
   }

@@ -98,7 +98,7 @@ export class VideoHighlightsComponent implements OnInit {
         console.log('View highlight reel:', item);
         break;
       case 'edit':
-        console.log('Edit highlight reel:', item);
+        this.openEditHighlightModal(item);
         break;
       case 'delete':
         if (confirm(`Are you sure you want to delete "${item.name}"?`)) {
@@ -168,6 +168,39 @@ export class VideoHighlightsComponent implements OnInit {
           },
           error: (error) => {
             console.error('Error creating highlight reel:', error);
+            this.loading.set(false);
+          }
+        });
+      }
+    });
+  }
+
+  openEditHighlightModal(item: HighlightReelRow): void {
+    const dialogRef = this.dialog.open(HighlightReelFormModalComponent, {
+      width: '1400px',
+      maxWidth: '95vw',
+      disableClose: true,
+      autoFocus: false,
+      data: {
+        isEditMode: true,
+        reel: {
+          id: item.id,
+          name: item.name,
+          description: item.description
+        }
+      } as HighlightReelFormModalData,
+      panelClass: 'schedule-form-modal-dialog'
+    });
+
+    dialogRef.afterClosed().subscribe((result?: HighlightReelUpsertPayload) => {
+      if (result) {
+        this.loading.set(true);
+        this.highlightsService.updateHighlightReel(item.id, result).subscribe({
+          next: () => {
+            this.loadHighlights();
+          },
+          error: (error) => {
+            console.error('Error updating highlight reel:', error);
             this.loading.set(false);
           }
         });

@@ -56,6 +56,7 @@ export interface GameEvent {
   time_length: string;
   youtube_link: string;
   id: number;
+  date?: string | undefined;
 }
 
 export interface LiveGameData {
