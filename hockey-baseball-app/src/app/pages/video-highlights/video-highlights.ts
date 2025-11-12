@@ -152,6 +152,7 @@ export class VideoHighlightsComponent implements OnInit {
       width: '1400px',
       maxWidth: '95vw',
       disableClose: true,
+      autoFocus: false,
       data: {
         isEditMode: false
       } as HighlightReelFormModalData,

@@ -8,12 +8,14 @@ import { MatInputModule } from '@angular/material/input';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { ScheduleService } from '../../../services/schedule.service';
 import { TeamService } from '../../../services/team.service';
 import { PlayerService } from '../../../services/player.service';
 import { GoalieService } from '../../../services/goalie.service';
 import { LiveGameService, GameEvent as LiveGameEvent } from '../../../services/live-game.service';
 import { GameEventNameService } from '../../../services/game-event-name.service';
+import { GameMetadataService, GamePeriodResponse } from '../../../services/game-metadata.service';
 import { HighlightReelUpsertPayload } from '../../interfaces/highlight-reel.interface';
 import { environment } from '../../../../environments/environment';
 import { forkJoin } from 'rxjs';
@@ -48,6 +50,7 @@ interface GameListItem {
     MatExpansionModule,
     MatIconModule,
     MatProgressSpinnerModule,
+    DragDropModule,
   ],
   templateUrl: './highlight-reel-form-modal.html',
   styleUrl: './highlight-reel-form-modal.scss'
@@ -61,6 +64,7 @@ export class HighlightReelFormModalComponent implements OnInit {
   private goalieService = inject(GoalieService);
   private liveGameService = inject(LiveGameService);
   private gameEventNameService = inject(GameEventNameService);
+  private gameMetadataService = inject(GameMetadataService);
   data = inject<HighlightReelFormModalData>(MAT_DIALOG_DATA);
 
   form: FormGroup;
@@ -79,6 +83,8 @@ export class HighlightReelFormModalComponent implements OnInit {
   }>>([]);
   private eventNameMap = new Map<number, string>();
   private teamNameMap = new Map<number, string>();
+  private periodNameMap = new Map<number, string>();
+  private periodOrderMap = new Map<number, number>();
   private nextSelectedEventId = 1;
 
   constructor() {
@@ -94,7 +100,7 @@ export class HighlightReelFormModalComponent implements OnInit {
   }
 
   private loadStaticData(): void {
-    // Load teams (for labels) and event names once, then list games
+    // Load teams, event names, and game periods
     this.isLoading = true;
     this.teamService.getTeams().subscribe({
       next: (teamsResp) => {
@@ -102,12 +108,27 @@ export class HighlightReelFormModalComponent implements OnInit {
         this.gameEventNameService.getGameEventNames().subscribe({
           next: (names) => {
             names.forEach(n => this.eventNameMap.set(n.id, n.name));
-            this.loadGames();
+            this.loadGamePeriods();
           },
           error: () => {
-            this.loadGames();
+            this.loadGamePeriods();
           }
         });
+      },
+      error: () => {
+        this.loadGamePeriods();
+      }
+    });
+  }
+
+  private loadGamePeriods(): void {
+    this.gameMetadataService.getGamePeriods().subscribe({
+      next: (periods) => {
+        periods.forEach(p => {
+          this.periodNameMap.set(p.id, p.name);
+          this.periodOrderMap.set(p.id, p.order ?? p.id);
+        });
+        this.loadGames();
       },
       error: () => {
         this.loadGames();
@@ -144,29 +165,38 @@ export class HighlightReelFormModalComponent implements OnInit {
     // Load events + player/goalie names for the game's teams
     forkJoin({
       liveData: this.liveGameService.getLiveGameData(game.id),
-          homePlayers: this.playerService.getPlayersByTeam(game.homeTeamId),
-          awayPlayers: this.playerService.getPlayersByTeam(game.awayTeamId),
-          homeGoalies: this.goalieService.getGoaliesByTeam(game.homeTeamId),
-          awayGoalies: this.goalieService.getGoaliesByTeam(game.awayTeamId)
-        }).subscribe({
-          next: ({ liveData, homePlayers, awayPlayers, homeGoalies, awayGoalies }) => {
-            const playerMap = new Map<number, string>();
-            [...homePlayers, ...awayPlayers].forEach(p => playerMap.set(parseInt(p.id), `${p.firstName} ${p.lastName}`));
-            const goalieMap = new Map<number, string>();
-            [...homeGoalies, ...awayGoalies].forEach(g => goalieMap.set(parseInt(g.id), `${g.firstName} ${g.lastName}`));
+      homePlayers: this.playerService.getPlayersByTeam(game.homeTeamId),
+      awayPlayers: this.playerService.getPlayersByTeam(game.awayTeamId),
+      homeGoalies: this.goalieService.getGoaliesByTeam(game.homeTeamId),
+      awayGoalies: this.goalieService.getGoaliesByTeam(game.awayTeamId),
+      gameData: this.scheduleService.getGameList()
+    }).subscribe({
+      next: ({ liveData, homePlayers, awayPlayers, homeGoalies, awayGoalies, gameData }) => {
+        const playerMap = new Map<number, string>();
+        [...homePlayers, ...awayPlayers].forEach(p => playerMap.set(parseInt(p.id), `${p.firstName} ${p.lastName}`));
+        const goalieMap = new Map<number, string>();
+        [...homeGoalies, ...awayGoalies].forEach(g => goalieMap.set(parseInt(g.id), `${g.firstName} ${g.lastName}`));
 
-            game.events = (liveData.events || []).map(event => ({ ...event, date: (liveData as any).date }));
-            game.playerNameMap = playerMap;
-            game.goalieNameMap = goalieMap;
-            game.loaded = true;
-            game.loading = false;
-          },
-          error: () => {
-            game.events = [];
-            game.loaded = true;
-            game.loading = false;
-          }
-        });
+        // Get the game date from the schedule
+        const currentGame = gameData.find(g => g.id === game.id);
+        const gameDate = currentGame?.date || new Date().toISOString().split('T')[0];
+
+        // Add date to each event
+        game.events = (liveData.events || []).map(event => ({ 
+          ...event, 
+          date: gameDate 
+        }));
+        game.playerNameMap = playerMap;
+        game.goalieNameMap = goalieMap;
+        game.loaded = true;
+        game.loading = false;
+      },
+      error: () => {
+        game.events = [];
+        game.loaded = true;
+        game.loading = false;
+      }
+    });
   }
 
   getTeamLogoUrl(teamId: number): string {
@@ -229,7 +259,7 @@ export class HighlightReelFormModalComponent implements OnInit {
       this.selectedEvents.set(updated);
     } else {
       // Add to selected
-      const periodLabel = ev.period_id ? `P${ev.period_id}` : 'P?';
+      const periodName = this.periodNameMap.get(ev.period_id) || `Period ${ev.period_id}`;
       const timeLabel = this.timeOf(game, ev);
       const newSelection = {
         id: this.nextSelectedEventId++,
@@ -237,7 +267,7 @@ export class HighlightReelFormModalComponent implements OnInit {
         eventName: this.eventTextOf(ev),
         description: this.descriptionOf(ev) || this.playerNameOf(game, ev),
         date: (ev as any).date?.toString() || new Date().toISOString().split('T')[0],
-        periodTime: `${periodLabel} / ${timeLabel}`,
+        periodTime: `${periodName} / ${timeLabel}`,
         gameLabel: game.label
       };
       this.selectedEvents.set([...this.selectedEvents(), newSelection]);
@@ -249,6 +279,12 @@ export class HighlightReelFormModalComponent implements OnInit {
     this.selectedEvents.set(updated);
   }
 
+  onSelectedEventDrop(event: CdkDragDrop<any[]>): void {
+    const items = [...this.selectedEvents()];
+    moveItemInArray(items, event.previousIndex, event.currentIndex);
+    this.selectedEvents.set(items);
+  }
+
   groupedEvents(game: GameListItem): Array<{ header?: string; ev?: LiveGameEvent }> {
     if (!game.events || game.events.length === 0) return [];
     const byPeriod = new Map<number, LiveGameEvent[]>();
@@ -257,10 +293,17 @@ export class HighlightReelFormModalComponent implements OnInit {
       if (!byPeriod.has(p)) byPeriod.set(p, []);
       byPeriod.get(p)!.push(ev);
     }
-    const sortedPeriodIds = Array.from(byPeriod.keys()).sort((a, b) => a - b);
+    
+    // Sort periods by their order from the API
+    const sortedPeriodIds = Array.from(byPeriod.keys()).sort((a, b) => {
+      const orderA = this.periodOrderMap.get(a) ?? a;
+      const orderB = this.periodOrderMap.get(b) ?? b;
+      return orderA - orderB;
+    });
+    
     const out: Array<{ header?: string; ev?: LiveGameEvent }> = [];
     for (const pid of sortedPeriodIds) {
-      const label = pid ? `Period ${pid}` : 'Period';
+      const label = this.periodNameMap.get(pid) || (pid ? `Period ${pid}` : 'Period');
       out.push({ header: label });
       const arr = byPeriod.get(pid)!;
       arr.sort((a, b) => this.timeToSeconds((a.time || '').toString()) - this.timeToSeconds((b.time || '').toString()));
