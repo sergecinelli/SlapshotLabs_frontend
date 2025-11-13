@@ -405,7 +405,6 @@ export class HighlightReelFormModalComponent implements OnInit {
       const label = this.periodNameMap.get(pid) || (pid ? `Period ${pid}` : 'Period');
       out.push({ header: label });
       const arr = byPeriod.get(pid)!;
-      arr.sort((a, b) => this.timeToSeconds((a.time || '').toString()) - this.timeToSeconds((b.time || '').toString()));
       for (const ev of arr) out.push({ ev });
     }
     return out;

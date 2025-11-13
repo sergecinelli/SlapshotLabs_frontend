@@ -22,7 +22,7 @@ export class HighlightsService {
   }
 
   updateHighlightReel(id: number, payload: HighlightReelUpsertPayload): Observable<HighlightReelApi> {
-    return this.api.patch<HighlightReelApi>(`/hockey/highlight-reels/${id}`, payload);
+    return this.api.put<HighlightReelApi>(`/hockey/highlight-reels/${id}`, payload);
   }
 
   deleteHighlightReel(id: number): Observable<unknown> {
