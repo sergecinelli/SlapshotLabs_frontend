@@ -505,7 +505,12 @@
                   <td class="px-4 py-3 text-sm text-gray-900">{{ event.description }}</td>
                     <td class="px-4 py-3 text-sm">
                       <div class="flex gap-1">
-                        <button mat-icon-button color="primary" matTooltip="Video">
+                        <button 
+                          mat-icon-button 
+                          color="primary" 
+                          [disabled]="!isYouTubeLinkValid(event.rawEventData?.youtube_link)"
+                          [matTooltip]="isYouTubeLinkValid(event.rawEventData?.youtube_link) ? 'Video' : 'No valid video link'"
+                          (click)="onViewEventVideo(event)">
                           <mat-icon>videocam</mat-icon>
                         </button>
                         <button mat-icon-button color="primary" matTooltip="Edit" (click)="onEditEvent(event)">

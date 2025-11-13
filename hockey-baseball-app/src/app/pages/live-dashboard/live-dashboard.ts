@@ -8,6 +8,8 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDialog } from '@angular/material/dialog';
+import { VideoViewModalComponent } from '../../shared/components/video-view-modal/video-view-modal';
+import { Video } from '../../shared/interfaces/video.interface';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header';
 import { ActionButtonComponent } from '../../shared/components/action-button/action-button';
@@ -1401,6 +1403,58 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
         this.refreshLiveData();
       }
     });
+  }
+
+  /**
+   * Open video modal for a game event
+   */
+  onViewEventVideo(event: GameEvent): void {
+    const raw = event.rawEventData;
+    const link = raw?.youtube_link || '';
+    if (!this.isYouTubeLinkValid(link)) return;
+
+    const modalVideo: Video = {
+      id: 0,
+      name: `${event.event} — ${event.player}`.trim(),
+      description: event.description || '',
+      youtube_link: link,
+      added_by: event.team || '-',
+      date: raw?.date || ''
+    };
+
+    this.dialog.open(VideoViewModalComponent, {
+      width: '900px',
+      maxWidth: '95vw',
+      panelClass: 'video-view-modal-dialog',
+      data: { video: modalVideo }
+    });
+  }
+
+  /**
+   * Validate a YouTube link (basic)
+   */
+  isYouTubeLinkValid(link?: string | null): boolean {
+    if (!link) return false;
+    try {
+      const u = new URL(link);
+      if (u.hostname.includes('youtu.be')) {
+        const id = u.pathname.replace('/', '').split('/')[0];
+        return !!id && id.length > 0;
+      }
+      if (u.hostname.includes('youtube.com')) {
+        if (u.pathname.startsWith('/watch')) {
+          return !!u.searchParams.get('v');
+        }
+        if (u.pathname.startsWith('/embed/') || u.pathname.startsWith('/shorts/')) {
+          const id = u.pathname.split('/')[2];
+          return !!id && id.length > 0;
+        }
+      }
+      return false;
+    } catch {
+      // fallback: raw 11-char ID
+      return /[a-zA-Z0-9_-]{11}/.test(link);
+    }
   }
 
   /**

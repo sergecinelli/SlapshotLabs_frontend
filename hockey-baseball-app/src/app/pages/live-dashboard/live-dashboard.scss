@@ -80,3 +80,13 @@
 .goal-row:hover td {
   @apply bg-red-200;
 }
+
+// Disabled button styling
+::ng-deep button[mat-icon-button][disabled] {
+  opacity: 0.7 !important;
+  cursor: not-allowed !important;
+  
+  mat-icon {
+    color: rgba(0, 0, 0, 0.26) !important;
+  }
+}

@@ -1,0 +1,79 @@
+<div class="video-form-modal">
+  <h2 mat-dialog-title class="modal-title">
+    <mat-icon class="title-icon">video_library</mat-icon>
+    {{ isEditMode ? 'Edit Video' : 'Add Video' }}
+  </h2>
+
+  <mat-dialog-content class="modal-content">
+    <form [formGroup]="videoForm" class="video-form">
+      
+      <!-- Video Information Section -->
+      <div class="form-section">
+        <div class="section-header">
+          <span class="section-title">Video Information</span>
+        </div>
+        <mat-divider class="section-divider"></mat-divider>
+        
+        <div class="form-row">
+          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field full-width">
+            <mat-label class="uppercase text-custom-secondary">Video Name</mat-label>
+            <input
+              matInput
+              formControlName="name"
+              placeholder="Enter video name"
+            />
+            <mat-error *ngIf="name?.invalid && name?.touched">
+              {{ getErrorMessage('name') }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field full-width">
+            <mat-label class="uppercase text-custom-secondary">YouTube Link</mat-label>
+            <input
+              matInput
+              formControlName="youtube_link"
+              placeholder="Enter YouTube link"
+            />
+            <mat-error *ngIf="youtube_link?.invalid && youtube_link?.touched">
+              {{ getErrorMessage('youtube_link') }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field full-width">
+            <mat-label class="uppercase text-custom-secondary">Description</mat-label>
+            <textarea
+              matInput
+              formControlName="description"
+              placeholder="Enter video description"
+              rows="4"
+            ></textarea>
+            <mat-error *ngIf="description?.invalid && description?.touched">
+              {{ getErrorMessage('description') }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+      </div>
+
+    </form>
+  </mat-dialog-content>
+
+  <mat-dialog-actions class="modal-actions">
+    <button mat-stroked-button (click)="onCancel()" class="cancel-btn">
+      Cancel
+    </button>
+    <button
+      mat-raised-button
+      color="primary"
+      (click)="onSubmit()"
+      class="submit-btn"
+      [disabled]="videoForm.invalid"
+    >
+      <mat-icon>save</mat-icon>
+      {{ isEditMode ? 'Update Video' : 'Add Video' }}
+    </button>
+  </mat-dialog-actions>
+</div>

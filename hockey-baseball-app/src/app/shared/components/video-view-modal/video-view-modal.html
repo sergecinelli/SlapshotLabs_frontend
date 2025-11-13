@@ -1,0 +1,33 @@
+<div class="video-view-modal">
+  <h2 mat-dialog-title class="modal-title">
+    <mat-icon class="title-icon">play_circle</mat-icon>
+    {{ data.video.name }}
+  </h2>
+
+  <mat-dialog-content class="modal-content">
+    <div class="video-container">
+      <div class="video-wrapper" *ngIf="videoUrl(); else noVideo">
+        <iframe
+          class="video-iframe"
+          [src]="videoUrl()"
+          title="Video player"
+          frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen>
+        </iframe>
+      </div>
+      <ng-template #noVideo>
+        <div class="no-video">
+          <mat-icon>info</mat-icon>
+          <p>{{ videoMessage() || 'Video not available' }}</p>
+        </div>
+      </ng-template>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions class="modal-actions">
+    <button mat-stroked-button (click)="close()" class="close-btn">
+      Close
+    </button>
+  </mat-dialog-actions>
+</div>

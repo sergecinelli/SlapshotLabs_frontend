@@ -1,0 +1,187 @@
+.video-view-modal {
+  width: 100%;
+  max-width: 900px;
+  background-color: white;
+  border-radius: 12px;
+  overflow: hidden;
+
+  .modal-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--color-primary);
+    font-size: 1.375rem;
+    font-weight: 600;
+    margin: 0;
+    padding: 16px 24px;
+    border-bottom: 1px solid #e5e7eb;
+
+    .title-icon {
+      color: var(--color-primary);
+      font-size: 1.5rem;
+      width: 24px;
+      height: 24px;
+    }
+  }
+
+  .modal-content {
+    padding: 24px !important;
+    max-height: calc(90vh - 120px);
+    overflow-y: auto;
+  }
+
+  .video-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .video-info {
+    .description {
+      font-size: 14px;
+      color: #4b5563;
+      margin: 0 0 12px 0;
+      line-height: 1.5;
+    }
+
+    .meta-info {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+
+      .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 13px;
+        color: #6b7280;
+
+        .meta-icon {
+          font-size: 16px;
+          width: 16px;
+          height: 16px;
+          color: var(--color-secondary);
+        }
+      }
+    }
+  }
+
+  .video-wrapper {
+    position: relative;
+    width: 100%;
+    padding-top: 56.25%; /* 16:9 aspect ratio */
+    border-radius: 8px;
+    overflow: hidden;
+    background: #000;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  }
+
+  .video-iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .no-video {
+    width: 100%;
+    min-height: 400px;
+    background: #f8fafc;
+    border: 1px dashed #cbd5e1;
+    border-radius: 8px;
+    color: #64748b;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 32px;
+
+    mat-icon {
+      font-size: 48px;
+      width: 48px;
+      height: 48px;
+      color: #94a3b8;
+    }
+
+    p {
+      margin: 0;
+      font-size: 14px;
+      text-align: center;
+    }
+  }
+
+  .modal-actions {
+    padding: 16px 24px;
+    border-top: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: flex-end;
+
+    .close-btn {
+      color: var(--color-secondary);
+      border-color: var(--color-secondary);
+
+      &:hover {
+        background-color: rgba(119, 143, 156, 0.1);
+      }
+    }
+  }
+}
+
+::ng-deep .video-view-modal-dialog {
+  .cdk-overlay-backdrop {
+    background-color: rgba(0, 0, 0, 0.5) !important;
+  }
+
+  .mat-mdc-dialog-container {
+    padding: 0 !important;
+    background-color: white !important;
+    border-radius: 12px !important;
+    overflow: hidden !important;
+
+    .mdc-dialog__surface {
+      background-color: white !important;
+      border-radius: 12px !important;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15), 0 4px 10px rgba(0, 0, 0, 0.1);
+      overflow: hidden !important;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .video-view-modal {
+    max-width: 95vw;
+
+    .modal-content {
+      padding: 16px !important;
+      max-height: calc(90vh - 100px);
+    }
+
+    .video-info {
+      .meta-info {
+        flex-direction: column;
+        gap: 8px;
+      }
+    }
+
+    .no-video {
+      min-height: 250px;
+    }
+  }
+}
+
+@media (max-height: 700px) {
+  .video-view-modal {
+    .modal-content {
+      max-height: calc(85vh - 100px);
+    }
+
+    .video-wrapper {
+      padding-top: 50%; /* Reduce aspect ratio slightly for small screens */
+    }
+
+    .no-video {
+      min-height: 250px;
+    }
+  }
+}

@@ -1,15 +1,17 @@
-import { Component, OnInit, signal, inject } from '@angular/core';
+import { Component, OnInit, signal, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatDialog } from '@angular/material/dialog';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header';
 import { DataTableComponent, TableColumn, TableAction } from '../../shared/components/data-table/data-table';
 import { VideoService } from '../../services/video.service';
-import { Video } from '../../shared/interfaces/video.interface';
+import { Video, VideoApiRequest } from '../../shared/interfaces/video.interface';
+import { VideoFormModalComponent } from '../../shared/components/video-form-modal/video-form-modal';
+import { VideoViewModalComponent } from '../../shared/components/video-view-modal/video-view-modal';
 
 @Component({
   selector: 'app-video-library',
-  standalone: true,
   imports: [CommonModule, PageHeaderComponent, DataTableComponent, MatButtonModule, MatIconModule],
   template: `
     <div class="p-6 pt-0">
@@ -38,10 +40,12 @@ import { Video } from '../../shared/interfaces/video.interface';
       ></app-data-table>
     </div>
   `,
-  styleUrl: './video-library.scss'
+  styleUrl: './video-library.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class VideoLibraryComponent implements OnInit {
   private videoService = inject(VideoService);
+  private dialog = inject(MatDialog);
 
   videos = signal<Video[]>([]);
   loading = signal(true);
@@ -49,8 +53,9 @@ export class VideoLibraryComponent implements OnInit {
   tableColumns: TableColumn[] = [
     { key: 'name', label: 'Name', sortable: true, width: '200px' },
     { key: 'description', label: 'Description', sortable: true, width: '250px' },
-    { key: 'dateAdded', label: 'Date Added', sortable: true, type: 'date', width: '150px' },
-    { key: 'addedBy', label: 'Added By', sortable: true, width: '150px' }
+    { key: 'youtube_link', label: 'YouTube Link', sortable: false, width: '200px' },
+    { key: 'date', label: 'Date Added', sortable: true, type: 'date', width: '150px' },
+    { key: 'added_by', label: 'Added By', sortable: true, width: '150px' }
   ];
 
   tableActions: TableAction[] = [
@@ -111,33 +116,79 @@ export class VideoLibraryComponent implements OnInit {
   }
 
   private deleteVideo(video: Video): void {
-    if (confirm(`Are you sure you want to delete ${video.name}?`)) {
+    if (confirm(`Are you sure you want to delete "${video.name}"?`)) {
       this.videoService.deleteVideo(video.id).subscribe({
-        next: (success) => {
-          if (success) {
-            const updatedVideos = this.videos().filter(v => v.id !== video.id);
-            this.videos.set(updatedVideos);
-          }
+        next: () => {
+          const updatedVideos = this.videos().filter(v => v.id !== video.id);
+          this.videos.set(updatedVideos);
         },
         error: (error) => {
           console.error('Error deleting video:', error);
+          alert('Failed to delete video. Please try again.');
         }
       });
     }
   }
 
   private editVideo(video: Video): void {
-    console.log('Edit video:', video);
-    // TODO: Open edit modal
+    const dialogRef = this.dialog.open(VideoFormModalComponent, {
+      width: '600px',
+      panelClass: 'video-form-modal-dialog',
+      data: {
+        video: video,
+        isEditMode: true
+      }
+    });
+
+    dialogRef.afterClosed().subscribe((result: VideoApiRequest) => {
+      if (result) {
+        this.videoService.updateVideo(video.id, result).subscribe({
+          next: () => {
+            // Refresh the entire table after updating
+            this.loadVideos();
+          },
+          error: (error) => {
+            console.error('Error updating video:', error);
+            alert('Failed to update video. Please try again.');
+          }
+        });
+      }
+    });
   }
 
   private viewVideo(video: Video): void {
-    console.log('View video:', video);
-    // TODO: Open video viewer
+    this.dialog.open(VideoViewModalComponent, {
+      width: '900px',
+      maxWidth: '95vw',
+      panelClass: 'video-view-modal-dialog',
+      data: {
+        video: video
+      }
+    });
   }
 
   openAddVideoModal(): void {
-    console.log('Add video modal');
-    // TODO: Open add video modal
+    const dialogRef = this.dialog.open(VideoFormModalComponent, {
+      width: '600px',
+      panelClass: 'video-form-modal-dialog',
+      data: {
+        isEditMode: false
+      }
+    });
+
+    dialogRef.afterClosed().subscribe((result: VideoApiRequest) => {
+      if (result) {
+        this.videoService.addVideo(result).subscribe({
+          next: () => {
+            // Refresh the entire table after adding
+            this.loadVideos();
+          },
+          error: (error) => {
+            console.error('Error adding video:', error);
+            alert('Failed to add video. Please try again.');
+          }
+        });
+      }
+    });
   }
 }
