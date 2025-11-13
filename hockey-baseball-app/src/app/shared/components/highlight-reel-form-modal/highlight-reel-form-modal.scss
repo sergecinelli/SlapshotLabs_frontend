@@ -68,6 +68,19 @@
         margin-bottom: 8px;
         flex-wrap: wrap;
 
+        &.align-center {
+          align-items: flex-start;
+        }
+
+        .add-custom-btn {
+          white-space: nowrap;
+          align-self: flex-start;
+          height: 40px;
+          margin-top: 4px;
+          display: inline-flex;
+          gap: 6px;
+        }
+
         .form-field {
           flex: 1;
           min-width: 240px;

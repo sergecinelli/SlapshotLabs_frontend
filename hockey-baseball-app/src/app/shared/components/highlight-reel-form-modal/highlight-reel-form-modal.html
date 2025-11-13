@@ -13,15 +13,33 @@
       <div class="form-row">
         <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
           <mat-label class="uppercase text-custom-secondary">Name</mat-label>
-          <input matInput formControlName="name" placeholder="Enter reel name">
+          <input matInput formControlName="name" placeholder="Enter reel name" />
         </mat-form-field>
       </div>
 
-      <div class="form-row">
+      <div class="form-row align-center">
         <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
           <mat-label class="uppercase text-custom-secondary">Description</mat-label>
-          <textarea matInput formControlName="description" rows="3" placeholder="Short description"></textarea>
+          <textarea
+            matInput
+            formControlName="description"
+            rows="3"
+            placeholder="Short description"
+          ></textarea>
         </mat-form-field>
+      </div>
+
+      <div class="flex justify-end">
+        <button
+          mat-stroked-button
+          color="primary"
+          type="button"
+          class="add-custom-btn"
+          (click)="openAddCustomHighlightModal()"
+        >
+          <mat-icon>add</mat-icon>
+          Add Custom Highlight
+        </button>
       </div>
 
       <div class="two-column-layout">
@@ -38,16 +56,38 @@
               </div>
 
               <div *ngIf="!game.loading">
-                <div *ngIf="game.events.length === 0" class="text-gray-500 px-2 py-2">No events.</div>
+                <div *ngIf="game.events.length === 0" class="text-gray-500 px-2 py-2">
+                  No events.
+                </div>
                 <div *ngIf="game.events.length > 0" class="overflow-x-auto">
                   <table class="w-full border-collapse">
                     <thead class="bg-gray-50 border-b border-gray-200">
                       <tr>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Time</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Team</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Event</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Player</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Description</th>
+                        <th
+                          class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
+                        >
+                          Time
+                        </th>
+                        <th
+                          class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
+                        >
+                          Team
+                        </th>
+                        <th
+                          class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
+                        >
+                          Event
+                        </th>
+                        <th
+                          class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
+                        >
+                          Player
+                        </th>
+                        <th
+                          class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
+                        >
+                          Description
+                        </th>
                       </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
@@ -57,22 +97,31 @@
                             {{ row.header }}
                           </td>
                         </tr>
-                        <tr 
-                          class="transition-colors cursor-pointer hover:bg-gray-100" 
+                        <tr
+                          class="transition-colors cursor-pointer hover:bg-gray-100"
                           *ngIf="!row.header && row.ev as ev"
                           (mousedown)="onEventClick(game, ev); $event.preventDefault()"
-                          [class.selected-row]="isEventSelected(ev.id)">
+                          [class.selected-row]="isEventSelected(ev.id)"
+                        >
                           <td class="px-4 py-3 text-sm text-gray-900">{{ timeOf(game, ev) }}</td>
                           <td class="px-4 py-3">
                             <div class="flex items-center gap-2">
-                              <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden flex-shrink-0">
-                                <img [src]="getTeamLogoUrl(ev.team_id)" [alt]="teamNameOf(game, ev)" class="w-full h-full object-cover" />
+                              <div
+                                class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden flex-shrink-0"
+                              >
+                                <img
+                                  [src]="getTeamLogoUrl(ev.team_id)"
+                                  [alt]="teamNameOf(game, ev)"
+                                  class="w-full h-full object-cover"
+                                />
                               </div>
                               <span class="text-sm text-gray-900">{{ teamNameOf(game, ev) }}</span>
                             </div>
                           </td>
                           <td class="px-4 py-3 text-sm text-gray-900">{{ eventTextOf(ev) }}</td>
-                          <td class="px-4 py-3 text-sm text-gray-900">{{ playerNameOf(game, ev) }}</td>
+                          <td class="px-4 py-3 text-sm text-gray-900">
+                            {{ playerNameOf(game, ev) }}
+                          </td>
                           <td class="px-4 py-3 text-sm text-gray-900">{{ descriptionOf(ev) }}</td>
                         </tr>
                       </ng-container>
@@ -114,12 +163,13 @@
                     <td class="table-cell">{{ event.date }}</td>
                     <td class="table-cell">{{ event.periodTime }}</td>
                     <td class="table-cell text-center actions-cell">
-                      <button 
-                        mat-icon-button 
-                        color="warn" 
+                      <button
+                        mat-icon-button
+                        color="warn"
                         (click)="removeSelectedEvent(event.id)"
                         class="remove-button"
-                        title="Remove">
+                        title="Remove"
+                      >
                         <mat-icon class="icon-small">delete</mat-icon>
                       </button>
                     </td>
@@ -135,7 +185,13 @@
 
   <mat-dialog-actions class="modal-actions">
     <button mat-stroked-button (click)="onCancel()" class="cancel-btn">Cancel</button>
-    <button mat-raised-button color="primary" (click)="onSubmit()" class="submit-btn" [disabled]="form.invalid">
+    <button
+      mat-raised-button
+      color="primary"
+      (click)="onSubmit()"
+      class="submit-btn"
+      [disabled]="form.invalid"
+    >
       <mat-icon>save</mat-icon>
       {{ isEditMode ? 'Update Highlight Reel' : 'Create Highlight Reel' }}
     </button>

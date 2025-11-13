@@ -10,7 +10,7 @@ export interface HighlightReelApi {
 // GET /api/hockey/highlight-reels/{id}/highlights
 export interface HighlightApi {
   id: number;
-  game_event_id: number;
+  game_event_id?: number;
   event_name?: string;
   note?: string;
   youtube_link?: string;
@@ -46,8 +46,10 @@ export interface HighlightReelUpsertPayload {
   name: string;
   description: string;
   highlights: {
-    game_event_id: number;
-    event_name?: string;
+    id?: number; // include when updating existing highlights in edit mode
+    is_custom?: boolean; // when true, omit game_event_id and send custom fields
+    game_event_id?: number; // required only when is_custom is false/undefined
+    event_name?: string; // name for custom highlights
     note?: string;
     youtube_link?: string;
     date?: string; // ISO date string (e.g., 2025-11-11)
