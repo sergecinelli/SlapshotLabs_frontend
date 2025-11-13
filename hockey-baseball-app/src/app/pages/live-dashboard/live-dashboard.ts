@@ -1143,6 +1143,8 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
       this.openTurnoverEditModal(event);
     } else if (event.eventNameId === this.faceoffEventId) {
       this.openFaceoffEditModal(event);
+    } else if (event.eventNameId === this.goalieChangeEventId) {
+      this.openGoalieChangeEditModal(event);
     } else if (event.eventNameId === this.penaltyEventId) {
       this.openPenaltyEditModal(event);
     } else {

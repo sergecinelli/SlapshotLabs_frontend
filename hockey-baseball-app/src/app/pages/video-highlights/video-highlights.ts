@@ -8,6 +8,7 @@ import { DataTableComponent, TableAction, TableColumn } from '../../shared/compo
 import { HighlightsService } from '../../services/highlights.service';
 import { HighlightReelApi, HighlightReelRow, HighlightReelUpsertPayload } from '../../shared/interfaces/highlight-reel.interface';
 import { HighlightReelFormModalComponent, HighlightReelFormModalData } from '../../shared/components/highlight-reel-form-modal/highlight-reel-form-modal';
+import { HighlightReelViewModalComponent } from '../../shared/components/highlight-reel-view-modal/highlight-reel-view-modal';
 
 @Component({
   selector: 'app-video-highlights',
@@ -95,7 +96,7 @@ export class VideoHighlightsComponent implements OnInit {
     const { action, item } = event;
     switch (action) {
       case 'view':
-        console.log('View highlight reel:', item);
+        this.openViewHighlightModal(item);
         break;
       case 'edit':
         this.openEditHighlightModal(item);
@@ -204,6 +205,29 @@ export class VideoHighlightsComponent implements OnInit {
             this.loading.set(false);
           }
         });
+      }
+    });
+  }
+
+  openViewHighlightModal(item: HighlightReelRow): void {
+    // Fetch highlights for the reel, then open the view modal with the list
+    this.highlightsService.getHighlights(item.id).subscribe({
+      next: (highlights) => {
+        this.dialog.open(HighlightReelViewModalComponent, {
+          width: '1400px',
+          maxWidth: '95vw',
+          autoFocus: false,
+          data: {
+            reelName: item.name,
+            highlights,
+            initialIndex: 0,
+          },
+          panelClass: 'highlight-reel-view-dialog'
+        });
+      },
+      error: (error) => {
+        console.error('Error loading highlights for reel:', error);
+        alert('Failed to load highlights for this reel.');
       }
     });
   }

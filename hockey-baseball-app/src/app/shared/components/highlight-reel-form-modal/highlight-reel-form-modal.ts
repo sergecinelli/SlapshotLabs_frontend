@@ -291,6 +291,51 @@ export class HighlightReelFormModalComponent implements OnInit {
     return hh * 3600 + mm * 60 + ss;
   }
 
+  private formatTimeForApi(timeStr: string): string {
+    // Convert time to HH:MM:SS.sssZ format
+    // Handle inputs like "10:06" -> "00:10:06.000Z"
+    // Handle inputs like "20:45:56.127" -> "20:45:56.127Z"
+    
+    if (!timeStr) {
+      return '00:00:00.000Z';
+    }
+
+    // If already in correct format (ends with Z), return as-is
+    if (timeStr.match(/^\d{2}:\d{2}:\d{2}\.\d{3}Z$/)) {
+      return timeStr;
+    }
+
+    // Parse the time string
+    const parts = timeStr.split(':');
+    let hours = 0;
+    let minutes = 0;
+    let seconds = 0;
+    let milliseconds = 0;
+
+    if (parts.length === 2) {
+      // Format: MM:SS
+      minutes = parseInt(parts[0], 10) || 0;
+      const secParts = parts[1].split('.');
+      seconds = parseInt(secParts[0], 10) || 0;
+      milliseconds = secParts[1] ? parseInt(secParts[1].padEnd(3, '0').substring(0, 3), 10) : 0;
+    } else if (parts.length === 3) {
+      // Format: HH:MM:SS or HH:MM:SS.sss
+      hours = parseInt(parts[0], 10) || 0;
+      minutes = parseInt(parts[1], 10) || 0;
+      const secParts = parts[2].replace('Z', '').split('.');
+      seconds = parseInt(secParts[0], 10) || 0;
+      milliseconds = secParts[1] ? parseInt(secParts[1].padEnd(3, '0').substring(0, 3), 10) : 0;
+    }
+
+    // Format as HH:MM:SS.sssZ
+    const hh = hours.toString().padStart(2, '0');
+    const mm = minutes.toString().padStart(2, '0');
+    const ss = seconds.toString().padStart(2, '0');
+    const sss = milliseconds.toString().padStart(3, '0');
+
+    return `${hh}:${mm}:${ss}.${sss}Z`;
+  }
+
   isEventSelected(gameEventId: number): boolean {
     return this.selectedEvents().some(e => e.gameEventId === gameEventId);
   }
@@ -367,11 +412,11 @@ export class HighlightReelFormModalComponent implements OnInit {
       const ev = selectedEvent.fullEvent;
       return {
         game_event_id: ev.id,
-        //event_name: this.eventNameMap.get(ev.event_name_id) || '',
-        //note: ev.note || '',
-        //youtube_link: ev.youtube_link || '',
-        //date: selectedEvent.date,
-        //time: ev.time?.toString() || new Date().toISOString(),
+        event_name: this.eventNameMap.get(ev.event_name_id) || '',
+        note: ev.note || '',
+        youtube_link: ev.youtube_link || '',
+        date: selectedEvent.date,
+        time: this.formatTimeForApi(ev.time?.toString() || ''),
         order: index
       };
     });

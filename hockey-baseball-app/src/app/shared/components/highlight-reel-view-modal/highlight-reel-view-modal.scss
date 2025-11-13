@@ -1,0 +1,128 @@
+.highlight-reel-view-modal {
+  width: 100%;
+  max-width: 1400px;
+  background-color: white;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.modal-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-primary);
+  font-size: 1.375rem;
+  font-weight: 600;
+  margin: 0;
+  padding: 16px 24px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.modal-content {
+  padding: 16px !important;
+}
+
+.two-column-layout {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 16px;
+}
+
+.column.left {
+  min-height: 420px;
+  display: flex;
+}
+
+.video-wrapper {
+  position: relative;
+  width: 100%;
+  padding-top: 56.25%; /* 16:9 */
+  border-radius: 8px;
+  overflow: hidden;
+  background: #000;
+}
+
+.video-iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.no-video {
+  width: 100%;
+  background: #f8fafc;
+  border: 1px dashed #cbd5e1;
+  border-radius: 8px;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+/* Reuse table styling concepts from form modal */
+.selected-events-table {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.selected-events-table .empty-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 32px 16px;
+  color: #6b7280;
+}
+
+.selected-events-table .table-wrapper {
+  overflow-x: auto;
+}
+
+.selected-events-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.selected-events-table .custom-header .header-cell {
+  background-color: #e5e7eb;
+  font-weight: 500;
+  font-size: 12px;
+  color: #4b5563;
+  padding: 8px 16px;
+  text-align: left;
+  white-space: nowrap;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.selected-events-table .table-row .table-cell {
+  font-size: 12px;
+  color: #111827;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 8px 16px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.selected-row .table-cell {
+  background-color: #dbeafe !important;
+}
+
+.modal-actions {
+  padding: 16px 24px;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: flex-end;
+}
+
+@media (max-width: 1200px) {
+  .two-column-layout {
+    grid-template-columns: 1fr;
+  }
+}
