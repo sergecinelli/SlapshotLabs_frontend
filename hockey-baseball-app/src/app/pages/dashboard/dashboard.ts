@@ -17,6 +17,9 @@ import { PlayerFormModalComponent, PlayerFormModalData } from '../../shared/comp
 import { TeamFormModalComponent, TeamFormModalData } from '../../shared/components/team-form-modal/team-form-modal';
 import { GoalieFormModalComponent, GoalieFormModalData } from '../../shared/components/goalie-form-modal/goalie-form-modal';
 import { ScheduleFormModalComponent, ScheduleFormModalData } from '../../shared/components/schedule-form-modal/schedule-form-modal';
+import { HighlightReelFormModalComponent, HighlightReelFormModalData } from '../../shared/components/highlight-reel-form-modal/highlight-reel-form-modal';
+import { HighlightReelUpsertPayload } from '../../shared/interfaces/highlight-reel.interface';
+import { HighlightsService } from '../../services/highlights.service';
 import { forkJoin } from 'rxjs';
 
 @Component({
@@ -32,6 +35,7 @@ export class DashboardComponent implements OnInit {
   private playerService = inject(PlayerService);
   private goalieService = inject(GoalieService);
   private apiService = inject(ApiService);
+  private highlightsService = inject(HighlightsService);
   private dialog = inject(MatDialog);
   private router = inject(Router);
 
@@ -213,8 +217,27 @@ export class DashboardComponent implements OnInit {
   }
 
   createHighlightReel(): void {
-    console.log('Create Highlight Reel clicked');
-    // TODO: Implement highlight reel creation functionality
+    const dialogRef = this.dialog.open(HighlightReelFormModalComponent, {
+      width: '1400px',
+      maxWidth: '95vw',
+      data: { isEditMode: false } as HighlightReelFormModalData,
+      panelClass: 'schedule-form-modal-dialog',
+      disableClose: true,
+      autoFocus: false
+    });
+
+    dialogRef.afterClosed().subscribe((result?: HighlightReelUpsertPayload) => {
+      if (result) {
+        this.highlightsService.createHighlightReel(result).subscribe({
+          next: () => {
+            this.router.navigate(['/highlights']);
+          },
+          error: (error) => {
+            console.error('Error creating highlight reel:', error);
+          }
+        });
+      }
+    });
   }
 
   getTeamById(teamId: number): Team | undefined {
