@@ -58,6 +58,7 @@ export class TeamsComponent implements OnInit {
 
   tableColumns: TableColumn[] = [
     { key: 'name', label: 'Team Name', sortable: true, width: '150px' },
+    { key: 'group', label: 'Group', sortable: true, width: '100px' },
     { key: 'level', label: 'Level', sortable: true, type: 'dropdown', width: '100px' },
     { key: 'division', label: 'Division', sortable: true, type: 'dropdown', width: '100px' },
     { key: 'gamesPlayed', label: 'GP', sortable: true, type: 'number', width: '60px' },

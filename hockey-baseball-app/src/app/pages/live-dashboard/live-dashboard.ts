@@ -336,7 +336,7 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
             score: gameExtra.home_goals,
             record: homeRecord,
             sog: 0, // Will be updated from live data
-            teamLevel: homeTeamLevel
+            teamLevel: `${homeTeamData.group} ${homeTeamLevel}`
           });
 
           this.awayTeam.set({
@@ -345,7 +345,7 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
             score: gameExtra.away_goals,
             record: awayRecord,
             sog: 0, // Will be updated from live data
-            teamLevel: awayTeamLevel
+            teamLevel: `${awayTeamData.group} ${awayTeamLevel}`
           });
 
           // Set team options for dropdowns
