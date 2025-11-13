@@ -112,8 +112,6 @@ export class TeamFormModalComponent implements OnInit {
       },
       error: (error) => {
         console.error('Failed to load options:', error);
-        // Use fallback options if API fails
-        this.useFallbackOptions();
         this.setDefaultValues();
         
         if (this.isEditMode && this.data.team) {
@@ -142,32 +140,7 @@ export class TeamFormModalComponent implements OnInit {
     this.teamForm.updateValueAndValidity();
   }
 
-  /**
-   * Use fallback options when API fails
-   */
-  private useFallbackOptions(): void {
-    this.levelOptions = [
-      { value: 'NHL', label: 'NHL' },
-      { value: 'AHL', label: 'AHL' },
-      { value: 'Junior A', label: 'Junior A' },
-      { value: 'Junior B', label: 'Junior B' },
-      { value: 'Junior C', label: 'Junior C' }
-    ];
-    
-    this.divisionOptions = [
-      { value: 'Atlantic', label: 'Atlantic' },
-      { value: 'Metropolitan', label: 'Metropolitan' },
-      { value: 'Central', label: 'Central' },
-      { value: 'Pacific', label: 'Pacific' }
-    ];
-  }
-
   private populateForm(team: Team): void {
-    console.log('Populating form with team:', team);
-    console.log('Level options:', this.levelOptions);
-    console.log('Division options:', this.divisionOptions);
-    console.log('Team levelId:', team.levelId, 'divisionId:', team.divisionId);
-    
     this.teamForm.patchValue({
       name: team.name,
       group: team.group,
@@ -176,8 +149,6 @@ export class TeamFormModalComponent implements OnInit {
       city: team.city,
       logo: team.logo
     });
-    
-    console.log('Form values after patch:', this.teamForm.value);
     
     // Set existing logo as preview if available
     if (team.logo && team.logo !== '/assets/icons/teams.svg' && !team.logo.includes('/assets/')) {

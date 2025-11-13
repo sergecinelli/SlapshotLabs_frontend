@@ -49,12 +49,10 @@ import { PlayerFormModalComponent, PlayerFormModalData } from '../../shared/comp
 export class PlayersComponent implements OnInit {
   private playerService = inject(PlayerService);
   private teamService = inject(TeamService);
-  private http = inject(HttpClient);
   private dialog = inject(MatDialog);
-  private snackBar = inject(MatSnackBar);
 
   players = signal<Player[]>([]);
-  teams: Team[] = [];  // Store teams to pass to modals
+  teams: Team[] = [];
   loading = signal(true);
 
   tableColumns: TableColumn[] = [
@@ -200,13 +198,9 @@ export class PlayersComponent implements OnInit {
   }
 
   private viewPlayerProfile(player: Player): void {
-    console.log('Opening profile for player:', player.firstName, player.lastName, 'ID:', player.id);
-    
     // Build the full URL including the base URL
     const baseUrl = window.location.origin;
     const url = `${baseUrl}/player-profile/${player.id}`;
-    
-    console.log('Opening URL:', url);
     
     window.location.assign(url);
   }

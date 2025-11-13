@@ -215,7 +215,6 @@ export class ScheduleFormModalComponent implements OnInit {
         },
         error: (error) => {
           console.error('Failed to load options:', error);
-          this.useFallbackOptions();
           this.setDefaultValues();
 
           if (this.isEditMode && this.data.schedule) {
@@ -309,31 +308,6 @@ export class ScheduleFormModalComponent implements OnInit {
     }
 
     this.scheduleForm.updateValueAndValidity();
-  }
-
-  /**
-   * Use fallback options when API fails
-   */
-  private useFallbackOptions(): void {
-    this.teamOptions = [
-      { value: '1', label: 'Team A (1U - NHL)' },
-      { value: '2', label: 'Team B (1U - NHL)' }
-    ];
-
-    this.goalieOptions = [
-      { value: '1', label: 'Goalie A (Team A)' },
-      { value: '2', label: 'Goalie B (Team B)' }
-    ];
-
-    this.arenaOptions = [
-      { value: 1, label: 'Arena 1' },
-      { value: 2, label: 'Arena 2' }
-    ];
-
-    this.gameTypeOptions = [
-      { value: 1, label: 'Regular Season' },
-      { value: 2, label: 'Playoff' }
-    ];
   }
 
   private populateForm(schedule: Schedule): void {

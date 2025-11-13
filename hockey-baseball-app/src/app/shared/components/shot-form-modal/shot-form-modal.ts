@@ -449,7 +449,6 @@ export class ShotFormModalComponent implements OnInit {
       if (this.isEditMode && this.eventId) {
         this.gameEventService.updateGameEvent(this.eventId, shotRequest).subscribe({
           next: (response) => {
-            console.log('Shot event updated:', response);
             this.isSubmitting = false;
             // Ensure caller always receives a truthy value to trigger refresh
             this.dialogRef.close(true);
@@ -463,7 +462,6 @@ export class ShotFormModalComponent implements OnInit {
       } else {
         this.gameEventService.createShotEvent(shotRequest).subscribe({
           next: (response) => {
-            console.log('Shot event created:', response);
             this.isSubmitting = false;
             this.dialogRef.close(response);
           },

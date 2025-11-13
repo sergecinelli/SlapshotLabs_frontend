@@ -349,7 +349,6 @@ export class GoalieChangeFormModalComponent implements OnInit {
       if (this.isEditMode && this.eventId) {
         this.gameEventService.updateGameEvent(this.eventId, goalieChangeRequest).subscribe({
           next: (response) => {
-            console.log('Goalie change event updated:', response);
             this.isSubmitting = false;
             // Ensure caller always receives a truthy value to trigger refresh
             this.dialogRef.close(true);
@@ -363,8 +362,6 @@ export class GoalieChangeFormModalComponent implements OnInit {
       } else {
         this.gameEventService.createGoalieChangeEvent(goalieChangeRequest).subscribe({
           next: (response) => {
-            console.log('Goalie change event created:', response);
-            
             // Find selected team and goalie for display
             const selectedTeam = this.teamOptions.find(t => t.value === formValue.team);
             const selectedGoalie = this.goalieOptions.find(g => g.value === formValue.goalie);

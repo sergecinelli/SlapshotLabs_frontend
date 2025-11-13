@@ -102,7 +102,6 @@ export class GoalieService {
 
     return this.apiService.delete<void>(`/hockey/goalie/${numericId}`).pipe(
       map(() => {
-        console.log(`Goalie with ID ${id} deleted successfully`);
         return true;
       }),
       catchError(error => {
@@ -140,7 +139,6 @@ export class GoalieService {
         if (!newGoalie) {
           throw new Error('Failed to fetch newly created goalie');
         }
-        console.log(`Added new goalie:`, newGoalie);
         return newGoalie;
       }),
       catchError(error => {
@@ -185,7 +183,6 @@ export class GoalieService {
         if (!updatedGoalie) {
           throw new Error(`Goalie with ID ${id} not found after update`);
         }
-        console.log(`Goalie with ID ${id} updated successfully`);
         return updatedGoalie;
       }),
       catchError(error => {

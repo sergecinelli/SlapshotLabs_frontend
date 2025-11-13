@@ -66,7 +66,6 @@ export class ForgotPasswordComponent implements OnDestroy {
     
     this.authService.requestPasswordReset(email).subscribe({
       next: (response) => {
-        console.log('Password reset email sent:', response);
         this.isEmailSent = true;
         this.isLoading = false;
         this.startResendTimer();

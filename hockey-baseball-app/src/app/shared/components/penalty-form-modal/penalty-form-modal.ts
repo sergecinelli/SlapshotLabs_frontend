@@ -354,7 +354,6 @@ export class PenaltyFormModalComponent implements OnInit {
       if (this.isEditMode && this.eventId) {
         this.gameEventService.updateGameEvent(this.eventId, penaltyRequest).subscribe({
           next: (response) => {
-            console.log('Penalty event updated:', response);
             this.isSubmitting = false;
             // Ensure caller always receives a truthy value to trigger refresh
             this.dialogRef.close(true);
@@ -368,8 +367,6 @@ export class PenaltyFormModalComponent implements OnInit {
       } else {
         this.gameEventService.createPenaltyEvent(penaltyRequest).subscribe({
           next: (response) => {
-            console.log('Penalty event created:', response);
-            
             // Find selected team and player for display
             const selectedTeam = this.teamOptions.find(t => t.value === formValue.team);
             const selectedPlayer = this.playerOptions.find(p => p.value === formValue.player);

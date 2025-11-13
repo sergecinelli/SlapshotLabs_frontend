@@ -138,9 +138,6 @@ export class ApiService {
    * PATCH request with multipart/form-data (for file uploads)
    */
   patchMultipart<T>(endpoint: string, formData: FormData, includeCredentials = true): Observable<T> {
-    console.log('patchMultipart called with FormData:', formData);
-    console.log('FormData instanceof FormData:', formData instanceof FormData);
-    
     const headers = new HttpHeaders({
       'Accept': 'application/json'
       // Don't set Content-Type for FormData - let browser set it with boundary
@@ -150,9 +147,6 @@ export class ApiService {
       headers,
       withCredentials: includeCredentials
     };
-
-    console.log('Making PATCH request to:', `${this.baseUrl}${endpoint}`);
-    console.log('Request options:', options);
 
     return this.http.patch<T>(
       `${this.baseUrl}${endpoint}`,

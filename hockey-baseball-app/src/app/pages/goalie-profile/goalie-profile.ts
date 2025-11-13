@@ -46,12 +46,10 @@ export class GoalieProfileComponent implements OnInit {
 
   private loadGoalie(id: string): void {
     this.loading = true;
-    console.log(`Loading goalie with ID: ${id}`);
     
     this.goalieService.getGoalieById(id).subscribe({
       next: (goalie) => {
         if (goalie) {
-          console.log('Goalie loaded successfully:', goalie);
           this.goalie = goalie;
         } else {
           console.error(`Goalie not found with ID: ${id}`);

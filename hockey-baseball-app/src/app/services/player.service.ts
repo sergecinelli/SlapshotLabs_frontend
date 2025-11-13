@@ -85,7 +85,6 @@ export class PlayerService {
 
     return this.apiService.delete<void>(`/hockey/player/${numericId}`).pipe(
       map(() => {
-        console.log(`Player with ID ${id} deleted successfully`);
         return true;
       }),
       catchError(error => {
@@ -123,7 +122,6 @@ export class PlayerService {
         if (!newPlayer) {
           throw new Error('Failed to fetch newly created player');
         }
-        console.log(`Added new player:`, newPlayer);
         return newPlayer;
       }),
       catchError(error => {
@@ -165,7 +163,6 @@ export class PlayerService {
         if (!updatedPlayer) {
           throw new Error(`Player with ID ${id} not found after update`);
         }
-        console.log(`Player with ID ${id} updated successfully`);
         return updatedPlayer;
       }),
       catchError(error => {

@@ -123,7 +123,6 @@ export class DashboardComponent implements OnInit {
     const { logoFile, ...team } = teamData;
     this.teamService.addTeam(team, logoFile).subscribe({
       next: (newTeam) => {
-        console.log('Team added successfully:', newTeam);
         this.router.navigate(['/teams']);
       },
       error: (error) => {
@@ -151,7 +150,6 @@ export class DashboardComponent implements OnInit {
   private addPlayer(playerData: Partial<Player>): void {
     this.playerService.addPlayer(playerData).subscribe({
       next: (newPlayer) => {
-        console.log('Player added successfully:', newPlayer);
         this.router.navigate(['/players']);
       },
       error: (error) => {
@@ -179,7 +177,6 @@ export class DashboardComponent implements OnInit {
   private addGoalie(goalieData: Partial<Goalie>): void {
     this.goalieService.addGoalie(goalieData).subscribe({
       next: (newGoalie) => {
-        console.log('Goalie added successfully:', newGoalie);
         this.router.navigate(['/goalies']);
       },
       error: (error) => {
@@ -207,7 +204,6 @@ export class DashboardComponent implements OnInit {
   private addGame(gameData: Record<string, unknown>): void {
     this.scheduleService.createGame(gameData).subscribe({
       next: () => {
-        console.log('Game added successfully');
         this.router.navigate(['/schedule']);
       },
       error: (error) => {

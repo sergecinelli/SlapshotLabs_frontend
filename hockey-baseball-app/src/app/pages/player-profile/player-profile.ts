@@ -49,12 +49,10 @@ export class PlayerProfileComponent implements OnInit {
 
   private loadPlayer(id: string): void {
     this.loading = true;
-    console.log(`Loading player with ID: ${id}`);
     
     this.playerService.getPlayerById(id).subscribe({
       next: (player) => {
         if (player) {
-          console.log('Player loaded successfully:', player);
           this.player = player;
         } else {
           console.error(`Player not found with ID: ${id}`);
@@ -125,7 +123,6 @@ export class PlayerProfileComponent implements OnInit {
     this.loading = true;
     this.playerService.updatePlayer(this.player.id, playerData).subscribe({
       next: (updatedPlayer) => {
-        console.log('Player updated successfully:', updatedPlayer);
         this.player = updatedPlayer;
         this.loading = false;
       },

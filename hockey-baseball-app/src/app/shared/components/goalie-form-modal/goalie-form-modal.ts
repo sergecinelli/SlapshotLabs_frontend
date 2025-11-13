@@ -106,9 +106,6 @@ export class GoalieFormModalComponent implements OnInit {
       },
       error: (error) => {
         console.error('Failed to load form data:', error);
-        // Use fallback data
-        this.teamOptions = this.getDefaultTeams();
-        this.positionOptions = this.positionService.getDefaultPositions();
         
         // Set default values to first available options
         this.setDefaultFormValues();
@@ -121,16 +118,6 @@ export class GoalieFormModalComponent implements OnInit {
         }
       }
     });
-  }
-
-  private getDefaultTeams(): TeamOption[] {
-    return [
-      { value: 'Red Wings', label: 'Red Wings' },
-      { value: 'Blue Sharks', label: 'Blue Sharks' },
-      { value: 'Lightning Bolts', label: 'Lightning Bolts' },
-      { value: 'Golden Eagles', label: 'Golden Eagles' },
-      { value: 'Ice Wolves', label: 'Ice Wolves' }
-    ];
   }
 
   private setDefaultFormValues(): void {

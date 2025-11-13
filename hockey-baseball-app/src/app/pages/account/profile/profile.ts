@@ -121,7 +121,6 @@ export class ProfileComponent implements OnInit {
     
     this.authService.editUser(updateData).subscribe({
       next: () => {
-        console.log('Profile updated successfully');
         this.successMessage = 'Profile updated successfully!';
         this.isSaving = false;
       },

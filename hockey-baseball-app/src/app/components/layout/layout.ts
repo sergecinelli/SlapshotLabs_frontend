@@ -49,7 +49,6 @@ export class LayoutComponent {
   protected logout(): void {
     this.authService.signOut().subscribe({
       next: () => {
-        console.log('Successfully signed out');
         this.navigationService.navigate('/sign-in');
       },
       error: (error) => {

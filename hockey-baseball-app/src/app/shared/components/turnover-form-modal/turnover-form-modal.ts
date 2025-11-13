@@ -119,7 +119,7 @@ export class TurnoverFormModalComponent implements OnInit {
     // Edit mode: populate with existing data
     if (this.isEditMode && this.dialogData.existingData) {
       const existing = this.dialogData.existingData;
-      
+
       // Restore location if available
       if (existing.iceTopOffset !== undefined && existing.iceLeftOffset !== undefined && existing.zone) {
         this.puckLocation = {
@@ -306,8 +306,8 @@ export class TurnoverFormModalComponent implements OnInit {
         period_id: formValue.period,
         time: timeOfDay,
         youtube_link: formValue.youtubeLink || undefined,
-        ice_top_offset: (this.puckLocation as PuckLocationWithCoords)?.top,
-        ice_left_offset: (this.puckLocation as PuckLocationWithCoords)?.left,
+        ice_top_offset: this.puckLocation?.y as number | undefined,
+        ice_left_offset: this.puckLocation?.x as number | undefined,
         zone: this.puckLocation?.zone
       };
 
@@ -315,7 +315,6 @@ export class TurnoverFormModalComponent implements OnInit {
       if (this.isEditMode && this.eventId) {
         this.gameEventService.updateGameEvent(this.eventId, turnoverRequest).subscribe({
           next: (response) => {
-            console.log('Turnover event updated:', response);
             this.isSubmitting = false;
             // Ensure caller always receives a truthy value to trigger refresh
             this.dialogRef.close(true);
@@ -329,8 +328,6 @@ export class TurnoverFormModalComponent implements OnInit {
       } else {
         this.gameEventService.createTurnoverEvent(turnoverRequest).subscribe({
           next: (response) => {
-            console.log('Turnover event created:', response);
-            
             // Find selected team and player for display
             const selectedTeam = this.teamOptions.find(t => t.value === formValue.team);
             const selectedPlayer = this.playerOptions.find(p => p.value === formValue.player);

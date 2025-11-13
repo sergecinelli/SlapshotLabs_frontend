@@ -107,6 +107,7 @@
           formControlName="location"
           [team1]="selectedTeamData"
           [team2]="otherTeamData"
+          [initialLocation]="puckLocation"
           (locationChange)="onLocationChange($event)">
         </app-location-selector>
         

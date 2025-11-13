@@ -204,13 +204,10 @@ export class GoaliesComponent implements OnInit {
   }
 
   private viewGoalieProfile(goalie: Goalie): void {
-    console.log('Opening profile for goalie:', goalie.firstName, goalie.lastName, 'ID:', goalie.id);
-    
     // Build the full URL including the base URL
     const baseUrl = window.location.origin;
     const url = `${baseUrl}/goalie-profile/${goalie.id}`;
     
-    console.log('Opening URL:', url);
     window.location.assign(url);
   }
 

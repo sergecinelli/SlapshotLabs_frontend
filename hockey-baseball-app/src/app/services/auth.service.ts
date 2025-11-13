@@ -63,24 +63,19 @@ export class AuthService {
     };
 
     // Refresh CSRF token before sign-in for security
-    console.log('🔄 Auth Service - Refreshing CSRF token before sign-in');
     return this.apiService.refreshCsrfToken().pipe(
       switchMap(() => {
-        console.log('🔑 Auth Service - CSRF token refreshed, proceeding with sign-in');
         return this.apiService.post<void>('/users/signin', signInRequest);
       }),
       switchMap(() => {
-        console.log('✅ Auth Service - Sign-in successful, waiting briefly for token sync');
         // Small delay to ensure CSRF token is properly synchronized
         return timer(100).pipe(
           mergeMap(() => {
-            console.log('🔄 Auth Service - Getting user profile after token sync');
             return this.refreshCurrentUser();
           })
         );
       }),
       tap(() => {
-        console.log('✅ Auth Service - User profile loaded successfully');
       }),
       switchMap(() => of(void 0)), // Convert to Observable<void>
       catchError(error => {
@@ -97,7 +92,6 @@ export class AuthService {
     return this.apiService.get<unknown>('/users/signout').pipe(
       switchMap(() => {
         // After logout, refresh CSRF token for security
-        console.log('🔄 Auth Service - Refreshing CSRF token after logout');
         return this.apiService.refreshCsrfToken().pipe(
           tap(() => {
             this.currentUserSubject.next(null);

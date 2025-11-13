@@ -34,16 +34,4 @@ export class PositionService {
       })
     );
   }
-
-  // Fallback method for default positions
-  getDefaultPositions(): PositionOption[] {
-    return [
-      { value: 'Goalie', label: 'Goalie' },
-      { value: 'Defense', label: 'Defense' },
-      { value: 'Forward', label: 'Forward' },
-      { value: 'Center', label: 'Center' },
-      { value: 'Left Wing', label: 'Left Wing' },
-      { value: 'Right Wing', label: 'Right Wing' }
-    ];
-  }
 }

@@ -55,7 +55,6 @@ export class TeamService {
 
     return this.apiService.delete<void>(`/hockey/team/${numericId}`).pipe(
       map(() => {
-        console.log(`Team with ID ${id} deleted successfully`);
         return true;
       }),
       catchError(error => {
@@ -104,7 +103,6 @@ export class TeamService {
           createdAt: new Date() // Set creation date
         };
         
-        console.log(`Added new team:`, newTeam);
         return newTeam;
       }),
       catchError(error => {
@@ -123,10 +121,6 @@ export class TeamService {
     }
 
     const apiUpdateData = this.teamDataMapper.toApiUpdateFormat(teamData);
-    
-    console.log('Updating team with data:', apiUpdateData);
-    console.log('Logo file:', logoFile);
-    console.log('Logo removed:', logoRemoved);
     
     // Create FormData for multipart request
     const formData = new FormData();
@@ -154,11 +148,6 @@ export class TeamService {
       formData.append('logo', blob, 'logo.' + contentType.split('/')[1]);
     }
     
-    console.log('FormData entries:');
-    formData.forEach((value, key) => {
-      console.log(key, ':', value instanceof File ? `File: ${value.name}` : value);
-    });
-    
     return this.apiService.patchMultipart<void>(`/hockey/team/${numericId}`, formData).pipe(
       switchMap(() => {
         // After successful update, fetch the updated team data
@@ -168,7 +157,6 @@ export class TeamService {
         if (!updatedTeam) {
           throw new Error(`Team with ID ${id} not found after update`);
         }
-        console.log(`Team with ID ${id} updated successfully`);
         return updatedTeam;
       }),
       catchError(error => {

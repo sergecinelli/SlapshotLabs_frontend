@@ -286,7 +286,6 @@ export class ScheduleComponent implements OnInit {
         const gameId = parseInt(schedule.id);
         this.scheduleService.updateGame(gameId, result).subscribe({
           next: () => {
-            console.log('Game updated successfully');
             this.loadSchedules(); // Reload the list
           },
           error: (error) => {
@@ -302,7 +301,6 @@ export class ScheduleComponent implements OnInit {
       const gameId = parseInt(schedule.id);
       this.scheduleService.deleteGame(gameId).subscribe({
         next: (response) => {
-          console.log('Game deleted successfully', response);
           this.loadSchedules(); // Always reload the list after successful API call
         },
         error: (error) => {
@@ -342,7 +340,6 @@ export class ScheduleComponent implements OnInit {
       if (result) {
         this.scheduleService.createGame(result).subscribe({
           next: () => {
-            console.log('Game added successfully');
             this.loadSchedules(); // Reload the list
           },
           error: (error) => {

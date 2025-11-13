@@ -189,13 +189,9 @@ export class TeamsComponent implements OnInit {
   }
 
   private viewTeamProfile(team: Team): void {
-    console.log('Opening profile for team:', team.name, 'ID:', team.id);
-    
     // Build the full URL including the base URL
     const baseUrl = window.location.origin;
     const url = `${baseUrl}/team-profile/${team.id}`;
-    
-    console.log('Opening URL:', url);
     
     window.location.assign(url);
   }

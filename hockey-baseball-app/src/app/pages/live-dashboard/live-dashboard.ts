@@ -322,8 +322,8 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
 
         if (homeTeamData && awayTeamData) {
           // Get team level names from API data
-          const homeTeamLevel = this.teamOptionsService.getLevelName(parseInt(homeTeamData.level));
-          const awayTeamLevel = this.teamOptionsService.getLevelName(parseInt(awayTeamData.level));
+          const homeTeamLevel = teamLevels.find(level => level.id === homeTeamData.levelId)?.name || '';
+          const awayTeamLevel = teamLevels.find(level => level.id === awayTeamData.levelId)?.name || '';
           
           // Format team records
           const homeRecord = `(${gameExtra.home_team_game_type_record.wins} - ${gameExtra.home_team_game_type_record.losses} - ${gameExtra.home_team_game_type_record.ties})`;
@@ -482,7 +482,7 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
       const sortedEvents = periodEvents.slice().sort((a, b) => {
         const ta = this.parseEventTime(a.time).getTime();
         const tb = this.parseEventTime(b.time).getTime();
-        if (ta !== tb) return ta - tb;
+        if (ta !== tb) return tb - ta;
         return (a.id || 0) - (b.id || 0);
       });
       
@@ -981,8 +981,6 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        console.log('Shot data:', result);
-        // Refresh live data to update stats and events
         this.refreshLiveData();
       }
     });
@@ -1008,8 +1006,6 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        console.log('Turnover data:', result);
-        // Refresh live data to update stats and events
         this.refreshLiveData();
       }
     });
@@ -1035,8 +1031,6 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        console.log('Faceoff data:', result);
-        // Refresh live data to update stats and events
         this.refreshLiveData();
       }
     });
@@ -1066,8 +1060,6 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        console.log('Goalie change data:', result);
-        // Refresh live data to update stats and events
         this.refreshLiveData();
       }
     });
@@ -1120,8 +1112,6 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        console.log('Penalty data:', result);
-        // Refresh live data to update stats and events
         this.refreshLiveData();
       }
     });
@@ -1202,7 +1192,6 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        console.log('Shot event updated:', result);
         this.refreshLiveData();
       }
     });
@@ -1244,7 +1233,6 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        console.log('Turnover event updated:', result);
         this.refreshLiveData();
       }
     });
@@ -1287,7 +1275,6 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        console.log('Faceoff event updated:', result);
         this.refreshLiveData();
       }
     });
@@ -1330,7 +1317,6 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        console.log('Goalie change event updated:', result);
         this.refreshLiveData();
       }
     });
@@ -1412,7 +1398,6 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        console.log('Penalty event updated:', result);
         this.refreshLiveData();
       }
     });
@@ -1430,8 +1415,6 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
     if (confirm('Are you sure you want to delete this event?')) {
       this.gameEventService.deleteGameEvent(eventId).subscribe({
         next: () => {
-          console.log(`Event ${eventId} deleted successfully`);
-          // Refresh live data to update stats and events
           this.refreshLiveData();
         },
         error: (error) => {
