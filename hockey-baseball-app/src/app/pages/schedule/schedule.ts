@@ -11,7 +11,7 @@ import { TeamService } from '../../services/team.service';
 import { ArenaService } from '../../services/arena.service';
 import { GoalieService } from '../../services/goalie.service';
 import { PlayerService } from '../../services/player.service';
-import { GameMetadataService } from '../../services/game-metadata.service';
+import { GameMetadataService, GameTypeResponse, GamePeriodResponse } from '../../services/game-metadata.service';
 import { Schedule, GameStatus, GameType } from '../../shared/interfaces/schedule.interface';
 import { Team } from '../../shared/interfaces/team.interface';
 import { Arena, Rink } from '../../shared/interfaces/arena.interface';
@@ -72,11 +72,11 @@ export class ScheduleComponent implements OnInit {
   rinks: Rink[] = [];
   goalies: Goalie[] = [];
   players: Player[] = [];
-  gameTypes: any[] = [];
-  gamePeriods: any[] = [];
+  gameTypes: GameTypeResponse[] = [];
+  gamePeriods: GamePeriodResponse[] = [];
   
   // Store raw game data for edit mode
-  rawGames: Map<string, any> = new Map();
+  rawGames = new Map<string, { id: number; home_team_id: number; home_goals: number; home_start_goalie_id: number; away_team_id: number; away_goals: number; away_start_goalie_id: number; game_type_group: string; tournament_name?: string; date: string; time: string; rink_id: number; status: number }>();
 
   tableColumns: TableColumn[] = [
     { key: 'homeTeam', label: 'Home Team', sortable: true, width: '150px' },
@@ -300,7 +300,7 @@ export class ScheduleComponent implements OnInit {
     if (confirm(`Are you sure you want to delete the game between ${schedule.homeTeam} and ${schedule.awayTeam}?`)) {
       const gameId = parseInt(schedule.id);
       this.scheduleService.deleteGame(gameId).subscribe({
-        next: (response) => {
+        next: () => {
           this.loadSchedules(); // Always reload the list after successful API call
         },
         error: (error) => {

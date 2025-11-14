@@ -22,13 +22,13 @@ import { GameMetadataService, GamePeriodResponse } from '../../services/game-met
 import { TeamService } from '../../services/team.service';
 import { PlayerService } from '../../services/player.service';
 import { GoalieService } from '../../services/goalie.service';
-import { LiveGameService, LiveGameData, GameExtra, GameEvent as ServiceGameEvent } from '../../services/live-game.service';
+import { LiveGameService, LiveGameData, GameExtra, GameEvent as ServiceGameEvent, OffensiveZoneEntry, DefensiveZoneExit } from '../../services/live-game.service';
 import { ArenaService } from '../../services/arena.service';
 import { Arena, Rink } from '../../shared/interfaces/arena.interface';
 import { Team } from '../../shared/interfaces/team.interface';
 import { TeamOptionsService } from '../../services/team-options.service';
 import { GameEventService } from '../../services/game-event.service';
-import { GameEventNameService, GameEventName } from '../../services/game-event-name.service';
+import { GameEventNameService } from '../../services/game-event-name.service';
 import { ScheduleService } from '../../services/schedule.service';
 import { environment } from '../../../environments/environment';
 import { forkJoin, interval, Subscription } from 'rxjs';
@@ -122,9 +122,8 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
   goalieChangeEventId = 0; // Regular goalie change
   penaltyEventId = 0;
   
-  // TODO: Replace with actual team IDs from game data
-  homeTeamId = 1; // This should come from the game API
-  awayTeamId = 2; // This should come from the game API
+  homeTeamId = 1;
+  awayTeamId = 2;
   
   // Game periods and shot types fetched from API
   gamePeriods: GamePeriodResponse[] = [];
@@ -337,7 +336,7 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
             logo: `${environment.apiUrl}/hockey/team/${homeTeamData.id}/logo`,
             score: gameExtra.home_goals,
             record: homeRecord,
-            sog: 0, // Will be updated from live data
+            sog: 0,
             teamLevel: `${homeTeamData.group} ${homeTeamLevel}`
           });
 
@@ -346,7 +345,7 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
             logo: `${environment.apiUrl}/hockey/team/${awayTeamData.id}/logo`,
             score: gameExtra.away_goals,
             record: awayRecord,
-            sog: 0, // Will be updated from live data
+            sog: 0,
             teamLevel: `${awayTeamData.group} ${awayTeamLevel}`
           });
 
@@ -365,11 +364,7 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
           ];
         }
 
-        // Load players and goalies for both teams, then start polling
-        this.loadPlayersAndGoalies(allTeams);
-        
-        // Note: startLiveDataPolling is now called from within loadPlayersAndGoalies
-        // after players are loaded to avoid race conditions
+        this.loadPlayersAndGoalies();
       },
       error: (error) => {
         console.error('Failed to load initial game data:', error);
@@ -594,7 +589,7 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
    */
   private getEventName(eventNameId: number): string {
     // Find the event name by ID from our loaded event names
-    const entry = Object.entries(this.eventNameIds).find(([_, id]) => id === eventNameId);
+    const entry = Object.entries(this.eventNameIds).find(([, id]) => id === eventNameId);
     return entry ? entry[0].toUpperCase() : 'UNKNOWN EVENT';
   }
 
@@ -621,7 +616,7 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
   /**
    * Load players and goalies for both teams
    */
-  private loadPlayersAndGoalies(teams: { id: string; name: string }[]): void {
+  private loadPlayersAndGoalies(): void {
     forkJoin({
       homeTeamPlayers: this.playerService.getPlayersByTeam(this.homeTeamId),
       awayTeamPlayers: this.playerService.getPlayersByTeam(this.awayTeamId),
@@ -831,7 +826,7 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.liveGameService.updateDefensiveZoneExit(rowId!, { [field]: next } as any).subscribe({
+    this.liveGameService.updateDefensiveZoneExit(rowId!, { [field]: next } as Partial<Pick<DefensiveZoneExit, 'icing' | 'skate_out' | 'so_win' | 'so_lose' | 'passes'>>).subscribe({
       next: () => this.refreshLiveDataOnce(),
       error: (e) => {
         console.error('Failed to update defensive zone exit:', e);
@@ -886,7 +881,7 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.liveGameService.updateOffensiveZoneEntry(rowId!, { [field]: next } as any).subscribe({
+    this.liveGameService.updateOffensiveZoneEntry(rowId!, { [field]: next } as Partial<Pick<OffensiveZoneEntry, 'pass_in' | 'dump_win' | 'dump_lose' | 'skate_in'>>).subscribe({
       next: () => this.refreshLiveDataOnce(),
       error: (e) => {
         console.error('Failed to update offensive zone entry:', e);

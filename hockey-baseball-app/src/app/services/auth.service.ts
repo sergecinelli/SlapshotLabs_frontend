@@ -75,8 +75,6 @@ export class AuthService {
           })
         );
       }),
-      tap(() => {
-      }),
       switchMap(() => of(void 0)), // Convert to Observable<void>
       catchError(error => {
         console.error('😱 Auth Service - Sign-in failed:', error);

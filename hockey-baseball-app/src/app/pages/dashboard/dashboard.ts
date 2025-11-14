@@ -126,7 +126,7 @@ export class DashboardComponent implements OnInit {
   private addTeam(teamData: Partial<Team> & { logoFile?: File; logoRemoved?: boolean }): void {
     const { logoFile, ...team } = teamData;
     this.teamService.addTeam(team, logoFile).subscribe({
-      next: (newTeam) => {
+      next: () => {
         this.router.navigate(['/teams']);
       },
       error: (error) => {
@@ -153,7 +153,7 @@ export class DashboardComponent implements OnInit {
 
   private addPlayer(playerData: Partial<Player>): void {
     this.playerService.addPlayer(playerData).subscribe({
-      next: (newPlayer) => {
+      next: () => {
         this.router.navigate(['/players']);
       },
       error: (error) => {
@@ -180,7 +180,7 @@ export class DashboardComponent implements OnInit {
 
   private addGoalie(goalieData: Partial<Goalie>): void {
     this.goalieService.addGoalie(goalieData).subscribe({
-      next: (newGoalie) => {
+      next: () => {
         this.router.navigate(['/goalies']);
       },
       error: (error) => {

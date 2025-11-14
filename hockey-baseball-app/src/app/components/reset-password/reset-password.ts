@@ -87,7 +87,7 @@ export class ResetPasswordComponent implements OnInit {
     };
     
     this.authService.confirmPasswordReset(resetData).subscribe({
-      next: (response) => {
+      next: () => {
         alert('Password has been reset successfully!');
         this.isLoading = false;
         // Navigate to sign-in page after successful reset

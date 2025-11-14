@@ -444,7 +444,7 @@ export class FaceoffFormModalComponent implements OnInit {
       // Edit or create based on mode
       if (this.isEditMode && this.eventId) {
         this.gameEventService.updateGameEvent(this.eventId, faceoffRequest).subscribe({
-          next: (response) => {
+          next: () => {
             this.isSubmitting = false;
             // Ensure caller always receives a truthy value to trigger refresh
             this.dialogRef.close(true);
@@ -457,7 +457,7 @@ export class FaceoffFormModalComponent implements OnInit {
         });
       } else {
         this.gameEventService.createFaceoffEvent(faceoffRequest).subscribe({
-          next: (response) => {
+          next: () => {
             // Find selected teams and players for display
             const winnerTeam = this.teamOptions.find(t => t.value === formValue.winnerTeam);
             const loserTeam = this.teamOptions.find(t => t.value === formValue.loserTeam);

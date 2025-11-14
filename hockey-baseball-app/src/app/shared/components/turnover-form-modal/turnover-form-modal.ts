@@ -9,11 +9,6 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
 import { LocationSelectorComponent, PuckLocation, Team } from '../location-selector/location-selector';
-
-interface PuckLocationWithCoords extends PuckLocation {
-  top?: number;
-  left?: number;
-}
 import { TeamService } from '../../../services/team.service';
 import { PlayerService } from '../../../services/player.service';
 import { GameMetadataService } from '../../../services/game-metadata.service';
@@ -314,7 +309,7 @@ export class TurnoverFormModalComponent implements OnInit {
       // Edit or create based on mode
       if (this.isEditMode && this.eventId) {
         this.gameEventService.updateGameEvent(this.eventId, turnoverRequest).subscribe({
-          next: (response) => {
+          next: () => {
             this.isSubmitting = false;
             // Ensure caller always receives a truthy value to trigger refresh
             this.dialogRef.close(true);
@@ -327,7 +322,7 @@ export class TurnoverFormModalComponent implements OnInit {
         });
       } else {
         this.gameEventService.createTurnoverEvent(turnoverRequest).subscribe({
-          next: (response) => {
+          next: () => {
             // Find selected team and player for display
             const selectedTeam = this.teamOptions.find(t => t.value === formValue.team);
             const selectedPlayer = this.playerOptions.find(p => p.value === formValue.player);

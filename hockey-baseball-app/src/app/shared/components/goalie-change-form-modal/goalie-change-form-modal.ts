@@ -36,10 +36,10 @@ export interface GoalieChangeFormData {
     MatInputModule,
     MatSelectModule,
     MatIconModule,
-    MatDividerModule
+    MatDividerModule,
   ],
   templateUrl: './goalie-change-form-modal.html',
-  styleUrl: './goalie-change-form-modal.scss'
+  styleUrl: './goalie-change-form-modal.scss',
 })
 export class GoalieChangeFormModalComponent implements OnInit {
   private fb = inject(FormBuilder);
@@ -48,10 +48,10 @@ export class GoalieChangeFormModalComponent implements OnInit {
   private goalieService = inject(GoalieService);
   private gameMetadataService = inject(GameMetadataService);
   private gameEventService = inject(GameEventService);
-  private dialogData = inject<{ 
-    gameId: number; 
+  private dialogData = inject<{
+    gameId: number;
     goalieChangeEventId: number;
-    periodOptions?: { value: number; label: string }[]; 
+    periodOptions?: { value: number; label: string }[];
     teamOptions?: { value: number; label: string; logo?: string }[];
     goalieOptions?: { value: number; label: string; teamId: number }[];
     homeTeamId?: number;
@@ -104,26 +104,26 @@ export class GoalieChangeFormModalComponent implements OnInit {
     } else {
       this.loadTeams();
     }
-    
+
     if (this.dialogData.periodOptions && this.dialogData.periodOptions.length > 0) {
       this.periodOptions = this.dialogData.periodOptions;
     } else {
       this.loadPeriods();
     }
-    
+
     // Edit mode: populate with existing data
     if (this.isEditMode && this.dialogData.existingData) {
       const existing = this.dialogData.existingData;
-      
+
       // Populate form
       this.goalieChangeForm.patchValue({
         team: existing.teamId,
         goalie: existing.goalieId,
         period: existing.periodId,
         time: existing.time,
-        note: existing.note || ''
+        note: existing.note || '',
       });
-      
+
       // Load goalies for the existing team (do not override selected goalie in edit mode)
       if (existing.teamId) {
         if (this.dialogData.goalieOptions && this.dialogData.goalieOptions.length > 0) {
@@ -136,14 +136,14 @@ export class GoalieChangeFormModalComponent implements OnInit {
       // Create mode: Set defaults
       if (this.teamOptions.length > 0) {
         this.goalieChangeForm.patchValue({ team: this.teamOptions[0].value });
-        
+
         if (this.dialogData.goalieOptions && this.dialogData.goalieOptions.length > 0) {
           this.filterGoaliesForTeam(this.teamOptions[0].value);
         } else {
           this.loadGoaliesForTeam(this.teamOptions[0].value);
         }
       }
-      
+
       if (this.periodOptions.length > 0) {
         this.goalieChangeForm.patchValue({ period: this.periodOptions[0].value });
       }
@@ -156,7 +156,7 @@ export class GoalieChangeFormModalComponent implements OnInit {
       goalie: ['', Validators.required],
       period: ['', Validators.required],
       time: ['', [Validators.required, Validators.pattern(/^([0-5]?[0-9]):([0-5][0-9])$/)]],
-      note: ['']
+      note: [''],
     });
   }
 
@@ -164,17 +164,17 @@ export class GoalieChangeFormModalComponent implements OnInit {
     this.isLoadingTeams = true;
     this.teamService.getTeams().subscribe({
       next: (response) => {
-        this.teamOptions = response.teams.map(team => ({
+        this.teamOptions = response.teams.map((team) => ({
           value: parseInt(team.id),
           label: team.name,
-          logo: team.logo
+          logo: team.logo,
         }));
         this.isLoadingTeams = false;
-        
+
         // Set default team after teams are loaded
         if (this.teamOptions.length > 0) {
           this.goalieChangeForm.patchValue({
-            team: this.teamOptions[0].value
+            team: this.teamOptions[0].value,
           });
           // Load goalies for default team
           this.loadGoaliesForTeam(this.teamOptions[0].value);
@@ -183,7 +183,7 @@ export class GoalieChangeFormModalComponent implements OnInit {
       error: (error) => {
         console.error('Failed to load teams:', error);
         this.isLoadingTeams = false;
-      }
+      },
     });
   }
 
@@ -200,49 +200,50 @@ export class GoalieChangeFormModalComponent implements OnInit {
       error: (error) => {
         console.error('Failed to load periods:', error);
         this.isLoadingPeriods = false;
-      }
+      },
     });
   }
 
   private loadGoaliesForTeam(teamId: number): void {
     this.isLoadingGoalies = true;
-    
+
     // Check if we already have goalies cached for this team
     if (this.goaliesByTeam[teamId]) {
       this.goalieOptions = this.goaliesByTeam[teamId];
       this.isLoadingGoalies = false;
       if (this.goalieOptions.length > 0) {
         const current = this.goalieChangeForm.get('goalie')?.value;
-        const hasCurrent = this.goalieOptions.some(g => g.value === current);
+        const hasCurrent = this.goalieOptions.some((g) => g.value === current);
         if (!(this.isEditMode && (current === null || hasCurrent))) {
           const defaultId = this.pickStartGoalieId(teamId);
-          const found = this.goalieOptions.find(g => g.value === defaultId);
-          this.goalieChangeForm.patchValue({ goalie: found ? found.value : this.goalieOptions[0].value });
+          const found = this.goalieOptions.find((g) => g.value === defaultId);
+          this.goalieChangeForm.patchValue({
+            goalie: found ? found.value : this.goalieOptions[0].value,
+          });
         }
       }
       return;
     }
-    
+
     this.goalieService.getGoaliesByTeam(teamId).subscribe({
       next: (goalies) => {
-        const goalieOptions = goalies.map(goalie => ({
+        const goalieOptions = goalies.map((goalie) => ({
           value: parseInt(goalie.id),
-          label: `${goalie.firstName} ${goalie.lastName}`
+          label: `${goalie.firstName} ${goalie.lastName}`,
         }));
-        
+
         // Cache the goalies
         this.goaliesByTeam[teamId] = goalieOptions;
         this.goalieOptions = goalieOptions;
         this.isLoadingGoalies = false;
-        
+
         if (this.goalieOptions.length > 0) {
-          const current = this.goalieChangeForm.get('goalie')?.value;
-          const hasCurrent = this.goalieOptions.some(g => g.value === current);
-          if (this.isEditMode && (current === null || hasCurrent)) {
-          } else {
+          if (!this.isEditMode) {
             const defaultId = this.pickStartGoalieId(teamId);
-            const found = this.goalieOptions.find(g => g.value === defaultId);
-            this.goalieChangeForm.patchValue({ goalie: found ? found.value : this.goalieOptions[0].value });
+            const found = this.goalieOptions.find((g) => g.value === defaultId);
+            this.goalieChangeForm.patchValue({
+              goalie: found ? found.value : this.goalieOptions[0].value,
+            });
           }
         } else {
           this.goalieChangeForm.patchValue({ goalie: '' });
@@ -251,7 +252,7 @@ export class GoalieChangeFormModalComponent implements OnInit {
       error: (error) => {
         console.error(`Failed to load goalies for team ${teamId}:`, error);
         this.isLoadingGoalies = false;
-      }
+      },
     });
   }
 
@@ -261,24 +262,23 @@ export class GoalieChangeFormModalComponent implements OnInit {
   private filterGoaliesForTeam(teamId: number): void {
     if (this.dialogData.goalieOptions) {
       const filteredGoalies = this.dialogData.goalieOptions
-        .filter(goalie => goalie.teamId === teamId)
-        .map(goalie => ({
+        .filter((goalie) => goalie.teamId === teamId)
+        .map((goalie) => ({
           value: goalie.value,
-          label: goalie.label
+          label: goalie.label,
         }));
-      
+
       // Cache the filtered goalies
       this.goaliesByTeam[teamId] = filteredGoalies;
       this.goalieOptions = filteredGoalies;
-      
+
       if (this.goalieOptions.length > 0) {
-        const current = this.goalieChangeForm.get('goalie')?.value;
-        const hasCurrent = this.goalieOptions.some(g => g.value === current);
-        if (this.isEditMode && (current === null || hasCurrent)) {
-        } else {
+        if (!this.isEditMode) {
           const defaultId = this.pickStartGoalieId(teamId);
-          const found = this.goalieOptions.find(g => g.value === defaultId);
-          this.goalieChangeForm.patchValue({ goalie: found ? found.value : this.goalieOptions[0].value });
+          const found = this.goalieOptions.find((g) => g.value === defaultId);
+          this.goalieChangeForm.patchValue({
+            goalie: found ? found.value : this.goalieOptions[0].value,
+          });
         }
       } else {
         this.goalieChangeForm.patchValue({ goalie: '' });
@@ -289,16 +289,19 @@ export class GoalieChangeFormModalComponent implements OnInit {
   private pickStartGoalieId(teamId: number | string | null | undefined): number | undefined {
     if (teamId == null) return undefined;
     const idNum = typeof teamId === 'string' ? parseInt(teamId, 10) : teamId;
-    if (this.dialogData.homeTeamId != null && idNum === this.dialogData.homeTeamId) return this.dialogData.homeStartGoalieId;
-    if (this.dialogData.awayTeamId != null && idNum === this.dialogData.awayTeamId) return this.dialogData.awayStartGoalieId;
+    if (this.dialogData.homeTeamId != null && idNum === this.dialogData.homeTeamId)
+      return this.dialogData.homeStartGoalieId;
+    if (this.dialogData.awayTeamId != null && idNum === this.dialogData.awayTeamId)
+      return this.dialogData.awayStartGoalieId;
     return undefined;
   }
- 
+
   private setupTeamChangeListener(): void {
-    const usePreloadedGoalies = this.dialogData.goalieOptions && this.dialogData.goalieOptions.length > 0;
-    
+    const usePreloadedGoalies =
+      this.dialogData.goalieOptions && this.dialogData.goalieOptions.length > 0;
+
     // When team changes, update available goalies
-    this.goalieChangeForm.get('team')?.valueChanges.subscribe(team => {
+    this.goalieChangeForm.get('team')?.valueChanges.subscribe((team) => {
       if (usePreloadedGoalies) {
         this.filterGoaliesForTeam(team);
       } else {
@@ -326,14 +329,17 @@ export class GoalieChangeFormModalComponent implements OnInit {
     if (this.goalieChangeForm.valid && !this.isSubmitting) {
       this.isSubmitting = true;
       const formValue = this.goalieChangeForm.value;
-      
+
       // Convert mm:ss to time-of-day like shots (HH:mm:ss.SSSZ with 00 hours)
       const [minutes, seconds] = formValue.time.split(':').map((v: string) => parseInt(v, 10));
       const tmp = new Date(Date.UTC(1970, 0, 1, 0, minutes, seconds, 0));
       const iso = tmp.toISOString();
       const timeOfDay = iso.substring(iso.indexOf('T') + 1);
-      
-      const goalieId = (typeof formValue.goalie === 'number' && !isNaN(formValue.goalie)) ? formValue.goalie : undefined;
+
+      const goalieId =
+        typeof formValue.goalie === 'number' && !isNaN(formValue.goalie)
+          ? formValue.goalie
+          : undefined;
 
       const goalieChangeRequest: GoalieChangeEventRequest = {
         game_id: this.gameId,
@@ -342,13 +348,13 @@ export class GoalieChangeFormModalComponent implements OnInit {
         ...(goalieId !== undefined && { goalie_id: goalieId }),
         period_id: formValue.period,
         time: timeOfDay,
-        note: formValue.note || undefined
+        note: formValue.note || undefined,
       };
 
       // Edit or create based on mode
       if (this.isEditMode && this.eventId) {
         this.gameEventService.updateGameEvent(this.eventId, goalieChangeRequest).subscribe({
-          next: (response) => {
+          next: () => {
             this.isSubmitting = false;
             // Ensure caller always receives a truthy value to trigger refresh
             this.dialogRef.close(true);
@@ -357,36 +363,36 @@ export class GoalieChangeFormModalComponent implements OnInit {
             console.error('Failed to update goalie change event:', error);
             this.isSubmitting = false;
             alert('Failed to update goalie change event. Please try again.');
-          }
+          },
         });
       } else {
         this.gameEventService.createGoalieChangeEvent(goalieChangeRequest).subscribe({
-          next: (response) => {
+          next: () => {
             // Find selected team and goalie for display
-            const selectedTeam = this.teamOptions.find(t => t.value === formValue.team);
-            const selectedGoalie = this.goalieOptions.find(g => g.value === formValue.goalie);
-            
+            const selectedTeam = this.teamOptions.find((t) => t.value === formValue.team);
+            const selectedGoalie = this.goalieOptions.find((g) => g.value === formValue.goalie);
+
             const goalieChangeData: GoalieChangeFormData = {
               teamLogo: selectedTeam?.logo || '',
               teamName: selectedTeam?.label || '',
               goalieName: selectedGoalie?.label || '',
               period: formValue.period.toString(),
               time: formValue.time,
-              note: formValue.note
+              note: formValue.note,
             };
-            
+
             this.isSubmitting = false;
             this.dialogRef.close(goalieChangeData);
           },
           error: (error) => {
             console.error('Failed to create goalie change event:', error);
             this.isSubmitting = false;
-          }
+          },
         });
       }
     } else if (!this.goalieChangeForm.valid) {
       // Mark all fields as touched to show validation errors
-      Object.keys(this.goalieChangeForm.controls).forEach(key => {
+      Object.keys(this.goalieChangeForm.controls).forEach((key) => {
         this.goalieChangeForm.get(key)?.markAsTouched();
       });
     }
@@ -415,7 +421,7 @@ export class GoalieChangeFormModalComponent implements OnInit {
       goalie: 'Goalie',
       period: 'Period',
       time: 'Time',
-      note: 'Note'
+      note: 'Note',
     };
     return labels[fieldName] || fieldName;
   }

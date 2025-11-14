@@ -15,9 +15,9 @@ import { PlayerService } from '../../../services/player.service';
 import { GoalieService } from '../../../services/goalie.service';
 import { LiveGameService, GameEvent as LiveGameEvent } from '../../../services/live-game.service';
 import { GameEventNameService } from '../../../services/game-event-name.service';
-import { GameMetadataService, GamePeriodResponse } from '../../../services/game-metadata.service';
+import { GameMetadataService } from '../../../services/game-metadata.service';
 import { HighlightsService } from '../../../services/highlights.service';
-import { HighlightReelUpsertPayload, HighlightApi } from '../../interfaces/highlight-reel.interface';
+import { HighlightReelUpsertPayload } from '../../interfaces/highlight-reel.interface';
 import { CustomHighlightModalComponent, CustomHighlightFormResult } from './custom-highlight-modal';
 import { environment } from '../../../../environments/environment';
 import { forkJoin } from 'rxjs';
@@ -76,7 +76,7 @@ export class HighlightReelFormModalComponent implements OnInit {
   isLoading = true;
 
   games = signal<GameListItem[]>([]);
-  selectedEvents = signal<Array<{
+  selectedEvents = signal<{
     id: number;
     gameEventId?: number;
     highlightId?: number; // existing highlight id when editing
@@ -90,7 +90,7 @@ export class HighlightReelFormModalComponent implements OnInit {
     customTime?: string; // raw time from custom form (e.g., HH:mm or HH:mm:ss)
     // Full event data for payload
     fullEvent: LiveGameEvent;
-  }>>([]);
+  }[]>([]);
   private eventNameMap = new Map<number, string>();
   private teamNameMap = new Map<number, string>();
   private periodNameMap = new Map<number, string>();
@@ -157,7 +157,7 @@ export class HighlightReelFormModalComponent implements OnInit {
     this.isLoading = true;
     this.teamService.getTeams().subscribe({
       next: (teamsResp) => {
-        (teamsResp.teams || []).forEach((t: any) => this.teamNameMap.set(parseInt(t.id), t.name));
+        (teamsResp.teams || []).forEach((t) => this.teamNameMap.set(parseInt(t.id), t.name));
         this.gameEventNameService.getGameEventNames().subscribe({
           next: (names) => {
             names.forEach(n => this.eventNameMap.set(n.id, n.name));
@@ -364,7 +364,7 @@ export class HighlightReelFormModalComponent implements OnInit {
         gameEventId: ev.id,
         eventName: this.eventTextOf(ev),
         description: this.descriptionOf(ev) || this.playerNameOf(game, ev),
-        date: (ev as any).date?.toString() || new Date().toISOString().split('T')[0],
+        date: (ev as LiveGameEvent & { date?: string }).date?.toString() || new Date().toISOString().split('T')[0],
         periodTime: `${periodName} / ${timeLabel}`,
         gameLabel: game.label,
         fullEvent: ev
@@ -378,13 +378,13 @@ export class HighlightReelFormModalComponent implements OnInit {
     this.selectedEvents.set(updated);
   }
 
-  onSelectedEventDrop(event: CdkDragDrop<any[]>): void {
+  onSelectedEventDrop(event: CdkDragDrop<{ id: number; gameEventId?: number; highlightId?: number; is_custom?: boolean; eventName?: string; description?: string; date?: string | undefined; periodTime?: string; gameLabel?: string; youtubeLink?: string; customTime?: string; fullEvent: LiveGameEvent }[]>): void {
     const items = [...this.selectedEvents()];
     moveItemInArray(items, event.previousIndex, event.currentIndex);
     this.selectedEvents.set(items);
   }
 
-  groupedEvents(game: GameListItem): Array<{ header?: string; ev?: LiveGameEvent }> {
+  groupedEvents(game: GameListItem): { header?: string; ev?: LiveGameEvent }[] {
     if (!game.events || game.events.length === 0) return [];
     const byPeriod = new Map<number, LiveGameEvent[]>();
     for (const ev of game.events) {
@@ -400,7 +400,7 @@ export class HighlightReelFormModalComponent implements OnInit {
       return orderA - orderB;
     });
     
-    const out: Array<{ header?: string; ev?: LiveGameEvent }> = [];
+    const out: { header?: string; ev?: LiveGameEvent }[] = [];
     for (const pid of sortedPeriodIds) {
       const label = this.periodNameMap.get(pid) || (pid ? `Period ${pid}` : 'Period');
       out.push({ header: label });
@@ -472,13 +472,13 @@ export class HighlightReelFormModalComponent implements OnInit {
         ...(this.isEditMode && selectedEvent.highlightId ? { id: selectedEvent.highlightId } : {}),
         game_event_id: ev.id,
         order: index
-      } as any;
+      };
     });
 
     const payload: HighlightReelUpsertPayload = {
       name: this.form.value.name || '',
       description: this.form.value.description || '',
-      highlights: highlights as any
+      highlights: highlights
     };
     this.dialogRef.close(payload);
   }

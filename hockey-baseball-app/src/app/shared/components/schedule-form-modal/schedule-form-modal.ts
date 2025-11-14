@@ -17,7 +17,7 @@ import { Goalie } from '../../interfaces/goalie.interface';
 import { Player } from '../../interfaces/player.interface';
 import { TeamService } from '../../../services/team.service';
 import { ArenaService } from '../../../services/arena.service';
-import { GameMetadataService, GameTypeResponse, GamePeriodResponse, GameTypeName } from '../../../services/game-metadata.service';
+import { GameMetadataService, GameTypeResponse, GamePeriodResponse } from '../../../services/game-metadata.service';
 import { GoalieService } from '../../../services/goalie.service';
 import { PlayerService } from '../../../services/player.service';
 import { forkJoin } from 'rxjs';
@@ -332,7 +332,7 @@ export class ScheduleFormModalComponent implements OnInit {
       this.filterGoaliesByTeam(game.home_team_id.toString(), 'home');
       
       // Find the game type by matching game_type_name with game type names
-      let gameTypeId = game.game_type_id;
+      const gameTypeId = game.game_type_id;
       
       this.scheduleForm.patchValue({
         awayTeam: game.away_team_id.toString(),
@@ -438,7 +438,7 @@ export class ScheduleFormModalComponent implements OnInit {
       
       // Get the game period with the lowest order (first period)
       const defaultGamePeriod = this.gamePeriods.length > 0
-        ? this.gamePeriods.reduce((min, period) => (period as any).order < (min as any).order ? period : min)
+        ? this.gamePeriods.reduce((min, period) => (period.order ?? Infinity) < (min.order ?? Infinity) ? period : min)
         : null;
       
       const hasGameTypeName = !!formValue.gameTypeName;

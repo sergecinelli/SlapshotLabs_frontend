@@ -448,7 +448,7 @@ export class ShotFormModalComponent implements OnInit {
       // Edit or create based on mode
       if (this.isEditMode && this.eventId) {
         this.gameEventService.updateGameEvent(this.eventId, shotRequest).subscribe({
-          next: (response) => {
+          next: () => {
             this.isSubmitting = false;
             // Ensure caller always receives a truthy value to trigger refresh
             this.dialogRef.close(true);
