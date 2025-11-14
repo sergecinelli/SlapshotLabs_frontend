@@ -78,6 +78,7 @@ export class TeamFormModalComponent implements OnInit {
       level: ['', [Validators.required]],
       division: ['', [Validators.required]],
       city: [''],
+      abbreviation: [''],
       logo: ['']
     });
   }
@@ -147,6 +148,7 @@ export class TeamFormModalComponent implements OnInit {
       level: team.levelId?.toString() || this.levelOptions[0]?.value || '',
       division: team.divisionId?.toString() || this.divisionOptions[0]?.value || '',
       city: team.city,
+      abbreviation: team.abbreviation || '',
       logo: team.logo
     });
     
@@ -315,6 +317,7 @@ export class TeamFormModalComponent implements OnInit {
         division: selectedDivision?.label || '',
         divisionId: parseInt(formValue.division, 10),
         city: formValue.city,
+        abbreviation: formValue.abbreviation || undefined,
         logo: formValue.logo || '/assets/icons/teams.svg'
       };
 
@@ -392,6 +395,7 @@ export class TeamFormModalComponent implements OnInit {
       level: 'Level',
       division: 'Division',
       city: 'City',
+      abbreviation: 'Abbreviation',
       logo: 'Team Logo'
     };
     return labels[fieldName] || fieldName;
