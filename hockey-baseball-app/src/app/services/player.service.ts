@@ -206,8 +206,16 @@ export class PlayerService {
         city: 'City',
         address: 'Address'
       },
-      createdAt: new Date()
-    };
+      createdAt: new Date(),
+      // Add new fields from API
+      playerBiography: data.player_bio || '',
+      birthplace: data.birthplace_country || '',
+      addressCountry: data.address_country || '',
+      addressRegion: data.address_region || '',
+      addressCity: data.address_city || '',
+      addressStreet: data.address_street || '',
+      addressPostalCode: data.address_postal_code || ''
+    } as Player & Record<string, unknown>;
   }
 
   private toApiUpdateFormat(playerData: Partial<Player>, photo?: string): PlayerApiPatch {
@@ -224,7 +232,11 @@ export class PlayerService {
     
     // Only include fields that are provided and exist in the API
     if (playerData.height) {
-      dataUpdate.height = this.parseHeightToInches(playerData.height);
+      if (typeof playerData.height === 'string') {
+        dataUpdate.height = this.parseHeightToInches(playerData.height);
+      } else if (typeof playerData.height === 'number') {
+        dataUpdate.height = playerData.height;
+      }
     }
     if (playerData.weight !== undefined) {
       dataUpdate.weight = playerData.weight;
@@ -250,10 +262,35 @@ export class PlayerService {
     if (playerData.penaltiesDrawn !== undefined) {
       dataUpdate.penalties_drawn = playerData.penaltiesDrawn;
     }
+
+    const extendedData = playerData as Record<string, unknown>;
+
+    if (extendedData['playerBiography'] !== undefined) {
+      dataUpdate.player_bio = extendedData['playerBiography'] as string | undefined;
+    }
+    if (extendedData['birthplace'] !== undefined) {
+      dataUpdate.birthplace_country = extendedData['birthplace'] as string | undefined;
+    }
+    if (extendedData['addressCountry'] !== undefined) {
+      dataUpdate.address_country = extendedData['addressCountry'] as string | undefined;
+    }
+    if (extendedData['addressRegion'] !== undefined) {
+      dataUpdate.address_region = extendedData['addressRegion'] as string | undefined;
+    }
+    if (extendedData['addressCity'] !== undefined) {
+      dataUpdate.address_city = extendedData['addressCity'] as string | undefined;
+    }
+    if (extendedData['addressStreet'] !== undefined) {
+      dataUpdate.address_street = extendedData['addressStreet'] as string | undefined;
+    }
+    if (extendedData['addressPostalCode'] !== undefined) {
+      dataUpdate.address_postal_code = extendedData['addressPostalCode'] as string | undefined;
+    }
     
     const patchData: PlayerApiPatch = {};
     if (Object.keys(dataUpdate).length > 0) {
       patchData.data = dataUpdate;
+      console.log(patchData);
     }
     if (photo !== undefined) {
       patchData.photo = photo;
@@ -263,7 +300,17 @@ export class PlayerService {
   }
 
   private toApiInFormat(playerData: Partial<Player>, teamId: number, photo = ''): PlayerApiIn {
-    const heightInches = this.parseHeightToInches(playerData.height || "6'0\"");
+    // Handle height - could be string like "6'0\"" or number (inches)
+    let heightInches: number;
+    if (typeof playerData.height === 'string') {
+      heightInches = this.parseHeightToInches(playerData.height);
+    } else if (typeof playerData.height === 'number') {
+      heightInches = playerData.height;
+    } else {
+      heightInches = 72; // Default 6'0"
+    }
+    
+    const extendedData = playerData as Record<string, unknown>;
     
     return {
       photo: photo,
@@ -277,19 +324,14 @@ export class PlayerService {
         first_name: playerData.firstName || '',
         last_name: playerData.lastName || '',
         birth_year: this.yearToDateString(playerData.birthYear || new Date().getFullYear() - 25),
-        player_bio: (playerData as Record<string, unknown>)['playerBiography'] as string | undefined,
-        birthplace_country: (playerData as Record<string, unknown>)['birthplace'] as string | undefined,
-        address_country: (playerData as Record<string, unknown>)['addressCountry'] as string | undefined,
-        address_region: (playerData as Record<string, unknown>)['addressRegion'] as string | undefined,
-        address_city: (playerData as Record<string, unknown>)['addressCity'] as string | undefined,
-        address_street: (playerData as Record<string, unknown>)['addressStreet'] as string | undefined,
-        address_postal_code: (playerData as Record<string, unknown>)['addressPostalCode'] as string | undefined,
+        player_bio: (extendedData['playerBiography'] as string) || '',
+        birthplace_country: (extendedData['birthplace'] as string) || '',
+        address_country: (extendedData['addressCountry'] as string) || '',
+        address_region: (extendedData['addressRegion'] as string) || '',
+        address_city: (extendedData['addressCity'] as string) || '',
+        address_street: (extendedData['addressStreet'] as string) || '',
+        address_postal_code: (extendedData['addressPostalCode'] as string) || '',
         penalties_drawn: playerData.penaltiesDrawn,
-        penalty_minutes: 0,
-        faceoffs: 0,
-        faceoffs_won: 0,
-        turnovers: 0,
-        analysis: undefined
       }
     };
   }

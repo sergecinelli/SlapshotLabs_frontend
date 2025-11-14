@@ -207,10 +207,10 @@ export class PlayerFormModalComponent implements OnInit {
       const selectedTeam = this.teamOptions.find(opt => opt.value === formValue.team);
       const teamName = selectedTeam ? selectedTeam.label : formValue.team;
       const teamId = formValue.team; // Keep the team ID
-      
-      const playerData: Partial<Player> = {
+
+      const playerData: Partial<Player> & Record<string, unknown> = {
         team: teamName,
-        ...(teamId && { teamId: teamId }),
+        teamId: teamId,
         birthYear: formValue.birthYear,
         jerseyNumber: formValue.jerseyNumber,
         firstName: formValue.firstName,
@@ -219,33 +219,13 @@ export class PlayerFormModalComponent implements OnInit {
         height: formValue.height,
         weight: formValue.weight,
         shoots: formValue.shoots,
-        // Add new fields
-        ...{
-          birthplace: formValue.birthplace,
-          addressCountry: formValue.addressCountry,
-          addressRegion: formValue.addressRegion,
-          addressCity: formValue.addressCity,
-          addressStreet: formValue.addressStreet,
-          addressPostalCode: formValue.addressPostalCode,
-          playerBiography: formValue.playerBiography
-        },
-        // Set default values for fields not in form
-        level: '',
-        shotsOnGoal: 0,
-        gamesPlayed: 0,
-        goals: 0,
-        assists: 0,
-        scoringChances: 0,
-        blockedShots: 0,
-        penaltiesDrawn: 0,
-        points: 0,
-        shotSprayChart: '',
-        rink: {
-          facilityName: 'Default Facility',
-          rinkName: 'Main Rink',
-          city: 'City',
-          address: 'Address'
-        }
+        birthplace: formValue.birthplace,
+        addressCountry: formValue.addressCountry,
+        addressRegion: formValue.addressRegion,
+        addressCity: formValue.addressCity,
+        addressStreet: formValue.addressStreet,
+        addressPostalCode: formValue.addressPostalCode,
+        playerBiography: formValue.playerBiography
       };
 
       if (this.isEditMode && this.data.player) {

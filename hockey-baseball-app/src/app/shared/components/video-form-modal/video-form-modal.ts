@@ -65,7 +65,7 @@ export class VideoFormModalComponent implements OnInit {
       return null;
     }
     
-    const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com\/(watch\?v=|embed\/)|youtu\.be\/)[\w-]+(&[\w=]*)*$/;
+    const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com\/(watch\?v=|embed\/|shorts\/)|youtu\.be\/)[\w-]+(\?[^\s]*)?$/;
     return youtubeRegex.test(control.value) ? null : { invalidYoutubeUrl: true };
   }
 
