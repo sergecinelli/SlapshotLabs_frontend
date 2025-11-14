@@ -2,6 +2,7 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ApiService } from '../../services/api.service';
 import { Router } from '@angular/router';
+import { environment } from '../../../environments/environment';
 
 interface GameBannerItem {
   id: number;
@@ -9,6 +10,8 @@ interface GameBannerItem {
   away_team_id: number;
   home_team_name: string;
   away_team_name: string;
+  home_team_abbreviation: string | null;
+  away_team_abbreviation: string | null;
   date: string; // YYYY-MM-DD
   time: string; // time string from API
   game_type_name: string;
@@ -16,6 +19,7 @@ interface GameBannerItem {
   rink_name: string;
   home_goals: number;
   away_goals: number;
+  status: number; // 1 = Not Started, 2 = In Progress, 3 = Completed
 }
 
 @Component({
@@ -29,7 +33,7 @@ export class BannerComponent implements OnInit {
   private api = inject(ApiService);
   private router = inject(Router);
 
-  bannerItem = signal<GameBannerItem | null>(null);
+  bannerItems = signal<GameBannerItem[]>([]);
   loading = signal<boolean>(false);
   error = signal<string | null>(null);
 
@@ -42,8 +46,7 @@ export class BannerComponent implements OnInit {
     this.error.set(null);
     this.api.get<GameBannerItem[]>('/hockey/game/list/banner').subscribe({
       next: (items) => {
-        const item = Array.isArray(items) && items.length > 0 ? items[0] : null;
-        this.bannerItem.set(item);
+        this.bannerItems.set(Array.isArray(items) ? items : []);
         this.loading.set(false);
       },
       error: (e) => {
@@ -54,7 +57,24 @@ export class BannerComponent implements OnInit {
     });
   }
 
-  goToLiveDashboard(): void {
-    this.router.navigate([`/live-dashboard/${this.bannerItem()?.id}`]);
+  goToLiveDashboard(gameId: number): void {
+    this.router.navigate([`/live-dashboard/${gameId}`]);
+  }
+
+  onKeyUp(gameId: number): void {
+    console.log('Key up event on game card for game ID:', gameId);
+  }
+
+  getTeamDisplay(abbreviation: string | null, name: string): string {
+    return abbreviation || name;
+  }
+
+  getTeamLogoUrl(teamId: number): string {
+    return `${environment.apiUrl}/hockey/team/${teamId}/logo`;
+  }
+
+  getTimeDisplay(item: GameBannerItem): string {
+    // status: 2 = In Progress
+    return item.status === 2 ? 'In Progress' : item.time;
   }
 }

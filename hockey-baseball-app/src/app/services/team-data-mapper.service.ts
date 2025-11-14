@@ -22,6 +22,7 @@ export class TeamDataMapperService {
       division: this.teamOptionsService.getDivisionName(apiTeam.division_id),
       divisionId: apiTeam.division_id,  // Store ID for form selection
       city: apiTeam.city || '',
+      abbreviation: apiTeam.abbreviation,
       logo: `${environment.apiUrl}/hockey/team/${apiTeam.id}/logo`,  // Logo fetched from separate endpoint
       createdAt: new Date()
     };
@@ -36,7 +37,8 @@ export class TeamDataMapperService {
       age_group: team.group || '1U',
       level_id: this.teamOptionsService.getLevelId(team.level || 'NHL'),
       division_id: this.teamOptionsService.getDivisionId(team.division || 'Atlantic'),
-      city: team.city || ''
+      city: team.city || '',
+      abbreviation: team.abbreviation
     };
   }
 
@@ -66,6 +68,9 @@ export class TeamDataMapperService {
     }
     if (team.city !== undefined) {
       updateData.city = team.city;
+    }
+    if (team.abbreviation !== undefined) {
+      updateData.abbreviation = team.abbreviation;
     }
     
     return updateData;

@@ -1,7 +1,28 @@
-@if (bannerItem(); as item) {
-  <button class="live-banner" (click)="goToLiveDashboard()" title="Go To LIVE Game Dashboard">
-    <span class="label">On Now:</span>
-    <span class="match">{{ item.away_team_name }} @ {{ item.home_team_name }}</span>
-    <span class="cta">- Go To LIVE Game Dashboard</span>
-  </button>
+@if (bannerItems().length > 0) {
+  <div class="banner-container">
+    @for (item of bannerItems(); track item.id) {
+      <div class="game-card" role="button" (click)="goToLiveDashboard(item.id)" aria-hidden="true" title="Go To LIVE Game Dashboard">
+        <div class="game-header">
+          <span class="game-type">{{ item.game_type_name }}</span>
+          <span class="period">Period {{ item.rink_name }}</span>
+        </div>
+        
+        <div class="teams-section">
+          <div class="team-row away">
+            <img [src]="getTeamLogoUrl(item.away_team_id)" [alt]="item.away_team_name" class="team-logo">
+            <span class="team-name">{{ getTeamDisplay(item.away_team_abbreviation, item.away_team_name) }}</span>
+            <span class="score">{{ item.away_goals }}</span>
+          </div>
+          
+          <div class="team-row home">
+            <img [src]="getTeamLogoUrl(item.home_team_id)" [alt]="item.home_team_name" class="team-logo">
+            <span class="team-name">{{ getTeamDisplay(item.home_team_abbreviation, item.home_team_name) }}</span>
+            <span class="score">{{ item.home_goals }}</span>
+          </div>
+        </div>
+        
+        <div class="time">{{ getTimeDisplay(item) }}</div>
+      </div>
+    }
+  </div>
 }

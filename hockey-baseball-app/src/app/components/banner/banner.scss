@@ -1,28 +1,86 @@
-.live-banner {
-  display: inline-flex;
+.banner-container {
+  display: flex;
+  gap: 0px;
   align-items: center;
-  gap: 8px;
-  padding: 10px 14px;
+  overflow-x: auto;
+  padding: 0;
   width: 100%;
-  justify-items: center;
-  justify-content: center;
-  max-width: 800px;
-  border: 1px solid #4F4E55;
+  height: 100%;
+}
+
+.game-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 180px;
+  padding: 0px;
+  border: 1px solid #333;
   border-radius: 8px;
   background: #fff;
-  color: #dc2626;
-  font-size: 14px;
+  font-size: 13px;
+  gap: 0px;
+  flex-shrink: 0;
   cursor: pointer;
+  transition: all 0.2s;
 }
 
-.live-banner .label {
-  font-weight: 700;
+.game-card:hover {
+  border-color: #dc2626;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.live-banner .match {
-  font-weight: 500;
-}
-
-.live-banner .cta {
+.game-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   font-weight: 600;
+  font-size: 12px;
+}
+
+.game-type {
+  color: #000;
+}
+
+.period {
+  color: #000;
+}
+
+.teams-section {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.team-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.team-logo {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.team-name {
+  font-weight: 600;
+  color: #000;
+  font-size: 13px;
+  flex: 1;
+}
+
+.score {
+  font-weight: 700;
+  font-size: 16px;
+  color: #000;
+  min-width: 20px;
+  text-align: right;
+}
+
+.time {
+  text-align: end;
+  font-weight: 600;
+  font-size: 11px;
+  color: #000;
 }
