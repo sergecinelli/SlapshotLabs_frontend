@@ -1,10 +1,19 @@
 @if (bannerItems().length > 0) {
   <div class="banner-container">
     @for (item of bannerItems(); track item.id) {
-      <div class="game-card" role="button" (click)="goToLiveDashboard(item.id)" aria-hidden="true" title="Go To LIVE Game Dashboard">
+      <div 
+        class="game-card" 
+        [class.clickable]="item.status === 2"
+        role="button" 
+        (click)="item.status === 2 && goToLiveDashboard(item.id)" 
+        aria-hidden="true" 
+        [title]="item.status === 2 ? 'Go To Game Dashboard' : ''">
+        
         <div class="game-header">
-          <span class="game-type">{{ item.game_type_name }}</span>
-          <span class="period">Period {{ item.rink_name }}</span>
+          <span class="game-type">{{ `${item.arena_name} ${item.rink_name}` }}</span>
+          @if (item.status !== 1) {
+            <span class="period">{{ item.game_period_name }}</span>
+          }
         </div>
         
         <div class="teams-section">
@@ -22,6 +31,12 @@
         </div>
         
         <div class="time">{{ getTimeDisplay(item) }}</div>
+        
+        @if (item.status === 2) {
+          <div class="hover-overlay">
+            <span class="view-label">View Game Dashboard</span>
+          </div>
+        }
       </div>
     }
   </div>

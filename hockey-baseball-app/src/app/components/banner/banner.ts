@@ -15,6 +15,7 @@ interface GameBannerItem {
   date: string; // YYYY-MM-DD
   time: string; // time string from API
   game_type_name: string;
+  game_period_name: string;
   arena_name: string;
   rink_name: string;
   home_goals: number;
@@ -75,6 +76,28 @@ export class BannerComponent implements OnInit {
 
   getTimeDisplay(item: GameBannerItem): string {
     // status: 2 = In Progress
-    return item.status === 2 ? 'In Progress' : item.time;
+    if (item.status === 2) {
+      return 'In Progress';
+    }
+    // status: 1 = Not Started, format time as 12-hour clock
+    if (item.status === 1) {
+      return this.formatTimeTo12Hour(item.time);
+    }
+    return item.time;
+  }
+
+  private formatTimeTo12Hour(time: string): string {
+    // Parse time string (assuming format like "17:30:00" or "17:30")
+    const timeParts = time.split(':');
+    if (timeParts.length < 2) return time;
+    
+    let hours = parseInt(timeParts[0], 10);
+    const minutes = timeParts[1];
+    
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    hours = hours ? hours : 12; // Convert 0 to 12
+    
+    return `${hours}:${minutes} ${ampm}`;
   }
 }
