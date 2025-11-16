@@ -86,6 +86,17 @@ export class BannerComponent implements OnInit {
     return item.time;
   }
 
+  getDateDisplay(dateString: string): string {
+    // Parse YYYY-MM-DD format
+    const date = new Date(dateString);
+    const options: Intl.DateTimeFormatOptions = { 
+      month: 'short', 
+      day: 'numeric', 
+      year: 'numeric' 
+    };
+    return date.toLocaleDateString('en-US', options);
+  }
+
   private formatTimeTo12Hour(time: string): string {
     // Parse time string (assuming format like "17:30:00" or "17:30")
     const timeParts = time.split(':');

@@ -30,7 +30,12 @@
           </div>
         </div>
         
-        <div class="time">{{ getTimeDisplay(item) }}</div>
+        <div class="time">
+          @if (item.status === 1) {
+            <span class="date mr-1.5">{{ getDateDisplay(item.date) }}</span>
+          }
+          <span>{{ getTimeDisplay(item) }}</span>
+        </div>
         
         @if (item.status === 2) {
           <div class="hover-overlay">
