@@ -1,0 +1,52 @@
+<div class="shot-location-display-container">
+  <!-- Stats Labels -->
+  <div class="stats-labels">
+    @for (stat of stats(); track stat.type) {
+      <div class="stat-label">
+        <span class="stat-dot" [style.background-color]="stat.color"></span>
+        <span class="stat-text">{{ stat.label }}: {{ stat.count }}</span>
+      </div>
+    }
+  </div>
+
+  <!-- Location Images Grid -->
+  <div class="location-images">
+    <!-- Rink Image -->
+    <div class="location-container">
+      <div class="location-wrapper">
+        <img 
+          src="/assets/images/hockey-rink.svg" 
+          alt="Hockey Rink"
+          class="location-image"
+        />
+        @for (item of rinkItems(); track $index) {
+          <div 
+            class="location-marker"
+            [style.top.%]="item.iceTopOffset"
+            [style.left.%]="item.iceLeftOffset"
+            [style.background-color]="item.color"
+          ></div>
+        }
+      </div>
+    </div>
+
+    <!-- Net Image -->
+    <div class="location-container">
+      <div class="location-wrapper">
+        <img 
+          src="/assets/images/net.svg" 
+          alt="Net"
+          class="location-image"
+        />
+        @for (item of netItems(); track $index) {
+          <div 
+            class="location-marker"
+            [style.top.%]="item.netTopOffset"
+            [style.left.%]="item.netLeftOffset"
+            [style.background-color]="item.color"
+          ></div>
+        }
+      </div>
+    </div>
+  </div>
+</div>

@@ -144,6 +144,19 @@
       </mat-card-content>
     </mat-card>
 
+    <!-- Shot Location Display Card -->
+    <mat-card class="info-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>sports_hockey</mat-icon>
+          Shot Locations
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <app-shot-location-display [data]="getShotLocationData()"></app-shot-location-display>
+      </mat-card-content>
+    </mat-card>
+
     <!-- Season Stats Table -->
     <mat-card class="info-card stats-table-card">
       <mat-card-header>

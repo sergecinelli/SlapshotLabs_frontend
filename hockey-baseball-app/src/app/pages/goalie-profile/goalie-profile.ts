@@ -8,6 +8,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatTableModule } from '@angular/material/table';
 import { GoalieService } from '../../services/goalie.service';
 import { Goalie, GoalieSeasonStats, GoalieRecentGameStats } from '../../shared/interfaces/goalie.interface';
+import { ShotLocationDisplayComponent, ShotLocationData } from '../../shared/components/shot-location-display/shot-location-display';
 
 @Component({
   selector: 'app-goalie-profile',
@@ -18,7 +19,8 @@ import { Goalie, GoalieSeasonStats, GoalieRecentGameStats } from '../../shared/i
     MatIconModule,
     MatCardModule,
     MatDividerModule,
-    MatTableModule
+    MatTableModule,
+    ShotLocationDisplayComponent
   ],
   templateUrl: './goalie-profile.html',
   styleUrl: './goalie-profile.scss'
@@ -203,6 +205,81 @@ export class GoalieProfileComponent implements OnInit {
         shotsAgainst: 28,
         saves: 23,
         savePercentage: 0.821
+      }
+    ];
+  }
+
+  getShotLocationData(): ShotLocationData[] {
+    return [
+      {
+        iceTopOffset: 25,
+        iceLeftOffset: 75,
+        netTopOffset: 30,
+        netLeftOffset: 40,
+        type: 'Goal'
+      },
+      {
+        iceTopOffset: 45,
+        iceLeftOffset: 80,
+        netTopOffset: 50,
+        netLeftOffset: 55,
+        type: 'Goal'
+      },
+      {
+        iceTopOffset: 35,
+        iceLeftOffset: 70,
+        netTopOffset: 45,
+        netLeftOffset: 50,
+        type: 'Save'
+      },
+      {
+        iceTopOffset: 55,
+        iceLeftOffset: 85,
+        netTopOffset: 60,
+        netLeftOffset: 70,
+        type: 'Save'
+      },
+      {
+        iceTopOffset: 50,
+        iceLeftOffset: 65,
+        netTopOffset: 55,
+        netLeftOffset: 35,
+        type: 'Save'
+      },
+      {
+        iceTopOffset: 30,
+        iceLeftOffset: 78,
+        netTopOffset: null,
+        netLeftOffset: null,
+        type: 'Scoring Chance'
+      },
+      {
+        iceTopOffset: 60,
+        iceLeftOffset: 72,
+        netTopOffset: null,
+        netLeftOffset: null,
+        type: 'Scoring Chance'
+      },
+      {
+        iceTopOffset: 20,
+        iceLeftOffset: 40,
+        netTopOffset: null,
+        netLeftOffset: null,
+        type: 'Penalty'
+      },
+      {
+        iceTopOffset: 70,
+        iceLeftOffset: 60,
+        netTopOffset: null,
+        netLeftOffset: null,
+        type: 'Turnover'
+      },
+      {
+        iceTopOffset: 40,
+        iceLeftOffset: 82,
+        netTopOffset: 42,
+        netLeftOffset: 48,
+        type: 'Save'
       }
     ];
   }
