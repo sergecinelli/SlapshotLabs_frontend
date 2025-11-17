@@ -1182,7 +1182,8 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
           iceTopOffset: rawEvent.ice_top_offset,
           iceLeftOffset: rawEvent.ice_left_offset,
           netTopOffset: rawEvent.net_top_offset,
-          netLeftOffset: rawEvent.net_left_offset
+          netLeftOffset: rawEvent.net_left_offset,
+          goalType: rawEvent.goal_type
         }
       }
     });

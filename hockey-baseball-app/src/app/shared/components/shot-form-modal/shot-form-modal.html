@@ -113,6 +113,33 @@
             {{ getErrorMessage('goalieScored') }}
           </div>
         </div>
+
+        <div class="goal-type-container">
+          <div class="goal-type-label uppercase text-custom-secondary">Goal Type</div>
+          <div class="goal-type-buttons">
+            <button 
+              type="button"
+              class="goal-type-button"
+              [class.selected]="shotForm.get('goalType')?.value === 'Short Handed'"
+              (click)="selectGoalType('Short Handed')">
+              <div class="goal-type-name">Short Handed</div>
+            </button>
+            <button 
+              type="button"
+              class="goal-type-button"
+              [class.selected]="shotForm.get('goalType')?.value === 'Even Strength'"
+              (click)="selectGoalType('Even Strength')">
+              <div class="goal-type-name">Even Strength</div>
+            </button>
+            <button 
+              type="button"
+              class="goal-type-button"
+              [class.selected]="shotForm.get('goalType')?.value === 'Power Play'"
+              (click)="selectGoalType('Power Play')">
+              <div class="goal-type-name">Power Play</div>
+            </button>
+          </div>
+        </div>
       </div>
 
       <!-- Save/Missed/Blocked Section -->

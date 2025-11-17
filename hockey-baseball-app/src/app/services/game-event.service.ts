@@ -93,6 +93,7 @@ export interface ShotEventRequest {
   ice_left_offset?: number;
   net_top_offset?: number;
   net_left_offset?: number;
+  goal_type?: string; // Goal type: "Short Handed", "Even Strength", "Power Play"
 }
 
 @Injectable({
@@ -236,7 +237,8 @@ export class GameEventService {
       ice_top_offset: shotData.ice_top_offset,
       ice_left_offset: shotData.ice_left_offset,
       net_top_offset: shotData.net_top_offset,
-      net_left_offset: shotData.net_left_offset
+      net_left_offset: shotData.net_left_offset,
+      goal_type: shotData.goal_type
     };
 
     return this.createGameEvent(eventData);

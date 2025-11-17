@@ -25,6 +25,7 @@ export interface ShotFormData {
   scoringPlayer?: string;
   assistPlayer?: string;
   goalieScored?: string;
+  goalType?: string;
   // For saves/missed/blocked
   shootingTeam?: string;
   shootingPlayer?: string;
@@ -88,6 +89,7 @@ export class ShotFormModalComponent implements OnInit {
       netTopOffset?: number;
       netLeftOffset?: number;
       zone?: string;
+      goalType?: string;
     };
   }>(MAT_DIALOG_DATA);
 
@@ -172,7 +174,8 @@ export class ShotFormModalComponent implements OnInit {
         shootingPlayer: existing.playerId,
         assistPlayer: existing.player2Id,
         goalieScored: existing.goalieId,
-        goalieInNet: existing.goalieId
+        goalieInNet: existing.goalieId,
+        goalType: existing.goalType || 'Short Handed'
       });
       
       if (existing.teamId) {
@@ -211,6 +214,7 @@ export class ShotFormModalComponent implements OnInit {
       scoringPlayer: [null as number | null],
       assistPlayer: [null as number | null],
       goalieScored: [null as number | null],
+      goalType: ['Short Handed'], // Default value
       // Save/Missed/Blocked fields
       shootingTeam: [null as number | null],
       shootingPlayer: [null as number | null],
@@ -385,6 +389,11 @@ export class ShotFormModalComponent implements OnInit {
     this.shotForm.get(fieldName)?.markAsTouched();
   }
 
+  selectGoalType(goalType: string): void {
+    this.shotForm.patchValue({ goalType });
+    this.shotForm.get('goalType')?.markAsTouched();
+  }
+
   getTeamLogoUrl(teamId: number): string {
     return `${environment.apiUrl}/hockey/team/${teamId}/logo`;
   }
@@ -442,7 +451,8 @@ export class ShotFormModalComponent implements OnInit {
         ice_top_offset: this.shotLocation?.rinkLocation.y,
         ice_left_offset: this.shotLocation?.rinkLocation.x,
         net_top_offset: this.shotLocation?.netLocation?.y,
-        net_left_offset: this.shotLocation?.netLocation?.x
+        net_left_offset: this.shotLocation?.netLocation?.x,
+        goal_type: this.isGoal ? formValue.goalType : undefined
       };
 
       // Edit or create based on mode
