@@ -1,4 +1,4 @@
-import { Component, input, computed, ChangeDetectionStrategy } from '@angular/core';
+import { Component, input, computed, ChangeDetectionStrategy, signal, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 export interface ShotLocationData {
@@ -25,7 +25,21 @@ interface TypeStats {
   }
 })
 export class ShotLocationDisplayComponent {
+  private readonly STORAGE_KEY = 'shotLocationFilters';
+  
   data = input.required<ShotLocationData[]>();
+  visibleTypes = signal<Set<ShotLocationData['type']>>(new Set());
+
+  constructor() {
+    // Load filters from local storage on initialization
+    this.loadFiltersFromStorage();
+    
+    // Save filters to local storage whenever they change
+    effect(() => {
+      const filters = Array.from(this.visibleTypes());
+      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(filters));
+    });
+  }
 
   private readonly typeColors: Record<ShotLocationData['type'], string> = {
     'Goal': '#22c55e',
@@ -46,6 +60,7 @@ export class ShotLocationDisplayComponent {
   stats = computed(() => {
     const data = this.data();
     const statsMap = new Map<ShotLocationData['type'], TypeStats>();
+    const visible = this.visibleTypes();
 
     data.forEach(item => {
       const existing = statsMap.get(item.type);
@@ -62,23 +77,55 @@ export class ShotLocationDisplayComponent {
     return Array.from(statsMap.entries()).map(([type, stats]) => ({
       type,
       label: this.typePlurals[type],
+      isVisible: visible.has(type),
       ...stats
     }));
   });
 
   rinkItems = computed(() => {
-    return this.data().map(item => ({
-      ...item,
-      color: this.typeColors[item.type]
-    }));
-  });
-
-  netItems = computed(() => {
+    const visible = this.visibleTypes();
     return this.data()
-      .filter(item => item.netTopOffset != null && item.netLeftOffset != null)
+      .filter(item => visible.has(item.type))
       .map(item => ({
         ...item,
         color: this.typeColors[item.type]
       }));
   });
+
+  netItems = computed(() => {
+    const visible = this.visibleTypes();
+    return this.data()
+      .filter(item => item.netTopOffset != null && item.netLeftOffset != null)
+      .filter(item => visible.has(item.type))
+      .map(item => ({
+        ...item,
+        color: this.typeColors[item.type]
+      }));
+  });
+
+  toggleType(type: ShotLocationData['type']): void {
+    const current = new Set(this.visibleTypes());
+    if (current.has(type)) {
+      current.delete(type);
+    } else {
+      current.add(type);
+    }
+    this.visibleTypes.set(current);
+  }
+
+  private loadFiltersFromStorage(): void {
+    try {
+      const stored = localStorage.getItem(this.STORAGE_KEY);
+      if (stored) {
+        const filters = JSON.parse(stored) as ShotLocationData['type'][];
+        this.visibleTypes.set(new Set(filters));
+      } else {
+        // By default, show all types
+        this.visibleTypes.set(new Set(['Goal', 'Save', 'Scoring Chance', 'Penalty', 'Turnover']));
+      }
+    } catch (error) {
+      // If there's an error parsing, default to showing all types
+      this.visibleTypes.set(new Set(['Goal', 'Save', 'Scoring Chance', 'Penalty', 'Turnover']));
+    }
+  }
 }

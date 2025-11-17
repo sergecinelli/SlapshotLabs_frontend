@@ -2,7 +2,11 @@
   <!-- Stats Labels -->
   <div class="stats-labels">
     @for (stat of stats(); track stat.type) {
-      <div class="stat-label">
+      <div 
+        class="stat-label" 
+        [class.inactive]="!stat.isVisible"
+        (click)="toggleType(stat.type)"
+      >
         <span class="stat-dot" [style.background-color]="stat.color"></span>
         <span class="stat-text">{{ stat.label }}: {{ stat.count }}</span>
       </div>
