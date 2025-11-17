@@ -7,6 +7,7 @@
     "start:server": "node server.js",
     "build": "ng build",
     "build:prod": "ng build --configuration=production",
+    "build:staging": "ng build --configuration=staging",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "format": "prettier --write \"src/**/*.{ts,html,scss,css,json}\"",

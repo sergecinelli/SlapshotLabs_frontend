@@ -6,6 +6,7 @@ export interface TeamApiOut {
   level_id: number;
   division_id: number;
   city: string;
+  abbreviation?: string;
 }
 
 export interface TeamApiIn {
@@ -14,6 +15,7 @@ export interface TeamApiIn {
   level_id: number;
   division_id: number;
   city: string;
+  abbreviation?: string;
 }
 
 // Frontend interface
@@ -27,6 +29,7 @@ export interface Team {
   divisionId?: number;  // Store division ID for form selection
   city: string;
   logo: string;
+  abbreviation?: string;
   createdAt?: Date;  // Creation date for sorting
   [key: string]: unknown;  // Index signature for compatibility with Record<string, unknown>
 }

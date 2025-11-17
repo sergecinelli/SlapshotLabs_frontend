@@ -76,6 +76,16 @@
             </mat-error>
           </mat-form-field>
 
+          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+            <mat-label class="uppercase text-custom-secondary">Abbreviation</mat-label>
+            <input matInput formControlName="abbreviation" placeholder="Enter abbreviation">
+            <mat-error *ngIf="teamForm.get('abbreviation')?.errors && teamForm.get('abbreviation')?.touched">
+              {{ getErrorMessage('abbreviation') }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
           <div class="form-field logo-picker-container">
             <div class="uppercase text-custom-secondary logo-label">Team Logo</div>
             

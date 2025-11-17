@@ -238,10 +238,8 @@ export class TeamsComponent implements OnInit {
     const { logoFile, ...team } = teamData;
     this.teamService.addTeam(team, logoFile).subscribe({
       next: (newTeam) => {
-        const currentTeams = this.teams();
-        // Add new team at the beginning (newest first)
-        const updatedTeams = [newTeam, ...currentTeams];
-        this.teams.set(updatedTeams);
+        // Refresh the entire list to ensure data consistency
+        this.loadTeams();
         // this.snackBar.open(
         //   `Team ${newTeam.name} added successfully`,
         //   'Close',
