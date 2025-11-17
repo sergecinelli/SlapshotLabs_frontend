@@ -79,31 +79,33 @@
   <div class="flex-1 flex flex-col overflow-hidden">
     <!-- Header -->
     <header class="bg-white h-[120px] flex justify-between">
-      <!-- Left: Live banner -->
-      <div class="bg-white px-6 py-0 flex items-center w-full">
-        <app-live-banner class="w-full"></app-live-banner>
-      </div>
-      <!-- Right: Support / Alerts / Logout -->
-      <div class="bg-white px-6 py-6 flex items-center justify-end">
-        <div class="flex items-center space-x-6  my-auto">
-          <a href="#" class="flex items-center space-x-2 text-custom-secondary hover:text-custom-dark font-medium text-sm">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192L5.636 18.364M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
-            </svg>
-            <span>Support</span>
-          </a>
-          <a href="#" class="flex items-center space-x-2 text-custom-secondary hover:text-custom-dark font-medium text-sm">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5zM9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <span>Alerts</span>
-          </a>
-          <button (click)="logout()" class="flex items-center space-x-2 text-custom-primary hover:text-red-800 font-medium text-sm bg-transparent border-none cursor-pointer">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-            </svg>
-            <span>Logout</span>
-          </button>
+      <div class="flex w-full h-full">
+        <!-- Live banner: horizontally scrollable -->
+        <div class="flex-1 min-w-0 flex items-center bg-white px-6 py-0 overflow-x-auto no-scrollbar">
+          <app-live-banner class="w-full min-w-max"></app-live-banner>
+        </div>
+        <!-- Right: Support / Alerts / Logout, fixed width -->
+        <div class="flex items-center justify-end bg-white pr-6 py-6" style="min-width:260px; max-width:270px; flex:0 0 270px;">
+          <div class="flex items-center space-x-6 my-auto">
+            <a href="#" class="flex items-center space-x-2 text-custom-secondary hover:text-custom-dark font-medium text-sm">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192L5.636 18.364M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
+              </svg>
+              <span>Support</span>
+            </a>
+            <a href="#" class="flex items-center space-x-2 text-custom-secondary hover:text-custom-dark font-medium text-sm">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5zM9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>Alerts</span>
+            </a>
+            <button (click)="logout()" class="flex items-center space-x-2 text-custom-primary hover:text-red-800 font-medium text-sm bg-transparent border-none cursor-pointer">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+              <span>Logout</span>
+            </button>
+          </div>
         </div>
       </div>
     </header>

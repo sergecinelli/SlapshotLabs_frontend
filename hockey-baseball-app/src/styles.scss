@@ -38,6 +38,19 @@ $custom-secondary-palette: (
   100: #ffffff,
 );
 
+@layer utilities {
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Hide scrollbar for IE, Edge and Firefox */
+  .no-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+}
+
 html {
   @include mat.theme(
     (
@@ -128,7 +141,7 @@ body {
 .loading-button {
   background-color: var(--color-secondary) !important;
   color: white !important;
-  
+
   &.mat-mdc-outlined-button {
     border-color: var(--color-secondary) !important;
   }
@@ -136,7 +149,7 @@ body {
 
 .resend-button {
   transition: all 0.3s ease;
-  
+
   &:disabled {
     opacity: 1 !important;
     cursor: not-allowed;
@@ -144,7 +157,7 @@ body {
     color: white !important;
     border-color: var(--color-secondary) !important;
   }
-  
+
   &:not(:disabled):hover {
     opacity: 0.9;
   }
@@ -227,16 +240,16 @@ mat-error {
   color: var(--color-dark) !important;
   min-height: 48px !important;
   padding: 0 16px !important;
-  
+
   &:hover:not(.mdc-list-item--disabled) {
     background-color: #f3f4f6 !important;
   }
-  
+
   &.mdc-list-item--selected:not(.mdc-list-item--disabled) {
     background-color: var(--color-primary) !important;
     color: white !important;
   }
-  
+
   &.mat-mdc-option-active {
     background-color: rgba(207, 20, 43, 0.1) !important;
     color: var(--color-primary) !important;
@@ -249,7 +262,7 @@ mat-error {
 
 .cdk-overlay-container .cdk-overlay-pane {
   z-index: 1100 !important;
-  
+
   &.mat-mdc-select-panel-above {
     z-index: 1101 !important;
   }
@@ -269,11 +282,11 @@ mat-error {
   .mat-mdc-select-value {
     color: var(--color-dark) !important;
   }
-  
+
   .mat-mdc-select-arrow {
     color: var(--color-secondary) !important;
   }
-  
+
   &.mat-mdc-select-focused {
     .mat-mdc-select-arrow {
       color: var(--color-primary) !important;
@@ -284,32 +297,32 @@ mat-error {
 ::ng-deep .goalie-form-modal-dialog {
   .mat-mdc-form-field {
     font-size: 14px !important;
-    
+
     .mat-mdc-input-element {
       font-size: 14px !important;
     }
-    
+
     .mdc-floating-label {
       font-size: 12px !important;
     }
-    
+
     .mat-mdc-form-field-subscript-wrapper {
       font-size: 12px !important;
     }
-    
+
     .mat-mdc-select-value {
       font-size: 14px !important;
     }
-    
+
     .mat-mdc-select-trigger {
       font-size: 14px !important;
     }
   }
-  
+
   .mat-mdc-option {
     font-size: 14px !important;
   }
-  
+
   mat-error {
     font-size: 12px !important;
   }
@@ -317,11 +330,11 @@ mat-error {
 
 .cdk-overlay-container .cdk-overlay-pane .mat-mdc-select-panel .mat-mdc-option {
   font-size: 14px !important;
-  
+
   .mdc-list-item__primary-text {
     font-size: 14px !important;
   }
-  
+
   span {
     font-size: 14px !important;
   }
@@ -337,7 +350,7 @@ mat-error {
   font-size: 14px !important;
 }
 
-.cdk-overlay-pane[aria-label*="select"] .mat-mdc-option,
+.cdk-overlay-pane[aria-label*='select'] .mat-mdc-option,
 .cdk-overlay-pane .mat-mdc-select-panel .mat-mdc-option {
   font-size: 14px !important;
 }
