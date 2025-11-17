@@ -10,35 +10,6 @@
     </div>
     <form [formGroup]="playerForm" class="player-form" *ngIf="!isLoading">
       
-      <!-- Team Information Section -->
-      <div class="form-section">
-        <div class="section-header">
-          <span class="section-title">Team Information</span>
-        </div>
-        <mat-divider class="section-divider"></mat-divider>
-        <div class="form-row">
-          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
-            <mat-label class="uppercase text-custom-secondary">Team</mat-label>
-            <mat-select formControlName="team" placeholder="Select team">
-              <mat-option *ngFor="let team of teamOptions" [value]="team.value">
-                {{ team.label }}
-              </mat-option>
-            </mat-select>
-            <mat-error *ngIf="playerForm.get('team')?.errors && playerForm.get('team')?.touched">
-              {{ getErrorMessage('team') }}
-            </mat-error>
-          </mat-form-field>
-
-          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
-            <mat-label class="uppercase text-custom-secondary">Birth Year:</mat-label>
-            <input matInput type="number" formControlName="birthYear" placeholder="Enter birth year">
-            <mat-error *ngIf="playerForm.get('birthYear')?.errors && playerForm.get('birthYear')?.touched">
-              {{ getErrorMessage('birthYear') }}
-            </mat-error>
-          </mat-form-field>
-        </div>
-      </div>
-
       <!-- Personal Information Section -->
       <div class="form-section">
         <div class="section-header">
@@ -67,6 +38,14 @@
             <input matInput formControlName="lastName" placeholder="Enter last name">
             <mat-error *ngIf="playerForm.get('lastName')?.errors && playerForm.get('lastName')?.touched">
               {{ getErrorMessage('lastName') }}
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+            <mat-label class="uppercase text-custom-secondary">Birth Year:</mat-label>
+            <input matInput type="number" formControlName="birthYear" placeholder="Enter birth year">
+            <mat-error *ngIf="playerForm.get('birthYear')?.errors && playerForm.get('birthYear')?.touched">
+              {{ getErrorMessage('birthYear') }}
             </mat-error>
           </mat-form-field>
 

@@ -18,6 +18,8 @@ export interface PlayerFormModalData {
   player?: Player;
   isEditMode: boolean;
   teams?: Team[];  // Optional: pass teams to avoid redundant API calls
+  teamId?: string;  // Team ID to assign new players to
+  teamName?: string;  // Team name for display
 }
 
 export interface TeamOption {
@@ -123,8 +125,10 @@ export class PlayerFormModalComponent implements OnInit {
   private setDefaultFormValues(): void {
     const defaultValues: Record<string, string> = {};
     
-    // Set first team as default
-    if (this.teamOptions.length > 0) {
+    // Set team from data if provided, otherwise use first team
+    if (this.data.teamId) {
+      defaultValues['team'] = this.data.teamId;
+    } else if (this.teamOptions.length > 0) {
       defaultValues['team'] = this.teamOptions[0].value;
     }
     

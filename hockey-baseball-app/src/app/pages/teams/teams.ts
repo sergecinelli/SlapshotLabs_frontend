@@ -72,7 +72,8 @@ export class TeamsComponent implements OnInit {
   tableActions: TableAction[] = [
     { label: 'Delete', action: 'delete', variant: 'danger' },
     { label: 'Edit', action: 'edit', variant: 'secondary' },
-    { label: 'View', action: 'view-profile', variant: 'primary' }
+    { label: 'View', action: 'view-profile', variant: 'primary' },
+    { label: 'Players', action: 'players', variant: 'secondary' }
   ];
 
   ngOnInit(): void {
@@ -122,6 +123,9 @@ export class TeamsComponent implements OnInit {
         break;
       case 'view-profile':
         this.viewTeamProfile(item);
+        break;
+      case 'players':
+        this.viewTeamPlayers(item);
         break;
       default:
         console.log(`Unknown action: ${action}`);
@@ -193,6 +197,14 @@ export class TeamsComponent implements OnInit {
     // Build the full URL including the base URL
     const baseUrl = window.location.origin;
     const url = `${baseUrl}/team-profile/${team.id}`;
+    
+    window.location.assign(url);
+  }
+
+  private viewTeamPlayers(team: Team): void {
+    // Navigate to players page with team context
+    const baseUrl = window.location.origin;
+    const url = `${baseUrl}/players?teamId=${team.id}&teamName=${encodeURIComponent(team.name)}`;
     
     window.location.assign(url);
   }

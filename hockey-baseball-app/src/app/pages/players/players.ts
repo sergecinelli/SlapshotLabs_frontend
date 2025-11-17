@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { ActivatedRoute } from '@angular/router';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header';
 import { DataTableComponent, TableColumn, TableAction } from '../../shared/components/data-table/data-table';
 import { PlayerService } from '../../services/player.service';
@@ -17,7 +18,7 @@ import { PlayerFormModalComponent, PlayerFormModalData } from '../../shared/comp
   imports: [CommonModule, PageHeaderComponent, DataTableComponent, MatButtonModule, MatIconModule, MatDialogModule],
   template: `
     <div class="p-6 pt-0">
-      <app-page-header title="Players"></app-page-header>
+      <app-page-header [title]="pageTitle()"></app-page-header>
       
       <!-- Add Player Button -->
       <div class="mb-4 flex justify-end">
@@ -32,7 +33,7 @@ import { PlayerFormModalComponent, PlayerFormModalData } from '../../shared/comp
       </div>
       
       <app-data-table
-        [columns]="tableColumns"
+        [columns]="tableColumns()"
         [data]="players()"
         [actions]="tableActions"
         [loading]="loading()"
@@ -48,12 +49,16 @@ export class PlayersComponent implements OnInit {
   private playerService = inject(PlayerService);
   private teamService = inject(TeamService);
   private dialog = inject(MatDialog);
+  private route = inject(ActivatedRoute);
 
   players = signal<Player[]>([]);
   teams: Team[] = [];
   loading = signal(true);
+  teamId = signal<string | null>(null);
+  teamName = signal<string>('Players');
+  pageTitle = signal<string>('Players');
 
-  tableColumns: TableColumn[] = [
+  private allTableColumns: TableColumn[] = [
     { key: 'team', label: 'Team', sortable: true, type: 'dropdown', width: '100px' },
     { key: 'position', label: 'Pos', sortable: true, type: 'dropdown', width: '100px' },
     { key: 'height', label: 'Ht', sortable: true, width: '65px' },
@@ -73,6 +78,8 @@ export class PlayersComponent implements OnInit {
     { key: 'penaltiesDrawn', label: 'Penalties Drawn', sortable: true, type: 'number', width: '120px' }
   ];
 
+  tableColumns = signal<TableColumn[]>(this.allTableColumns);
+
   tableActions: TableAction[] = [
     { label: 'Delete', action: 'delete', variant: 'danger' },
     { label: 'Edit', action: 'edit', variant: 'secondary' },
@@ -81,7 +88,29 @@ export class PlayersComponent implements OnInit {
   ];
 
   ngOnInit(): void {
-    this.loadPlayers();
+    // Check for teamId query parameter
+    this.route.queryParams.subscribe(params => {
+      const teamId = params['teamId'];
+      const teamName = params['teamName'];
+      
+      if (teamId) {
+        this.teamId.set(teamId);
+        if (teamName) {
+          this.teamName.set(teamName);
+          this.pageTitle.set(`${teamName} Players`);
+        }
+        // Hide team column when viewing team-specific players
+        this.tableColumns.set(this.allTableColumns.filter(col => col.key !== 'team'));
+        this.loadPlayersByTeam(parseInt(teamId, 10));
+      } else {
+        this.teamId.set(null);
+        this.teamName.set('Players');
+        this.pageTitle.set('Players');
+        // Show all columns including team
+        this.tableColumns.set(this.allTableColumns);
+        this.loadPlayers();
+      }
+    });
   }
 
   private loadPlayers(): void {
@@ -97,6 +126,24 @@ export class PlayersComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading players:', error);
+        this.loading.set(false);
+      }
+    });
+  }
+
+  private loadPlayersByTeam(teamId: number): void {
+    this.loading.set(true);
+    this.playerService.getPlayersByTeam(teamId).subscribe({
+      next: (players) => {
+        // Sort by creation date (newest to oldest) by default
+        const sortedPlayers = this.sortByDate(players, 'desc');
+        this.players.set(sortedPlayers);
+        this.loading.set(false);
+        // Fetch all teams separately for modals
+        this.loadTeams();
+      },
+      error: (error) => {
+        console.error('Error loading players for team:', error);
         this.loading.set(false);
       }
     });
@@ -214,7 +261,9 @@ export class PlayersComponent implements OnInit {
       maxWidth: '95vw',
       data: {
         isEditMode: false,
-        teams: this.teams
+        teams: this.teams,
+        teamId: this.teamId(),
+        teamName: this.teamName()
       } as PlayerFormModalData,
       panelClass: 'player-form-modal-dialog',
       disableClose: true
@@ -253,7 +302,9 @@ export class PlayersComponent implements OnInit {
       data: {
         player: player,
         isEditMode: true,
-        teams: this.teams
+        teams: this.teams,
+        teamId: this.teamId(),
+        teamName: this.teamName()
       } as PlayerFormModalData,
       panelClass: 'player-form-modal-dialog',
       disableClose: true

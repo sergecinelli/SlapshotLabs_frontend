@@ -41,11 +41,6 @@ export class NavigationService {
       icon: 'goalies'
     },
     {
-      label: 'Players',
-      path: '/players',
-      icon: 'players'
-    },
-    {
       label: 'Teams',
       path: '/teams',
       icon: 'teams'
