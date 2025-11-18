@@ -1,7 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
+import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -20,6 +20,8 @@ import { ArenaService } from '../../../services/arena.service';
 import { GameMetadataService, GameTypeResponse, GamePeriodResponse } from '../../../services/game-metadata.service';
 import { GoalieService } from '../../../services/goalie.service';
 import { PlayerService } from '../../../services/player.service';
+import { GamePlayerService } from '../../../services/game-player.service';
+import { RosterSelectionModalComponent, RosterSelectionModalData, RosterSelectionResult } from '../roster-selection-modal/roster-selection-modal';
 import { forkJoin } from 'rxjs';
 
 export interface GameData {
@@ -79,11 +81,13 @@ export interface ScheduleFormModalData {
 export class ScheduleFormModalComponent implements OnInit {
   private fb = inject(FormBuilder);
   private dialogRef = inject<MatDialogRef<ScheduleFormModalComponent>>(MatDialogRef);
+  private dialog = inject(MatDialog);
   private teamService = inject(TeamService);
   private arenaService = inject(ArenaService);
   private gameMetadataService = inject(GameMetadataService);
   private goalieService = inject(GoalieService);
   private playerService = inject(PlayerService);
+  private gamePlayerService = inject(GamePlayerService);
   data = inject<ScheduleFormModalData>(MAT_DIALOG_DATA);
 
   scheduleForm: FormGroup;
@@ -107,6 +111,12 @@ export class ScheduleFormModalComponent implements OnInit {
   gameTypeOptions: { value: number; label: string }[] = [];
   gameTypeNameOptions: { value: number; label: string }[] = [];
   selectedGameType: GameTypeResponse | null = null;
+
+  // Roster selection state
+  homeGoalieIds: number[] = [];
+  homePlayerIds: number[] = [];
+  awayGoalieIds: number[] = [];
+  awayPlayerIds: number[] = [];
 
   statusOptions = [
     { value: 1, label: 'Not Started' },
@@ -177,6 +187,13 @@ export class ScheduleFormModalComponent implements OnInit {
         this.populateForm(this.data.schedule);
       }
 
+      // Load roster data if in edit mode
+      if (this.isEditMode && this.data.gameData) {
+        this.loadGameRoster(this.data.gameData.id);
+      } else {
+        this.initializeRosterSelections();
+      }
+
       this.isLoading = false;
     } else {
       // Fetch from API if data not provided
@@ -209,6 +226,13 @@ export class ScheduleFormModalComponent implements OnInit {
           // If in edit mode, populate the form
           if (this.isEditMode && this.data.schedule) {
             this.populateForm(this.data.schedule);
+          }
+
+          // Load roster data if in edit mode
+          if (this.isEditMode && this.data.gameData) {
+            this.loadGameRoster(this.data.gameData.id);
+          } else {
+            this.initializeRosterSelections();
           }
 
           this.isLoading = false;
@@ -411,6 +435,127 @@ export class ScheduleFormModalComponent implements OnInit {
     return status;
   }
 
+  /**
+   * Load game roster data when editing
+   */
+  private loadGameRoster(gameId: number): void {
+    this.gamePlayerService.getGameRoster(gameId).subscribe({
+      next: (roster) => {
+        this.homeGoalieIds = roster.home_goalies.map(g => g.id);
+        this.homePlayerIds = roster.home_players.map(p => p.id);
+        this.awayGoalieIds = roster.away_goalies.map(g => g.id);
+        this.awayPlayerIds = roster.away_players.map(p => p.id);
+      },
+      error: (error) => {
+        console.error('Failed to load game roster:', error);
+        // Initialize with all team members if roster load fails
+        this.initializeRosterSelections();
+      }
+    });
+  }
+
+  /**
+   * Initialize roster selections with all team members
+   */
+  private initializeRosterSelections(): void {
+    const homeTeamId = parseInt(this.scheduleForm.get('homeTeam')?.value);
+    const awayTeamId = parseInt(this.scheduleForm.get('awayTeam')?.value);
+
+    if (!isNaN(homeTeamId)) {
+      this.homeGoalieIds = this.goalies
+        .filter(g => g.teamId === homeTeamId)
+        .map(g => parseInt(g.id));
+      this.homePlayerIds = this.players
+        .filter(p => p.teamId === homeTeamId)
+        .map(p => parseInt(p.id));
+    }
+
+    if (!isNaN(awayTeamId)) {
+      this.awayGoalieIds = this.goalies
+        .filter(g => g.teamId === awayTeamId)
+        .map(g => parseInt(g.id));
+      this.awayPlayerIds = this.players
+        .filter(p => p.teamId === awayTeamId)
+        .map(p => parseInt(p.id));
+    }
+  }
+
+  /**
+   * Open roster selection modal for home team
+   */
+  openHomeRosterModal(): void {
+    const homeTeamId = parseInt(this.scheduleForm.get('homeTeam')?.value);
+    if (isNaN(homeTeamId)) {
+      return;
+    }
+
+    // Initialize rosters if not already set
+    if (this.homeGoalieIds.length === 0 && this.homePlayerIds.length === 0) {
+      this.initializeRosterSelections();
+    }
+
+    const homeTeam = this.teams.find(t => parseInt(t.id) === homeTeamId);
+    const teamName = homeTeam ? homeTeam.name : 'Home Team';
+
+    const dialogRef = this.dialog.open(RosterSelectionModalComponent, {
+      width: '700px',
+      maxWidth: '95vw',
+      maxHeight: '90vh',
+      panelClass: 'roster-selection-dialog',
+      data: {
+        teamId: homeTeamId,
+        teamName: teamName,
+        selectedGoalieIds: this.homeGoalieIds,
+        selectedPlayerIds: this.homePlayerIds
+      } as RosterSelectionModalData
+    });
+
+    dialogRef.afterClosed().subscribe((result: RosterSelectionResult | undefined) => {
+      if (result) {
+        this.homeGoalieIds = result.goalieIds;
+        this.homePlayerIds = result.playerIds;
+      }
+    });
+  }
+
+  /**
+   * Open roster selection modal for away team
+   */
+  openAwayRosterModal(): void {
+    const awayTeamId = parseInt(this.scheduleForm.get('awayTeam')?.value);
+    if (isNaN(awayTeamId)) {
+      return;
+    }
+
+    // Initialize rosters if not already set
+    if (this.awayGoalieIds.length === 0 && this.awayPlayerIds.length === 0) {
+      this.initializeRosterSelections();
+    }
+
+    const awayTeam = this.teams.find(t => parseInt(t.id) === awayTeamId);
+    const teamName = awayTeam ? awayTeam.name : 'Away Team';
+
+    const dialogRef = this.dialog.open(RosterSelectionModalComponent, {
+      width: '700px',
+      maxWidth: '95vw',
+      maxHeight: '90vh',
+      panelClass: 'roster-selection-dialog',
+      data: {
+        teamId: awayTeamId,
+        teamName: teamName,
+        selectedGoalieIds: this.awayGoalieIds,
+        selectedPlayerIds: this.awayPlayerIds
+      } as RosterSelectionModalData
+    });
+
+    dialogRef.afterClosed().subscribe((result: RosterSelectionResult | undefined) => {
+      if (result) {
+        this.awayGoalieIds = result.goalieIds;
+        this.awayPlayerIds = result.playerIds;
+      }
+    });
+  }
+
   onSubmit(): void {
     if (this.isLoading) {
       return;
@@ -422,19 +567,16 @@ export class ScheduleFormModalComponent implements OnInit {
       const homeTeamId = parseInt(formValue.homeTeam);
       const awayTeamId = parseInt(formValue.awayTeam);
       
-      // Get all goalies and players for home and away teams
-      const homeGoalies = this.goalies
-        .filter(g => g.teamId === homeTeamId)
-        .map(g => parseInt(g.id));
-      const awayGoalies = this.goalies
-        .filter(g => g.teamId === awayTeamId)
-        .map(g => parseInt(g.id));
-      const homePlayers = this.players
-        .filter(p => p.teamId === homeTeamId)
-        .map(p => parseInt(p.id));
-      const awayPlayers = this.players
-        .filter(p => p.teamId === awayTeamId)
-        .map(p => parseInt(p.id));
+      // Use selected roster IDs, or initialize with all team members if not set
+      if (this.homeGoalieIds.length === 0 || this.homePlayerIds.length === 0 ||
+          this.awayGoalieIds.length === 0 || this.awayPlayerIds.length === 0) {
+        this.initializeRosterSelections();
+      }
+      
+      const homeGoalies = this.homeGoalieIds;
+      const awayGoalies = this.awayGoalieIds;
+      const homePlayers = this.homePlayerIds;
+      const awayPlayers = this.awayPlayerIds;
       
       // Get the game period with the lowest order (first period)
       const defaultGamePeriod = this.gamePeriods.length > 0

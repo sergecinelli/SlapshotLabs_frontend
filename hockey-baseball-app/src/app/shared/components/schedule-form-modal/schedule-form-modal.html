@@ -42,6 +42,19 @@
         </div>
 
         <div class="form-row">
+          <button 
+            type="button"
+            mat-stroked-button 
+            color="primary"
+            (click)="openAwayRosterModal()"
+            class="roster-button"
+            [disabled]="!scheduleForm.get('awayTeam')?.value">
+            <mat-icon>groups</mat-icon>
+            Select Away Team Roster
+          </button>
+        </div>
+
+        <div class="form-row">
           <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
             <mat-label class="uppercase text-custom-secondary">Home Team</mat-label>
             <mat-select formControlName="homeTeam" (selectionChange)="onHomeTeamChange($event.value)">
@@ -62,6 +75,19 @@
               </mat-option>
             </mat-select>
           </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <button 
+            type="button"
+            mat-stroked-button 
+            color="primary"
+            (click)="openHomeRosterModal()"
+            class="roster-button"
+            [disabled]="!scheduleForm.get('homeTeam')?.value">
+            <mat-icon>groups</mat-icon>
+            Select Home Team Roster
+          </button>
         </div>
 
         <div class="form-row">

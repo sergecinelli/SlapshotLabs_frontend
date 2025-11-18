@@ -22,6 +22,7 @@ import { GameMetadataService, GamePeriodResponse } from '../../services/game-met
 import { TeamService } from '../../services/team.service';
 import { PlayerService } from '../../services/player.service';
 import { GoalieService } from '../../services/goalie.service';
+import { GamePlayerService } from '../../services/game-player.service';
 import { LiveGameService, LiveGameData, GameExtra, GameEvent as ServiceGameEvent, OffensiveZoneEntry, DefensiveZoneExit } from '../../services/live-game.service';
 import { ArenaService } from '../../services/arena.service';
 import { Arena, Rink } from '../../shared/interfaces/arena.interface';
@@ -101,6 +102,7 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
   private teamService = inject(TeamService);
   private playerService = inject(PlayerService);
   private goalieService = inject(GoalieService);
+  private gamePlayerService = inject(GamePlayerService);
   private liveGameService = inject(LiveGameService);
   private arenaService = inject(ArenaService);
   private teamOptionsService = inject(TeamOptionsService);
@@ -614,50 +616,45 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Load players and goalies for both teams
+   * Load players and goalies from game roster
    */
   private loadPlayersAndGoalies(): void {
-    forkJoin({
-      homeTeamPlayers: this.playerService.getPlayersByTeam(this.homeTeamId),
-      awayTeamPlayers: this.playerService.getPlayersByTeam(this.awayTeamId),
-      homeTeamGoalies: this.goalieService.getGoaliesByTeam(this.homeTeamId),
-      awayTeamGoalies: this.goalieService.getGoaliesByTeam(this.awayTeamId)
-    }).subscribe({
-      next: ({ homeTeamPlayers, awayTeamPlayers, homeTeamGoalies, awayTeamGoalies }) => {
-        // Set players from both teams
+    this.gamePlayerService.getGameRoster(this.gameId).subscribe({
+      next: (roster) => {
+        // Set players from roster
         this.playerOptions = [
-          ...homeTeamPlayers.map(player => ({
-            value: parseInt(player.id),
-            label: `${player.firstName} ${player.lastName}`,
+          ...roster.home_players.map(player => ({
+            value: player.id,
+            label: `${player.first_name} ${player.last_name}`,
             teamId: this.homeTeamId
           })),
-          ...awayTeamPlayers.map(player => ({
-            value: parseInt(player.id),
-            label: `${player.firstName} ${player.lastName}`,
+          ...roster.away_players.map(player => ({
+            value: player.id,
+            label: `${player.first_name} ${player.last_name}`,
             teamId: this.awayTeamId
           }))
         ];
 
-        // Set goalies from both teams
+        // Set goalies from roster
         this.goalieOptions = [
-          ...homeTeamGoalies.map(goalie => ({
-            value: parseInt(goalie.id),
-            label: `${goalie.firstName} ${goalie.lastName}`,
+          ...roster.home_goalies.map(goalie => ({
+            value: goalie.id,
+            label: `${goalie.first_name} ${goalie.last_name}`,
             teamId: this.homeTeamId
           })),
-          ...awayTeamGoalies.map(goalie => ({
-            value: parseInt(goalie.id),
-            label: `${goalie.firstName} ${goalie.lastName}`,
+          ...roster.away_goalies.map(goalie => ({
+            value: goalie.id,
+            label: `${goalie.first_name} ${goalie.last_name}`,
             teamId: this.awayTeamId
           }))
         ];
         
-        // Start polling for live data after players are loaded
+        // Start polling for live data after roster is loaded
         this.startLiveDataPolling();
       },
       error: (error) => {
-        console.error('Failed to load players/goalies:', error);
-        // Start polling even if players failed to load
+        console.error('Failed to load game roster:', error);
+        // Start polling even if roster failed to load
         this.startLiveDataPolling();
       }
     });
