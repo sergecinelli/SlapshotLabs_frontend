@@ -14,92 +14,119 @@
   <div *ngIf="!isLoadingGameData" class="space-y-6">
     <!-- Tournament Info Header -->
     <div class="bg-gray-700 text-white px-6 py-2 rounded-md flex justify-between items-center">
-    <div>
-      <span class="font-medium text-lg">{{ tournamentName() }}</span>
+      <div>
+        <span class="font-medium text-lg">{{ tournamentName() }}</span>
+      </div>
+      <div class="text-center">
+        <div class="font-semibold">{{ tournamentType() }}</div>
+        <div>{{ tournamentCategory() }}</div>
+      </div>
+      <div class="text-right">
+        <div>{{ tournamentDate() }}</div>
+        <div class="text-sm">{{ arenaInfo() }}</div>
+      </div>
     </div>
-    <div class="text-center">
-      <div class="font-semibold">{{ tournamentType() }}</div>
-      <div>{{ tournamentCategory() }}</div>
-    </div>
-    <div class="text-right">
-      <div>{{ tournamentDate() }}</div>
-      <div class="text-sm">{{ arenaInfo() }}</div>
-    </div>
-  </div>
 
-  <!-- Game Score Section -->
-  <div class="bg-white rounded-lg shadow-lg border border-gray-200 pb-4">
-    <div class="flex justify-center items-center gap-8 mb-6">
-      <!-- Away Team -->
-      <div class="flex items-center justify-around gap-4 text-right">
-        <div>
-          <div class="text-xs text-gray-500">
-            {{ awayTeam().teamLevel }} <span class="font-bold text-custom-dark ml-3 uppercase">Visitor</span>
+    <!-- Game Score Section -->
+    <div class="bg-white rounded-lg shadow-lg border border-gray-200 pb-4">
+      <div class="flex justify-center items-center gap-8 mb-6">
+        <!-- Away Team -->
+        <div class="flex items-center justify-around gap-4 text-right">
+          <div>
+            <div class="text-xs text-gray-500">
+              {{ awayTeam().teamLevel }}
+              <span class="font-bold text-custom-dark ml-3 uppercase">Visitor</span>
+            </div>
+            <div class="font-semibold text-base tracking-wider max-w-56">{{ awayTeam().name }}</div>
+            <div class="text-sm font-medium">{{ awayTeam().record }}</div>
           </div>
-          <div class="font-semibold text-base tracking-wider max-w-56">{{ awayTeam().name }}</div>
-          <div class="text-sm font-medium">{{ awayTeam().record }}</div>
+          <div
+            class="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden"
+          >
+            <img
+              [src]="awayTeam().logo"
+              [alt]="awayTeam().name"
+              class="w-full h-full object-cover"
+            />
+          </div>
         </div>
-        <div class="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden">
-          <img [src]="awayTeam().logo" [alt]="awayTeam().name" class="w-full h-full object-cover" />
+
+        <!-- Score -->
+        <div class="flex-col gap-0 mb-14">
+          <div class="text-center mb-4">
+            <ng-container *ngIf="!isGameOver; else finalLabel">
+              <mat-form-field class="period-select-field">
+                <mat-select
+                  [(ngModel)]="currentPeriodId"
+                  (selectionChange)="onPeriodChange($event.value)"
+                  [panelClass]="'period-select-panel'"
+                >
+                  <mat-option *ngFor="let period of periodOptions" [value]="period.value">
+                    {{ period.label }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </ng-container>
+            <ng-template #finalLabel>
+              <div class="text-xl font-semibold">Final</div>
+            </ng-template>
+          </div>
+          <div class="flex items-center gap-2">
+            <div class="text-center">
+              <div class="text-8xl font-bold">{{ awayTeam().score }}</div>
+              <div class="text-sm text-gray-500">SOG: {{ awayTeam().sog }}</div>
+            </div>
+            <div class="text-[72px] text-custom-dark mx-2">⁃</div>
+            <div class="text-center">
+              <div class="text-8xl font-bold">{{ homeTeam().score }}</div>
+              <div class="text-sm text-gray-500">SOG: {{ homeTeam().sog }}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Home Team -->
+        <div class="flex items-center gap-4">
+          <div
+            class="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden"
+          >
+            <img
+              [src]="homeTeam().logo"
+              [alt]="homeTeam().name"
+              class="w-full h-full object-cover"
+            />
+          </div>
+          <div>
+            <div class="text-xs text-gray-500">
+              {{ homeTeam().teamLevel }}
+              <span class="font-bold text-custom-dark ml-3 uppercase">Home</span>
+            </div>
+            <div class="font-semibold text-base tracking-wider max-w-56">{{ homeTeam().name }}</div>
+            <div class="text-sm font-medium">{{ homeTeam().record }}</div>
+          </div>
         </div>
       </div>
+    </div>
 
-      <!-- Score -->
-      <div class="flex-col gap-0 mb-14">
+    <!-- Game Event Actions (Unified Section) -->
+    <div *ngIf="!isLoadingGameData" class="p-4">
+      <div class="flex flex-wrap gap-3 justify-center">
+        <app-action-button label="Shots" (buttonClick)="onShots()"> </app-action-button>
+        <app-action-button label="Turnover" (buttonClick)="onTurnover()"> </app-action-button>
+        <app-action-button label="Faceoff" (buttonClick)="onFaceoff()"> </app-action-button>
+        <app-action-button label="Goalie Change" (buttonClick)="onGoalieChange()">
+        </app-action-button>
+        <app-action-button label="Penalty" (buttonClick)="onPenalty()"> </app-action-button>
+      </div>
+    </div>
+
+    <!-- Stats Section - Two Team Boxes Side by Side -->
+    <div class="grid grid-cols-2 gap-4">
+      <!-- Away Team Stats Box -->
+      <div class="bg-white rounded-lg shadow-lg border border-gray-200 p-4">
         <div class="text-center mb-4">
-          <ng-container *ngIf="!isGameOver; else finalLabel">
-            <mat-form-field class="period-select-field">
-              <mat-select 
-                [(ngModel)]="currentPeriodId" 
-                (selectionChange)="onPeriodChange($event.value)"
-                [panelClass]="'period-select-panel'">
-                <mat-option *ngFor="let period of periodOptions" [value]="period.value">
-                  {{ period.label }}
-                </mat-option>
-              </mat-select>
-            </mat-form-field>
-          </ng-container>
-          <ng-template #finalLabel>
-            <div class="text-xl font-semibold">Final</div>
-          </ng-template>
+          <div class="text-sm font-bold text-gray-900">{{ awayTeam().name }}</div>
         </div>
-        <div class="flex items-center gap-2">
-          <div class="text-center">
-            <div class="text-8xl font-bold">{{ awayTeam().score }}</div>
-            <div class="text-sm text-gray-500">SOG: {{ awayTeam().sog }}</div>
-          </div>
-          <div class="text-[72px] text-custom-dark mx-2">⁃</div>
-          <div class="text-center">
-            <div class="text-8xl font-bold">{{ homeTeam().score }}</div>
-            <div class="text-sm text-gray-500">SOG: {{ homeTeam().sog }}</div>
-          </div>
-        </div>
-      </div>
 
-      <!-- Home Team -->
-      <div class="flex items-center gap-4">
-        <div class="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden">
-          <img [src]="homeTeam().logo" [alt]="homeTeam().name" class="w-full h-full object-cover" />
-        </div>
-        <div>
-          <div class="text-xs text-gray-500">
-            {{ homeTeam().teamLevel }} <span class="font-bold text-custom-dark ml-3 uppercase">Home</span>
-          </div>
-          <div class="font-semibold text-base tracking-wider max-w-56">{{ homeTeam().name }}</div>
-          <div class="text-sm font-medium">{{ homeTeam().record }}</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Stats Section - Two Team Boxes Side by Side -->
-  <div class="grid grid-cols-2 gap-4">
-    <!-- Away Team Stats Box -->
-    <div class="bg-white rounded-lg shadow-lg border border-gray-200 p-4">
-      <div class="text-center mb-4">
-        <div class="text-sm font-bold text-gray-900">{{ awayTeam().name }}</div>
-      </div>
-      
         <div class="space-y-3">
           <!-- Faceoff Win % and Defensive Zone Exit Row -->
           <div class="grid grid-cols-[auto_2.5fr] gap-3">
@@ -113,58 +140,98 @@
             <div class="border border-gray-300 rounded p-3">
               <div class="text-xs text-gray-600 mb-2 font-semibold">Defensive Zone Exit</div>
               <div class="grid grid-cols-5 gap-1 text-center">
-              <div>
-                <div class="text-[9px] text-gray-500 mb-1">Long</div>
-                <button (click)="incrementDefensiveZoneExit('away', 'long')" class="stat-increment-btn">
-                  <img src="assets/icons/up-button.svg" alt="Increment">
-                </button>
-                <div class="text-sm font-semibold my-1">{{ awayStats().defensiveZoneExit.long }}</div>
-                <button (click)="decrementDefensiveZoneExit('away', 'long')" class="stat-decrement-btn">
-                  <img src="assets/icons/down-button.svg" alt="Decrement">
-                </button>
-              </div>
-              <div>
-                <div class="text-[9px] text-gray-500 mb-1">Skate</div>
-                <button (click)="incrementDefensiveZoneExit('away', 'skate')" class="stat-increment-btn">
-                  <img src="assets/icons/up-button.svg" alt="Increment">
-                </button>
-                <div class="text-sm font-semibold my-1">{{ awayStats().defensiveZoneExit.skate }}</div>
-                <button (click)="decrementDefensiveZoneExit('away', 'skate')" class="stat-decrement-btn">
-                  <img src="assets/icons/down-button.svg" alt="Decrement">
-                </button>
-              </div>
-              <div>
-                <div class="text-[9px] text-gray-500 mb-1">SO&Win</div>
-                <button (click)="incrementDefensiveZoneExit('away', 'soWin')" class="stat-increment-btn">
-                  <img src="assets/icons/up-button.svg" alt="Increment">
-                </button>
-                <div class="text-sm font-semibold my-1">{{ awayStats().defensiveZoneExit.soWin }}</div>
-                <button (click)="decrementDefensiveZoneExit('away', 'soWin')" class="stat-decrement-btn">
-                  <img src="assets/icons/down-button.svg" alt="Decrement">
-                </button>
-              </div>
-              <div>
-                <div class="text-[9px] text-gray-500 mb-1">SO&Lose</div>
-                <button (click)="incrementDefensiveZoneExit('away', 'soLose')" class="stat-increment-btn">
-                  <img src="assets/icons/up-button.svg" alt="Increment">
-                </button>
-                <div class="text-sm font-semibold my-1">{{ awayStats().defensiveZoneExit.soLose }}</div>
-                <button (click)="decrementDefensiveZoneExit('away', 'soLose')" class="stat-decrement-btn">
-                  <img src="assets/icons/down-button.svg" alt="Decrement">
-                </button>
-              </div>
-              <div>
-                <div class="text-[9px] text-gray-500 mb-1">Pass</div>
-                <button (click)="incrementDefensiveZoneExit('away', 'pass')" class="stat-increment-btn">
-                  <img src="assets/icons/up-button.svg" alt="Increment">
-                </button>
-                <div class="text-sm font-semibold my-1">{{ awayStats().defensiveZoneExit.pass }}</div>
-                <button (click)="decrementDefensiveZoneExit('away', 'pass')" class="stat-decrement-btn">
-                  <img src="assets/icons/down-button.svg" alt="Decrement">
-                </button>
+                <div>
+                  <div class="text-[9px] text-gray-500 mb-1">Long</div>
+                  <button
+                    (click)="incrementDefensiveZoneExit('away', 'long')"
+                    class="stat-increment-btn"
+                  >
+                    <img src="assets/icons/up-button.svg" alt="Increment" />
+                  </button>
+                  <div class="text-sm font-semibold my-1">
+                    {{ awayStats().defensiveZoneExit.long }}
+                  </div>
+                  <button
+                    (click)="decrementDefensiveZoneExit('away', 'long')"
+                    class="stat-decrement-btn"
+                  >
+                    <img src="assets/icons/down-button.svg" alt="Decrement" />
+                  </button>
+                </div>
+                <div>
+                  <div class="text-[9px] text-gray-500 mb-1">Skate</div>
+                  <button
+                    (click)="incrementDefensiveZoneExit('away', 'skate')"
+                    class="stat-increment-btn"
+                  >
+                    <img src="assets/icons/up-button.svg" alt="Increment" />
+                  </button>
+                  <div class="text-sm font-semibold my-1">
+                    {{ awayStats().defensiveZoneExit.skate }}
+                  </div>
+                  <button
+                    (click)="decrementDefensiveZoneExit('away', 'skate')"
+                    class="stat-decrement-btn"
+                  >
+                    <img src="assets/icons/down-button.svg" alt="Decrement" />
+                  </button>
+                </div>
+                <div>
+                  <div class="text-[9px] text-gray-500 mb-1">SO&Win</div>
+                  <button
+                    (click)="incrementDefensiveZoneExit('away', 'soWin')"
+                    class="stat-increment-btn"
+                  >
+                    <img src="assets/icons/up-button.svg" alt="Increment" />
+                  </button>
+                  <div class="text-sm font-semibold my-1">
+                    {{ awayStats().defensiveZoneExit.soWin }}
+                  </div>
+                  <button
+                    (click)="decrementDefensiveZoneExit('away', 'soWin')"
+                    class="stat-decrement-btn"
+                  >
+                    <img src="assets/icons/down-button.svg" alt="Decrement" />
+                  </button>
+                </div>
+                <div>
+                  <div class="text-[9px] text-gray-500 mb-1">SO&Lose</div>
+                  <button
+                    (click)="incrementDefensiveZoneExit('away', 'soLose')"
+                    class="stat-increment-btn"
+                  >
+                    <img src="assets/icons/up-button.svg" alt="Increment" />
+                  </button>
+                  <div class="text-sm font-semibold my-1">
+                    {{ awayStats().defensiveZoneExit.soLose }}
+                  </div>
+                  <button
+                    (click)="decrementDefensiveZoneExit('away', 'soLose')"
+                    class="stat-decrement-btn"
+                  >
+                    <img src="assets/icons/down-button.svg" alt="Decrement" />
+                  </button>
+                </div>
+                <div>
+                  <div class="text-[9px] text-gray-500 mb-1">Pass</div>
+                  <button
+                    (click)="incrementDefensiveZoneExit('away', 'pass')"
+                    class="stat-increment-btn"
+                  >
+                    <img src="assets/icons/up-button.svg" alt="Increment" />
+                  </button>
+                  <div class="text-sm font-semibold my-1">
+                    {{ awayStats().defensiveZoneExit.pass }}
+                  </div>
+                  <button
+                    (click)="decrementDefensiveZoneExit('away', 'pass')"
+                    class="stat-decrement-btn"
+                  >
+                    <img src="assets/icons/down-button.svg" alt="Decrement" />
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
           </div>
 
           <!-- Offensive Zone Entry -->
@@ -173,42 +240,74 @@
             <div class="grid grid-cols-4 gap-1 text-center">
               <div>
                 <div class="text-[9px] text-gray-500 mb-1">Pass</div>
-                <button (click)="incrementOffensiveZoneEntry('away', 'pass')" class="stat-increment-btn">
-                  <img src="assets/icons/up-button.svg" alt="Increment">
+                <button
+                  (click)="incrementOffensiveZoneEntry('away', 'pass')"
+                  class="stat-increment-btn"
+                >
+                  <img src="assets/icons/up-button.svg" alt="Increment" />
                 </button>
-                <div class="text-sm font-semibold my-1">{{ awayStats().offensiveZoneEntry.pass }}</div>
-                <button (click)="decrementOffensiveZoneEntry('away', 'pass')" class="stat-decrement-btn">
-                  <img src="assets/icons/down-button.svg" alt="Decrement">
+                <div class="text-sm font-semibold my-1">
+                  {{ awayStats().offensiveZoneEntry.pass }}
+                </div>
+                <button
+                  (click)="decrementOffensiveZoneEntry('away', 'pass')"
+                  class="stat-decrement-btn"
+                >
+                  <img src="assets/icons/down-button.svg" alt="Decrement" />
                 </button>
               </div>
               <div>
                 <div class="text-[9px] text-gray-500 mb-1">Dump/W</div>
-                <button (click)="incrementOffensiveZoneEntry('away', 'dump')" class="stat-increment-btn">
-                  <img src="assets/icons/up-button.svg" alt="Increment">
+                <button
+                  (click)="incrementOffensiveZoneEntry('away', 'dump')"
+                  class="stat-increment-btn"
+                >
+                  <img src="assets/icons/up-button.svg" alt="Increment" />
                 </button>
-                <div class="text-sm font-semibold my-1">{{ awayStats().offensiveZoneEntry.dump }}</div>
-                <button (click)="decrementOffensiveZoneEntry('away', 'dump')" class="stat-decrement-btn">
-                  <img src="assets/icons/down-button.svg" alt="Decrement">
+                <div class="text-sm font-semibold my-1">
+                  {{ awayStats().offensiveZoneEntry.dump }}
+                </div>
+                <button
+                  (click)="decrementOffensiveZoneEntry('away', 'dump')"
+                  class="stat-decrement-btn"
+                >
+                  <img src="assets/icons/down-button.svg" alt="Decrement" />
                 </button>
               </div>
               <div>
                 <div class="text-[9px] text-gray-500 mb-1">Dump/L</div>
-                <button (click)="incrementOffensiveZoneEntry('away', 'carry')" class="stat-increment-btn">
-                  <img src="assets/icons/up-button.svg" alt="Increment">
+                <button
+                  (click)="incrementOffensiveZoneEntry('away', 'carry')"
+                  class="stat-increment-btn"
+                >
+                  <img src="assets/icons/up-button.svg" alt="Increment" />
                 </button>
-                <div class="text-sm font-semibold my-1">{{ awayStats().offensiveZoneEntry.carry }}</div>
-                <button (click)="decrementOffensiveZoneEntry('away', 'carry')" class="stat-decrement-btn">
-                  <img src="assets/icons/down-button.svg" alt="Decrement">
+                <div class="text-sm font-semibold my-1">
+                  {{ awayStats().offensiveZoneEntry.carry }}
+                </div>
+                <button
+                  (click)="decrementOffensiveZoneEntry('away', 'carry')"
+                  class="stat-decrement-btn"
+                >
+                  <img src="assets/icons/down-button.svg" alt="Decrement" />
                 </button>
               </div>
               <div>
                 <div class="text-[9px] text-gray-500 mb-1">Skated</div>
-                <button (click)="incrementOffensiveZoneEntry('away', 'skated')" class="stat-increment-btn">
-                  <img src="assets/icons/up-button.svg" alt="Increment">
+                <button
+                  (click)="incrementOffensiveZoneEntry('away', 'skated')"
+                  class="stat-increment-btn"
+                >
+                  <img src="assets/icons/up-button.svg" alt="Increment" />
                 </button>
-                <div class="text-sm font-semibold my-1">{{ awayStats().offensiveZoneEntry.skated }}</div>
-                <button (click)="decrementOffensiveZoneEntry('away', 'skated')" class="stat-decrement-btn">
-                  <img src="assets/icons/down-button.svg" alt="Decrement">
+                <div class="text-sm font-semibold my-1">
+                  {{ awayStats().offensiveZoneEntry.skated }}
+                </div>
+                <button
+                  (click)="decrementOffensiveZoneEntry('away', 'skated')"
+                  class="stat-decrement-btn"
+                >
+                  <img src="assets/icons/down-button.svg" alt="Decrement" />
                 </button>
               </div>
             </div>
@@ -263,7 +362,7 @@
         <div class="text-center mb-4">
           <div class="text-sm font-bold text-gray-900">{{ homeTeam().name }}</div>
         </div>
-        
+
         <div class="space-y-3">
           <!-- Faceoff Win % and Defensive Zone Exit Row -->
           <div class="grid grid-cols-[auto_2.5fr] gap-3">
@@ -277,58 +376,98 @@
             <div class="border border-gray-300 rounded p-3">
               <div class="text-xs text-gray-600 mb-2 font-semibold">Defensive Zone Exit</div>
               <div class="grid grid-cols-5 gap-1 text-center">
-              <div>
-                <div class="text-[9px] text-gray-500 mb-1">Long</div>
-                <button (click)="incrementDefensiveZoneExit('home', 'long')" class="stat-increment-btn">
-                  <img src="assets/icons/up-button.svg" alt="Increment">
-                </button>
-                <div class="text-sm font-semibold my-1">{{ homeStats().defensiveZoneExit.long }}</div>
-                <button (click)="decrementDefensiveZoneExit('home', 'long')" class="stat-decrement-btn">
-                  <img src="assets/icons/down-button.svg" alt="Decrement">
-                </button>
-              </div>
-              <div>
-                <div class="text-[9px] text-gray-500 mb-1">Skate</div>
-                <button (click)="incrementDefensiveZoneExit('home', 'skate')" class="stat-increment-btn">
-                  <img src="assets/icons/up-button.svg" alt="Increment">
-                </button>
-                <div class="text-sm font-semibold my-1">{{ homeStats().defensiveZoneExit.skate }}</div>
-                <button (click)="decrementDefensiveZoneExit('home', 'skate')" class="stat-decrement-btn">
-                  <img src="assets/icons/down-button.svg" alt="Decrement">
-                </button>
-              </div>
-              <div>
-                <div class="text-[9px] text-gray-500 mb-1">SO&Win</div>
-                <button (click)="incrementDefensiveZoneExit('home', 'soWin')" class="stat-increment-btn">
-                  <img src="assets/icons/up-button.svg" alt="Increment">
-                </button>
-                <div class="text-sm font-semibold my-1">{{ homeStats().defensiveZoneExit.soWin }}</div>
-                <button (click)="decrementDefensiveZoneExit('home', 'soWin')" class="stat-decrement-btn">
-                  <img src="assets/icons/down-button.svg" alt="Decrement">
-                </button>
-              </div>
-              <div>
-                <div class="text-[9px] text-gray-500 mb-1">SO&Lose</div>
-                <button (click)="incrementDefensiveZoneExit('home', 'soLose')" class="stat-increment-btn">
-                  <img src="assets/icons/up-button.svg" alt="Increment">
-                </button>
-                <div class="text-sm font-semibold my-1">{{ homeStats().defensiveZoneExit.soLose }}</div>
-                <button (click)="decrementDefensiveZoneExit('home', 'soLose')" class="stat-decrement-btn">
-                  <img src="assets/icons/down-button.svg" alt="Decrement">
-                </button>
-              </div>
-              <div>
-                <div class="text-[9px] text-gray-500 mb-1">Pass</div>
-                <button (click)="incrementDefensiveZoneExit('home', 'pass')" class="stat-increment-btn">
-                  <img src="assets/icons/up-button.svg" alt="Increment">
-                </button>
-                <div class="text-sm font-semibold my-1">{{ homeStats().defensiveZoneExit.pass }}</div>
-                <button (click)="decrementDefensiveZoneExit('home', 'pass')" class="stat-decrement-btn">
-                  <img src="assets/icons/down-button.svg" alt="Decrement">
-                </button>
+                <div>
+                  <div class="text-[9px] text-gray-500 mb-1">Long</div>
+                  <button
+                    (click)="incrementDefensiveZoneExit('home', 'long')"
+                    class="stat-increment-btn"
+                  >
+                    <img src="assets/icons/up-button.svg" alt="Increment" />
+                  </button>
+                  <div class="text-sm font-semibold my-1">
+                    {{ homeStats().defensiveZoneExit.long }}
+                  </div>
+                  <button
+                    (click)="decrementDefensiveZoneExit('home', 'long')"
+                    class="stat-decrement-btn"
+                  >
+                    <img src="assets/icons/down-button.svg" alt="Decrement" />
+                  </button>
+                </div>
+                <div>
+                  <div class="text-[9px] text-gray-500 mb-1">Skate</div>
+                  <button
+                    (click)="incrementDefensiveZoneExit('home', 'skate')"
+                    class="stat-increment-btn"
+                  >
+                    <img src="assets/icons/up-button.svg" alt="Increment" />
+                  </button>
+                  <div class="text-sm font-semibold my-1">
+                    {{ homeStats().defensiveZoneExit.skate }}
+                  </div>
+                  <button
+                    (click)="decrementDefensiveZoneExit('home', 'skate')"
+                    class="stat-decrement-btn"
+                  >
+                    <img src="assets/icons/down-button.svg" alt="Decrement" />
+                  </button>
+                </div>
+                <div>
+                  <div class="text-[9px] text-gray-500 mb-1">SO&Win</div>
+                  <button
+                    (click)="incrementDefensiveZoneExit('home', 'soWin')"
+                    class="stat-increment-btn"
+                  >
+                    <img src="assets/icons/up-button.svg" alt="Increment" />
+                  </button>
+                  <div class="text-sm font-semibold my-1">
+                    {{ homeStats().defensiveZoneExit.soWin }}
+                  </div>
+                  <button
+                    (click)="decrementDefensiveZoneExit('home', 'soWin')"
+                    class="stat-decrement-btn"
+                  >
+                    <img src="assets/icons/down-button.svg" alt="Decrement" />
+                  </button>
+                </div>
+                <div>
+                  <div class="text-[9px] text-gray-500 mb-1">SO&Lose</div>
+                  <button
+                    (click)="incrementDefensiveZoneExit('home', 'soLose')"
+                    class="stat-increment-btn"
+                  >
+                    <img src="assets/icons/up-button.svg" alt="Increment" />
+                  </button>
+                  <div class="text-sm font-semibold my-1">
+                    {{ homeStats().defensiveZoneExit.soLose }}
+                  </div>
+                  <button
+                    (click)="decrementDefensiveZoneExit('home', 'soLose')"
+                    class="stat-decrement-btn"
+                  >
+                    <img src="assets/icons/down-button.svg" alt="Decrement" />
+                  </button>
+                </div>
+                <div>
+                  <div class="text-[9px] text-gray-500 mb-1">Pass</div>
+                  <button
+                    (click)="incrementDefensiveZoneExit('home', 'pass')"
+                    class="stat-increment-btn"
+                  >
+                    <img src="assets/icons/up-button.svg" alt="Increment" />
+                  </button>
+                  <div class="text-sm font-semibold my-1">
+                    {{ homeStats().defensiveZoneExit.pass }}
+                  </div>
+                  <button
+                    (click)="decrementDefensiveZoneExit('home', 'pass')"
+                    class="stat-decrement-btn"
+                  >
+                    <img src="assets/icons/down-button.svg" alt="Decrement" />
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
           </div>
 
           <!-- Offensive Zone Entry -->
@@ -337,42 +476,74 @@
             <div class="grid grid-cols-4 gap-1 text-center">
               <div>
                 <div class="text-[9px] text-gray-500 mb-1">Pass</div>
-                <button (click)="incrementOffensiveZoneEntry('home', 'pass')" class="stat-increment-btn">
-                  <img src="assets/icons/up-button.svg" alt="Increment">
+                <button
+                  (click)="incrementOffensiveZoneEntry('home', 'pass')"
+                  class="stat-increment-btn"
+                >
+                  <img src="assets/icons/up-button.svg" alt="Increment" />
                 </button>
-                <div class="text-sm font-semibold my-1">{{ homeStats().offensiveZoneEntry.pass }}</div>
-                <button (click)="decrementOffensiveZoneEntry('home', 'pass')" class="stat-decrement-btn">
-                  <img src="assets/icons/down-button.svg" alt="Decrement">
+                <div class="text-sm font-semibold my-1">
+                  {{ homeStats().offensiveZoneEntry.pass }}
+                </div>
+                <button
+                  (click)="decrementOffensiveZoneEntry('home', 'pass')"
+                  class="stat-decrement-btn"
+                >
+                  <img src="assets/icons/down-button.svg" alt="Decrement" />
                 </button>
               </div>
               <div>
                 <div class="text-[9px] text-gray-500 mb-1">Dump/W</div>
-                <button (click)="incrementOffensiveZoneEntry('home', 'dump')" class="stat-increment-btn">
-                  <img src="assets/icons/up-button.svg" alt="Increment">
+                <button
+                  (click)="incrementOffensiveZoneEntry('home', 'dump')"
+                  class="stat-increment-btn"
+                >
+                  <img src="assets/icons/up-button.svg" alt="Increment" />
                 </button>
-                <div class="text-sm font-semibold my-1">{{ homeStats().offensiveZoneEntry.dump }}</div>
-                <button (click)="decrementOffensiveZoneEntry('home', 'dump')" class="stat-decrement-btn">
-                  <img src="assets/icons/down-button.svg" alt="Decrement">
+                <div class="text-sm font-semibold my-1">
+                  {{ homeStats().offensiveZoneEntry.dump }}
+                </div>
+                <button
+                  (click)="decrementOffensiveZoneEntry('home', 'dump')"
+                  class="stat-decrement-btn"
+                >
+                  <img src="assets/icons/down-button.svg" alt="Decrement" />
                 </button>
               </div>
               <div>
                 <div class="text-[9px] text-gray-500 mb-1">Dump/L</div>
-                <button (click)="incrementOffensiveZoneEntry('home', 'carry')" class="stat-increment-btn">
-                  <img src="assets/icons/up-button.svg" alt="Increment">
+                <button
+                  (click)="incrementOffensiveZoneEntry('home', 'carry')"
+                  class="stat-increment-btn"
+                >
+                  <img src="assets/icons/up-button.svg" alt="Increment" />
                 </button>
-                <div class="text-sm font-semibold my-1">{{ homeStats().offensiveZoneEntry.carry }}</div>
-                <button (click)="decrementOffensiveZoneEntry('home', 'carry')" class="stat-decrement-btn">
-                  <img src="assets/icons/down-button.svg" alt="Decrement">
+                <div class="text-sm font-semibold my-1">
+                  {{ homeStats().offensiveZoneEntry.carry }}
+                </div>
+                <button
+                  (click)="decrementOffensiveZoneEntry('home', 'carry')"
+                  class="stat-decrement-btn"
+                >
+                  <img src="assets/icons/down-button.svg" alt="Decrement" />
                 </button>
               </div>
               <div>
                 <div class="text-[9px] text-gray-500 mb-1">Skated</div>
-                <button (click)="incrementOffensiveZoneEntry('home', 'skated')" class="stat-increment-btn">
-                  <img src="assets/icons/up-button.svg" alt="Increment">
+                <button
+                  (click)="incrementOffensiveZoneEntry('home', 'skated')"
+                  class="stat-increment-btn"
+                >
+                  <img src="assets/icons/up-button.svg" alt="Increment" />
                 </button>
-                <div class="text-sm font-semibold my-1">{{ homeStats().offensiveZoneEntry.skated }}</div>
-                <button (click)="decrementOffensiveZoneEntry('home', 'skated')" class="stat-decrement-btn">
-                  <img src="assets/icons/down-button.svg" alt="Decrement">
+                <div class="text-sm font-semibold my-1">
+                  {{ homeStats().offensiveZoneEntry.skated }}
+                </div>
+                <button
+                  (click)="decrementOffensiveZoneEntry('home', 'skated')"
+                  class="stat-decrement-btn"
+                >
+                  <img src="assets/icons/down-button.svg" alt="Decrement" />
                 </button>
               </div>
             </div>
@@ -424,50 +595,47 @@
     </div>
   </div>
 
-  <!-- Game Event Actions (Unified Section) -->
-  <div *ngIf="!isLoadingGameData" class=" p-4">
-    <div class="flex flex-wrap gap-3 justify-center">
-      <app-action-button 
-        label="Shots" 
-        (buttonClick)="onShots()">
-      </app-action-button>
-      <app-action-button 
-        label="Turnover" 
-        (buttonClick)="onTurnover()">
-      </app-action-button>
-      <app-action-button 
-        label="Faceoff" 
-        (buttonClick)="onFaceoff()">
-      </app-action-button>
-      <app-action-button 
-        label="Goalie Change" 
-        (buttonClick)="onGoalieChange()">
-      </app-action-button>
-      <app-action-button 
-        label="Penalty" 
-        (buttonClick)="onPenalty()">
-      </app-action-button>
-    </div>
-  </div>
-
   <!-- Events Section (Full Width) -->
   <div *ngIf="!isLoadingGameData" class="bg-white rounded-lg shadow-lg border border-gray-200">
     <div class="px-6 pt-4 pb-2 border-b border-gray-200">
       <h2 class="text-xl font-semibold text-gray-900">Game Events</h2>
     </div>
 
-
     <!-- Events Table -->
     <div class="overflow-x-auto">
       <table class="w-full border-collapse">
         <thead class="bg-gray-50 border-b border-gray-200">
           <tr>
-            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Time</th>
-            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Team</th>
-            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Event</th>
-            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Player</th>
-            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Description</th>
-            <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
+            <th
+              class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
+            >
+              Time
+            </th>
+            <th
+              class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
+            >
+              Team
+            </th>
+            <th
+              class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
+            >
+              Event
+            </th>
+            <th
+              class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
+            >
+              Player
+            </th>
+            <th
+              class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
+            >
+              Description
+            </th>
+            <th
+              class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
+            >
+              Actions
+            </th>
           </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
@@ -475,7 +643,11 @@
             <tr>
               <td colspan="6" class="px-4 py-8 text-center text-gray-500">
                 <div class="flex flex-col items-center justify-center">
-                  <mat-icon class="text-gray-400 mb-2" style="font-size: 48px; width: 48px; height: 48px;">event_note</mat-icon>
+                  <mat-icon
+                    class="text-gray-400 mb-2"
+                    style="font-size: 48px; width: 48px; height: 48px"
+                    >event_note</mat-icon
+                  >
                   <p class="text-lg font-medium">No game events yet</p>
                   <p class="text-sm">Events will appear here as the game progresses</p>
                 </div>
@@ -490,12 +662,23 @@
                   </td>
                 </tr>
               } @else {
-                <tr class="transition-colors" [class.bg-red-200]="event.shotType === 'goal'" [class.goal-row]="event.shotType === 'goal'">
+                <tr
+                  class="transition-colors"
+                  [class.bg-red-200]="event.shotType === 'goal'"
+                  [class.goal-row]="event.shotType === 'goal'"
+                >
                   <td class="px-4 py-3 text-sm text-gray-900">{{ event.time }}</td>
                   <td class="px-4 py-3">
                     <div class="flex items-center gap-2">
-                      <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden flex-shrink-0">
-                        <img *ngIf="event.teamId" [src]="getTeamLogoUrl(event.teamId)" [alt]="event.team" class="w-full h-full object-cover" />
+                      <div
+                        class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden flex-shrink-0"
+                      >
+                        <img
+                          *ngIf="event.teamId"
+                          [src]="getTeamLogoUrl(event.teamId)"
+                          [alt]="event.team"
+                          class="w-full h-full object-cover"
+                        />
                       </div>
                       <span class="text-sm text-gray-900">{{ event.team }}</span>
                     </div>
@@ -503,24 +686,39 @@
                   <td class="px-4 py-3 text-sm text-gray-900">{{ event.event }}</td>
                   <td class="px-4 py-3 text-sm text-gray-900">{{ event.player }}</td>
                   <td class="px-4 py-3 text-sm text-gray-900">{{ event.description }}</td>
-                    <td class="px-4 py-3 text-sm">
-                      <div class="flex gap-1">
-                        <button 
-                          mat-icon-button 
-                          color="primary" 
-                          [disabled]="!isYouTubeLinkValid(event.rawEventData?.youtube_link)"
-                          [matTooltip]="isYouTubeLinkValid(event.rawEventData?.youtube_link) ? 'Video' : 'No valid video link'"
-                          (click)="onViewEventVideo(event)">
-                          <mat-icon>videocam</mat-icon>
-                        </button>
-                        <button mat-icon-button color="primary" matTooltip="Edit" (click)="onEditEvent(event)">
-                          <mat-icon>edit</mat-icon>
-                        </button>
-                        <button mat-icon-button color="warn" matTooltip="Delete" (click)="onDeleteEvent(event.id)">
-                          <mat-icon>delete</mat-icon>
-                        </button>
-                      </div>
-                    </td>
+                  <td class="px-4 py-3 text-sm">
+                    <div class="flex gap-1">
+                      <button
+                        mat-icon-button
+                        color="primary"
+                        [disabled]="!isYouTubeLinkValid(event.rawEventData?.youtube_link)"
+                        [matTooltip]="
+                          isYouTubeLinkValid(event.rawEventData?.youtube_link)
+                            ? 'Video'
+                            : 'No valid video link'
+                        "
+                        (click)="onViewEventVideo(event)"
+                      >
+                        <mat-icon>videocam</mat-icon>
+                      </button>
+                      <button
+                        mat-icon-button
+                        color="primary"
+                        matTooltip="Edit"
+                        (click)="onEditEvent(event)"
+                      >
+                        <mat-icon>edit</mat-icon>
+                      </button>
+                      <button
+                        mat-icon-button
+                        color="warn"
+                        matTooltip="Delete"
+                        (click)="onDeleteEvent(event.id)"
+                      >
+                        <mat-icon>delete</mat-icon>
+                      </button>
+                    </div>
+                  </td>
                 </tr>
               }
             }
@@ -529,5 +727,5 @@
       </table>
     </div>
   </div>
-  </div><!-- End content wrapper -->
-
+</div>
+<!-- End content wrapper -->

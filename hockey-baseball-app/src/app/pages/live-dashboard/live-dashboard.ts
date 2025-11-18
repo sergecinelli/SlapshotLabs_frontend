@@ -1077,8 +1077,26 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
     this.currentPeriodId = periodId;
     this.period.set(selectedPeriod.name);
 
-    this.scheduleService.updateGame(this.gameId, { game_period_id: periodId }).subscribe({
-      next: () => this.refreshLiveDataOnce(),
+    // Check if selected period is the last one (Final)
+    const maxOrder = Math.max(...this.gamePeriods.map(p => p.order ?? p.id));
+    const selectedOrder = selectedPeriod.order ?? selectedPeriod.id;
+    const isFinalPeriod = selectedOrder === maxOrder;
+
+    // Build update payload - include status if Final is selected
+    const updatePayload: Record<string, unknown> = { game_period_id: periodId };
+    if (isFinalPeriod) {
+      updatePayload['status'] = 3; // Game Over
+    }
+
+    this.scheduleService.updateGame(this.gameId, updatePayload).subscribe({
+      next: () => {
+        // If Final was selected, update local game state
+        if (isFinalPeriod) {
+          this.isGameOver = true;
+          this.pageTitle.set('Game Dashboard');
+        }
+        this.refreshLiveDataOnce();
+      },
       error: (e) => {
         console.error('Failed to update game period:', e);
         // Revert UI on error
