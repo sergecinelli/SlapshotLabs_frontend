@@ -400,6 +400,8 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
         next: (liveData) => {
           this.updateStatsFromLiveData(liveData);
           this.updateGameEvents(liveData, this.gamePeriods, this.teamOptions.map(t => ({ id: t.value.toString(), name: t.label })));
+          // Refresh spray charts on each poll
+          this.refreshGameSprayChart();
           // First successful live-data load ends loading state
           if (this.isLoadingGameData) {
             this.isLoadingGameData = false;
@@ -674,6 +676,48 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Refresh game spray chart data (without showing loading state)
+   */
+  private refreshGameSprayChart(): void {
+    // Fetch spray chart data with metadata in parallel
+    forkJoin({
+      sprayChartEvents: this.gameEventService.getGameSprayChart(this.gameId, {}),
+      eventNames: this.gameEventNameService.getGameEventNames(),
+      shotTypes: this.gameMetadataService.getShotTypes()
+    }).subscribe({
+      next: ({ sprayChartEvents, eventNames, shotTypes }) => {
+        // Transform all events using the game transformation method
+        const allTransformedData = this.sprayChartUtils.transformGameSprayChartData(
+          sprayChartEvents,
+          eventNames,
+          shotTypes
+        );
+        
+        // Split data by team
+        const homeData: ShotLocationData[] = [];
+        const awayData: ShotLocationData[] = [];
+        
+        sprayChartEvents.forEach((event, index) => {
+          if (index < allTransformedData.length) {
+            const transformedItem = allTransformedData[index];
+            if (event.team_id === this.homeTeamId) {
+              homeData.push(transformedItem);
+            } else if (event.team_id === this.awayTeamId) {
+              awayData.push(transformedItem);
+            }
+          }
+        });
+        
+        this.homeSprayChartData.set(homeData);
+        this.awaySprayChartData.set(awayData);
+      },
+      error: (error) => {
+        console.error('Failed to refresh game spray chart:', error);
+      }
+    });
+  }
+
+  /**
    * Load players and goalies from game roster
    */
   private loadPlayersAndGoalies(): void {
@@ -841,6 +885,8 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
       next: (liveData) => {
         this.updateStatsFromLiveData(liveData);
         this.updateGameEvents(liveData, this.gamePeriods, this.teamOptions.map(t => ({ id: t.value.toString(), name: t.label })));
+        // Also refresh spray charts when data is refreshed
+        this.refreshGameSprayChart();
       },
       error: (e) => console.error('Failed to refresh live data:', e)
     });
