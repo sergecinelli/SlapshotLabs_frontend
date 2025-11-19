@@ -6,7 +6,7 @@ export interface ShotLocationData {
   iceLeftOffset: number;
   netTopOffset?: number | null;
   netLeftOffset?: number | null;
-  type: 'Goal' | 'Save' | 'Scoring Chance' | 'Penalty' | 'Turnover';
+  type: 'Goal' | 'Save' | 'Scoring Chance' | 'Penalty' | 'Turnover' | 'Blocked' | 'Missed' | 'PP Goal' | 'SH Goal';
 }
 
 interface TypeStats {
@@ -25,19 +25,28 @@ interface TypeStats {
   }
 })
 export class ShotLocationDisplayComponent {
-  private readonly STORAGE_KEY = 'shotLocationFilters';
-  
   data = input.required<ShotLocationData[]>();
+  storageKey = input<string>('shotLocationFilters');
   visibleTypes = signal<Set<ShotLocationData['type']>>(new Set());
+  private isInitialized = signal(false);
 
   constructor() {
-    // Load filters from local storage on initialization
-    this.loadFiltersFromStorage();
-    
-    // Save filters to local storage whenever they change
+    // Load filters from local storage once storageKey is available
     effect(() => {
-      const filters = Array.from(this.visibleTypes());
-      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(filters));
+      const key = this.storageKey();
+      if (!this.isInitialized()) {
+        this.loadFiltersFromStorage(key);
+        this.isInitialized.set(true);
+      }
+    });
+    
+    // Save filters to local storage whenever they change (but only after initialization)
+    effect(() => {
+      if (this.isInitialized()) {
+        const filters = Array.from(this.visibleTypes());
+        const key = this.storageKey();
+        localStorage.setItem(key, JSON.stringify(filters));
+      }
     });
   }
 
@@ -46,7 +55,11 @@ export class ShotLocationDisplayComponent {
     'Save': '#3b82f6',
     'Scoring Chance': '#f59e0b',
     'Penalty': '#ef4444',
-    'Turnover': '#8b5cf6'
+    'Turnover': '#8b5cf6',
+    'Blocked': '#f97316',
+    'Missed': '#64748b',
+    'PP Goal': '#10b981',
+    'SH Goal': '#06b6d4'
   };
 
   private readonly typePlurals: Record<ShotLocationData['type'], string> = {
@@ -54,7 +67,11 @@ export class ShotLocationDisplayComponent {
     'Save': 'Saves',
     'Scoring Chance': 'Scoring Chances',
     'Penalty': 'Penalties',
-    'Turnover': 'Turnovers'
+    'Turnover': 'Turnovers',
+    'Blocked': 'Blocks',
+    'Missed': 'Misses',
+    'PP Goal': 'PP Goals',
+    'SH Goal': 'SH Goals'
   };
 
   stats = computed(() => {
@@ -86,6 +103,7 @@ export class ShotLocationDisplayComponent {
     const visible = this.visibleTypes();
     return this.data()
       .filter(item => visible.has(item.type))
+      .filter(item => !(item.iceTopOffset === 0 && item.iceLeftOffset === 0))
       .map(item => ({
         ...item,
         color: this.typeColors[item.type]
@@ -96,6 +114,7 @@ export class ShotLocationDisplayComponent {
     const visible = this.visibleTypes();
     return this.data()
       .filter(item => item.netTopOffset != null && item.netLeftOffset != null)
+      .filter(item => !(item.netTopOffset === 0 && item.netLeftOffset === 0))
       .filter(item => visible.has(item.type))
       .map(item => ({
         ...item,
@@ -113,19 +132,19 @@ export class ShotLocationDisplayComponent {
     this.visibleTypes.set(current);
   }
 
-  private loadFiltersFromStorage(): void {
+  private loadFiltersFromStorage(key: string): void {
     try {
-      const stored = localStorage.getItem(this.STORAGE_KEY);
+      const stored = localStorage.getItem(key);
       if (stored) {
         const filters = JSON.parse(stored) as ShotLocationData['type'][];
         this.visibleTypes.set(new Set(filters));
       } else {
         // By default, show all types
-        this.visibleTypes.set(new Set(['Goal', 'Save', 'Scoring Chance', 'Penalty', 'Turnover']));
+        this.visibleTypes.set(new Set(['Goal', 'Save', 'Scoring Chance', 'Penalty', 'Turnover', 'Blocked', 'Missed', 'PP Goal', 'SH Goal']));
       }
     } catch (error) {
       // If there's an error parsing, default to showing all types
-      this.visibleTypes.set(new Set(['Goal', 'Save', 'Scoring Chance', 'Penalty', 'Turnover']));
+      this.visibleTypes.set(new Set(['Goal', 'Save', 'Scoring Chance', 'Penalty', 'Turnover', 'Blocked', 'Missed', 'PP Goal', 'SH Goal']));
     }
   }
 }
