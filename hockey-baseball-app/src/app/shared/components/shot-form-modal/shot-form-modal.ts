@@ -342,9 +342,6 @@ export class ShotFormModalComponent implements OnInit {
     return shotType !== null && shotType !== goalShotType?.value;
   }
 
-  get showScoringChance(): boolean {
-    return !this.isGoal;
-  }
 
   get isScoringChance(): boolean {
     return this.shotForm.get('isScoringChance')?.value === true;
@@ -353,10 +350,8 @@ export class ShotFormModalComponent implements OnInit {
   selectShotType(shotType: number): void {
     this.shotForm.patchValue({ shotType });
     this.shotForm.get('shotType')?.markAsTouched();
-    // Reset scoring chance when switching to goal
     const goalShotType = this.shotTypeOptions.find(st => st.label.toLowerCase() === 'goal');
     if (shotType === goalShotType?.value) {
-      this.shotForm.patchValue({ isScoringChance: false });
       // Ensure goalie list reflects opposite of scoring team
       const teamId = this.shotForm.get('scoringTeam')?.value;
       if (teamId) this.filterPlayersAndGoaliesForTeam(teamId);
