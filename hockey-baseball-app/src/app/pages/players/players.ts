@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header';
 import { DataTableComponent, TableColumn, TableAction } from '../../shared/components/data-table/data-table';
 import { PlayerService } from '../../services/player.service';
@@ -50,6 +50,7 @@ export class PlayersComponent implements OnInit {
   private teamService = inject(TeamService);
   private dialog = inject(MatDialog);
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
 
   players = signal<Player[]>([]);
   teams: Team[] = [];
@@ -251,8 +252,7 @@ export class PlayersComponent implements OnInit {
   }
 
   private viewShotSprayChart(player: Player): void {
-    console.log('View shot spray chart for:', player);
-    // TODO: Navigate to shot spray chart page
+    this.router.navigate(['/spray-chart', player.id], { queryParams: { type: 'player' } });
   }
 
   openAddPlayerModal(): void {
