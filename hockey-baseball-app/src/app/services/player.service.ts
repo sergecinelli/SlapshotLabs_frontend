@@ -4,6 +4,7 @@ import { map, catchError, switchMap } from 'rxjs/operators';
 import { Player, PlayerTableData, PlayerApiOut, PlayerApiIn, PlayerApiPatch, PlayerApiInData, PlayerApiOutData } from '../shared/interfaces/player.interface';
 import { ApiService } from './api.service';
 import { TeamService } from './team.service';
+import { SprayChartFilter, SprayChartEvent } from '../shared/interfaces/spray-chart.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -376,6 +377,22 @@ export class PlayerService {
       6: 'Goalie'
     };
     return positionMap[positionId] || 'Center';
+  }
+
+  getPlayerSprayChart(id: string, filter: SprayChartFilter = {}): Observable<SprayChartEvent[]> {
+    // Convert string ID to number for API call
+    const numericId = parseInt(id, 10);
+    if (isNaN(numericId)) {
+      console.error(`Invalid player ID: ${id}`);
+      return throwError(() => new Error(`Invalid player ID: ${id}`));
+    }
+
+    return this.apiService.post<SprayChartEvent[]>(`/hockey/player/${numericId}/spray-chart`, filter).pipe(
+      catchError(error => {
+        console.error(`Failed to fetch spray chart for player ${id}:`, error);
+        return throwError(() => error);
+      })
+    );
   }
 
   private mapPositionNameToId(position: string): number {

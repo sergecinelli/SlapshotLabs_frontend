@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { ApiService } from './api.service';
+import { GameSprayChartFilter, SprayChartEvent } from '../shared/interfaces/spray-chart.interface';
 
 export interface GameEventRequest {
   game_id: number;
@@ -242,5 +243,17 @@ export class GameEventService {
     };
 
     return this.createGameEvent(eventData);
+  }
+
+  /**
+   * Get spray chart data for a specific game
+   */
+  getGameSprayChart(gameId: number, filter: GameSprayChartFilter = {}): Observable<SprayChartEvent[]> {
+    return this.apiService.post<SprayChartEvent[]>(`/hockey/game/${gameId}/spray-chart`, filter).pipe(
+      catchError(error => {
+        console.error(`Failed to fetch spray chart for game ${gameId}:`, error);
+        return throwError(() => error);
+      })
+    );
   }
 }
