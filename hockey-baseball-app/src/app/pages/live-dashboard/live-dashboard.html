@@ -729,15 +729,15 @@
   </div>
 
   <!-- Spray Charts Section (Full Width) -->
-  <div *ngIf="!isLoadingGameData" class="bg-white rounded-lg shadow-lg border border-gray-200 p-6">
-    <div class="mb-6">
+  <div *ngIf="!isLoadingGameData" class="bg-white rounded-lg shadow-lg border border-gray-200 px-6 pb-6">
+    <div>
       <h2 class="text-xl font-semibold text-gray-900 text-center">Spray Charts</h2>
     </div>
 
     <div *ngIf="isLoadingSprayCharts()" class="flex items-center justify-center min-h-[400px]">
       <div class="text-center">
         <mat-spinner diameter="60" class="mx-auto"></mat-spinner>
-        <p class="mt-4 text-gray-600">Loading spray charts...</p>
+        <p class="mt-2 text-gray-600">Loading spray charts...</p>
       </div>
     </div>
 
