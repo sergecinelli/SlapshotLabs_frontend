@@ -6,6 +6,7 @@ import { ApiService } from './api.service';
 import { GoalieDataMapper } from '../shared/utils/goalie-data-mapper';
 import { TeamService } from './team.service';
 import { isDefaultGoalieName } from '../shared/constants/goalie.constants';
+import { SprayChartFilter, SprayChartEvent } from '../shared/interfaces/spray-chart.interface';
 
 export interface GetGoaliesOptions {
   excludeDefault?: boolean;
@@ -200,6 +201,22 @@ export class GoalieService {
   private yearToDateString(year: number): string {
     // Use February 1st of the given year
     return `${year}-02-01`;
+  }
+
+  getGoalieSprayChart(id: string, filter: SprayChartFilter = {}): Observable<SprayChartEvent[]> {
+    // Convert string ID to number for API call
+    const numericId = parseInt(id, 10);
+    if (isNaN(numericId)) {
+      console.error(`Invalid goalie ID: ${id}`);
+      return throwError(() => new Error(`Invalid goalie ID: ${id}`));
+    }
+
+    return this.apiService.post<SprayChartEvent[]>(`/hockey/goalie/${numericId}/spray-chart`, filter).pipe(
+      catchError(error => {
+        console.error(`Failed to fetch spray chart for goalie ${id}:`, error);
+        return throwError(() => error);
+      })
+    );
   }
 
   private toApiPatchFormat(goalieData: Partial<Goalie>, teamId: number): GoalieApiInData {

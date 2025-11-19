@@ -727,5 +727,61 @@
       </table>
     </div>
   </div>
+
+  <!-- Spray Charts Section (Full Width) -->
+  <div *ngIf="!isLoadingGameData" class="bg-white rounded-lg shadow-lg border border-gray-200 px-6 pb-6">
+    <div>
+      <h2 class="text-xl font-semibold text-gray-900 text-center">Spray Charts</h2>
+    </div>
+
+    <div *ngIf="isLoadingSprayCharts()" class="flex items-center justify-center min-h-[400px]">
+      <div class="text-center">
+        <mat-spinner diameter="60" class="mx-auto"></mat-spinner>
+        <p class="mt-2 text-gray-600">Loading spray charts...</p>
+      </div>
+    </div>
+
+    <div *ngIf="!isLoadingSprayCharts()" class="grid grid-cols-2 gap-6">
+      <!-- Away Team Spray Chart -->
+      <div>
+        <div class="text-center mb-4">
+          <h3 class="text-lg font-semibold text-gray-900">{{ awayTeam().name }} {{ awayTeam().teamLevel }}</h3>
+        </div>
+        @if (awaySprayChartData().length > 0) {
+          <app-shot-location-display 
+            [data]="awaySprayChartData()"
+            [storageKey]="'liveDashboardAwaySprayChart'"
+          ></app-shot-location-display>
+        } @else {
+          <div class="flex items-center justify-center min-h-[400px] border border-gray-200 rounded-lg bg-gray-50">
+            <div class="text-center">
+              <mat-icon class="text-gray-400 text-6xl">sports_hockey</mat-icon>
+              <p class="text-gray-500 mt-2">No spray chart data available</p>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Home Team Spray Chart -->
+      <div>
+        <div class="text-center mb-4">
+          <h3 class="text-lg font-semibold text-gray-900">{{ homeTeam().name }} {{homeTeam().teamLevel}}</h3>
+        </div>
+        @if (homeSprayChartData().length > 0) {
+          <app-shot-location-display 
+            [data]="homeSprayChartData()"
+            [storageKey]="'liveDashboardHomeSprayChart'"
+          ></app-shot-location-display>
+        } @else {
+          <div class="flex items-center justify-center min-h-[400px] border border-gray-200 rounded-lg bg-gray-50">
+            <div class="text-center">
+              <mat-icon class="text-gray-400 text-6xl">sports_hockey</mat-icon>
+              <p class="text-gray-500 mt-2">No spray chart data available</p>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
 </div>
 <!-- End content wrapper -->

@@ -153,7 +153,14 @@
         </mat-card-title>
       </mat-card-header>
       <mat-card-content>
-        <app-shot-location-display [data]="getShotLocationData()"></app-shot-location-display>
+        @if (getShotLocationData().length > 0) {
+          <app-shot-location-display [data]="getShotLocationData()" [storageKey]="'goalieSprayChartFilters'"></app-shot-location-display>
+        } @else {
+          <div class="empty-state">
+            <mat-icon class="empty-icon">sports_hockey</mat-icon>
+            <p class="empty-message">No shot data available for this goalie in the current season.</p>
+          </div>
+        }
       </mat-card-content>
     </mat-card>
 

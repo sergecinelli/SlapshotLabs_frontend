@@ -6,9 +6,14 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatTableModule } from '@angular/material/table';
+import { forkJoin } from 'rxjs';
 import { GoalieService } from '../../services/goalie.service';
 import { Goalie, GoalieSeasonStats, GoalieRecentGameStats } from '../../shared/interfaces/goalie.interface';
 import { ShotLocationDisplayComponent, ShotLocationData } from '../../shared/components/shot-location-display/shot-location-display';
+import { SeasonService } from '../../services/season.service';
+import { GameEventNameService, GameEventName } from '../../services/game-event-name.service';
+import { GameMetadataService, ShotTypeResponse } from '../../services/game-metadata.service';
+import { SprayChartUtilsService } from '../../services/spray-chart-utils.service';
 
 @Component({
   selector: 'app-goalie-profile',
@@ -29,9 +34,14 @@ export class GoalieProfileComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private goalieService = inject(GoalieService);
+  private seasonService = inject(SeasonService);
+  private gameEventNameService = inject(GameEventNameService);
+  private gameMetadataService = inject(GameMetadataService);
+  private sprayChartUtils = inject(SprayChartUtilsService);
 
   goalie: Goalie | null = null;
   loading = true;
+  shotLocationData: ShotLocationData[] = [];
   
   // Table column definitions
   seasonStatsColumns: string[] = ['season', 'team', 'gamesPlayed', 'wins', 'losses', 'ties', 'goalsAgainst', 'shotsAgainst', 'saves', 'savePercentage'];
@@ -49,23 +59,60 @@ export class GoalieProfileComponent implements OnInit {
   private loadGoalie(id: string): void {
     this.loading = true;
     
-    this.goalieService.getGoalieById(id).subscribe({
-      next: (goalie) => {
+    // Fetch goalie data, spray chart metadata, and spray chart data in parallel
+    forkJoin({
+      goalie: this.goalieService.getGoalieById(id),
+      seasons: this.seasonService.getSeasons(),
+      eventNames: this.gameEventNameService.getGameEventNames(),
+      shotTypes: this.gameMetadataService.getShotTypes()
+    }).subscribe({
+      next: ({ goalie, seasons, eventNames, shotTypes }) => {
         if (goalie) {
           this.goalie = goalie;
+          
+          // Get the last season (highest ID)
+          const lastSeason = seasons.reduce((max, season) => 
+            season.id > max.id ? season : max, seasons[0]
+          );
+          
+          // Fetch spray chart data for the last season
+          this.loadSprayChartData(id, lastSeason.id, eventNames, shotTypes);
         } else {
           console.error(`Goalie not found with ID: ${id}`);
-          // Could redirect to 404 page or show error message
-          // For now, navigate back to goalies list
           this.router.navigate(['/goalies']);
+          this.loading = false;
         }
-        this.loading = false;
       },
       error: (error) => {
         console.error('Error loading goalie:', error);
         this.loading = false;
-        // Could show a user-friendly error message here
         this.router.navigate(['/goalies']);
+      }
+    });
+  }
+
+  private loadSprayChartData(
+    goalieId: string,
+    seasonId: number,
+    eventNames: GameEventName[],
+    shotTypes: ShotTypeResponse[]
+  ): void {
+    // Fetch spray chart with season filter only (game_id and shot_type_id are empty)
+    this.goalieService.getGoalieSprayChart(goalieId, { season_id: seasonId }).subscribe({
+      next: (sprayChartEvents) => {
+        this.shotLocationData = this.sprayChartUtils.transformSprayChartData(
+          sprayChartEvents,
+          eventNames,
+          shotTypes
+        );
+        console.log(this.shotLocationData);
+        this.loading = false;
+      },
+      error: (error) => {
+        console.error('Error loading spray chart data:', error);
+        // Set empty array on error so component still renders
+        this.shotLocationData = [];
+        this.loading = false;
       }
     });
   }
@@ -210,77 +257,6 @@ export class GoalieProfileComponent implements OnInit {
   }
 
   getShotLocationData(): ShotLocationData[] {
-    return [
-      {
-        iceTopOffset: 25,
-        iceLeftOffset: 75,
-        netTopOffset: 30,
-        netLeftOffset: 40,
-        type: 'Goal'
-      },
-      {
-        iceTopOffset: 45,
-        iceLeftOffset: 80,
-        netTopOffset: 50,
-        netLeftOffset: 55,
-        type: 'Goal'
-      },
-      {
-        iceTopOffset: 35,
-        iceLeftOffset: 70,
-        netTopOffset: 45,
-        netLeftOffset: 50,
-        type: 'Save'
-      },
-      {
-        iceTopOffset: 55,
-        iceLeftOffset: 85,
-        netTopOffset: 60,
-        netLeftOffset: 70,
-        type: 'Save'
-      },
-      {
-        iceTopOffset: 50,
-        iceLeftOffset: 65,
-        netTopOffset: 55,
-        netLeftOffset: 35,
-        type: 'Save'
-      },
-      {
-        iceTopOffset: 30,
-        iceLeftOffset: 78,
-        netTopOffset: null,
-        netLeftOffset: null,
-        type: 'Scoring Chance'
-      },
-      {
-        iceTopOffset: 60,
-        iceLeftOffset: 72,
-        netTopOffset: null,
-        netLeftOffset: null,
-        type: 'Scoring Chance'
-      },
-      {
-        iceTopOffset: 20,
-        iceLeftOffset: 40,
-        netTopOffset: null,
-        netLeftOffset: null,
-        type: 'Penalty'
-      },
-      {
-        iceTopOffset: 70,
-        iceLeftOffset: 60,
-        netTopOffset: null,
-        netLeftOffset: null,
-        type: 'Turnover'
-      },
-      {
-        iceTopOffset: 40,
-        iceLeftOffset: 82,
-        netTopOffset: 42,
-        netLeftOffset: 48,
-        type: 'Save'
-      }
-    ];
+    return this.shotLocationData;
   }
 }

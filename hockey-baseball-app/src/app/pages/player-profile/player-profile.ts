@@ -7,9 +7,15 @@ import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatTableModule } from '@angular/material/table';
 import { MatDialog } from '@angular/material/dialog';
+import { forkJoin } from 'rxjs';
 import { PlayerService } from '../../services/player.service';
 import { Player, PlayerSeasonStats, PlayerRecentGameStats } from '../../shared/interfaces/player.interface';
 import { PlayerFormModalComponent } from '../../shared/components/player-form-modal/player-form-modal';
+import { ShotLocationDisplayComponent, ShotLocationData } from '../../shared/components/shot-location-display/shot-location-display';
+import { SeasonService } from '../../services/season.service';
+import { GameEventNameService, GameEventName } from '../../services/game-event-name.service';
+import { GameMetadataService, ShotTypeResponse } from '../../services/game-metadata.service';
+import { SprayChartUtilsService } from '../../services/spray-chart-utils.service';
 
 @Component({
   selector: 'app-player-profile',
@@ -20,7 +26,8 @@ import { PlayerFormModalComponent } from '../../shared/components/player-form-mo
     MatIconModule,
     MatCardModule,
     MatDividerModule,
-    MatTableModule
+    MatTableModule,
+    ShotLocationDisplayComponent
   ],
   templateUrl: './player-profile.html',
   styleUrl: './player-profile.scss'
@@ -30,9 +37,14 @@ export class PlayerProfileComponent implements OnInit {
   private router = inject(Router);
   private playerService = inject(PlayerService);
   private dialog = inject(MatDialog);
+  private seasonService = inject(SeasonService);
+  private gameEventNameService = inject(GameEventNameService);
+  private gameMetadataService = inject(GameMetadataService);
+  private sprayChartUtils = inject(SprayChartUtilsService);
 
   player: Player | null = null;
   loading = true;
+  shotLocationData: ShotLocationData[] = [];
   
   // Table column definitions
   seasonStatsColumns: string[] = ['season', 'team', 'gamesPlayed', 'goals', 'assists', 'points', 'shotsOnGoal', 'scoringChances', 'penaltiesDrawn', 'turnovers', 'faceOffWinPercentage'];
@@ -50,20 +62,59 @@ export class PlayerProfileComponent implements OnInit {
   private loadPlayer(id: string): void {
     this.loading = true;
     
-    this.playerService.getPlayerById(id).subscribe({
-      next: (player) => {
+    // Fetch player data, spray chart metadata, and spray chart data in parallel
+    forkJoin({
+      player: this.playerService.getPlayerById(id),
+      seasons: this.seasonService.getSeasons(),
+      eventNames: this.gameEventNameService.getGameEventNames(),
+      shotTypes: this.gameMetadataService.getShotTypes()
+    }).subscribe({
+      next: ({ player, seasons, eventNames, shotTypes }) => {
         if (player) {
           this.player = player;
+          
+          // Get the last season (highest ID)
+          const lastSeason = seasons.reduce((max, season) => 
+            season.id > max.id ? season : max, seasons[0]
+          );
+          
+          // Fetch spray chart data for the last season
+          this.loadSprayChartData(id, lastSeason.id, eventNames, shotTypes);
         } else {
           console.error(`Player not found with ID: ${id}`);
           this.router.navigate(['/players']);
+          this.loading = false;
         }
-        this.loading = false;
       },
       error: (error) => {
         console.error('Error loading player:', error);
         this.loading = false;
         this.router.navigate(['/players']);
+      }
+    });
+  }
+
+  private loadSprayChartData(
+    playerId: string,
+    seasonId: number,
+    eventNames: GameEventName[],
+    shotTypes: ShotTypeResponse[]
+  ): void {
+    // Fetch spray chart with season filter only (game_id and shot_type_id are empty)
+    this.playerService.getPlayerSprayChart(playerId, { season_id: seasonId }).subscribe({
+      next: (sprayChartEvents) => {
+        this.shotLocationData = this.sprayChartUtils.transformPlayerSprayChartData(
+          sprayChartEvents,
+          eventNames,
+          shotTypes
+        );
+        this.loading = false;
+      },
+      error: (error) => {
+        console.error('Error loading spray chart data:', error);
+        // Set empty array on error so component still renders
+        this.shotLocationData = [];
+        this.loading = false;
       }
     });
   }
@@ -268,5 +319,9 @@ export class PlayerProfileComponent implements OnInit {
         faceOffWinPercentage: 62.5
       }
     ];
+  }
+
+  getShotLocationData(): ShotLocationData[] {
+    return this.shotLocationData;
   }
 }
