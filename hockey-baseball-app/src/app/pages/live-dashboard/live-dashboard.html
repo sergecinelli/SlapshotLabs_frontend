@@ -745,7 +745,7 @@
       <!-- Away Team Spray Chart -->
       <div>
         <div class="text-center mb-4">
-          <h3 class="text-lg font-semibold text-gray-900">{{ awayTeam().name }} {{ awayTeam().teamLevel }}</h3>
+          <h3 class="text-lg font-semibold text-gray-900">{{ awayTeam().name }}</h3>
         </div>
         @if (awaySprayChartData().length > 0) {
           <app-shot-location-display 
@@ -765,7 +765,7 @@
       <!-- Home Team Spray Chart -->
       <div>
         <div class="text-center mb-4">
-          <h3 class="text-lg font-semibold text-gray-900">{{ homeTeam().name }} {{homeTeam().teamLevel}}</h3>
+          <h3 class="text-lg font-semibold text-gray-900">{{ homeTeam().name }}</h3>
         </div>
         @if (homeSprayChartData().length > 0) {
           <app-shot-location-display 
