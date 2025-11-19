@@ -63,6 +63,10 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/goalie-profile/goalie-profile').then(m => m.GoalieProfileComponent)
       },
       { 
+        path: 'spray-chart/:id', 
+        loadComponent: () => import('./pages/spray-chart/spray-chart').then(m => m.SprayChartComponent)
+      },
+      { 
         path: 'players', 
         loadComponent: () => import('./pages/players/players').then(m => m.PlayersComponent)
       },

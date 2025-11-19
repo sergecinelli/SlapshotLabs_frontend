@@ -1,0 +1,39 @@
+<div class="spray-chart-page">
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <p>Loading spray chart data...</p>
+  </div>
+
+  <!-- Spray Chart Content -->
+  <div *ngIf="!loading && goalie" class="spray-chart-content">
+    <!-- Spray Chart Display Card -->
+    <mat-card class="spray-chart-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>sports_hockey</mat-icon>
+          Spray Chart for {{ goalie.firstName }} {{ goalie.lastName }}
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        @if (shotLocationData.length > 0) {
+          <app-shot-location-display [data]="shotLocationData"></app-shot-location-display>
+        } @else {
+          <div class="empty-state">
+            <mat-icon class="empty-icon">sports_hockey</mat-icon>
+            <p class="empty-message">No shot data available for this goalie.</p>
+          </div>
+        }
+      </mat-card-content>
+    </mat-card>
+
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="!loading && !goalie" class="error-container">
+    <p>Goalie not found.</p>
+    <button mat-raised-button color="primary" (click)="goBack()">
+      Back to Goalies
+    </button>
+  </div>
+
+</div>
