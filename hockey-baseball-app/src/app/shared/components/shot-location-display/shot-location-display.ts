@@ -6,7 +6,7 @@ export interface ShotLocationData {
   iceLeftOffset: number;
   netTopOffset?: number | null;
   netLeftOffset?: number | null;
-  type: 'Goal' | 'Save' | 'Scoring Chance' | 'Penalty' | 'Turnover' | 'Blocked' | 'Missed' | 'PP Goal' | 'SH Goal';
+  type: 'Goal' | 'Save' | 'Scoring Chance' | 'Penalty' | 'Turnover' | 'Blocked' | 'Missed' | 'PP Goal' | 'SH Goal' | 'Faceoff';
 }
 
 interface TypeStats {
@@ -59,7 +59,8 @@ export class ShotLocationDisplayComponent {
     'Blocked': '#f97316',
     'Missed': '#64748b',
     'PP Goal': '#10b981',
-    'SH Goal': '#06b6d4'
+    'SH Goal': '#06b6d4',
+    'Faceoff': '#ec4899'
   };
 
   private readonly typePlurals: Record<ShotLocationData['type'], string> = {
@@ -68,10 +69,11 @@ export class ShotLocationDisplayComponent {
     'Scoring Chance': 'Scoring Chances',
     'Penalty': 'Penalties',
     'Turnover': 'Turnovers',
-    'Blocked': 'Blocks',
+    'Blocked': 'Blocked',
     'Missed': 'Misses',
     'PP Goal': 'PP Goals',
-    'SH Goal': 'SH Goals'
+    'SH Goal': 'SH Goals',
+    'Faceoff': 'Faceoffs'
   };
 
   stats = computed(() => {
@@ -140,11 +142,11 @@ export class ShotLocationDisplayComponent {
         this.visibleTypes.set(new Set(filters));
       } else {
         // By default, show all types
-        this.visibleTypes.set(new Set(['Goal', 'Save', 'Scoring Chance', 'Penalty', 'Turnover', 'Blocked', 'Missed', 'PP Goal', 'SH Goal']));
+        this.visibleTypes.set(new Set(['Goal', 'Save', 'Scoring Chance', 'Penalty', 'Turnover', 'Blocked', 'Missed', 'PP Goal', 'SH Goal', 'Faceoff']));
       }
-    } catch (error) {
+    } catch {
       // If there's an error parsing, default to showing all types
-      this.visibleTypes.set(new Set(['Goal', 'Save', 'Scoring Chance', 'Penalty', 'Turnover', 'Blocked', 'Missed', 'PP Goal', 'SH Goal']));
+      this.visibleTypes.set(new Set(['Goal', 'Save', 'Scoring Chance', 'Penalty', 'Turnover', 'Blocked', 'Missed', 'PP Goal', 'SH Goal', 'Faceoff']));
     }
   }
 }

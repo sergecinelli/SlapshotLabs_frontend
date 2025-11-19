@@ -31,6 +31,8 @@ import { TeamOptionsService } from '../../services/team-options.service';
 import { GameEventService } from '../../services/game-event.service';
 import { GameEventNameService } from '../../services/game-event-name.service';
 import { ScheduleService } from '../../services/schedule.service';
+import { SprayChartUtilsService } from '../../services/spray-chart-utils.service';
+import { ShotLocationDisplayComponent, ShotLocationData } from '../../shared/components/shot-location-display/shot-location-display';
 import { environment } from '../../../environments/environment';
 import { forkJoin, interval, Subscription } from 'rxjs';
 import { switchMap, startWith } from 'rxjs/operators';
@@ -90,7 +92,7 @@ interface GameEvent {
 @Component({
   selector: 'app-live-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule, PageHeaderComponent, ActionButtonComponent, MatIconModule, MatButtonModule, MatTooltipModule, MatSelectModule, MatFormFieldModule, MatProgressSpinnerModule],
+  imports: [CommonModule, FormsModule, PageHeaderComponent, ActionButtonComponent, MatIconModule, MatButtonModule, MatTooltipModule, MatSelectModule, MatFormFieldModule, MatProgressSpinnerModule, ShotLocationDisplayComponent],
   templateUrl: './live-dashboard.html',
   styleUrl: './live-dashboard.scss'
 })
@@ -109,6 +111,7 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
   private gameEventService = inject(GameEventService);
   private gameEventNameService = inject(GameEventNameService);
   private scheduleService = inject(ScheduleService);
+  private sprayChartUtils = inject(SprayChartUtilsService);
   
   // Polling subscription for live data
   private liveDataPollingSubscription?: Subscription;
@@ -246,6 +249,11 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
   // Starting goalies for defaults in forms
   private homeStartGoalieId?: number;
   private awayStartGoalieId?: number;
+  
+  // Spray chart data
+  homeSprayChartData = signal<ShotLocationData[]>([]);
+  awaySprayChartData = signal<ShotLocationData[]>([]);
+  isLoadingSprayCharts = signal(true);
  
   ngOnInit(): void {
     // Get game ID from route parameter
@@ -367,6 +375,7 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
         }
 
         this.loadPlayersAndGoalies();
+        this.loadGameSprayChart();
       },
       error: (error) => {
         console.error('Failed to load initial game data:', error);
@@ -613,6 +622,55 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
     if (name.includes('block')) return 'blocked';
     if (name.includes('miss')) return 'missed';
     return undefined;
+  }
+
+  /**
+   * Load game spray chart data
+   */
+  private loadGameSprayChart(): void {
+    this.isLoadingSprayCharts.set(true);
+    
+    // Fetch spray chart data with metadata in parallel
+    forkJoin({
+      sprayChartEvents: this.gameEventService.getGameSprayChart(this.gameId, {}),
+      eventNames: this.gameEventNameService.getGameEventNames(),
+      shotTypes: this.gameMetadataService.getShotTypes()
+    }).subscribe({
+      next: ({ sprayChartEvents, eventNames, shotTypes }) => {
+        // Transform all events using the game transformation method
+        const allTransformedData = this.sprayChartUtils.transformGameSprayChartData(
+          sprayChartEvents,
+          eventNames,
+          shotTypes
+        );
+        
+        // Split data by team
+        const homeData: ShotLocationData[] = [];
+        const awayData: ShotLocationData[] = [];
+        
+        sprayChartEvents.forEach((event, index) => {
+          if (index < allTransformedData.length) {
+            const transformedItem = allTransformedData[index];
+            if (event.team_id === this.homeTeamId) {
+              homeData.push(transformedItem);
+            } else if (event.team_id === this.awayTeamId) {
+              awayData.push(transformedItem);
+            }
+          }
+        });
+        
+        this.homeSprayChartData.set(homeData);
+        this.awaySprayChartData.set(awayData);
+        this.isLoadingSprayCharts.set(false);
+      },
+      error: (error) => {
+        console.error('Failed to load game spray chart:', error);
+        // Set empty arrays on error so component still renders
+        this.homeSprayChartData.set([]);
+        this.awaySprayChartData.set([]);
+        this.isLoadingSprayCharts.set(false);
+      }
+    });
   }
 
   /**
