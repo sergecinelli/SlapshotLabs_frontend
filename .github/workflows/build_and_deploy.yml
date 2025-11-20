@@ -3,7 +3,7 @@ name: Build and Deploy to S3 (OIDC)
 on:
   push:
     branches:
-      - main
+      - master
   workflow_dispatch:
 
 permissions:
