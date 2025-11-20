@@ -82,7 +82,7 @@ export class GoalieDataMapper {
         address_city: (goalie as Record<string, unknown>)['addressCity'] as string | undefined,
         address_street: (goalie as Record<string, unknown>)['addressStreet'] as string | undefined,
         address_postal_code: (goalie as Record<string, unknown>)['addressPostalCode'] as string | undefined,
-        analysis: 'Some analysis'
+        analysis: (goalie as Record<string, unknown>)['analysis'] as string | undefined
       }
     };
   }
@@ -115,6 +115,7 @@ export class GoalieDataMapper {
       addressCity: data.address_city,
       addressStreet: data.address_street,
       addressPostalCode: data.address_postal_code,
+      analysis: data.analysis || '',
       shotsOnGoal: data.shots_on_goal || 0,
       saves: data.saves || 0,
       goalsAgainst: data.goals_against || 0,

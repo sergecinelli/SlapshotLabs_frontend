@@ -152,7 +152,8 @@ export class ScheduleFormModalComponent implements OnInit {
       gameTypeGroup: [''],
       gameTypeName: [''],
       homeFaceoffWin: [0, [Validators.min(0)]],
-      awayFaceoffWin: [0, [Validators.min(0)]]
+      awayFaceoffWin: [0, [Validators.min(0)]],
+      analysis: ['']
     });
   }
 
@@ -371,7 +372,8 @@ export class ScheduleFormModalComponent implements OnInit {
         rink: game.rink_id,
         tournamentName: game.tournament_name || '',
         status: game.status,
-        gameType: gameTypeId
+        gameType: gameTypeId,
+        analysis: (game as unknown as Record<string, unknown>)['analysis'] || ''
       });
       
       // Trigger game type change to populate game type names
@@ -414,7 +416,8 @@ export class ScheduleFormModalComponent implements OnInit {
         arena: arenaId,
         rink: rinkId,
         tournamentName: schedule.tournamentName || '',
-        status: this.mapStatusToNumber(schedule.status)
+        status: this.mapStatusToNumber(schedule.status),
+        analysis: (schedule as unknown as Record<string, unknown>)['analysis'] || ''
       });
     }
   }
@@ -600,7 +603,8 @@ export class ScheduleFormModalComponent implements OnInit {
         away_goalies: awayGoalies,
         home_players: homePlayers,
         away_players: awayPlayers,
-        game_period_id: defaultGamePeriod ? defaultGamePeriod.id : 0
+        game_period_id: defaultGamePeriod ? defaultGamePeriod.id : 0,
+        analysis: formValue.analysis
       };
 
       // If edit mode, include the game ID
@@ -647,7 +651,8 @@ export class ScheduleFormModalComponent implements OnInit {
       arena: 'Arena',
       rink: 'Rink',
       gameType: 'Game Type',
-      status: 'Status'
+      status: 'Status',
+      analysis: 'Analysis'
     };
     return labels[fieldName] || fieldName;
   }

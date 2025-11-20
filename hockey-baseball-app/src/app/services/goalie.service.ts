@@ -237,7 +237,7 @@ export class GoalieService {
       address_city: (goalieData as Record<string, unknown>)['addressCity'] as string | undefined,
       address_street: (goalieData as Record<string, unknown>)['addressStreet'] as string | undefined,
       address_postal_code: (goalieData as Record<string, unknown>)['addressPostalCode'] as string | undefined,
-      analysis: 'Some analysis'
+      analysis: (goalieData as Record<string, unknown>)['analysis'] as string | undefined
     };
   }
 }

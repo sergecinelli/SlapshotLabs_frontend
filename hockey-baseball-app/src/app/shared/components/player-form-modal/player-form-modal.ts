@@ -165,7 +165,8 @@ export class PlayerFormModalComponent implements OnInit {
       addressCity: [''],
       addressStreet: [''],
       addressPostalCode: [''],
-      playerBiography: ['']
+      playerBiography: [''],
+      analysis: ['']
     });
   }
 
@@ -199,7 +200,8 @@ export class PlayerFormModalComponent implements OnInit {
       addressCity: (player as Record<string, unknown>)['addressCity'],
       addressStreet: (player as Record<string, unknown>)['addressStreet'],
       addressPostalCode: (player as Record<string, unknown>)['addressPostalCode'],
-      playerBiography: (player as Record<string, unknown>)['playerBiography']
+      playerBiography: (player as Record<string, unknown>)['playerBiography'],
+      analysis: (player as Record<string, unknown>)['analysis']
     });
   }
 
@@ -229,7 +231,8 @@ export class PlayerFormModalComponent implements OnInit {
         addressCity: formValue.addressCity,
         addressStreet: formValue.addressStreet,
         addressPostalCode: formValue.addressPostalCode,
-        playerBiography: formValue.playerBiography
+        playerBiography: formValue.playerBiography,
+        analysis: formValue.analysis
       };
 
       if (this.isEditMode && this.data.player) {
@@ -282,7 +285,8 @@ export class PlayerFormModalComponent implements OnInit {
       addressCity: 'City',
       addressStreet: 'Street Address',
       addressPostalCode: 'Postal Code',
-      playerBiography: 'Player Biography'
+      playerBiography: 'Player Biography',
+      analysis: 'Analysis'
     };
     return labels[fieldName] || fieldName;
   }

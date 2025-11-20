@@ -161,7 +161,8 @@ export class GoalieFormModalComponent implements OnInit {
       addressCity: [''],
       addressStreet: [''],
       addressPostalCode: [''],
-      playerBiography: ['']
+      playerBiography: [''],
+      analysis: ['']
     });
   }
 
@@ -195,7 +196,8 @@ export class GoalieFormModalComponent implements OnInit {
       addressCity: (goalie as Record<string, unknown>)['addressCity'],
       addressStreet: (goalie as Record<string, unknown>)['addressStreet'],
       addressPostalCode: (goalie as Record<string, unknown>)['addressPostalCode'],
-      playerBiography: goalie.playerBiography
+      playerBiography: goalie.playerBiography,
+      analysis: (goalie as Record<string, unknown>)['analysis']
     });
   }
 
@@ -226,6 +228,7 @@ export class GoalieFormModalComponent implements OnInit {
         addressStreet: formValue.addressStreet,
         addressPostalCode: formValue.addressPostalCode,
         playerBiography: formValue.playerBiography,
+        analysis: formValue.analysis,
         // Set default values for fields not in form
         level: '',
         shotsOnGoal: 0,
@@ -299,7 +302,8 @@ export class GoalieFormModalComponent implements OnInit {
       addressCity: 'City',
       addressStreet: 'Street Address',
       addressPostalCode: 'Postal Code',
-      playerBiography: 'Player Biography'
+      playerBiography: 'Player Biography',
+      analysis: 'Analysis'
     };
     return labels[fieldName] || fieldName;
   }

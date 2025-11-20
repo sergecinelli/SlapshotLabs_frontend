@@ -215,7 +215,8 @@ export class PlayerService {
       addressRegion: data.address_region || '',
       addressCity: data.address_city || '',
       addressStreet: data.address_street || '',
-      addressPostalCode: data.address_postal_code || ''
+      addressPostalCode: data.address_postal_code || '',
+      analysis: data.analysis || ''
     } as Player & Record<string, unknown>;
   }
 
@@ -287,6 +288,9 @@ export class PlayerService {
     if (extendedData['addressPostalCode'] !== undefined) {
       dataUpdate.address_postal_code = extendedData['addressPostalCode'] as string | undefined;
     }
+    if (extendedData['analysis'] !== undefined) {
+      dataUpdate.analysis = extendedData['analysis'] as string | undefined;
+    }
     
     const patchData: PlayerApiPatch = {};
     if (Object.keys(dataUpdate).length > 0) {
@@ -333,6 +337,7 @@ export class PlayerService {
         address_street: (extendedData['addressStreet'] as string) || '',
         address_postal_code: (extendedData['addressPostalCode'] as string) || '',
         penalties_drawn: playerData.penaltiesDrawn,
+        analysis: (extendedData['analysis'] as string) || ''
       }
     };
   }
