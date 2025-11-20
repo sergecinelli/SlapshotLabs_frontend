@@ -103,25 +103,41 @@ export class ShotLocationDisplayComponent {
 
   rinkItems = computed(() => {
     const visible = this.visibleTypes();
-    return this.data()
+    const filtered = this.data()
       .filter(item => visible.has(item.type))
-      .filter(item => !(item.iceTopOffset === 0 && item.iceLeftOffset === 0))
-      .map(item => ({
+      .filter(item => !(item.iceTopOffset === 0 && item.iceLeftOffset === 0));
+    
+    // Add sequential numbering per type
+    const counters = new Map<ShotLocationData['type'], number>();
+    return filtered.map(item => {
+      const currentCount = counters.get(item.type) || 0;
+      counters.set(item.type, currentCount + 1);
+      return {
         ...item,
-        color: this.typeColors[item.type]
-      }));
+        color: this.typeColors[item.type],
+        number: currentCount + 1
+      };
+    });
   });
 
   netItems = computed(() => {
     const visible = this.visibleTypes();
-    return this.data()
+    const filtered = this.data()
       .filter(item => item.netTopOffset != null && item.netLeftOffset != null)
       .filter(item => !(item.netTopOffset === 0 && item.netLeftOffset === 0))
-      .filter(item => visible.has(item.type))
-      .map(item => ({
+      .filter(item => visible.has(item.type));
+    
+    // Add sequential numbering per type
+    const counters = new Map<ShotLocationData['type'], number>();
+    return filtered.map(item => {
+      const currentCount = counters.get(item.type) || 0;
+      counters.set(item.type, currentCount + 1);
+      return {
         ...item,
-        color: this.typeColors[item.type]
-      }));
+        color: this.typeColors[item.type],
+        number: currentCount + 1
+      };
+    });
   });
 
   toggleType(type: ShotLocationData['type']): void {

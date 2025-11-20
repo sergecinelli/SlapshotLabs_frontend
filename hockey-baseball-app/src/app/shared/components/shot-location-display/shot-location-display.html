@@ -26,10 +26,14 @@
         @for (item of rinkItems(); track $index) {
           <div 
             class="location-marker"
+            [class.marker-large]="item.number >= 100"
+            [class.marker-medium]="item.number >= 10 && item.number < 100"
             [style.top.%]="item.iceTopOffset"
             [style.left.%]="item.iceLeftOffset"
             [style.background-color]="item.color"
-          ></div>
+          >
+            <span class="marker-number">{{ item.number }}</span>
+          </div>
         }
       </div>
     </div>
@@ -45,10 +49,14 @@
         @for (item of netItems(); track $index) {
           <div 
             class="location-marker"
+            [class.marker-large]="item.number >= 100"
+            [class.marker-medium]="item.number >= 10 && item.number < 100"
             [style.top.%]="item.netTopOffset"
             [style.left.%]="item.netLeftOffset"
             [style.background-color]="item.color"
-          ></div>
+          >
+            <span class="marker-number">{{ item.number }}</span>
+          </div>
         }
       </div>
     </div>
