@@ -5,7 +5,7 @@ on:
     branches:
       - master
     paths:
-      - 'hockey_baseball_app/**'
+      - 'hockey-baseball-app/**'
   workflow_dispatch:
 
 permissions:
@@ -27,9 +27,11 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
+        working-directory: hockey-baseball-app
         run: npm ci
 
       - name: Build application
+        working-directory: hockey-baseball-app
         run: npm run build:prod
 
       - name: Configure AWS credentials (OIDC)
@@ -40,7 +42,7 @@ jobs:
 
       - name: Upload to S3
         run: |
-          aws s3 sync dist/hockey-baseball-app/browser s3://${{ vars.S3_BUCKET_NAME }} --delete
+          aws s3 sync hockey-baseball-app/dist/browser s3://${{ vars.S3_BUCKET_NAME }} --delete
 
       - name: Invalidate CloudFront (optional)
         if: ${{ vars.CLOUDFRONT_DISTRIBUTION_ID != '' }}
