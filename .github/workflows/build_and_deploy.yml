@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - master
+    paths:
+      - 'hockey_baseball_app/**'
   workflow_dispatch:
 
 permissions:
