@@ -5,7 +5,7 @@ import {
   HighlightReelApi,
   HighlightReelUpsertPayload,
   HighlightApi,
-  HighlightCreatePayload
+  HighlightCreatePayload,
 } from '../shared/interfaces/highlight-reel.interface';
 
 @Injectable({ providedIn: 'root' })
@@ -21,7 +21,10 @@ export class HighlightsService {
     return this.api.post<HighlightReelApi>('/hockey/highlight-reels', payload);
   }
 
-  updateHighlightReel(id: number, payload: HighlightReelUpsertPayload): Observable<HighlightReelApi> {
+  updateHighlightReel(
+    id: number,
+    payload: HighlightReelUpsertPayload
+  ): Observable<HighlightReelApi> {
     return this.api.put<HighlightReelApi>(`/hockey/highlight-reels/${id}`, payload);
   }
 

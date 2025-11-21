@@ -4,7 +4,7 @@ import { BehaviorSubject, Observable, of } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class CsrfTokenService {
   private http = inject(HttpClient);
@@ -21,35 +21,41 @@ export class CsrfTokenService {
       this.isInitialized = true;
       return of(existingToken);
     }
-    return this.http.post(this.csrfUrl, {}, {
-      responseType: 'text',
-      observe: 'response',
-      withCredentials: true
-    }).pipe(
-      map(response => {
-        let csrfToken = this.getCsrfTokenFromCookie();
-        if (!csrfToken) {
-          const setCookieHeader = response.headers.get('set-cookie');
-          if (setCookieHeader) {
-            const csrfMatch = setCookieHeader.match(/csrftoken=([^;\s]+)/);
-            if (csrfMatch) {
-              csrfToken = csrfMatch[1];
+    return this.http
+      .post(
+        this.csrfUrl,
+        {},
+        {
+          responseType: 'text',
+          observe: 'response',
+          withCredentials: true,
+        }
+      )
+      .pipe(
+        map((response) => {
+          let csrfToken = this.getCsrfTokenFromCookie();
+          if (!csrfToken) {
+            const setCookieHeader = response.headers.get('set-cookie');
+            if (setCookieHeader) {
+              const csrfMatch = setCookieHeader.match(/csrftoken=([^;\s]+)/);
+              if (csrfMatch) {
+                csrfToken = csrfMatch[1];
+              }
             }
           }
-        }
-        if (!csrfToken) {
-          csrfToken = '';
-        }
-        this.csrfToken.next(csrfToken);
-        this.isInitialized = true;
-        return csrfToken;
-      }),
-      catchError(() => {
-        this.csrfToken.next('');
-        this.isInitialized = true;
-        return of('');
-      })
-    );
+          if (!csrfToken) {
+            csrfToken = '';
+          }
+          this.csrfToken.next(csrfToken);
+          this.isInitialized = true;
+          return csrfToken;
+        }),
+        catchError(() => {
+          this.csrfToken.next('');
+          this.isInitialized = true;
+          return of('');
+        })
+      );
   }
   private getCsrfTokenFromCookie(): string {
     if (typeof document === 'undefined') {

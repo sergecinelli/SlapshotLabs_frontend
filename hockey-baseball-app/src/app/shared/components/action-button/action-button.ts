@@ -8,7 +8,7 @@ import { MatIconModule } from '@angular/material/icon';
   standalone: true,
   imports: [CommonModule, MatButtonModule, MatIconModule],
   templateUrl: './action-button.html',
-  styleUrl: './action-button.scss'
+  styleUrl: './action-button.scss',
 })
 export class ActionButtonComponent {
   @Input() label!: string;

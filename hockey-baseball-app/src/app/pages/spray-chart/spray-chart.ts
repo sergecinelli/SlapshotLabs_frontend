@@ -9,7 +9,10 @@ import { GoalieService } from '../../services/goalie.service';
 import { PlayerService } from '../../services/player.service';
 import { Goalie } from '../../shared/interfaces/goalie.interface';
 import { Player } from '../../shared/interfaces/player.interface';
-import { ShotLocationDisplayComponent, ShotLocationData } from '../../shared/components/shot-location-display/shot-location-display';
+import {
+  ShotLocationDisplayComponent,
+  ShotLocationData,
+} from '../../shared/components/shot-location-display/shot-location-display';
 import { GameEventNameService, GameEventName } from '../../services/game-event-name.service';
 import { GameMetadataService, ShotTypeResponse } from '../../services/game-metadata.service';
 import { SprayChartUtilsService } from '../../services/spray-chart-utils.service';
@@ -21,10 +24,10 @@ import { SprayChartUtilsService } from '../../services/spray-chart-utils.service
     MatButtonModule,
     MatIconModule,
     MatCardModule,
-    ShotLocationDisplayComponent
+    ShotLocationDisplayComponent,
   ],
   templateUrl: './spray-chart.html',
-  styleUrl: './spray-chart.scss'
+  styleUrl: './spray-chart.scss',
 })
 export class SprayChartComponent implements OnInit {
   private route = inject(ActivatedRoute);
@@ -44,7 +47,7 @@ export class SprayChartComponent implements OnInit {
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
     const type = this.route.snapshot.queryParamMap.get('type') || 'goalie';
-    
+
     if (id) {
       this.entityType = type as 'goalie' | 'player';
       if (type === 'player') {
@@ -59,13 +62,13 @@ export class SprayChartComponent implements OnInit {
 
   private loadGoalieSprayChartData(goalieId: string): void {
     this.loading = true;
-    
+
     // Fetch goalie data, spray chart metadata, and spray chart data in parallel
     forkJoin({
       goalie: this.goalieService.getGoalieById(goalieId),
       eventNames: this.gameEventNameService.getGameEventNames(),
       shotTypes: this.gameMetadataService.getShotTypes(),
-      sprayChartEvents: this.goalieService.getGoalieSprayChart(goalieId, {}) // Empty filter = all seasons
+      sprayChartEvents: this.goalieService.getGoalieSprayChart(goalieId, {}), // Empty filter = all seasons
     }).subscribe({
       next: ({ goalie, eventNames, shotTypes, sprayChartEvents }) => {
         if (goalie) {
@@ -85,19 +88,19 @@ export class SprayChartComponent implements OnInit {
         console.error('Error loading spray chart data:', error);
         this.loading = false;
         this.router.navigate(['/goalies']);
-      }
+      },
     });
   }
 
   private loadPlayerSprayChartData(playerId: string): void {
     this.loading = true;
-    
+
     // Fetch player data, spray chart metadata, and spray chart data in parallel
     forkJoin({
       player: this.playerService.getPlayerById(playerId),
       eventNames: this.gameEventNameService.getGameEventNames(),
       shotTypes: this.gameMetadataService.getShotTypes(),
-      sprayChartEvents: this.playerService.getPlayerSprayChart(playerId, {}) // Empty filter = all seasons
+      sprayChartEvents: this.playerService.getPlayerSprayChart(playerId, {}), // Empty filter = all seasons
     }).subscribe({
       next: ({ player, eventNames, shotTypes, sprayChartEvents }) => {
         if (player) {
@@ -117,7 +120,7 @@ export class SprayChartComponent implements OnInit {
         console.error('Error loading spray chart data:', error);
         this.loading = false;
         this.router.navigate(['/players']);
-      }
+      },
     });
   }
 

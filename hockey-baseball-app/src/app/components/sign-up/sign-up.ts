@@ -1,6 +1,12 @@
 import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  Validators,
+  ReactiveFormsModule,
+  AbstractControl,
+} from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -32,28 +38,31 @@ export class SignUpComponent {
 
   signUpForm: FormGroup;
   isLoading = false;
-  
+
   constructor() {
-    this.signUpForm = this.formBuilder.group({
-      email: ['', [Validators.required, Validators.email]],
-      firstName: ['', [Validators.required, Validators.minLength(2)]],
-      lastName: ['', [Validators.required, Validators.minLength(2)]],
-      phoneNumber: ['', [Validators.required, Validators.pattern(/^[+]?[1-9][\d]{0,15}$/)]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
-      confirmPassword: ['', [Validators.required]]
-    }, { validators: this.passwordMatchValidator });
+    this.signUpForm = this.formBuilder.group(
+      {
+        email: ['', [Validators.required, Validators.email]],
+        firstName: ['', [Validators.required, Validators.minLength(2)]],
+        lastName: ['', [Validators.required, Validators.minLength(2)]],
+        phoneNumber: ['', [Validators.required, Validators.pattern(/^[+]?[1-9][\d]{0,15}$/)]],
+        password: ['', [Validators.required, Validators.minLength(6)]],
+        confirmPassword: ['', [Validators.required]],
+      },
+      { validators: this.passwordMatchValidator }
+    );
   }
 
   // Custom validator for password confirmation
   passwordMatchValidator(control: AbstractControl): Record<string, boolean> | null {
     const password = control.get('password');
     const confirmPassword = control.get('confirmPassword');
-    
+
     if (!password || !confirmPassword) {
       return null;
     }
-    
-    return password.value !== confirmPassword.value ? { 'passwordMismatch': true } : null;
+
+    return password.value !== confirmPassword.value ? { passwordMismatch: true } : null;
   }
 
   onSubmit() {
@@ -61,7 +70,7 @@ export class SignUpComponent {
       this.signUpForm.markAllAsTouched();
       return;
     }
-    
+
     this.isLoading = true;
     const formValue: UserRegistrationForm = {
       email: this.signUpForm.value.email,
@@ -69,15 +78,15 @@ export class SignUpComponent {
       lastName: this.signUpForm.value.lastName,
       phoneNumber: this.signUpForm.value.phoneNumber,
       password: this.signUpForm.value.password,
-      confirmPassword: this.signUpForm.value.confirmPassword
+      confirmPassword: this.signUpForm.value.confirmPassword,
     };
 
     this.authService.signUp(formValue).subscribe({
       next: () => {
         this.isLoading = false;
         // this.snackBar.open(
-        //   response.message || 'Registration successful! Please sign in.', 
-        //   'Close', 
+        //   response.message || 'Registration successful! Please sign in.',
+        //   'Close',
         //   {
         //     duration: 5000,
         //     panelClass: ['success-snackbar']
@@ -89,15 +98,15 @@ export class SignUpComponent {
       error: (error) => {
         this.isLoading = false;
         // this.snackBar.open(
-        //   error.message || 'Registration failed. Please try again.', 
-        //   'Close', 
+        //   error.message || 'Registration failed. Please try again.',
+        //   'Close',
         //   {
         //     duration: 5000,
         //     panelClass: ['error-snackbar']
         //   }
         // );
         console.error('Sign up error:', error);
-      }
+      },
     });
   }
 

@@ -5,33 +5,48 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header';
-import { DataTableComponent, TableColumn, TableAction } from '../../shared/components/data-table/data-table';
+import {
+  DataTableComponent,
+  TableColumn,
+  TableAction,
+} from '../../shared/components/data-table/data-table';
 import { PlayerService } from '../../services/player.service';
 import { TeamService } from '../../services/team.service';
 import { Player } from '../../shared/interfaces/player.interface';
 import { Team } from '../../shared/interfaces/team.interface';
-import { PlayerFormModalComponent, PlayerFormModalData } from '../../shared/components/player-form-modal/player-form-modal';
+import {
+  PlayerFormModalComponent,
+  PlayerFormModalData,
+} from '../../shared/components/player-form-modal/player-form-modal';
 
 @Component({
   selector: 'app-players',
   standalone: true,
-  imports: [CommonModule, PageHeaderComponent, DataTableComponent, MatButtonModule, MatIconModule, MatDialogModule],
+  imports: [
+    CommonModule,
+    PageHeaderComponent,
+    DataTableComponent,
+    MatButtonModule,
+    MatIconModule,
+    MatDialogModule,
+  ],
   template: `
     <div class="p-6 pt-0">
       <app-page-header [title]="pageTitle()"></app-page-header>
-      
+
       <!-- Add Player Button -->
       <div class="mb-4 flex justify-end">
-        <button 
-          mat-raised-button 
-          color="primary" 
+        <button
+          mat-raised-button
+          color="primary"
           (click)="openAddPlayerModal()"
-          class="add-player-btn">
+          class="add-player-btn"
+        >
           <mat-icon>add</mat-icon>
           Add a Player
         </button>
       </div>
-      
+
       <app-data-table
         [columns]="tableColumns()"
         [data]="players()"
@@ -43,7 +58,7 @@ import { PlayerFormModalComponent, PlayerFormModalData } from '../../shared/comp
       ></app-data-table>
     </div>
   `,
-  styleUrl: './players.scss'
+  styleUrl: './players.scss',
 })
 export class PlayersComponent implements OnInit {
   private playerService = inject(PlayerService);
@@ -74,9 +89,21 @@ export class PlayersComponent implements OnInit {
     { key: 'goals', label: 'Goals', sortable: true, type: 'number', width: '70px' },
     { key: 'assists', label: 'Assists', sortable: true, type: 'number', width: '75px' },
     { key: 'points', label: 'Pts', sortable: true, type: 'number', width: '60px' },
-    { key: 'scoringChances', label: 'Scoring Chances', sortable: true, type: 'number', width: '120px' },
+    {
+      key: 'scoringChances',
+      label: 'Scoring Chances',
+      sortable: true,
+      type: 'number',
+      width: '120px',
+    },
     { key: 'blockedShots', label: 'Blocked Shots', sortable: true, type: 'number', width: '110px' },
-    { key: 'penaltiesDrawn', label: 'Penalties Drawn', sortable: true, type: 'number', width: '120px' }
+    {
+      key: 'penaltiesDrawn',
+      label: 'Penalties Drawn',
+      sortable: true,
+      type: 'number',
+      width: '120px',
+    },
   ];
 
   tableColumns = signal<TableColumn[]>(this.allTableColumns);
@@ -85,15 +112,21 @@ export class PlayersComponent implements OnInit {
     { label: 'Delete', action: 'delete', variant: 'danger' },
     { label: 'Edit', action: 'edit', variant: 'secondary' },
     { label: 'Profile', action: 'view-profile', variant: 'primary' },
-    { label: 'Spray Chart', icon: 'spray-chart', action: 'shot-spray-chart', variant: 'secondary', iconOnly: true },
+    {
+      label: 'Spray Chart',
+      icon: 'spray-chart',
+      action: 'shot-spray-chart',
+      variant: 'secondary',
+      iconOnly: true,
+    },
   ];
 
   ngOnInit(): void {
     // Check for teamId query parameter
-    this.route.queryParams.subscribe(params => {
+    this.route.queryParams.subscribe((params) => {
       const teamId = params['teamId'];
       const teamName = params['teamName'];
-      
+
       if (teamId) {
         this.teamId.set(teamId);
         if (teamName) {
@@ -101,7 +134,7 @@ export class PlayersComponent implements OnInit {
           this.pageTitle.set(`${teamName} Players`);
         }
         // Hide team column when viewing team-specific players
-        this.tableColumns.set(this.allTableColumns.filter(col => col.key !== 'team'));
+        this.tableColumns.set(this.allTableColumns.filter((col) => col.key !== 'team'));
         this.loadPlayersByTeam(parseInt(teamId, 10));
       } else {
         this.teamId.set(null);
@@ -128,7 +161,7 @@ export class PlayersComponent implements OnInit {
       error: (error) => {
         console.error('Error loading players:', error);
         this.loading.set(false);
-      }
+      },
     });
   }
 
@@ -146,7 +179,7 @@ export class PlayersComponent implements OnInit {
       error: (error) => {
         console.error('Error loading players for team:', error);
         this.loading.set(false);
-      }
+      },
     });
   }
 
@@ -157,13 +190,13 @@ export class PlayersComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading teams:', error);
-      }
+      },
     });
   }
 
-  onActionClick(event: { action: string, item: Player }): void {
+  onActionClick(event: { action: string; item: Player }): void {
     const { action, item } = event;
-    
+
     switch (action) {
       case 'delete':
         this.deletePlayer(item);
@@ -182,30 +215,32 @@ export class PlayersComponent implements OnInit {
     }
   }
 
-  onSort(event: { column: string, direction: 'asc' | 'desc' }): void {
+  onSort(event: { column: string; direction: 'asc' | 'desc' }): void {
     const { column, direction } = event;
     const sortedPlayers = [...this.players()].sort((a, b) => {
       const aValue = this.getNestedValue(a, column);
       const bValue = this.getNestedValue(b, column);
-      
+
       if (aValue === bValue) return 0;
-      
+
       const result = (aValue as string | number) < (bValue as string | number) ? -1 : 1;
       return direction === 'asc' ? result : -result;
     });
-    
+
     this.players.set(sortedPlayers);
   }
 
   private getNestedValue(obj: Player, path: string): unknown {
-    return path.split('.').reduce((current: unknown, key: string) => (current as Record<string, unknown>)?.[key], obj);
+    return path
+      .split('.')
+      .reduce((current: unknown, key: string) => (current as Record<string, unknown>)?.[key], obj);
   }
 
   private sortByDate(players: Player[], direction: 'asc' | 'desc'): Player[] {
     return [...players].sort((a, b) => {
       const aDate = a.createdAt || new Date(0); // Use epoch if no date
       const bDate = b.createdAt || new Date(0);
-      
+
       const result = aDate.getTime() - bDate.getTime();
       return direction === 'desc' ? -result : result; // desc = newest first
     });
@@ -216,7 +251,7 @@ export class PlayersComponent implements OnInit {
       this.playerService.deletePlayer(player.id).subscribe({
         next: (success) => {
           if (success) {
-            const updatedPlayers = this.players().filter(p => p.id !== player.id);
+            const updatedPlayers = this.players().filter((p) => p.id !== player.id);
             this.players.set(updatedPlayers);
             // this.snackBar.open(
             //   `Player ${player.firstName} ${player.lastName} deleted successfully`,
@@ -238,7 +273,7 @@ export class PlayersComponent implements OnInit {
           //   'Close',
           //   { duration: 3000, panelClass: ['custom-snackbar', 'error-snackbar'] }
           // );
-        }
+        },
       });
     }
   }
@@ -247,7 +282,7 @@ export class PlayersComponent implements OnInit {
     // Build the full URL including the base URL
     const baseUrl = window.location.origin;
     const url = `${baseUrl}/player-profile/${player.id}`;
-    
+
     window.location.assign(url);
   }
 
@@ -263,13 +298,13 @@ export class PlayersComponent implements OnInit {
         isEditMode: false,
         teams: this.teams,
         teamId: this.teamId(),
-        teamName: this.teamName()
+        teamName: this.teamName(),
       } as PlayerFormModalData,
       panelClass: 'player-form-modal-dialog',
-      disableClose: true
+      disableClose: true,
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         this.addPlayer(result);
       }
@@ -291,7 +326,7 @@ export class PlayersComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error adding player:', error);
-      }
+      },
     });
   }
 
@@ -304,13 +339,13 @@ export class PlayersComponent implements OnInit {
         isEditMode: true,
         teams: this.teams,
         teamId: this.teamId(),
-        teamName: this.teamName()
+        teamName: this.teamName(),
       } as PlayerFormModalData,
       panelClass: 'player-form-modal-dialog',
-      disableClose: true
+      disableClose: true,
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         this.updatePlayer(result);
       }
@@ -321,7 +356,7 @@ export class PlayersComponent implements OnInit {
     this.playerService.updatePlayer(playerData.id!, playerData).subscribe({
       next: (updatedPlayer) => {
         const currentPlayers = this.players();
-        const index = currentPlayers.findIndex(p => p.id === updatedPlayer.id);
+        const index = currentPlayers.findIndex((p) => p.id === updatedPlayer.id);
         if (index !== -1) {
           const newPlayers = [...currentPlayers];
           newPlayers[index] = updatedPlayer;
@@ -335,7 +370,7 @@ export class PlayersComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error updating player:', error);
-      }
+      },
     });
   }
 }

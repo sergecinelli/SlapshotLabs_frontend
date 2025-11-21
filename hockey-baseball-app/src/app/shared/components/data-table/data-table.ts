@@ -1,4 +1,13 @@
-import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy, ElementRef, Renderer2, inject } from '@angular/core';
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  ChangeDetectionStrategy,
+  ElementRef,
+  Renderer2,
+  inject,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
@@ -29,10 +38,17 @@ export interface TableAction {
 @Component({
   selector: 'app-data-table',
   standalone: true,
-  imports: [CommonModule, MatTableModule, MatButtonModule, MatSortModule, MatProgressSpinnerModule, MatTooltipModule],
+  imports: [
+    CommonModule,
+    MatTableModule,
+    MatButtonModule,
+    MatSortModule,
+    MatProgressSpinnerModule,
+    MatTooltipModule,
+  ],
   templateUrl: './data-table.html',
   styleUrl: './data-table.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DataTableComponent<T extends Record<string, unknown> = Record<string, unknown>> {
   private elementRef = inject(ElementRef);
@@ -47,16 +63,16 @@ export class DataTableComponent<T extends Record<string, unknown> = Record<strin
     return this._data;
   }
   private _data: T[] = [];
-  
+
   @Input() actions: TableAction[] = [];
   @Input() loading = false;
   @Input() emptyMessage = 'No data available';
-  
-  @Output() actionClick = new EventEmitter<{ action: string, item: T }>();
-  @Output() sort = new EventEmitter<{ column: string, direction: 'asc' | 'desc' }>();
+
+  @Output() actionClick = new EventEmitter<{ action: string; item: T }>();
+  @Output() sort = new EventEmitter<{ column: string; direction: 'asc' | 'desc' }>();
 
   get displayedColumns(): string[] {
-    const columnKeys = this.columns.map(col => col.key);
+    const columnKeys = this.columns.map((col) => col.key);
     return this.actions.length > 0 ? [...columnKeys, 'actions'] : columnKeys;
   }
 
@@ -77,21 +93,23 @@ export class DataTableComponent<T extends Record<string, unknown> = Record<strin
   getDateValue(item: T, column: TableColumn): Date | null {
     const value = this.getCellValue(item, column);
     if (value === null || value === undefined) return null;
-    
+
     if (value instanceof Date) {
       return value;
     }
-    
+
     if (typeof value === 'string' || typeof value === 'number') {
       const date = new Date(value);
       return isNaN(date.getTime()) ? null : date;
     }
-    
+
     return null;
   }
 
   private getNestedValue(obj: Record<string, unknown>, path: string): unknown {
-    return path.split('.').reduce((current: unknown, key: string) => (current as Record<string, unknown>)?.[key], obj);
+    return path
+      .split('.')
+      .reduce((current: unknown, key: string) => (current as Record<string, unknown>)?.[key], obj);
   }
 
   getNumberValue(item: T, column: TableColumn): number | null {
@@ -106,7 +124,7 @@ export class DataTableComponent<T extends Record<string, unknown> = Record<strin
     if (value === null || value === undefined) {
       return '-';
     }
-    
+
     // Special formatting for specific fields
     switch (column.key) {
       case 'weight':
@@ -122,32 +140,36 @@ export class DataTableComponent<T extends Record<string, unknown> = Record<strin
         }
         break;
     }
-    
+
     return String(value);
   }
 
-
   isTextTruncated(element: HTMLElement): boolean {
     if (!element) return false;
-    
+
     // Check if the element's scrollWidth is greater than its clientWidth
     // This indicates that the content is wider than the visible area
     return element.scrollWidth > element.clientWidth;
   }
 
-  onCellMouseEnter(cellElement: HTMLElement, matTooltip: MatTooltip, item: T, column: TableColumn): void {
+  onCellMouseEnter(
+    cellElement: HTMLElement,
+    matTooltip: MatTooltip,
+    item: T,
+    column: TableColumn
+  ): void {
     // Always show tooltip if explicitly enabled for the column
     if (column.showTooltip === true) {
       matTooltip.disabled = false;
       return;
     }
-    
-    // Never show tooltip if explicitly disabled for the column  
+
+    // Never show tooltip if explicitly disabled for the column
     if (column.showTooltip === false) {
       matTooltip.disabled = true;
       return;
     }
-    
+
     // Default behavior: show tooltip only if text is truncated
     const isTextTruncated = this.isTextTruncated(cellElement);
     matTooltip.disabled = !isTextTruncated;
@@ -159,7 +181,7 @@ export class DataTableComponent<T extends Record<string, unknown> = Record<strin
     const statusMap: Record<number, string> = {
       1: 'status-badge not-started',
       2: 'status-badge game-in-progress',
-      3: 'status-badge game-over'
+      3: 'status-badge game-over',
     };
     return statusMap[statusNum] || 'status-badge';
   }
@@ -169,7 +191,7 @@ export class DataTableComponent<T extends Record<string, unknown> = Record<strin
     const statusLabelMap: Record<number, string> = {
       1: 'Not Started',
       2: 'Game in Progress',
-      3: 'Game Over'
+      3: 'Game Over',
     };
     return statusLabelMap[statusNum] || String(status);
   }
@@ -178,10 +200,10 @@ export class DataTableComponent<T extends Record<string, unknown> = Record<strin
     const typeStr = String(gameType || '');
     const typeMap: Record<string, string> = {
       'Regular Season': 'game-type-badge regular-season',
-      'Playoff': 'game-type-badge playoff',
-      'Tournament': 'game-type-badge tournament',
-      'Exhibition': 'game-type-badge exhibition',
-      'Summer League': 'game-type-badge summer-league'
+      Playoff: 'game-type-badge playoff',
+      Tournament: 'game-type-badge tournament',
+      Exhibition: 'game-type-badge exhibition',
+      'Summer League': 'game-type-badge summer-league',
     };
     return typeMap[typeStr] || 'game-type-badge';
   }

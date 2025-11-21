@@ -24,14 +24,14 @@ export interface Team {
   name: string;
   group: string;
   level: string;
-  levelId?: number;  // Store level ID for form selection
+  levelId?: number; // Store level ID for form selection
   division: string;
-  divisionId?: number;  // Store division ID for form selection
+  divisionId?: number; // Store division ID for form selection
   city: string;
   logo: string;
   abbreviation?: string;
-  createdAt?: Date;  // Creation date for sorting
-  [key: string]: unknown;  // Index signature for compatibility with Record<string, unknown>
+  createdAt?: Date; // Creation date for sorting
+  [key: string]: unknown; // Index signature for compatibility with Record<string, unknown>
 }
 
 export interface TeamTableData {

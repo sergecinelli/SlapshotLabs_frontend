@@ -8,7 +8,11 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
-import { LocationSelectorComponent, PuckLocation, Team } from '../location-selector/location-selector';
+import {
+  LocationSelectorComponent,
+  PuckLocation,
+  Team,
+} from '../location-selector/location-selector';
 
 import { TeamService } from '../../../services/team.service';
 import { PlayerService } from '../../../services/player.service';
@@ -40,10 +44,10 @@ export interface PenaltyFormData {
     MatSelectModule,
     MatIconModule,
     MatDividerModule,
-    LocationSelectorComponent
+    LocationSelectorComponent,
   ],
   templateUrl: './penalty-form-modal.html',
-  styleUrl: './penalty-form-modal.scss'
+  styleUrl: './penalty-form-modal.scss',
 })
 export class PenaltyFormModalComponent implements OnInit {
   private fb = inject(FormBuilder);
@@ -52,10 +56,10 @@ export class PenaltyFormModalComponent implements OnInit {
   private playerService = inject(PlayerService);
   private gameMetadataService = inject(GameMetadataService);
   private gameEventService = inject(GameEventService);
-  private dialogData = inject<{ 
-    gameId: number; 
-    penaltyEventId: number; 
-    periodOptions?: { value: number; label: string }[]; 
+  private dialogData = inject<{
+    gameId: number;
+    penaltyEventId: number;
+    periodOptions?: { value: number; label: string }[];
     teamOptions?: { value: number; label: string; logo?: string }[];
     playerOptions?: { value: number; label: string; teamId: number }[];
     // Edit mode fields
@@ -109,26 +113,30 @@ export class PenaltyFormModalComponent implements OnInit {
     } else {
       this.loadTeams();
     }
-    
+
     if (this.dialogData.periodOptions && this.dialogData.periodOptions.length > 0) {
       this.periodOptions = this.dialogData.periodOptions;
     } else {
       this.loadPeriods();
     }
-    
+
     // Edit mode: populate with existing data
     if (this.isEditMode && this.dialogData.existingData) {
       const existing = this.dialogData.existingData;
-      
+
       // Restore location if available
-      if (existing.iceTopOffset !== undefined && existing.iceLeftOffset !== undefined && existing.zone) {
+      if (
+        existing.iceTopOffset !== undefined &&
+        existing.iceLeftOffset !== undefined &&
+        existing.zone
+      ) {
         this.puckLocation = {
           x: existing.iceLeftOffset,
           y: existing.iceTopOffset,
-          zone: existing.zone as 'defending' | 'neutral' | 'attacking' ?? 'defending'
+          zone: (existing.zone as 'defending' | 'neutral' | 'attacking') ?? 'defending',
         };
       }
-      
+
       // Populate form
       this.penaltyForm.patchValue({
         team: existing.teamId,
@@ -137,9 +145,9 @@ export class PenaltyFormModalComponent implements OnInit {
         period: existing.periodId,
         time: existing.time,
         location: existing.zone,
-        youtubeLink: existing.youtubeLink || ''
+        youtubeLink: existing.youtubeLink || '',
       });
-      
+
       // Load players for the existing team
       if (existing.teamId) {
         if (this.dialogData.playerOptions && this.dialogData.playerOptions.length > 0) {
@@ -152,14 +160,14 @@ export class PenaltyFormModalComponent implements OnInit {
       // Create mode: Set defaults
       if (this.teamOptions.length > 0) {
         this.penaltyForm.patchValue({ team: this.teamOptions[0].value });
-        
+
         if (this.dialogData.playerOptions && this.dialogData.playerOptions.length > 0) {
           this.filterPlayersForTeam(this.teamOptions[0].value);
         } else {
           this.loadPlayersForTeam(this.teamOptions[0].value);
         }
       }
-      
+
       if (this.periodOptions.length > 0) {
         this.penaltyForm.patchValue({ period: this.periodOptions[0].value });
       }
@@ -170,11 +178,14 @@ export class PenaltyFormModalComponent implements OnInit {
     return this.fb.group({
       team: ['', Validators.required],
       player: ['', Validators.required],
-      penaltyLength: ['', [Validators.required, Validators.pattern(/^([0-5]?[0-9]):([0-5][0-9])$/)]],
+      penaltyLength: [
+        '',
+        [Validators.required, Validators.pattern(/^([0-5]?[0-9]):([0-5][0-9])$/)],
+      ],
       period: ['', Validators.required],
       time: ['', [Validators.required, Validators.pattern(/^([0-5]?[0-9]):([0-5][0-9])$/)]],
       youtubeLink: [''],
-      location: ['']
+      location: [''],
     });
   }
 
@@ -182,17 +193,17 @@ export class PenaltyFormModalComponent implements OnInit {
     this.isLoadingTeams = true;
     this.teamService.getTeams().subscribe({
       next: (response) => {
-        this.teamOptions = response.teams.map(team => ({
+        this.teamOptions = response.teams.map((team) => ({
           value: parseInt(team.id),
           label: team.name,
-          logo: team.logo
+          logo: team.logo,
         }));
         this.isLoadingTeams = false;
-        
+
         // Set default team after teams are loaded
         if (this.teamOptions.length > 0) {
           this.penaltyForm.patchValue({
-            team: this.teamOptions[0].value
+            team: this.teamOptions[0].value,
           });
           // Load players for default team
           this.loadPlayersForTeam(this.teamOptions[0].value);
@@ -201,7 +212,7 @@ export class PenaltyFormModalComponent implements OnInit {
       error: (error) => {
         console.error('Failed to load teams:', error);
         this.isLoadingTeams = false;
-      }
+      },
     });
   }
 
@@ -218,13 +229,13 @@ export class PenaltyFormModalComponent implements OnInit {
       error: (error) => {
         console.error('Failed to load periods:', error);
         this.isLoadingPeriods = false;
-      }
+      },
     });
   }
 
   private loadPlayersForTeam(teamId: number): void {
     this.isLoadingPlayers = true;
-    
+
     // Check if we already have players cached for this team
     if (this.playersByTeam[teamId]) {
       this.playerOptions = this.playersByTeam[teamId];
@@ -234,19 +245,19 @@ export class PenaltyFormModalComponent implements OnInit {
       }
       return;
     }
-    
+
     this.playerService.getPlayersByTeam(teamId).subscribe({
       next: (players) => {
-        const playerOptions = players.map(player => ({
+        const playerOptions = players.map((player) => ({
           value: parseInt(player.id),
-          label: `${player.firstName} ${player.lastName}`
+          label: `${player.firstName} ${player.lastName}`,
         }));
-        
+
         // Cache the players
         this.playersByTeam[teamId] = playerOptions;
         this.playerOptions = playerOptions;
         this.isLoadingPlayers = false;
-        
+
         if (this.playerOptions.length > 0) {
           this.penaltyForm.patchValue({ player: this.playerOptions[0].value });
         } else {
@@ -256,7 +267,7 @@ export class PenaltyFormModalComponent implements OnInit {
       error: (error) => {
         console.error(`Failed to load players for team ${teamId}:`, error);
         this.isLoadingPlayers = false;
-      }
+      },
     });
   }
 
@@ -266,16 +277,16 @@ export class PenaltyFormModalComponent implements OnInit {
   private filterPlayersForTeam(teamId: number): void {
     if (this.dialogData.playerOptions) {
       const filteredPlayers = this.dialogData.playerOptions
-        .filter(player => player.teamId === teamId)
-        .map(player => ({
+        .filter((player) => player.teamId === teamId)
+        .map((player) => ({
           value: player.value,
-          label: player.label
+          label: player.label,
         }));
-      
+
       // Cache the filtered players
       this.playersByTeam[teamId] = filteredPlayers;
       this.playerOptions = filteredPlayers;
-      
+
       if (this.playerOptions.length > 0) {
         this.penaltyForm.patchValue({ player: this.playerOptions[0].value });
       } else {
@@ -285,10 +296,11 @@ export class PenaltyFormModalComponent implements OnInit {
   }
 
   private setupTeamChangeListener(): void {
-    const usePreloadedPlayers = this.dialogData.playerOptions && this.dialogData.playerOptions.length > 0;
-    
+    const usePreloadedPlayers =
+      this.dialogData.playerOptions && this.dialogData.playerOptions.length > 0;
+
     // When team changes, update available players
-    this.penaltyForm.get('team')?.valueChanges.subscribe(team => {
+    this.penaltyForm.get('team')?.valueChanges.subscribe((team) => {
       if (usePreloadedPlayers) {
         this.filterPlayersForTeam(team);
       } else {
@@ -323,19 +335,21 @@ export class PenaltyFormModalComponent implements OnInit {
     if (this.penaltyForm.valid && !this.isSubmitting) {
       this.isSubmitting = true;
       const formValue = this.penaltyForm.value;
-      
+
       // Convert mm:ss to time-of-day like shots (HH:mm:ss.SSSZ with 00 hours)
       const [minutes, seconds] = formValue.time.split(':').map((v: string) => parseInt(v, 10));
       const tmp = new Date(Date.UTC(1970, 0, 1, 0, minutes, seconds, 0));
       const iso = tmp.toISOString();
       const timeOfDay = iso.substring(iso.indexOf('T') + 1);
-      
+
       // Convert penalty length to ISO 8601 duration (timedelta) format, e.g., PT2M30S
-      const [penaltyMinutes, penaltySeconds] = formValue.penaltyLength.split(':').map((v: string) => parseInt(v, 10));
+      const [penaltyMinutes, penaltySeconds] = formValue.penaltyLength
+        .split(':')
+        .map((v: string) => parseInt(v, 10));
       const mm = isNaN(penaltyMinutes) ? 0 : penaltyMinutes;
       const ss = isNaN(penaltySeconds) ? 0 : penaltySeconds;
       const timeLengthDuration = `PT${mm > 0 ? mm + 'M' : ''}${ss > 0 ? ss + 'S' : '0S'}`;
-      
+
       const penaltyRequest: PenaltyEventRequest = {
         game_id: this.gameId,
         event_name_id: this.penaltyEventId,
@@ -347,7 +361,7 @@ export class PenaltyFormModalComponent implements OnInit {
         youtube_link: formValue.youtubeLink || undefined,
         ice_top_offset: this.puckLocation?.y as number | undefined,
         ice_left_offset: this.puckLocation?.x as number | undefined,
-        zone: this.puckLocation?.zone
+        zone: this.puckLocation?.zone,
       };
 
       // Edit or create based on mode
@@ -362,15 +376,15 @@ export class PenaltyFormModalComponent implements OnInit {
             console.error('Failed to update penalty event:', error);
             this.isSubmitting = false;
             alert('Failed to update penalty event. Please try again.');
-          }
+          },
         });
       } else {
         this.gameEventService.createPenaltyEvent(penaltyRequest).subscribe({
           next: () => {
             // Find selected team and player for display
-            const selectedTeam = this.teamOptions.find(t => t.value === formValue.team);
-            const selectedPlayer = this.playerOptions.find(p => p.value === formValue.player);
-            
+            const selectedTeam = this.teamOptions.find((t) => t.value === formValue.team);
+            const selectedPlayer = this.playerOptions.find((p) => p.value === formValue.player);
+
             const penaltyData: PenaltyFormData = {
               teamLogo: selectedTeam?.logo || '',
               teamName: selectedTeam?.label || '',
@@ -379,21 +393,21 @@ export class PenaltyFormModalComponent implements OnInit {
               period: formValue.period.toString(),
               time: formValue.time,
               youtubeLink: formValue.youtubeLink,
-              location: this.puckLocation || undefined
+              location: this.puckLocation || undefined,
             };
-            
+
             this.isSubmitting = false;
             this.dialogRef.close(penaltyData);
           },
           error: (error) => {
             console.error('Failed to create penalty event:', error);
             this.isSubmitting = false;
-          }
+          },
         });
       }
     } else if (!this.penaltyForm.valid) {
       // Mark all fields as touched to show validation errors
-      Object.keys(this.penaltyForm.controls).forEach(key => {
+      Object.keys(this.penaltyForm.controls).forEach((key) => {
         this.penaltyForm.get(key)?.markAsTouched();
       });
     }
@@ -424,7 +438,7 @@ export class PenaltyFormModalComponent implements OnInit {
       period: 'Period',
       time: 'Time',
       youtubeLink: 'YouTube Link',
-      location: 'Location'
+      location: 'Location',
     };
     return labels[fieldName] || fieldName;
   }
@@ -432,26 +446,26 @@ export class PenaltyFormModalComponent implements OnInit {
   get selectedTeamData(): Team | undefined {
     const selectedTeamId = this.penaltyForm.get('team')?.value;
     if (!selectedTeamId) return undefined;
-    
-    const team = this.teamOptions.find(t => t.value === selectedTeamId);
+
+    const team = this.teamOptions.find((t) => t.value === selectedTeamId);
     if (!team) return undefined;
-    
+
     return {
       name: team.label,
-      logo: `${environment.apiUrl}/hockey/team/${selectedTeamId}/logo`
+      logo: `${environment.apiUrl}/hockey/team/${selectedTeamId}/logo`,
     };
   }
 
   get otherTeamData(): Team | undefined {
     const selectedTeamId = this.penaltyForm.get('team')?.value;
     if (!selectedTeamId) return undefined;
-    
-    const otherTeam = this.teamOptions.find(t => t.value !== selectedTeamId);
+
+    const otherTeam = this.teamOptions.find((t) => t.value !== selectedTeamId);
     if (!otherTeam) return undefined;
-    
+
     return {
       name: otherTeam.label,
-      logo: `${environment.apiUrl}/hockey/team/${otherTeam.value}/logo`
+      logo: `${environment.apiUrl}/hockey/team/${otherTeam.value}/logo`,
     };
   }
 

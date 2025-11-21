@@ -31,7 +31,7 @@ export class ForgotPasswordComponent implements OnDestroy {
   isEmailSent = false;
   isLoading = false;
   errorMessage = '';
-  
+
   // Resend functionality
   canResend = false;
   resendCountdown = 0;
@@ -39,7 +39,7 @@ export class ForgotPasswordComponent implements OnDestroy {
 
   constructor() {
     this.forgotPasswordForm = this.formBuilder.group({
-      email: ['', [Validators.required, Validators.email]]
+      email: ['', [Validators.required, Validators.email]],
     });
   }
 
@@ -51,7 +51,7 @@ export class ForgotPasswordComponent implements OnDestroy {
 
   onSubmit() {
     this.errorMessage = '';
-    
+
     if (this.forgotPasswordForm.invalid) {
       this.forgotPasswordForm.markAllAsTouched();
       return;
@@ -63,7 +63,7 @@ export class ForgotPasswordComponent implements OnDestroy {
   sendPasswordResetEmail() {
     this.isLoading = true;
     const email = this.forgotPasswordForm.get('email')?.value;
-    
+
     this.authService.requestPasswordReset(email).subscribe({
       next: () => {
         this.isEmailSent = true;
@@ -74,7 +74,7 @@ export class ForgotPasswordComponent implements OnDestroy {
         console.error('Error sending password reset email:', error);
         this.errorMessage = error.message || 'Failed to send email. Please try again.';
         this.isLoading = false;
-      }
+      },
     });
   }
 
@@ -87,7 +87,7 @@ export class ForgotPasswordComponent implements OnDestroy {
   startResendTimer() {
     this.canResend = false;
     this.resendCountdown = 60; // 60 seconds
-    
+
     this.resendTimer = setInterval(() => {
       this.resendCountdown--;
       if (this.resendCountdown <= 0) {

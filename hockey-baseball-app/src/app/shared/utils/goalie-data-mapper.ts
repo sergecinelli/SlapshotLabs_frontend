@@ -4,7 +4,6 @@ import { Goalie, GoalieApiIn, GoalieApiOut } from '../interfaces/goalie.interfac
  * Utility class for transforming data between frontend and API formats
  */
 export class GoalieDataMapper {
-  
   /**
    * Convert feet'inches format to total inches
    * @param heightStr - Height string like "5'10" or "6'2""
@@ -12,17 +11,17 @@ export class GoalieDataMapper {
    */
   static heightStringToInches(heightStr: string): number {
     if (!heightStr) return 0;
-    
+
     const match = heightStr.match(/(\d+)'(\d+)/);
     if (!match) {
       // Try to parse as just a number
       const parsed = parseInt(heightStr);
       return isNaN(parsed) ? 0 : parsed;
     }
-    
+
     const feet = parseInt(match[1]);
     const inches = parseInt(match[2]);
-    return (feet * 12) + inches;
+    return feet * 12 + inches;
   }
 
   /**
@@ -32,7 +31,7 @@ export class GoalieDataMapper {
    */
   static inchesToHeightString(inches: number): string {
     if (!inches || inches <= 0) return '';
-    
+
     const feet = Math.floor(inches / 12);
     const remainingInches = inches % 12;
     return `${feet}'${remainingInches}"`;
@@ -77,13 +76,17 @@ export class GoalieDataMapper {
         birth_year: this.yearToDateString(goalie.birthYear || new Date().getFullYear()),
         player_bio: goalie.playerBiography,
         birthplace_country: (goalie as Record<string, unknown>)['birthplace'] as string | undefined,
-        address_country: (goalie as Record<string, unknown>)['addressCountry'] as string | undefined,
+        address_country: (goalie as Record<string, unknown>)['addressCountry'] as
+          | string
+          | undefined,
         address_region: (goalie as Record<string, unknown>)['addressRegion'] as string | undefined,
         address_city: (goalie as Record<string, unknown>)['addressCity'] as string | undefined,
         address_street: (goalie as Record<string, unknown>)['addressStreet'] as string | undefined,
-        address_postal_code: (goalie as Record<string, unknown>)['addressPostalCode'] as string | undefined,
-        analysis: (goalie as Record<string, unknown>)['analysis'] as string | undefined
-      }
+        address_postal_code: (goalie as Record<string, unknown>)['addressPostalCode'] as
+          | string
+          | undefined,
+        analysis: (goalie as Record<string, unknown>)['analysis'] as string | undefined,
+      },
     };
   }
 
@@ -97,7 +100,7 @@ export class GoalieDataMapper {
     const data = apiGoalie.data;
     return {
       id: data.id.toString(),
-      teamId: data.team_id,  // Store team ID from API
+      teamId: data.team_id, // Store team ID from API
       team: teamName || `Team ${data.team_id}`,
       level: 'Professional', // Default value since not in API
       position: 'Goalie',
@@ -124,7 +127,7 @@ export class GoalieDataMapper {
         facilityName: 'Default Facility',
         rinkName: 'Main Rink',
         city: 'City',
-        address: 'Address'
+        address: 'Address',
       },
       gamesPlayed: data.games_played || 0,
       wins: data.wins,
@@ -135,7 +138,7 @@ export class GoalieDataMapper {
       ppga: data.power_play_goals_against || 0,
       shga: data.short_handed_goals_against || 0,
       savesAboveAvg: 0, // Field not available in API
-      createdAt: new Date() // Set creation date for newly created items
+      createdAt: new Date(), // Set creation date for newly created items
     };
   }
 
@@ -145,7 +148,7 @@ export class GoalieDataMapper {
    * @returns Array of frontend Goalie objects
    */
   static fromApiOutArrayFormat(apiGoalies: GoalieApiOut[]): Goalie[] {
-    return apiGoalies.map(apiGoalie => this.fromApiOutFormat(apiGoalie));
+    return apiGoalies.map((apiGoalie) => this.fromApiOutFormat(apiGoalie));
   }
 
   /**

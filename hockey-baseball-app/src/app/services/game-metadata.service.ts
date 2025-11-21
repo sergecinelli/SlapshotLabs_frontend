@@ -29,7 +29,7 @@ export interface ShotTypeResponse {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class GameMetadataService {
   private apiService = inject(ApiService);
@@ -39,7 +39,7 @@ export class GameMetadataService {
    */
   getGameTypes(): Observable<GameTypeResponse[]> {
     return this.apiService.get<GameTypeResponse[]>('/hockey/game-type/list').pipe(
-      catchError(error => {
+      catchError((error) => {
         console.error('Failed to fetch game types:', error);
         return throwError(() => error);
       })
@@ -51,7 +51,7 @@ export class GameMetadataService {
    */
   getGamePeriods(): Observable<GamePeriodResponse[]> {
     return this.apiService.get<GamePeriodResponse[]>('/hockey/game-period/list').pipe(
-      catchError(error => {
+      catchError((error) => {
         console.error('Failed to fetch game periods:', error);
         return throwError(() => error);
       })
@@ -62,19 +62,21 @@ export class GameMetadataService {
    * Transform game types to dropdown options
    */
   transformGameTypesToOptions(gameTypes: GameTypeResponse[]): { value: number; label: string }[] {
-    return gameTypes.map(type => ({
+    return gameTypes.map((type) => ({
       value: type.id,
-      label: type.name
+      label: type.name,
     }));
   }
 
   /**
    * Transform game periods to dropdown options
    */
-  transformGamePeriodsToOptions(gamePeriods: GamePeriodResponse[]): { value: number; label: string }[] {
-    return gamePeriods.map(period => ({
+  transformGamePeriodsToOptions(
+    gamePeriods: GamePeriodResponse[]
+  ): { value: number; label: string }[] {
+    return gamePeriods.map((period) => ({
       value: period.id,
-      label: period.name
+      label: period.name,
     }));
   }
 
@@ -83,7 +85,7 @@ export class GameMetadataService {
    */
   getShotTypes(): Observable<ShotTypeResponse[]> {
     return this.apiService.get<ShotTypeResponse[]>('/hockey/shot-type/list').pipe(
-      catchError(error => {
+      catchError((error) => {
         console.error('Failed to fetch shot types:', error);
         return throwError(() => error);
       })
@@ -94,9 +96,9 @@ export class GameMetadataService {
    * Transform shot types to dropdown options
    */
   transformShotTypesToOptions(shotTypes: ShotTypeResponse[]): { value: number; label: string }[] {
-    return shotTypes.map(type => ({
+    return shotTypes.map((type) => ({
       value: type.id,
-      label: type.name
+      label: type.name,
     }));
   }
 }

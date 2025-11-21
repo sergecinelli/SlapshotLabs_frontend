@@ -1,42 +1,54 @@
 @if (bannerItems().length > 0) {
   <div class="banner-container">
     @for (item of bannerItems(); track item.id) {
-      <div 
-        class="game-card" 
+      <div
+        class="game-card"
         [class.clickable]="item.status === 2"
-        role="button" 
-        (click)="item.status === 2 && goToLiveDashboard(item.id)" 
-        aria-hidden="true" 
-        [title]="item.status === 2 ? 'Go To Game Dashboard' : ''">
-        
+        role="button"
+        (click)="item.status === 2 && goToLiveDashboard(item.id)"
+        aria-hidden="true"
+        [title]="item.status === 2 ? 'Go To Game Dashboard' : ''"
+      >
         <div class="game-header">
           <span class="game-type">{{ `${item.arena_name} ${item.rink_name}` }}</span>
           @if (item.status !== 1) {
             <span class="period">{{ item.game_period_name }}</span>
           }
         </div>
-        
+
         <div class="teams-section">
           <div class="team-row away">
-            <img [src]="getTeamLogoUrl(item.away_team_id)" [alt]="item.away_team_name" class="team-logo">
-            <span class="team-name" [class.font-bold]="isWinning(item, false)">{{ getTeamDisplay(item.away_team_abbreviation, item.away_team_name) }}</span>
+            <img
+              [src]="getTeamLogoUrl(item.away_team_id)"
+              [alt]="item.away_team_name"
+              class="team-logo"
+            />
+            <span class="team-name" [class.font-bold]="isWinning(item, false)">{{
+              getTeamDisplay(item.away_team_abbreviation, item.away_team_name)
+            }}</span>
             <span class="score">{{ item.away_goals }}</span>
           </div>
-          
+
           <div class="team-row home">
-            <img [src]="getTeamLogoUrl(item.home_team_id)" [alt]="item.home_team_name" class="team-logo">
-            <span class="team-name" [class.font-bold]="isWinning(item, true)">{{ getTeamDisplay(item.home_team_abbreviation, item.home_team_name) }}</span>
+            <img
+              [src]="getTeamLogoUrl(item.home_team_id)"
+              [alt]="item.home_team_name"
+              class="team-logo"
+            />
+            <span class="team-name" [class.font-bold]="isWinning(item, true)">{{
+              getTeamDisplay(item.home_team_abbreviation, item.home_team_name)
+            }}</span>
             <span class="score">{{ item.home_goals }}</span>
           </div>
         </div>
-        
+
         <div class="time">
           @if (item.status === 1) {
             <span class="date mr-1.5">{{ getDateDisplay(item.date) }}</span>
           }
           <span>{{ getTimeDisplay(item) }}</span>
         </div>
-        
+
         @if (item.status === 2) {
           <div class="hover-overlay">
             <span class="view-label">View Game Dashboard</span>

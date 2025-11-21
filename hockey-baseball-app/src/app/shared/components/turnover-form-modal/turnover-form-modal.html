@@ -6,49 +6,65 @@
 
   <mat-dialog-content class="modal-content">
     <form [formGroup]="turnoverForm" class="turnover-form">
-      
       <!-- Turnover Information Section -->
       <div class="form-section">
         <div class="section-header">
           <span class="section-title">Turnover Information</span>
         </div>
         <mat-divider class="section-divider"></mat-divider>
-        
+
         <div class="team-selection-container">
-          <div class="team-selection-label uppercase text-custom-secondary">Team that turned the puck over</div>
+          <div class="team-selection-label uppercase text-custom-secondary">
+            Team that turned the puck over
+          </div>
           <div *ngIf="isLoadingTeams" class="loading-message">Loading teams...</div>
           <div class="team-buttons" *ngIf="!isLoadingTeams">
-            <button 
-              *ngFor="let team of teamOptions" 
+            <button
+              *ngFor="let team of teamOptions"
               type="button"
               class="team-button"
               [class.selected]="turnoverForm.get('team')?.value === team.value"
-              (click)="selectTeam(team.value)">
+              (click)="selectTeam(team.value)"
+            >
               <div class="team-avatar">
-                <img *ngIf="team.value" [src]="getTeamLogoUrl(team.value)" [alt]="team.label" class="team-logo-img" />
+                <img
+                  *ngIf="team.value"
+                  [src]="getTeamLogoUrl(team.value)"
+                  [alt]="team.label"
+                  class="team-logo-img"
+                />
               </div>
               <div class="team-name">{{ team.label }}</div>
             </button>
           </div>
-          <div *ngIf="turnoverForm.get('team')?.errors && turnoverForm.get('team')?.touched" class="team-error">
+          <div
+            *ngIf="turnoverForm.get('team')?.errors && turnoverForm.get('team')?.touched"
+            class="team-error"
+          >
             {{ getErrorMessage('team') }}
           </div>
         </div>
 
         <div class="player-selection-container">
-          <div class="player-selection-label uppercase text-custom-secondary">Player that turned the puck over</div>
+          <div class="player-selection-label uppercase text-custom-secondary">
+            Player that turned the puck over
+          </div>
           <div *ngIf="isLoadingPlayers" class="loading-message">Loading players...</div>
           <div class="player-buttons" *ngIf="!isLoadingPlayers">
-            <button 
-              *ngFor="let player of playerOptions" 
+            <button
+              *ngFor="let player of playerOptions"
               type="button"
               class="player-button"
               [class.selected]="turnoverForm.get('player')?.value === player.value"
-              (click)="selectPlayer(player.value)">
+              (click)="selectPlayer(player.value)"
+            >
               <div class="player-name">{{ player.label }}</div>
             </button>
           </div>
-          <div *ngIf="turnoverForm.get('player')?.errors && turnoverForm.get('player')?.touched" class="player-error">
+          <div
+            *ngIf="turnoverForm.get('player')?.errors && turnoverForm.get('player')?.touched"
+            class="player-error"
+          >
             {{ getErrorMessage('player') }}
           </div>
         </div>
@@ -57,26 +73,31 @@
           <div class="period-selection-label uppercase text-custom-secondary">Period</div>
           <div *ngIf="isLoadingPeriods" class="loading-message">Loading periods...</div>
           <div class="period-buttons" *ngIf="!isLoadingPeriods">
-            <button 
-              *ngFor="let period of periodOptions" 
+            <button
+              *ngFor="let period of periodOptions"
               type="button"
               class="period-button"
               [class.selected]="turnoverForm.get('period')?.value === period.value"
-              (click)="selectPeriod(period.value)">
+              (click)="selectPeriod(period.value)"
+            >
               <div class="period-name">{{ period.label }}</div>
             </button>
           </div>
-          <div *ngIf="turnoverForm.get('period')?.errors && turnoverForm.get('period')?.touched" class="period-error">
+          <div
+            *ngIf="turnoverForm.get('period')?.errors && turnoverForm.get('period')?.touched"
+            class="period-error"
+          >
             {{ getErrorMessage('period') }}
           </div>
         </div>
 
         <div class="form-row">
-
           <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
             <mat-label class="uppercase text-custom-secondary">Time</mat-label>
-            <input matInput formControlName="time" placeholder="mm:ss" maxlength="5">
-            <mat-error *ngIf="turnoverForm.get('time')?.errors && turnoverForm.get('time')?.touched">
+            <input matInput formControlName="time" placeholder="mm:ss" maxlength="5" />
+            <mat-error
+              *ngIf="turnoverForm.get('time')?.errors && turnoverForm.get('time')?.touched"
+            >
               {{ getErrorMessage('time') }}
             </mat-error>
           </mat-form-field>
@@ -89,12 +110,20 @@
           <span class="section-title">Add YouTube Link</span>
         </div>
         <mat-divider class="section-divider"></mat-divider>
-        
+
         <div class="form-row">
-          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field full-width">
+          <mat-form-field
+            [floatLabel]="'always'"
+            [hideRequiredMarker]="true"
+            class="form-field full-width"
+          >
             <mat-label class="uppercase text-custom-secondary">YouTube Link</mat-label>
-            <input matInput formControlName="youtubeLink" placeholder="YouTube link">
-            <mat-error *ngIf="turnoverForm.get('youtubeLink')?.errors && turnoverForm.get('youtubeLink')?.touched">
+            <input matInput formControlName="youtubeLink" placeholder="YouTube link" />
+            <mat-error
+              *ngIf="
+                turnoverForm.get('youtubeLink')?.errors && turnoverForm.get('youtubeLink')?.touched
+              "
+            >
               {{ getErrorMessage('youtubeLink') }}
             </mat-error>
           </mat-form-field>
@@ -103,19 +132,25 @@
 
       <!-- Set Location Section -->
       <div class="form-section">
-        <app-location-selector 
+        <app-location-selector
           formControlName="location"
           [team1]="selectedTeamData"
           [team2]="otherTeamData"
           [initialLocation]="puckLocation"
-          (locationChange)="onLocationChange($event)">
+          (locationChange)="onLocationChange($event)"
+        >
         </app-location-selector>
-        
-        <div *ngIf="turnoverForm.get('location')?.errors?.['required'] && turnoverForm.get('location')?.touched" class="location-error">
+
+        <div
+          *ngIf="
+            turnoverForm.get('location')?.errors?.['required'] &&
+            turnoverForm.get('location')?.touched
+          "
+          class="location-error"
+        >
           Please click on the rink to set the turnover location
         </div>
       </div>
-
     </form>
   </mat-dialog-content>
 
@@ -123,9 +158,15 @@
     <button mat-stroked-button (click)="onCancel()" class="cancel-btn" [disabled]="isSubmitting">
       Cancel
     </button>
-    <button mat-raised-button color="primary" (click)="onSubmit()" class="submit-btn" [disabled]="turnoverForm.invalid || isSubmitting">
+    <button
+      mat-raised-button
+      color="primary"
+      (click)="onSubmit()"
+      class="submit-btn"
+      [disabled]="turnoverForm.invalid || isSubmitting"
+    >
       <mat-icon>save</mat-icon>
-      {{ isSubmitting ? 'Saving...' : (isEditMode ? 'Save Turnover' : 'Add Turnover') }}
+      {{ isSubmitting ? 'Saving...' : isEditMode ? 'Save Turnover' : 'Add Turnover' }}
     </button>
   </mat-dialog-actions>
 </div>

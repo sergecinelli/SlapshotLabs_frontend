@@ -6,7 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
   standalone: true,
   imports: [MatButtonModule],
   templateUrl: './auth-button.html',
-  styleUrl: './auth-button.scss'
+  styleUrl: './auth-button.scss',
 })
 export class AuthButtonComponent {
   @Input() text = '';
@@ -15,7 +15,7 @@ export class AuthButtonComponent {
   @Input() variant: 'filled' | 'outlined' = 'filled';
   @Input() loading = false;
   @Input() loadingText = 'Loading...';
-  
+
   @Output() clicked = new EventEmitter<void>();
 
   onClick(): void {

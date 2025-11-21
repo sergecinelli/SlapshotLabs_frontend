@@ -17,9 +17,9 @@ import { PositionService, PositionOption } from '../../../services/position.serv
 export interface PlayerFormModalData {
   player?: Player;
   isEditMode: boolean;
-  teams?: Team[];  // Optional: pass teams to avoid redundant API calls
-  teamId?: string;  // Team ID to assign new players to
-  teamName?: string;  // Team name for display
+  teams?: Team[]; // Optional: pass teams to avoid redundant API calls
+  teamId?: string; // Team ID to assign new players to
+  teamName?: string; // Team name for display
 }
 
 export interface TeamOption {
@@ -39,10 +39,10 @@ export interface TeamOption {
     MatInputModule,
     MatSelectModule,
     MatIconModule,
-    MatDividerModule
+    MatDividerModule,
   ],
   templateUrl: './player-form-modal.html',
-  styleUrl: './player-form-modal.scss'
+  styleUrl: './player-form-modal.scss',
 })
 export class PlayerFormModalComponent implements OnInit {
   private fb = inject(FormBuilder);
@@ -57,7 +57,7 @@ export class PlayerFormModalComponent implements OnInit {
 
   shootsOptions = [
     { value: 'Right Shot', label: 'Right Shot' },
-    { value: 'Left Shot', label: 'Left Shot' }
+    { value: 'Left Shot', label: 'Left Shot' },
   ];
 
   positionOptions: PositionOption[] = [];
@@ -76,31 +76,31 @@ export class PlayerFormModalComponent implements OnInit {
 
   private loadFormData(): void {
     this.isLoading = true;
-    
+
     // Use provided teams or fetch from API
-    const teamsObservable = this.data.teams 
+    const teamsObservable = this.data.teams
       ? of({ teams: this.data.teams, total: this.data.teams.length })
       : this.teamService.getTeams();
-    
+
     // Fetch teams and positions concurrently
     forkJoin({
       teams: teamsObservable,
-      positions: this.positionService.getPositions()
+      positions: this.positionService.getPositions(),
     }).subscribe({
       next: ({ teams, positions }) => {
         // Transform teams to options format
-        this.teamOptions = teams.teams.map(team => ({
+        this.teamOptions = teams.teams.map((team) => ({
           value: team.id,
-          label: team.name
+          label: team.name,
         }));
-        
+
         this.positionOptions = positions;
-        
+
         // Set default values to first available options
         this.setDefaultFormValues();
-        
+
         this.isLoading = false;
-        
+
         // Populate form if in edit mode (this will override defaults)
         if (this.isEditMode && this.data.player) {
           this.populateForm(this.data.player);
@@ -108,40 +108,40 @@ export class PlayerFormModalComponent implements OnInit {
       },
       error: (error) => {
         console.error('Failed to load form data:', error);
-        
+
         // Set default values to first available options
         this.setDefaultFormValues();
-        
+
         this.isLoading = false;
-        
+
         // Populate form if in edit mode (this will override defaults)
         if (this.isEditMode && this.data.player) {
           this.populateForm(this.data.player);
         }
-      }
+      },
     });
   }
 
   private setDefaultFormValues(): void {
     const defaultValues: Record<string, string> = {};
-    
+
     // Set team from data if provided, otherwise use first team
     if (this.data.teamId) {
       defaultValues['team'] = this.data.teamId;
     } else if (this.teamOptions.length > 0) {
       defaultValues['team'] = this.teamOptions[0].value;
     }
-    
+
     // Set first position as default
     if (this.positionOptions.length > 0) {
       defaultValues['position'] = this.positionOptions[0].value;
     }
-    
+
     // Set first shoots option as default
     if (this.shootsOptions.length > 0) {
       defaultValues['shoots'] = this.shootsOptions[0].value;
     }
-    
+
     // Apply defaults to form
     if (Object.keys(defaultValues).length > 0) {
       this.playerForm.patchValue(defaultValues);
@@ -166,14 +166,14 @@ export class PlayerFormModalComponent implements OnInit {
       addressStreet: [''],
       addressPostalCode: [''],
       playerBiography: [''],
-      analysis: ['']
+      analysis: [''],
     });
   }
 
   private populateForm(player: Player): void {
     // Find the team ID by matching team name
     let teamId = '';
-    const matchingTeam = this.teamOptions.find(opt => opt.label === player.team);
+    const matchingTeam = this.teamOptions.find((opt) => opt.label === player.team);
     if (matchingTeam) {
       teamId = matchingTeam.value;
     } else {
@@ -183,7 +183,7 @@ export class PlayerFormModalComponent implements OnInit {
         teamId = teamIdMatch[1];
       }
     }
-    
+
     this.playerForm.patchValue({
       team: teamId,
       birthYear: player.birthYear,
@@ -201,16 +201,16 @@ export class PlayerFormModalComponent implements OnInit {
       addressStreet: (player as Record<string, unknown>)['addressStreet'],
       addressPostalCode: (player as Record<string, unknown>)['addressPostalCode'],
       playerBiography: (player as Record<string, unknown>)['playerBiography'],
-      analysis: (player as Record<string, unknown>)['analysis']
+      analysis: (player as Record<string, unknown>)['analysis'],
     });
   }
 
   onSubmit(): void {
     if (this.playerForm.valid) {
       const formValue = this.playerForm.value;
-      
+
       // Convert team ID back to team name
-      const selectedTeam = this.teamOptions.find(opt => opt.value === formValue.team);
+      const selectedTeam = this.teamOptions.find((opt) => opt.value === formValue.team);
       const teamName = selectedTeam ? selectedTeam.label : formValue.team;
       const teamId = formValue.team; // Keep the team ID
 
@@ -232,7 +232,7 @@ export class PlayerFormModalComponent implements OnInit {
         addressStreet: formValue.addressStreet,
         addressPostalCode: formValue.addressPostalCode,
         playerBiography: formValue.playerBiography,
-        analysis: formValue.analysis
+        analysis: formValue.analysis,
       };
 
       if (this.isEditMode && this.data.player) {
@@ -242,7 +242,7 @@ export class PlayerFormModalComponent implements OnInit {
       this.dialogRef.close(playerData);
     } else {
       // Mark all fields as touched to show validation errors
-      Object.keys(this.playerForm.controls).forEach(key => {
+      Object.keys(this.playerForm.controls).forEach((key) => {
         this.playerForm.get(key)?.markAsTouched();
       });
     }
@@ -286,7 +286,7 @@ export class PlayerFormModalComponent implements OnInit {
       addressStreet: 'Street Address',
       addressPostalCode: 'Postal Code',
       playerBiography: 'Player Biography',
-      analysis: 'Analysis'
+      analysis: 'Analysis',
     };
     return labels[fieldName] || fieldName;
   }

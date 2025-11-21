@@ -5,16 +5,15 @@ import { map, catchError } from 'rxjs/operators';
 import { AuthService } from '../../services/auth.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class GuestGuard implements CanActivate {
   private authService = inject(AuthService);
   private router = inject(Router);
 
-
   canActivate(): Observable<boolean> {
     return this.authService.getCurrentUser().pipe(
-      map(user => {
+      map((user) => {
         if (user) {
           // User is authenticated, redirect to dashboard
           this.router.navigate(['/dashboard']);

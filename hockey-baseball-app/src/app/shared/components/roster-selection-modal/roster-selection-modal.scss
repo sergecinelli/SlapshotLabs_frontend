@@ -106,7 +106,7 @@
     .cancel-btn {
       color: var(--color-secondary);
       border-color: var(--color-secondary);
-      
+
       &:hover {
         background-color: rgba(119, 143, 156, 0.1);
       }
@@ -118,17 +118,17 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      
+
       mat-icon {
         font-size: 16px;
         width: 16px;
         height: 16px;
       }
-      
+
       &:hover {
         background-color: #b8122a;
       }
-      
+
       &:disabled {
         background-color: var(--color-secondary);
         color: white;
@@ -143,17 +143,19 @@
   .cdk-overlay-backdrop {
     background-color: rgba(0, 0, 0, 0.5) !important;
   }
-  
+
   .mat-mdc-dialog-container {
     padding: 0 !important;
     background-color: white !important;
     border-radius: 12px !important;
     overflow: hidden !important;
-    
+
     .mdc-dialog__surface {
       background-color: white !important;
       border-radius: 12px !important;
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15), 0 4px 10px rgba(0, 0, 0, 0.1);
+      box-shadow:
+        0 8px 25px rgba(0, 0, 0, 0.15),
+        0 4px 10px rgba(0, 0, 0, 0.1);
       overflow: hidden !important;
     }
   }

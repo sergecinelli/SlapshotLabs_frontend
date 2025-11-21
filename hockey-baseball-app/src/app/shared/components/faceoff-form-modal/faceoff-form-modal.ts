@@ -8,7 +8,11 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
-import { LocationSelectorComponent, PuckLocation, Team } from '../location-selector/location-selector';
+import {
+  LocationSelectorComponent,
+  PuckLocation,
+  Team,
+} from '../location-selector/location-selector';
 
 import { TeamService } from '../../../services/team.service';
 import { PlayerService } from '../../../services/player.service';
@@ -42,10 +46,10 @@ export interface FaceoffFormData {
     MatSelectModule,
     MatIconModule,
     MatDividerModule,
-    LocationSelectorComponent
+    LocationSelectorComponent,
   ],
   templateUrl: './faceoff-form-modal.html',
-  styleUrl: './faceoff-form-modal.scss'
+  styleUrl: './faceoff-form-modal.scss',
 })
 export class FaceoffFormModalComponent implements OnInit {
   private fb = inject(FormBuilder);
@@ -54,10 +58,10 @@ export class FaceoffFormModalComponent implements OnInit {
   private playerService = inject(PlayerService);
   private gameMetadataService = inject(GameMetadataService);
   private gameEventService = inject(GameEventService);
-  private dialogData = inject<{ 
-    gameId: number; 
-    faceoffEventId: number; 
-    periodOptions?: { value: number; label: string }[]; 
+  private dialogData = inject<{
+    gameId: number;
+    faceoffEventId: number;
+    periodOptions?: { value: number; label: string }[];
     teamOptions?: { value: number; label: string; logo?: string }[];
     playerOptions?: { value: number; label: string; teamId: number }[];
     // Edit mode fields
@@ -91,7 +95,7 @@ export class FaceoffFormModalComponent implements OnInit {
   winnerPlayerOptions: { value: number; label: string }[] = [];
   loserPlayerOptions: { value: number; label: string }[] = [];
   periodOptions: { value: number; label: string }[] = [];
-  
+
   isLoadingTeams = false;
   isLoadingWinnerPlayers = false;
   isLoadingLoserPlayers = false;
@@ -114,29 +118,33 @@ export class FaceoffFormModalComponent implements OnInit {
     } else {
       this.loadTeams();
     }
-    
+
     if (this.dialogData.periodOptions && this.dialogData.periodOptions.length > 0) {
       this.periodOptions = this.dialogData.periodOptions;
     } else {
       this.loadPeriods();
     }
-    
+
     // Edit mode: populate with existing data
     if (this.isEditMode && this.dialogData.existingData) {
       const existing = this.dialogData.existingData;
-      
+
       // Restore location if available
-      if (existing.iceTopOffset !== undefined && existing.iceLeftOffset !== undefined && existing.zone) {
+      if (
+        existing.iceTopOffset !== undefined &&
+        existing.iceLeftOffset !== undefined &&
+        existing.zone
+      ) {
         this.puckLocation = {
           x: existing.iceLeftOffset,
           y: existing.iceTopOffset,
-          zone: existing.zone as 'defending' | 'neutral' | 'attacking' ?? 'defending'
+          zone: (existing.zone as 'defending' | 'neutral' | 'attacking') ?? 'defending',
         };
       }
-      
+
       // Find loser team (opposite of winner)
-      const loserTeam = this.teamOptions.find(t => t.value !== existing.winnerTeamId);
-      
+      const loserTeam = this.teamOptions.find((t) => t.value !== existing.winnerTeamId);
+
       // Populate form
       this.faceoffForm.patchValue({
         winnerTeam: existing.winnerTeamId,
@@ -146,9 +154,9 @@ export class FaceoffFormModalComponent implements OnInit {
         period: existing.periodId,
         time: existing.time,
         location: existing.zone,
-        youtubeLink: existing.youtubeLink || ''
+        youtubeLink: existing.youtubeLink || '',
       });
-      
+
       // Load players for both teams
       if (existing.winnerTeamId) {
         if (this.dialogData.playerOptions && this.dialogData.playerOptions.length > 0) {
@@ -167,9 +175,9 @@ export class FaceoffFormModalComponent implements OnInit {
       if (this.teamOptions.length > 1) {
         this.faceoffForm.patchValue({
           winnerTeam: this.teamOptions[0].value,
-          loserTeam: this.teamOptions[1].value
+          loserTeam: this.teamOptions[1].value,
         });
-        
+
         if (this.dialogData.playerOptions && this.dialogData.playerOptions.length > 0) {
           this.filterPlayersForTeam(this.teamOptions[0].value, 'winner');
           this.filterPlayersForTeam(this.teamOptions[1].value, 'loser');
@@ -178,7 +186,7 @@ export class FaceoffFormModalComponent implements OnInit {
           this.loadPlayersForTeam(this.teamOptions[1].value, 'loser');
         }
       }
-      
+
       if (this.periodOptions.length > 0) {
         this.faceoffForm.patchValue({ period: this.periodOptions[0].value });
       }
@@ -194,7 +202,7 @@ export class FaceoffFormModalComponent implements OnInit {
       period: ['', Validators.required],
       time: ['', [Validators.required, Validators.pattern(/^([0-5]?[0-9]):([0-5][0-9])$/)]],
       location: [''],
-      youtubeLink: ['']
+      youtubeLink: [''],
     });
   }
 
@@ -202,18 +210,18 @@ export class FaceoffFormModalComponent implements OnInit {
     this.isLoadingTeams = true;
     this.teamService.getTeams().subscribe({
       next: (response) => {
-        this.teamOptions = response.teams.map(team => ({
+        this.teamOptions = response.teams.map((team) => ({
           value: parseInt(team.id),
           label: team.name,
-          logo: team.logo
+          logo: team.logo,
         }));
         this.isLoadingTeams = false;
-        
+
         // Set default values after teams are loaded
         if (this.teamOptions.length > 1) {
           this.faceoffForm.patchValue({
             winnerTeam: this.teamOptions[0].value,
-            loserTeam: this.teamOptions[1].value
+            loserTeam: this.teamOptions[1].value,
           });
           // Load players for both teams
           this.loadPlayersForTeam(this.teamOptions[0].value, 'winner');
@@ -223,7 +231,7 @@ export class FaceoffFormModalComponent implements OnInit {
       error: (error) => {
         console.error('Failed to load teams:', error);
         this.isLoadingTeams = false;
-      }
+      },
     });
   }
 
@@ -240,7 +248,7 @@ export class FaceoffFormModalComponent implements OnInit {
       error: (error) => {
         console.error('Failed to load periods:', error);
         this.isLoadingPeriods = false;
-      }
+      },
     });
   }
 
@@ -250,15 +258,15 @@ export class FaceoffFormModalComponent implements OnInit {
   private filterPlayersForTeam(teamId: number, teamType: 'winner' | 'loser'): void {
     if (this.dialogData.playerOptions) {
       const filteredPlayers = this.dialogData.playerOptions
-        .filter(player => player.teamId === teamId)
-        .map(player => ({
+        .filter((player) => player.teamId === teamId)
+        .map((player) => ({
           value: player.value,
-          label: player.label
+          label: player.label,
         }));
-      
+
       // Cache the filtered players
       this.playersByTeam[teamId] = filteredPlayers;
-      
+
       if (teamType === 'winner') {
         this.winnerPlayerOptions = filteredPlayers;
         if (this.winnerPlayerOptions.length > 0) {
@@ -283,7 +291,7 @@ export class FaceoffFormModalComponent implements OnInit {
     } else {
       this.isLoadingLoserPlayers = true;
     }
-    
+
     // Check if we already have players cached for this team
     if (this.playersByTeam[teamId]) {
       if (teamType === 'winner') {
@@ -301,17 +309,17 @@ export class FaceoffFormModalComponent implements OnInit {
       }
       return;
     }
-    
+
     this.playerService.getPlayersByTeam(teamId).subscribe({
       next: (players) => {
-        const playerOptions = players.map(player => ({
+        const playerOptions = players.map((player) => ({
           value: parseInt(player.id),
-          label: `${player.firstName} ${player.lastName}`
+          label: `${player.firstName} ${player.lastName}`,
         }));
-        
+
         // Cache the players
         this.playersByTeam[teamId] = playerOptions;
-        
+
         if (teamType === 'winner') {
           this.winnerPlayerOptions = playerOptions;
           this.isLoadingWinnerPlayers = false;
@@ -337,16 +345,17 @@ export class FaceoffFormModalComponent implements OnInit {
         } else {
           this.isLoadingLoserPlayers = false;
         }
-      }
+      },
     });
   }
 
   private setupTeamChangeListeners(): void {
-    const usePreloadedPlayers = this.dialogData.playerOptions && this.dialogData.playerOptions.length > 0;
-    
+    const usePreloadedPlayers =
+      this.dialogData.playerOptions && this.dialogData.playerOptions.length > 0;
+
     // When winner team changes, automatically set loser team to the opposite and update players
-    this.faceoffForm.get('winnerTeam')?.valueChanges.subscribe(winnerTeam => {
-      const loserTeam = this.teamOptions.find(t => t.value !== winnerTeam);
+    this.faceoffForm.get('winnerTeam')?.valueChanges.subscribe((winnerTeam) => {
+      const loserTeam = this.teamOptions.find((t) => t.value !== winnerTeam);
       if (loserTeam) {
         this.faceoffForm.patchValue({ loserTeam: loserTeam.value }, { emitEvent: false });
         // Manually update loser players since we disabled event emission
@@ -364,8 +373,8 @@ export class FaceoffFormModalComponent implements OnInit {
     });
 
     // When loser team changes, automatically set winner team to the opposite and update players
-    this.faceoffForm.get('loserTeam')?.valueChanges.subscribe(loserTeam => {
-      const winnerTeam = this.teamOptions.find(t => t.value !== loserTeam);
+    this.faceoffForm.get('loserTeam')?.valueChanges.subscribe((loserTeam) => {
+      const winnerTeam = this.teamOptions.find((t) => t.value !== loserTeam);
       if (winnerTeam) {
         this.faceoffForm.patchValue({ winnerTeam: winnerTeam.value }, { emitEvent: false });
         // Manually update winner players since we disabled event emission
@@ -382,7 +391,6 @@ export class FaceoffFormModalComponent implements OnInit {
       }
     });
   }
-
 
   selectWinnerTeam(teamValue: number): void {
     this.faceoffForm.patchValue({ winnerTeam: teamValue });
@@ -420,13 +428,13 @@ export class FaceoffFormModalComponent implements OnInit {
     if (this.faceoffForm.valid && !this.isSubmitting) {
       this.isSubmitting = true;
       const formValue = this.faceoffForm.value;
-      
+
       // Convert mm:ss to time-of-day like shots (HH:mm:ss.SSSZ with 00 hours)
       const [minutes, seconds] = formValue.time.split(':').map((v: string) => parseInt(v, 10));
       const tmp = new Date(Date.UTC(1970, 0, 1, 0, minutes, seconds, 0));
       const iso = tmp.toISOString();
       const timeOfDay = iso.substring(iso.indexOf('T') + 1);
-      
+
       const faceoffRequest: FaceoffEventRequest = {
         game_id: this.gameId,
         event_name_id: this.faceoffEventId,
@@ -438,7 +446,7 @@ export class FaceoffFormModalComponent implements OnInit {
         youtube_link: formValue.youtubeLink || undefined,
         ice_top_offset: this.puckLocation?.y as number | undefined,
         ice_left_offset: this.puckLocation?.x as number | undefined,
-        zone: this.puckLocation?.zone
+        zone: this.puckLocation?.zone,
       };
 
       // Edit or create based on mode
@@ -453,17 +461,21 @@ export class FaceoffFormModalComponent implements OnInit {
             console.error('Failed to update faceoff event:', error);
             this.isSubmitting = false;
             alert('Failed to update faceoff event. Please try again.');
-          }
+          },
         });
       } else {
         this.gameEventService.createFaceoffEvent(faceoffRequest).subscribe({
           next: () => {
             // Find selected teams and players for display
-            const winnerTeam = this.teamOptions.find(t => t.value === formValue.winnerTeam);
-            const loserTeam = this.teamOptions.find(t => t.value === formValue.loserTeam);
-            const winnerPlayer = this.winnerPlayerOptions.find(p => p.value === formValue.winnerPlayer);
-            const loserPlayer = this.loserPlayerOptions.find(p => p.value === formValue.loserPlayer);
-            
+            const winnerTeam = this.teamOptions.find((t) => t.value === formValue.winnerTeam);
+            const loserTeam = this.teamOptions.find((t) => t.value === formValue.loserTeam);
+            const winnerPlayer = this.winnerPlayerOptions.find(
+              (p) => p.value === formValue.winnerPlayer
+            );
+            const loserPlayer = this.loserPlayerOptions.find(
+              (p) => p.value === formValue.loserPlayer
+            );
+
             const faceoffData: FaceoffFormData = {
               winnerTeamLogo: winnerTeam?.logo || '',
               winnerTeamName: winnerTeam?.label || '',
@@ -474,21 +486,21 @@ export class FaceoffFormModalComponent implements OnInit {
               period: formValue.period.toString(),
               time: formValue.time,
               location: this.puckLocation || undefined,
-              youtubeLink: formValue.youtubeLink
+              youtubeLink: formValue.youtubeLink,
             };
-            
+
             this.isSubmitting = false;
             this.dialogRef.close(faceoffData);
           },
           error: (error) => {
             console.error('Failed to create faceoff event:', error);
             this.isSubmitting = false;
-          }
+          },
         });
       }
     } else if (!this.faceoffForm.valid) {
       // Mark all fields as touched to show validation errors
-      Object.keys(this.faceoffForm.controls).forEach(key => {
+      Object.keys(this.faceoffForm.controls).forEach((key) => {
         this.faceoffForm.get(key)?.markAsTouched();
       });
     }
@@ -520,7 +532,7 @@ export class FaceoffFormModalComponent implements OnInit {
       period: 'Period',
       time: 'Time',
       location: 'Location',
-      youtubeLink: 'YouTube Link'
+      youtubeLink: 'YouTube Link',
     };
     return labels[fieldName] || fieldName;
   }
@@ -528,26 +540,26 @@ export class FaceoffFormModalComponent implements OnInit {
   get winnerTeamData(): Team | undefined {
     const winnerTeamId = this.faceoffForm.get('winnerTeam')?.value;
     if (!winnerTeamId) return undefined;
-    
-    const team = this.teamOptions.find(t => t.value === winnerTeamId);
+
+    const team = this.teamOptions.find((t) => t.value === winnerTeamId);
     if (!team) return undefined;
-    
+
     return {
       name: team.label,
-      logo: `${environment.apiUrl}/hockey/team/${winnerTeamId}/logo`
+      logo: `${environment.apiUrl}/hockey/team/${winnerTeamId}/logo`,
     };
   }
 
   get loserTeamData(): Team | undefined {
     const loserTeamId = this.faceoffForm.get('loserTeam')?.value;
     if (!loserTeamId) return undefined;
-    
-    const team = this.teamOptions.find(t => t.value === loserTeamId);
+
+    const team = this.teamOptions.find((t) => t.value === loserTeamId);
     if (!team) return undefined;
-    
+
     return {
       name: team.label,
-      logo: `${environment.apiUrl}/hockey/team/${loserTeamId}/logo`
+      logo: `${environment.apiUrl}/hockey/team/${loserTeamId}/logo`,
     };
   }
 

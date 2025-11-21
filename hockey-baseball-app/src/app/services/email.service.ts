@@ -12,7 +12,6 @@ export interface EmailResponse {
   providedIn: 'root',
 })
 export class EmailService {
-
   /**
    * Simulates sending a password reset email
    * @param email - The email address to send the reset link to

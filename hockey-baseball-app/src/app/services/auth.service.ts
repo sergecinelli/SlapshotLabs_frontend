@@ -12,16 +12,16 @@ import {
   PasswordResetConfirm,
   ApiMessage,
   UserRegistrationForm,
-  UserSignInForm
+  UserSignInForm,
 } from '../shared/interfaces/auth.interfaces';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthService {
   private currentUserSubject = new BehaviorSubject<UserProfile | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
-  
+
   private isAuthenticatedSubject = new BehaviorSubject<boolean>(false);
   public isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
 
@@ -46,7 +46,7 @@ export class AuthService {
       email: registrationData.email,
       first_name: registrationData.firstName,
       last_name: registrationData.lastName,
-      password: registrationData.password
+      password: registrationData.password,
     };
 
     return this.apiService.post<ApiMessage>('/users/signup', signUpRequest);
@@ -59,7 +59,7 @@ export class AuthService {
     const signInRequest: UserSignInRequest = {
       email: signInData.email,
       password: signInData.password,
-      remember_me: signInData.rememberMe
+      remember_me: signInData.rememberMe,
     };
 
     // Refresh CSRF token before sign-in for security
@@ -76,7 +76,7 @@ export class AuthService {
         );
       }),
       switchMap(() => of(void 0)), // Convert to Observable<void>
-      catchError(error => {
+      catchError((error) => {
         console.error('😱 Auth Service - Sign-in failed:', error);
         return throwError(() => error);
       })
@@ -142,7 +142,7 @@ export class AuthService {
 
     // If no cached user data, fetch from API
     this.currentUserRequest$ = this.apiService.get<UserProfile>('/users/get').pipe(
-      tap(user => {
+      tap((user) => {
         this.currentUserSubject.next(user);
         this.isAuthenticatedSubject.next(true);
         this.currentUserRequest$ = null; // Clear the ongoing request
@@ -208,7 +208,7 @@ export class AuthService {
       email: formData.email,
       first_name: formData.firstName,
       last_name: formData.lastName,
-      password: formData.password
+      password: formData.password,
     };
   }
 
@@ -219,7 +219,7 @@ export class AuthService {
     return {
       email: formData.email,
       password: formData.password,
-      remember_me: formData.rememberMe
+      remember_me: formData.rememberMe,
     };
   }
 
@@ -228,7 +228,7 @@ export class AuthService {
    */
   refreshCurrentUser(): Observable<UserProfile | null> {
     return this.apiService.get<UserProfile>('/users/get').pipe(
-      tap(user => {
+      tap((user) => {
         this.currentUserSubject.next(user);
         this.isAuthenticatedSubject.next(true);
       }),
@@ -239,5 +239,4 @@ export class AuthService {
       })
     );
   }
-
 }

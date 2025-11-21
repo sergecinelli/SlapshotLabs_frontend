@@ -6,33 +6,43 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header';
-import { DataTableComponent, TableColumn, TableAction } from '../../shared/components/data-table/data-table';
+import {
+  DataTableComponent,
+  TableColumn,
+  TableAction,
+} from '../../shared/components/data-table/data-table';
 import { TeamService } from '../../services/team.service';
 import { Team } from '../../shared/interfaces/team.interface';
-import { TeamFormModalComponent, TeamFormModalData } from '../../shared/components/team-form-modal/team-form-modal';
+import {
+  TeamFormModalComponent,
+  TeamFormModalData,
+} from '../../shared/components/team-form-modal/team-form-modal';
 import { TeamOptionsService } from '../../services/team-options.service';
 import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-teams',
   standalone: true,
-  imports: [CommonModule, PageHeaderComponent, DataTableComponent, MatButtonModule, MatIconModule, MatDialogModule],
+  imports: [
+    CommonModule,
+    PageHeaderComponent,
+    DataTableComponent,
+    MatButtonModule,
+    MatIconModule,
+    MatDialogModule,
+  ],
   template: `
     <div class="p-6 pt-0">
       <app-page-header title="Teams"></app-page-header>
-      
+
       <!-- Add Team Button -->
       <div class="mb-4 flex justify-end">
-        <button 
-          mat-raised-button 
-          color="primary" 
-          (click)="openAddTeamModal()"
-          class="add-team-btn">
+        <button mat-raised-button color="primary" (click)="openAddTeamModal()" class="add-team-btn">
           <mat-icon>add</mat-icon>
           Add a Team
         </button>
       </div>
-      
+
       <app-data-table
         [columns]="tableColumns"
         [data]="teams()"
@@ -44,7 +54,7 @@ import { forkJoin } from 'rxjs';
       ></app-data-table>
     </div>
   `,
-  styleUrl: './teams.scss'
+  styleUrl: './teams.scss',
 })
 export class TeamsComponent implements OnInit {
   private teamService = inject(TeamService);
@@ -66,14 +76,14 @@ export class TeamsComponent implements OnInit {
     { key: 'losses', label: 'Losses', sortable: true, type: 'number', width: '75px' },
     { key: 'points', label: 'Points', sortable: true, type: 'number', width: '75px' },
     { key: 'goalsFor', label: 'Goals For', sortable: true, type: 'number', width: '90px' },
-    { key: 'goalsAgainst', label: 'Goals Against', sortable: true, type: 'number', width: '110px' }
+    { key: 'goalsAgainst', label: 'Goals Against', sortable: true, type: 'number', width: '110px' },
   ];
 
   tableActions: TableAction[] = [
     { label: 'Delete', action: 'delete', variant: 'danger' },
     { label: 'Edit', action: 'edit', variant: 'secondary' },
     { label: 'View', action: 'view-profile', variant: 'primary' },
-    { label: 'Players', action: 'players', variant: 'secondary' }
+    { label: 'Players', action: 'players', variant: 'secondary' },
   ];
 
   ngOnInit(): void {
@@ -81,7 +91,7 @@ export class TeamsComponent implements OnInit {
     this.loading.set(true);
     forkJoin({
       levels: this.teamOptionsService.getTeamLevels(),
-      divisions: this.teamOptionsService.getDivisions()
+      divisions: this.teamOptionsService.getDivisions(),
     }).subscribe({
       next: () => {
         // Options loaded, now fetch teams with correct mappings
@@ -91,7 +101,7 @@ export class TeamsComponent implements OnInit {
         console.error('Error loading team options:', error);
         // Still try to load teams even if options fail
         this.loadTeams();
-      }
+      },
     });
   }
 
@@ -107,13 +117,13 @@ export class TeamsComponent implements OnInit {
       error: (error) => {
         console.error('Error loading teams:', error);
         this.loading.set(false);
-      }
+      },
     });
   }
 
-  onActionClick(event: { action: string, item: Team }): void {
+  onActionClick(event: { action: string; item: Team }): void {
     const { action, item } = event;
-    
+
     switch (action) {
       case 'delete':
         this.deleteTeam(item);
@@ -132,30 +142,32 @@ export class TeamsComponent implements OnInit {
     }
   }
 
-  onSort(event: { column: string, direction: 'asc' | 'desc' }): void {
+  onSort(event: { column: string; direction: 'asc' | 'desc' }): void {
     const { column, direction } = event;
     const sortedTeams = [...this.teams()].sort((a, b) => {
       const aValue = this.getNestedValue(a, column);
       const bValue = this.getNestedValue(b, column);
-      
+
       if (aValue === bValue) return 0;
-      
+
       const result = (aValue as string | number) < (bValue as string | number) ? -1 : 1;
       return direction === 'asc' ? result : -result;
     });
-    
+
     this.teams.set(sortedTeams);
   }
 
   private getNestedValue(obj: Team, path: string): unknown {
-    return path.split('.').reduce((current: unknown, key: string) => (current as Record<string, unknown>)?.[key], obj);
+    return path
+      .split('.')
+      .reduce((current: unknown, key: string) => (current as Record<string, unknown>)?.[key], obj);
   }
 
   private sortByDate(teams: Team[], direction: 'asc' | 'desc'): Team[] {
     return [...teams].sort((a, b) => {
       const aDate = a.createdAt || new Date(0); // Use epoch if no date
       const bDate = b.createdAt || new Date(0);
-      
+
       const result = aDate.getTime() - bDate.getTime();
       return direction === 'desc' ? -result : result; // desc = newest first
     });
@@ -166,7 +178,7 @@ export class TeamsComponent implements OnInit {
       this.teamService.deleteTeam(team.id).subscribe({
         next: (success) => {
           if (success) {
-            const updatedTeams = this.teams().filter(t => t.id !== team.id);
+            const updatedTeams = this.teams().filter((t) => t.id !== team.id);
             this.teams.set(updatedTeams);
             // this.snackBar.open(
             //   `Team ${team.name} deleted successfully`,
@@ -188,7 +200,7 @@ export class TeamsComponent implements OnInit {
           //   'Close',
           //   { duration: 3000, panelClass: ['custom-snackbar', 'error-snackbar'] }
           // );
-        }
+        },
       });
     }
   }
@@ -197,7 +209,7 @@ export class TeamsComponent implements OnInit {
     // Build the full URL including the base URL
     const baseUrl = window.location.origin;
     const url = `${baseUrl}/team-profile/${team.id}`;
-    
+
     window.location.assign(url);
   }
 
@@ -205,7 +217,7 @@ export class TeamsComponent implements OnInit {
     // Navigate to players page with team context
     const baseUrl = window.location.origin;
     const url = `${baseUrl}/players?teamId=${team.id}&teamName=${encodeURIComponent(team.name)}`;
-    
+
     window.location.assign(url);
   }
 
@@ -214,13 +226,13 @@ export class TeamsComponent implements OnInit {
       width: '800px',
       maxWidth: '95vw',
       data: {
-        isEditMode: false
+        isEditMode: false,
       } as TeamFormModalData,
       panelClass: 'team-form-modal-dialog',
-      disableClose: true
+      disableClose: true,
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         this.addTeam(result);
       }
@@ -233,13 +245,13 @@ export class TeamsComponent implements OnInit {
       maxWidth: '95vw',
       data: {
         team: team,
-        isEditMode: true
+        isEditMode: true,
       } as TeamFormModalData,
       panelClass: 'team-form-modal-dialog',
-      disableClose: true
+      disableClose: true,
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         this.updateTeam(result);
       }
@@ -260,7 +272,7 @@ export class TeamsComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error adding team:', error);
-      }
+      },
     });
   }
 
@@ -269,7 +281,7 @@ export class TeamsComponent implements OnInit {
     this.teamService.updateTeam(team.id!, team, logoFile, logoRemoved).subscribe({
       next: (updatedTeam) => {
         const currentTeams = this.teams();
-        const index = currentTeams.findIndex(t => t.id === updatedTeam.id);
+        const index = currentTeams.findIndex((t) => t.id === updatedTeam.id);
         if (index !== -1) {
           const newTeams = [...currentTeams];
           newTeams[index] = updatedTeam;
@@ -283,7 +295,7 @@ export class TeamsComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error updating team:', error);
-      }
+      },
     });
   }
 }

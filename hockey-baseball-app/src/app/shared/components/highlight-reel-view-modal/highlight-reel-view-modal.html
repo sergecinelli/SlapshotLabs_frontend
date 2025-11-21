@@ -15,7 +15,8 @@
             title="Highlight video"
             frameborder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            allowfullscreen>
+            allowfullscreen
+          >
           </iframe>
         </div>
         <ng-template #noVideo>
@@ -48,7 +49,8 @@
                 class="table-row cursor-pointer"
                 *ngFor="let h of highlights(); let i = index"
                 (click)="onRowClick(i)"
-                [class.selected-row]="i === selectedIndex()">
+                [class.selected-row]="i === selectedIndex()"
+              >
                 <td class="table-cell">{{ h.event_name || '-' }}</td>
                 <td class="table-cell">{{ h.note || '-' }}</td>
                 <td class="table-cell">{{ formatDate(h.date) }}</td>

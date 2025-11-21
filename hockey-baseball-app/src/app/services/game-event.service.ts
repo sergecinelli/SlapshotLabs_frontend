@@ -98,7 +98,7 @@ export interface ShotEventRequest {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class GameEventService {
   private apiService = inject(ApiService);
@@ -107,24 +107,31 @@ export class GameEventService {
    * Create a new game event
    */
   createGameEvent(eventData: GameEventRequest): Observable<{ id: number; success: boolean }> {
-    return this.apiService.post<{ id: number; success: boolean }>('/hockey/game-event', eventData).pipe(
-      catchError(error => {
-        console.error('Failed to create game event:', error);
-        return throwError(() => error);
-      })
-    );
+    return this.apiService
+      .post<{ id: number; success: boolean }>('/hockey/game-event', eventData)
+      .pipe(
+        catchError((error) => {
+          console.error('Failed to create game event:', error);
+          return throwError(() => error);
+        })
+      );
   }
 
   /**
    * Update an existing game event
    */
-  updateGameEvent(eventId: number, eventData: Partial<GameEventRequest>): Observable<{ success: boolean }> {
-    return this.apiService.patch<{ success: boolean }>(`/hockey/game-event/${eventId}`, eventData).pipe(
-      catchError(error => {
-        console.error('Failed to update game event:', error);
-        return throwError(() => error);
-      })
-    );
+  updateGameEvent(
+    eventId: number,
+    eventData: Partial<GameEventRequest>
+  ): Observable<{ success: boolean }> {
+    return this.apiService
+      .patch<{ success: boolean }>(`/hockey/game-event/${eventId}`, eventData)
+      .pipe(
+        catchError((error) => {
+          console.error('Failed to update game event:', error);
+          return throwError(() => error);
+        })
+      );
   }
 
   /**
@@ -132,7 +139,7 @@ export class GameEventService {
    */
   deleteGameEvent(eventId: number): Observable<void> {
     return this.apiService.delete<void>(`/hockey/game-event/${eventId}`).pipe(
-      catchError(error => {
+      catchError((error) => {
         console.error('Failed to delete game event:', error);
         return throwError(() => error);
       })
@@ -142,7 +149,9 @@ export class GameEventService {
   /**
    * Create a turnover event with only required fields
    */
-  createTurnoverEvent(turnoverData: TurnoverEventRequest): Observable<{ id: number; success: boolean }> {
+  createTurnoverEvent(
+    turnoverData: TurnoverEventRequest
+  ): Observable<{ id: number; success: boolean }> {
     const eventData: GameEventRequest = {
       game_id: turnoverData.game_id,
       event_name_id: turnoverData.event_name_id,
@@ -153,7 +162,7 @@ export class GameEventService {
       youtube_link: turnoverData.youtube_link,
       ice_top_offset: turnoverData.ice_top_offset,
       ice_left_offset: turnoverData.ice_left_offset,
-      zone: turnoverData.zone
+      zone: turnoverData.zone,
     };
 
     return this.createGameEvent(eventData);
@@ -162,7 +171,9 @@ export class GameEventService {
   /**
    * Create a faceoff event with required fields
    */
-  createFaceoffEvent(faceoffData: FaceoffEventRequest): Observable<{ id: number; success: boolean }> {
+  createFaceoffEvent(
+    faceoffData: FaceoffEventRequest
+  ): Observable<{ id: number; success: boolean }> {
     const eventData: GameEventRequest = {
       game_id: faceoffData.game_id,
       event_name_id: faceoffData.event_name_id,
@@ -183,7 +194,9 @@ export class GameEventService {
   /**
    * Create a goalie change event with required fields
    */
-  createGoalieChangeEvent(goalieChangeData: GoalieChangeEventRequest): Observable<{ id: number; success: boolean }> {
+  createGoalieChangeEvent(
+    goalieChangeData: GoalieChangeEventRequest
+  ): Observable<{ id: number; success: boolean }> {
     const eventData: GameEventRequest = {
       game_id: goalieChangeData.game_id,
       event_name_id: goalieChangeData.event_name_id,
@@ -191,7 +204,7 @@ export class GameEventService {
       goalie_id: goalieChangeData.goalie_id,
       period_id: goalieChangeData.period_id,
       time: goalieChangeData.time,
-      note: goalieChangeData.note
+      note: goalieChangeData.note,
     };
 
     return this.createGameEvent(eventData);
@@ -200,7 +213,9 @@ export class GameEventService {
   /**
    * Create a penalty event with required fields
    */
-  createPenaltyEvent(penaltyData: PenaltyEventRequest): Observable<{ id: number; success: boolean }> {
+  createPenaltyEvent(
+    penaltyData: PenaltyEventRequest
+  ): Observable<{ id: number; success: boolean }> {
     const eventData: GameEventRequest = {
       game_id: penaltyData.game_id,
       event_name_id: penaltyData.event_name_id,
@@ -212,7 +227,7 @@ export class GameEventService {
       youtube_link: penaltyData.youtube_link,
       ice_top_offset: penaltyData.ice_top_offset,
       ice_left_offset: penaltyData.ice_left_offset,
-      zone: penaltyData.zone
+      zone: penaltyData.zone,
     };
 
     return this.createGameEvent(eventData);
@@ -239,7 +254,7 @@ export class GameEventService {
       ice_left_offset: shotData.ice_left_offset,
       net_top_offset: shotData.net_top_offset,
       net_left_offset: shotData.net_left_offset,
-      goal_type: shotData.goal_type
+      goal_type: shotData.goal_type,
     };
 
     return this.createGameEvent(eventData);
@@ -248,12 +263,17 @@ export class GameEventService {
   /**
    * Get spray chart data for a specific game
    */
-  getGameSprayChart(gameId: number, filter: GameSprayChartFilter = {}): Observable<SprayChartEvent[]> {
-    return this.apiService.post<SprayChartEvent[]>(`/hockey/game/${gameId}/spray-chart`, filter).pipe(
-      catchError(error => {
-        console.error(`Failed to fetch spray chart for game ${gameId}:`, error);
-        return throwError(() => error);
-      })
-    );
+  getGameSprayChart(
+    gameId: number,
+    filter: GameSprayChartFilter = {}
+  ): Observable<SprayChartEvent[]> {
+    return this.apiService
+      .post<SprayChartEvent[]>(`/hockey/game/${gameId}/spray-chart`, filter)
+      .pipe(
+        catchError((error) => {
+          console.error(`Failed to fetch spray chart for game ${gameId}:`, error);
+          return throwError(() => error);
+        })
+      );
   }
 }

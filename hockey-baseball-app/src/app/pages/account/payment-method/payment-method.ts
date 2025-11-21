@@ -16,6 +16,6 @@ import { PageHeaderComponent } from '../../../shared/components/page-header/page
       </div>
     </div>
   `,
-  styleUrl: './payment-method.scss'
+  styleUrl: './payment-method.scss',
 })
 export class PaymentMethodComponent {}

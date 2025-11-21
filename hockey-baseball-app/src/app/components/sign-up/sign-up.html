@@ -128,18 +128,13 @@
 
       <!-- Form-level error for password mismatch -->
       @if (signUpForm.errors?.['passwordMismatch'] && confirmPassword?.dirty) {
-        <div class="text-red-600 text-sm mt-2">
-          Passwords do not match
-        </div>
+        <div class="text-red-600 text-sm mt-2">Passwords do not match</div>
       }
     </div>
 
     <div class="flex justify-center flex-col text-center mt-6">
       <!-- Sign Up Button -->
-      <app-auth-button
-        text="SIGN UP"
-        type="submit"
-      ></app-auth-button>
+      <app-auth-button text="SIGN UP" type="submit"></app-auth-button>
 
       <app-auth-link
         text="Already have an account?"

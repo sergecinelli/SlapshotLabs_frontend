@@ -9,17 +9,17 @@
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(207, 20, 43, 0.3);
   transition: all 0.3s ease;
-  
+
   &:hover {
     background-color: #b8122a !important;
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(207, 20, 43, 0.4);
   }
-  
+
   &:active {
     transform: translateY(0);
   }
-  
+
   mat-icon {
     font-size: 20px;
     width: 20px;

@@ -10,12 +10,12 @@
         <p>Loading roster...</p>
       </div>
     }
-    
+
     @if (!isLoading()) {
       <!-- Goalies Section -->
       <div class="roster-section">
         <h3 class="section-title">Goalies</h3>
-        
+
         @if (goalies().length === 0) {
           <p class="no-data">No goalies available for this team.</p>
         } @else {
@@ -26,14 +26,16 @@
                 <mat-checkbox
                   (change)="toggleAllGoalies()"
                   [checked]="areAllGoaliesSelected()"
-                  [indeterminate]="goalieSelection.hasValue() && !areAllGoaliesSelected()">
+                  [indeterminate]="goalieSelection.hasValue() && !areAllGoaliesSelected()"
+                >
                 </mat-checkbox>
               </th>
               <td mat-cell *matCellDef="let row">
                 <mat-checkbox
                   (click)="$event.stopPropagation()"
                   (change)="toggleGoalie(row.id)"
-                  [checked]="isGoalieSelected(row.id)">
+                  [checked]="isGoalieSelected(row.id)"
+                >
                 </mat-checkbox>
               </td>
             </ng-container>
@@ -57,9 +59,12 @@
             </ng-container>
 
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedColumns;" 
-                (click)="toggleGoalie(row.id)"
-                class="roster-row"></tr>
+            <tr
+              mat-row
+              *matRowDef="let row; columns: displayedColumns"
+              (click)="toggleGoalie(row.id)"
+              class="roster-row"
+            ></tr>
           </table>
         }
       </div>
@@ -67,7 +72,7 @@
       <!-- Players Section -->
       <div class="roster-section">
         <h3 class="section-title">Players</h3>
-        
+
         @if (players().length === 0) {
           <p class="no-data">No players available for this team.</p>
         } @else {
@@ -78,14 +83,16 @@
                 <mat-checkbox
                   (change)="toggleAllPlayers()"
                   [checked]="areAllPlayersSelected()"
-                  [indeterminate]="playerSelection.hasValue() && !areAllPlayersSelected()">
+                  [indeterminate]="playerSelection.hasValue() && !areAllPlayersSelected()"
+                >
                 </mat-checkbox>
               </th>
               <td mat-cell *matCellDef="let row">
                 <mat-checkbox
                   (click)="$event.stopPropagation()"
                   (change)="togglePlayer(row.id)"
-                  [checked]="isPlayerSelected(row.id)">
+                  [checked]="isPlayerSelected(row.id)"
+                >
                 </mat-checkbox>
               </td>
             </ng-container>
@@ -109,9 +116,12 @@
             </ng-container>
 
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedColumns;" 
-                (click)="togglePlayer(row.id)"
-                class="roster-row"></tr>
+            <tr
+              mat-row
+              *matRowDef="let row; columns: displayedColumns"
+              (click)="togglePlayer(row.id)"
+              class="roster-row"
+            ></tr>
           </table>
         }
       </div>
@@ -119,15 +129,14 @@
   </mat-dialog-content>
 
   <mat-dialog-actions class="modal-actions">
-    <button mat-stroked-button (click)="onCancel()" class="cancel-btn">
-      Cancel
-    </button>
-    <button 
-      mat-raised-button 
-      color="primary" 
-      (click)="onConfirm()" 
+    <button mat-stroked-button (click)="onCancel()" class="cancel-btn">Cancel</button>
+    <button
+      mat-raised-button
+      color="primary"
+      (click)="onConfirm()"
       class="confirm-btn"
-      [disabled]="isLoading()">
+      [disabled]="isLoading()"
+    >
       <mat-icon>check</mat-icon>
       Confirm Selection
     </button>

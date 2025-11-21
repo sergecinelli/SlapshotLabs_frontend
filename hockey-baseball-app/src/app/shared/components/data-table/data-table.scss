@@ -5,65 +5,70 @@
   .loading-state {
     background-color: white;
     border-radius: 0.5rem;
-    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    box-shadow:
+      0 1px 3px 0 rgb(0 0 0 / 0.1),
+      0 1px 2px -1px rgb(0 0 0 / 0.1);
   }
 
   .table-wrapper {
     background-color: white;
     border-radius: 0.5rem;
-    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    box-shadow:
+      0 1px 3px 0 rgb(0 0 0 / 0.1),
+      0 1px 2px -1px rgb(0 0 0 / 0.1);
     overflow-x: auto;
     overflow-y: hidden;
-    
+
     &::-webkit-scrollbar {
       height: 8px;
     }
-    
+
     &::-webkit-scrollbar-track {
       background-color: #f1f5f9;
       border-radius: 4px;
     }
-    
+
     &::-webkit-scrollbar-thumb {
       background-color: #cbd5e1;
       border-radius: 4px;
-      
+
       &:hover {
         background-color: #94a3b8;
       }
     }
-    
+
     table {
       width: 100%;
       min-width: 1200px;
       table-layout: fixed;
-      
+
       .custom-header {
         .mat-mdc-header-cell {
           @apply bg-gray-200 font-medium text-sm text-gray-600 border-0;
-          
+
           &:first-child {
             border-top-left-radius: 8px;
           }
-          
+
           &:last-child {
             border-top-right-radius: 8px;
           }
         }
       }
-      
+
       .table-row {
-        transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+        transition-property:
+          color, background-color, border-color, text-decoration-color, fill, stroke;
         transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
         transition-duration: 150ms;
-        
+
         &:hover {
           .mat-mdc-cell {
             background-color: #f9fafb !important;
           }
         }
       }
-      
+
       .mat-mdc-cell {
         font-size: 12px !important;
         color: #111827 !important;
@@ -72,21 +77,21 @@
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        
+
         // Override text overflow for badge cells
         &.badge-cell {
           text-overflow: unset;
           overflow: visible;
         }
-        
+
         &.text-center {
           text-align: center !important;
         }
-        
+
         &.text-right {
           text-align: right !important;
         }
-        
+
         &.actions-cell {
           white-space: normal !important;
           overflow: visible !important;
@@ -94,22 +99,22 @@
           padding: 4px 8px !important;
         }
       }
-      
+
       .mat-mdc-header-cell {
         padding: 8px 16px !important;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        
+
         &.text-center {
           text-align: center !important;
         }
-        
+
         &.text-right {
           text-align: right !important;
         }
       }
-      
+
       .action-button {
         min-width: auto !important;
         padding: 2px 6px !important;
@@ -117,7 +122,7 @@
         height: 26px !important;
         line-height: 1.2 !important;
         border-radius: 4px !important;
-        
+
         &.icon-only-button {
           width: 28px !important;
           height: 28px !important;
@@ -127,49 +132,54 @@
           align-items: center;
           justify-content: center;
         }
-        
+
         &.mat-mdc-button {
           &.mat-primary {
             background-color: var(--color-primary) !important;
             color: white !important;
           }
-          
+
           &.mat-warn {
             background-color: #ef4444 !important;
             color: white !important;
           }
-          
+
           &:not(.mat-primary):not(.mat-warn) {
             background-color: #f3f4f6 !important;
             color: #374151 !important;
-            
+
             &:hover {
               background-color: #e5e7eb !important;
             }
           }
         }
       }
-      
+
       .action-icon {
         width: 16px !important;
         height: 16px !important;
-        filter: brightness(0) saturate(100%) invert(30%) sepia(10%) saturate(1000%) hue-rotate(200deg) brightness(96%) contrast(86%);
-        
+        filter: brightness(0) saturate(100%) invert(30%) sepia(10%) saturate(1000%)
+          hue-rotate(200deg) brightness(96%) contrast(86%);
+
         .mat-primary & {
-          filter: brightness(0) saturate(100%) invert(100%) sepia(100%) saturate(0%) hue-rotate(340deg) brightness(101%) contrast(103%);
+          filter: brightness(0) saturate(100%) invert(100%) sepia(100%) saturate(0%)
+            hue-rotate(340deg) brightness(101%) contrast(103%);
         }
-        
+
         .mat-warn & {
-          filter: brightness(0) saturate(100%) invert(100%) sepia(100%) saturate(0%) hue-rotate(340deg) brightness(101%) contrast(103%);
+          filter: brightness(0) saturate(100%) invert(100%) sepia(100%) saturate(0%)
+            hue-rotate(340deg) brightness(101%) contrast(103%);
         }
       }
     }
   }
-  
+
   .empty-state {
     background-color: white;
     border-radius: 0.5rem;
-    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    box-shadow:
+      0 1px 3px 0 rgb(0 0 0 / 0.1),
+      0 1px 2px -1px rgb(0 0 0 / 0.1);
   }
 
   // Badge styles for schedule table
@@ -181,17 +191,17 @@
     text-align: center;
     display: inline-block;
     min-width: 80px;
-    
+
     &.game-in-progress {
       background-color: #fef3c7;
       color: #92400e;
     }
-    
+
     &.not-started {
       background-color: #e5e7eb;
       color: #374151;
     }
-    
+
     &.game-over {
       background-color: #d1fae5;
       color: #065f46;
@@ -204,27 +214,27 @@
     font-size: 0.75rem;
     font-weight: 500;
     display: inline-block;
-    
+
     &.regular-season {
       background-color: #dbeafe;
       color: #1e40af;
     }
-    
+
     &.playoff {
       background-color: #fce7f3;
       color: #be185d;
     }
-    
+
     &.tournament {
       background-color: #f3e8ff;
       color: #7c3aed;
     }
-    
+
     &.exhibition {
       background-color: #fef3c7;
       color: #92400e;
     }
-    
+
     &.summer-league {
       background-color: #d1fae5;
       color: #065f46;

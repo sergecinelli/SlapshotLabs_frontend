@@ -9,9 +9,16 @@ import { MatTableModule } from '@angular/material/table';
 import { MatDialog } from '@angular/material/dialog';
 import { forkJoin } from 'rxjs';
 import { PlayerService } from '../../services/player.service';
-import { Player, PlayerSeasonStats, PlayerRecentGameStats } from '../../shared/interfaces/player.interface';
+import {
+  Player,
+  PlayerSeasonStats,
+  PlayerRecentGameStats,
+} from '../../shared/interfaces/player.interface';
 import { PlayerFormModalComponent } from '../../shared/components/player-form-modal/player-form-modal';
-import { ShotLocationDisplayComponent, ShotLocationData } from '../../shared/components/shot-location-display/shot-location-display';
+import {
+  ShotLocationDisplayComponent,
+  ShotLocationData,
+} from '../../shared/components/shot-location-display/shot-location-display';
 import { SeasonService } from '../../services/season.service';
 import { GameEventNameService, GameEventName } from '../../services/game-event-name.service';
 import { GameMetadataService, ShotTypeResponse } from '../../services/game-metadata.service';
@@ -27,10 +34,10 @@ import { SprayChartUtilsService } from '../../services/spray-chart-utils.service
     MatCardModule,
     MatDividerModule,
     MatTableModule,
-    ShotLocationDisplayComponent
+    ShotLocationDisplayComponent,
   ],
   templateUrl: './player-profile.html',
-  styleUrl: './player-profile.scss'
+  styleUrl: './player-profile.scss',
 })
 export class PlayerProfileComponent implements OnInit {
   private route = inject(ActivatedRoute);
@@ -45,10 +52,36 @@ export class PlayerProfileComponent implements OnInit {
   player: Player | null = null;
   loading = true;
   shotLocationData: ShotLocationData[] = [];
-  
+
   // Table column definitions
-  seasonStatsColumns: string[] = ['season', 'team', 'gamesPlayed', 'goals', 'assists', 'points', 'shotsOnGoal', 'scoringChances', 'penaltiesDrawn', 'turnovers', 'faceOffWinPercentage'];
-  recentGameStatsColumns: string[] = ['season', 'date', 'vs', 'team', 'score', 'goals', 'assists', 'points', 'shotsOnGoal', 'scoringChances', 'penaltiesDrawn', 'turnovers', 'faceOffWinPercentage'];
+  seasonStatsColumns: string[] = [
+    'season',
+    'team',
+    'gamesPlayed',
+    'goals',
+    'assists',
+    'points',
+    'shotsOnGoal',
+    'scoringChances',
+    'penaltiesDrawn',
+    'turnovers',
+    'faceOffWinPercentage',
+  ];
+  recentGameStatsColumns: string[] = [
+    'season',
+    'date',
+    'vs',
+    'team',
+    'score',
+    'goals',
+    'assists',
+    'points',
+    'shotsOnGoal',
+    'scoringChances',
+    'penaltiesDrawn',
+    'turnovers',
+    'faceOffWinPercentage',
+  ];
 
   ngOnInit(): void {
     const playerId = this.route.snapshot.paramMap.get('id');
@@ -61,23 +94,24 @@ export class PlayerProfileComponent implements OnInit {
 
   private loadPlayer(id: string): void {
     this.loading = true;
-    
+
     // Fetch player data, spray chart metadata, and spray chart data in parallel
     forkJoin({
       player: this.playerService.getPlayerById(id),
       seasons: this.seasonService.getSeasons(),
       eventNames: this.gameEventNameService.getGameEventNames(),
-      shotTypes: this.gameMetadataService.getShotTypes()
+      shotTypes: this.gameMetadataService.getShotTypes(),
     }).subscribe({
       next: ({ player, seasons, eventNames, shotTypes }) => {
         if (player) {
           this.player = player;
-          
+
           // Get the last season (highest ID)
-          const lastSeason = seasons.reduce((max, season) => 
-            season.id > max.id ? season : max, seasons[0]
+          const lastSeason = seasons.reduce(
+            (max, season) => (season.id > max.id ? season : max),
+            seasons[0]
           );
-          
+
           // Fetch spray chart data for the last season
           this.loadSprayChartData(id, lastSeason.id, eventNames, shotTypes);
         } else {
@@ -90,7 +124,7 @@ export class PlayerProfileComponent implements OnInit {
         console.error('Error loading player:', error);
         this.loading = false;
         this.router.navigate(['/players']);
-      }
+      },
     });
   }
 
@@ -115,7 +149,7 @@ export class PlayerProfileComponent implements OnInit {
         // Set empty array on error so component still renders
         this.shotLocationData = [];
         this.loading = false;
-      }
+      },
     });
   }
 
@@ -155,13 +189,13 @@ export class PlayerProfileComponent implements OnInit {
       maxWidth: '95vw',
       data: {
         player: this.player,
-        isEditMode: true
+        isEditMode: true,
       },
       panelClass: 'player-form-modal-dialog',
-      disableClose: true
+      disableClose: true,
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         this.updatePlayer(result);
       }
@@ -180,7 +214,7 @@ export class PlayerProfileComponent implements OnInit {
       error: (error) => {
         console.error('Error updating player:', error);
         this.loading = false;
-      }
+      },
     });
   }
 
@@ -188,7 +222,7 @@ export class PlayerProfileComponent implements OnInit {
     console.log('Request player analysis clicked');
     // TODO: Implement analysis request
   }
-  
+
   getSeasonStats(): PlayerSeasonStats[] {
     return [
       {
@@ -203,7 +237,7 @@ export class PlayerProfileComponent implements OnInit {
         scoringChances: 45,
         penaltiesDrawn: 8,
         turnovers: 15,
-        faceOffWinPercentage: 52.5
+        faceOffWinPercentage: 52.5,
       },
       {
         season: '2023/2024',
@@ -217,7 +251,7 @@ export class PlayerProfileComponent implements OnInit {
         scoringChances: 156,
         penaltiesDrawn: 23,
         turnovers: 67,
-        faceOffWinPercentage: 48.9
+        faceOffWinPercentage: 48.9,
       },
       {
         season: '2022/2023',
@@ -231,11 +265,11 @@ export class PlayerProfileComponent implements OnInit {
         scoringChances: 134,
         penaltiesDrawn: 31,
         turnovers: 58,
-        faceOffWinPercentage: 51.2
-      }
+        faceOffWinPercentage: 51.2,
+      },
     ];
   }
-  
+
   getRecentGameStats(): PlayerRecentGameStats[] {
     return [
       {
@@ -252,7 +286,7 @@ export class PlayerProfileComponent implements OnInit {
         scoringChances: 3,
         penaltiesDrawn: 1,
         turnovers: 2,
-        faceOffWinPercentage: 60.0
+        faceOffWinPercentage: 60.0,
       },
       {
         season: '2024/2025',
@@ -268,7 +302,7 @@ export class PlayerProfileComponent implements OnInit {
         scoringChances: 2,
         penaltiesDrawn: 0,
         turnovers: 3,
-        faceOffWinPercentage: 45.5
+        faceOffWinPercentage: 45.5,
       },
       {
         season: '2024/2025',
@@ -284,7 +318,7 @@ export class PlayerProfileComponent implements OnInit {
         scoringChances: 4,
         penaltiesDrawn: 2,
         turnovers: 1,
-        faceOffWinPercentage: 55.8
+        faceOffWinPercentage: 55.8,
       },
       {
         season: '2024/2025',
@@ -300,7 +334,7 @@ export class PlayerProfileComponent implements OnInit {
         scoringChances: 2,
         penaltiesDrawn: 0,
         turnovers: 2,
-        faceOffWinPercentage: 48.2
+        faceOffWinPercentage: 48.2,
       },
       {
         season: '2024/2025',
@@ -316,8 +350,8 @@ export class PlayerProfileComponent implements OnInit {
         scoringChances: 5,
         penaltiesDrawn: 1,
         turnovers: 0,
-        faceOffWinPercentage: 62.5
-      }
+        faceOffWinPercentage: 62.5,
+      },
     ];
   }
 

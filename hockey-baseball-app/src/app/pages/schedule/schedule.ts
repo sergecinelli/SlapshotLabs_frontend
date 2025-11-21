@@ -5,42 +5,61 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header';
-import { DataTableComponent, TableColumn, TableAction } from '../../shared/components/data-table/data-table';
+import {
+  DataTableComponent,
+  TableColumn,
+  TableAction,
+} from '../../shared/components/data-table/data-table';
 import { ScheduleService } from '../../services/schedule.service';
 import { TeamService } from '../../services/team.service';
 import { ArenaService } from '../../services/arena.service';
 import { GoalieService } from '../../services/goalie.service';
 import { PlayerService } from '../../services/player.service';
-import { GameMetadataService, GameTypeResponse, GamePeriodResponse } from '../../services/game-metadata.service';
+import {
+  GameMetadataService,
+  GameTypeResponse,
+  GamePeriodResponse,
+} from '../../services/game-metadata.service';
 import { BannerService } from '../../services/banner.service';
 import { Schedule, GameStatus, GameType } from '../../shared/interfaces/schedule.interface';
 import { Team } from '../../shared/interfaces/team.interface';
 import { Arena, Rink } from '../../shared/interfaces/arena.interface';
 import { Goalie } from '../../shared/interfaces/goalie.interface';
 import { Player } from '../../shared/interfaces/player.interface';
-import { ScheduleFormModalComponent, ScheduleFormModalData } from '../../shared/components/schedule-form-modal/schedule-form-modal';
+import {
+  ScheduleFormModalComponent,
+  ScheduleFormModalData,
+} from '../../shared/components/schedule-form-modal/schedule-form-modal';
 import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-schedule',
   standalone: true,
-  imports: [CommonModule, PageHeaderComponent, DataTableComponent, MatButtonModule, MatIconModule, MatDialogModule],
+  imports: [
+    CommonModule,
+    PageHeaderComponent,
+    DataTableComponent,
+    MatButtonModule,
+    MatIconModule,
+    MatDialogModule,
+  ],
   template: `
     <div class="p-6 pt-0">
       <app-page-header title="Schedule"></app-page-header>
-      
+
       <!-- Add Schedule Button -->
       <div class="mb-4 flex justify-end">
-        <button 
-          mat-raised-button 
-          color="primary" 
+        <button
+          mat-raised-button
+          color="primary"
           (click)="openAddScheduleModal()"
-          class="add-schedule-btn">
+          class="add-schedule-btn"
+        >
           <mat-icon>add</mat-icon>
           Add to Schedule
         </button>
       </div>
-      
+
       <app-data-table
         [columns]="tableColumns"
         [data]="schedules()"
@@ -52,7 +71,7 @@ import { forkJoin } from 'rxjs';
       ></app-data-table>
     </div>
   `,
-  styleUrl: './schedule.scss'
+  styleUrl: './schedule.scss',
 })
 export class ScheduleComponent implements OnInit {
   private scheduleService = inject(ScheduleService);
@@ -67,7 +86,7 @@ export class ScheduleComponent implements OnInit {
 
   schedules = signal<Schedule[]>([]);
   loading = signal(true);
-  
+
   // Cached data for form modals
   teams: Team[] = [];
   arenas: Arena[] = [];
@@ -76,9 +95,27 @@ export class ScheduleComponent implements OnInit {
   players: Player[] = [];
   gameTypes: GameTypeResponse[] = [];
   gamePeriods: GamePeriodResponse[] = [];
-  
+
   // Store raw game data for edit mode
-  rawGames = new Map<string, { id: number; home_team_id: number; home_goals: number; home_start_goalie_id: number; away_team_id: number; away_goals: number; away_start_goalie_id: number; game_type_id: number; game_type_name?: string; tournament_name?: string; date: string; time: string; rink_id: number; status: number }>();
+  rawGames = new Map<
+    string,
+    {
+      id: number;
+      home_team_id: number;
+      home_goals: number;
+      home_start_goalie_id: number;
+      away_team_id: number;
+      away_goals: number;
+      away_start_goalie_id: number;
+      game_type_id: number;
+      game_type_name?: string;
+      tournament_name?: string;
+      date: string;
+      time: string;
+      rink_id: number;
+      status: number;
+    }
+  >();
 
   tableColumns: TableColumn[] = [
     { key: 'homeTeam', label: 'Home Team', sortable: true, width: '150px' },
@@ -92,30 +129,30 @@ export class ScheduleComponent implements OnInit {
     { key: 'date', label: 'Date', sortable: true, width: '120px' },
     { key: 'time', label: 'Time', sortable: true, width: '80px' },
     { key: 'rink', label: 'Rink', sortable: true, width: '180px' },
-    { key: 'status', label: 'Status', sortable: true, type: 'custom', width: '140px' }
+    { key: 'status', label: 'Status', sortable: true, type: 'custom', width: '140px' },
   ];
 
   tableActions: TableAction[] = [
-    { 
-      label: 'Dashboard', 
-      action: 'dashboard', 
+    {
+      label: 'Dashboard',
+      action: 'dashboard',
       variant: 'primary',
       condition: (item: Record<string, unknown>) => {
         const status = item['status'] as GameStatus;
         return status === GameStatus.GameInProgress || status === GameStatus.GameOver;
-      }
+      },
     },
     { label: 'Edit', action: 'edit', variant: 'secondary' },
-    { label: 'Delete', action: 'delete', variant: 'danger' }
+    { label: 'Delete', action: 'delete', variant: 'danger' },
   ];
 
   ngOnInit(): void {
     this.loadInitialData();
   }
-  
+
   private loadInitialData(): void {
     this.loading.set(true);
-    
+
     // Load all necessary data for the schedule page and form
     forkJoin({
       schedules: this.scheduleService.getGameList(),
@@ -125,7 +162,7 @@ export class ScheduleComponent implements OnInit {
       goalies: this.goalieService.getGoalies(),
       players: this.playerService.getPlayers(),
       gameTypes: this.gameMetadataService.getGameTypes(),
-      gamePeriods: this.gameMetadataService.getGamePeriods()
+      gamePeriods: this.gameMetadataService.getGamePeriods(),
     }).subscribe({
       next: ({ schedules, teams, arenas, rinks, goalies, players, gameTypes, gamePeriods }) => {
         // Store data for form modals
@@ -136,53 +173,62 @@ export class ScheduleComponent implements OnInit {
         this.players = players.players;
         this.gameTypes = gameTypes;
         this.gamePeriods = gamePeriods;
-        
+
         // Create mappings
-        const teamMap = new Map(this.teams.map(t => [parseInt(t.id), t.name]));
-        const goalieMap = new Map(this.goalies.map(g => [parseInt(g.id), `${g.firstName} ${g.lastName}`]));
-        const rinkMap = new Map(this.rinks.map(r => {
-          const arena = this.arenas.find(a => a.id === r.arena_id);
-          return [r.id, arena ? `${arena.name} - ${r.name}` : r.name];
-        }));
-        
+        const teamMap = new Map(this.teams.map((t) => [parseInt(t.id), t.name]));
+        const goalieMap = new Map(
+          this.goalies.map((g) => [parseInt(g.id), `${g.firstName} ${g.lastName}`])
+        );
+        const rinkMap = new Map(
+          this.rinks.map((r) => {
+            const arena = this.arenas.find((a) => a.id === r.arena_id);
+            return [r.id, arena ? `${arena.name} - ${r.name}` : r.name];
+          })
+        );
+
         // Create game type mapping - map game_type_id to game type group name
         const gameTypeMap = new Map<number, string>();
-        this.gameTypes.forEach(type => {
+        this.gameTypes.forEach((type) => {
           gameTypeMap.set(type.id, type.name);
         });
-        
+
         // Store raw game data for edit mode
-        schedules.forEach(game => {
+        schedules.forEach((game) => {
           this.rawGames.set(game.id.toString(), game);
         });
-        
+
         // Map API response to Schedule interface
-        const mappedSchedules: Schedule[] = schedules.map(game => ({
+        const mappedSchedules: Schedule[] = schedules.map((game) => ({
           id: game.id.toString(),
           homeTeam: teamMap.get(game.home_team_id) || `Team ${game.home_team_id}`,
           homeGoals: game.home_goals,
-          homeTeamGoalie: goalieMap.get(game.home_start_goalie_id) || `Goalie ${game.home_start_goalie_id}`,
+          homeTeamGoalie:
+            goalieMap.get(game.home_start_goalie_id) || `Goalie ${game.home_start_goalie_id}`,
           awayTeam: teamMap.get(game.away_team_id) || `Team ${game.away_team_id}`,
           awayGoals: game.away_goals,
-          awayTeamGoalie: goalieMap.get(game.away_start_goalie_id) || `Goalie ${game.away_start_goalie_id}`,
+          awayTeamGoalie:
+            goalieMap.get(game.away_start_goalie_id) || `Goalie ${game.away_start_goalie_id}`,
           gameType: (gameTypeMap.get(game.game_type_id) || '') as GameType,
           tournamentName: game.game_type_name || '',
           date: game.date,
           time: game.time,
           rink: rinkMap.get(game.rink_id) || `Rink ${game.rink_id}`,
-          status: game.status === 1 ? GameStatus.NotStarted : 
-                  game.status === 2 ? GameStatus.GameInProgress : 
-                  GameStatus.GameOver,
-          events: []
+          status:
+            game.status === 1
+              ? GameStatus.NotStarted
+              : game.status === 2
+                ? GameStatus.GameInProgress
+                : GameStatus.GameOver,
+          events: [],
         }));
-        
+
         this.schedules.set(mappedSchedules);
         this.loading.set(false);
       },
       error: (error) => {
         console.error('Error loading initial data:', error);
         this.loading.set(false);
-      }
+      },
     });
   }
 
@@ -190,55 +236,64 @@ export class ScheduleComponent implements OnInit {
     // Reload just the schedules without refetching all data
     this.scheduleService.getGameList().subscribe({
       next: (games) => {
-        const teamMap = new Map(this.teams.map(t => [parseInt(t.id), t.name]));
-        const goalieMap = new Map(this.goalies.map(g => [parseInt(g.id), `${g.firstName} ${g.lastName}`]));
-        const rinkMap = new Map(this.rinks.map(r => {
-          const arena = this.arenas.find(a => a.id === r.arena_id);
-          return [r.id, arena ? `${arena.name} - ${r.name}` : r.name];
-        }));
-        
+        const teamMap = new Map(this.teams.map((t) => [parseInt(t.id), t.name]));
+        const goalieMap = new Map(
+          this.goalies.map((g) => [parseInt(g.id), `${g.firstName} ${g.lastName}`])
+        );
+        const rinkMap = new Map(
+          this.rinks.map((r) => {
+            const arena = this.arenas.find((a) => a.id === r.arena_id);
+            return [r.id, arena ? `${arena.name} - ${r.name}` : r.name];
+          })
+        );
+
         // Create game type mapping - map game_type_id to game type group name
         const gameTypeMap = new Map<number, string>();
-        this.gameTypes.forEach(type => {
+        this.gameTypes.forEach((type) => {
           gameTypeMap.set(type.id, type.name);
         });
-        
+
         // Store raw game data for edit mode
-        games.forEach(game => {
+        games.forEach((game) => {
           this.rawGames.set(game.id.toString(), game);
         });
-        
-        const mappedSchedules: Schedule[] = games.map(game => ({
+
+        const mappedSchedules: Schedule[] = games.map((game) => ({
           id: game.id.toString(),
           homeTeam: teamMap.get(game.home_team_id) || `Team ${game.home_team_id}`,
           homeGoals: game.home_goals,
-          homeTeamGoalie: goalieMap.get(game.home_start_goalie_id) || `Goalie ${game.home_start_goalie_id}`,
+          homeTeamGoalie:
+            goalieMap.get(game.home_start_goalie_id) || `Goalie ${game.home_start_goalie_id}`,
           awayTeam: teamMap.get(game.away_team_id) || `Team ${game.away_team_id}`,
           awayGoals: game.away_goals,
-          awayTeamGoalie: goalieMap.get(game.away_start_goalie_id) || `Goalie ${game.away_start_goalie_id}`,
+          awayTeamGoalie:
+            goalieMap.get(game.away_start_goalie_id) || `Goalie ${game.away_start_goalie_id}`,
           gameType: (gameTypeMap.get(game.game_type_id) || '') as GameType,
           tournamentName: game.game_type_name || '',
           date: game.date,
           time: game.time,
           rink: rinkMap.get(game.rink_id) || `Rink ${game.rink_id}`,
-          status: game.status === 1 ? GameStatus.NotStarted : 
-                  game.status === 2 ? GameStatus.GameInProgress : 
-                  GameStatus.GameOver,
-          events: []
+          status:
+            game.status === 1
+              ? GameStatus.NotStarted
+              : game.status === 2
+                ? GameStatus.GameInProgress
+                : GameStatus.GameOver,
+          events: [],
         }));
-        
+
         this.schedules.set(mappedSchedules);
       },
       error: (error) => {
         console.error('Error loading schedules:', error);
-      }
+      },
     });
   }
 
-  onActionClick(event: { action: string, item: Record<string, unknown> }): void {
+  onActionClick(event: { action: string; item: Record<string, unknown> }): void {
     const { action, item } = event;
     const schedule = item as Schedule;
-    
+
     switch (action) {
       case 'dashboard':
         this.openLiveDashboard(schedule);
@@ -254,28 +309,30 @@ export class ScheduleComponent implements OnInit {
     }
   }
 
-  onSort(event: { column: string, direction: 'asc' | 'desc' }): void {
+  onSort(event: { column: string; direction: 'asc' | 'desc' }): void {
     const { column, direction } = event;
     const sortedSchedules = [...this.schedules()].sort((a, b) => {
       const aValue = this.getNestedValue(a, column);
       const bValue = this.getNestedValue(b, column);
-      
+
       if (aValue === bValue) return 0;
-      
+
       const result = (aValue as string | number) < (bValue as string | number) ? -1 : 1;
       return direction === 'asc' ? result : -result;
     });
-    
+
     this.schedules.set(sortedSchedules);
   }
 
   private getNestedValue(obj: Schedule, path: string): unknown {
-    return path.split('.').reduce((current: unknown, key: string) => (current as Record<string, unknown>)?.[key], obj);
+    return path
+      .split('.')
+      .reduce((current: unknown, key: string) => (current as Record<string, unknown>)?.[key], obj);
   }
 
   private editSchedule(schedule: Schedule): void {
     const rawGameData = this.rawGames.get(schedule.id);
-    
+
     const dialogRef = this.dialog.open(ScheduleFormModalComponent, {
       width: '800px',
       maxWidth: '95vw',
@@ -290,12 +347,12 @@ export class ScheduleComponent implements OnInit {
         goalies: this.goalies,
         players: this.players,
         gameTypes: this.gameTypes,
-        gamePeriods: this.gamePeriods
+        gamePeriods: this.gamePeriods,
       } as ScheduleFormModalData,
-      panelClass: 'schedule-form-modal-dialog'
+      panelClass: 'schedule-form-modal-dialog',
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         const gameId = parseInt(schedule.id);
         this.scheduleService.updateGame(gameId, result).subscribe({
@@ -305,14 +362,18 @@ export class ScheduleComponent implements OnInit {
           },
           error: (error) => {
             console.error('Error updating game:', error);
-          }
+          },
         });
       }
     });
   }
 
   private deleteSchedule(schedule: Schedule): void {
-    if (confirm(`Are you sure you want to delete the game between ${schedule.homeTeam} and ${schedule.awayTeam}?`)) {
+    if (
+      confirm(
+        `Are you sure you want to delete the game between ${schedule.homeTeam} and ${schedule.awayTeam}?`
+      )
+    ) {
       const gameId = parseInt(schedule.id);
       this.scheduleService.deleteGame(gameId).subscribe({
         next: () => {
@@ -321,7 +382,7 @@ export class ScheduleComponent implements OnInit {
         error: (error) => {
           console.error('Error deleting game:', error);
           alert('Error deleting game. Please try again.');
-        }
+        },
       });
     }
   }
@@ -346,12 +407,12 @@ export class ScheduleComponent implements OnInit {
         goalies: this.goalies,
         players: this.players,
         gameTypes: this.gameTypes,
-        gamePeriods: this.gamePeriods
+        gamePeriods: this.gamePeriods,
       } as ScheduleFormModalData,
-      panelClass: 'schedule-form-modal-dialog'
+      panelClass: 'schedule-form-modal-dialog',
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         this.scheduleService.createGame(result).subscribe({
           next: () => {
@@ -360,7 +421,7 @@ export class ScheduleComponent implements OnInit {
           },
           error: (error) => {
             console.error('Error adding game:', error);
-          }
+          },
         });
       }
     });

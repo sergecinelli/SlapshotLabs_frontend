@@ -4,27 +4,46 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header';
-import { DataTableComponent, TableAction, TableColumn } from '../../shared/components/data-table/data-table';
+import {
+  DataTableComponent,
+  TableAction,
+  TableColumn,
+} from '../../shared/components/data-table/data-table';
 import { HighlightsService } from '../../services/highlights.service';
-import { HighlightReelApi, HighlightReelRow, HighlightReelUpsertPayload } from '../../shared/interfaces/highlight-reel.interface';
-import { HighlightReelFormModalComponent, HighlightReelFormModalData } from '../../shared/components/highlight-reel-form-modal/highlight-reel-form-modal';
+import {
+  HighlightReelApi,
+  HighlightReelRow,
+  HighlightReelUpsertPayload,
+} from '../../shared/interfaces/highlight-reel.interface';
+import {
+  HighlightReelFormModalComponent,
+  HighlightReelFormModalData,
+} from '../../shared/components/highlight-reel-form-modal/highlight-reel-form-modal';
 import { HighlightReelViewModalComponent } from '../../shared/components/highlight-reel-view-modal/highlight-reel-view-modal';
 
 @Component({
   selector: 'app-video-highlights',
   standalone: true,
-  imports: [CommonModule, PageHeaderComponent, DataTableComponent, MatButtonModule, MatIconModule, MatDialogModule],
+  imports: [
+    CommonModule,
+    PageHeaderComponent,
+    DataTableComponent,
+    MatButtonModule,
+    MatIconModule,
+    MatDialogModule,
+  ],
   template: `
     <div class="p-6 pt-0">
       <app-page-header title="Video Highlights"></app-page-header>
 
       <!-- Create Highlight Reel Button -->
       <div class="mb-4 flex justify-end">
-        <button 
-          mat-raised-button 
-          color="primary" 
+        <button
+          mat-raised-button
+          color="primary"
           (click)="openCreateHighlightModal()"
-          class="add-video-btn">
+          class="add-video-btn"
+        >
           <mat-icon>add</mat-icon>
           Create New Highlight Reel
         </button>
@@ -41,7 +60,7 @@ import { HighlightReelViewModalComponent } from '../../shared/components/highlig
       ></app-data-table>
     </div>
   `,
-  styleUrl: './video-highlights.scss'
+  styleUrl: './video-highlights.scss',
 })
 export class VideoHighlightsComponent implements OnInit {
   private highlightsService = inject(HighlightsService);
@@ -53,14 +72,20 @@ export class VideoHighlightsComponent implements OnInit {
   tableColumns: TableColumn[] = [
     { key: 'name', label: 'Name', sortable: true, width: '220px' },
     { key: 'description', label: 'Description', sortable: true, width: '300px' },
-    { key: 'dateCreatedFormatted', label: 'Date Created', sortable: true, type: 'text', width: '160px' },
-    { key: 'createdBy', label: 'Created By', sortable: true, width: '160px' }
+    {
+      key: 'dateCreatedFormatted',
+      label: 'Date Created',
+      sortable: true,
+      type: 'text',
+      width: '160px',
+    },
+    { key: 'createdBy', label: 'Created By', sortable: true, width: '160px' },
   ];
 
   tableActions: TableAction[] = [
     { label: 'View', action: 'view', variant: 'primary' },
     { label: 'Edit', action: 'edit', variant: 'secondary' },
-    { label: 'Delete', action: 'delete', variant: 'danger' }
+    { label: 'Delete', action: 'delete', variant: 'danger' },
   ];
 
   ngOnInit(): void {
@@ -79,7 +104,7 @@ export class VideoHighlightsComponent implements OnInit {
             description: item.description,
             createdBy: item.created_by,
             dateCreated: date,
-            dateCreatedFormatted: this.formatDateShort(date)
+            dateCreatedFormatted: this.formatDateShort(date),
           } as HighlightReelRow;
         });
         this.rows.set(mapped);
@@ -88,7 +113,7 @@ export class VideoHighlightsComponent implements OnInit {
       error: (error) => {
         console.error('Error loading highlights:', error);
         this.loading.set(false);
-      }
+      },
     });
   }
 
@@ -107,7 +132,7 @@ export class VideoHighlightsComponent implements OnInit {
           this.highlightsService.deleteHighlightReel(item.id).subscribe({
             next: () => {
               // Optimistically remove from current list
-              const updated = this.rows().filter(r => r.id !== item.id);
+              const updated = this.rows().filter((r) => r.id !== item.id);
               this.rows.set(updated);
               this.loading.set(false);
             },
@@ -115,7 +140,7 @@ export class VideoHighlightsComponent implements OnInit {
               console.error('Error deleting highlight reel:', error);
               this.loading.set(false);
               alert('Failed to delete highlight reel.');
-            }
+            },
           });
         }
         break;
@@ -155,9 +180,9 @@ export class VideoHighlightsComponent implements OnInit {
       disableClose: true,
       autoFocus: false,
       data: {
-        isEditMode: false
+        isEditMode: false,
       } as HighlightReelFormModalData,
-      panelClass: 'schedule-form-modal-dialog'
+      panelClass: 'schedule-form-modal-dialog',
     });
 
     dialogRef.afterClosed().subscribe((result?: HighlightReelUpsertPayload) => {
@@ -170,7 +195,7 @@ export class VideoHighlightsComponent implements OnInit {
           error: (error) => {
             console.error('Error creating highlight reel:', error);
             this.loading.set(false);
-          }
+          },
         });
       }
     });
@@ -187,10 +212,10 @@ export class VideoHighlightsComponent implements OnInit {
         reel: {
           id: item.id,
           name: item.name,
-          description: item.description
-        }
+          description: item.description,
+        },
       } as HighlightReelFormModalData,
-      panelClass: 'schedule-form-modal-dialog'
+      panelClass: 'schedule-form-modal-dialog',
     });
 
     dialogRef.afterClosed().subscribe((result?: HighlightReelUpsertPayload) => {
@@ -203,7 +228,7 @@ export class VideoHighlightsComponent implements OnInit {
           error: (error) => {
             console.error('Error updating highlight reel:', error);
             this.loading.set(false);
-          }
+          },
         });
       }
     });
@@ -222,13 +247,13 @@ export class VideoHighlightsComponent implements OnInit {
             highlights,
             initialIndex: 0,
           },
-          panelClass: 'highlight-reel-view-dialog'
+          panelClass: 'highlight-reel-view-dialog',
         });
       },
       error: (error) => {
         console.error('Error loading highlights for reel:', error);
         alert('Failed to load highlights for this reel.');
-      }
+      },
     });
   }
 }

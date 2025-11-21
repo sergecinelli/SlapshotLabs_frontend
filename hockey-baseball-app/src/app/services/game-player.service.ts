@@ -36,7 +36,7 @@ export interface GameRosterResponse {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class GamePlayerService {
   private apiService = inject(ApiService);

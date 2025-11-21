@@ -24,11 +24,11 @@ export interface VideoFormModalData {
     MatFormFieldModule,
     MatInputModule,
     MatIconModule,
-    MatDividerModule
+    MatDividerModule,
   ],
   templateUrl: './video-form-modal.html',
   styleUrl: './video-form-modal.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class VideoFormModalComponent implements OnInit {
   private fb = inject(FormBuilder);
@@ -53,7 +53,7 @@ export class VideoFormModalComponent implements OnInit {
     return this.fb.group({
       name: ['', [Validators.required, Validators.maxLength(255)]],
       description: ['', [Validators.required, Validators.maxLength(1000)]],
-      youtube_link: ['', [Validators.required, this.youtubeUrlValidator]]
+      youtube_link: ['', [Validators.required, this.youtubeUrlValidator]],
     });
   }
 
@@ -64,8 +64,9 @@ export class VideoFormModalComponent implements OnInit {
     if (!control.value) {
       return null;
     }
-    
-    const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com\/(watch\?v=|embed\/|shorts\/)|youtu\.be\/)[\w-]+(\?[^\s]*)?$/;
+
+    const youtubeRegex =
+      /^(https?:\/\/)?(www\.)?(youtube\.com\/(watch\?v=|embed\/|shorts\/)|youtu\.be\/)[\w-]+(\?[^\s]*)?$/;
     return youtubeRegex.test(control.value) ? null : { invalidYoutubeUrl: true };
   }
 
@@ -73,7 +74,7 @@ export class VideoFormModalComponent implements OnInit {
     this.videoForm.patchValue({
       name: video.name,
       description: video.description,
-      youtube_link: video.youtube_link
+      youtube_link: video.youtube_link,
     });
   }
 
@@ -83,7 +84,7 @@ export class VideoFormModalComponent implements OnInit {
       this.dialogRef.close({
         name: formValue.name,
         description: formValue.description,
-        youtube_link: formValue.youtube_link
+        youtube_link: formValue.youtube_link,
       });
     }
   }
@@ -106,13 +107,14 @@ export class VideoFormModalComponent implements OnInit {
 
   getErrorMessage(field: string): string {
     const control = this.videoForm.get(field);
-    
+
     if (!control || !control.errors) {
       return '';
     }
 
     if (control.hasError('required')) {
-      const fieldName = field === 'youtube_link' ? 'YouTube link' : field.charAt(0).toUpperCase() + field.slice(1);
+      const fieldName =
+        field === 'youtube_link' ? 'YouTube link' : field.charAt(0).toUpperCase() + field.slice(1);
       return `${fieldName} is required`;
     }
 

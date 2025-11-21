@@ -6,7 +6,7 @@ import { ApiService } from './api.service';
 import { TeamDataMapperService } from './team-data-mapper.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class TeamService {
   private apiService = inject(ApiService);
@@ -14,14 +14,14 @@ export class TeamService {
 
   getTeams(): Observable<TeamTableData> {
     return this.apiService.get<TeamApiOut[]>('/hockey/team/list').pipe(
-      map(apiTeams => {
+      map((apiTeams) => {
         const teams = this.teamDataMapper.fromApiOutArrayFormat(apiTeams);
         return {
           teams: teams,
-          total: teams.length
+          total: teams.length,
         };
       }),
-      catchError(error => {
+      catchError((error) => {
         console.error('Failed to fetch teams:', error);
         return throwError(() => error);
       })
@@ -37,8 +37,8 @@ export class TeamService {
     }
 
     return this.apiService.get<TeamApiOut>(`/hockey/team/${numericId}`).pipe(
-      map(apiTeam => this.teamDataMapper.fromApiOutFormat(apiTeam)),
-      catchError(error => {
+      map((apiTeam) => this.teamDataMapper.fromApiOutFormat(apiTeam)),
+      catchError((error) => {
         console.error(`Failed to fetch team with ID ${id}:`, error);
         return throwError(() => error);
       })
@@ -57,7 +57,7 @@ export class TeamService {
       map(() => {
         return true;
       }),
-      catchError(error => {
+      catchError((error) => {
         console.error(`Failed to delete team with ID ${id}:`, error);
         return throwError(() => error);
       })
@@ -67,11 +67,11 @@ export class TeamService {
   addTeam(teamData: Partial<Team>, logoFile?: File): Observable<Team> {
     // Transform frontend data to API format
     const apiTeamData = this.teamDataMapper.toApiInFormat(teamData);
-    
+
     // Create FormData for multipart request
     const formData = new FormData();
     formData.append('data', JSON.stringify(apiTeamData));
-    
+
     // Add logo file if provided (file will be converted to base64 by the backend)
     if (logoFile) {
       formData.append('logo', logoFile, logoFile.name);
@@ -88,9 +88,9 @@ export class TeamService {
       const blob = new Blob([byteArray], { type: contentType });
       formData.append('logo', blob, 'logo.' + contentType.split('/')[1]);
     }
-    
+
     return this.apiService.postMultipart<{ id: number }>('/hockey/team', formData).pipe(
-      map(response => {
+      map((response) => {
         // Create a complete team object with the returned ID
         const newTeam: Team = {
           id: response.id.toString(),
@@ -100,19 +100,24 @@ export class TeamService {
           division: teamData.division || 'Atlantic',
           city: teamData.city || '',
           logo: teamData.logo || '/assets/icons/teams.svg',
-          createdAt: new Date() // Set creation date
+          createdAt: new Date(), // Set creation date
         };
-        
+
         return newTeam;
       }),
-      catchError(error => {
+      catchError((error) => {
         console.error('Failed to add team:', error);
         return throwError(() => error);
       })
     );
   }
 
-  updateTeam(id: string, teamData: Partial<Team>, logoFile?: File, logoRemoved?: boolean): Observable<Team> {
+  updateTeam(
+    id: string,
+    teamData: Partial<Team>,
+    logoFile?: File,
+    logoRemoved?: boolean
+  ): Observable<Team> {
     // Convert string ID to number for API call
     const numericId = parseInt(id, 10);
     if (isNaN(numericId)) {
@@ -121,11 +126,11 @@ export class TeamService {
     }
 
     const apiUpdateData = this.teamDataMapper.toApiUpdateFormat(teamData);
-    
+
     // Create FormData for multipart request
     const formData = new FormData();
     formData.append('data', JSON.stringify(apiUpdateData));
-    
+
     // Add logo file if provided (file will be converted to base64 by the backend)
     if (logoFile) {
       if (logoRemoved) {
@@ -147,19 +152,19 @@ export class TeamService {
       const blob = new Blob([byteArray], { type: contentType });
       formData.append('logo', blob, 'logo.' + contentType.split('/')[1]);
     }
-    
+
     return this.apiService.patchMultipart<void>(`/hockey/team/${numericId}`, formData).pipe(
       switchMap(() => {
         // After successful update, fetch the updated team data
         return this.getTeamById(id);
       }),
-      map(updatedTeam => {
+      map((updatedTeam) => {
         if (!updatedTeam) {
           throw new Error(`Team with ID ${id} not found after update`);
         }
         return updatedTeam;
       }),
-      catchError(error => {
+      catchError((error) => {
         console.error(`Failed to update team with ID ${id}:`, error);
         return throwError(() => error);
       })
@@ -177,11 +182,10 @@ export class TeamService {
     }
 
     return this.apiService.get<Blob>(`/hockey/team/${numericId}/logo`).pipe(
-      catchError(error => {
+      catchError((error) => {
         console.error(`Failed to fetch logo for team with ID ${id}:`, error);
         return throwError(() => error);
       })
     );
   }
-
 }

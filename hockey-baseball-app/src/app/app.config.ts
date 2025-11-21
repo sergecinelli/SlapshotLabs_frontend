@@ -20,7 +20,7 @@ export const appConfig: ApplicationConfig = {
     {
       provide: HTTP_INTERCEPTORS,
       useClass: CsrfInterceptor,
-      multi: true
+      multi: true,
     },
     {
       provide: MAT_SNACK_BAR_DEFAULT_OPTIONS,
@@ -28,8 +28,8 @@ export const appConfig: ApplicationConfig = {
         duration: 3000,
         verticalPosition: 'top',
         horizontalPosition: 'right',
-        panelClass: ['custom-snackbar']
-      }
-    }
+        panelClass: ['custom-snackbar'],
+      },
+    },
   ],
 };

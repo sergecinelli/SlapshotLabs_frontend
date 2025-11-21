@@ -5,7 +5,7 @@ import { TeamLevel, Division } from '../shared/interfaces/team-level.interface';
 import { ApiService } from './api.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class TeamOptionsService {
   private apiService = inject(ApiService);
@@ -19,15 +19,15 @@ export class TeamOptionsService {
    */
   getTeamLevels(): Observable<TeamLevel[]> {
     return this.apiService.get<TeamLevel[]>('/hockey/team-level/list').pipe(
-      map(levels => {
+      map((levels) => {
         // Populate mapping for data transformation
-        levels.forEach(level => {
+        levels.forEach((level) => {
           this.levelMap.set(level.name, level.id);
           this.levelIdMap.set(level.id, level.name);
         });
         return levels;
       }),
-      catchError(error => {
+      catchError((error) => {
         console.error('Failed to fetch team levels:', error);
         return throwError(() => error);
       })
@@ -39,15 +39,15 @@ export class TeamOptionsService {
    */
   getDivisions(): Observable<Division[]> {
     return this.apiService.get<Division[]>('/hockey/division/list').pipe(
-      map(divisions => {
+      map((divisions) => {
         // Populate mapping for data transformation
-        divisions.forEach(division => {
+        divisions.forEach((division) => {
           this.divisionMap.set(division.name, division.id);
           this.divisionIdMap.set(division.id, division.name);
         });
         return divisions;
       }),
-      catchError(error => {
+      catchError((error) => {
         console.error('Failed to fetch divisions:', error);
         return throwError(() => error);
       })
@@ -59,15 +59,15 @@ export class TeamOptionsService {
    */
   getGroupOptions(): { value: string; label: string }[] {
     const groups = [];
-    
+
     // Add 1U
     groups.push({ value: '1U', label: '1U' });
-    
+
     // Add 5U through 22U
     for (let i = 5; i <= 22; i++) {
       groups.push({ value: `${i}U`, label: `${i}U` });
     }
-    
+
     return groups;
   }
 
@@ -76,9 +76,9 @@ export class TeamOptionsService {
    * Using ID as value for proper selection
    */
   transformLevelsToOptions(levels: TeamLevel[]): { value: string; label: string }[] {
-    return levels.map(level => ({
+    return levels.map((level) => ({
       value: level.id.toString(),
-      label: level.name
+      label: level.name,
     }));
   }
 
@@ -87,9 +87,9 @@ export class TeamOptionsService {
    * Using ID as value for proper selection
    */
   transformDivisionsToOptions(divisions: Division[]): { value: string; label: string }[] {
-    return divisions.map(division => ({
+    return divisions.map((division) => ({
       value: division.id.toString(),
-      label: division.name
+      label: division.name,
     }));
   }
 

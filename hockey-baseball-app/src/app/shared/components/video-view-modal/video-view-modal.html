@@ -13,7 +13,8 @@
           title="Video player"
           frameborder="0"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          allowfullscreen>
+          allowfullscreen
+        >
         </iframe>
       </div>
       <ng-template #noVideo>
@@ -26,8 +27,6 @@
   </mat-dialog-content>
 
   <mat-dialog-actions class="modal-actions">
-    <button mat-stroked-button (click)="close()" class="close-btn">
-      Close
-    </button>
+    <button mat-stroked-button (click)="close()" class="close-btn">Close</button>
   </mat-dialog-actions>
 </div>

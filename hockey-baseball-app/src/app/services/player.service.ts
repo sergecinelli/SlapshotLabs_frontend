@@ -1,13 +1,21 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable, throwError, forkJoin } from 'rxjs';
 import { map, catchError, switchMap } from 'rxjs/operators';
-import { Player, PlayerTableData, PlayerApiOut, PlayerApiIn, PlayerApiPatch, PlayerApiInData, PlayerApiOutData } from '../shared/interfaces/player.interface';
+import {
+  Player,
+  PlayerTableData,
+  PlayerApiOut,
+  PlayerApiIn,
+  PlayerApiPatch,
+  PlayerApiInData,
+  PlayerApiOutData,
+} from '../shared/interfaces/player.interface';
 import { ApiService } from './api.service';
 import { TeamService } from './team.service';
 import { SprayChartFilter, SprayChartEvent } from '../shared/interfaces/spray-chart.interface';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class PlayerService {
   private apiService = inject(ApiService);
@@ -16,22 +24,22 @@ export class PlayerService {
   getPlayers(): Observable<PlayerTableData> {
     return forkJoin({
       players: this.apiService.get<PlayerApiOutData[]>('/hockey/player/list'),
-      teams: this.teamService.getTeams()
+      teams: this.teamService.getTeams(),
     }).pipe(
       map(({ players: apiPlayers, teams }) => {
         // Create team ID to name mapping
-        const teamMap = new Map(teams.teams.map(t => [parseInt(t.id), t.name]));
-        
+        const teamMap = new Map(teams.teams.map((t) => [parseInt(t.id), t.name]));
+
         // Map players with team names
-        const players = apiPlayers.map(apiPlayer => 
+        const players = apiPlayers.map((apiPlayer) =>
           this.fromApiOutFormat({ photo: '', data: apiPlayer }, teamMap.get(apiPlayer.team_id))
         );
         return {
           players: players,
-          total: players.length
+          total: players.length,
         };
       }),
-      catchError(error => {
+      catchError((error) => {
         console.error('Failed to fetch players:', error);
         return throwError(() => error);
       })
@@ -40,11 +48,11 @@ export class PlayerService {
 
   getPlayersByTeam(teamId: number): Observable<Player[]> {
     return this.apiService.get<PlayerApiOutData[]>(`/hockey/player/list?team_id=${teamId}`).pipe(
-      map(apiPlayers => {
+      map((apiPlayers) => {
         // Convert to frontend format
-        return apiPlayers.map(apiPlayer => this.fromApiOutFormat({ photo: '', data: apiPlayer }));
+        return apiPlayers.map((apiPlayer) => this.fromApiOutFormat({ photo: '', data: apiPlayer }));
       }),
-      catchError(error => {
+      catchError((error) => {
         console.error(`Failed to fetch players for team ${teamId}:`, error);
         return throwError(() => error);
       })
@@ -61,15 +69,18 @@ export class PlayerService {
 
     return forkJoin({
       player: this.apiService.get<PlayerApiOutData>(`/hockey/player/${numericId}`),
-      teams: this.teamService.getTeams()
+      teams: this.teamService.getTeams(),
     }).pipe(
       map(({ player: apiPlayer, teams }) => {
         // Create team ID to name mapping
-        const teamMap = new Map(teams.teams.map(t => [parseInt(t.id), t.name]));
+        const teamMap = new Map(teams.teams.map((t) => [parseInt(t.id), t.name]));
         // Single player endpoint returns flat object without photo wrapper
-        return this.fromApiOutFormat({ photo: '', data: apiPlayer }, teamMap.get(apiPlayer.team_id));
+        return this.fromApiOutFormat(
+          { photo: '', data: apiPlayer },
+          teamMap.get(apiPlayer.team_id)
+        );
       }),
-      catchError(error => {
+      catchError((error) => {
         console.error(`Failed to fetch player with ID ${id}:`, error);
         return throwError(() => error);
       })
@@ -88,7 +99,7 @@ export class PlayerService {
       map(() => {
         return true;
       }),
-      catchError(error => {
+      catchError((error) => {
         console.error(`Failed to delete player with ID ${id}:`, error);
         return throwError(() => error);
       })
@@ -99,33 +110,33 @@ export class PlayerService {
     // Extract team ID from playerData or default to 1
     const teamId = (playerData as Record<string, unknown>)['teamId'] as string | undefined;
     const numericTeamId = teamId ? parseInt(teamId, 10) : 1;
-    
+
     // Transform frontend data to API format
     const apiPlayerData = this.toApiInFormat(playerData, numericTeamId, photo);
-    
+
     // Create FormData for multipart/form-data request
     const formData = new FormData();
-    
+
     // Add photo if provided
     if (photo) {
       formData.append('photo', photo);
     }
-    
+
     // Add data as JSON string
     formData.append('data', JSON.stringify(apiPlayerData.data));
-    
+
     return this.apiService.postMultipart<{ id: number }>('/hockey/player', formData).pipe(
-      switchMap(response => {
+      switchMap((response) => {
         // Fetch the newly created player to get proper team name mapping
         return this.getPlayerById(response.id.toString());
       }),
-      map(newPlayer => {
+      map((newPlayer) => {
         if (!newPlayer) {
           throw new Error('Failed to fetch newly created player');
         }
         return newPlayer;
       }),
-      catchError(error => {
+      catchError((error) => {
         console.error('Failed to add player:', error);
         return throwError(() => error);
       })
@@ -141,32 +152,32 @@ export class PlayerService {
     }
 
     const apiUpdateData = this.toApiUpdateFormat(playerData, photo);
-    
+
     // Create FormData for multipart/form-data request
     const formData = new FormData();
-    
+
     // Add photo if provided
     if (photo !== undefined) {
       formData.append('photo', photo);
     }
-    
+
     // Add data as JSON string if there are data updates
     if (apiUpdateData.data && Object.keys(apiUpdateData.data).length > 0) {
       formData.append('data', JSON.stringify(apiUpdateData.data));
     }
-    
+
     return this.apiService.patchMultipart<void>(`/hockey/player/${numericId}`, formData).pipe(
       switchMap(() => {
         // After successful update, fetch the updated player data
         return this.getPlayerById(id);
       }),
-      map(updatedPlayer => {
+      map((updatedPlayer) => {
         if (!updatedPlayer) {
           throw new Error(`Player with ID ${id} not found after update`);
         }
         return updatedPlayer;
       }),
-      catchError(error => {
+      catchError((error) => {
         console.error(`Failed to update player with ID ${id}:`, error);
         return throwError(() => error);
       })
@@ -181,7 +192,7 @@ export class PlayerService {
 
     return {
       id: data.id.toString(),
-      teamId: data.team_id,  // Store team ID from API
+      teamId: data.team_id, // Store team ID from API
       team: teamName || `Team ${data.team_id}`,
       position: this.mapPositionIdToName(data.position_id),
       height: heightString,
@@ -205,7 +216,7 @@ export class PlayerService {
         facilityName: 'Default Facility',
         rinkName: 'Main Rink',
         city: 'City',
-        address: 'Address'
+        address: 'Address',
       },
       createdAt: new Date(),
       // Add new fields from API
@@ -216,13 +227,13 @@ export class PlayerService {
       addressCity: data.address_city || '',
       addressStreet: data.address_street || '',
       addressPostalCode: data.address_postal_code || '',
-      analysis: data.analysis || ''
+      analysis: data.analysis || '',
     } as Player & Record<string, unknown>;
   }
 
   private toApiUpdateFormat(playerData: Partial<Player>, photo?: string): PlayerApiPatch {
     const dataUpdate: Partial<PlayerApiInData> = {};
-    
+
     // Include team_id if provided
     const teamId = (playerData as Record<string, unknown>)['teamId'] as string | undefined;
     if (teamId) {
@@ -231,7 +242,7 @@ export class PlayerService {
         dataUpdate.team_id = numericTeamId;
       }
     }
-    
+
     // Only include fields that are provided and exist in the API
     if (playerData.height) {
       if (typeof playerData.height === 'string') {
@@ -247,7 +258,7 @@ export class PlayerService {
       dataUpdate.shoots = playerData.shoots === 'Right Shot' ? 'R' : 'L';
     }
     if (playerData.jerseyNumber !== undefined) {
-      dataUpdate.number = playerData.jerseyNumber;  // Changed from jersey_number to number
+      dataUpdate.number = playerData.jerseyNumber; // Changed from jersey_number to number
     }
     if (playerData.firstName) {
       dataUpdate.first_name = playerData.firstName;
@@ -291,7 +302,7 @@ export class PlayerService {
     if (extendedData['analysis'] !== undefined) {
       dataUpdate.analysis = extendedData['analysis'] as string | undefined;
     }
-    
+
     const patchData: PlayerApiPatch = {};
     if (Object.keys(dataUpdate).length > 0) {
       patchData.data = dataUpdate;
@@ -300,7 +311,7 @@ export class PlayerService {
     if (photo !== undefined) {
       patchData.photo = photo;
     }
-    
+
     return patchData;
   }
 
@@ -314,9 +325,9 @@ export class PlayerService {
     } else {
       heightInches = 72; // Default 6'0"
     }
-    
+
     const extendedData = playerData as Record<string, unknown>;
-    
+
     return {
       photo: photo,
       data: {
@@ -337,8 +348,8 @@ export class PlayerService {
         address_street: (extendedData['addressStreet'] as string) || '',
         address_postal_code: (extendedData['addressPostalCode'] as string) || '',
         penalties_drawn: playerData.penaltiesDrawn,
-        analysis: (extendedData['analysis'] as string) || ''
-      }
+        analysis: (extendedData['analysis'] as string) || '',
+      },
     };
   }
 
@@ -372,14 +383,19 @@ export class PlayerService {
     return date.getUTCFullYear();
   }
 
-  private mapPositionIdToName(positionId: number): 'Left Wing' | 'Center' | 'Right Wing' | 'Left Defense' | 'Right Defense' | 'Goalie' {
-    const positionMap: Record<number, 'Left Wing' | 'Center' | 'Right Wing' | 'Left Defense' | 'Right Defense' | 'Goalie'> = {
+  private mapPositionIdToName(
+    positionId: number
+  ): 'Left Wing' | 'Center' | 'Right Wing' | 'Left Defense' | 'Right Defense' | 'Goalie' {
+    const positionMap: Record<
+      number,
+      'Left Wing' | 'Center' | 'Right Wing' | 'Left Defense' | 'Right Defense' | 'Goalie'
+    > = {
       1: 'Left Wing',
       2: 'Center',
       3: 'Right Wing',
       4: 'Left Defense',
       5: 'Right Defense',
-      6: 'Goalie'
+      6: 'Goalie',
     };
     return positionMap[positionId] || 'Center';
   }
@@ -392,22 +408,24 @@ export class PlayerService {
       return throwError(() => new Error(`Invalid player ID: ${id}`));
     }
 
-    return this.apiService.post<SprayChartEvent[]>(`/hockey/player/${numericId}/spray-chart`, filter).pipe(
-      catchError(error => {
-        console.error(`Failed to fetch spray chart for player ${id}:`, error);
-        return throwError(() => error);
-      })
-    );
+    return this.apiService
+      .post<SprayChartEvent[]>(`/hockey/player/${numericId}/spray-chart`, filter)
+      .pipe(
+        catchError((error) => {
+          console.error(`Failed to fetch spray chart for player ${id}:`, error);
+          return throwError(() => error);
+        })
+      );
   }
 
   private mapPositionNameToId(position: string): number {
     const positionMap: Record<string, number> = {
       'Left Wing': 1,
-      'Center': 2,
+      Center: 2,
       'Right Wing': 3,
       'Left Defense': 4,
       'Right Defense': 5,
-      'Goalie': 6
+      Goalie: 6,
     };
     return positionMap[position] || 2;
   }

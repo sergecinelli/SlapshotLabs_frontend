@@ -63,10 +63,10 @@ export interface TeamSeasonStat {
     MatIconModule,
     MatCardModule,
     MatDividerModule,
-    MatTableModule
+    MatTableModule,
   ],
   templateUrl: './team-profile.html',
-  styleUrl: './team-profile.scss'
+  styleUrl: './team-profile.scss',
 })
 export class TeamProfileComponent implements OnInit {
   private route = inject(ActivatedRoute);
@@ -81,12 +81,20 @@ export class TeamProfileComponent implements OnInit {
   loading = true;
   loadingRoster = false;
   currentSeasonIndex = 0;
-  
+
   // Table column definitions
   seasonStatsColumns: string[] = ['season', 'gamesPlayed', 'wins', 'losses', 'ties', 'points'];
   recentGamesColumns: string[] = ['date', 'opponent', 'result', 'gameType', 'rink'];
   upcomingGamesColumns: string[] = ['date', 'time', 'opponent', 'gameType', 'rink'];
-  rosterColumns: string[] = ['jerseyNumber', 'firstName', 'lastName', 'position', 'height', 'weight', 'shoots'];
+  rosterColumns: string[] = [
+    'jerseyNumber',
+    'firstName',
+    'lastName',
+    'position',
+    'height',
+    'weight',
+    'shoots',
+  ];
 
   ngOnInit(): void {
     const teamId = this.route.snapshot.paramMap.get('id');
@@ -99,7 +107,7 @@ export class TeamProfileComponent implements OnInit {
 
   private loadTeam(id: string): void {
     this.loading = true;
-    
+
     this.teamService.getTeamById(id).subscribe({
       next: (team) => {
         if (team) {
@@ -116,17 +124,17 @@ export class TeamProfileComponent implements OnInit {
         console.error('Error loading team:', error);
         this.loading = false;
         this.router.navigate(['/teams']);
-      }
+      },
     });
   }
 
   private loadRoster(teamId: number): void {
     this.loadingRoster = true;
-    
+
     // Fetch both players and goalies in parallel
     forkJoin({
       players: this.playerService.getPlayersByTeam(teamId),
-      goalies: this.goalieService.getGoaliesByTeam(teamId, { excludeDefault: false })
+      goalies: this.goalieService.getGoaliesByTeam(teamId, { excludeDefault: false }),
     }).subscribe({
       next: ({ players, goalies }) => {
         // Combine players and goalies into one roster
@@ -138,7 +146,7 @@ export class TeamProfileComponent implements OnInit {
         this.loadingRoster = false;
         // Keep roster empty on error
         this.roster = [];
-      }
+      },
     });
   }
 
@@ -150,13 +158,13 @@ export class TeamProfileComponent implements OnInit {
       maxWidth: '95vw',
       data: {
         team: this.team,
-        isEditMode: true
+        isEditMode: true,
       },
       panelClass: 'team-form-modal-dialog',
-      disableClose: true
+      disableClose: true,
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         this.updateTeam(result);
       }
@@ -168,7 +176,7 @@ export class TeamProfileComponent implements OnInit {
 
     this.loading = true;
     const { logoFile, logoRemoved, ...team } = teamData;
-    
+
     this.teamService.updateTeam(this.team.id, team, logoFile, logoRemoved).subscribe({
       next: (updatedTeam) => {
         this.team = updatedTeam;
@@ -177,7 +185,7 @@ export class TeamProfileComponent implements OnInit {
       error: (error) => {
         console.error('Error updating team:', error);
         this.loading = false;
-      }
+      },
     });
   }
 
@@ -212,7 +220,7 @@ export class TeamProfileComponent implements OnInit {
         wins: 18,
         losses: 5,
         ties: 2,
-        points: 38
+        points: 38,
       },
       {
         season: '2023/2024',
@@ -220,7 +228,7 @@ export class TeamProfileComponent implements OnInit {
         wins: 50,
         losses: 25,
         ties: 7,
-        points: 107
+        points: 107,
       },
       {
         season: '2022/2023',
@@ -228,8 +236,8 @@ export class TeamProfileComponent implements OnInit {
         wins: 45,
         losses: 30,
         ties: 7,
-        points: 97
-      }
+        points: 97,
+      },
     ];
   }
 
@@ -259,7 +267,7 @@ export class TeamProfileComponent implements OnInit {
         gameType: 'Regular Season',
         rink: 'Scotiabank Arena - Main Rink',
         status: 'Game Over',
-        result: 'W 4-2'
+        result: 'W 4-2',
       },
       {
         id: '2',
@@ -273,7 +281,7 @@ export class TeamProfileComponent implements OnInit {
         gameType: 'Regular Season',
         rink: 'Canadian Tire Centre - Main Rink',
         status: 'Game Over',
-        result: 'L 1-3'
+        result: 'L 1-3',
       },
       {
         id: '3',
@@ -287,7 +295,7 @@ export class TeamProfileComponent implements OnInit {
         gameType: 'Regular Season',
         rink: 'Scotiabank Arena - Main Rink',
         status: 'Game Over',
-        result: 'W 5-1'
+        result: 'W 5-1',
       },
       {
         id: '4',
@@ -301,7 +309,7 @@ export class TeamProfileComponent implements OnInit {
         gameType: 'Regular Season',
         rink: 'KeyBank Center - Main Rink',
         status: 'Game Over',
-        result: 'T 3-3'
+        result: 'T 3-3',
       },
       {
         id: '5',
@@ -315,8 +323,8 @@ export class TeamProfileComponent implements OnInit {
         gameType: 'Regular Season',
         rink: 'Scotiabank Arena - Main Rink',
         status: 'Game Over',
-        result: 'W 2-1'
-      }
+        result: 'W 2-1',
+      },
     ];
   }
 
@@ -331,7 +339,7 @@ export class TeamProfileComponent implements OnInit {
         awayTeam: 'Toronto Maple Leafs',
         gameType: 'Regular Season',
         rink: 'Amalie Arena - Main Rink',
-        status: 'Not Started'
+        status: 'Not Started',
       },
       {
         id: '7',
@@ -342,7 +350,7 @@ export class TeamProfileComponent implements OnInit {
         awayTeam: 'Detroit Red Wings',
         gameType: 'Regular Season',
         rink: 'Scotiabank Arena - Main Rink',
-        status: 'Not Started'
+        status: 'Not Started',
       },
       {
         id: '8',
@@ -353,7 +361,7 @@ export class TeamProfileComponent implements OnInit {
         awayTeam: 'Toronto Maple Leafs',
         gameType: 'Regular Season',
         rink: 'PPG Paints Arena - Main Rink',
-        status: 'Not Started'
+        status: 'Not Started',
       },
       {
         id: '9',
@@ -364,7 +372,7 @@ export class TeamProfileComponent implements OnInit {
         awayTeam: 'New York Rangers',
         gameType: 'Regular Season',
         rink: 'Scotiabank Arena - Main Rink',
-        status: 'Not Started'
+        status: 'Not Started',
       },
       {
         id: '10',
@@ -375,8 +383,8 @@ export class TeamProfileComponent implements OnInit {
         awayTeam: 'Toronto Maple Leafs',
         gameType: 'Regular Season',
         rink: 'Capital One Arena - Main Rink',
-        status: 'Not Started'
-      }
+        status: 'Not Started',
+      },
     ];
   }
 

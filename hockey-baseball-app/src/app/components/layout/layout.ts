@@ -11,7 +11,7 @@ import { BannerComponent } from '../banner/banner';
   standalone: true,
   imports: [CommonModule, RouterOutlet, BannerComponent],
   templateUrl: './layout.html',
-  styleUrl: './layout.scss'
+  styleUrl: './layout.scss',
 })
 export class LayoutComponent {
   private navigationService = inject(NavigationService);
@@ -55,7 +55,7 @@ export class LayoutComponent {
         console.error('Error during sign out:', error);
         // Navigate to sign-in anyway as the local state is cleared
         this.navigationService.navigate('/sign-in');
-      }
+      },
     });
   }
 

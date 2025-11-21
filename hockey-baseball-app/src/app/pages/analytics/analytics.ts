@@ -16,6 +16,6 @@ import { PageHeaderComponent } from '../../shared/components/page-header/page-he
       </div>
     </div>
   `,
-  styleUrl: './analytics.scss'
+  styleUrl: './analytics.scss',
 })
 export class AnalyticsComponent {}

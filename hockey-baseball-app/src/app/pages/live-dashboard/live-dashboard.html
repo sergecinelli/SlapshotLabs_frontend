@@ -138,7 +138,9 @@
 
             <!-- Defensive Zone Exit -->
             <div class="p-3">
-              <div class="text-sm font-semibold border border-solid rounded p-2 mb-1">Defensive Zone Exit</div>
+              <div class="text-sm font-semibold border border-solid rounded p-2 mb-1">
+                Defensive Zone Exit
+              </div>
               <div class="grid grid-cols-5 gap-1 text-center">
                 <div>
                   <div class="text-[12px] mb-1">Long</div>
@@ -236,7 +238,9 @@
 
           <!-- Offensive Zone Entry -->
           <div class="p-3">
-            <div class="text-sm font-semibold border border-solid rounded p-2 mb-1">Offensive Zone Entry</div>
+            <div class="text-sm font-semibold border border-solid rounded p-2 mb-1">
+              Offensive Zone Entry
+            </div>
             <div class="grid grid-cols-4 gap-1 text-center">
               <div>
                 <div class="text-[12px] mb-1">Pass</div>
@@ -374,7 +378,9 @@
 
             <!-- Defensive Zone Exit -->
             <div class="p-3">
-              <div class="text-sm font-semibold border border-solid rounded p-2 mb-1">Defensive Zone Exit</div>
+              <div class="text-sm font-semibold border border-solid rounded p-2 mb-1">
+                Defensive Zone Exit
+              </div>
               <div class="grid grid-cols-5 gap-1 text-center">
                 <div>
                   <div class="text-[12px] mb-1">Long</div>
@@ -472,7 +478,9 @@
 
           <!-- Offensive Zone Entry -->
           <div class="p-3">
-            <div class="text-sm font-semibold border border-solid rounded p-2 mb-1">Offensive Zone Entry</div>
+            <div class="text-sm font-semibold border border-solid rounded p-2 mb-1">
+              Offensive Zone Entry
+            </div>
             <div class="grid grid-cols-4 gap-1 text-center">
               <div>
                 <div class="text-[12px] mb-1">Pass</div>
@@ -729,7 +737,10 @@
   </div>
 
   <!-- Spray Charts Section (Full Width) -->
-  <div *ngIf="!isLoadingGameData" class="bg-white rounded-lg shadow-lg border border-gray-200 px-6 pb-6">
+  <div
+    *ngIf="!isLoadingGameData"
+    class="bg-white rounded-lg shadow-lg border border-gray-200 px-6 pb-6"
+  >
     <div>
       <h2 class="text-xl font-semibold text-gray-900 text-center">Spray Charts</h2>
     </div>
@@ -746,12 +757,16 @@
       <div>
         <div class="text-center mb-4">
           <div class="flex items-center justify-center gap-2">
-            <img [src]="getTeamLogoUrl(awayTeamId)" [alt]="awayTeam().name" class="w-8 h-8 rounded-full object-cover">
+            <img
+              [src]="getTeamLogoUrl(awayTeamId)"
+              [alt]="awayTeam().name"
+              class="w-8 h-8 rounded-full object-cover"
+            />
             <h3 class="text-lg font-semibold text-gray-900">{{ awayTeam().name }}</h3>
           </div>
         </div>
         @if (awaySprayChartData().length > 0) {
-          <app-shot-location-display 
+          <app-shot-location-display
             [data]="awaySprayChartData()"
             [storageKey]="'liveDashboardAwaySprayChart'"
             [teamId]="awayTeamId"
@@ -759,7 +774,9 @@
             [showDirection]="true"
           ></app-shot-location-display>
         } @else {
-          <div class="flex items-center justify-center min-h-[400px] border border-gray-200 rounded-lg bg-gray-50">
+          <div
+            class="flex items-center justify-center min-h-[400px] border border-gray-200 rounded-lg bg-gray-50"
+          >
             <div class="text-center">
               <mat-icon class="text-gray-400 text-6xl">sports_hockey</mat-icon>
               <p class="text-gray-500 mt-2">No spray chart data available</p>
@@ -772,12 +789,16 @@
       <div>
         <div class="text-center mb-4">
           <div class="flex items-center justify-center gap-2">
-            <img [src]="getTeamLogoUrl(homeTeamId)" [alt]="homeTeam().name" class="w-8 h-8 rounded-full object-cover">
+            <img
+              [src]="getTeamLogoUrl(homeTeamId)"
+              [alt]="homeTeam().name"
+              class="w-8 h-8 rounded-full object-cover"
+            />
             <h3 class="text-lg font-semibold text-gray-900">{{ homeTeam().name }}</h3>
           </div>
         </div>
         @if (homeSprayChartData().length > 0) {
-          <app-shot-location-display 
+          <app-shot-location-display
             [data]="homeSprayChartData()"
             [storageKey]="'liveDashboardHomeSprayChart'"
             [teamId]="homeTeamId"
@@ -785,7 +806,9 @@
             [showDirection]="true"
           ></app-shot-location-display>
         } @else {
-          <div class="flex items-center justify-center min-h-[400px] border border-gray-200 rounded-lg bg-gray-50">
+          <div
+            class="flex items-center justify-center min-h-[400px] border border-gray-200 rounded-lg bg-gray-50"
+          >
             <div class="text-center">
               <mat-icon class="text-gray-400 text-6xl">sports_hockey</mat-icon>
               <p class="text-gray-500 mt-2">No spray chart data available</p>

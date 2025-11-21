@@ -41,10 +41,10 @@ export interface RosterSelectionResult {
     MatButtonModule,
     MatTableModule,
     MatCheckboxModule,
-    MatIconModule
+    MatIconModule,
   ],
   templateUrl: './roster-selection-modal.html',
-  styleUrl: './roster-selection-modal.scss'
+  styleUrl: './roster-selection-modal.scss',
 })
 export class RosterSelectionModalComponent implements OnInit {
   private dialogRef = inject<MatDialogRef<RosterSelectionModalComponent>>(MatDialogRef);
@@ -57,7 +57,7 @@ export class RosterSelectionModalComponent implements OnInit {
   players = signal<RosterPlayer[]>([]);
 
   displayedColumns = ['select', 'jerseyNumber', 'firstName', 'lastName'];
-  
+
   goalieSelection = new SelectionModel<number>(true, []);
   playerSelection = new SelectionModel<number>(true, []);
 
@@ -73,30 +73,34 @@ export class RosterSelectionModalComponent implements OnInit {
 
     forkJoin({
       goalies: this.goalieService.getGoaliesByTeam(this.data.teamId, { excludeDefault: true }),
-      players: this.playerService.getPlayersByTeam(this.data.teamId)
+      players: this.playerService.getPlayersByTeam(this.data.teamId),
     }).subscribe({
       next: ({ goalies, players }) => {
         // Map goalies to roster format
-        this.goalies.set(goalies.map(g => ({
-          id: parseInt(g.id),
-          jerseyNumber: g.jerseyNumber,
-          firstName: g.firstName,
-          lastName: g.lastName,
-          position: 'Goalie'
-        })));
+        this.goalies.set(
+          goalies.map((g) => ({
+            id: parseInt(g.id),
+            jerseyNumber: g.jerseyNumber,
+            firstName: g.firstName,
+            lastName: g.lastName,
+            position: 'Goalie',
+          }))
+        );
 
         // Map players to roster format
-        this.players.set(players.map(p => ({
-          id: parseInt(p.id),
-          jerseyNumber: p.jerseyNumber,
-          firstName: p.firstName,
-          lastName: p.lastName,
-          position: p.position
-        })));
+        this.players.set(
+          players.map((p) => ({
+            id: parseInt(p.id),
+            jerseyNumber: p.jerseyNumber,
+            firstName: p.firstName,
+            lastName: p.lastName,
+            position: p.position,
+          }))
+        );
 
         // Select all by default
-        this.goalieSelection.select(...this.goalies().map(g => g.id));
-        this.playerSelection.select(...this.players().map(p => p.id));
+        this.goalieSelection.select(...this.goalies().map((g) => g.id));
+        this.playerSelection.select(...this.players().map((p) => p.id));
 
         // If there are pre-selected IDs, use those instead
         if (this.data.selectedGoalieIds && this.data.selectedGoalieIds.length > 0) {
@@ -113,7 +117,7 @@ export class RosterSelectionModalComponent implements OnInit {
       error: (error) => {
         console.error('Failed to load roster:', error);
         this.isLoading.set(false);
-      }
+      },
     });
   }
 
@@ -149,7 +153,7 @@ export class RosterSelectionModalComponent implements OnInit {
     if (this.areAllGoaliesSelected()) {
       this.goalieSelection.clear();
     } else {
-      this.goalieSelection.select(...this.goalies().map(g => g.id));
+      this.goalieSelection.select(...this.goalies().map((g) => g.id));
     }
   }
 
@@ -157,7 +161,7 @@ export class RosterSelectionModalComponent implements OnInit {
     if (this.areAllPlayersSelected()) {
       this.playerSelection.clear();
     } else {
-      this.playerSelection.select(...this.players().map(p => p.id));
+      this.playerSelection.select(...this.players().map((p) => p.id));
     }
   }
 
@@ -168,7 +172,7 @@ export class RosterSelectionModalComponent implements OnInit {
   onConfirm(): void {
     const result: RosterSelectionResult = {
       goalieIds: this.goalieSelection.selected,
-      playerIds: this.playerSelection.selected
+      playerIds: this.playerSelection.selected,
     };
     this.dialogRef.close(result);
   }

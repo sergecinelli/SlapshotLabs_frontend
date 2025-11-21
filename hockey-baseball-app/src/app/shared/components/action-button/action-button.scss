@@ -10,12 +10,12 @@
   cursor: pointer;
   transition: all 0.2s ease-in-out;
   font-family: inherit;
-  
+
   &:hover:not(:disabled) {
     background-color: #fef2f2;
     border-color: #b91c1c;
   }
-  
+
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
@@ -39,7 +39,7 @@
     width: 160px;
     height: 80px;
   }
-  
+
   .button-label {
     font-size: 14px;
   }

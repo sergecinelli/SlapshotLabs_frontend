@@ -5,7 +5,7 @@ import { GameEventName } from './game-event-name.service';
 import { ShotTypeResponse } from './game-metadata.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class SprayChartUtilsService {
   /**
@@ -17,20 +17,20 @@ export class SprayChartUtilsService {
     shotTypes: ShotTypeResponse[]
   ): ShotLocationData[] {
     // Create lookup maps for event names and shot types
-    const eventNameMap = new Map(eventNames.map(e => [e.id, e.name]));
-    const shotTypeMap = new Map(shotTypes.map(s => [s.id, s.name]));
-    
+    const eventNameMap = new Map(eventNames.map((e) => [e.id, e.name]));
+    const shotTypeMap = new Map(shotTypes.map((s) => [s.id, s.name]));
+
     const results: ShotLocationData[] = [];
-    
+
     for (const event of events) {
       const eventName = eventNameMap.get(event.event_name_id);
       const shotTypeName = shotTypeMap.get(event.shot_type_id);
-      
+
       // Only process "Shot on Goal" events
       if (eventName !== 'Shot on Goal') {
         continue;
       }
-      
+
       // Determine if it's a Goal or Save based on shot type
       let type: 'Goal' | 'Save' | null = null;
       if (shotTypeName === 'Goal') {
@@ -38,21 +38,21 @@ export class SprayChartUtilsService {
       } else if (shotTypeName === 'Save') {
         type = 'Save';
       }
-      
+
       // Skip if not Goal or Save
       if (!type) {
         continue;
       }
-      
+
       results.push({
         iceTopOffset: this.convertCoordinateToPercentage(event.ice_top_offset),
         iceLeftOffset: this.convertCoordinateToPercentage(event.ice_left_offset),
         netTopOffset: this.convertCoordinateToPercentage(event.net_top_offset),
         netLeftOffset: this.convertCoordinateToPercentage(event.net_left_offset),
-        type
+        type,
       });
     }
-    
+
     return results;
   }
 
@@ -65,17 +65,17 @@ export class SprayChartUtilsService {
     shotTypes: ShotTypeResponse[]
   ): ShotLocationData[] {
     // Create lookup maps for event names and shot types
-    const eventNameMap = new Map(eventNames.map(e => [e.id, e.name]));
-    const shotTypeMap = new Map(shotTypes.map(s => [s.id, s.name]));
-    
+    const eventNameMap = new Map(eventNames.map((e) => [e.id, e.name]));
+    const shotTypeMap = new Map(shotTypes.map((s) => [s.id, s.name]));
+
     const results: ShotLocationData[] = [];
-    
+
     for (const event of events) {
       const eventName = eventNameMap.get(event.event_name_id);
       const shotTypeName = shotTypeMap.get(event.shot_type_id);
-      
+
       let type: ShotLocationData['type'] | null = null;
-      
+
       // Handle Penalty events
       if (eventName === 'Penalty') {
         type = 'Penalty';
@@ -106,21 +106,21 @@ export class SprayChartUtilsService {
           type = 'Missed';
         }
       }
-      
+
       // Skip if no valid type was determined
       if (!type) {
         continue;
       }
-      
+
       results.push({
         iceTopOffset: this.convertCoordinateToPercentage(event.ice_top_offset),
         iceLeftOffset: this.convertCoordinateToPercentage(event.ice_left_offset),
         netTopOffset: this.convertCoordinateToPercentage(event.net_top_offset),
         netLeftOffset: this.convertCoordinateToPercentage(event.net_left_offset),
-        type
+        type,
       });
     }
-    
+
     return results;
   }
 
@@ -133,17 +133,17 @@ export class SprayChartUtilsService {
     shotTypes: ShotTypeResponse[]
   ): ShotLocationData[] {
     // Create lookup maps for event names and shot types
-    const eventNameMap = new Map(eventNames.map(e => [e.id, e.name]));
-    const shotTypeMap = new Map(shotTypes.map(s => [s.id, s.name]));
-    
+    const eventNameMap = new Map(eventNames.map((e) => [e.id, e.name]));
+    const shotTypeMap = new Map(shotTypes.map((s) => [s.id, s.name]));
+
     const results: ShotLocationData[] = [];
-    
+
     for (const event of events) {
       const eventName = eventNameMap.get(event.event_name_id);
       const shotTypeName = shotTypeMap.get(event.shot_type_id);
-      
+
       let type: ShotLocationData['type'] | null = null;
-      
+
       // Handle Faceoff events
       if (eventName === 'Faceoff') {
         type = 'Faceoff';
@@ -180,21 +180,21 @@ export class SprayChartUtilsService {
           type = 'Missed';
         }
       }
-      
+
       // Skip if no valid type was determined
       if (!type) {
         continue;
       }
-      
+
       results.push({
         iceTopOffset: this.convertCoordinateToPercentage(event.ice_top_offset),
         iceLeftOffset: this.convertCoordinateToPercentage(event.ice_left_offset),
         netTopOffset: this.convertCoordinateToPercentage(event.net_top_offset),
         netLeftOffset: this.convertCoordinateToPercentage(event.net_left_offset),
-        type
+        type,
       });
     }
-    
+
     return results;
   }
 

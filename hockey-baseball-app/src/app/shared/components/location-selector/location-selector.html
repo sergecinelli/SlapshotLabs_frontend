@@ -15,7 +15,12 @@
         <img *ngIf="team2.logo" [src]="team2.logo" [alt]="team2.name" class="team-logo" />
       </div>
     </div>
-    <button type="button" class="rink-wrapper" [style.max-width]="maxWidth" (click)="onRinkClick($event)">
+    <button
+      type="button"
+      class="rink-wrapper"
+      [style.max-width]="maxWidth"
+      (click)="onRinkClick($event)"
+    >
       <img [src]="imageUrl" alt="Location" class="hockey-rink-image" />
       <div
         *ngIf="puckLocation"
@@ -24,11 +29,12 @@
         [style.top.%]="puckLocation.y / 10"
       ></div>
     </button>
-    <button 
-      *ngIf="showClearButton && puckLocation" 
-      type="button" 
+    <button
+      *ngIf="showClearButton && puckLocation"
+      type="button"
       class="clear-location-btn"
-      (click)="onClearLocation()">
+      (click)="onClearLocation()"
+    >
       Clear
     </button>
   </div>

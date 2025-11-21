@@ -1,6 +1,6 @@
 .navigation-item {
   transition: all 0.2s ease-in-out;
-  
+
   &:hover {
     transform: translateX(2px);
   }
@@ -45,9 +45,9 @@ nav::-webkit-scrollbar-thumb:hover {
 
 .nav-icon {
   transition: filter 0.2s ease-in-out;
-  
+
   filter: invert(3%) sepia(18%) saturate(2044%) hue-rotate(155deg) brightness(97%) contrast(98%);
-  
+
   &.active {
     filter: invert(15%) sepia(85%) saturate(6474%) hue-rotate(346deg) brightness(89%) contrast(91%);
   }
@@ -55,9 +55,9 @@ nav::-webkit-scrollbar-thumb:hover {
 
 .submenu-icon {
   transition: filter 0.2s ease-in-out;
-  
+
   filter: invert(3%) sepia(18%) saturate(2044%) hue-rotate(155deg) brightness(97%) contrast(98%);
-  
+
   &.active {
     filter: invert(15%) sepia(85%) saturate(6474%) hue-rotate(346deg) brightness(89%) contrast(91%);
   }

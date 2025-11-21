@@ -1,7 +1,12 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule, MatDialog } from '@angular/material/dialog';
+import {
+  MatDialogRef,
+  MAT_DIALOG_DATA,
+  MatDialogModule,
+  MatDialog,
+} from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -17,11 +22,19 @@ import { Goalie } from '../../interfaces/goalie.interface';
 import { Player } from '../../interfaces/player.interface';
 import { TeamService } from '../../../services/team.service';
 import { ArenaService } from '../../../services/arena.service';
-import { GameMetadataService, GameTypeResponse, GamePeriodResponse } from '../../../services/game-metadata.service';
+import {
+  GameMetadataService,
+  GameTypeResponse,
+  GamePeriodResponse,
+} from '../../../services/game-metadata.service';
 import { GoalieService } from '../../../services/goalie.service';
 import { PlayerService } from '../../../services/player.service';
 import { GamePlayerService } from '../../../services/game-player.service';
-import { RosterSelectionModalComponent, RosterSelectionModalData, RosterSelectionResult } from '../roster-selection-modal/roster-selection-modal';
+import {
+  RosterSelectionModalComponent,
+  RosterSelectionModalData,
+  RosterSelectionResult,
+} from '../roster-selection-modal/roster-selection-modal';
 import { forkJoin } from 'rxjs';
 
 export interface GameData {
@@ -73,10 +86,10 @@ export interface ScheduleFormModalData {
     MatIconModule,
     MatDividerModule,
     MatDatepickerModule,
-    MatNativeDateModule
+    MatNativeDateModule,
   ],
   templateUrl: './schedule-form-modal.html',
-  styleUrl: './schedule-form-modal.scss'
+  styleUrl: './schedule-form-modal.scss',
 })
 export class ScheduleFormModalComponent implements OnInit {
   private fb = inject(FormBuilder);
@@ -121,7 +134,7 @@ export class ScheduleFormModalComponent implements OnInit {
   statusOptions = [
     { value: 1, label: 'Not Started' },
     { value: 2, label: 'Game in Progress' },
-    { value: 3, label: 'Game Over' }
+    { value: 3, label: 'Game Over' },
   ];
 
   constructor() {
@@ -146,14 +159,17 @@ export class ScheduleFormModalComponent implements OnInit {
       tournamentName: [''],
       status: [1, [Validators.required]],
       date: ['', [Validators.required]],
-      time: ['', [Validators.required, Validators.pattern(/^(1[0-2]|0?[1-9]):[0-5][0-9]\s*(AM|PM|am|pm)$/)]],
+      time: [
+        '',
+        [Validators.required, Validators.pattern(/^(1[0-2]|0?[1-9]):[0-5][0-9]\s*(AM|PM|am|pm)$/)],
+      ],
       arena: ['', [Validators.required]],
       rink: ['', [Validators.required]],
       gameTypeGroup: [''],
       gameTypeName: [''],
       homeFaceoffWin: [0, [Validators.min(0)]],
       awayFaceoffWin: [0, [Validators.min(0)]],
-      analysis: ['']
+      analysis: [''],
     });
   }
 
@@ -164,8 +180,15 @@ export class ScheduleFormModalComponent implements OnInit {
     this.isLoading = true;
 
     // Check if data was provided from parent component
-    if (this.data.teams && this.data.arenas && this.data.rinks && 
-        this.data.goalies && this.data.players && this.data.gameTypes && this.data.gamePeriods) {
+    if (
+      this.data.teams &&
+      this.data.arenas &&
+      this.data.rinks &&
+      this.data.goalies &&
+      this.data.players &&
+      this.data.gameTypes &&
+      this.data.gamePeriods
+    ) {
       // Use provided data
       this.teams = this.data.teams;
       this.arenas = this.data.arenas;
@@ -205,7 +228,7 @@ export class ScheduleFormModalComponent implements OnInit {
         goalies: this.goalieService.getGoalies(),
         players: this.playerService.getPlayers(),
         gameTypes: this.gameMetadataService.getGameTypes(),
-        gamePeriods: this.gameMetadataService.getGamePeriods()
+        gamePeriods: this.gameMetadataService.getGamePeriods(),
       }).subscribe({
         next: ({ teams, arenas, rinks, goalies, players, gameTypes, gamePeriods }) => {
           this.teams = teams.teams;
@@ -219,7 +242,9 @@ export class ScheduleFormModalComponent implements OnInit {
           this.teamOptions = this.transformTeamsToOptions(this.teams);
           this.arenaOptions = this.arenaService.transformArenasToOptions(this.arenas);
           this.goalieOptions = this.transformGoaliesToOptions(this.goalies);
-          this.gameTypeOptions = this.gameMetadataService.transformGameTypesToOptions(this.gameTypes);
+          this.gameTypeOptions = this.gameMetadataService.transformGameTypesToOptions(
+            this.gameTypes
+          );
 
           // Set default values
           this.setDefaultValues();
@@ -247,7 +272,7 @@ export class ScheduleFormModalComponent implements OnInit {
           }
 
           this.isLoading = false;
-        }
+        },
       });
     }
   }
@@ -256,9 +281,9 @@ export class ScheduleFormModalComponent implements OnInit {
    * Transform teams to dropdown options
    */
   private transformTeamsToOptions(teams: Team[]): { value: string; label: string }[] {
-    return teams.map(team => ({
+    return teams.map((team) => ({
       value: team.id,
-      label: `${team.name} (${team.group} - ${team.level})`
+      label: `${team.name} (${team.group} - ${team.level})`,
     }));
   }
 
@@ -266,9 +291,9 @@ export class ScheduleFormModalComponent implements OnInit {
    * Transform goalies to dropdown options
    */
   private transformGoaliesToOptions(goalies: Goalie[]): { value: string; label: string }[] {
-    return goalies.map(goalie => ({
+    return goalies.map((goalie) => ({
       value: goalie.id,
-      label: `${goalie.firstName} ${goalie.lastName} (${goalie.team})`
+      label: `${goalie.firstName} ${goalie.lastName} (${goalie.team})`,
     }));
   }
 
@@ -282,7 +307,7 @@ export class ScheduleFormModalComponent implements OnInit {
         homeGoals: 0,
         awayGoals: 0,
         homeFaceoffWin: 0,
-        awayFaceoffWin: 0
+        awayFaceoffWin: 0,
       };
 
       // Set default team values
@@ -290,13 +315,14 @@ export class ScheduleFormModalComponent implements OnInit {
         const awayTeamId = this.teamOptions[0].value;
         defaultValues['awayTeam'] = awayTeamId;
         // Set different team for home team if available
-        const homeTeamId = this.teamOptions.length > 1 ? this.teamOptions[1].value : this.teamOptions[0].value;
+        const homeTeamId =
+          this.teamOptions.length > 1 ? this.teamOptions[1].value : this.teamOptions[0].value;
         defaultValues['homeTeam'] = homeTeamId;
-        
+
         // Filter goalies based on selected teams
         this.filterGoaliesByTeam(awayTeamId, 'away');
         this.filterGoaliesByTeam(homeTeamId, 'home');
-        
+
         // Set default goalie values from filtered lists
         if (this.awayGoalieOptions.length > 0) {
           defaultValues['awayTeamGoalie'] = this.awayGoalieOptions[0].value;
@@ -305,13 +331,13 @@ export class ScheduleFormModalComponent implements OnInit {
           defaultValues['homeTeamGoalie'] = this.homeGoalieOptions[0].value;
         }
       }
-      
+
       // Set default game type
       if (this.gameTypeOptions.length > 0) {
         defaultValues['gameType'] = this.gameTypeOptions[0].value;
         this.onGameTypeChange(this.gameTypeOptions[0].value);
       }
-      
+
       // Set default arena value
       if (this.arenaOptions.length > 0) {
         defaultValues['arena'] = this.arenaOptions[0].value;
@@ -321,7 +347,7 @@ export class ScheduleFormModalComponent implements OnInit {
           defaultValues['rink'] = this.rinkOptions[0].value;
         }
       }
-      
+
       // Set default date and time (tomorrow at 7 PM)
       const tomorrow = new Date();
       tomorrow.setDate(tomorrow.getDate() + 1);
@@ -339,26 +365,26 @@ export class ScheduleFormModalComponent implements OnInit {
     // Use raw game data if available (preferred for edit mode)
     if (this.data.gameData) {
       const game = this.data.gameData;
-      
+
       // Use home_start_goalie_id or home_team_goalie_id
       const homeGoalieId = game.home_start_goalie_id || game.home_team_goalie_id || 0;
       const awayGoalieId = game.away_start_goalie_id || game.away_team_goalie_id || 0;
-      
+
       // Find the arena for this rink
-      const rink = this.rinks.find(r => r.id === game.rink_id);
+      const rink = this.rinks.find((r) => r.id === game.rink_id);
       const arenaId = rink?.arena_id;
-      
+
       if (arenaId) {
         this.filterRinksByArena(arenaId);
       }
-      
+
       // Filter goalies based on selected teams
       this.filterGoaliesByTeam(game.away_team_id.toString(), 'away');
       this.filterGoaliesByTeam(game.home_team_id.toString(), 'home');
-      
+
       // Find the game type by matching game_type_name with game type names
       const gameTypeId = game.game_type_id;
-      
+
       this.scheduleForm.patchValue({
         awayTeam: game.away_team_id.toString(),
         homeTeam: game.home_team_id.toString(),
@@ -373,9 +399,9 @@ export class ScheduleFormModalComponent implements OnInit {
         tournamentName: game.tournament_name || '',
         status: game.status,
         gameType: gameTypeId,
-        analysis: (game as unknown as Record<string, unknown>)['analysis'] || ''
+        analysis: (game as unknown as Record<string, unknown>)['analysis'] || '',
       });
-      
+
       // Trigger game type change to populate game type names
       if (gameTypeId) {
         this.onGameTypeChange(gameTypeId);
@@ -387,15 +413,15 @@ export class ScheduleFormModalComponent implements OnInit {
       const awayGoalieId = this.extractIdFromString(schedule.awayTeamGoalie);
       const homeGoalieId = this.extractIdFromString(schedule.homeTeamGoalie);
       const rinkId = this.extractIdFromString(schedule.rink);
-      
+
       // Find the arena for this rink
-      const rink = this.rinks.find(r => r.id === parseInt(rinkId));
+      const rink = this.rinks.find((r) => r.id === parseInt(rinkId));
       const arenaId = rink?.arena_id;
-      
+
       if (arenaId) {
         this.filterRinksByArena(arenaId);
       }
-      
+
       // Filter goalies based on selected teams
       if (awayTeamId) {
         this.filterGoaliesByTeam(awayTeamId, 'away');
@@ -403,7 +429,7 @@ export class ScheduleFormModalComponent implements OnInit {
       if (homeTeamId) {
         this.filterGoaliesByTeam(homeTeamId, 'home');
       }
-      
+
       this.scheduleForm.patchValue({
         awayTeam: awayTeamId,
         homeTeam: homeTeamId,
@@ -417,7 +443,7 @@ export class ScheduleFormModalComponent implements OnInit {
         rink: rinkId,
         tournamentName: schedule.tournamentName || '',
         status: this.mapStatusToNumber(schedule.status),
-        analysis: (schedule as unknown as Record<string, unknown>)['analysis'] || ''
+        analysis: (schedule as unknown as Record<string, unknown>)['analysis'] || '',
       });
     }
   }
@@ -444,16 +470,16 @@ export class ScheduleFormModalComponent implements OnInit {
   private loadGameRoster(gameId: number): void {
     this.gamePlayerService.getGameRoster(gameId).subscribe({
       next: (roster) => {
-        this.homeGoalieIds = roster.home_goalies.map(g => g.id);
-        this.homePlayerIds = roster.home_players.map(p => p.id);
-        this.awayGoalieIds = roster.away_goalies.map(g => g.id);
-        this.awayPlayerIds = roster.away_players.map(p => p.id);
+        this.homeGoalieIds = roster.home_goalies.map((g) => g.id);
+        this.homePlayerIds = roster.home_players.map((p) => p.id);
+        this.awayGoalieIds = roster.away_goalies.map((g) => g.id);
+        this.awayPlayerIds = roster.away_players.map((p) => p.id);
       },
       error: (error) => {
         console.error('Failed to load game roster:', error);
         // Initialize with all team members if roster load fails
         this.initializeRosterSelections();
-      }
+      },
     });
   }
 
@@ -466,20 +492,20 @@ export class ScheduleFormModalComponent implements OnInit {
 
     if (!isNaN(homeTeamId)) {
       this.homeGoalieIds = this.goalies
-        .filter(g => g.teamId === homeTeamId)
-        .map(g => parseInt(g.id));
+        .filter((g) => g.teamId === homeTeamId)
+        .map((g) => parseInt(g.id));
       this.homePlayerIds = this.players
-        .filter(p => p.teamId === homeTeamId)
-        .map(p => parseInt(p.id));
+        .filter((p) => p.teamId === homeTeamId)
+        .map((p) => parseInt(p.id));
     }
 
     if (!isNaN(awayTeamId)) {
       this.awayGoalieIds = this.goalies
-        .filter(g => g.teamId === awayTeamId)
-        .map(g => parseInt(g.id));
+        .filter((g) => g.teamId === awayTeamId)
+        .map((g) => parseInt(g.id));
       this.awayPlayerIds = this.players
-        .filter(p => p.teamId === awayTeamId)
-        .map(p => parseInt(p.id));
+        .filter((p) => p.teamId === awayTeamId)
+        .map((p) => parseInt(p.id));
     }
   }
 
@@ -497,7 +523,7 @@ export class ScheduleFormModalComponent implements OnInit {
       this.initializeRosterSelections();
     }
 
-    const homeTeam = this.teams.find(t => parseInt(t.id) === homeTeamId);
+    const homeTeam = this.teams.find((t) => parseInt(t.id) === homeTeamId);
     const teamName = homeTeam ? homeTeam.name : 'Home Team';
 
     const dialogRef = this.dialog.open(RosterSelectionModalComponent, {
@@ -509,8 +535,8 @@ export class ScheduleFormModalComponent implements OnInit {
         teamId: homeTeamId,
         teamName: teamName,
         selectedGoalieIds: this.homeGoalieIds,
-        selectedPlayerIds: this.homePlayerIds
-      } as RosterSelectionModalData
+        selectedPlayerIds: this.homePlayerIds,
+      } as RosterSelectionModalData,
     });
 
     dialogRef.afterClosed().subscribe((result: RosterSelectionResult | undefined) => {
@@ -535,7 +561,7 @@ export class ScheduleFormModalComponent implements OnInit {
       this.initializeRosterSelections();
     }
 
-    const awayTeam = this.teams.find(t => parseInt(t.id) === awayTeamId);
+    const awayTeam = this.teams.find((t) => parseInt(t.id) === awayTeamId);
     const teamName = awayTeam ? awayTeam.name : 'Away Team';
 
     const dialogRef = this.dialog.open(RosterSelectionModalComponent, {
@@ -547,8 +573,8 @@ export class ScheduleFormModalComponent implements OnInit {
         teamId: awayTeamId,
         teamName: teamName,
         selectedGoalieIds: this.awayGoalieIds,
-        selectedPlayerIds: this.awayPlayerIds
-      } as RosterSelectionModalData
+        selectedPlayerIds: this.awayPlayerIds,
+      } as RosterSelectionModalData,
     });
 
     dialogRef.afterClosed().subscribe((result: RosterSelectionResult | undefined) => {
@@ -566,26 +592,33 @@ export class ScheduleFormModalComponent implements OnInit {
 
     if (this.scheduleForm.valid) {
       const formValue = this.scheduleForm.value;
-      
+
       const homeTeamId = parseInt(formValue.homeTeam);
       const awayTeamId = parseInt(formValue.awayTeam);
-      
+
       // Use selected roster IDs, or initialize with all team members if not set
-      if (this.homeGoalieIds.length === 0 || this.homePlayerIds.length === 0 ||
-          this.awayGoalieIds.length === 0 || this.awayPlayerIds.length === 0) {
+      if (
+        this.homeGoalieIds.length === 0 ||
+        this.homePlayerIds.length === 0 ||
+        this.awayGoalieIds.length === 0 ||
+        this.awayPlayerIds.length === 0
+      ) {
         this.initializeRosterSelections();
       }
-      
+
       const homeGoalies = this.homeGoalieIds;
       const awayGoalies = this.awayGoalieIds;
       const homePlayers = this.homePlayerIds;
       const awayPlayers = this.awayPlayerIds;
-      
+
       // Get the game period with the lowest order (first period)
-      const defaultGamePeriod = this.gamePeriods.length > 0
-        ? this.gamePeriods.reduce((min, period) => (period.order ?? Infinity) < (min.order ?? Infinity) ? period : min)
-        : null;
-      
+      const defaultGamePeriod =
+        this.gamePeriods.length > 0
+          ? this.gamePeriods.reduce((min, period) =>
+              (period.order ?? Infinity) < (min.order ?? Infinity) ? period : min
+            )
+          : null;
+
       const hasGameTypeName = !!formValue.gameTypeName;
       // Create API request body
       const gameData: Record<string, unknown> & { id?: number } = {
@@ -604,7 +637,7 @@ export class ScheduleFormModalComponent implements OnInit {
         home_players: homePlayers,
         away_players: awayPlayers,
         game_period_id: defaultGamePeriod ? defaultGamePeriod.id : 0,
-        analysis: formValue.analysis
+        analysis: formValue.analysis,
       };
 
       // If edit mode, include the game ID
@@ -615,7 +648,7 @@ export class ScheduleFormModalComponent implements OnInit {
       this.dialogRef.close(gameData);
     } else {
       // Mark all fields as touched to show validation errors
-      Object.keys(this.scheduleForm.controls).forEach(key => {
+      Object.keys(this.scheduleForm.controls).forEach((key) => {
         this.scheduleForm.get(key)?.markAsTouched();
       });
     }
@@ -652,7 +685,7 @@ export class ScheduleFormModalComponent implements OnInit {
       rink: 'Rink',
       gameType: 'Game Type',
       status: 'Status',
-      analysis: 'Analysis'
+      analysis: 'Analysis',
     };
     return labels[fieldName] || fieldName;
   }
@@ -671,14 +704,14 @@ export class ScheduleFormModalComponent implements OnInit {
    */
   private filterGoaliesByTeam(teamId: string, teamType: 'away' | 'home'): void {
     const numericTeamId = parseInt(teamId, 10);
-    
-    const filteredGoalies = this.goalies.filter(goalie => {
+
+    const filteredGoalies = this.goalies.filter((goalie) => {
       // Filter by teamId from API data
       return goalie.teamId === numericTeamId;
     });
-    
+
     const options = this.transformGoaliesToOptions(filteredGoalies);
-    
+
     if (teamType === 'away') {
       this.awayGoalieOptions = options;
     } else {
@@ -720,17 +753,17 @@ export class ScheduleFormModalComponent implements OnInit {
     this.scheduleForm.get('gameType')?.markAsTouched();
     this.onGameTypeChange(value);
   }
-  
+
   /**
    * Handle game type change to update game type names
    */
   onGameTypeChange(gameTypeId: number): void {
-    this.selectedGameType = this.gameTypes.find(gt => gt.id === gameTypeId) || null;
-    
+    this.selectedGameType = this.gameTypes.find((gt) => gt.id === gameTypeId) || null;
+
     if (this.selectedGameType && this.selectedGameType.game_type_names.length > 0) {
-      this.gameTypeNameOptions = this.selectedGameType.game_type_names.map(name => ({
+      this.gameTypeNameOptions = this.selectedGameType.game_type_names.map((name) => ({
         value: name.id,
-        label: name.name
+        label: name.name,
       }));
       // Set first game type name as default
       this.scheduleForm.patchValue({ gameTypeName: this.gameTypeNameOptions[0].value });
@@ -752,7 +785,7 @@ export class ScheduleFormModalComponent implements OnInit {
    * Filter rinks based on selected arena
    */
   private filterRinksByArena(arenaId: number): void {
-    const filteredRinks = this.rinks.filter(rink => rink.arena_id === arenaId);
+    const filteredRinks = this.rinks.filter((rink) => rink.arena_id === arenaId);
     this.rinkOptions = this.arenaService.transformRinksToOptions(filteredRinks);
   }
 
@@ -763,10 +796,10 @@ export class ScheduleFormModalComponent implements OnInit {
    */
   private convertTo12Hour(time24: string): string {
     if (!time24) return '';
-    
+
     const [hours24Str, minutes] = time24.split(':');
     const hours24 = parseInt(hours24Str);
-    
+
     if (hours24 === 0) {
       return `12:${minutes} AM`;
     } else if (hours24 < 12) {
@@ -785,25 +818,25 @@ export class ScheduleFormModalComponent implements OnInit {
    */
   private convertTo24Hour(time12: string): string {
     if (!time12) return '';
-    
+
     const timePattern = /(\d{1,2}):(\d{2})\s*(AM|PM)/i;
     const match = time12.match(timePattern);
-    
+
     if (!match) {
       // If format is invalid, return as-is
       return time12;
     }
-    
+
     let hours = parseInt(match[1]);
     const minutes = match[2];
     const period = match[3].toUpperCase();
-    
+
     if (period === 'AM') {
       if (hours === 12) hours = 0;
     } else {
       if (hours !== 12) hours += 12;
     }
-    
+
     const hours24 = hours.toString().padStart(2, '0');
     return `${hours24}:${minutes}:00`;
   }

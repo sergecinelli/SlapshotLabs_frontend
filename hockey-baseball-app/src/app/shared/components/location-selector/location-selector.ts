@@ -24,9 +24,9 @@ export interface Team {
     {
       provide: NG_VALUE_ACCESSOR,
       useExisting: forwardRef(() => LocationSelectorComponent),
-      multi: true
-    }
-  ]
+      multi: true,
+    },
+  ],
 })
 export class LocationSelectorComponent implements ControlValueAccessor {
   @Input() showTitle = true;
@@ -58,15 +58,15 @@ export class LocationSelectorComponent implements ControlValueAccessor {
     const rect = target.getBoundingClientRect();
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
-    
+
     // Calculate positions from 0-1000
     const xCoord = Math.round((x / rect.width) * 1000);
     const yCoord = Math.round((y / rect.height) * 1000);
-    
+
     // Clamp values to 0-1000 range
     const clampedX = Math.max(0, Math.min(1000, xCoord));
     const clampedY = Math.max(0, Math.min(1000, yCoord));
-    
+
     // Determine zone based on x position
     // Defending zone: 0-333, Neutral zone: 333-666, Attacking zone: 666-1000
     let zone: 'defending' | 'neutral' | 'attacking';
@@ -77,7 +77,7 @@ export class LocationSelectorComponent implements ControlValueAccessor {
     } else {
       zone = 'attacking';
     }
-    
+
     this.puckLocation = { x: clampedX, y: clampedY, zone };
     this.onChange(zone);
     this.onTouched();

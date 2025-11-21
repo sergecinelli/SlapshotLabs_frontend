@@ -16,6 +16,6 @@ import { PageHeaderComponent } from '../../../shared/components/page-header/page
       </div>
     </div>
   `,
-  styleUrl: './payment-history.scss'
+  styleUrl: './payment-history.scss',
 })
 export class PaymentHistoryComponent {}

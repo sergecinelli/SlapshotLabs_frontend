@@ -14,20 +14,20 @@ export interface PositionOption {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class PositionService {
   private apiService = inject(ApiService);
 
   getPositions(): Observable<PositionOption[]> {
     return this.apiService.get<Position[]>('/hockey/player-position/list').pipe(
-      map(positions => 
-        positions.map(position => ({
+      map((positions) =>
+        positions.map((position) => ({
           value: position.name,
-          label: position.name
+          label: position.name,
         }))
       ),
-      catchError(error => {
+      catchError((error) => {
         console.error('Failed to fetch positions:', error);
         // Fallback to default positions if API fails
         return throwError(() => error);

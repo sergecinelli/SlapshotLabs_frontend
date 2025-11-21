@@ -10,7 +10,7 @@ export interface VideoTableData {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class VideoService {
   private apiService = inject(ApiService);
@@ -20,14 +20,14 @@ export class VideoService {
    */
   getVideos(): Observable<VideoTableData> {
     return this.apiService.get<VideoApiResponse[]>('/hockey/video-library').pipe(
-      map(apiVideos => {
-        const videos = apiVideos.map(apiVideo => this.fromApiFormat(apiVideo));
+      map((apiVideos) => {
+        const videos = apiVideos.map((apiVideo) => this.fromApiFormat(apiVideo));
         return {
           videos,
-          total: videos.length
+          total: videos.length,
         };
       }),
-      catchError(error => {
+      catchError((error) => {
         console.error('Failed to fetch videos:', error);
         return throwError(() => error);
       })
@@ -39,8 +39,8 @@ export class VideoService {
    */
   getVideoById(id: number): Observable<Video | undefined> {
     return this.apiService.get<VideoApiResponse>(`/hockey/video-library/${id}`).pipe(
-      map(apiVideo => this.fromApiFormat(apiVideo)),
-      catchError(error => {
+      map((apiVideo) => this.fromApiFormat(apiVideo)),
+      catchError((error) => {
         console.error(`Failed to fetch video with ID ${id}:`, error);
         return throwError(() => error);
       })
@@ -53,7 +53,7 @@ export class VideoService {
   deleteVideo(id: number): Observable<boolean> {
     return this.apiService.delete<void>(`/hockey/video-library/${id}`).pipe(
       map(() => true),
-      catchError(error => {
+      catchError((error) => {
         console.error(`Failed to delete video with ID ${id}:`, error);
         return throwError(() => error);
       })
@@ -65,8 +65,8 @@ export class VideoService {
    */
   addVideo(videoData: VideoApiRequest): Observable<Video> {
     return this.apiService.post<VideoApiResponse>('/hockey/video-library', videoData).pipe(
-      map(apiVideo => this.fromApiFormat(apiVideo)),
-      catchError(error => {
+      map((apiVideo) => this.fromApiFormat(apiVideo)),
+      catchError((error) => {
         console.error('Failed to add video:', error);
         return throwError(() => error);
       })
@@ -80,7 +80,7 @@ export class VideoService {
   updateVideo(id: number, videoData: VideoApiRequest): Observable<boolean> {
     return this.apiService.patch<void>(`/hockey/video-library/${id}`, videoData).pipe(
       map(() => true),
-      catchError(error => {
+      catchError((error) => {
         console.error(`Failed to update video with ID ${id}:`, error);
         return throwError(() => error);
       })
@@ -97,7 +97,7 @@ export class VideoService {
       description: apiVideo.description,
       youtube_link: apiVideo.youtube_link,
       added_by: apiVideo.added_by,
-      date: apiVideo.date
+      date: apiVideo.date,
     };
   }
 }

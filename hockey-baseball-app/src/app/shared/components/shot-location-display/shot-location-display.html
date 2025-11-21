@@ -2,8 +2,8 @@
   <!-- Stats Labels -->
   <div class="stats-labels">
     @for (stat of stats(); track stat.type) {
-      <div 
-        class="stat-label" 
+      <div
+        class="stat-label"
         [class.inactive]="!stat.isVisible"
         aria-hidden="true"
         (click)="toggleType(stat.type)"
@@ -22,22 +22,33 @@
         <div class="direction-indicator">
           <svg class="direction-arrow" viewBox="0 0 200 40" xmlns="http://www.w3.org/2000/svg">
             <defs>
-              <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+              <marker
+                id="arrowhead"
+                markerWidth="10"
+                markerHeight="10"
+                refX="9"
+                refY="3"
+                orient="auto"
+              >
                 <polygon points="0 0, 10 3, 0 6" fill="#ef4444" />
               </marker>
             </defs>
-            <line x1="10" y1="20" x2="190" y2="20" stroke="#ef4444" stroke-width="3" marker-end="url(#arrowhead)" />
+            <line
+              x1="10"
+              y1="20"
+              x2="190"
+              y2="20"
+              stroke="#ef4444"
+              stroke-width="3"
+              marker-end="url(#arrowhead)"
+            />
           </svg>
         </div>
       }
       <div class="location-wrapper">
-        <img 
-          src="/assets/images/hockey-rink.svg" 
-          alt="Hockey Rink"
-          class="location-image"
-        />
+        <img src="/assets/images/hockey-rink.svg" alt="Hockey Rink" class="location-image" />
         @for (item of rinkItems(); track $index) {
-          <div 
+          <div
             class="location-marker"
             [class.marker-large]="item.number >= 100"
             [class.marker-medium]="item.number >= 10 && item.number < 100"
@@ -54,13 +65,9 @@
     <!-- Net Image -->
     <div class="location-container">
       <div class="location-wrapper">
-        <img 
-          src="/assets/images/net.svg" 
-          alt="Net"
-          class="location-image"
-        />
+        <img src="/assets/images/net.svg" alt="Net" class="location-image" />
         @for (item of netItems(); track $index) {
-          <div 
+          <div
             class="location-marker"
             [class.marker-large]="item.number >= 100"
             [class.marker-medium]="item.number >= 10 && item.number < 100"

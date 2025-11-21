@@ -6,7 +6,7 @@ import { CsrfTokenService } from './csrf-token.service';
 import { environment } from '../../environments/environment';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ApiService {
   private readonly baseUrl = environment.apiUrl;
@@ -19,12 +19,12 @@ export class ApiService {
   private getHttpOptions(includeCredentials = true) {
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
-      'Accept': 'application/json'
+      Accept: 'application/json',
     });
 
     return {
       headers,
-      withCredentials: includeCredentials // This enables sending/receiving cookies
+      withCredentials: includeCredentials, // This enables sending/receiving cookies
     };
   }
 
@@ -33,7 +33,7 @@ export class ApiService {
    */
   private handleError(error: HttpErrorResponse) {
     let errorMessage = 'An unknown error occurred!';
-    
+
     if (error.error instanceof ErrorEvent) {
       // Client-side error
       errorMessage = `Error: ${error.error.message}`;
@@ -44,7 +44,10 @@ export class ApiService {
       } else if (error.error && error.error.errors) {
         // Handle validation errors
         const validationErrors = Object.entries(error.error.errors)
-          .map(([field, messages]) => `${field}: ${Array.isArray(messages) ? messages.join(', ') : messages}`)
+          .map(
+            ([field, messages]) =>
+              `${field}: ${Array.isArray(messages) ? messages.join(', ') : messages}`
+          )
           .join('; ');
         errorMessage = `Validation errors: ${validationErrors}`;
       } else {
@@ -55,7 +58,7 @@ export class ApiService {
     return throwError(() => ({
       status: error.status,
       message: errorMessage,
-      error: error.error
+      error: error.error,
     }));
   }
 
@@ -63,26 +66,18 @@ export class ApiService {
    * Generic GET request
    */
   get<T>(endpoint: string, includeCredentials = true): Observable<T> {
-    return this.http.get<T>(
-      `${this.baseUrl}${endpoint}`,
-      this.getHttpOptions(includeCredentials)
-    ).pipe(
-      retry(1),
-      catchError(this.handleError)
-    );
+    return this.http
+      .get<T>(`${this.baseUrl}${endpoint}`, this.getHttpOptions(includeCredentials))
+      .pipe(retry(1), catchError(this.handleError));
   }
 
   /**
    * Generic POST request
    */
   post<T>(endpoint: string, body: unknown, includeCredentials = true): Observable<T> {
-    return this.http.post<T>(
-      `${this.baseUrl}${endpoint}`,
-      body,
-      this.getHttpOptions(includeCredentials)
-    ).pipe(
-      catchError(this.handleError)
-    );
+    return this.http
+      .post<T>(`${this.baseUrl}${endpoint}`, body, this.getHttpOptions(includeCredentials))
+      .pipe(catchError(this.handleError));
   }
 
   /**
@@ -90,83 +85,68 @@ export class ApiService {
    */
   postMultipart<T>(endpoint: string, formData: FormData, includeCredentials = true): Observable<T> {
     const headers = new HttpHeaders({
-      'Accept': 'application/json'
+      Accept: 'application/json',
       // Don't set Content-Type for FormData - let browser set it with boundary
     });
 
     const options = {
       headers,
-      withCredentials: includeCredentials
+      withCredentials: includeCredentials,
     };
 
-    return this.http.post<T>(
-      `${this.baseUrl}${endpoint}`,
-      formData,
-      options
-    ).pipe(
-      catchError(this.handleError)
-    );
+    return this.http
+      .post<T>(`${this.baseUrl}${endpoint}`, formData, options)
+      .pipe(catchError(this.handleError));
   }
 
   /**
    * Generic PUT request
    */
   put<T>(endpoint: string, body: unknown, includeCredentials = true): Observable<T> {
-    return this.http.put<T>(
-      `${this.baseUrl}${endpoint}`,
-      body,
-      this.getHttpOptions(includeCredentials)
-    ).pipe(
-      catchError(this.handleError)
-    );
+    return this.http
+      .put<T>(`${this.baseUrl}${endpoint}`, body, this.getHttpOptions(includeCredentials))
+      .pipe(catchError(this.handleError));
   }
 
   /**
    * Generic PATCH request
    */
   patch<T>(endpoint: string, body: unknown, includeCredentials = true): Observable<T> {
-    return this.http.patch<T>(
-      `${this.baseUrl}${endpoint}`,
-      body,
-      this.getHttpOptions(includeCredentials)
-    ).pipe(
-      catchError(this.handleError)
-    );
+    return this.http
+      .patch<T>(`${this.baseUrl}${endpoint}`, body, this.getHttpOptions(includeCredentials))
+      .pipe(catchError(this.handleError));
   }
 
   /**
    * PATCH request with multipart/form-data (for file uploads)
    */
-  patchMultipart<T>(endpoint: string, formData: FormData, includeCredentials = true): Observable<T> {
+  patchMultipart<T>(
+    endpoint: string,
+    formData: FormData,
+    includeCredentials = true
+  ): Observable<T> {
     const headers = new HttpHeaders({
-      'Accept': 'application/json'
+      Accept: 'application/json',
       // Don't set Content-Type for FormData - let browser set it with boundary
     });
 
     const options = {
       headers,
-      withCredentials: includeCredentials
+      withCredentials: includeCredentials,
     };
 
-    return this.http.patch<T>(
-      `${this.baseUrl}${endpoint}`,
-      formData,
-      options
-    ).pipe(
-      catchError(this.handleError)
-    );
+    return this.http
+      .patch<T>(`${this.baseUrl}${endpoint}`, formData, options)
+      .pipe(catchError(this.handleError));
   }
 
   /**
    * Generic DELETE request
    */
   delete<T>(endpoint: string, includeCredentials = true): Observable<T> {
-    return this.http.delete<T>(
-      `${this.baseUrl}${endpoint}`,
-      this.getHttpOptions(includeCredentials)
-    ).pipe(
-      catchError(this.handleError)
-    );
+    return this.http
+      .delete<T>(`${this.baseUrl}${endpoint}`, this.getHttpOptions(includeCredentials))
+      .pipe(catchError(this.handleError));
   }
 
   /**

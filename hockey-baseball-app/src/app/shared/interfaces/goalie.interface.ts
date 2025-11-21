@@ -8,13 +8,13 @@ export interface GoalieRink {
 // API Schema interfaces - matching backend
 export interface GoalieApiInData {
   team_id: number;
-  height: number;  // Height in inches
-  weight: number;  // Weight in lbs
-  shoots: string;  // "R" for Right Shot, "L" for Left Shot
-  number: number;  // Jersey number
+  height: number; // Height in inches
+  weight: number; // Weight in lbs
+  shoots: string; // "R" for Right Shot, "L" for Left Shot
+  number: number; // Jersey number
   first_name: string;
   last_name: string;
-  birth_year: string;  // Date format: YYYY-MM-DD
+  birth_year: string; // Date format: YYYY-MM-DD
   player_bio?: string;
   birthplace_country?: string;
   address_country?: string;
@@ -34,13 +34,13 @@ export interface GoalieApiIn {
 export interface GoalieApiOutData {
   id: number;
   team_id: number;
-  height: number;  // Height in inches
-  weight: number;  // Weight in lbs
-  shoots: string;  // "R" for Right Shot, "L" for Left Shot
-  number: number;  // Jersey number
+  height: number; // Height in inches
+  weight: number; // Weight in lbs
+  shoots: string; // "R" for Right Shot, "L" for Left Shot
+  number: number; // Jersey number
   first_name: string;
   last_name: string;
-  birth_year: string;  // Date format
+  birth_year: string; // Date format
   player_bio?: string;
   birthplace_country?: string;
   address_country?: string;
@@ -80,21 +80,21 @@ export interface GoalieApiPatch {
 // Frontend interface - keeping existing structure for compatibility
 export interface Goalie {
   id: string;
-  teamId?: number;  // Team ID from API
+  teamId?: number; // Team ID from API
   team: string;
   level: string;
   position: string;
-  height: string;  // e.g., "5'6""
-  weight: number;  // in lbs
+  height: string; // e.g., "5'6""
+  weight: number; // in lbs
   shoots: 'Right Shot' | 'Left Shot';
   jerseyNumber: number;
   firstName: string;
   lastName: string;
   birthYear: number;
-  birthplace?: string;  // Birthplace field
-  address?: string;  // Single address field
-  playerBiography?: string;  // Player biography text
-  country?: string;  // Optional country field
+  birthplace?: string; // Birthplace field
+  address?: string; // Single address field
+  playerBiography?: string; // Player biography text
+  country?: string; // Optional country field
   shotsOnGoal: number;
   saves: number;
   goalsAgainst: number;
@@ -105,11 +105,11 @@ export interface Goalie {
   goals: number;
   assists: number;
   points: number;
-  ppga: number;  // Power Play Goals Against
-  shga: number;  // Short Handed Goals Against
+  ppga: number; // Power Play Goals Against
+  shga: number; // Short Handed Goals Against
   savesAboveAvg: number;
-  createdAt?: Date;  // Creation date for sorting
-  [key: string]: unknown;  // Index signature for compatibility with Record<string, unknown>
+  createdAt?: Date; // Creation date for sorting
+  [key: string]: unknown; // Index signature for compatibility with Record<string, unknown>
 }
 
 export interface GoalieTableData {

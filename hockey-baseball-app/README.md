@@ -1,6 +1,7 @@
 # HockeyBaseballApp
 
-A modern web application built with Angular 20, featuring a responsive UI with Angular Material and TailwindCSS.
+A modern web application built with Angular 20, featuring a responsive UI with
+Angular Material and TailwindCSS.
 
 ## Tech Stack
 
@@ -51,12 +52,14 @@ hockey-baseball-app/
 ### Installation
 
 1. Clone the repository:
+
 ```bash
 git clone <repository-url>
 cd hockey-baseball-app
 ```
 
 2. Install dependencies:
+
 ```bash
 npm install
 ```
@@ -71,7 +74,8 @@ Start the local development server:
 npm start
 ```
 
-Navigate to `http://localhost:4200/`. The application will automatically reload when you modify source files.
+Navigate to `http://localhost:4200/`. The application will automatically reload
+when you modify source files.
 
 ### Code Scaffolding
 
@@ -131,7 +135,9 @@ Build the project with production optimizations:
 npm run build:prod
 ```
 
-Build artifacts will be stored in the `dist/hockey-baseball-app/browser/` directory. The production build includes:
+Build artifacts will be stored in the `dist/hockey-baseball-app/browser/`
+directory. The production build includes:
+
 - Code minification
 - Tree shaking
 - Ahead-of-Time (AOT) compilation
@@ -168,7 +174,8 @@ npm run build:prod
 npm run start:server
 ```
 
-The server will run on `http://localhost:3000` (or the port specified in the `PORT` environment variable).
+The server will run on `http://localhost:3000` (or the port specified in the
+`PORT` environment variable).
 
 ### Docker
 
@@ -184,7 +191,8 @@ docker run -p 3000:3000 hockey-baseball-app
 
 ## Component Library
 
-This project uses **Angular Material** as the primary UI component library, which provides:
+This project uses **Angular Material** as the primary UI component library,
+which provides:
 
 - Pre-built, accessible components following Material Design principles
 - Components used: buttons, cards, forms, dialogs, navigation, tables, and more
@@ -192,6 +200,7 @@ This project uses **Angular Material** as the primary UI component library, whic
 - Responsive design with Angular CDK (Component Dev Kit)
 
 **TailwindCSS** is used for:
+
 - Utility-first styling
 - Custom layouts and spacing
 - Responsive design utilities

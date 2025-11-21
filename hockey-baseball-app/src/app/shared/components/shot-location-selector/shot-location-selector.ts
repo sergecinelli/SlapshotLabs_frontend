@@ -1,7 +1,11 @@
 import { Component, Output, EventEmitter, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatDividerModule } from '@angular/material/divider';
-import { LocationSelectorComponent, PuckLocation, Team } from '../location-selector/location-selector';
+import {
+  LocationSelectorComponent,
+  PuckLocation,
+  Team,
+} from '../location-selector/location-selector';
 
 export interface NetLocation {
   x: number; // 0-1000
@@ -18,7 +22,7 @@ export interface ShotLocation {
   standalone: true,
   imports: [CommonModule, MatDividerModule, LocationSelectorComponent],
   templateUrl: './shot-location-selector.html',
-  styleUrl: './shot-location-selector.scss'
+  styleUrl: './shot-location-selector.scss',
 })
 export class ShotLocationSelectorComponent {
   @Input() team1?: Team;
@@ -30,14 +34,14 @@ export class ShotLocationSelectorComponent {
         this.rinkLocation = value.rinkLocation;
         this.initialRinkLocation = value.rinkLocation;
       }
-      
+
       // Only set net location if it exists and is not (0,0)
       if (value.netLocation && !(value.netLocation.x === 0 && value.netLocation.y === 0)) {
         this.netLocation = value.netLocation;
         this.initialNetLocation = {
           x: value.netLocation.x,
           y: value.netLocation.y,
-          zone: 'attacking' // dummy zone for net location
+          zone: 'attacking', // dummy zone for net location
         };
       }
     }
@@ -64,7 +68,7 @@ export class ShotLocationSelectorComponent {
     if (this.rinkLocation) {
       this.locationChange.emit({
         rinkLocation: this.rinkLocation,
-        netLocation: this.netLocation
+        netLocation: this.netLocation,
       });
     } else {
       this.locationChange.emit(null);

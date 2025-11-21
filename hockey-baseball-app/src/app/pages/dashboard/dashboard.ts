@@ -13,11 +13,26 @@ import { Schedule, GameStatus, GameType } from '../../shared/interfaces/schedule
 import { Team } from '../../shared/interfaces/team.interface';
 import { Player } from '../../shared/interfaces/player.interface';
 import { Goalie } from '../../shared/interfaces/goalie.interface';
-import { PlayerFormModalComponent, PlayerFormModalData } from '../../shared/components/player-form-modal/player-form-modal';
-import { TeamFormModalComponent, TeamFormModalData } from '../../shared/components/team-form-modal/team-form-modal';
-import { GoalieFormModalComponent, GoalieFormModalData } from '../../shared/components/goalie-form-modal/goalie-form-modal';
-import { ScheduleFormModalComponent, ScheduleFormModalData } from '../../shared/components/schedule-form-modal/schedule-form-modal';
-import { HighlightReelFormModalComponent, HighlightReelFormModalData } from '../../shared/components/highlight-reel-form-modal/highlight-reel-form-modal';
+import {
+  PlayerFormModalComponent,
+  PlayerFormModalData,
+} from '../../shared/components/player-form-modal/player-form-modal';
+import {
+  TeamFormModalComponent,
+  TeamFormModalData,
+} from '../../shared/components/team-form-modal/team-form-modal';
+import {
+  GoalieFormModalComponent,
+  GoalieFormModalData,
+} from '../../shared/components/goalie-form-modal/goalie-form-modal';
+import {
+  ScheduleFormModalComponent,
+  ScheduleFormModalData,
+} from '../../shared/components/schedule-form-modal/schedule-form-modal';
+import {
+  HighlightReelFormModalComponent,
+  HighlightReelFormModalData,
+} from '../../shared/components/highlight-reel-form-modal/highlight-reel-form-modal';
 import { HighlightReelUpsertPayload } from '../../shared/interfaces/highlight-reel.interface';
 import { HighlightsService } from '../../services/highlights.service';
 import { forkJoin } from 'rxjs';
@@ -27,7 +42,7 @@ import { forkJoin } from 'rxjs';
   standalone: true,
   imports: [CommonModule, PageHeaderComponent, ActionButtonComponent, MatDialogModule],
   templateUrl: './dashboard.html',
-  styleUrl: './dashboard.scss'
+  styleUrl: './dashboard.scss',
 })
 export class DashboardComponent implements OnInit {
   private scheduleService = inject(ScheduleService);
@@ -51,23 +66,38 @@ export class DashboardComponent implements OnInit {
 
   private loadData(): void {
     this.loading.set(true);
-    
+
     // Load teams and games concurrently
     forkJoin({
       teams: this.teamService.getTeams(),
-      games: this.scheduleService.getDashboardGames()
+      games: this.scheduleService.getDashboardGames(),
     }).subscribe({
       next: ({ teams, games }) => {
         // Store teams and create mapping
         this.teams.set(teams.teams);
-        this.teamsMap = new Map(teams.teams.map(team => [parseInt(team.id), team]));
-        
+        this.teamsMap = new Map(teams.teams.map((team) => [parseInt(team.id), team]));
+
         // Map API response to Schedule interface
-        const mapGameToSchedule = (game: { id: number; home_team_id: number; home_goals: number; home_start_goalie_id: number; away_team_id: number; away_goals: number; away_start_goalie_id: number; game_type_id: number; game_type_name?: string; tournament_name?: string; date: string; time: string; rink_id: number; status: number }): Schedule => {
+        const mapGameToSchedule = (game: {
+          id: number;
+          home_team_id: number;
+          home_goals: number;
+          home_start_goalie_id: number;
+          away_team_id: number;
+          away_goals: number;
+          away_start_goalie_id: number;
+          game_type_id: number;
+          game_type_name?: string;
+          tournament_name?: string;
+          date: string;
+          time: string;
+          rink_id: number;
+          status: number;
+        }): Schedule => {
           const homeTeam = this.teamsMap.get(game.home_team_id);
           const awayTeam = this.teamsMap.get(game.away_team_id);
           const apiUrl = this.apiService.getBaseUrl();
-          
+
           return {
             id: game.id.toString(),
             homeTeam: homeTeam?.name || `Team ${game.home_team_id}`,
@@ -85,16 +115,19 @@ export class DashboardComponent implements OnInit {
             date: game.date,
             time: game.time,
             rink: `Rink ${game.rink_id}`, // TODO: Map to actual rink name
-            status: game.status === 0 ? GameStatus.NotStarted : 
-                    game.status === 1 ? GameStatus.GameInProgress : 
-                    GameStatus.GameOver,
-            events: []
+            status:
+              game.status === 0
+                ? GameStatus.NotStarted
+                : game.status === 1
+                  ? GameStatus.GameInProgress
+                  : GameStatus.GameOver,
+            events: [],
           };
         };
-        
+
         const upcoming = games.upcoming_games.map(mapGameToSchedule);
         const completed = games.previous_games.map(mapGameToSchedule);
-        
+
         this.upcomingGames.set(upcoming);
         this.gameResults.set(completed);
         this.loading.set(false);
@@ -102,7 +135,7 @@ export class DashboardComponent implements OnInit {
       error: (error) => {
         console.error('Error loading data:', error);
         this.loading.set(false);
-      }
+      },
     });
   }
 
@@ -113,10 +146,10 @@ export class DashboardComponent implements OnInit {
       maxWidth: '95vw',
       data: { isEditMode: false } as TeamFormModalData,
       panelClass: 'team-form-modal-dialog',
-      disableClose: true
+      disableClose: true,
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         this.addTeam(result);
       }
@@ -131,7 +164,7 @@ export class DashboardComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error adding team:', error);
-      }
+      },
     });
   }
 
@@ -141,10 +174,10 @@ export class DashboardComponent implements OnInit {
       maxWidth: '95vw',
       data: { isEditMode: false } as PlayerFormModalData,
       panelClass: 'player-form-modal-dialog',
-      disableClose: true
+      disableClose: true,
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         this.addPlayer(result);
       }
@@ -158,7 +191,7 @@ export class DashboardComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error adding player:', error);
-      }
+      },
     });
   }
 
@@ -168,10 +201,10 @@ export class DashboardComponent implements OnInit {
       maxWidth: '95vw',
       data: { isEditMode: false } as GoalieFormModalData,
       panelClass: 'goalie-form-modal-dialog',
-      disableClose: true
+      disableClose: true,
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         this.addGoalie(result);
       }
@@ -185,7 +218,7 @@ export class DashboardComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error adding goalie:', error);
-      }
+      },
     });
   }
 
@@ -195,10 +228,10 @@ export class DashboardComponent implements OnInit {
       maxWidth: '95vw',
       data: { isEditMode: false } as ScheduleFormModalData,
       panelClass: 'schedule-form-modal-dialog',
-      disableClose: true
+      disableClose: true,
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         this.addGame(result);
       }
@@ -212,7 +245,7 @@ export class DashboardComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error adding game:', error);
-      }
+      },
     });
   }
 
@@ -223,7 +256,7 @@ export class DashboardComponent implements OnInit {
       data: { isEditMode: false } as HighlightReelFormModalData,
       panelClass: 'schedule-form-modal-dialog',
       disableClose: true,
-      autoFocus: false
+      autoFocus: false,
     });
 
     dialogRef.afterClosed().subscribe((result?: HighlightReelUpsertPayload) => {
@@ -234,7 +267,7 @@ export class DashboardComponent implements OnInit {
           },
           error: (error) => {
             console.error('Error creating highlight reel:', error);
-          }
+          },
         });
       }
     });

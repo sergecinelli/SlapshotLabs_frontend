@@ -9,17 +9,17 @@
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(207, 20, 43, 0.3);
   transition: all 0.3s ease;
-  
+
   &:hover {
     background-color: #b8122a !important;
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(207, 20, 43, 0.4);
   }
-  
+
   &:active {
     transform: translateY(0);
   }
-  
+
   mat-icon {
     font-size: 20px;
     width: 20px;
@@ -35,48 +35,47 @@
   padding: 24px;
   max-width: 1400px;
   margin: 0 auto;
-  
+
   .loading-container {
     text-align: center;
     padding: 48px;
     color: var(--color-secondary);
     font-size: 1.125rem;
   }
-  
+
   .error-container {
     text-align: center;
     padding: 48px;
     color: var(--color-dark);
-    
+
     p {
       font-size: 1.125rem;
       margin-bottom: 24px;
       color: var(--color-secondary);
     }
   }
-  
+
   .profile-content {
-    
     .profile-header {
       margin-bottom: 32px;
       padding: 24px;
       background-color: white;
       border-radius: 12px;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-      
+
       .team-header-layout {
         display: flex;
         flex-direction: column;
         gap: 16px;
-        
+
         .team-main-info {
           display: flex;
           align-items: center;
           gap: 24px;
-          
+
           .team-logo-container {
             flex-shrink: 0;
-            
+
             .team-logo {
               width: 120px;
               height: 120px;
@@ -86,7 +85,7 @@
               align-items: center;
               justify-content: center;
               overflow: hidden;
-              
+
               .logo-placeholder {
                 font-size: 3rem;
                 color: var(--color-secondary);
@@ -98,10 +97,10 @@
               }
             }
           }
-          
+
           .team-name-container {
             flex: 0.5;
-            
+
             .team-name {
               font-size: 2rem;
               font-weight: 600;
@@ -109,17 +108,17 @@
               margin: 0;
             }
           }
-          
+
           .team-stats-container {
             display: flex;
             flex-direction: column;
             gap: 8px;
             align-items: flex-start;
-            
+
             .stats-row {
               display: flex;
               gap: 12px;
-              
+
               span {
                 background-color: var(--color-secondary);
                 color: white;
@@ -128,15 +127,15 @@
                 font-weight: 500;
                 font-size: 0.75rem;
                 white-space: nowrap;
-                
+
                 &.current-season {
                   background-color: var(--color-primary);
                 }
-                
+
                 &.city {
                   background-color: #6b7280;
                 }
-                
+
                 &.team-record {
                   background-color: var(--color-dark);
                 }
@@ -144,11 +143,11 @@
             }
           }
         }
-        
+
         .team-categories {
           display: flex;
           gap: 16px;
-          
+
           span {
             background-color: var(--color-secondary);
             color: white;
@@ -157,15 +156,15 @@
             font-weight: 500;
             font-size: 0.75rem;
             white-space: nowrap;
-            
+
             &.age-group {
               background-color: #6366f1;
             }
-            
+
             &.level {
               background-color: #10b981;
             }
-            
+
             &.division {
               background-color: #f59e0b;
             }
@@ -173,19 +172,19 @@
         }
       }
     }
-    
+
     .info-card {
       margin-bottom: 32px;
       border-radius: 12px;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-      
+
       &:last-child {
         margin-bottom: 0;
       }
-      
+
       mat-card-header {
         padding-bottom: 8px;
-        
+
         mat-card-title {
           display: flex;
           align-items: center;
@@ -193,7 +192,7 @@
           color: var(--color-dark);
           font-size: 1.125rem;
           font-weight: 500;
-          
+
           mat-icon {
             color: var(--color-primary);
             font-size: 1.125rem;
@@ -202,12 +201,12 @@
           }
         }
       }
-      
+
       mat-card-content {
         padding-top: 16px;
       }
     }
-    
+
     // Season Stats Card
     .season-stats-card {
       .season-navigation {
@@ -215,35 +214,37 @@
         justify-content: space-between;
         align-items: center;
         margin-bottom: 16px;
-        
+
         .current-season {
           font-size: 1rem;
           font-weight: 600;
           color: var(--color-dark);
         }
-        
+
         .previous-season-btn {
           color: var(--color-secondary);
           font-size: 0.875rem;
-          
+
           &:hover {
             color: var(--color-primary);
           }
         }
       }
-      
+
       .table-container {
         background-color: white;
         border-radius: 0.5rem;
-        box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+        box-shadow:
+          0 1px 3px 0 rgb(0 0 0 / 0.1),
+          0 1px 2px -1px rgb(0 0 0 / 0.1);
         overflow-x: auto;
         overflow-y: hidden;
         margin-top: 8px;
-        
+
         .season-table {
           width: 100%;
           min-width: 600px;
-          
+
           .mat-mdc-header-row {
             .mat-mdc-header-cell {
               background-color: #e5e7eb;
@@ -253,25 +254,25 @@
               padding: 8px 12px !important;
               border: 0;
               text-align: center;
-              
+
               &:first-child {
                 border-top-left-radius: 8px;
                 text-align: left;
               }
-              
+
               &:last-child {
                 border-top-right-radius: 8px;
               }
             }
           }
-          
+
           .mat-mdc-row {
             &:hover {
               .mat-mdc-cell {
                 background-color: #f9fafb !important;
               }
             }
-            
+
             .mat-mdc-cell {
               font-size: 12px !important;
               color: #111827 !important;
@@ -279,7 +280,7 @@
               padding: 12px !important;
               text-align: center;
               font-weight: 500;
-              
+
               &:first-child {
                 text-align: left !important;
                 font-weight: 600;
@@ -289,16 +290,16 @@
         }
       }
     }
-    
+
     // Schedule Card
     .schedule-card {
       .schedule-section {
         margin-bottom: 32px;
-        
+
         &:last-child {
           margin-bottom: 0;
         }
-        
+
         .schedule-subtitle {
           font-size: 0.875rem;
           color: var(--color-secondary);
@@ -307,38 +308,40 @@
           text-transform: uppercase;
           letter-spacing: 0.5px;
         }
-        
+
         .table-container {
           background-color: white;
           border-radius: 0.5rem;
-          box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+          box-shadow:
+            0 1px 3px 0 rgb(0 0 0 / 0.1),
+            0 1px 2px -1px rgb(0 0 0 / 0.1);
           overflow-x: auto;
           overflow-y: hidden;
           margin-top: 8px;
-          
+
           &::-webkit-scrollbar {
             height: 8px;
           }
-          
+
           &::-webkit-scrollbar-track {
             background-color: #f1f5f9;
             border-radius: 4px;
           }
-          
+
           &::-webkit-scrollbar-thumb {
             background-color: #cbd5e1;
             border-radius: 4px;
-            
+
             &:hover {
               background-color: #94a3b8;
             }
           }
-          
+
           .schedule-table {
             width: 100%;
             min-width: 700px;
             table-layout: fixed;
-            
+
             // Header styling
             .mat-mdc-header-row {
               .mat-mdc-header-cell {
@@ -351,29 +354,29 @@
                 white-space: nowrap;
                 overflow: hidden;
                 text-overflow: ellipsis;
-                
+
                 &:first-child {
                   border-top-left-radius: 8px;
                 }
-                
+
                 &:last-child {
                   border-top-right-radius: 8px;
                 }
               }
             }
-            
+
             // Row styling
             .mat-mdc-row {
               transition-property: color, background-color, border-color;
               transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
               transition-duration: 150ms;
-              
+
               &:hover {
                 .mat-mdc-cell {
                   background-color: #f9fafb !important;
                 }
               }
-              
+
               .mat-mdc-cell {
                 font-size: 12px !important;
                 color: #111827 !important;
@@ -382,18 +385,18 @@
                 white-space: nowrap;
                 overflow: hidden;
                 text-overflow: ellipsis;
-                
+
                 &.result-cell {
                   font-weight: 600;
-                  
+
                   &.win {
                     color: #10b981 !important;
                   }
-                  
+
                   &.loss {
                     color: #ef4444 !important;
                   }
-                  
+
                   &.tie {
                     color: #f59e0b !important;
                   }
@@ -404,41 +407,42 @@
         }
       }
     }
-    
+
     // Roster Card
     .roster-card {
-      
       .table-container {
         background-color: white;
         border-radius: 0.5rem;
-        box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+        box-shadow:
+          0 1px 3px 0 rgb(0 0 0 / 0.1),
+          0 1px 2px -1px rgb(0 0 0 / 0.1);
         overflow-x: auto;
         overflow-y: hidden;
         margin-top: 8px;
-        
+
         &::-webkit-scrollbar {
           height: 8px;
         }
-        
+
         &::-webkit-scrollbar-track {
           background-color: #f1f5f9;
           border-radius: 4px;
         }
-        
+
         &::-webkit-scrollbar-thumb {
           background-color: #cbd5e1;
           border-radius: 4px;
-          
+
           &:hover {
             background-color: #94a3b8;
           }
         }
-        
+
         .roster-table {
           width: 100%;
           min-width: 800px;
           table-layout: fixed;
-          
+
           // Header styling
           .mat-mdc-header-row {
             .mat-mdc-header-cell {
@@ -451,29 +455,29 @@
               white-space: nowrap;
               overflow: hidden;
               text-overflow: ellipsis;
-              
+
               &:first-child {
                 border-top-left-radius: 8px;
               }
-              
+
               &:last-child {
                 border-top-right-radius: 8px;
               }
             }
           }
-          
+
           // Row styling
           .mat-mdc-row {
             transition-property: color, background-color, border-color;
             transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
             transition-duration: 150ms;
-            
+
             &:hover {
               .mat-mdc-cell {
                 background-color: #f9fafb !important;
               }
             }
-            
+
             .mat-mdc-cell {
               font-size: 12px !important;
               color: #111827 !important;
@@ -494,7 +498,7 @@
 @media (max-width: 1024px) {
   .team-profile-page {
     padding: 16px;
-    
+
     .profile-content {
       .profile-header {
         .team-header-layout {
@@ -502,12 +506,12 @@
             flex-direction: column;
             align-items: flex-start;
             gap: 16px;
-            
+
             .team-logo-container {
               .team-logo {
                 width: 100px;
                 height: 100px;
-                
+
                 .logo-placeholder {
                   font-size: 2.5rem;
                   width: 2.5rem;
@@ -515,25 +519,25 @@
                 }
               }
             }
-            
+
             .team-name-container {
               .team-name {
                 font-size: 1.5rem;
               }
             }
-            
+
             .team-stats-container {
               align-items: flex-start;
             }
           }
-          
+
           .team-categories {
             margin-left: 0;
             flex-wrap: wrap;
           }
         }
       }
-      
+
       .season-stats-card {
         .table-container {
           .season-table {
@@ -553,18 +557,18 @@
           .team-main-info {
             text-align: center;
             align-items: center;
-            
+
             .team-stats-container {
               align-items: center;
             }
           }
-          
+
           .team-categories {
             justify-content: center;
           }
         }
       }
-      
+
       .roster-card {
         .table-container {
           .roster-table {

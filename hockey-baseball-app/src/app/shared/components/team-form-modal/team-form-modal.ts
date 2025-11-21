@@ -31,10 +31,10 @@ export interface TeamFormModalData {
     MatSelectModule,
     MatIconModule,
     MatDividerModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
   ],
   templateUrl: './team-form-modal.html',
-  styleUrl: './team-form-modal.scss'
+  styleUrl: './team-form-modal.scss',
 })
 export class TeamFormModalComponent implements OnInit {
   private fb = inject(FormBuilder);
@@ -79,7 +79,7 @@ export class TeamFormModalComponent implements OnInit {
       division: ['', [Validators.required]],
       city: [''],
       abbreviation: [''],
-      logo: ['']
+      logo: [''],
     });
   }
 
@@ -88,39 +88,39 @@ export class TeamFormModalComponent implements OnInit {
    */
   private loadOptions(): void {
     this.isLoading = true;
-    
+
     // Get group options (static)
     this.groupOptions = this.teamOptionsService.getGroupOptions();
-    
+
     // Fetch levels and divisions from API
     forkJoin({
       levels: this.teamOptionsService.getTeamLevels(),
-      divisions: this.teamOptionsService.getDivisions()
+      divisions: this.teamOptionsService.getDivisions(),
     }).subscribe({
       next: ({ levels, divisions }) => {
         this.levelOptions = this.teamOptionsService.transformLevelsToOptions(levels);
         this.divisionOptions = this.teamOptionsService.transformDivisionsToOptions(divisions);
-        
+
         // Set default values after options are loaded
         this.setDefaultValues();
-        
+
         // If in edit mode, populate the form
         if (this.isEditMode && this.data.team) {
           this.populateForm(this.data.team);
         }
-        
+
         this.isLoading = false;
       },
       error: (error) => {
         console.error('Failed to load options:', error);
         this.setDefaultValues();
-        
+
         if (this.isEditMode && this.data.team) {
           this.populateForm(this.data.team);
         }
-        
+
         this.isLoading = false;
-      }
+      },
     });
   }
 
@@ -133,10 +133,10 @@ export class TeamFormModalComponent implements OnInit {
       this.teamForm.patchValue({
         group: this.groupOptions[0]?.value || '1U',
         level: this.levelOptions[0]?.value || 'NHL',
-        division: this.divisionOptions[0]?.value || 'Atlantic'
+        division: this.divisionOptions[0]?.value || 'Atlantic',
       });
     }
-    
+
     // Update validity after setting values
     this.teamForm.updateValueAndValidity();
   }
@@ -149,9 +149,9 @@ export class TeamFormModalComponent implements OnInit {
       division: team.divisionId?.toString() || this.divisionOptions[0]?.value || '',
       city: team.city,
       abbreviation: team.abbreviation || '',
-      logo: team.logo
+      logo: team.logo,
     });
-    
+
     // Set existing logo as preview if available
     if (team.logo && team.logo !== '/assets/icons/teams.svg' && !team.logo.includes('/assets/')) {
       this.isImageLoading = true;
@@ -248,7 +248,7 @@ export class TeamFormModalComponent implements OnInit {
     this.isImageLoading = false;
     this.logoRemoved = true; // Mark that logo was explicitly removed
     this.teamForm.patchValue({ logo: '' });
-    
+
     // Reset file input
     const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
     if (fileInput) {
@@ -301,14 +301,14 @@ export class TeamFormModalComponent implements OnInit {
     if (this.isLoading) {
       return; // Prevent submission while loading
     }
-    
+
     if (this.teamForm.valid) {
       const formValue = this.teamForm.value;
-      
+
       // Find the selected level and division names for display
-      const selectedLevel = this.levelOptions.find(opt => opt.value === formValue.level);
-      const selectedDivision = this.divisionOptions.find(opt => opt.value === formValue.division);
-      
+      const selectedLevel = this.levelOptions.find((opt) => opt.value === formValue.level);
+      const selectedDivision = this.divisionOptions.find((opt) => opt.value === formValue.division);
+
       const teamData: Partial<Team> & { logoFile?: File; logoRemoved?: boolean } = {
         name: formValue.name,
         group: formValue.group,
@@ -318,7 +318,7 @@ export class TeamFormModalComponent implements OnInit {
         divisionId: parseInt(formValue.division, 10),
         city: formValue.city,
         abbreviation: formValue.abbreviation || undefined,
-        logo: formValue.logo || '/assets/icons/teams.svg'
+        logo: formValue.logo || '/assets/icons/teams.svg',
       };
 
       if (this.isEditMode && this.data.team) {
@@ -338,7 +338,7 @@ export class TeamFormModalComponent implements OnInit {
       this.dialogRef.close(teamData);
     } else {
       // Mark all fields as touched to show validation errors
-      Object.keys(this.teamForm.controls).forEach(key => {
+      Object.keys(this.teamForm.controls).forEach((key) => {
         this.teamForm.get(key)?.markAsTouched();
       });
     }
@@ -360,7 +360,7 @@ export class TeamFormModalComponent implements OnInit {
    */
   get formErrors(): Record<string, unknown> {
     const errors: Record<string, unknown> = {};
-    Object.keys(this.teamForm.controls).forEach(key => {
+    Object.keys(this.teamForm.controls).forEach((key) => {
       const control = this.teamForm.get(key);
       if (control && control.errors) {
         errors[key] = control.errors;
@@ -396,7 +396,7 @@ export class TeamFormModalComponent implements OnInit {
       division: 'Division',
       city: 'City',
       abbreviation: 'Abbreviation',
-      logo: 'Team Logo'
+      logo: 'Team Logo',
     };
     return labels[fieldName] || fieldName;
   }

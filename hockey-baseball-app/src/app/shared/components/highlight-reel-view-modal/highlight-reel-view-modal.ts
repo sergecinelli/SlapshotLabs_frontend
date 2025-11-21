@@ -33,7 +33,9 @@ export class HighlightReelViewModalComponent implements OnInit {
   videoMessage = signal<string | null>(null);
 
   ngOnInit(): void {
-    const ordered = [...(this.data.highlights || [])].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+    const ordered = [...(this.data.highlights || [])].sort(
+      (a, b) => (a.order ?? 0) - (b.order ?? 0)
+    );
     this.highlights.set(ordered);
 
     // Determine initial selected index
@@ -41,7 +43,7 @@ export class HighlightReelViewModalComponent implements OnInit {
     if (typeof this.data.initialIndex === 'number' && ordered[this.data.initialIndex]) {
       startIdx = this.data.initialIndex;
     } else if (typeof this.data.initialHighlightId === 'number') {
-      const idx = ordered.findIndex(h => h.id === this.data.initialHighlightId);
+      const idx = ordered.findIndex((h) => h.id === this.data.initialHighlightId);
       startIdx = idx >= 0 ? idx : 0;
     }
     this.selectedIndex.set(startIdx);

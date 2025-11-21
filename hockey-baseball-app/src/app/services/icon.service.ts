@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class IconService {
   private iconCache = new Map<string, string>();
@@ -17,7 +17,7 @@ export class IconService {
         console.warn(`Icon ${iconName} not found`);
         return '';
       }
-      
+
       const svgContent = await response.text();
       this.iconCache.set(iconName, svgContent);
       return svgContent;

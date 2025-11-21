@@ -34,13 +34,13 @@ export enum GameType {
   Playoff = 'Playoff',
   Tournament = 'Tournament',
   Exhibition = 'Exhibition',
-  SummerLeague = 'Summer League'
+  SummerLeague = 'Summer League',
 }
 
 export enum GameStatus {
   NotStarted = 1,
   GameInProgress = 2,
-  GameOver = 3
+  GameOver = 3,
 }
 
 export enum GameEventType {
@@ -52,7 +52,7 @@ export enum GameEventType {
   Turnover = 'Turnover',
   FaceoffWin = 'Faceoff Win',
   FaceoffLoss = 'Faceoff Loss',
-  GoalieChange = 'Goalie Change (change the goalie that is in the game)'
+  GoalieChange = 'Goalie Change (change the goalie that is in the game)',
 }
 
 export enum GamePeriod {
@@ -60,7 +60,7 @@ export enum GamePeriod {
   SecondPeriod = '2nd Period',
   ThirdPeriod = '3rd Period',
   Overtime = 'Overtime',
-  ShootOut = 'Shoot Out'
+  ShootOut = 'Shoot Out',
 }
 
 // Zone-specific event types for the detailed tracking
@@ -75,25 +75,25 @@ export enum DefensiveZoneExitType {
   SkateOut = 'Skate Out',
   SOWin = 'SO & Win',
   SOLose = 'SO & Lose',
-  Pass = 'Pass'
+  Pass = 'Pass',
 }
 
 export enum OffensiveZoneEntryType {
   PassIn = 'Pass In',
   DumpWin = 'Dump & Win',
   DumpLose = 'Dump & Lose',
-  SkateIn = 'Skate In'
+  SkateIn = 'Skate In',
 }
 
 export enum ShotType {
   ShotOnGoal = 'Shot on Goal',
   MissedNet = 'Missed Net',
   ScoringChance = 'Scoring Chance',
-  Blocked = 'Blocked'
+  Blocked = 'Blocked',
 }
 
 export enum TurnoverType {
   OffZone = 'Off Zone',
   NeutralZone = 'Neutral Zone',
-  DefZone = 'Def. Zone'
+  DefZone = 'Def. Zone',
 }

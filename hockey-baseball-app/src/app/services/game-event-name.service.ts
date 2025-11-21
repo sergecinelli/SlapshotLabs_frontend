@@ -8,7 +8,7 @@ export interface GameEventName {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class GameEventNameService {
   private apiService = inject(ApiService);

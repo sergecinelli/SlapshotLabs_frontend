@@ -12,145 +12,177 @@
   <!-- Material Table -->
   @if (!loading) {
     <div class="table-wrapper">
-    <table mat-table [dataSource]="data" matSort (matSortChange)="onSortChange($event)" class="mat-elevation-2">
-      
-      <!-- Dynamic Columns -->
-      @for (column of columns; track column.key) {
-        <ng-container [matColumnDef]="column.key">
-        <!-- Sortable header -->
-        @if (column.sortable) {
-          <th mat-header-cell *matHeaderCellDef mat-sort-header="{{column.key}}" 
+      <table
+        mat-table
+        [dataSource]="data"
+        matSort
+        (matSortChange)="onSortChange($event)"
+        class="mat-elevation-2"
+      >
+        <!-- Dynamic Columns -->
+        @for (column of columns; track column.key) {
+          <ng-container [matColumnDef]="column.key">
+            <!-- Sortable header -->
+            @if (column.sortable) {
+              <th
+                mat-header-cell
+                *matHeaderCellDef
+                mat-sort-header="{{ column.key }}"
+                [style.width]="column.width"
+                [class.text-center]="column.align === 'center'"
+                [class.text-right]="column.align === 'right'"
+              >
+                {{ column.label }}
+              </th>
+            } @else {
+              <!-- Non-sortable header -->
+              <th
+                mat-header-cell
+                *matHeaderCellDef
+                [style.width]="column.width"
+                [class.text-center]="column.align === 'center'"
+                [class.text-right]="column.align === 'right'"
+              >
+                {{ column.label }}
+              </th>
+            }
+            <td
+              mat-cell
+              *matCellDef="let element"
+              #cellElement
+              #tooltip="matTooltip"
               [style.width]="column.width"
               [class.text-center]="column.align === 'center'"
-              [class.text-right]="column.align === 'right'">
-            {{ column.label }}
-          </th>
-        } @else {
-          <!-- Non-sortable header -->
-          <th mat-header-cell *matHeaderCellDef 
-              [style.width]="column.width"
-              [class.text-center]="column.align === 'center'"
-              [class.text-right]="column.align === 'right'">
-            {{ column.label }}
-          </th>
+              [class.text-right]="column.align === 'right'"
+              [class.badge-cell]="
+                column.type === 'custom' && (column.key === 'status' || column.key === 'gameType')
+              "
+              [matTooltip]="getTooltipText(element, column)"
+              matTooltipPosition="above"
+              [matTooltipDisabled]="column.showTooltip === false"
+              (mouseenter)="onCellMouseEnter(cellElement, tooltip, element, column)"
+            >
+              @switch (column.type) {
+                <!-- Text -->
+                @case ('text') {
+                  <span>
+                    {{ getCellValue(element, column) || '-' }}
+                  </span>
+                }
+
+                <!-- Number -->
+                @case ('number') {
+                  <span class="font-mono">
+                    @if (column.key === 'birthYear') {
+                      {{ getCellValue(element, column) }}
+                    } @else {
+                      {{ getNumberValue(element, column) | number }}
+                    }
+                  </span>
+                }
+
+                <!-- Date -->
+                @case ('date') {
+                  <span>
+                    {{ getDateValue(element, column) | date: 'MMM. d, y' }}
+                  </span>
+                }
+
+                <!-- Dropdown -->
+                @case ('dropdown') {
+                  <span>
+                    {{ getCellValue(element, column) || '-' }}
+                  </span>
+                }
+
+                <!-- Custom rendering -->
+                @case ('custom') {
+                  @if (column.key === 'status') {
+                    <span [class]="getStatusBadgeClass(getCellValue(element, column))">
+                      {{ getStatusLabel(getCellValue(element, column)) }}
+                    </span>
+                  } @else if (column.key === 'gameType') {
+                    <span [class]="getGameTypeBadgeClass(getCellValue(element, column))">
+                      {{ getCellValue(element, column) }}
+                    </span>
+                  } @else {
+                    <span>
+                      {{ getCellValue(element, column) || '-' }}
+                    </span>
+                  }
+                }
+
+                <!-- Default -->
+                @default {
+                  <span>
+                    {{ getCellValue(element, column) || '-' }}
+                  </span>
+                }
+              }
+            </td>
+          </ng-container>
         }
-        <td mat-cell *matCellDef="let element" 
-            #cellElement
-            #tooltip="matTooltip"
-            [style.width]="column.width"
-            [class.text-center]="column.align === 'center'"
-            [class.text-right]="column.align === 'right'"
-            [class.badge-cell]="column.type === 'custom' && (column.key === 'status' || column.key === 'gameType')"
-            [matTooltip]="getTooltipText(element, column)"
-            matTooltipPosition="above"
-            [matTooltipDisabled]="column.showTooltip === false"
-            (mouseenter)="onCellMouseEnter(cellElement, tooltip, element, column)">
-          @switch (column.type) {
-            <!-- Text -->
-            @case ('text') {
-              <span>
-                {{ getCellValue(element, column) || '-' }}
-              </span>
-            }
-            
-            <!-- Number -->
-            @case ('number') {
-              <span class="font-mono">
-                @if (column.key === 'birthYear') {
-                  {{ getCellValue(element, column) }}
-                } @else {
-                  {{ getNumberValue(element, column) | number }}
+
+        <!-- Actions Column -->
+        @if (actions.length > 0) {
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef class="text-center" style="width: 200px">
+              Actions
+            </th>
+            <td
+              mat-cell
+              *matCellDef="let element"
+              class="text-center actions-cell"
+              style="width: 200px"
+            >
+              <div class="flex flex-wrap items-center justify-center gap-1">
+                @for (action of actions; track action.action) {
+                  @if (!action.condition || action.condition(element)) {
+                    <button
+                      mat-button
+                      (click)="onActionClick(action.action, element)"
+                      [color]="
+                        action.variant === 'primary'
+                          ? 'primary'
+                          : action.variant === 'danger'
+                            ? 'warn'
+                            : ''
+                      "
+                      [class]="action.iconOnly ? 'action-button icon-only-button' : 'action-button'"
+                      [matTooltip]="action.iconOnly ? action.label : ''"
+                      matTooltipPosition="above"
+                    >
+                      @if (action.icon) {
+                        <img
+                          [src]="iconService.getIconPath(action.icon)"
+                          [alt]="action.label"
+                          class="action-icon"
+                          [class.mr-1]="!action.iconOnly"
+                        />
+                      }
+                      @if (!action.iconOnly) {
+                        {{ action.label }}
+                      }
+                    </button>
+                  }
                 }
-              </span>
-            }
+              </div>
+            </td>
+          </ng-container>
+        }
 
-            <!-- Date -->
-            @case ('date') {
-              <span>
-                {{ getDateValue(element, column) | date:'MMM. d, y' }}
-              </span>
-            }
+        <tr mat-header-row *matHeaderRowDef="displayedColumns" class="custom-header"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns" class="table-row"></tr>
+      </table>
 
-            <!-- Dropdown -->
-            @case ('dropdown') {
-              <span>
-                {{ getCellValue(element, column) || '-' }}
-              </span>
-            }
-
-            <!-- Custom rendering -->
-            @case ('custom') {
-              @if (column.key === 'status') {
-                <span [class]="getStatusBadgeClass(getCellValue(element, column))">
-                  {{ getStatusLabel(getCellValue(element, column)) }}
-                </span>
-              } @else if (column.key === 'gameType') {
-                <span [class]="getGameTypeBadgeClass(getCellValue(element, column))">
-                  {{ getCellValue(element, column) }}
-                </span>
-              } @else {
-                <span>
-                  {{ getCellValue(element, column) || '-' }}
-                </span>
-              }
-            }
-            
-            <!-- Default -->
-            @default {
-              <span>
-                {{ getCellValue(element, column) || '-' }}
-              </span>
-            }
-          }
-        </td>
-        </ng-container>
-      }
-
-      <!-- Actions Column -->
-      @if (actions.length > 0) {
-        <ng-container matColumnDef="actions">
-        <th mat-header-cell *matHeaderCellDef class="text-center" style="width: 200px;">Actions</th>
-        <td mat-cell *matCellDef="let element" class="text-center actions-cell" style="width: 200px;">
-          <div class="flex flex-wrap items-center justify-center gap-1">
-            @for (action of actions; track action.action) {
-              @if (!action.condition || action.condition(element)) {
-                <button 
-                  mat-button
-                  (click)="onActionClick(action.action, element)"
-                  [color]="action.variant === 'primary' ? 'primary' : action.variant === 'danger' ? 'warn' : ''"
-                  [class]="action.iconOnly ? 'action-button icon-only-button' : 'action-button'"
-                  [matTooltip]="action.iconOnly ? action.label : ''"
-                  matTooltipPosition="above"
-                >
-                @if (action.icon) {
-                  <img [src]="iconService.getIconPath(action.icon)" 
-                       [alt]="action.label" 
-                       class="action-icon"
-                       [class.mr-1]="!action.iconOnly">
-                }
-                @if (!action.iconOnly) {
-                  {{ action.label }}
-                }
-                </button>
-              }
-            }
+      <!-- Empty State -->
+      @if (data.length === 0) {
+        <div class="empty-state">
+          <div class="text-center py-12">
+            <div class="text-gray-500">{{ emptyMessage }}</div>
           </div>
-        </td>
-        </ng-container>
-      }
-
-      <tr mat-header-row *matHeaderRowDef="displayedColumns" class="custom-header"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="table-row"></tr>
-    </table>
-
-    <!-- Empty State -->
-    @if (data.length === 0) {
-      <div class="empty-state">
-        <div class="text-center py-12">
-          <div class="text-gray-500">{{ emptyMessage }}</div>
         </div>
-      </div>
-    }
+      }
     </div>
   }
 </div>

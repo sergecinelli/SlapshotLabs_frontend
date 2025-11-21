@@ -4,7 +4,6 @@ import { Team, TeamApiIn, TeamApiOut } from '../interfaces/team.interface';
  * Utility class for transforming data between frontend and API formats for teams
  */
 export class TeamDataMapper {
-  
   /**
    * Transform API TeamApiOut data to frontend Team format
    * @param apiTeam - API team data
@@ -14,12 +13,12 @@ export class TeamDataMapper {
     return {
       id: apiTeam.id.toString(),
       name: apiTeam.name,
-      group: apiTeam.age_group || 'Eastern Conference',  // Use age_group as group
+      group: apiTeam.age_group || 'Eastern Conference', // Use age_group as group
       level: this.mapLevelIdToName(apiTeam.level_id),
       division: this.mapDivisionIdToName(apiTeam.division_id),
       city: apiTeam.city || '',
-      logo: '/assets/icons/teams.svg',  // Default logo since API doesn't return it directly
-      createdAt: new Date() // Set creation date for newly created items
+      logo: '/assets/icons/teams.svg', // Default logo since API doesn't return it directly
+      createdAt: new Date(), // Set creation date for newly created items
     };
   }
 
@@ -34,7 +33,7 @@ export class TeamDataMapper {
       age_group: team.group || 'Adult', // Map frontend group to age_group
       level_id: this.mapLevelNameToId(team.level || 'NHL'),
       division_id: this.mapDivisionNameToId(team.division || 'Atlantic'),
-      city: team.city || ''
+      city: team.city || '',
     };
   }
 
@@ -45,12 +44,12 @@ export class TeamDataMapper {
    */
   static toApiUpdateFormat(team: Partial<Team>): Partial<TeamApiIn> {
     const updateData: Partial<TeamApiIn> = {};
-    
+
     if (team.name) {
       updateData.name = team.name;
     }
     if (team.group) {
-      updateData.age_group = team.group;  // Map frontend group to age_group
+      updateData.age_group = team.group; // Map frontend group to age_group
     }
     if (team.level) {
       updateData.level_id = this.mapLevelNameToId(team.level);
@@ -61,7 +60,7 @@ export class TeamDataMapper {
     if (team.city) {
       updateData.city = team.city;
     }
-    
+
     return updateData;
   }
 
@@ -71,7 +70,7 @@ export class TeamDataMapper {
    * @returns Array of frontend Team objects
    */
   static fromApiOutArrayFormat(apiTeams: TeamApiOut[]): Team[] {
-    return apiTeams.map(apiTeam => this.fromApiOutFormat(apiTeam));
+    return apiTeams.map((apiTeam) => this.fromApiOutFormat(apiTeam));
   }
 
   /**
@@ -82,10 +81,10 @@ export class TeamDataMapper {
   private static mapLevelIdToName(levelId: number): string {
     const levelMap: Record<number, string> = {
       1: 'NHL',
-      2: 'AHL', 
+      2: 'AHL',
       3: 'Junior A',
       4: 'Junior B',
-      5: 'Junior C'
+      5: 'Junior C',
     };
     return levelMap[levelId] || 'NHL';
   }
@@ -97,11 +96,11 @@ export class TeamDataMapper {
    */
   private static mapLevelNameToId(level: string): number {
     const levelMap: Record<string, number> = {
-      'NHL': 1,
-      'AHL': 2,
+      NHL: 1,
+      AHL: 2,
       'Junior A': 3,
       'Junior B': 4,
-      'Junior C': 5
+      'Junior C': 5,
     };
     return levelMap[level] || 1;
   }
@@ -116,7 +115,7 @@ export class TeamDataMapper {
       1: 'Atlantic',
       2: 'Metropolitan',
       3: 'Central',
-      4: 'Pacific'
+      4: 'Pacific',
     };
     return divisionMap[divisionId] || 'Atlantic';
   }
@@ -128,10 +127,10 @@ export class TeamDataMapper {
    */
   private static mapDivisionNameToId(division: string): number {
     const divisionMap: Record<string, number> = {
-      'Atlantic': 1,
-      'Metropolitan': 2,
-      'Central': 3,
-      'Pacific': 4
+      Atlantic: 1,
+      Metropolitan: 2,
+      Central: 3,
+      Pacific: 4,
     };
     return divisionMap[division] || 1;
   }

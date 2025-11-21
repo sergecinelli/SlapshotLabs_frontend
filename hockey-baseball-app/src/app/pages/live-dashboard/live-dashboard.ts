@@ -23,7 +23,14 @@ import { TeamService } from '../../services/team.service';
 import { PlayerService } from '../../services/player.service';
 import { GoalieService } from '../../services/goalie.service';
 import { GamePlayerService } from '../../services/game-player.service';
-import { LiveGameService, LiveGameData, GameExtra, GameEvent as ServiceGameEvent, OffensiveZoneEntry, DefensiveZoneExit } from '../../services/live-game.service';
+import {
+  LiveGameService,
+  LiveGameData,
+  GameExtra,
+  GameEvent as ServiceGameEvent,
+  OffensiveZoneEntry,
+  DefensiveZoneExit,
+} from '../../services/live-game.service';
 import { ArenaService } from '../../services/arena.service';
 import { Arena, Rink } from '../../shared/interfaces/arena.interface';
 import { Team } from '../../shared/interfaces/team.interface';
@@ -32,7 +39,10 @@ import { GameEventService } from '../../services/game-event.service';
 import { GameEventNameService } from '../../services/game-event-name.service';
 import { ScheduleService } from '../../services/schedule.service';
 import { SprayChartUtilsService } from '../../services/spray-chart-utils.service';
-import { ShotLocationDisplayComponent, ShotLocationData } from '../../shared/components/shot-location-display/shot-location-display';
+import {
+  ShotLocationDisplayComponent,
+  ShotLocationData,
+} from '../../shared/components/shot-location-display/shot-location-display';
 import { environment } from '../../../environments/environment';
 import { forkJoin, interval, Subscription } from 'rxjs';
 import { switchMap, startWith } from 'rxjs/operators';
@@ -92,9 +102,21 @@ interface GameEvent {
 @Component({
   selector: 'app-live-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule, PageHeaderComponent, ActionButtonComponent, MatIconModule, MatButtonModule, MatTooltipModule, MatSelectModule, MatFormFieldModule, MatProgressSpinnerModule, ShotLocationDisplayComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    PageHeaderComponent,
+    ActionButtonComponent,
+    MatIconModule,
+    MatButtonModule,
+    MatTooltipModule,
+    MatSelectModule,
+    MatFormFieldModule,
+    MatProgressSpinnerModule,
+    ShotLocationDisplayComponent,
+  ],
   templateUrl: './live-dashboard.html',
-  styleUrl: './live-dashboard.scss'
+  styleUrl: './live-dashboard.scss',
 })
 export class LiveDashboardComponent implements OnInit, OnDestroy {
   private dialog = inject(MatDialog);
@@ -112,13 +134,13 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
   private gameEventNameService = inject(GameEventNameService);
   private scheduleService = inject(ScheduleService);
   private sprayChartUtils = inject(SprayChartUtilsService);
-  
+
   // Polling subscription for live data
   private liveDataPollingSubscription?: Subscription;
-  
+
   // Game ID from route parameter
   gameId = 1;
-  
+
   // Event name IDs - loaded from API
   eventNameIds: Record<string, number> = {};
   shotOnGoalEventId = 0;
@@ -126,42 +148,42 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
   faceoffEventId = 0;
   goalieChangeEventId = 0; // Regular goalie change
   penaltyEventId = 0;
-  
+
   homeTeamId = 1;
   awayTeamId = 2;
-  
+
   // Game periods and shot types fetched from API
   gamePeriods: GamePeriodResponse[] = [];
   periodOptions: { value: number; label: string }[] = [];
   shotTypeOptions: { value: number; label: string }[] = [];
-  
+
   // Teams fetched from API (only home and away)
   teamOptions: { value: number; label: string; logo?: string }[] = [];
-  
+
   // Players and goalies for both teams
   playerOptions: { value: number; label: string; teamId: number }[] = [];
   goalieOptions: { value: number; label: string; teamId: number }[] = [];
-  
+
   // Loading state
   isLoadingGameData = true;
-  
+
   // Game status flags
   isGameOver = false;
   pageTitle = signal('Live Dashboard');
-  
+
   // Current period ID for dropdown
   currentPeriodId = 1;
-  
+
   // Game start time (used to compute elapsed times for events)
   private gameStartTime: Date | null = null;
-  
+
   // Tournament/game header data
   tournamentName = signal('');
   tournamentType = signal('');
   tournamentCategory = signal('');
   tournamentDate = signal('');
   arenaInfo = signal('');
-  
+
   // Team data
   homeTeam = signal<TeamDisplay>({
     name: '',
@@ -169,7 +191,7 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
     score: 0,
     record: '',
     sog: 0,
-    teamLevel: ''
+    teamLevel: '',
   });
 
   awayTeam = signal<TeamDisplay>({
@@ -178,11 +200,11 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
     score: 0,
     record: '',
     sog: 0,
-    teamLevel: ''
+    teamLevel: '',
   });
 
   period = signal('');
-  
+
   // Game statistics
   homeStats = signal<GameStats>({
     faceoffWinPct: 0,
@@ -191,25 +213,25 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
       skate: 0,
       soWin: 0,
       soLose: 0,
-      pass: 0
+      pass: 0,
     },
     offensiveZoneEntry: {
       pass: 0,
       dump: 0, // Dump Win
       carry: 0, // Dump Lose
-      skated: 0
+      skated: 0,
     },
     shots: {
       shotsOnGoal: 0,
       missedNet: 0,
       scoringChances: 0,
-      blocked: 0
+      blocked: 0,
     },
     turnovers: {
       offZone: 0,
       neutralZone: 0,
-      defZone: 0
-    }
+      defZone: 0,
+    },
   });
 
   awayStats = signal<GameStats>({
@@ -219,25 +241,25 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
       skate: 0,
       soWin: 0,
       soLose: 0,
-      pass: 0
+      pass: 0,
     },
     offensiveZoneEntry: {
       pass: 0,
       dump: 0, // Dump Win
       carry: 0, // Dump Lose
-      skated: 0
+      skated: 0,
     },
     shots: {
       shotsOnGoal: 0,
       missedNet: 0,
       scoringChances: 0,
-      blocked: 0
+      blocked: 0,
     },
     turnovers: {
       offZone: 0,
       neutralZone: 0,
-      defZone: 0
-    }
+      defZone: 0,
+    },
   });
 
   // IDs for patching zone exit/entry rows
@@ -249,15 +271,15 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
   // Starting goalies for defaults in forms
   private homeStartGoalieId?: number;
   private awayStartGoalieId?: number;
-  
+
   // Spray chart data
   homeSprayChartData = signal<ShotLocationData[]>([]);
   awaySprayChartData = signal<ShotLocationData[]>([]);
   isLoadingSprayCharts = signal(true);
- 
+
   ngOnInit(): void {
     // Get game ID from route parameter
-    this.route.params.subscribe(params => {
+    this.route.params.subscribe((params) => {
       const gameIdParam = params['gameId'];
       if (gameIdParam) {
         this.gameId = parseInt(gameIdParam, 10);
@@ -286,28 +308,38 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
       arenas: this.arenaService.getArenas(),
       rinks: this.arenaService.getAllRinks(),
       teamLevels: this.teamOptionsService.getTeamLevels(),
-      eventNames: this.gameEventNameService.getGameEventNames()
+      eventNames: this.gameEventNameService.getGameEventNames(),
     }).subscribe({
-      next: ({ gameExtra, periods, shotTypes, gameTypes, teams, arenas, rinks, teamLevels, eventNames }) => {
+      next: ({
+        gameExtra,
+        periods,
+        shotTypes,
+        gameTypes,
+        teams,
+        arenas,
+        rinks,
+        teamLevels,
+        eventNames,
+      }) => {
         // Check if game status is "Not Started" (1)
         if (gameExtra.status === 1) {
           this.router.navigate(['/dashboard']);
           return;
         }
-        
+
         // Set game status flags
         this.isGameOver = gameExtra.status === 3;
         this.pageTitle.set(this.isGameOver ? 'Game Dashboard' : 'Live Dashboard');
-        
+
         // Set team IDs from game extra
         this.homeTeamId = gameExtra.home_team_id;
         this.awayTeamId = gameExtra.away_team_id;
 
         // Map event names to IDs
-        eventNames.forEach(event => {
+        eventNames.forEach((event) => {
           this.eventNameIds[event.name] = event.id;
         });
-        
+
         // Set specific event IDs for forms
         this.shotOnGoalEventId = this.eventNameIds['Shot on Goal'] || 0;
         this.turnoverEventId = this.eventNameIds['Turnover'] || 0;
@@ -328,18 +360,20 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
         // Store starting goalies for default selections
         this.homeStartGoalieId = gameExtra.home_start_goalie_id;
         this.awayStartGoalieId = gameExtra.away_start_goalie_id;
-        const homeTeamData = allTeams.find(t => parseInt(t.id) === this.homeTeamId);
-        const awayTeamData = allTeams.find(t => parseInt(t.id) === this.awayTeamId);
+        const homeTeamData = allTeams.find((t) => parseInt(t.id) === this.homeTeamId);
+        const awayTeamData = allTeams.find((t) => parseInt(t.id) === this.awayTeamId);
 
         if (homeTeamData && awayTeamData) {
           // Get team level names from API data
-          const homeTeamLevel = teamLevels.find(level => level.id === homeTeamData.levelId)?.name || '';
-          const awayTeamLevel = teamLevels.find(level => level.id === awayTeamData.levelId)?.name || '';
-          
+          const homeTeamLevel =
+            teamLevels.find((level) => level.id === homeTeamData.levelId)?.name || '';
+          const awayTeamLevel =
+            teamLevels.find((level) => level.id === awayTeamData.levelId)?.name || '';
+
           // Format team records
           const homeRecord = `(${gameExtra.home_team_game_type_record.wins} - ${gameExtra.home_team_game_type_record.losses} - ${gameExtra.home_team_game_type_record.ties})`;
           const awayRecord = `(${gameExtra.away_team_game_type_record.wins} - ${gameExtra.away_team_game_type_record.losses} - ${gameExtra.away_team_game_type_record.ties})`;
-          
+
           // Update team signals with real data
           this.homeTeam.set({
             name: homeTeamData.name,
@@ -347,7 +381,7 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
             score: gameExtra.home_goals,
             record: homeRecord,
             sog: 0,
-            teamLevel: `${homeTeamData.group} ${homeTeamLevel}`
+            teamLevel: `${homeTeamData.group} ${homeTeamLevel}`,
           });
 
           this.awayTeam.set({
@@ -356,7 +390,7 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
             score: gameExtra.away_goals,
             record: awayRecord,
             sog: 0,
-            teamLevel: `${awayTeamData.group} ${awayTeamLevel}`
+            teamLevel: `${awayTeamData.group} ${awayTeamLevel}`,
           });
 
           // Set team options for dropdowns
@@ -364,13 +398,13 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
             {
               value: parseInt(homeTeamData.id),
               label: homeTeamData.name,
-              logo: homeTeamData.logo
+              logo: homeTeamData.logo,
             },
             {
               value: parseInt(awayTeamData.id),
               label: awayTeamData.name,
-              logo: awayTeamData.logo
-            }
+              logo: awayTeamData.logo,
+            },
           ];
         }
 
@@ -382,7 +416,7 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
         // If game not found or error loading, redirect to dashboard
         console.warn('Game not found or error loading game data, redirecting to dashboard');
         this.router.navigate(['/dashboard']);
-      }
+      },
     });
   }
 
@@ -399,7 +433,11 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (liveData) => {
           this.updateStatsFromLiveData(liveData);
-          this.updateGameEvents(liveData, this.gamePeriods, this.teamOptions.map(t => ({ id: t.value.toString(), name: t.label })));
+          this.updateGameEvents(
+            liveData,
+            this.gamePeriods,
+            this.teamOptions.map((t) => ({ id: t.value.toString(), name: t.label }))
+          );
           // Refresh spray charts on each poll
           this.refreshGameSprayChart();
           // First successful live-data load ends loading state
@@ -409,16 +447,22 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
         },
         error: (error) => {
           console.error('Failed to poll live game data:', error);
-        }
+        },
       });
   }
 
   /**
    * Update game header information from extra data
    */
-  private updateGameHeaderFromExtra(gameExtra: GameExtra, gameTypes: { id: number; name: string }[], rinks: Rink[], arenas: Arena[], teams: Team[]): void {
+  private updateGameHeaderFromExtra(
+    gameExtra: GameExtra,
+    gameTypes: { id: number; name: string }[],
+    rinks: Rink[],
+    arenas: Arena[],
+    teams: Team[]
+  ): void {
     // Update period
-    const currentPeriod = this.gamePeriods.find(p => p.id === gameExtra.game_period_id);
+    const currentPeriod = this.gamePeriods.find((p) => p.id === gameExtra.game_period_id);
     this.currentPeriodId = gameExtra.game_period_id;
     if (this.isGameOver) {
       this.period.set('Final');
@@ -427,33 +471,35 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
     }
 
     // tournamentCategory - game type by game_type_id
-    const gameType = gameTypes.find(t => t.id === gameExtra.game_type_id);
+    const gameType = gameTypes.find((t) => t.id === gameExtra.game_type_id);
     this.tournamentCategory.set(gameType ? gameType.name : 'Unknown');
 
     // tournamentName - game_type_name from API
     this.tournamentName.set(gameExtra.game_type_name || '');
 
     // tournamentType - team's age_group
-    const homeTeam = teams.find(t => parseInt(t.id) === gameExtra.home_team_id);
+    const homeTeam = teams.find((t) => parseInt(t.id) === gameExtra.home_team_id);
     const ageGroup = homeTeam?.group || '';
     this.tournamentType.set(ageGroup);
 
     // Update date and time
     const gameDate = new Date(gameExtra.date + 'T' + gameExtra.time);
     this.gameStartTime = gameDate;
-    this.tournamentDate.set(gameDate.toLocaleString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: 'numeric',
-      minute: '2-digit',
-      hour12: true
-    }));
+    this.tournamentDate.set(
+      gameDate.toLocaleString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true,
+      })
+    );
 
     // arenaInfo - format: "Arena - Rink"
-    const rink = rinks.find(r => r.id === gameExtra.rink_id);
+    const rink = rinks.find((r) => r.id === gameExtra.rink_id);
     if (rink) {
-      const arena = arenas.find(a => a.id === rink.arena_id);
+      const arena = arenas.find((a) => a.id === rink.arena_id);
       const arenaName = arena?.name || 'Unknown Arena';
       this.arenaInfo.set(`${arenaName} - ${rink.name}`);
     }
@@ -462,11 +508,15 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
   /**
    * Update game events from live data, grouped by period
    */
-  private updateGameEvents(liveData: LiveGameData, periods: GamePeriodResponse[], teams: { id: string; name: string }[]): void {
+  private updateGameEvents(
+    liveData: LiveGameData,
+    periods: GamePeriodResponse[],
+    teams: { id: string; name: string }[]
+  ): void {
     // Group events by period
     const eventsByPeriod = new Map<number, ServiceGameEvent[]>();
-    
-    liveData.events.forEach(event => {
+
+    liveData.events.forEach((event) => {
       if (!eventsByPeriod.has(event.period_id)) {
         eventsByPeriod.set(event.period_id, []);
       }
@@ -475,17 +525,17 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
 
     // Create flat array with period headers and events
     const groupedEvents: GameEvent[] = [];
-    
+
     // Sort periods using backend-provided order (fallback to id)
-    const periodOrderMap = new Map<number, number>(periods.map(p => [p.id, (p.order ?? p.id)]));
+    const periodOrderMap = new Map<number, number>(periods.map((p) => [p.id, p.order ?? p.id]));
     const sortedPeriods = Array.from(eventsByPeriod.keys()).sort((a, b) => {
       const oa = periodOrderMap.get(a) ?? a;
       const ob = periodOrderMap.get(b) ?? b;
       return oa - ob;
     });
-    
-    sortedPeriods.forEach(periodId => {
-      const period = periods.find(p => p.id === periodId);
+
+    sortedPeriods.forEach((periodId) => {
+      const period = periods.find((p) => p.id === periodId);
       const periodEvents = eventsByPeriod.get(periodId) || [];
 
       // Sort events within the period by time (then by id for stability)
@@ -495,7 +545,7 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
         if (ta !== tb) return tb - ta;
         return (a.id || 0) - (b.id || 0);
       });
-      
+
       // Add period header
       groupedEvents.push({
         id: `period-${periodId}`,
@@ -504,23 +554,23 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
         team: '',
         event: '',
         player: '',
-        description: ''
+        description: '',
       });
-      
+
       // Add events for this period
-      sortedEvents.forEach(event => {
-        const team = teams.find(t => parseInt(t.id) === event.team_id);
+      sortedEvents.forEach((event) => {
+        const team = teams.find((t) => parseInt(t.id) === event.team_id);
         const eventTime = this.parseEventTime(event.time);
-        
+
         // Find player name from playerOptions
         let playerName = '';
         if (event.player_id) {
-          const player = this.playerOptions.find(p => p.value === event.player_id);
+          const player = this.playerOptions.find((p) => p.value === event.player_id);
           if (player) {
             playerName = player.label;
           } else {
             // Try goalies if not found in players
-            const goalie = this.goalieOptions.find(g => g.value === event.player_id);
+            const goalie = this.goalieOptions.find((g) => g.value === event.player_id);
             if (goalie) {
               playerName = goalie.label;
             } else {
@@ -529,7 +579,7 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
             }
           }
         }
-        
+
         // Determine shot type category for shot events
         const isShotEvent = event.event_name_id === this.shotOnGoalEventId;
         const shotTypeCategory = isShotEvent ? this.mapShotType(event.shot_type_id) : undefined;
@@ -546,7 +596,7 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
           description: event.note || event.goal_type || '',
           shotType: shotTypeCategory,
           eventNameId: event.event_name_id,
-          rawEventData: event
+          rawEventData: event,
         });
       });
     });
@@ -568,7 +618,7 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
       const mm = parseInt(m[2], 10);
       const ss = parseInt(m[3], 10);
       const ms = m[5] ? parseInt(m[5], 10) : 0;
-      const offsetMs = ((hh * 3600 + mm * 60 + ss) * 1000) + ms;
+      const offsetMs = (hh * 3600 + mm * 60 + ss) * 1000 + ms;
       return new Date(this.gameStartTime.getTime() + offsetMs);
     }
     // Fallback: combine with game date
@@ -611,7 +661,7 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
    */
   private mapShotType(shotTypeId?: number): 'save' | 'goal' | 'missed' | 'blocked' | undefined {
     if (!shotTypeId) return undefined;
-    const st = this.shotTypeOptions.find(s => s.value === shotTypeId);
+    const st = this.shotTypeOptions.find((s) => s.value === shotTypeId);
     if (!st) return undefined;
     const name = st.label.trim().toLowerCase();
     if (name === 'goal') return 'goal';
@@ -631,12 +681,12 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
    */
   private loadGameSprayChart(): void {
     this.isLoadingSprayCharts.set(true);
-    
+
     // Fetch spray chart data with metadata in parallel
     forkJoin({
       sprayChartEvents: this.gameEventService.getGameSprayChart(this.gameId, {}),
       eventNames: this.gameEventNameService.getGameEventNames(),
-      shotTypes: this.gameMetadataService.getShotTypes()
+      shotTypes: this.gameMetadataService.getShotTypes(),
     }).subscribe({
       next: ({ sprayChartEvents, eventNames, shotTypes }) => {
         // Transform all events using the game transformation method
@@ -645,11 +695,11 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
           eventNames,
           shotTypes
         );
-        
+
         // Split data by team
         const homeData: ShotLocationData[] = [];
         const awayData: ShotLocationData[] = [];
-        
+
         sprayChartEvents.forEach((event, index) => {
           if (index < allTransformedData.length) {
             const transformedItem = allTransformedData[index];
@@ -660,7 +710,7 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
             }
           }
         });
-        
+
         this.homeSprayChartData.set(homeData);
         this.awaySprayChartData.set(awayData);
         this.isLoadingSprayCharts.set(false);
@@ -671,7 +721,7 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
         this.homeSprayChartData.set([]);
         this.awaySprayChartData.set([]);
         this.isLoadingSprayCharts.set(false);
-      }
+      },
     });
   }
 
@@ -683,7 +733,7 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
     forkJoin({
       sprayChartEvents: this.gameEventService.getGameSprayChart(this.gameId, {}),
       eventNames: this.gameEventNameService.getGameEventNames(),
-      shotTypes: this.gameMetadataService.getShotTypes()
+      shotTypes: this.gameMetadataService.getShotTypes(),
     }).subscribe({
       next: ({ sprayChartEvents, eventNames, shotTypes }) => {
         // Transform all events using the game transformation method
@@ -692,11 +742,11 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
           eventNames,
           shotTypes
         );
-        
+
         // Split data by team
         const homeData: ShotLocationData[] = [];
         const awayData: ShotLocationData[] = [];
-        
+
         sprayChartEvents.forEach((event, index) => {
           if (index < allTransformedData.length) {
             const transformedItem = allTransformedData[index];
@@ -707,13 +757,13 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
             }
           }
         });
-        
+
         this.homeSprayChartData.set(homeData);
         this.awaySprayChartData.set(awayData);
       },
       error: (error) => {
         console.error('Failed to refresh game spray chart:', error);
-      }
+      },
     });
   }
 
@@ -725,32 +775,32 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
       next: (roster) => {
         // Set players from roster
         this.playerOptions = [
-          ...roster.home_players.map(player => ({
+          ...roster.home_players.map((player) => ({
             value: player.id,
             label: `${player.first_name} ${player.last_name}`,
-            teamId: this.homeTeamId
+            teamId: this.homeTeamId,
           })),
-          ...roster.away_players.map(player => ({
+          ...roster.away_players.map((player) => ({
             value: player.id,
             label: `${player.first_name} ${player.last_name}`,
-            teamId: this.awayTeamId
-          }))
+            teamId: this.awayTeamId,
+          })),
         ];
 
         // Set goalies from roster
         this.goalieOptions = [
-          ...roster.home_goalies.map(goalie => ({
+          ...roster.home_goalies.map((goalie) => ({
             value: goalie.id,
             label: `${goalie.first_name} ${goalie.last_name}`,
-            teamId: this.homeTeamId
+            teamId: this.homeTeamId,
           })),
-          ...roster.away_goalies.map(goalie => ({
+          ...roster.away_goalies.map((goalie) => ({
             value: goalie.id,
             label: `${goalie.first_name} ${goalie.last_name}`,
-            teamId: this.awayTeamId
-          }))
+            teamId: this.awayTeamId,
+          })),
         ];
-        
+
         // Start polling for live data after roster is loaded
         this.startLiveDataPolling();
       },
@@ -758,7 +808,7 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
         console.error('Failed to load game roster:', error);
         // Start polling even if roster failed to load
         this.startLiveDataPolling();
-      }
+      },
     });
   }
 
@@ -767,13 +817,15 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
    */
   private updateStatsFromLiveData(liveData: LiveGameData): void {
     // Update goals
-    this.homeTeam.update(team => ({ ...team, score: liveData.home_goals }));
-    this.awayTeam.update(team => ({ ...team, score: liveData.away_goals }));
+    this.homeTeam.update((team) => ({ ...team, score: liveData.home_goals }));
+    this.awayTeam.update((team) => ({ ...team, score: liveData.away_goals }));
 
     // Calculate faceoff win percentages
     const totalFaceoffs = liveData.home_faceoff_win + liveData.away_faceoff_win;
-    const homeFaceoffPct = totalFaceoffs > 0 ? Math.round((liveData.home_faceoff_win / totalFaceoffs) * 100) : 0;
-    const awayFaceoffPct = totalFaceoffs > 0 ? Math.round((liveData.away_faceoff_win / totalFaceoffs) * 100) : 0;
+    const homeFaceoffPct =
+      totalFaceoffs > 0 ? Math.round((liveData.home_faceoff_win / totalFaceoffs) * 100) : 0;
+    const awayFaceoffPct =
+      totalFaceoffs > 0 ? Math.round((liveData.away_faceoff_win / totalFaceoffs) * 100) : 0;
 
     // Capture row IDs for patching
     this.homeDefensiveZoneExitId = liveData.home_defensive_zone_exit?.id;
@@ -789,25 +841,25 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
         skate: liveData.home_defensive_zone_exit.skate_out,
         soWin: liveData.home_defensive_zone_exit.so_win,
         soLose: liveData.home_defensive_zone_exit.so_lose,
-        pass: liveData.home_defensive_zone_exit.passes
+        pass: liveData.home_defensive_zone_exit.passes,
       },
       offensiveZoneEntry: {
         pass: liveData.home_offensive_zone_entry.pass_in,
         dump: liveData.home_offensive_zone_entry.dump_win,
         carry: liveData.home_offensive_zone_entry.dump_lose,
-        skated: liveData.home_offensive_zone_entry.skate_in
+        skated: liveData.home_offensive_zone_entry.skate_in,
       },
       shots: {
         shotsOnGoal: liveData.home_shots.shots_on_goal,
         missedNet: liveData.home_shots.missed_net,
         scoringChances: liveData.home_shots.scoring_chance,
-        blocked: liveData.home_shots.blocked
+        blocked: liveData.home_shots.blocked,
       },
       turnovers: {
         offZone: liveData.home_turnovers.off_zone,
         neutralZone: liveData.home_turnovers.neutral_zone,
-        defZone: liveData.home_turnovers.def_zone
-      }
+        defZone: liveData.home_turnovers.def_zone,
+      },
     });
 
     // Update away stats
@@ -818,32 +870,31 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
         skate: liveData.away_defensive_zone_exit.skate_out,
         soWin: liveData.away_defensive_zone_exit.so_win,
         soLose: liveData.away_defensive_zone_exit.so_lose,
-        pass: liveData.away_defensive_zone_exit.passes
+        pass: liveData.away_defensive_zone_exit.passes,
       },
       offensiveZoneEntry: {
         pass: liveData.away_offensive_zone_entry.pass_in,
         dump: liveData.away_offensive_zone_entry.dump_win,
         carry: liveData.away_offensive_zone_entry.dump_lose,
-        skated: liveData.away_offensive_zone_entry.skate_in
+        skated: liveData.away_offensive_zone_entry.skate_in,
       },
       shots: {
         shotsOnGoal: liveData.away_shots.shots_on_goal,
         missedNet: liveData.away_shots.missed_net,
         scoringChances: liveData.away_shots.scoring_chance,
-        blocked: liveData.away_shots.blocked
+        blocked: liveData.away_shots.blocked,
       },
       turnovers: {
         offZone: liveData.away_turnovers.off_zone,
         neutralZone: liveData.away_turnovers.neutral_zone,
-        defZone: liveData.away_turnovers.def_zone
-      }
+        defZone: liveData.away_turnovers.def_zone,
+      },
     });
 
     // Update shots on goal for teams
-    this.homeTeam.update(team => ({ ...team, sog: liveData.home_shots.shots_on_goal }));
-    this.awayTeam.update(team => ({ ...team, sog: liveData.away_shots.shots_on_goal }));
+    this.homeTeam.update((team) => ({ ...team, sog: liveData.home_shots.shots_on_goal }));
+    this.awayTeam.update((team) => ({ ...team, sog: liveData.away_shots.shots_on_goal }));
   }
-
 
   // Game events (loaded from API)
   gameEvents = signal<GameEvent[]>([]);
@@ -855,7 +906,7 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
       skate: 'skate_out',
       soWin: 'so_win',
       soLose: 'so_lose',
-      pass: 'passes'
+      pass: 'passes',
     } as const;
     return mapping[type];
   }
@@ -865,7 +916,7 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
       pass: 'pass_in',
       dump: 'dump_win',
       carry: 'dump_lose',
-      skated: 'skate_in'
+      skated: 'skate_in',
     } as const;
     return mapping[type];
   }
@@ -873,7 +924,7 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
   private refreshLiveDataOnce(): void {
     this.liveGameService.getLiveGameData(this.gameId).subscribe({
       next: (liveData) => this.updateStatsFromLiveData(liveData),
-      error: (e) => console.error('Failed to refresh live data:', e)
+      error: (e) => console.error('Failed to refresh live data:', e),
     });
   }
 
@@ -884,24 +935,38 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
     this.liveGameService.getLiveGameData(this.gameId).subscribe({
       next: (liveData) => {
         this.updateStatsFromLiveData(liveData);
-        this.updateGameEvents(liveData, this.gamePeriods, this.teamOptions.map(t => ({ id: t.value.toString(), name: t.label })));
+        this.updateGameEvents(
+          liveData,
+          this.gamePeriods,
+          this.teamOptions.map((t) => ({ id: t.value.toString(), name: t.label }))
+        );
         // Also refresh spray charts when data is refreshed
         this.refreshGameSprayChart();
       },
-      error: (e) => console.error('Failed to refresh live data:', e)
+      error: (e) => console.error('Failed to refresh live data:', e),
     });
   }
 
   // Defensive Zone Exit increment/decrement methods (with backend PATCH)
-  incrementDefensiveZoneExit(team: 'away' | 'home', type: 'long' | 'skate' | 'soWin' | 'soLose' | 'pass'): void {
+  incrementDefensiveZoneExit(
+    team: 'away' | 'home',
+    type: 'long' | 'skate' | 'soWin' | 'soLose' | 'pass'
+  ): void {
     this.updateDefensiveZoneExit(team, type, +1);
   }
 
-  decrementDefensiveZoneExit(team: 'away' | 'home', type: 'long' | 'skate' | 'soWin' | 'soLose' | 'pass'): void {
+  decrementDefensiveZoneExit(
+    team: 'away' | 'home',
+    type: 'long' | 'skate' | 'soWin' | 'soLose' | 'pass'
+  ): void {
     this.updateDefensiveZoneExit(team, type, -1);
   }
 
-  private updateDefensiveZoneExit(team: 'away' | 'home', type: 'long' | 'skate' | 'soWin' | 'soLose' | 'pass', delta: 1 | -1): void {
+  private updateDefensiveZoneExit(
+    team: 'away' | 'home',
+    type: 'long' | 'skate' | 'soWin' | 'soLose' | 'pass',
+    delta: 1 | -1
+  ): void {
     const field = this.mapDefensiveField(type);
     const isAway = team === 'away';
     const stats = isAway ? this.awayStats() : this.homeStats();
@@ -912,12 +977,12 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
     if (isAway) {
       this.awayStats.set({
         ...stats,
-        defensiveZoneExit: { ...stats.defensiveZoneExit, [type]: next }
+        defensiveZoneExit: { ...stats.defensiveZoneExit, [type]: next },
       });
     } else {
       this.homeStats.set({
         ...stats,
-        defensiveZoneExit: { ...stats.defensiveZoneExit, [type]: next }
+        defensiveZoneExit: { ...stats.defensiveZoneExit, [type]: next },
       });
     }
 
@@ -927,36 +992,50 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.liveGameService.updateDefensiveZoneExit(rowId!, { [field]: next } as Partial<Pick<DefensiveZoneExit, 'icing' | 'skate_out' | 'so_win' | 'so_lose' | 'passes'>>).subscribe({
-      next: () => this.refreshLiveDataOnce(),
-      error: (e) => {
-        console.error('Failed to update defensive zone exit:', e);
-        // Revert UI on error
-        if (isAway) {
-          this.awayStats.update(s => ({
-            ...s,
-            defensiveZoneExit: { ...s.defensiveZoneExit, [type]: current }
-          }));
-        } else {
-          this.homeStats.update(s => ({
-            ...s,
-            defensiveZoneExit: { ...s.defensiveZoneExit, [type]: current }
-          }));
-        }
-      }
-    });
+    this.liveGameService
+      .updateDefensiveZoneExit(rowId!, { [field]: next } as Partial<
+        Pick<DefensiveZoneExit, 'icing' | 'skate_out' | 'so_win' | 'so_lose' | 'passes'>
+      >)
+      .subscribe({
+        next: () => this.refreshLiveDataOnce(),
+        error: (e) => {
+          console.error('Failed to update defensive zone exit:', e);
+          // Revert UI on error
+          if (isAway) {
+            this.awayStats.update((s) => ({
+              ...s,
+              defensiveZoneExit: { ...s.defensiveZoneExit, [type]: current },
+            }));
+          } else {
+            this.homeStats.update((s) => ({
+              ...s,
+              defensiveZoneExit: { ...s.defensiveZoneExit, [type]: current },
+            }));
+          }
+        },
+      });
   }
 
   // Offensive Zone Entry increment/decrement methods (with backend PATCH)
-  incrementOffensiveZoneEntry(team: 'away' | 'home', type: 'pass' | 'dump' | 'carry' | 'skated'): void {
+  incrementOffensiveZoneEntry(
+    team: 'away' | 'home',
+    type: 'pass' | 'dump' | 'carry' | 'skated'
+  ): void {
     this.updateOffensiveZoneEntry(team, type, +1);
   }
 
-  decrementOffensiveZoneEntry(team: 'away' | 'home', type: 'pass' | 'dump' | 'carry' | 'skated'): void {
+  decrementOffensiveZoneEntry(
+    team: 'away' | 'home',
+    type: 'pass' | 'dump' | 'carry' | 'skated'
+  ): void {
     this.updateOffensiveZoneEntry(team, type, -1);
   }
 
-  private updateOffensiveZoneEntry(team: 'away' | 'home', type: 'pass' | 'dump' | 'carry' | 'skated', delta: 1 | -1): void {
+  private updateOffensiveZoneEntry(
+    team: 'away' | 'home',
+    type: 'pass' | 'dump' | 'carry' | 'skated',
+    delta: 1 | -1
+  ): void {
     const field = this.mapOffensiveField(type);
     const isAway = team === 'away';
     const stats = isAway ? this.awayStats() : this.homeStats();
@@ -967,12 +1046,12 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
     if (isAway) {
       this.awayStats.set({
         ...stats,
-        offensiveZoneEntry: { ...stats.offensiveZoneEntry, [type]: next }
+        offensiveZoneEntry: { ...stats.offensiveZoneEntry, [type]: next },
       });
     } else {
       this.homeStats.set({
         ...stats,
-        offensiveZoneEntry: { ...stats.offensiveZoneEntry, [type]: next }
+        offensiveZoneEntry: { ...stats.offensiveZoneEntry, [type]: next },
       });
     }
 
@@ -982,24 +1061,28 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.liveGameService.updateOffensiveZoneEntry(rowId!, { [field]: next } as Partial<Pick<OffensiveZoneEntry, 'pass_in' | 'dump_win' | 'dump_lose' | 'skate_in'>>).subscribe({
-      next: () => this.refreshLiveDataOnce(),
-      error: (e) => {
-        console.error('Failed to update offensive zone entry:', e);
-        // Revert UI on error
-        if (isAway) {
-          this.awayStats.update(s => ({
-            ...s,
-            offensiveZoneEntry: { ...s.offensiveZoneEntry, [type]: current }
-          }));
-        } else {
-          this.homeStats.update(s => ({
-            ...s,
-            offensiveZoneEntry: { ...s.offensiveZoneEntry, [type]: current }
-          }));
-        }
-      }
-    });
+    this.liveGameService
+      .updateOffensiveZoneEntry(rowId!, { [field]: next } as Partial<
+        Pick<OffensiveZoneEntry, 'pass_in' | 'dump_win' | 'dump_lose' | 'skate_in'>
+      >)
+      .subscribe({
+        next: () => this.refreshLiveDataOnce(),
+        error: (e) => {
+          console.error('Failed to update offensive zone entry:', e);
+          // Revert UI on error
+          if (isAway) {
+            this.awayStats.update((s) => ({
+              ...s,
+              offensiveZoneEntry: { ...s.offensiveZoneEntry, [type]: current },
+            }));
+          } else {
+            this.homeStats.update((s) => ({
+              ...s,
+              offensiveZoneEntry: { ...s.offensiveZoneEntry, [type]: current },
+            }));
+          }
+        },
+      });
   }
 
   // Turnover increment/decrement methods
@@ -1010,8 +1093,8 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
         ...currentStats,
         turnovers: {
           ...currentStats.turnovers,
-          [zone]: currentStats.turnovers[zone] + 1
-        }
+          [zone]: currentStats.turnovers[zone] + 1,
+        },
       });
     } else {
       const currentStats = this.homeStats();
@@ -1019,8 +1102,8 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
         ...currentStats,
         turnovers: {
           ...currentStats.turnovers,
-          [zone]: currentStats.turnovers[zone] + 1
-        }
+          [zone]: currentStats.turnovers[zone] + 1,
+        },
       });
     }
   }
@@ -1033,8 +1116,8 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
           ...currentStats,
           turnovers: {
             ...currentStats.turnovers,
-            [zone]: currentStats.turnovers[zone] - 1
-          }
+            [zone]: currentStats.turnovers[zone] - 1,
+          },
         });
       }
     } else {
@@ -1044,8 +1127,8 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
           ...currentStats,
           turnovers: {
             ...currentStats.turnovers,
-            [zone]: currentStats.turnovers[zone] - 1
-          }
+            [zone]: currentStats.turnovers[zone] - 1,
+          },
         });
       }
     }
@@ -1073,11 +1156,11 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
         homeTeamId: this.homeTeamId,
         awayTeamId: this.awayTeamId,
         homeStartGoalieId: this.homeStartGoalieId,
-        awayStartGoalieId: this.awayStartGoalieId
-      }
+        awayStartGoalieId: this.awayStartGoalieId,
+      },
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         this.refreshLiveData();
       }
@@ -1098,11 +1181,11 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
         turnoverEventId: this.turnoverEventId,
         periodOptions: this.periodOptions,
         teamOptions: this.teamOptions,
-        playerOptions: this.playerOptions
-      }
+        playerOptions: this.playerOptions,
+      },
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         this.refreshLiveData();
       }
@@ -1123,11 +1206,11 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
         faceoffEventId: this.faceoffEventId,
         periodOptions: this.periodOptions,
         teamOptions: this.teamOptions,
-        playerOptions: this.playerOptions
-      }
+        playerOptions: this.playerOptions,
+      },
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         this.refreshLiveData();
       }
@@ -1152,11 +1235,11 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
         homeTeamId: this.homeTeamId,
         awayTeamId: this.awayTeamId,
         homeStartGoalieId: this.homeStartGoalieId,
-        awayStartGoalieId: this.awayStartGoalieId
-      }
+        awayStartGoalieId: this.awayStartGoalieId,
+      },
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         this.refreshLiveData();
       }
@@ -1167,9 +1250,13 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
    * Handle period change from dropdown
    */
   onPeriodChange(periodId: number): void {
-    if (this.isGameOver) { return; }
-    const selectedPeriod = this.gamePeriods.find(p => p.id === periodId);
-    if (!selectedPeriod) { return; }
+    if (this.isGameOver) {
+      return;
+    }
+    const selectedPeriod = this.gamePeriods.find((p) => p.id === periodId);
+    if (!selectedPeriod) {
+      return;
+    }
 
     const prevPeriodId = this.currentPeriodId;
     const prevPeriodName = this.period();
@@ -1179,7 +1266,7 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
     this.period.set(selectedPeriod.name);
 
     // Check if selected period is the last one (Final)
-    const maxOrder = Math.max(...this.gamePeriods.map(p => p.order ?? p.id));
+    const maxOrder = Math.max(...this.gamePeriods.map((p) => p.order ?? p.id));
     const selectedOrder = selectedPeriod.order ?? selectedPeriod.id;
     const isFinalPeriod = selectedOrder === maxOrder;
 
@@ -1204,7 +1291,7 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
         this.currentPeriodId = prevPeriodId;
         this.period.set(prevPeriodName);
         alert('Failed to update period. Please try again.');
-      }
+      },
     });
   }
 
@@ -1222,11 +1309,11 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
         penaltyEventId: this.penaltyEventId,
         periodOptions: this.periodOptions,
         teamOptions: this.teamOptions,
-        playerOptions: this.playerOptions
-      }
+        playerOptions: this.playerOptions,
+      },
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         this.refreshLiveData();
       }
@@ -1261,11 +1348,11 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
 
   private openShotEditModal(event: GameEvent): void {
     const rawEvent = event.rawEventData!;
-    
+
     // Convert time back to mm:ss format
     const eventTime = this.parseEventTime(rawEvent.time);
     const timeString = this.formatElapsedTime(eventTime);
-    
+
     const dialogRef = this.dialog.open(ShotFormModalComponent, {
       width: '800px',
       panelClass: 'shot-form-modal-dialog',
@@ -1302,12 +1389,12 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
           iceLeftOffset: rawEvent.ice_left_offset,
           netTopOffset: rawEvent.net_top_offset,
           netLeftOffset: rawEvent.net_left_offset,
-          goalType: rawEvent.goal_type
-        }
-      }
+          goalType: rawEvent.goal_type,
+        },
+      },
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         this.refreshLiveData();
       }
@@ -1316,11 +1403,11 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
 
   private openTurnoverEditModal(event: GameEvent): void {
     const rawEvent = event.rawEventData!;
-    
+
     // Convert time back to mm:ss format
     const eventTime = this.parseEventTime(rawEvent.time);
     const timeString = this.formatElapsedTime(eventTime);
-    
+
     const dialogRef = this.dialog.open(TurnoverFormModalComponent, {
       width: '800px',
       panelClass: 'turnover-form-modal-dialog',
@@ -1343,12 +1430,12 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
           zone: rawEvent.zone,
           youtubeLink: rawEvent.youtube_link,
           iceTopOffset: rawEvent.ice_top_offset,
-          iceLeftOffset: rawEvent.ice_left_offset
-        }
-      }
+          iceLeftOffset: rawEvent.ice_left_offset,
+        },
+      },
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         this.refreshLiveData();
       }
@@ -1357,11 +1444,11 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
 
   private openFaceoffEditModal(event: GameEvent): void {
     const rawEvent = event.rawEventData!;
-    
+
     // Convert time back to mm:ss format
     const eventTime = this.parseEventTime(rawEvent.time);
     const timeString = this.formatElapsedTime(eventTime);
-    
+
     const dialogRef = this.dialog.open(FaceoffFormModalComponent, {
       width: '800px',
       panelClass: 'faceoff-form-modal-dialog',
@@ -1385,12 +1472,12 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
           zone: rawEvent.zone,
           youtubeLink: rawEvent.youtube_link,
           iceTopOffset: rawEvent.ice_top_offset,
-          iceLeftOffset: rawEvent.ice_left_offset
-        }
-      }
+          iceLeftOffset: rawEvent.ice_left_offset,
+        },
+      },
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         this.refreshLiveData();
       }
@@ -1399,11 +1486,11 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
 
   private openGoalieChangeEditModal(event: GameEvent): void {
     const rawEvent = event.rawEventData!;
-    
+
     // Convert time back to mm:ss format
     const eventTime = this.parseEventTime(rawEvent.time);
     const timeString = this.formatElapsedTime(eventTime);
-    
+
     const dialogRef = this.dialog.open(GoalieChangeFormModalComponent, {
       width: '800px',
       panelClass: 'goalie-change-form-modal-dialog',
@@ -1427,12 +1514,12 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
           time: timeString,
           teamId: rawEvent.team_id,
           goalieId: rawEvent.goalie_id,
-          note: rawEvent.note
-        }
-      }
+          note: rawEvent.note,
+        },
+      },
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         this.refreshLiveData();
       }
@@ -1441,11 +1528,11 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
 
   private openPenaltyEditModal(event: GameEvent): void {
     const rawEvent = event.rawEventData!;
-    
+
     // Convert time back to mm:ss format
     const eventTime = this.parseEventTime(rawEvent.time);
     const timeString = this.formatElapsedTime(eventTime);
-    
+
     // Convert time_length to mm:ss for edit modal input. Supports ISO 8601 duration (PT..), mm:ss, HH:mm:ss[.SSS][Z], or full ISO.
     let penaltyTimeString = '2:00'; // default
     if (rawEvent.time_length) {
@@ -1484,7 +1571,7 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
         }
       }
     }
-    
+
     const dialogRef = this.dialog.open(PenaltyFormModalComponent, {
       width: '800px',
       panelClass: 'penalty-form-modal-dialog',
@@ -1508,12 +1595,12 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
           zone: rawEvent.zone,
           youtubeLink: rawEvent.youtube_link,
           iceTopOffset: rawEvent.ice_top_offset,
-          iceLeftOffset: rawEvent.ice_left_offset
-        }
-      }
+          iceLeftOffset: rawEvent.ice_left_offset,
+        },
+      },
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         this.refreshLiveData();
       }
@@ -1534,14 +1621,14 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
       description: event.description || '',
       youtube_link: link,
       added_by: event.team || '-',
-      date: raw?.date || ''
+      date: raw?.date || '',
     };
 
     this.dialog.open(VideoViewModalComponent, {
       width: '900px',
       maxWidth: '95vw',
       panelClass: 'video-view-modal-dialog',
-      data: { video: modalVideo }
+      data: { video: modalVideo },
     });
   }
 
@@ -1589,7 +1676,7 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
         error: (error) => {
           console.error('Failed to delete event:', error);
           alert('Failed to delete event. Please try again.');
-        }
+        },
       });
     }
   }

@@ -15,7 +15,7 @@ export interface VideoViewModalData {
   imports: [CommonModule, MatDialogModule, MatButtonModule, MatIconModule],
   templateUrl: './video-view-modal.html',
   styleUrl: './video-view-modal.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class VideoViewModalComponent implements OnInit {
   private dialogRef = inject<MatDialogRef<VideoViewModalComponent>>(MatDialogRef);
@@ -67,7 +67,7 @@ export class VideoViewModalComponent implements OnInit {
     if (!link) {
       return { id: null, start: 0 };
     }
-    
+
     try {
       const u = new URL(link);
       let id: string | null = null;

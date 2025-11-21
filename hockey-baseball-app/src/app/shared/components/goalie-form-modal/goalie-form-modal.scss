@@ -9,35 +9,35 @@
   transform: translateZ(0);
   will-change: transform;
   backface-visibility: hidden;
-  
+
   ::ng-deep .mat-mdc-form-field {
     font-size: 14px !important;
-    
+
     .mat-mdc-input-element {
       font-size: 14px !important;
     }
-    
+
     .mdc-text-field__input {
       font-size: 14px !important;
     }
-    
+
     .mdc-floating-label {
       font-size: 12px !important;
     }
-    
+
     .mat-mdc-select-value {
       font-size: 14px !important;
     }
-    
+
     .mat-mdc-select-value-text {
       font-size: 14px !important;
     }
   }
-  
+
   ::ng-deep mat-error {
     font-size: 12px !important;
   }
-  
+
   .modal-title {
     display: flex;
     align-items: center;
@@ -48,13 +48,13 @@
     margin: 0;
     padding: 16px 24px;
     border-bottom: 1px solid #e5e7eb;
-    
+
     .title-icon {
       color: var(--color-primary);
       font-size: 1.375rem;
     }
   }
-  
+
   .modal-content {
     padding: 24px;
     max-height: 600px;
@@ -63,7 +63,7 @@
     -webkit-overflow-scrolling: touch;
     will-change: scroll-position;
     backface-visibility: hidden;
-    
+
     .loading-container {
       display: flex;
       justify-content: center;
@@ -72,18 +72,18 @@
       color: var(--color-secondary);
       font-size: 14px;
     }
-    
+
     .goalie-form {
       .form-section {
         margin-bottom: 0px;
-        
+
         &:last-child {
           margin-bottom: 0;
         }
-        
+
         .section-header {
           margin-bottom: 8px;
-          
+
           .section-title {
             color: var(--color-dark);
             font-size: 1rem;
@@ -92,7 +92,7 @@
             padding: 0;
           }
         }
-        
+
         .section-divider {
           margin-bottom: 16px;
           border-top-color: var(--color-primary) !important;
@@ -102,24 +102,24 @@
           backface-visibility: hidden;
           -webkit-backface-visibility: hidden;
         }
-        
+
         .form-row {
           display: flex;
           column-gap: 16px;
           margin-bottom: 8px;
           flex-wrap: wrap;
-          
+
           .form-field {
             flex: 1;
             min-width: 200px;
-            
+
             &.full-width {
               flex: 2;
               min-width: 300px;
             }
           }
         }
-        
+
         // Use shared radio button styles
         @include radio-button-selection.shoots-selection-container;
         @include radio-button-selection.position-selection-container;
@@ -132,7 +132,7 @@
             flex-wrap: nowrap;
           }
         }
-        
+
         .position-selection-container {
           .position-buttons {
             display: flex;
@@ -143,40 +143,40 @@
       }
     }
   }
-  
+
   .modal-actions {
     padding: 16px 24px;
     border-top: 1px solid #e5e7eb;
     display: flex;
     justify-content: flex-end;
     gap: 12px;
-    
+
     .cancel-btn {
       color: var(--color-secondary);
       border-color: var(--color-secondary);
-      
+
       &:hover {
         background-color: rgba(119, 143, 156, 0.1);
       }
     }
-    
+
     .submit-btn {
       background-color: var(--color-primary);
       color: white;
       display: flex;
       align-items: center;
       gap: 8px;
-      
+
       mat-icon {
         font-size: 16px;
         width: 16px;
         height: 16px;
       }
-      
+
       &:hover {
         background-color: #b8122a;
       }
-      
+
       &:disabled {
         background-color: var(--color-secondary);
         color: white;
@@ -190,69 +190,71 @@
   .cdk-overlay-backdrop {
     background-color: rgba(0, 0, 0, 0.5) !important;
   }
-  
+
   .mat-mdc-dialog-container {
     padding: 0 !important;
     background-color: white !important;
     border-radius: 12px !important;
     overflow: hidden !important;
-    
+
     .mdc-dialog__surface {
       background-color: white !important;
       border-radius: 12px !important;
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15), 0 4px 10px rgba(0, 0, 0, 0.1);
+      box-shadow:
+        0 8px 25px rgba(0, 0, 0, 0.15),
+        0 4px 10px rgba(0, 0, 0, 0.1);
       overflow: hidden !important;
     }
   }
-  
+
   .mat-mdc-form-field {
     font-size: 14px !important;
-    
+
     .mat-mdc-input-element {
       font-size: 14px !important;
     }
-    
+
     .mdc-floating-label {
       font-size: 12px !important;
     }
-    
+
     .mat-mdc-form-field-subscript-wrapper {
       font-size: 12px !important;
     }
-    
+
     .mat-mdc-select-value {
       font-size: 14px !important;
     }
-    
+
     .mat-mdc-select-trigger {
       font-size: 14px !important;
     }
-    
+
     .mat-mdc-select-value-text {
       font-size: 14px !important;
     }
   }
-  
+
   mat-error {
     font-size: 12px !important;
   }
-  
+
   .mdc-text-field__input {
     font-size: 14px !important;
   }
-  
+
   .mdc-floating-label--float-above {
     font-size: 12px !important;
   }
-  
+
   .mdc-text-field--outlined .mdc-floating-label {
     font-size: 12px !important;
   }
-  
+
   .mat-mdc-select-value {
     font-size: 14px !important;
   }
-  
+
   .mat-mdc-option .mdc-list-item__primary-text {
     font-size: 14px !important;
   }
@@ -261,11 +263,11 @@
 ::ng-deep .cdk-overlay-container .mat-mdc-select-panel {
   .mat-mdc-option {
     font-size: 14px !important;
-    
+
     .mdc-list-item__primary-text {
       font-size: 14px !important;
     }
-    
+
     span {
       font-size: 14px !important;
     }
@@ -280,7 +282,7 @@
     border-radius: 12px !important;
     overflow: hidden !important;
   }
-  
+
   .mat-mdc-dialog-container {
     border-radius: 12px !important;
     overflow: hidden !important;
@@ -290,22 +292,22 @@
 @media (max-width: 768px) {
   .goalie-form-modal {
     max-width: 95vw;
-    
+
     .modal-content {
       padding: 16px;
       max-height: 70vh;
-      
+
       .goalie-form {
         .form-section {
           margin-bottom: 12px;
-          
+
           .form-row {
             flex-direction: column;
             gap: 12px;
-            
+
             .form-field {
               min-width: unset;
-              
+
               &.full-width {
                 min-width: unset;
               }
@@ -314,11 +316,11 @@
         }
       }
     }
-    
+
     .modal-actions {
       padding: 12px 16px;
       flex-direction: column-reverse;
-      
+
       button {
         width: 100%;
         margin: 4px 0;

@@ -2,40 +2,39 @@
   padding: 24px;
   max-width: 1200px;
   margin: 0 auto;
-  
+
   .back-btn {
     display: flex;
     align-items: center;
     gap: 8px;
     color: var(--color-secondary);
     border-color: var(--color-secondary);
-    
+
     &:hover {
       background-color: rgba(119, 143, 156, 0.1);
     }
   }
-  
+
   .loading-container {
     text-align: center;
     padding: 48px;
     color: var(--color-secondary);
     font-size: 1.125rem;
   }
-  
+
   .error-container {
     text-align: center;
     padding: 48px;
     color: var(--color-dark);
-    
+
     p {
       font-size: 1.125rem;
       margin-bottom: 24px;
       color: var(--color-secondary);
     }
   }
-  
+
   .profile-content {
-    
     .profile-header {
       display: flex;
       justify-content: space-between;
@@ -45,21 +44,21 @@
       background-color: white;
       border-radius: 12px;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-      
+
       .player-info {
         flex: 1;
-        
+
         .player-name {
           font-size: 2rem;
           font-weight: 600;
           color: var(--color-dark);
           margin: 0 0 16px 0;
         }
-        
+
         .player-details {
           display: flex;
           gap: 16px;
-          
+
           .team {
             background-color: var(--color-primary);
             color: white;
@@ -68,7 +67,7 @@
             font-weight: 500;
             font-size: 0.75rem;
           }
-          
+
           .position {
             background-color: var(--color-secondary);
             color: white;
@@ -77,7 +76,7 @@
             font-weight: 500;
             font-size: 0.75rem;
           }
-          
+
           .jersey {
             background-color: var(--color-dark);
             color: white;
@@ -88,7 +87,7 @@
           }
         }
       }
-      
+
       .player-avatar {
         .avatar-icon {
           font-size: 4.5rem;
@@ -101,19 +100,19 @@
         }
       }
     }
-    
+
     .info-card {
       margin-bottom: 32px;
       border-radius: 12px;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-      
+
       &:last-child {
         margin-bottom: 0;
       }
-      
+
       mat-card-header {
         padding-bottom: 8px;
-        
+
         mat-card-title {
           display: flex;
           align-items: center;
@@ -121,7 +120,7 @@
           color: var(--color-dark);
           font-size: 1.125rem;
           font-weight: 500;
-          
+
           mat-icon {
             color: var(--color-primary);
             font-size: 1.125rem;
@@ -130,10 +129,10 @@
           }
         }
       }
-      
+
       mat-card-content {
         padding-top: 16px;
-        
+
         .empty-state {
           display: flex;
           flex-direction: column;
@@ -141,7 +140,7 @@
           justify-content: center;
           padding: 48px 24px;
           color: var(--color-secondary);
-          
+
           .empty-icon {
             font-size: 4rem;
             width: 4rem;
@@ -150,7 +149,7 @@
             opacity: 0.5;
             margin-bottom: 16px;
           }
-          
+
           .empty-message {
             font-size: 1rem;
             text-align: center;
@@ -158,12 +157,12 @@
             max-width: 400px;
           }
         }
-        
+
         .info-grid {
           display: flex;
           flex-wrap: nowrap;
           gap: 24px;
-          
+
           .info-item {
             display: flex;
             flex-direction: column;
@@ -171,11 +170,11 @@
             min-width: 0;
             flex: 1;
             text-align: center;
-            
+
             &.full-width {
               flex-basis: 100%;
             }
-            
+
             .label {
               font-weight: 500;
               color: var(--color-secondary);
@@ -183,7 +182,7 @@
               text-transform: uppercase;
               letter-spacing: 0.5px;
             }
-            
+
             .value {
               font-weight: 500;
               color: var(--color-dark);
@@ -191,38 +190,38 @@
             }
           }
         }
-        
+
         .stats-grid {
           display: grid;
           grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
           gap: 16px;
           margin-bottom: 16px;
-          
+
           &:last-child {
             margin-bottom: 0;
           }
-          
+
           .stat-item {
             text-align: center;
             padding: 12px 8px;
-            
+
             &.highlight {
               background-color: #f9fafb;
               border-radius: 12px;
               border: 2px solid var(--color-primary);
-              
+
               .stat-value {
                 color: var(--color-primary);
                 font-size: 1.25rem;
                 font-weight: 600;
               }
-              
+
               .stat-label {
                 color: var(--color-primary);
                 font-weight: 500;
               }
             }
-            
+
             .stat-value {
               display: block;
               font-size: 1.25rem;
@@ -230,7 +229,7 @@
               color: var(--color-dark);
               margin-bottom: 4px;
             }
-            
+
             .stat-label {
               display: block;
               font-size: 0.625rem;
@@ -241,7 +240,7 @@
             }
           }
         }
-        
+
         .rink-info {
           .info-item {
             display: flex;
@@ -249,17 +248,17 @@
             align-items: center;
             padding: 16px 0;
             border-bottom: 1px solid #f3f4f6;
-            
+
             &:last-child {
               border-bottom: none;
             }
-            
+
             &.full-width {
               flex-direction: column;
               align-items: flex-start;
               gap: 8px;
             }
-            
+
             .label {
               font-weight: 500;
               color: var(--color-secondary);
@@ -268,20 +267,20 @@
               text-transform: uppercase;
               letter-spacing: 0.5px;
             }
-            
+
             .value {
               font-weight: 600;
               color: var(--color-dark);
               text-align: right;
               font-size: 1rem;
             }
-            
+
             &.full-width .value {
               text-align: left;
             }
           }
         }
-        
+
         mat-divider {
           margin: 16px 0;
           border-color: var(--color-primary) !important;
@@ -289,40 +288,42 @@
         }
       }
     }
-    
+
     // Stats Table Card Specific Styles (matching goalies table)
     .stats-table-card {
       .table-container {
         background-color: white;
         border-radius: 0.5rem;
-        box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+        box-shadow:
+          0 1px 3px 0 rgb(0 0 0 / 0.1),
+          0 1px 2px -1px rgb(0 0 0 / 0.1);
         overflow-x: auto;
         overflow-y: hidden;
         margin-top: 8px;
-        
+
         &::-webkit-scrollbar {
           height: 8px;
         }
-        
+
         &::-webkit-scrollbar-track {
           background-color: #f1f5f9;
           border-radius: 4px;
         }
-        
+
         &::-webkit-scrollbar-thumb {
           background-color: #cbd5e1;
           border-radius: 4px;
-          
+
           &:hover {
             background-color: #94a3b8;
           }
         }
-        
+
         .stats-table {
           width: 100%;
           min-width: 800px;
           table-layout: fixed;
-          
+
           // Header styling to match goalies table
           .mat-mdc-header-row {
             .mat-mdc-header-cell {
@@ -335,33 +336,34 @@
               white-space: nowrap;
               overflow: hidden;
               text-overflow: ellipsis;
-              
+
               &:first-child {
                 border-top-left-radius: 8px;
               }
-              
+
               &:last-child {
                 border-top-right-radius: 8px;
               }
-              
+
               &.center {
                 text-align: center;
               }
             }
           }
-          
+
           // Row styling to match goalies table
           .mat-mdc-row {
-            transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+            transition-property:
+              color, background-color, border-color, text-decoration-color, fill, stroke;
             transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
             transition-duration: 150ms;
-            
+
             &:hover {
               .mat-mdc-cell {
                 background-color: #f9fafb !important;
               }
             }
-            
+
             .mat-mdc-cell {
               font-size: 12px !important;
               color: #111827 !important;
@@ -370,11 +372,11 @@
               white-space: nowrap;
               overflow: hidden;
               text-overflow: ellipsis;
-              
+
               &.center {
                 text-align: center !important;
               }
-              
+
               &.team-cell {
                 display: flex;
                 align-items: center;
@@ -382,7 +384,7 @@
                 white-space: normal !important;
                 overflow: visible !important;
                 text-overflow: initial !important;
-                
+
                 .team-logo {
                   font-size: 1rem;
                   display: inline-flex;
@@ -395,14 +397,14 @@
                     display: none;
                   }
                 }
-                
+
                 .team-name {
                   font-weight: 500;
                   color: #111827;
                   font-size: 12px;
                 }
               }
-              
+
               &.save-percentage {
                 font-weight: 600;
                 color: var(--color-primary);
@@ -410,7 +412,7 @@
             }
           }
         }
-        
+
         // Specific styles for recent games table - keep same font sizes as main table
         .recent-games-table {
           // Headers should be the same size as season stats
@@ -419,12 +421,12 @@
               font-size: 14px !important; // Same as season stats
             }
           }
-          
+
           .mat-mdc-row {
             .mat-mdc-cell {
               font-size: 12px !important; // Same as season stats
               padding: 8px 16px !important; // Same as season stats
-              
+
               &.team-cell {
                 .team-name {
                   font-size: 12px; // Same as season stats
@@ -441,15 +443,15 @@
 @media (max-width: 1024px) {
   .goalie-profile-page {
     padding: 16px;
-    
+
     .profile-content {
       .profile-header {
         padding: 20px;
-        
+
         .player-info .player-name {
           font-size: 1.875rem;
         }
-        
+
         .player-avatar .avatar-icon {
           font-size: 4rem;
           width: 4rem;
@@ -457,10 +459,10 @@
           padding: 16px;
         }
       }
-      
+
       .info-card {
         margin-bottom: 24px;
-        
+
         &.stats-table-card {
           .table-container {
             .stats-table {
@@ -470,21 +472,21 @@
                   font-size: 12px !important; // Slightly smaller for tablet
                 }
               }
-              
+
               .mat-mdc-row {
                 .mat-mdc-cell {
                   padding: 6px 12px !important;
                   font-size: 11px !important; // Slightly smaller for tablet
-                  
+
                   &.team-cell {
                     gap: 6px;
-                    
+
                     .team-logo {
                       font-size: 0.875rem;
                       width: 16px;
                       height: 16px;
                     }
-                    
+
                     .team-name {
                       font-size: 11px;
                     }
@@ -492,26 +494,26 @@
                 }
               }
             }
-            
+
             .recent-games-table {
               .mat-mdc-header-row {
                 .mat-mdc-header-cell {
                   font-size: 12px !important; // Same as season stats header
                 }
               }
-              
+
               .mat-mdc-row {
                 .mat-mdc-cell {
                   font-size: 11px !important; // Same as season stats cells
                   padding: 6px 12px !important;
-                  
+
                   &.team-cell {
                     .team-logo {
                       font-size: 0.75rem;
                       width: 14px;
                       height: 14px;
                     }
-                    
+
                     .team-name {
                       font-size: 11px; // Same as cells
                     }
@@ -529,45 +531,45 @@
 @media (max-width: 768px) {
   .goalie-profile-page {
     padding: 12px;
-    
+
     .profile-content {
       .profile-header {
         flex-direction: column;
         gap: 20px;
         text-align: center;
         padding: 16px;
-        
+
         .player-info .player-name {
           font-size: 1.625rem;
         }
-        
+
         .player-details {
           justify-content: center;
           flex-wrap: wrap;
         }
       }
-      
+
       .info-card {
         margin-bottom: 16px;
-        
+
         mat-card-content {
           .info-grid {
             flex-direction: column !important;
             gap: 16px;
           }
-          
+
           .stats-grid {
             grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)) !important;
             gap: 12px;
-            
+
             .stat-item {
               padding: 10px 6px;
-              
+
               &.highlight .stat-value {
                 font-size: 1.375rem;
                 font-weight: 600;
               }
-              
+
               .stat-value {
                 font-size: 1rem;
                 font-weight: 500;
@@ -575,33 +577,33 @@
             }
           }
         }
-        
+
         &.stats-table-card {
           .table-container {
             .stats-table {
               min-width: 600px;
-              
+
               .mat-mdc-header-row {
                 .mat-mdc-header-cell {
                   padding: 4px 8px !important;
                   font-size: 11px !important; // Smaller for mobile
                 }
               }
-              
+
               .mat-mdc-row {
                 .mat-mdc-cell {
                   padding: 4px 8px !important;
                   font-size: 10px !important; // Smaller for mobile
-                  
+
                   &.team-cell {
                     gap: 4px;
-                    
+
                     .team-logo {
                       font-size: 0.75rem;
                       width: 14px;
                       height: 14px;
                     }
-                    
+
                     .team-name {
                       font-size: 10px;
                     }
@@ -609,26 +611,26 @@
                 }
               }
             }
-            
+
             .recent-games-table {
               .mat-mdc-header-row {
                 .mat-mdc-header-cell {
                   font-size: 11px !important; // Same as season stats header
                 }
               }
-              
+
               .mat-mdc-row {
                 .mat-mdc-cell {
                   font-size: 10px !important; // Same as season stats cells
                   padding: 4px 8px !important;
-                  
+
                   &.team-cell {
                     .team-logo {
                       font-size: 0.625rem;
                       width: 12px;
                       height: 12px;
                     }
-                    
+
                     .team-name {
                       font-size: 10px; // Same as cells
                     }
@@ -649,7 +651,7 @@
     border-color: var(--color-primary) !important;
     border-top-width: 2px !important;
   }
-  
+
   .mat-divider {
     border-top-color: var(--color-primary) !important;
     border-color: var(--color-primary) !important;

@@ -21,7 +21,7 @@ import { UserProfile, UserEditRequest } from '../../../shared/interfaces/auth.in
     PageHeaderComponent,
   ],
   templateUrl: './profile.html',
-  styleUrl: './profile.scss'
+  styleUrl: './profile.scss',
 })
 export class ProfileComponent implements OnInit {
   private formBuilder = inject(FormBuilder);
@@ -33,7 +33,7 @@ export class ProfileComponent implements OnInit {
   isSaving = false;
   errorMessage = '';
   successMessage = '';
-  
+
   constructor() {
     // Initialize form with empty values - will be populated from API
     this.profileForm = this.formBuilder.group({
@@ -44,7 +44,7 @@ export class ProfileComponent implements OnInit {
       country: [''],
       city: [''],
       street: [''],
-      postalCode: ['']
+      postalCode: [''],
     });
   }
 
@@ -55,10 +55,10 @@ export class ProfileComponent implements OnInit {
   loadUserProfile() {
     this.isLoading = true;
     this.errorMessage = '';
-    
+
     // First try to get cached user data
     const currentUser = this.authService.getCurrentUserValue();
-    
+
     if (currentUser) {
       // Use cached data
       this.populateForm(currentUser);
@@ -76,7 +76,7 @@ export class ProfileComponent implements OnInit {
           console.error('Error loading user profile:', error);
           this.errorMessage = error.message || 'Failed to load profile data.';
           this.isLoading = false;
-        }
+        },
       });
     }
   }
@@ -90,22 +90,22 @@ export class ProfileComponent implements OnInit {
       country: user.country || '',
       city: user.city || '',
       street: user.street || '',
-      postalCode: user.postal_code || ''
+      postalCode: user.postal_code || '',
     });
   }
 
   onSave() {
     this.errorMessage = '';
     this.successMessage = '';
-    
+
     if (this.profileForm.invalid) {
       this.profileForm.markAllAsTouched();
       return;
     }
-    
+
     this.isSaving = true;
     const formValue = this.profileForm.value;
-    
+
     const updateData: UserEditRequest = {
       email: formValue.email || null,
       first_name: formValue.firstName || null,
@@ -116,9 +116,9 @@ export class ProfileComponent implements OnInit {
       city: formValue.city || null,
       street: formValue.street || null,
       postal_code: formValue.postalCode || null,
-      password: null // Not using password field in profile
+      password: null, // Not using password field in profile
     };
-    
+
     this.authService.editUser(updateData).subscribe({
       next: () => {
         this.successMessage = 'Profile updated successfully!';
@@ -128,7 +128,7 @@ export class ProfileComponent implements OnInit {
         console.error('Error updating profile:', error);
         this.errorMessage = error.message || 'Failed to update profile. Please try again.';
         this.isSaving = false;
-      }
+      },
     });
   }
 

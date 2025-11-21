@@ -22,167 +22,167 @@
     }
 
     <form [formGroup]="profileForm" (ngSubmit)="onSave()" class="max-w-md">
-    <div class="profile-form-single-column space-y-1">
-      <!-- Email Address -->
-      <div class="flex items-start space-x-4">
-        <p class="text-custom-primary font-medium w-24 text-right my-1">Email:</p>
-        <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="flex-1">
-          <mat-label class="uppercase text-custom-secondary">Email Address</mat-label>
-          <input
-            matInput
-            type="email"
-            autocomplete="email"
-            formControlName="email"
-            placeholder="Enter your email"
-          />
-          @if (email?.invalid && (email?.dirty || email?.touched)) {
-            <mat-error>
-              @if (email?.errors?.['required']) {
-                Email address is required
-              }
-              @if (email?.errors?.['email']) {
-                Please enter a valid email address
-              }
-            </mat-error>
-          }
-        </mat-form-field>
-      </div>
+      <div class="profile-form-single-column space-y-1">
+        <!-- Email Address -->
+        <div class="flex items-start space-x-4">
+          <p class="text-custom-primary font-medium w-24 text-right my-1">Email:</p>
+          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="flex-1">
+            <mat-label class="uppercase text-custom-secondary">Email Address</mat-label>
+            <input
+              matInput
+              type="email"
+              autocomplete="email"
+              formControlName="email"
+              placeholder="Enter your email"
+            />
+            @if (email?.invalid && (email?.dirty || email?.touched)) {
+              <mat-error>
+                @if (email?.errors?.['required']) {
+                  Email address is required
+                }
+                @if (email?.errors?.['email']) {
+                  Please enter a valid email address
+                }
+              </mat-error>
+            }
+          </mat-form-field>
+        </div>
 
-      <!-- First Name -->
-      <div class="flex items-start space-x-4">
-        <p class="text-custom-primary font-medium w-24 text-right my-1">First Name:</p>
-        <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="flex-1">
-          <mat-label class="uppercase text-custom-secondary">First Name</mat-label>
-          <input
-            matInput
-            type="text"
-            autocomplete="given-name"
-            formControlName="firstName"
-            placeholder="First name"
-          />
-          @if (firstName?.invalid && (firstName?.dirty || firstName?.touched)) {
-            <mat-error>
-              @if (firstName?.errors?.['required']) {
-                Required
-              }
-              @if (firstName?.errors?.['minlength']) {
-                Min 2 characters
-              }
-            </mat-error>
-          }
-        </mat-form-field>
-      </div>
+        <!-- First Name -->
+        <div class="flex items-start space-x-4">
+          <p class="text-custom-primary font-medium w-24 text-right my-1">First Name:</p>
+          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="flex-1">
+            <mat-label class="uppercase text-custom-secondary">First Name</mat-label>
+            <input
+              matInput
+              type="text"
+              autocomplete="given-name"
+              formControlName="firstName"
+              placeholder="First name"
+            />
+            @if (firstName?.invalid && (firstName?.dirty || firstName?.touched)) {
+              <mat-error>
+                @if (firstName?.errors?.['required']) {
+                  Required
+                }
+                @if (firstName?.errors?.['minlength']) {
+                  Min 2 characters
+                }
+              </mat-error>
+            }
+          </mat-form-field>
+        </div>
 
-      <!-- Last Name -->
-      <div class="flex items-start space-x-4">
-        <p class="text-custom-primary font-medium w-24 text-right my-1">Last Name:</p>
-        <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="flex-1">
-          <mat-label class="uppercase text-custom-secondary">Last Name</mat-label>
-          <input
-            matInput
-            type="text"
-            autocomplete="family-name"
-            formControlName="lastName"
-            placeholder="Last name"
-          />
-          @if (lastName?.invalid && (lastName?.dirty || lastName?.touched)) {
-            <mat-error>
-              @if (lastName?.errors?.['required']) {
-                Required
-              }
-              @if (lastName?.errors?.['minlength']) {
-                Min 2 characters
-              }
-            </mat-error>
-          }
-        </mat-form-field>
-      </div>
+        <!-- Last Name -->
+        <div class="flex items-start space-x-4">
+          <p class="text-custom-primary font-medium w-24 text-right my-1">Last Name:</p>
+          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="flex-1">
+            <mat-label class="uppercase text-custom-secondary">Last Name</mat-label>
+            <input
+              matInput
+              type="text"
+              autocomplete="family-name"
+              formControlName="lastName"
+              placeholder="Last name"
+            />
+            @if (lastName?.invalid && (lastName?.dirty || lastName?.touched)) {
+              <mat-error>
+                @if (lastName?.errors?.['required']) {
+                  Required
+                }
+                @if (lastName?.errors?.['minlength']) {
+                  Min 2 characters
+                }
+              </mat-error>
+            }
+          </mat-form-field>
+        </div>
 
-      <!-- Phone Number -->
-      <div class="flex items-start space-x-4">
-        <p class="text-custom-primary font-medium w-24 text-right my-1">Phone:</p>
-        <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="flex-1">
-          <mat-label class="uppercase text-custom-secondary">Phone Number (Optional)</mat-label>
-          <input
-            matInput
-            type="tel"
-            autocomplete="tel"
-            formControlName="phoneNumber"
-            placeholder="Enter your phone number (optional)"
-          />
-        </mat-form-field>
-      </div>
+        <!-- Phone Number -->
+        <div class="flex items-start space-x-4">
+          <p class="text-custom-primary font-medium w-24 text-right my-1">Phone:</p>
+          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="flex-1">
+            <mat-label class="uppercase text-custom-secondary">Phone Number (Optional)</mat-label>
+            <input
+              matInput
+              type="tel"
+              autocomplete="tel"
+              formControlName="phoneNumber"
+              placeholder="Enter your phone number (optional)"
+            />
+          </mat-form-field>
+        </div>
 
-      <!-- Country -->
-      <div class="flex items-start space-x-4">
-        <p class="text-custom-primary font-medium w-24 text-right my-1">Country:</p>
-        <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="flex-1">
-          <mat-label class="uppercase text-custom-secondary">Country (Optional)</mat-label>
-          <input
-            matInput
-            type="text"
-            formControlName="country"
-            placeholder="Enter your country (optional)"
-          />
-        </mat-form-field>
-      </div>
+        <!-- Country -->
+        <div class="flex items-start space-x-4">
+          <p class="text-custom-primary font-medium w-24 text-right my-1">Country:</p>
+          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="flex-1">
+            <mat-label class="uppercase text-custom-secondary">Country (Optional)</mat-label>
+            <input
+              matInput
+              type="text"
+              formControlName="country"
+              placeholder="Enter your country (optional)"
+            />
+          </mat-form-field>
+        </div>
 
-      <!-- City -->
-      <div class="flex items-start space-x-4">
-        <p class="text-custom-primary font-medium w-24 text-right my-1">City:</p>
-        <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="flex-1">
-          <mat-label class="uppercase text-custom-secondary">City (Optional)</mat-label>
-          <input
-            matInput
-            type="text"
-            formControlName="city"
-            placeholder="Enter your city (optional)"
-          />
-        </mat-form-field>
-      </div>
+        <!-- City -->
+        <div class="flex items-start space-x-4">
+          <p class="text-custom-primary font-medium w-24 text-right my-1">City:</p>
+          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="flex-1">
+            <mat-label class="uppercase text-custom-secondary">City (Optional)</mat-label>
+            <input
+              matInput
+              type="text"
+              formControlName="city"
+              placeholder="Enter your city (optional)"
+            />
+          </mat-form-field>
+        </div>
 
-      <!-- Street -->
-      <div class="flex items-start space-x-4">
-        <p class="text-custom-primary font-medium w-24 text-right my-1">Street:</p>
-        <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="flex-1">
-          <mat-label class="uppercase text-custom-secondary">Street Address (Optional)</mat-label>
-          <input
-            matInput
-            type="text"
-            formControlName="street"
-            placeholder="Enter your street address (optional)"
-          />
-        </mat-form-field>
-      </div>
+        <!-- Street -->
+        <div class="flex items-start space-x-4">
+          <p class="text-custom-primary font-medium w-24 text-right my-1">Street:</p>
+          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="flex-1">
+            <mat-label class="uppercase text-custom-secondary">Street Address (Optional)</mat-label>
+            <input
+              matInput
+              type="text"
+              formControlName="street"
+              placeholder="Enter your street address (optional)"
+            />
+          </mat-form-field>
+        </div>
 
-      <!-- Postal Code -->
-      <div class="flex items-start space-x-4">
-        <p class="text-custom-primary font-medium w-24 text-right my-1">Postal Code:</p>
-        <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="flex-1">
-          <mat-label class="uppercase text-custom-secondary">Postal Code (Optional)</mat-label>
-          <input
-            matInput
-            type="text"
-            formControlName="postalCode"
-            placeholder="Enter your postal code (optional)"
-          />
-        </mat-form-field>
-      </div>
+        <!-- Postal Code -->
+        <div class="flex items-start space-x-4">
+          <p class="text-custom-primary font-medium w-24 text-right my-1">Postal Code:</p>
+          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="flex-1">
+            <mat-label class="uppercase text-custom-secondary">Postal Code (Optional)</mat-label>
+            <input
+              matInput
+              type="text"
+              formControlName="postalCode"
+              placeholder="Enter your postal code (optional)"
+            />
+          </mat-form-field>
+        </div>
 
-      <!-- Reset Password Option -->
-      <div class="flex items-start space-x-4">
-        <p class="text-custom-primary font-medium w-24 text-right my-1">Password:</p>
-        <div class="flex-1">
-          <app-auth-button
-            text="RESET PASSWORD VIA EMAIL"
-            type="button"
-            variant="outlined"
-            size="small"
-            (clicked)="onResetPassword()"
-          ></app-auth-button>
+        <!-- Reset Password Option -->
+        <div class="flex items-start space-x-4">
+          <p class="text-custom-primary font-medium w-24 text-right my-1">Password:</p>
+          <div class="flex-1">
+            <app-auth-button
+              text="RESET PASSWORD VIA EMAIL"
+              type="button"
+              variant="outlined"
+              size="small"
+              (clicked)="onResetPassword()"
+            ></app-auth-button>
+          </div>
         </div>
       </div>
-    </div>
 
       <!-- Save Button -->
       <div class="flex justify-center mt-8">

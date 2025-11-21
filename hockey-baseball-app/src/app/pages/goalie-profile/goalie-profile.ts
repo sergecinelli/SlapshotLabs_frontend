@@ -8,8 +8,15 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatTableModule } from '@angular/material/table';
 import { forkJoin } from 'rxjs';
 import { GoalieService } from '../../services/goalie.service';
-import { Goalie, GoalieSeasonStats, GoalieRecentGameStats } from '../../shared/interfaces/goalie.interface';
-import { ShotLocationDisplayComponent, ShotLocationData } from '../../shared/components/shot-location-display/shot-location-display';
+import {
+  Goalie,
+  GoalieSeasonStats,
+  GoalieRecentGameStats,
+} from '../../shared/interfaces/goalie.interface';
+import {
+  ShotLocationDisplayComponent,
+  ShotLocationData,
+} from '../../shared/components/shot-location-display/shot-location-display';
 import { SeasonService } from '../../services/season.service';
 import { GameEventNameService, GameEventName } from '../../services/game-event-name.service';
 import { GameMetadataService, ShotTypeResponse } from '../../services/game-metadata.service';
@@ -25,10 +32,10 @@ import { SprayChartUtilsService } from '../../services/spray-chart-utils.service
     MatCardModule,
     MatDividerModule,
     MatTableModule,
-    ShotLocationDisplayComponent
+    ShotLocationDisplayComponent,
   ],
   templateUrl: './goalie-profile.html',
-  styleUrl: './goalie-profile.scss'
+  styleUrl: './goalie-profile.scss',
 })
 export class GoalieProfileComponent implements OnInit {
   private route = inject(ActivatedRoute);
@@ -42,10 +49,31 @@ export class GoalieProfileComponent implements OnInit {
   goalie: Goalie | null = null;
   loading = true;
   shotLocationData: ShotLocationData[] = [];
-  
+
   // Table column definitions
-  seasonStatsColumns: string[] = ['season', 'team', 'gamesPlayed', 'wins', 'losses', 'ties', 'goalsAgainst', 'shotsAgainst', 'saves', 'savePercentage'];
-  recentGameStatsColumns: string[] = ['season', 'date', 'vs', 'team', 'score', 'goalsAgainst', 'shotsAgainst', 'saves', 'savePercentage'];
+  seasonStatsColumns: string[] = [
+    'season',
+    'team',
+    'gamesPlayed',
+    'wins',
+    'losses',
+    'ties',
+    'goalsAgainst',
+    'shotsAgainst',
+    'saves',
+    'savePercentage',
+  ];
+  recentGameStatsColumns: string[] = [
+    'season',
+    'date',
+    'vs',
+    'team',
+    'score',
+    'goalsAgainst',
+    'shotsAgainst',
+    'saves',
+    'savePercentage',
+  ];
 
   ngOnInit(): void {
     const goalieId = this.route.snapshot.paramMap.get('id');
@@ -58,23 +86,24 @@ export class GoalieProfileComponent implements OnInit {
 
   private loadGoalie(id: string): void {
     this.loading = true;
-    
+
     // Fetch goalie data, spray chart metadata, and spray chart data in parallel
     forkJoin({
       goalie: this.goalieService.getGoalieById(id),
       seasons: this.seasonService.getSeasons(),
       eventNames: this.gameEventNameService.getGameEventNames(),
-      shotTypes: this.gameMetadataService.getShotTypes()
+      shotTypes: this.gameMetadataService.getShotTypes(),
     }).subscribe({
       next: ({ goalie, seasons, eventNames, shotTypes }) => {
         if (goalie) {
           this.goalie = goalie;
-          
+
           // Get the last season (highest ID)
-          const lastSeason = seasons.reduce((max, season) => 
-            season.id > max.id ? season : max, seasons[0]
+          const lastSeason = seasons.reduce(
+            (max, season) => (season.id > max.id ? season : max),
+            seasons[0]
           );
-          
+
           // Fetch spray chart data for the last season
           this.loadSprayChartData(id, lastSeason.id, eventNames, shotTypes);
         } else {
@@ -87,7 +116,7 @@ export class GoalieProfileComponent implements OnInit {
         console.error('Error loading goalie:', error);
         this.loading = false;
         this.router.navigate(['/goalies']);
-      }
+      },
     });
   }
 
@@ -113,7 +142,7 @@ export class GoalieProfileComponent implements OnInit {
         // Set empty array on error so component still renders
         this.shotLocationData = [];
         this.loading = false;
-      }
+      },
     });
   }
 
@@ -140,13 +169,13 @@ export class GoalieProfileComponent implements OnInit {
     const winPercentage = (this.goalie.wins / this.goalie.gamesPlayed) * 100;
     return winPercentage.toFixed(1);
   }
-  
+
   getCountry(): string {
     // Return default mocked country value
     // If goalie has country data, use it, otherwise default to Canada
     return this.goalie?.country || 'Canada';
   }
-  
+
   getSeasonStats(): GoalieSeasonStats[] {
     return [
       {
@@ -160,7 +189,7 @@ export class GoalieProfileComponent implements OnInit {
         goalsAgainst: 15,
         shotsAgainst: 95,
         saves: 80,
-        savePercentage: 0.842
+        savePercentage: 0.842,
       },
       {
         season: '2023/2024',
@@ -173,7 +202,7 @@ export class GoalieProfileComponent implements OnInit {
         goalsAgainst: 15,
         shotsAgainst: 95,
         saves: 80,
-        savePercentage: 0.842
+        savePercentage: 0.842,
       },
       {
         season: '2022/2023',
@@ -186,11 +215,11 @@ export class GoalieProfileComponent implements OnInit {
         goalsAgainst: 15,
         shotsAgainst: 95,
         saves: 80,
-        savePercentage: 0.842
-      }
+        savePercentage: 0.842,
+      },
     ];
   }
-  
+
   getRecentGameStats(): GoalieRecentGameStats[] {
     return [
       {
@@ -203,7 +232,7 @@ export class GoalieProfileComponent implements OnInit {
         goalsAgainst: 5,
         shotsAgainst: 28,
         saves: 23,
-        savePercentage: 0.821
+        savePercentage: 0.821,
       },
       {
         season: '2025/2026',
@@ -215,7 +244,7 @@ export class GoalieProfileComponent implements OnInit {
         goalsAgainst: 5,
         shotsAgainst: 28,
         saves: 23,
-        savePercentage: 0.821
+        savePercentage: 0.821,
       },
       {
         season: '2025/2026',
@@ -227,7 +256,7 @@ export class GoalieProfileComponent implements OnInit {
         goalsAgainst: 5,
         shotsAgainst: 28,
         saves: 23,
-        savePercentage: 0.821
+        savePercentage: 0.821,
       },
       {
         season: '2025/2026',
@@ -239,7 +268,7 @@ export class GoalieProfileComponent implements OnInit {
         goalsAgainst: 5,
         shotsAgainst: 28,
         saves: 23,
-        savePercentage: 0.821
+        savePercentage: 0.821,
       },
       {
         season: '2025/2026',
@@ -251,8 +280,8 @@ export class GoalieProfileComponent implements OnInit {
         goalsAgainst: 5,
         shotsAgainst: 28,
         saves: 23,
-        savePercentage: 0.821
-      }
+        savePercentage: 0.821,
+      },
     ];
   }
 

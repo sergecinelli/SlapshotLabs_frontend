@@ -30,7 +30,7 @@ interface GameBannerItem {
   standalone: true,
   imports: [CommonModule],
   templateUrl: './banner.html',
-  styleUrl: './banner.scss'
+  styleUrl: './banner.scss',
 })
 export class BannerComponent implements OnInit, OnDestroy {
   private api = inject(ApiService);
@@ -44,7 +44,7 @@ export class BannerComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.fetchBanner();
-    
+
     // Subscribe to refresh events
     this.refreshSubscription = this.bannerService.refreshBanner$.subscribe(() => {
       this.fetchBanner();
@@ -67,7 +67,7 @@ export class BannerComponent implements OnInit, OnDestroy {
         console.error('Failed to load banner:', e);
         this.error.set(null);
         this.loading.set(false);
-      }
+      },
     });
   }
 
@@ -102,10 +102,10 @@ export class BannerComponent implements OnInit, OnDestroy {
   getDateDisplay(dateString: string): string {
     // Parse YYYY-MM-DD format
     const date = new Date(dateString);
-    const options: Intl.DateTimeFormatOptions = { 
-      month: 'short', 
-      day: 'numeric', 
-      year: 'numeric' 
+    const options: Intl.DateTimeFormatOptions = {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
     };
     return date.toLocaleDateString('en-US', options);
   }
@@ -119,14 +119,14 @@ export class BannerComponent implements OnInit, OnDestroy {
     // Parse time string (assuming format like "17:30:00" or "17:30")
     const timeParts = time.split(':');
     if (timeParts.length < 2) return time;
-    
+
     let hours = parseInt(timeParts[0], 10);
     const minutes = timeParts[1];
-    
+
     const ampm = hours >= 12 ? 'PM' : 'AM';
     hours = hours % 12;
     hours = hours ? hours : 12; // Convert 0 to 12
-    
+
     return `${hours}:${minutes} ${ampm}`;
   }
 }

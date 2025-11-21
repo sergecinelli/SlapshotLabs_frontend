@@ -5,12 +5,12 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
   standalone: true,
   imports: [],
   templateUrl: './auth-link.html',
-  styleUrl: './auth-link.scss'
+  styleUrl: './auth-link.scss',
 })
 export class AuthLinkComponent {
   @Input() text = '';
   @Input() linkText = '';
-  
+
   @Output() linkClicked = new EventEmitter<void>();
 
   onLinkClick(): void {

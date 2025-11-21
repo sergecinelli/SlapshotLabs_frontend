@@ -36,12 +36,12 @@ export class SignInComponent implements OnInit {
   signInForm: FormGroup;
   isLoading = false;
   returnUrl = '/dashboard';
-  
+
   constructor() {
     this.signInForm = this.formBuilder.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
-      rememberMe: [false]
+      rememberMe: [false],
     });
   }
 
@@ -60,7 +60,7 @@ export class SignInComponent implements OnInit {
     const formValue: UserSignInForm = {
       email: this.signInForm.value.email,
       password: this.signInForm.value.password,
-      rememberMe: this.signInForm.value.rememberMe || false
+      rememberMe: this.signInForm.value.rememberMe || false,
     };
 
     this.authService.signIn(formValue).subscribe({
@@ -76,15 +76,15 @@ export class SignInComponent implements OnInit {
       error: (error) => {
         this.isLoading = false;
         // this.snackBar.open(
-        //   error.message || 'Sign in failed. Please try again.', 
-        //   'Close', 
+        //   error.message || 'Sign in failed. Please try again.',
+        //   'Close',
         //   {
         //     duration: 5000,
         //     panelClass: ['error-snackbar']
         //   }
         // );
         console.error('Sign in error:', error);
-      }
+      },
     });
   }
 

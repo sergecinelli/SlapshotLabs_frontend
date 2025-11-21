@@ -71,7 +71,7 @@ export class CustomHighlightModalComponent {
       description: 'Description',
       date: 'Date',
       time: 'Time',
-      youtube_link: 'Video Link'
+      youtube_link: 'Video Link',
     };
     return labels[fieldName] || fieldName;
   }

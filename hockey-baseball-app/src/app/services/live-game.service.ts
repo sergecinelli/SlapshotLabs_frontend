@@ -125,7 +125,7 @@ export interface GameDetails {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class LiveGameService {
   private apiService = inject(ApiService);
@@ -159,7 +159,10 @@ export class LiveGameService {
     defensiveZoneExitId: number,
     patch: Partial<Pick<DefensiveZoneExit, 'icing' | 'skate_out' | 'so_win' | 'so_lose' | 'passes'>>
   ): Observable<DefensiveZoneExit> {
-    return this.apiService.patch<DefensiveZoneExit>(`/hockey/game/defensive-zone-exit/${defensiveZoneExitId}`, patch);
+    return this.apiService.patch<DefensiveZoneExit>(
+      `/hockey/game/defensive-zone-exit/${defensiveZoneExitId}`,
+      patch
+    );
   }
 
   /**
@@ -169,6 +172,9 @@ export class LiveGameService {
     offensiveZoneEntryId: number,
     patch: Partial<Pick<OffensiveZoneEntry, 'pass_in' | 'dump_win' | 'dump_lose' | 'skate_in'>>
   ): Observable<OffensiveZoneEntry> {
-    return this.apiService.patch<OffensiveZoneEntry>(`/hockey/game/offensive-zone-entry/${offensiveZoneEntryId}`, patch);
+    return this.apiService.patch<OffensiveZoneEntry>(
+      `/hockey/game/offensive-zone-entry/${offensiveZoneEntryId}`,
+      patch
+    );
   }
 }

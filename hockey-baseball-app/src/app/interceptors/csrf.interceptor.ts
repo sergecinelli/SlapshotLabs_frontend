@@ -26,16 +26,16 @@ export class CsrfInterceptor implements HttpInterceptor {
     const csrfToken = this.csrfTokenService.getCsrfTokenSync();
     if (csrfToken) {
       const csrfRequest = request.clone({
-        setHeaders: { 'X-CSRFToken': csrfToken }
+        setHeaders: { 'X-CSRFToken': csrfToken },
       });
       return next.handle(csrfRequest).pipe(
-        catchError(error => {
+        catchError((error) => {
           if (error.status === 403) {
             // CSRF token might be stale, refresh and retry once
             return this.csrfTokenService.refreshCsrfToken().pipe(
-              switchMap(newToken => {
+              switchMap((newToken) => {
                 const retryRequest = request.clone({
-                  setHeaders: { 'X-CSRFToken': newToken }
+                  setHeaders: { 'X-CSRFToken': newToken },
                 });
                 return next.handle(retryRequest);
               }),
@@ -48,10 +48,10 @@ export class CsrfInterceptor implements HttpInterceptor {
     }
     // No token available, get/refresh it first then proceed
     return this.csrfTokenService.refreshCsrfToken().pipe(
-      switchMap(token => {
+      switchMap((token) => {
         if (token && token !== '') {
           const csrfRequest = request.clone({
-            setHeaders: { 'X-CSRFToken': token }
+            setHeaders: { 'X-CSRFToken': token },
           });
           return next.handle(csrfRequest);
         }
@@ -62,6 +62,6 @@ export class CsrfInterceptor implements HttpInterceptor {
   }
   private isPublicEndpoint(url: string): boolean {
     const publicEndpoints = ['/api/openapi.json', '/api/users/csrf'];
-    return publicEndpoints.some(endpoint => url.includes(endpoint));
+    return publicEndpoints.some((endpoint) => url.includes(endpoint));
   }
 }

@@ -17,7 +17,7 @@ import { PositionService, PositionOption } from '../../../services/position.serv
 export interface GoalieFormModalData {
   goalie?: Goalie;
   isEditMode: boolean;
-  teams?: Team[];  // Optional: pass teams to avoid redundant API calls
+  teams?: Team[]; // Optional: pass teams to avoid redundant API calls
 }
 
 export interface TeamOption {
@@ -37,10 +37,10 @@ export interface TeamOption {
     MatInputModule,
     MatSelectModule,
     MatIconModule,
-    MatDividerModule
+    MatDividerModule,
   ],
   templateUrl: './goalie-form-modal.html',
-  styleUrl: './goalie-form-modal.scss'
+  styleUrl: './goalie-form-modal.scss',
 })
 export class GoalieFormModalComponent implements OnInit {
   private fb = inject(FormBuilder);
@@ -55,7 +55,7 @@ export class GoalieFormModalComponent implements OnInit {
 
   shootsOptions = [
     { value: 'Right Shot', label: 'Right Shot' },
-    { value: 'Left Shot', label: 'Left Shot' }
+    { value: 'Left Shot', label: 'Left Shot' },
   ];
 
   positionOptions: PositionOption[] = [];
@@ -74,31 +74,31 @@ export class GoalieFormModalComponent implements OnInit {
 
   private loadFormData(): void {
     this.isLoading = true;
-    
+
     // Use provided teams or fetch from API
-    const teamsObservable = this.data.teams 
+    const teamsObservable = this.data.teams
       ? of({ teams: this.data.teams, total: this.data.teams.length })
       : this.teamService.getTeams();
-    
+
     // Fetch teams and positions concurrently
     forkJoin({
       teams: teamsObservable,
-      positions: this.positionService.getPositions()
+      positions: this.positionService.getPositions(),
     }).subscribe({
       next: ({ teams, positions }) => {
         // Transform teams to options format
-        this.teamOptions = teams.teams.map(team => ({
+        this.teamOptions = teams.teams.map((team) => ({
           value: team.id,
-          label: team.name
+          label: team.name,
         }));
-        
+
         this.positionOptions = positions;
-        
+
         // Set default values to first available options
         this.setDefaultFormValues();
-        
+
         this.isLoading = false;
-        
+
         // Populate form if in edit mode (this will override defaults)
         if (this.isEditMode && this.data.goalie) {
           this.populateForm(this.data.goalie);
@@ -106,38 +106,38 @@ export class GoalieFormModalComponent implements OnInit {
       },
       error: (error) => {
         console.error('Failed to load form data:', error);
-        
+
         // Set default values to first available options
         this.setDefaultFormValues();
-        
+
         this.isLoading = false;
-        
+
         // Populate form if in edit mode (this will override defaults)
         if (this.isEditMode && this.data.goalie) {
           this.populateForm(this.data.goalie);
         }
-      }
+      },
     });
   }
 
   private setDefaultFormValues(): void {
     const defaultValues: Record<string, string> = {};
-    
+
     // Set first team as default
     if (this.teamOptions.length > 0) {
       defaultValues['team'] = this.teamOptions[0].value;
     }
-    
+
     // Set first position as default
     if (this.positionOptions.length > 0) {
       defaultValues['position'] = this.positionOptions[0].value;
     }
-    
+
     // Set first shoots option as default (already handled in createForm)
     if (this.shootsOptions.length > 0) {
       defaultValues['shoots'] = this.shootsOptions[0].value;
     }
-    
+
     // Apply defaults to form
     if (Object.keys(defaultValues).length > 0) {
       this.goalieForm.patchValue(defaultValues);
@@ -162,14 +162,14 @@ export class GoalieFormModalComponent implements OnInit {
       addressStreet: [''],
       addressPostalCode: [''],
       playerBiography: [''],
-      analysis: ['']
+      analysis: [''],
     });
   }
 
   private populateForm(goalie: Goalie): void {
     // Find the team ID by matching team name
     let teamId = '';
-    const matchingTeam = this.teamOptions.find(opt => opt.label === goalie.team);
+    const matchingTeam = this.teamOptions.find((opt) => opt.label === goalie.team);
     if (matchingTeam) {
       teamId = matchingTeam.value;
     } else {
@@ -179,7 +179,7 @@ export class GoalieFormModalComponent implements OnInit {
         teamId = teamIdMatch[1];
       }
     }
-    
+
     this.goalieForm.patchValue({
       team: teamId,
       birthYear: goalie.birthYear,
@@ -197,22 +197,22 @@ export class GoalieFormModalComponent implements OnInit {
       addressStreet: (goalie as Record<string, unknown>)['addressStreet'],
       addressPostalCode: (goalie as Record<string, unknown>)['addressPostalCode'],
       playerBiography: goalie.playerBiography,
-      analysis: (goalie as Record<string, unknown>)['analysis']
+      analysis: (goalie as Record<string, unknown>)['analysis'],
     });
   }
 
   onSubmit(): void {
     if (this.goalieForm.valid) {
       const formValue = this.goalieForm.value;
-      
+
       // Convert team ID back to team name
-      const selectedTeam = this.teamOptions.find(opt => opt.value === formValue.team);
+      const selectedTeam = this.teamOptions.find((opt) => opt.value === formValue.team);
       const teamName = selectedTeam ? selectedTeam.label : formValue.team;
       const teamId = formValue.team; // Keep the team ID
-      
+
       const goalieData: Partial<Goalie> = {
         team: teamName,
-        teamId: teamId,  // Always include teamId
+        teamId: teamId, // Always include teamId
         birthYear: formValue.birthYear,
         jerseyNumber: formValue.jerseyNumber,
         firstName: formValue.firstName,
@@ -248,8 +248,8 @@ export class GoalieFormModalComponent implements OnInit {
           facilityName: 'Default Facility',
           rinkName: 'Main Rink',
           city: 'City',
-          address: 'Address'
-        }
+          address: 'Address',
+        },
       };
 
       if (this.isEditMode && this.data.goalie) {
@@ -259,7 +259,7 @@ export class GoalieFormModalComponent implements OnInit {
       this.dialogRef.close(goalieData);
     } else {
       // Mark all fields as touched to show validation errors
-      Object.keys(this.goalieForm.controls).forEach(key => {
+      Object.keys(this.goalieForm.controls).forEach((key) => {
         this.goalieForm.get(key)?.markAsTouched();
       });
     }
@@ -303,7 +303,7 @@ export class GoalieFormModalComponent implements OnInit {
       addressStreet: 'Street Address',
       addressPostalCode: 'Postal Code',
       playerBiography: 'Player Biography',
-      analysis: 'Analysis'
+      analysis: 'Analysis',
     };
     return labels[fieldName] || fieldName;
   }

@@ -1,4 +1,6 @@
-You are an expert in TypeScript, Angular, and scalable web application development. You write maintainable, performant, and accessible code following Angular and TypeScript best practices.
+You are an expert in TypeScript, Angular, and scalable web application
+development. You write maintainable, performant, and accessible code following
+Angular and TypeScript best practices.
 
 ## TypeScript Best Practices
 
@@ -12,7 +14,9 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 - Must NOT set `standalone: true` inside Angular decorators. It's the default.
 - Use signals for state management
 - Implement lazy loading for feature routes
-- Do NOT use the `@HostBinding` and `@HostListener` decorators. Put host bindings inside the `host` object of the `@Component` or `@Directive` decorator instead
+- Do NOT use the `@HostBinding` and `@HostListener` decorators. Put host
+  bindings inside the `host` object of the `@Component` or `@Directive`
+  decorator instead
 - Use `NgOptimizedImage` for all static images.
   - `NgOptimizedImage` does not work for inline base64 images.
 
@@ -21,7 +25,8 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 - Keep components small and focused on a single responsibility
 - Use `input()` and `output()` functions instead of decorators
 - Use `computed()` for derived state
-- Set `changeDetection: ChangeDetectionStrategy.OnPush` in `@Component` decorator
+- Set `changeDetection: ChangeDetectionStrategy.OnPush` in `@Component`
+  decorator
 - Prefer inline templates for small components
 - Prefer Reactive forms instead of Template-driven ones
 - Do NOT use `ngClass`, use `class` bindings instead
@@ -37,7 +42,8 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 ## Templates
 
 - Keep templates simple and avoid complex logic
-- Use native control flow (`@if`, `@for`, `@switch`) instead of `*ngIf`, `*ngFor`, `*ngSwitch`
+- Use native control flow (`@if`, `@for`, `@switch`) instead of `*ngIf`,
+  `*ngFor`, `*ngSwitch`
 - Use the async pipe to handle observables
 
 ## Services
