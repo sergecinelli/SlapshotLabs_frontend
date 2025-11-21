@@ -1,5 +1,7 @@
 import { Component, input, computed, ChangeDetectionStrategy, signal, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { MatIconModule } from '@angular/material/icon';
+import { environment } from '../../../../environments/environment';
 
 export interface ShotLocationData {
   iceTopOffset: number;
@@ -16,7 +18,7 @@ interface TypeStats {
 
 @Component({
   selector: 'app-shot-location-display',
-  imports: [CommonModule],
+  imports: [CommonModule, MatIconModule],
   templateUrl: './shot-location-display.html',
   styleUrl: './shot-location-display.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -27,6 +29,10 @@ interface TypeStats {
 export class ShotLocationDisplayComponent {
   data = input.required<ShotLocationData[]>();
   storageKey = input<string>('shotLocationFilters');
+  teamId = input<number>();
+  teamName = input<string>();
+  attackingDirection = input<'left' | 'right'>('right');
+  showDirection = input<boolean>(false);
   visibleTypes = signal<Set<ShotLocationData['type']>>(new Set());
   private isInitialized = signal(false);
 
@@ -149,6 +155,11 @@ export class ShotLocationDisplayComponent {
     }
     this.visibleTypes.set(current);
   }
+
+  getTeamLogoUrl = computed(() => {
+    const teamId = this.teamId();
+    return teamId ? `${environment.apiUrl}/hockey/team/${teamId}/logo` : '';
+  });
 
   private loadFiltersFromStorage(key: string): void {
     try {

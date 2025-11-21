@@ -65,7 +65,22 @@
     .location-container {
       width: 100%;
       display: flex;
-      justify-content: center;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+
+      .direction-indicator {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+
+        .direction-arrow {
+          width: 80%;
+          max-width: 300px;
+          height: auto;
+        }
+      }
 
       .location-wrapper {
         position: relative;
