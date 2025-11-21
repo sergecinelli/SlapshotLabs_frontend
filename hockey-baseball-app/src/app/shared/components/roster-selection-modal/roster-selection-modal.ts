@@ -6,8 +6,6 @@ import { MatTableModule } from '@angular/material/table';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatIconModule } from '@angular/material/icon';
 import { SelectionModel } from '@angular/cdk/collections';
-import { Goalie } from '../../interfaces/goalie.interface';
-import { Player } from '../../interfaces/player.interface';
 import { GoalieService } from '../../../services/goalie.service';
 import { PlayerService } from '../../../services/player.service';
 import { forkJoin } from 'rxjs';

@@ -13,8 +13,8 @@ import {
   ShotLocationDisplayComponent,
   ShotLocationData,
 } from '../../shared/components/shot-location-display/shot-location-display';
-import { GameEventNameService, GameEventName } from '../../services/game-event-name.service';
-import { GameMetadataService, ShotTypeResponse } from '../../services/game-metadata.service';
+import { GameEventNameService } from '../../services/game-event-name.service';
+import { GameMetadataService } from '../../services/game-metadata.service';
 import { SprayChartUtilsService } from '../../services/spray-chart-utils.service';
 
 @Component({
