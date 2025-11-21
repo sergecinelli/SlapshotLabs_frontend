@@ -110,6 +110,11 @@ export class BannerComponent implements OnInit, OnDestroy {
     return date.toLocaleDateString('en-US', options);
   }
 
+  isWinning(item: GameBannerItem, isHomeTeam: boolean): boolean {
+    if (item.status !== 2) return false;
+    return isHomeTeam ? item.home_goals > item.away_goals : item.away_goals > item.home_goals;
+  }
+
   private formatTimeTo12Hour(time: string): string {
     // Parse time string (assuming format like "17:30:00" or "17:30")
     const timeParts = time.split(':');
