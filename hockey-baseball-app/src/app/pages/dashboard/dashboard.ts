@@ -63,7 +63,7 @@ export class DashboardComponent implements OnInit {
         this.teamsMap = new Map(teams.teams.map(team => [parseInt(team.id), team]));
         
         // Map API response to Schedule interface
-        const mapGameToSchedule = (game: { id: number; home_team_id: number; home_goals: number; home_start_goalie_id: number; away_team_id: number; away_goals: number; away_start_goalie_id: number; game_type_group: string; tournament_name?: string; date: string; time: string; rink_id: number; status: number }): Schedule => {
+        const mapGameToSchedule = (game: { id: number; home_team_id: number; home_goals: number; home_start_goalie_id: number; away_team_id: number; away_goals: number; away_start_goalie_id: number; game_type_id: number; game_type_name?: string; tournament_name?: string; date: string; time: string; rink_id: number; status: number }): Schedule => {
           const homeTeam = this.teamsMap.get(game.home_team_id);
           const awayTeam = this.teamsMap.get(game.away_team_id);
           const apiUrl = this.apiService.getBaseUrl();
@@ -80,8 +80,8 @@ export class DashboardComponent implements OnInit {
             awayTeamLogo: `${apiUrl}/hockey/team/${game.away_team_id}/logo`,
             awayGoals: game.away_goals,
             awayTeamGoalie: `Goalie ${game.away_start_goalie_id}`,
-            gameType: game.game_type_group as GameType,
-            tournamentName: game.tournament_name,
+            gameType: '' as GameType, // TODO: Map game_type_id to game type name
+            tournamentName: game.game_type_name,
             date: game.date,
             time: game.time,
             rink: `Rink ${game.rink_id}`, // TODO: Map to actual rink name

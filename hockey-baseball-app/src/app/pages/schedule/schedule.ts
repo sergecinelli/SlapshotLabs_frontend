@@ -12,6 +12,7 @@ import { ArenaService } from '../../services/arena.service';
 import { GoalieService } from '../../services/goalie.service';
 import { PlayerService } from '../../services/player.service';
 import { GameMetadataService, GameTypeResponse, GamePeriodResponse } from '../../services/game-metadata.service';
+import { BannerService } from '../../services/banner.service';
 import { Schedule, GameStatus, GameType } from '../../shared/interfaces/schedule.interface';
 import { Team } from '../../shared/interfaces/team.interface';
 import { Arena, Rink } from '../../shared/interfaces/arena.interface';
@@ -60,6 +61,7 @@ export class ScheduleComponent implements OnInit {
   private goalieService = inject(GoalieService);
   private playerService = inject(PlayerService);
   private gameMetadataService = inject(GameMetadataService);
+  private bannerService = inject(BannerService);
   private dialog = inject(MatDialog);
   private router = inject(Router);
 
@@ -76,11 +78,11 @@ export class ScheduleComponent implements OnInit {
   gamePeriods: GamePeriodResponse[] = [];
   
   // Store raw game data for edit mode
-  rawGames = new Map<string, { id: number; home_team_id: number; home_goals: number; home_start_goalie_id: number; away_team_id: number; away_goals: number; away_start_goalie_id: number; game_type_group: string; tournament_name?: string; date: string; time: string; rink_id: number; status: number }>();
+  rawGames = new Map<string, { id: number; home_team_id: number; home_goals: number; home_start_goalie_id: number; away_team_id: number; away_goals: number; away_start_goalie_id: number; game_type_id: number; game_type_name?: string; tournament_name?: string; date: string; time: string; rink_id: number; status: number }>();
 
   tableColumns: TableColumn[] = [
     { key: 'homeTeam', label: 'Home Team', sortable: true, width: '150px' },
-    { key: 'homeGoals', label: 'Home Goals', sortable: true, type: 'number', width: '90px' },
+    { key: 'homeGoals', label: 'Home Goals', sortable: true, type: 'number', width: '100px' },
     { key: 'homeTeamGoalie', label: 'Home Goalie', sortable: true, width: '120px' },
     { key: 'awayTeam', label: 'Away Team', sortable: true, width: '150px' },
     { key: 'awayGoals', label: 'Away Goals', sortable: true, type: 'number', width: '90px' },
@@ -143,6 +145,12 @@ export class ScheduleComponent implements OnInit {
           return [r.id, arena ? `${arena.name} - ${r.name}` : r.name];
         }));
         
+        // Create game type mapping - map game_type_id to game type group name
+        const gameTypeMap = new Map<number, string>();
+        this.gameTypes.forEach(type => {
+          gameTypeMap.set(type.id, type.name);
+        });
+        
         // Store raw game data for edit mode
         schedules.forEach(game => {
           this.rawGames.set(game.id.toString(), game);
@@ -157,8 +165,8 @@ export class ScheduleComponent implements OnInit {
           awayTeam: teamMap.get(game.away_team_id) || `Team ${game.away_team_id}`,
           awayGoals: game.away_goals,
           awayTeamGoalie: goalieMap.get(game.away_start_goalie_id) || `Goalie ${game.away_start_goalie_id}`,
-          gameType: game.game_type_group as GameType,
-          tournamentName: game.tournament_name,
+          gameType: (gameTypeMap.get(game.game_type_id) || '') as GameType,
+          tournamentName: game.game_type_name || '',
           date: game.date,
           time: game.time,
           rink: rinkMap.get(game.rink_id) || `Rink ${game.rink_id}`,
@@ -189,6 +197,12 @@ export class ScheduleComponent implements OnInit {
           return [r.id, arena ? `${arena.name} - ${r.name}` : r.name];
         }));
         
+        // Create game type mapping - map game_type_id to game type group name
+        const gameTypeMap = new Map<number, string>();
+        this.gameTypes.forEach(type => {
+          gameTypeMap.set(type.id, type.name);
+        });
+        
         // Store raw game data for edit mode
         games.forEach(game => {
           this.rawGames.set(game.id.toString(), game);
@@ -202,8 +216,8 @@ export class ScheduleComponent implements OnInit {
           awayTeam: teamMap.get(game.away_team_id) || `Team ${game.away_team_id}`,
           awayGoals: game.away_goals,
           awayTeamGoalie: goalieMap.get(game.away_start_goalie_id) || `Goalie ${game.away_start_goalie_id}`,
-          gameType: game.game_type_group as GameType,
-          tournamentName: game.tournament_name,
+          gameType: (gameTypeMap.get(game.game_type_id) || '') as GameType,
+          tournamentName: game.game_type_name || '',
           date: game.date,
           time: game.time,
           rink: rinkMap.get(game.rink_id) || `Rink ${game.rink_id}`,
@@ -287,6 +301,7 @@ export class ScheduleComponent implements OnInit {
         this.scheduleService.updateGame(gameId, result).subscribe({
           next: () => {
             this.loadSchedules(); // Reload the list
+            this.bannerService.triggerRefresh(); // Refresh the banner
           },
           error: (error) => {
             console.error('Error updating game:', error);
@@ -341,6 +356,7 @@ export class ScheduleComponent implements OnInit {
         this.scheduleService.createGame(result).subscribe({
           next: () => {
             this.loadSchedules(); // Reload the list
+            this.bannerService.triggerRefresh(); // Refresh the banner
           },
           error: (error) => {
             console.error('Error adding game:', error);

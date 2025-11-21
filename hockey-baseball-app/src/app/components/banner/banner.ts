@@ -1,8 +1,10 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ApiService } from '../../services/api.service';
 import { Router } from '@angular/router';
 import { environment } from '../../../environments/environment';
+import { BannerService } from '../../services/banner.service';
+import { Subscription } from 'rxjs';
 
 interface GameBannerItem {
   id: number;
@@ -30,9 +32,11 @@ interface GameBannerItem {
   templateUrl: './banner.html',
   styleUrl: './banner.scss'
 })
-export class BannerComponent implements OnInit {
+export class BannerComponent implements OnInit, OnDestroy {
   private api = inject(ApiService);
   private router = inject(Router);
+  private bannerService = inject(BannerService);
+  private refreshSubscription?: Subscription;
 
   bannerItems = signal<GameBannerItem[]>([]);
   loading = signal<boolean>(false);
@@ -40,6 +44,15 @@ export class BannerComponent implements OnInit {
 
   ngOnInit(): void {
     this.fetchBanner();
+    
+    // Subscribe to refresh events
+    this.refreshSubscription = this.bannerService.refreshBanner$.subscribe(() => {
+      this.fetchBanner();
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.refreshSubscription?.unsubscribe();
   }
 
   fetchBanner(): void {
