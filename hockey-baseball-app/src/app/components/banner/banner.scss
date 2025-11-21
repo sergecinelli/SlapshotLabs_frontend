@@ -17,7 +17,7 @@
   border: 1px solid #333;
   border-radius: 8px;
   background: #fff;
-  font-size: 13px;
+  font-size: 14px;
   gap: 0px;
   flex-shrink: 0;
   cursor: default;
@@ -37,8 +37,6 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-weight: 600;
-  font-size: 12px;
 }
 
 .game-type {
@@ -46,14 +44,14 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  font-size: 10px;
+  font-size: 12px;
 }
 
 .period {
   color: #000;
   margin-left: 4px;
   white-space: nowrap;
-  font-size: 10px;
+  font-size: 12px;
 }
 
 .teams-section {
@@ -77,15 +75,13 @@
 }
 
 .team-name {
-  font-weight: 600;
   color: #000;
-  font-size: 10px;
+  font-size: 14px;
   flex: 1;
 }
 
 .score {
-  font-weight: 700;
-  font-size: 10px;
+  font-size: 14px;
   color: #000;
   min-width: 20px;
   text-align: right;
@@ -93,8 +89,7 @@
 
 .time {
   text-align: end;
-  font-weight: 600;
-  font-size: 9px;
+  font-size: 12px;
   color: #000;
 }
 
@@ -118,7 +113,7 @@
   color: #dc2626;
   background: #fff;
   font-weight: 700;
-  font-size: 12px;
+  font-size: 14px;
   text-align: center;
   padding: 0 4px;
 }
