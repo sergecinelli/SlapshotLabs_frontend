@@ -7,7 +7,13 @@ import { environment } from '../../environments/environment';
 @Injectable()
 export class CsrfInterceptor implements HttpInterceptor {
   private csrfTokenService = inject(CsrfTokenService);
-  private readonly baseUrl = environment.apiUrl.replace('/api', '');
+  private readonly baseUrl = (() => {
+    const url = environment.apiUrl;
+    if (url.endsWith('/api')) {
+      return url.slice(0, -4); // Remove '/api' from end
+    }
+    return url.replace(/\/api\/?$/, ''); // Fallback: remove trailing /api
+  })();
   intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
     // Only apply CSRF token to requests to our API
     if (!request.url.startsWith(this.baseUrl) || this.isPublicEndpoint(request.url)) {
