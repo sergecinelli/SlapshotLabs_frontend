@@ -580,9 +580,42 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
           }
         }
 
+        // Find player_2 name if exists (for blocked shots, penalty drawn, assists, etc.)
+        let player2Name = '';
+        if (event.player_2_id) {
+          const player2 = this.playerOptions.find((p) => p.value === event.player_2_id);
+          if (player2) {
+            player2Name = player2.label;
+          }
+        }
+
         // Determine shot type category for shot events
         const isShotEvent = event.event_name_id === this.shotOnGoalEventId;
         const shotTypeCategory = isShotEvent ? this.mapShotType(event.shot_type_id) : undefined;
+        const isPenaltyEvent = event.event_name_id === this.penaltyEventId;
+
+        // Build description with additional info
+        let description = event.note || event.goal_type || '';
+        
+        // Add player_2 info to description for specific event types
+        if (player2Name) {
+          if (shotTypeCategory === 'blocked') {
+            // For blocked shots, show who blocked it
+            description = description 
+              ? `${description} | Blocked by: ${player2Name}`
+              : `Blocked by: ${player2Name}`;
+          } else if (isPenaltyEvent) {
+            // For penalties, show who drew the penalty
+            description = description
+              ? `${description} | Drawn by: ${player2Name}`
+              : `Drawn by: ${player2Name}`;
+          } else if (shotTypeCategory === 'goal' && player2Name) {
+            // For goals, show assist if available
+            description = description
+              ? `${description} | Assist: ${player2Name}`
+              : `Assist: ${player2Name}`;
+          }
+        }
 
         groupedEvents.push({
           id: event.id,
@@ -593,7 +626,7 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
           // Show shotType in Event column for shot events; otherwise show event name
           event: shotTypeCategory?.toUpperCase() ?? this.getEventName(event.event_name_id),
           player: playerName,
-          description: event.note || event.goal_type || '',
+          description: description,
           shotType: shotTypeCategory,
           eventNameId: event.event_name_id,
           rawEventData: event,
@@ -1591,6 +1624,7 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
           time: timeString,
           teamId: rawEvent.team_id,
           playerId: rawEvent.player_id,
+          player2Id: rawEvent.player_2_id,
           penaltyLength: penaltyTimeString,
           zone: rawEvent.zone,
           youtubeLink: rawEvent.youtube_link,

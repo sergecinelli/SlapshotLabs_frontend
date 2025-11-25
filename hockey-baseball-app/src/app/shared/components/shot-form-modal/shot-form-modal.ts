@@ -110,6 +110,7 @@ export class ShotFormModalComponent implements OnInit {
 
   // Filtered options based on selected team
   playerOptions: { value: number; label: string }[] = [];
+  blockingPlayerOptions: { value: number; label: string }[] = [];
   goalieOptions: { value: number; label: string }[] = [];
 
   // Loading states
@@ -159,12 +160,12 @@ export class ShotFormModalComponent implements OnInit {
           },
           netLocation:
             existing.netTopOffset !== undefined &&
-            existing.netLeftOffset !== undefined &&
-            !(existing.netTopOffset === 0 && existing.netLeftOffset === 0)
+              existing.netLeftOffset !== undefined &&
+              !(existing.netTopOffset === 0 && existing.netLeftOffset === 0)
               ? {
-                  x: existing.netLeftOffset,
-                  y: existing.netTopOffset,
-                }
+                x: existing.netLeftOffset,
+                y: existing.netTopOffset,
+              }
               : undefined,
         };
       }
@@ -182,6 +183,7 @@ export class ShotFormModalComponent implements OnInit {
         shootingTeam: existing.teamId,
         scoringPlayer: existing.playerId,
         shootingPlayer: existing.playerId,
+        blockingPlayer: existing.player2Id,
         assistPlayer: existing.player2Id,
         goalieScored: existing.goalieId,
         goalieInNet: existing.goalieId,
@@ -228,6 +230,7 @@ export class ShotFormModalComponent implements OnInit {
       // Save/Missed/Blocked fields
       shootingTeam: [null as number | null],
       shootingPlayer: [null as number | null],
+      blockingPlayer: [null as number | null],
       goalieInNet: [null as number | null],
       // Scoring chance note
       scoringChanceNote: [''],
@@ -245,15 +248,27 @@ export class ShotFormModalComponent implements OnInit {
   }
 
   private filterPlayersAndGoaliesForTeam(teamId: number, skipGoalieDefault = false): void {
+    const oppositeTeam = this.teamOptions.find((t) => t.value !== teamId);
+
     // Players should be from the selected team
     if (this.dialogData.playerOptions) {
       this.playerOptions = this.dialogData.playerOptions
         .filter((p) => p.teamId === teamId)
         .map((p) => ({ value: p.value, label: p.label }));
+    } else {
+      this.playerOptions = [];
+    }
+
+    // Blocking players should be from the OPPOSITE team
+    if (oppositeTeam && this.dialogData.playerOptions) {
+      this.blockingPlayerOptions = this.dialogData.playerOptions
+        .filter((p) => p.teamId === oppositeTeam.value)
+        .map((p) => ({ value: p.value, label: p.label }));
+    } else {
+      this.blockingPlayerOptions = [];
     }
 
     // Goalies should be from the OPPOSITE team
-    const oppositeTeam = this.teamOptions.find((t) => t.value !== teamId);
     if (oppositeTeam && this.dialogData.goalieOptions) {
       const oppositeGoalies = this.dialogData.goalieOptions
         .filter((g) => g.teamId === oppositeTeam.value)
@@ -304,6 +319,7 @@ export class ShotFormModalComponent implements OnInit {
       'goalieScored',
       'shootingTeam',
       'shootingPlayer',
+      'blockingPlayer',
       'goalieInNet',
     ];
 
@@ -324,7 +340,7 @@ export class ShotFormModalComponent implements OnInit {
       // Non-goal fields are required
       this.shotForm.get('shootingTeam')?.setValidators([Validators.required]);
       this.shotForm.get('shootingPlayer')?.setValidators([Validators.required]);
-      // goalieInNet remains optional
+      // blockingPlayer and goalieInNet remain optional
     }
 
     // Recompute validity without emitting to avoid feedback loop
@@ -353,6 +369,12 @@ export class ShotFormModalComponent implements OnInit {
     const shotType = this.shotForm.get('shotType')?.value;
     const goalShotType = this.shotTypeOptions.find((st) => st.label.toLowerCase() === 'goal');
     return shotType !== null && shotType !== goalShotType?.value;
+  }
+
+  get isBlocked(): boolean {
+    const shotType = this.shotForm.get('shotType')?.value;
+    const blockedShotType = this.shotTypeOptions.find((st) => st.label.toLowerCase() === 'blocked');
+    return shotType === blockedShotType?.value;
   }
 
   get isScoringChance(): boolean {
@@ -448,7 +470,7 @@ export class ShotFormModalComponent implements OnInit {
         event_name_id: this.shotEventId,
         team_id: this.isGoal ? formValue.scoringTeam : formValue.shootingTeam,
         player_id: this.isGoal ? formValue.scoringPlayer : formValue.shootingPlayer,
-        player_2_id: this.isGoal ? formValue.assistPlayer : undefined,
+        player_2_id: this.isGoal ? formValue.assistPlayer : (this.isBlocked ? formValue.blockingPlayer : undefined),
         shot_type_id: formValue.shotType,
         goalie_id: goalieId,
         period_id: formValue.period,
@@ -525,6 +547,7 @@ export class ShotFormModalComponent implements OnInit {
       goalieScored: 'Goalie',
       shootingTeam: 'Shooting Team',
       shootingPlayer: 'Shooting Player',
+      blockingPlayer: 'Blocking Player',
       goalieInNet: 'Goalie',
       scoringChanceNote: 'Note',
     };

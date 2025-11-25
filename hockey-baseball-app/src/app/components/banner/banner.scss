@@ -1,6 +1,6 @@
 .banner-container {
   display: flex;
-  gap: 20px;
+  gap: 10px;
   align-items: center;
   overflow-x: hidden;
   padding: 0;
@@ -12,7 +12,7 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  max-width: 210px;
+  max-width: fit-content;
   padding: 8px 12px;
   border: 1px solid #333;
   border-radius: 8px;

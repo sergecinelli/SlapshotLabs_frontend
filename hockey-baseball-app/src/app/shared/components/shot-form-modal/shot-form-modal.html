@@ -237,6 +237,23 @@
           </div>
         </div>
 
+        <div *ngIf="isBlocked" class="player-selection-container">
+          <div class="player-selection-label uppercase text-custom-secondary">
+            Player that blocked the shot
+          </div>
+          <div class="player-buttons">
+            <button
+              *ngFor="let player of blockingPlayerOptions"
+              type="button"
+              class="player-button"
+              [class.selected]="shotForm.get('blockingPlayer')?.value === player.value"
+              (click)="selectPlayer(player.value, 'blockingPlayer')"
+            >
+              <div class="player-name">{{ player.label }}</div>
+            </button>
+          </div>
+        </div>
+
         <div class="goalie-selection-container">
           <div class="goalie-selection-label uppercase text-custom-secondary">Goalie in Net</div>
           <div class="goalie-buttons">

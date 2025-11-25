@@ -68,6 +68,7 @@ export interface PenaltyEventRequest {
   event_name_id: number;
   team_id: number;
   player_id: number;
+  player_2_id?: number;
   period_id: number;
   time: string;
   time_length: string;
@@ -221,6 +222,7 @@ export class GameEventService {
       event_name_id: penaltyData.event_name_id,
       team_id: penaltyData.team_id,
       player_id: penaltyData.player_id,
+      player_2_id: penaltyData.player_2_id,
       period_id: penaltyData.period_id,
       time: penaltyData.time,
       time_length: penaltyData.time_length,

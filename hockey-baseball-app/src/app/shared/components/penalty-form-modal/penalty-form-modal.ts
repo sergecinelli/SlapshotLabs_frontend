@@ -70,6 +70,7 @@ export class PenaltyFormModalComponent implements OnInit {
       time?: string;
       teamId?: number;
       playerId?: number;
+      player2Id?: number;
       penaltyLength?: string;
       zone?: string;
       youtubeLink?: string;
@@ -90,6 +91,7 @@ export class PenaltyFormModalComponent implements OnInit {
   teamOptions: { value: number; label: string; logo?: string }[] = [];
   playersByTeam: Record<number, { value: number; label: string }[]> = {};
   playerOptions: { value: number; label: string }[] = [];
+  penaltyDrawnPlayerOptions: { value: number; label: string }[] = [];
   periodOptions: { value: number; label: string }[] = [];
 
   isLoadingTeams = false;
@@ -141,6 +143,7 @@ export class PenaltyFormModalComponent implements OnInit {
       this.penaltyForm.patchValue({
         team: existing.teamId,
         player: existing.playerId,
+        penaltyDrawnPlayer: existing.player2Id,
         penaltyLength: existing.penaltyLength,
         period: existing.periodId,
         time: existing.time,
@@ -178,6 +181,7 @@ export class PenaltyFormModalComponent implements OnInit {
     return this.fb.group({
       team: ['', Validators.required],
       player: ['', Validators.required],
+      penaltyDrawnPlayer: [null as number | null],
       penaltyLength: [
         '',
         [Validators.required, Validators.pattern(/^([0-5]?[0-9]):([0-5][0-9])$/)],
@@ -243,9 +247,20 @@ export class PenaltyFormModalComponent implements OnInit {
       if (this.playerOptions.length > 0) {
         this.penaltyForm.patchValue({ player: this.playerOptions[0].value });
       }
+
+      // Update penalty drawn players from preloaded data or cache
+      this.updatePenaltyDrawnPlayers(teamId);
       return;
     }
 
+    // If we have preloaded data, use it instead of API call
+    if (this.dialogData.playerOptions && this.dialogData.playerOptions.length > 0) {
+      this.filterPlayersForTeam(teamId);
+      this.isLoadingPlayers = false;
+      return;
+    }
+
+    // Only make API call if no preloaded data (fallback case)
     this.playerService.getPlayersByTeam(teamId).subscribe({
       next: (players) => {
         const playerOptions = players.map((player) => ({
@@ -263,6 +278,9 @@ export class PenaltyFormModalComponent implements OnInit {
         } else {
           this.penaltyForm.patchValue({ player: '' });
         }
+
+        // Update penalty drawn players from preloaded data or cache
+        this.updatePenaltyDrawnPlayers(teamId);
       },
       error: (error) => {
         console.error(`Failed to load players for team ${teamId}:`, error);
@@ -271,10 +289,54 @@ export class PenaltyFormModalComponent implements OnInit {
     });
   }
 
+  private updatePenaltyDrawnPlayers(teamId: number): void {
+    const oppositeTeam = this.teamOptions.find((t) => t.value !== teamId);
+    if (!oppositeTeam) {
+      this.penaltyDrawnPlayerOptions = [];
+      return;
+    }
+
+    // First, try preloaded data (most common case)
+    if (this.dialogData.playerOptions && this.dialogData.playerOptions.length > 0) {
+      this.penaltyDrawnPlayerOptions = this.dialogData.playerOptions
+        .filter((player) => player.teamId === oppositeTeam.value)
+        .map((player) => ({
+          value: player.value,
+          label: player.label,
+        }));
+      return;
+    }
+
+    // Then, try cache (if we loaded via API before)
+    if (this.playersByTeam[oppositeTeam.value]) {
+      this.penaltyDrawnPlayerOptions = this.playersByTeam[oppositeTeam.value];
+      return;
+    }
+
+    // Only make API call as last resort (should rarely happen)
+    this.playerService.getPlayersByTeam(oppositeTeam.value).subscribe({
+      next: (players) => {
+        const playerOptions = players.map((player) => ({
+          value: parseInt(player.id),
+          label: `${player.firstName} ${player.lastName}`,
+        }));
+
+        this.playersByTeam[oppositeTeam.value] = playerOptions;
+        this.penaltyDrawnPlayerOptions = playerOptions;
+      },
+      error: (error) => {
+        console.error(`Failed to load players for opposite team ${oppositeTeam.value}:`, error);
+        this.penaltyDrawnPlayerOptions = [];
+      },
+    });
+  }
+
   /**
    * Filter players from pre-loaded player options based on team
    */
   private filterPlayersForTeam(teamId: number): void {
+    const oppositeTeam = this.teamOptions.find((t) => t.value !== teamId);
+
     if (this.dialogData.playerOptions) {
       const filteredPlayers = this.dialogData.playerOptions
         .filter((player) => player.teamId === teamId)
@@ -291,6 +353,18 @@ export class PenaltyFormModalComponent implements OnInit {
         this.penaltyForm.patchValue({ player: this.playerOptions[0].value });
       } else {
         this.penaltyForm.patchValue({ player: '' });
+      }
+
+      // Filter penalty drawn players from the opposite team
+      if (oppositeTeam) {
+        this.penaltyDrawnPlayerOptions = this.dialogData.playerOptions
+          .filter((player) => player.teamId === oppositeTeam.value)
+          .map((player) => ({
+            value: player.value,
+            label: player.label,
+          }));
+      } else {
+        this.penaltyDrawnPlayerOptions = [];
       }
     }
   }
@@ -317,6 +391,11 @@ export class PenaltyFormModalComponent implements OnInit {
   selectPlayer(playerValue: number): void {
     this.penaltyForm.patchValue({ player: playerValue });
     this.penaltyForm.get('player')?.markAsTouched();
+  }
+
+  selectPenaltyDrawnPlayer(playerValue: number): void {
+    this.penaltyForm.patchValue({ penaltyDrawnPlayer: playerValue });
+    this.penaltyForm.get('penaltyDrawnPlayer')?.markAsTouched();
   }
 
   selectPeriod(periodValue: number): void {
@@ -355,6 +434,7 @@ export class PenaltyFormModalComponent implements OnInit {
         event_name_id: this.penaltyEventId,
         team_id: formValue.team,
         player_id: formValue.player,
+        player_2_id: formValue.penaltyDrawnPlayer || undefined,
         period_id: formValue.period,
         time: timeOfDay,
         time_length: timeLengthDuration,
@@ -434,6 +514,7 @@ export class PenaltyFormModalComponent implements OnInit {
     const labels: Record<string, string> = {
       team: 'Team',
       player: 'Player',
+      penaltyDrawnPlayer: 'Penalty Drawn Player',
       penaltyLength: 'Penalty Length',
       period: 'Period',
       time: 'Time',
