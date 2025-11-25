@@ -1,4 +1,45 @@
-@use '@angular/material' as mat;
+@use "@angular/material" as mat;
+
+// Inter Font Family
+@font-face {
+  font-family: "Inter";
+  src: url("assets/fonts/Inter/Inter-Thin.ttf") format("truetype");
+  font-weight: 100;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("assets/fonts/Inter/Inter-Light.ttf") format("truetype");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("assets/fonts/Inter/Inter-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("assets/fonts/Inter/Inter-SemiBold.ttf") format("truetype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("assets/fonts/Inter/Inter-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
 
 $custom-primary-palette: (
   0: #000000,
@@ -16,7 +57,7 @@ $custom-primary-palette: (
   95: #edacad,
   98: #f3c8c7,
   99: #f9e4e1,
-  100: #ffffff,
+  100: #ffffff
 );
 
 $custom-secondary-palette: (
@@ -35,7 +76,7 @@ $custom-secondary-palette: (
   95: #d7dbe8,
   98: #efeefb,
   99: #f7f6ff,
-  100: #ffffff,
+  100: #ffffff
 );
 
 @layer utilities {
@@ -51,16 +92,20 @@ $custom-secondary-palette: (
   }
 }
 
+* {
+  font-family: "Inter";
+}
+
 html {
   @include mat.theme(
     (
       color: (
         primary: $custom-primary-palette,
         secondary: $custom-secondary-palette,
-        tertiary: $custom-primary-palette,
+        tertiary: $custom-primary-palette
       ),
-      typography: Roboto,
-      density: 0,
+      typography: Inter,
+      density: 0
     )
   );
 }
@@ -120,7 +165,8 @@ body {
 }
 body {
   margin: 0;
-  font-family: Roboto, 'Helvetica Neue', sans-serif;
+  font-family: "Inter", Roboto, "Helvetica Neue", sans-serif;
+  font-synthesis: none; // Отключаем синтетическое утолщение, чтобы использовать реальные файлы шрифтов
 }
 
 .mat-mdc-button.mat-mdc-button-disabled {
@@ -350,7 +396,7 @@ mat-error {
   font-size: 14px !important;
 }
 
-.cdk-overlay-pane[aria-label*='select'] .mat-mdc-option,
+.cdk-overlay-pane[aria-label*="select"] .mat-mdc-option,
 .cdk-overlay-pane .mat-mdc-select-panel .mat-mdc-option {
   font-size: 14px !important;
 }

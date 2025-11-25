@@ -118,6 +118,11 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'gamesheet',
+        loadComponent: () =>
+          import('./pages/gamesheet/gamesheet').then((m) => m.GamesheetComponent),
+      },
+      {
         path: 'live-dashboard/:gameId',
         loadComponent: () =>
           import('./pages/live-dashboard/live-dashboard').then((m) => m.LiveDashboardComponent),

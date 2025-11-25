@@ -1,0 +1,23 @@
+.gamesheet-container {
+  width: 100%;
+  height: calc(100vh - 145px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+  border-radius: 10px;
+}
+
+.gamesheet-iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  flex: 1;
+  min-height: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 100%;
+}

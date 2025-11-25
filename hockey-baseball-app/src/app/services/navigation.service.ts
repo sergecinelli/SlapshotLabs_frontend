@@ -65,6 +65,11 @@ export class NavigationService {
       path: '/highlights',
       icon: 'highlights',
     },
+    {
+      label: 'GAMESHEET',
+      path: '/gamesheet',
+      icon: 'gamesheet', // Using image instead of SVG
+    },
     /*{
       label: 'Live Dashboard',
       path: '/live-dashboard/10',

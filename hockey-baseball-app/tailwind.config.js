@@ -3,6 +3,9 @@ module.exports = {
   content: ['./src/**/*.{html,ts}'],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['Inter', 'Roboto', 'Helvetica Neue', 'sans-serif'],
+      },
       colors: {
         custom: {
           primary: '#cf142b', // Primary red
