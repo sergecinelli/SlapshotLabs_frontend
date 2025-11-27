@@ -41,7 +41,7 @@ jobs:
 
       # 5. Copy build to EC2
       - name: Deploy build to EC2
-        uses: appleboy/scp-action@v0.1.8
+        uses: appleboy/scp-action@v1.0.0
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
