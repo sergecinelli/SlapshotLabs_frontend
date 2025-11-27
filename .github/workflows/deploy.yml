@@ -12,14 +12,14 @@ jobs:
 
     defaults:
       run:
-        working-directory: hockey-baseball-app  # Run commands from this subfolder
+        working-directory: hockey-baseball-app  # Run all commands from this subfolder
 
     steps:
       # 1. Checkout repository
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2. Setup Node.js
+      # 2. Setup Node.js and npm cache
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -42,5 +42,5 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          source: "dist/browser/*"   # relative to working-directory
+          source: "dist/hockey-baseball-app/*"   # Correct path to built SPA files
           target: "/var/www/hockey-baseball-app"
