@@ -39,14 +39,24 @@ jobs:
       - name: List build files
         run: ls -la dist/hockey-baseball-app/browser
 
-      # 5. Copy build to EC2
+      # 5. Clean target directory on EC2
+      - name: Clean target directory on EC2
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            mkdir -p /var/www/hockey-baseball-app
+            find /var/www/hockey-baseball-app -mindepth 1 -delete || true
+
+      # 6. Copy build to EC2
       - name: Deploy build to EC2
         uses: appleboy/scp-action@v1.0.0
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          source: "hockey-baseball-app/dist/hockey-baseball-app/browser/*"
+          source: "hockey-baseball-app/dist/hockey-baseball-app/browser/"
           target: "/var/www/hockey-baseball-app"
           strip_components: 4
-          rm: true
