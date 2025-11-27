@@ -25,6 +25,7 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
+          cache-dependency-path: hockey-baseball-app/package-lock.json
 
       # 3. Install dependencies
       - name: Install dependencies
