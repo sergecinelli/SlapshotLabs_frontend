@@ -35,6 +35,10 @@ jobs:
       - name: Build application
         run: npm run build:prod
 
+      # Optional: List built files for debugging
+      - name: List build files
+        run: ls -la dist/hockey-baseball-app
+
       # 5. Copy build to EC2
       - name: Deploy build to EC2
         uses: appleboy/scp-action@v0.1.7
