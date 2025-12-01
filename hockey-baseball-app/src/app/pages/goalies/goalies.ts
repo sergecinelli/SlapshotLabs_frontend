@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { ActivatedRoute, Router } from '@angular/router';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header';
 import {
   DataTableComponent,
@@ -17,7 +18,6 @@ import {
   GoalieFormModalComponent,
   GoalieFormModalData,
 } from '../../shared/components/goalie-form-modal/goalie-form-modal';
-import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-goalies',
@@ -32,7 +32,7 @@ import { Router } from '@angular/router';
   ],
   template: `
     <div class="p-6 pt-0">
-      <app-page-header title="Goalies"></app-page-header>
+      <app-page-header [title]="pageTitle()"></app-page-header>
 
       <!-- Add Goalie Button -->
       <div class="mb-4 flex justify-end">
@@ -48,7 +48,7 @@ import { Router } from '@angular/router';
       </div>
 
       <app-data-table
-        [columns]="tableColumns"
+        [columns]="tableColumns()"
         [data]="goalies()"
         [actions]="tableActions"
         [loading]="loading()"
@@ -64,13 +64,17 @@ export class GoaliesComponent implements OnInit {
   private goalieService = inject(GoalieService);
   private teamService = inject(TeamService);
   private dialog = inject(MatDialog);
+  private route = inject(ActivatedRoute);
   private router = inject(Router);
 
   goalies = signal<Goalie[]>([]);
   teams: Team[] = []; // Store teams to pass to modals
   loading = signal(true);
+  teamId = signal<string | null>(null);
+  teamName = signal<string>('Goalies');
+  pageTitle = signal<string>('Goalies');
 
-  tableColumns: TableColumn[] = [
+  private allTableColumns: TableColumn[] = [
     { key: 'team', label: 'Team', sortable: true, type: 'dropdown', width: '100px' },
     { key: 'position', label: 'Pos', sortable: false, width: '75px' },
     { key: 'height', label: 'Ht', sortable: true, width: '65px' },
@@ -94,6 +98,8 @@ export class GoaliesComponent implements OnInit {
     { key: 'shga', label: 'SHGA', sortable: true, type: 'number', width: '70px' },
   ];
 
+  tableColumns = signal<TableColumn[]>(this.allTableColumns);
+
   tableActions: TableAction[] = [
     { label: 'Delete', action: 'delete', variant: 'danger' },
     { label: 'Edit', action: 'edit', variant: 'secondary' },
@@ -108,7 +114,29 @@ export class GoaliesComponent implements OnInit {
   ];
 
   ngOnInit(): void {
-    this.loadGoalies();
+    // Check for teamId query parameter
+    this.route.queryParams.subscribe((params) => {
+      const teamId = params['teamId'];
+      const teamName = params['teamName'];
+
+      if (teamId) {
+        this.teamId.set(teamId);
+        if (teamName) {
+          this.teamName.set(teamName);
+          this.pageTitle.set(`Goalies | ${teamName}`);
+        }
+        // Hide team column when viewing team-specific goalies
+        this.tableColumns.set(this.allTableColumns.filter((col) => col.key !== 'team'));
+        this.loadGoaliesByTeam(parseInt(teamId, 10));
+      } else {
+        this.teamId.set(null);
+        this.teamName.set('Goalies');
+        this.pageTitle.set('Goalies');
+        // Show all columns including team
+        this.tableColumns.set(this.allTableColumns);
+        this.loadGoalies();
+      }
+    });
   }
 
   private loadGoalies(): void {
@@ -124,6 +152,24 @@ export class GoaliesComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading goalies:', error);
+        this.loading.set(false);
+      },
+    });
+  }
+
+  private loadGoaliesByTeam(teamId: number): void {
+    this.loading.set(true);
+    this.goalieService.getGoaliesByTeam(teamId, { excludeDefault: true }).subscribe({
+      next: (goalies) => {
+        // Sort by creation date (newest to oldest) by default
+        const sortedGoalies = this.sortByDate(goalies, 'desc');
+        this.goalies.set(sortedGoalies);
+        this.loading.set(false);
+        // Fetch all teams separately for modals
+        this.loadTeams();
+      },
+      error: (error) => {
+        console.error('Error loading goalies for team:', error);
         this.loading.set(false);
       },
     });
@@ -243,6 +289,8 @@ export class GoaliesComponent implements OnInit {
       data: {
         isEditMode: false,
         teams: this.teams,
+        teamId: this.teamId(),
+        teamName: this.teamName(),
       } as GoalieFormModalData,
       panelClass: 'goalie-form-modal-dialog',
       disableClose: true,
@@ -282,6 +330,8 @@ export class GoaliesComponent implements OnInit {
         goalie: goalie,
         isEditMode: true,
         teams: this.teams,
+        teamId: this.teamId(),
+        teamName: this.teamName(),
       } as GoalieFormModalData,
       panelClass: 'goalie-form-modal-dialog',
       disableClose: true,

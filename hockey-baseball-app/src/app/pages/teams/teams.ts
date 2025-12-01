@@ -84,6 +84,7 @@ export class TeamsComponent implements OnInit {
     { label: 'Edit', action: 'edit', variant: 'secondary' },
     { label: 'View', action: 'view-profile', variant: 'primary' },
     { label: 'Players', action: 'players', variant: 'secondary' },
+    { label: 'Goalies', action: 'goalies', variant: 'secondary' },
   ];
 
   ngOnInit(): void {
@@ -136,6 +137,9 @@ export class TeamsComponent implements OnInit {
         break;
       case 'players':
         this.viewTeamPlayers(item);
+        break;
+      case 'goalies':
+        this.viewTeamGoalies(item);
         break;
       default:
         console.log(`Unknown action: ${action}`);
@@ -216,7 +220,15 @@ export class TeamsComponent implements OnInit {
   private viewTeamPlayers(team: Team): void {
     // Navigate to players page with team context
     const baseUrl = window.location.origin;
-    const url = `${baseUrl}/players?teamId=${team.id}&teamName=${encodeURIComponent(team.name)}`;
+    const url = `${baseUrl}/teams/players?teamId=${team.id}&teamName=${encodeURIComponent(team.name)}`;
+
+    window.location.assign(url);
+  }
+
+  private viewTeamGoalies(team: Team): void {
+    // Navigate to goalies page with team context
+    const baseUrl = window.location.origin;
+    const url = `${baseUrl}/teams/goalies?teamId=${team.id}&teamName=${encodeURIComponent(team.name)}`;
 
     window.location.assign(url);
   }

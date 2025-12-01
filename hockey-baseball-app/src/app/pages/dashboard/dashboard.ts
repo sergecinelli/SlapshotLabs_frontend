@@ -189,7 +189,7 @@ export class DashboardComponent implements OnInit {
   private addPlayer(playerData: Partial<Player>): void {
     this.playerService.addPlayer(playerData).subscribe({
       next: () => {
-        this.router.navigate(['/players']);
+        this.router.navigate(['/teams/players']);
       },
       error: (error) => {
         console.error('Error adding player:', error);
@@ -216,7 +216,7 @@ export class DashboardComponent implements OnInit {
   private addGoalie(goalieData: Partial<Goalie>): void {
     this.goalieService.addGoalie(goalieData).subscribe({
       next: () => {
-        this.router.navigate(['/goalies']);
+        this.router.navigate(['/teams/goalies']);
       },
       error: (error) => {
         console.error('Error adding goalie:', error);

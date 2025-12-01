@@ -56,7 +56,7 @@ export class SprayChartComponent implements OnInit {
         this.loadGoalieSprayChartData(id);
       }
     } else {
-      this.router.navigate(['/goalies']);
+      this.router.navigate(['/teams/goalies']);
     }
   }
 
@@ -80,14 +80,14 @@ export class SprayChartComponent implements OnInit {
           );
         } else {
           console.error(`Goalie not found with ID: ${goalieId}`);
-          this.router.navigate(['/goalies']);
+          this.router.navigate(['/teams/goalies']);
         }
         this.loading = false;
       },
       error: (error) => {
         console.error('Error loading spray chart data:', error);
         this.loading = false;
-        this.router.navigate(['/goalies']);
+        this.router.navigate(['/teams/goalies']);
       },
     });
   }
@@ -112,23 +112,23 @@ export class SprayChartComponent implements OnInit {
           );
         } else {
           console.error(`Player not found with ID: ${playerId}`);
-          this.router.navigate(['/players']);
+          this.router.navigate(['/teams/players']);
         }
         this.loading = false;
       },
       error: (error) => {
         console.error('Error loading spray chart data:', error);
         this.loading = false;
-        this.router.navigate(['/players']);
+        this.router.navigate(['/teams/players']);
       },
     });
   }
 
   goBack(): void {
     if (this.entityType === 'player') {
-      this.router.navigate(['/players']);
+      this.router.navigate(['/teams/players']);
     } else {
-      this.router.navigate(['/goalies']);
+      this.router.navigate(['/teams/goalies']);
     }
   }
 

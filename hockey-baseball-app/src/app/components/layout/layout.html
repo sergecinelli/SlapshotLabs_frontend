@@ -20,7 +20,7 @@
         <div>
           <!-- Main Navigation Item -->
           <button
-            (click)="item.children ? toggleSubmenu(item) : navigate(item.path)"
+            (click)="navigate(item.path)"
             [class.gamesheet]="item.path === '/gamesheet'"
             [class]="
               'flex items-center justify-between w-full px-4 py-3 text-sm transition-colors duration-200 text-left bg-transparent border-none cursor-pointer ' +
@@ -29,7 +29,7 @@
                 : 'text-custom-dark hover:text-custom-primary font-medium')
             "
           >
-            <div class="flex items-center space-x-3">
+            <div class="flex items-center space-x-3 flex-1">
               @if (item.icon) {
                 <img
                   [src]="getIconPath(item.icon)"
@@ -44,13 +44,18 @@
             </div>
             @if (item.children) {
               <svg
+                (click)="toggleSubmenu(item); $event.stopPropagation()"
+                (keyup.enter)="toggleSubmenu(item); $event.stopPropagation()"
+                (keyup.space)="toggleSubmenu(item); $event.stopPropagation()"
                 [class]="
-                  'w-4 h-4 transition-transform duration-200 ' +
+                  'w-4 h-4 transition-transform duration-200 cursor-pointer flex-shrink-0 ml-2 ' +
                   (isActive(item.path) || isParentActive(item)
                     ? 'text-custom-primary'
-                    : 'text-custom-secondary')
+                    : 'text-custom-secondary hover:text-custom-primary')
                 "
                 [style.transform]="item.expanded ? 'rotate(90deg)' : 'rotate(0deg)'"
+                tabindex="0"
+                role="button"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"

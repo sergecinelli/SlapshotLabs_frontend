@@ -63,10 +63,23 @@ export const routes: Routes = [
           ),
       },
 
-      // Other main routes (lazy loaded)
+      // Teams routes
       {
-        path: 'goalies',
+        path: 'teams',
+        loadComponent: () => import('./pages/teams/teams').then((m) => m.TeamsComponent),
+      },
+      {
+        path: 'teams/players',
+        loadComponent: () => import('./pages/players/players').then((m) => m.PlayersComponent),
+      },
+      {
+        path: 'teams/goalies',
         loadComponent: () => import('./pages/goalies/goalies').then((m) => m.GoaliesComponent),
+      },
+      {
+        path: 'player-profile/:id',
+        loadComponent: () =>
+          import('./pages/player-profile/player-profile').then((m) => m.PlayerProfileComponent),
       },
       {
         path: 'goalie-profile/:id',
@@ -77,19 +90,6 @@ export const routes: Routes = [
         path: 'spray-chart/:id',
         loadComponent: () =>
           import('./pages/spray-chart/spray-chart').then((m) => m.SprayChartComponent),
-      },
-      {
-        path: 'players',
-        loadComponent: () => import('./pages/players/players').then((m) => m.PlayersComponent),
-      },
-      {
-        path: 'player-profile/:id',
-        loadComponent: () =>
-          import('./pages/player-profile/player-profile').then((m) => m.PlayerProfileComponent),
-      },
-      {
-        path: 'teams',
-        loadComponent: () => import('./pages/teams/teams').then((m) => m.TeamsComponent),
       },
       {
         path: 'team-profile/:id',

@@ -131,7 +131,7 @@ export class PlayersComponent implements OnInit {
         this.teamId.set(teamId);
         if (teamName) {
           this.teamName.set(teamName);
-          this.pageTitle.set(`${teamName} Players`);
+          this.pageTitle.set(`Players | ${teamName}`);
         }
         // Hide team column when viewing team-specific players
         this.tableColumns.set(this.allTableColumns.filter((col) => col.key !== 'team'));

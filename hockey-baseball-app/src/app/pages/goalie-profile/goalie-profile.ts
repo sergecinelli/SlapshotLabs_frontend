@@ -83,7 +83,7 @@ export class GoalieProfileComponent implements OnInit {
     if (goalieId) {
       this.loadGoalie(goalieId);
     } else {
-      this.router.navigate(['/goalies']);
+      this.router.navigate(['/teams/goalies']);
     }
   }
 
@@ -116,7 +116,7 @@ export class GoalieProfileComponent implements OnInit {
           this.loadSprayChartData(id, lastSeason.id, eventNames, shotTypes);
         } else {
           console.error(`Goalie not found with ID: ${id}`);
-          this.router.navigate(['/goalies']);
+          this.router.navigate(['/teams/goalies']);
           this.loading = false;
         }
       },
@@ -126,7 +126,7 @@ export class GoalieProfileComponent implements OnInit {
         // Set empty arrays on error so component still renders
         this.seasonStats = [];
         this.recentGameStats = [];
-        this.router.navigate(['/goalies']);
+        this.router.navigate(['/teams/goalies']);
       },
     });
   }

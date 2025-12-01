@@ -36,14 +36,14 @@ export class NavigationService {
       ],
     },
     {
-      label: 'Goalies',
-      path: '/goalies',
-      icon: 'goalies',
-    },
-    {
       label: 'Teams',
       path: '/teams',
       icon: 'teams',
+      expanded: false,
+      children: [
+        { label: 'Players', path: '/teams/players', icon: 'players' },
+        { label: 'Goalies', path: '/teams/goalies', icon: 'goalies' },
+      ],
     },
     {
       label: 'Schedule',

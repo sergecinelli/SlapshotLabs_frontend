@@ -90,7 +90,7 @@ export class PlayerProfileComponent implements OnInit {
     if (playerId) {
       this.loadPlayer(playerId);
     } else {
-      this.router.navigate(['/players']);
+      this.router.navigate(['/teams/players']);
     }
   }
 
@@ -123,7 +123,7 @@ export class PlayerProfileComponent implements OnInit {
           this.loadSprayChartData(id, lastSeason.id, eventNames, shotTypes);
         } else {
           console.error(`Player not found with ID: ${id}`);
-          this.router.navigate(['/players']);
+          this.router.navigate(['/teams/players']);
           this.loading = false;
         }
       },
@@ -133,7 +133,7 @@ export class PlayerProfileComponent implements OnInit {
         // Set empty arrays on error so component still renders
         this.seasonStats = [];
         this.recentGameStats = [];
-        this.router.navigate(['/players']);
+        this.router.navigate(['/teams/players']);
       },
     });
   }
