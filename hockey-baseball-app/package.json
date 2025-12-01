@@ -12,7 +12,8 @@
     "test": "ng test",
     "format": "prettier --write \"src/**/*.{ts,html,scss,css,json}\"",
     "format:check": "prettier --check \"src/**/*.{ts,html,scss,css,json}\"",
-    "lint": "ng lint"
+    "lint": "ng lint",
+    "back": "cd ../../SlapshotLabs_backend && git pull && docker-compose down && docker-compose up -d --build"
   },
   "private": true,
   "dependencies": {

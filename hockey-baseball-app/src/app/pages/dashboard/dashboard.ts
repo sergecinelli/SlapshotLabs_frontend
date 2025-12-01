@@ -82,17 +82,19 @@ export class DashboardComponent implements OnInit {
           id: number;
           home_team_id: number;
           home_goals: number;
-          home_start_goalie_id: number;
+          home_start_goalie_id: number | null;
           away_team_id: number;
           away_goals: number;
-          away_start_goalie_id: number;
+          away_start_goalie_id: number | null;
           game_type_id: number;
-          game_type_name?: string;
+          game_type_name: string | null;
           tournament_name?: string;
           date: string;
           time: string;
-          rink_id: number;
+          rink_id: number | null;
           status: number;
+          season_id?: number | null;
+          arena_id?: number | null;
         }): Schedule => {
           const homeTeam = this.teamsMap.get(game.home_team_id);
           const awayTeam = this.teamsMap.get(game.away_team_id);
@@ -104,17 +106,17 @@ export class DashboardComponent implements OnInit {
             homeTeamId: game.home_team_id,
             homeTeamLogo: `${apiUrl}/hockey/team/${game.home_team_id}/logo`,
             homeGoals: game.home_goals,
-            homeTeamGoalie: `Goalie ${game.home_start_goalie_id}`, // TODO: Map to actual goalie names
+            homeTeamGoalie: game.home_start_goalie_id ? `Goalie ${game.home_start_goalie_id}` : '—', // TODO: Map to actual goalie names
             awayTeam: awayTeam?.name || `Team ${game.away_team_id}`,
             awayTeamId: game.away_team_id,
             awayTeamLogo: `${apiUrl}/hockey/team/${game.away_team_id}/logo`,
             awayGoals: game.away_goals,
-            awayTeamGoalie: `Goalie ${game.away_start_goalie_id}`,
+            awayTeamGoalie: game.away_start_goalie_id ? `Goalie ${game.away_start_goalie_id}` : '—',
             gameType: '' as GameType, // TODO: Map game_type_id to game type name
-            tournamentName: game.game_type_name,
+            tournamentName: game.game_type_name || undefined,
             date: game.date,
             time: game.time,
-            rink: `Rink ${game.rink_id}`, // TODO: Map to actual rink name
+            rink: game.rink_id ? `Rink ${game.rink_id}` : '—', // TODO: Map to actual rink name
             status:
               game.status === 0
                 ? GameStatus.NotStarted

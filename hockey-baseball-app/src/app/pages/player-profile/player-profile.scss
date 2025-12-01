@@ -29,7 +29,6 @@
 
 .player-profile-page {
   padding: 24px;
-  max-width: 1400px;
   margin: 0 auto;
 
   .loading-container {
@@ -485,6 +484,18 @@
                 text-align: center !important;
               }
 
+              .team-logo-img {
+                width: 32px;
+                height: 32px;
+                object-fit: contain;
+                border-radius: 4px;
+              }
+
+              .no-logo {
+                color: var(--color-secondary);
+                opacity: 0.5;
+              }
+
               &.team-cell {
                 display: flex;
                 align-items: center;
@@ -498,12 +509,9 @@
                   display: inline-flex;
                   align-items: center;
                   justify-content: center;
-                  width: 20px;
-                  height: 20px;
-
-                  &:empty {
-                    display: none;
-                  }
+                  width: 30px;
+                  height: 30px;
+                  border-radius: 5px;
                 }
 
                 .team-name {

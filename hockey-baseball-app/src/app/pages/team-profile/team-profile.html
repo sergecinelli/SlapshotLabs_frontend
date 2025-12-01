@@ -12,12 +12,7 @@
         <mat-icon>edit</mat-icon>
         Edit Team Profile
       </button>
-      <button
-        mat-raised-button
-        color="accent"
-        (click)="onRequestTeamAnalysis()"
-        class="add-team-btn"
-      >
+      <button mat-raised-button color="accent" (click)="onRequestTeamAnalysis()" class="add-team-btn">
         <mat-icon>analytics</mat-icon>
         Request Team Analysis
       </button>
@@ -73,6 +68,7 @@
           </button>
         </div>
 
+        @if (getSeasonStatsDataSource().length > 0) {
         <div class="table-container">
           <table mat-table [dataSource]="getSeasonStatsDataSource()" class="season-table">
             <!-- Season Column -->
@@ -117,6 +113,12 @@
             <tr mat-row *matRowDef="let row; columns: seasonStatsColumns"></tr>
           </table>
         </div>
+        } @else {
+        <div class="empty-state">
+          <mat-icon class="empty-icon">table_chart</mat-icon>
+          <p class="empty-message">No season statistics available for this team.</p>
+        </div>
+        }
       </mat-card-content>
     </mat-card>
 
@@ -132,12 +134,9 @@
         <!-- Recent Games -->
         <div class="schedule-section">
           <h3 class="schedule-subtitle red-text">{{ getRecentGamesTitle() }}</h3>
+          @if (getRecentGames().length > 0) {
           <div class="table-container">
-            <table
-              mat-table
-              [dataSource]="getRecentGames()"
-              class="schedule-table recent-games-table"
-            >
+            <table mat-table [dataSource]="getRecentGames()" class="schedule-table recent-games-table">
               <!-- Date Column -->
               <ng-container matColumnDef="date">
                 <th mat-header-cell *matHeaderCellDef class="header-cell">Date</th>
@@ -153,12 +152,7 @@
               <!-- Result Column -->
               <ng-container matColumnDef="result">
                 <th mat-header-cell *matHeaderCellDef class="header-cell">Result</th>
-                <td
-                  mat-cell
-                  *matCellDef="let element"
-                  class="data-cell result-cell"
-                  [ngClass]="getResultClass(element.result || '')"
-                >
+                <td mat-cell *matCellDef="let element" class="data-cell result-cell" [ngClass]="getResultClass(element.result || '')">
                   {{ element.result }}
                 </td>
               </ng-container>
@@ -179,17 +173,20 @@
               <tr mat-row *matRowDef="let row; columns: recentGamesColumns"></tr>
             </table>
           </div>
+          } @else {
+          <div class="empty-state">
+            <mat-icon class="empty-icon">schedule</mat-icon>
+            <p class="empty-message">No recent games available for this team.</p>
+          </div>
+          }
         </div>
 
         <!-- Upcoming Games -->
         <div class="schedule-section">
           <h3 class="schedule-subtitle red-text">{{ getUpcomingGamesTitle() }}</h3>
+          @if (getUpcomingGames().length > 0) {
           <div class="table-container">
-            <table
-              mat-table
-              [dataSource]="getUpcomingGames()"
-              class="schedule-table upcoming-games-table"
-            >
+            <table mat-table [dataSource]="getUpcomingGames()" class="schedule-table upcoming-games-table">
               <!-- Date Column -->
               <ng-container matColumnDef="date">
                 <th mat-header-cell *matHeaderCellDef class="header-cell">Date</th>
@@ -224,6 +221,12 @@
               <tr mat-row *matRowDef="let row; columns: upcomingGamesColumns"></tr>
             </table>
           </div>
+          } @else {
+          <div class="empty-state">
+            <mat-icon class="empty-icon">schedule</mat-icon>
+            <p class="empty-message">No upcoming games available for this team.</p>
+          </div>
+          }
         </div>
       </mat-card-content>
     </mat-card>

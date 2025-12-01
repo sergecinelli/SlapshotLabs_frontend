@@ -51,3 +51,27 @@ export interface TeamSeasonStats {
   points: number;
   goalDifferential: number;
 }
+
+// API response interface for team-season/list endpoint
+export interface TeamSeasonOut {
+  id: number;
+  team_id: number;
+  season_id: number;
+  games_played: number;
+  goals_against: number;
+  wins: number;
+  losses: number;
+  ties: number;
+  points: number;
+}
+
+// Frontend interface for team season statistics
+export interface TeamSeasonStat {
+  season: string;
+  seasonId: number;
+  gamesPlayed: number;
+  wins: number;
+  losses: number;
+  ties: number;
+  points: number;
+}

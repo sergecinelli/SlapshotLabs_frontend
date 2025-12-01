@@ -18,6 +18,7 @@ import {
   ShotLocationData,
 } from '../../shared/components/shot-location-display/shot-location-display';
 import { SeasonService } from '../../services/season.service';
+import { Season } from '../../shared/interfaces/season.interface';
 import { GameEventNameService, GameEventName } from '../../services/game-event-name.service';
 import { GameMetadataService, ShotTypeResponse } from '../../services/game-metadata.service';
 import { SprayChartUtilsService } from '../../services/spray-chart-utils.service';
@@ -49,6 +50,9 @@ export class GoalieProfileComponent implements OnInit {
   goalie: Goalie | null = null;
   loading = true;
   shotLocationData: ShotLocationData[] = [];
+  seasonStats: GoalieSeasonStats[] = [];
+  recentGameStats: GoalieRecentGameStats[] = [];
+  seasons: Season[] = [];
 
   // Table column definitions
   seasonStatsColumns: string[] = [
@@ -66,8 +70,7 @@ export class GoalieProfileComponent implements OnInit {
   recentGameStatsColumns: string[] = [
     'season',
     'date',
-    'vs',
-    'team',
+    'vsTeam',
     'score',
     'goalsAgainst',
     'shotsAgainst',
@@ -87,16 +90,21 @@ export class GoalieProfileComponent implements OnInit {
   private loadGoalie(id: string): void {
     this.loading = true;
 
-    // Fetch goalie data, spray chart metadata, and spray chart data in parallel
+    // Fetch goalie data, spray chart metadata, spray chart data, team seasons, and recent games in parallel
     forkJoin({
       goalie: this.goalieService.getGoalieById(id),
       seasons: this.seasonService.getSeasons(),
       eventNames: this.gameEventNameService.getGameEventNames(),
       shotTypes: this.gameMetadataService.getShotTypes(),
+      teamSeasons: this.goalieService.getGoalieTeamSeasons(id),
+      recentGames: this.goalieService.getGoalieRecentGames(id, 5),
     }).subscribe({
-      next: ({ goalie, seasons, eventNames, shotTypes }) => {
+      next: ({ goalie, seasons, eventNames, shotTypes, teamSeasons, recentGames }) => {
         if (goalie) {
           this.goalie = goalie;
+          this.seasonStats = teamSeasons;
+          this.recentGameStats = recentGames;
+          this.seasons = seasons;
 
           // Get the last season (highest ID)
           const lastSeason = seasons.reduce(
@@ -115,6 +123,9 @@ export class GoalieProfileComponent implements OnInit {
       error: (error) => {
         console.error('Error loading goalie:', error);
         this.loading = false;
+        // Set empty arrays on error so component still renders
+        this.seasonStats = [];
+        this.recentGameStats = [];
         this.router.navigate(['/goalies']);
       },
     });
@@ -177,112 +188,16 @@ export class GoalieProfileComponent implements OnInit {
   }
 
   getSeasonStats(): GoalieSeasonStats[] {
-    return [
-      {
-        season: '2024/2025',
-        logo: '',
-        team: 'Florida Panthers',
-        gamesPlayed: 20,
-        wins: 5,
-        losses: 10,
-        ties: 5,
-        goalsAgainst: 15,
-        shotsAgainst: 95,
-        saves: 80,
-        savePercentage: 0.842,
-      },
-      {
-        season: '2023/2024',
-        logo: '',
-        team: 'Toronto Maple Leaves',
-        gamesPlayed: 20,
-        wins: 5,
-        losses: 10,
-        ties: 5,
-        goalsAgainst: 15,
-        shotsAgainst: 95,
-        saves: 80,
-        savePercentage: 0.842,
-      },
-      {
-        season: '2022/2023',
-        logo: '',
-        team: 'Toronto Maple Leaves',
-        gamesPlayed: 20,
-        wins: 5,
-        losses: 10,
-        ties: 5,
-        goalsAgainst: 15,
-        shotsAgainst: 95,
-        saves: 80,
-        savePercentage: 0.842,
-      },
-    ];
+    return this.seasonStats;
+  }
+
+  getSeasonName(seasonId: number): string {
+    const season = this.seasons.find((s) => s.id === seasonId);
+    return season ? season.name : '';
   }
 
   getRecentGameStats(): GoalieRecentGameStats[] {
-    return [
-      {
-        season: '2025/2026',
-        date: 'Oct. 10, 2025',
-        vs: 'vs',
-        teamLogo: '',
-        team: 'Toronto Maple Leafs',
-        score: '(L/W/T) 5 - 3',
-        goalsAgainst: 5,
-        shotsAgainst: 28,
-        saves: 23,
-        savePercentage: 0.821,
-      },
-      {
-        season: '2025/2026',
-        date: 'Oct. 10, 2025',
-        vs: 'vs',
-        teamLogo: '',
-        team: 'Toronto Maple Leafs',
-        score: '(L/W/T) 5 - 3',
-        goalsAgainst: 5,
-        shotsAgainst: 28,
-        saves: 23,
-        savePercentage: 0.821,
-      },
-      {
-        season: '2025/2026',
-        date: 'Oct. 10, 2025',
-        vs: 'vs',
-        teamLogo: '',
-        team: 'Toronto Maple Leafs',
-        score: '(L/W/T) 5 - 3',
-        goalsAgainst: 5,
-        shotsAgainst: 28,
-        saves: 23,
-        savePercentage: 0.821,
-      },
-      {
-        season: '2025/2026',
-        date: 'Oct. 10, 2025',
-        vs: 'vs',
-        teamLogo: '',
-        team: 'Toronto Maple Leafs',
-        score: '(L/W/T) 5 - 3',
-        goalsAgainst: 5,
-        shotsAgainst: 28,
-        saves: 23,
-        savePercentage: 0.821,
-      },
-      {
-        season: '2025/2026',
-        date: 'Oct. 10, 2025',
-        vs: 'vs',
-        teamLogo: '',
-        team: 'Toronto Maple Leafs',
-        score: '(L/W/T) 5 - 3',
-        goalsAgainst: 5,
-        shotsAgainst: 28,
-        saves: 23,
-        savePercentage: 0.821,
-      },
-    ];
+    return this.recentGameStats;
   }
 
   getShotLocationData(): ShotLocationData[] {

@@ -1,9 +1,10 @@
 import { Injectable, inject } from '@angular/core';
-import { Observable, throwError } from 'rxjs';
+import { Observable, throwError, forkJoin } from 'rxjs';
 import { map, catchError, switchMap } from 'rxjs/operators';
-import { Team, TeamTableData, TeamApiOut } from '../shared/interfaces/team.interface';
+import { Team, TeamTableData, TeamApiOut, TeamSeasonOut, TeamSeasonStat } from '../shared/interfaces/team.interface';
 import { ApiService } from './api.service';
 import { TeamDataMapperService } from './team-data-mapper.service';
+import { SeasonService } from './season.service';
 
 @Injectable({
   providedIn: 'root',
@@ -11,6 +12,7 @@ import { TeamDataMapperService } from './team-data-mapper.service';
 export class TeamService {
   private apiService = inject(ApiService);
   private teamDataMapper = inject(TeamDataMapperService);
+  private seasonService = inject(SeasonService);
 
   getTeams(): Observable<TeamTableData> {
     return this.apiService.get<TeamApiOut[]>('/hockey/team/list').pipe(
@@ -184,6 +186,47 @@ export class TeamService {
     return this.apiService.get<Blob>(`/hockey/team/${numericId}/logo`).pipe(
       catchError((error) => {
         console.error(`Failed to fetch logo for team with ID ${id}:`, error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  getTeamSeasons(teamId: number, limit = 2): Observable<TeamSeasonStat[]> {
+    const params: Record<string, string> = {};
+    if (limit) {
+      params['limit'] = limit.toString();
+    }
+    if (teamId) {
+      params['team_id'] = teamId.toString();
+    }
+    const queryString = new URLSearchParams(params).toString();
+    const url = `/hockey/team-season/list${queryString ? `?${queryString}` : ''}`;
+
+    return forkJoin({
+      teamSeasons: this.apiService.get<TeamSeasonOut[]>(url),
+      seasons: this.seasonService.getSeasons(),
+    }).pipe(
+      map(({ teamSeasons, seasons }) => {
+        // Create season ID to name mapping
+        const seasonMap = new Map(seasons.map((s) => [s.id, s.name]));
+
+        // Map API response to frontend format
+        return teamSeasons.map((season) => {
+          const seasonName = seasonMap.get(season.season_id) || `Season ${season.season_id}`;
+
+          return {
+            season: seasonName,
+            seasonId: season.season_id,
+            gamesPlayed: season.games_played,
+            wins: season.wins,
+            losses: season.losses,
+            ties: season.ties,
+            points: season.points,
+          };
+        });
+      }),
+      catchError((error) => {
+        console.error(`Failed to fetch team seasons for team ${teamId}:`, error);
         return throwError(() => error);
       })
     );

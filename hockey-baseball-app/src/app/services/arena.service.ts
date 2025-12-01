@@ -35,6 +35,18 @@ export class ArenaService {
   }
 
   /**
+   * Fetch a specific rink by ID from the API
+   */
+  getRinkById(id: number): Observable<Rink> {
+    return this.apiService.get<Rink>(`/hockey/arena-rink/${id}`).pipe(
+      catchError((error) => {
+        console.error(`Failed to fetch rink ${id}:`, error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  /**
    * Transform arenas to dropdown options
    */
   transformArenasToOptions(arenas: Arena[]): { value: number; label: string }[] {

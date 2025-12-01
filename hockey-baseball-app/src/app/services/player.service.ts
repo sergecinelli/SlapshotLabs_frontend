@@ -9,6 +9,10 @@ import {
   PlayerApiPatch,
   PlayerApiInData,
   PlayerApiOutData,
+  PlayerTeamSeasonApiOut,
+  PlayerSeasonStats,
+  GamePlayerOut,
+  PlayerRecentGameStats,
 } from '../shared/interfaces/player.interface';
 import { ApiService } from './api.service';
 import { TeamService } from './team.service';
@@ -211,6 +215,11 @@ export class PlayerService {
       scoringChances: data.scoring_chances || 0,
       blockedShots: data.blocked_shots || 0,
       penaltiesDrawn: data.penalties_drawn || 0,
+      penaltyMinutes: data.penalty_minutes || 0,
+      turnovers: data.turnovers || 0,
+      faceoffWinPercents: data.faceoff_win_percents || 0,
+      shortHandedGoals: data.short_handed_goals || 0,
+      powerPlayGoals: data.power_play_goals || 0,
       level: 'Professional',
       rink: {
         facilityName: 'Default Facility',
@@ -416,6 +425,149 @@ export class PlayerService {
           return throwError(() => error);
         })
       );
+  }
+
+  getPlayerTeamSeasons(id: string): Observable<PlayerSeasonStats[]> {
+    // Convert string ID to number for API call
+    const numericId = parseInt(id, 10);
+    if (isNaN(numericId)) {
+      console.error(`Invalid player ID: ${id}`);
+      return throwError(() => new Error(`Invalid player ID: ${id}`));
+    }
+
+    return forkJoin({
+      teamSeasons: this.apiService.get<PlayerTeamSeasonApiOut[]>(
+        `/hockey/player/${numericId}/team-seasons`
+      ),
+      teams: this.teamService.getTeams(),
+    }).pipe(
+      map(({ teamSeasons, teams }) => {
+        // Create team ID to name and logo mapping
+        const teamMap = new Map(
+          teams.teams.map((t) => [parseInt(t.id), { name: t.name, logo: t.logo || '' }])
+        );
+
+        // Map API response to frontend format
+        return teamSeasons.map((season) => {
+          const teamInfo = teamMap.get(season.team_id) || {
+            name: `Team ${season.team_id}`,
+            logo: '',
+          };
+
+          return {
+            season: '', // Will be filled from seasons list by seasonId
+            seasonId: season.season_id,
+            logo: teamInfo.logo,
+            team: teamInfo.name,
+            gamesPlayed: season.games_played,
+            goals: season.goals,
+            assists: season.assists,
+            points: season.points,
+            shotsOnGoal: season.shots_on_goal,
+            scoringChances: season.scoring_chances,
+            penaltiesDrawn: this.parsePenaltyDuration(season.penalties_drawn),
+            turnovers: season.turnovers,
+            faceOffWinPercentage: season.faceoff_win_percents,
+          };
+        });
+      }),
+      catchError((error) => {
+        console.error(`Failed to fetch team seasons for player ${id}:`, error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  getPlayerRecentGames(id: string, limit = 5): Observable<PlayerRecentGameStats[]> {
+    // Convert string ID to number for API call
+    const numericId = parseInt(id, 10);
+    if (isNaN(numericId)) {
+      console.error(`Invalid player ID: ${id}`);
+      return throwError(() => new Error(`Invalid player ID: ${id}`));
+    }
+
+    return forkJoin({
+      games: this.apiService.get<GamePlayerOut[]>(
+        `/hockey/game-player/player/${numericId}?limit=${limit}`
+      ),
+      teams: this.teamService.getTeams(),
+    }).pipe(
+      map(({ games, teams }) => {
+        // Create team ID to name and logo mapping
+        const teamMap = new Map(
+          teams.teams.map((t) => [parseInt(t.id), { name: t.name, logo: t.logo || '' }])
+        );
+
+        // Map API response to frontend format
+        return games.map((game) => {
+          // Get opponent team info by team_vs_id
+          const vsTeamInfo = teamMap.get(game.team_vs_id) || {
+            name: game.team_vs_name,
+            logo: '',
+          };
+
+          // Get player's team info by team_id
+          const playerTeamInfo = teamMap.get(game.team_id) || {
+            name: game.team_name,
+            logo: '',
+          };
+
+          // Format date
+          const gameDate = new Date(game.date);
+          const formattedDate = gameDate.toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric',
+          });
+
+          // faceoff_win_percents is already in percentage format (0-100)
+          const faceOffWinPercentage = game.faceoff_win_percents || 0;
+
+          // Get base URL for logo endpoint
+          const baseUrl = this.apiService.getBaseUrl();
+          const vsTeamLogoUrl = `${baseUrl}/hockey/team/${game.team_vs_id}/logo`;
+
+          return {
+            season: game.season_name || '',
+            date: formattedDate,
+            vsTeamName: vsTeamInfo.name, // Opponent team name
+            vsTeamLogo: vsTeamLogoUrl, // Logo URL from API endpoint
+            teamName: playerTeamInfo.name, // Player's team name
+            teamLogo: playerTeamInfo.logo, // Player's team name
+            score: game.score,
+            goals: game.goals,
+            assists: game.assists,
+            points: game.points,
+            shotsOnGoal: game.shots_on_goal,
+            scoringChances: game.scoring_chances,
+            penaltiesDrawn: this.parsePenaltyDuration(game.penalty_minutes),
+            turnovers: game.turnovers,
+            faceOffWinPercentage: faceOffWinPercentage,
+          };
+        });
+      }),
+      catchError((error) => {
+        console.error(`Failed to fetch recent games for player ${id}:`, error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  /**
+   * Parse penalty duration string (e.g., "00:05:00") to number of minutes
+   */
+  private parsePenaltyDuration(duration: string): number {
+    if (!duration) return 0;
+    // Format is typically "HH:MM:SS" or "MM:SS"
+    const parts = duration.split(':');
+    if (parts.length === 3) {
+      // HH:MM:SS format
+      return parseInt(parts[0], 10) * 60 + parseInt(parts[1], 10);
+    } else if (parts.length === 2) {
+      // MM:SS format
+      return parseInt(parts[0], 10);
+    }
+    return 0;
   }
 
   private mapPositionNameToId(position: string): number {

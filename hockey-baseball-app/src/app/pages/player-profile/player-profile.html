@@ -96,7 +96,7 @@
             <div class="stat-label">Assists</div>
           </div>
           <div class="stat-box">
-            <div class="stat-value">45%</div>
+            <div class="stat-value">{{ (player.faceoffWinPercents || 0) | number:'1.0-0' }}%</div>
             <div class="stat-label">Face Off Win %</div>
           </div>
         </div>
@@ -104,11 +104,11 @@
         <!-- Second Row: 4 additional stats -->
         <div class="stats-row">
           <div class="stat-box">
-            <div class="stat-value">10</div>
+            <div class="stat-value">{{ player.powerPlayGoals || 0 }}</div>
             <div class="stat-label">PP Goals</div>
           </div>
           <div class="stat-box">
-            <div class="stat-value">5</div>
+            <div class="stat-value">{{ player.shortHandedGoals || 0 }}</div>
             <div class="stat-label">SH Goals</div>
           </div>
           <div class="stat-box">
@@ -125,7 +125,7 @@
         <div class="penalty-stats-row">
           <div class="penalty-stat-box">
             <span class="penalty-label">Penalty Minutes:</span>
-            <span class="penalty-value">45</span>
+            <span class="penalty-value">{{ player.penaltyMinutes || 0 }}</span>
           </div>
           <div class="penalty-stat-box">
             <span class="penalty-label">Penalties Drawn:</span>
@@ -133,7 +133,7 @@
           </div>
           <div class="penalty-stat-box">
             <span class="penalty-label">Turnovers:</span>
-            <span class="penalty-value">23</span>
+            <span class="penalty-value">{{ player.turnovers || 0 }}</span>
           </div>
         </div>
       </mat-card-content>
@@ -149,17 +149,14 @@
       </mat-card-header>
       <mat-card-content>
         @if (getShotLocationData().length > 0) {
-          <app-shot-location-display
-            [data]="getShotLocationData()"
-            [storageKey]="'playerSprayChartFilters'"
-          ></app-shot-location-display>
+        <app-shot-location-display [data]="getShotLocationData()" [storageKey]="'playerSprayChartFilters'"></app-shot-location-display>
         } @else {
-          <div class="empty-state">
-            <mat-icon class="empty-icon">sports_hockey</mat-icon>
-            <p class="empty-message">
-              No shot data available for this player in the current season.
-            </p>
-          </div>
+        <div class="empty-state">
+          <mat-icon class="empty-icon">sports_hockey</mat-icon>
+          <p class="empty-message">
+            No shot data available for this player in the current season.
+          </p>
+        </div>
         }
       </mat-card-content>
     </mat-card>
@@ -173,16 +170,15 @@
         </mat-card-title>
       </mat-card-header>
       <mat-card-content>
+        @if (getRecentGameStats().length > 0) {
         <div class="table-container">
-          <table
-            mat-table
-            [dataSource]="getRecentGameStats()"
-            class="stats-table recent-games-table"
-          >
+          <table mat-table [dataSource]="getRecentGameStats()" class="stats-table recent-games-table">
             <!-- Season Column -->
             <ng-container matColumnDef="season">
               <th mat-header-cell *matHeaderCellDef class="header-cell">Season</th>
-              <td mat-cell *matCellDef="let element" class="data-cell">{{ element.season }}</td>
+              <td mat-cell *matCellDef="let element" class="data-cell">
+                {{ element.season || '—' }}
+              </td>
             </ng-container>
 
             <!-- Date Column -->
@@ -191,20 +187,12 @@
               <td mat-cell *matCellDef="let element" class="data-cell">{{ element.date }}</td>
             </ng-container>
 
-            <!-- vs Column -->
-            <ng-container matColumnDef="vs">
-              <th mat-header-cell *matHeaderCellDef class="header-cell center">vs</th>
-              <td mat-cell *matCellDef="let element" class="data-cell center">
-                {{ element.team }}
-              </td>
-            </ng-container>
-
-            <!-- Team Column -->
-            <ng-container matColumnDef="team">
-              <th mat-header-cell *matHeaderCellDef class="header-cell">Team Name</th>
+            <!-- vs Team Column -->
+            <ng-container matColumnDef="vsTeam">
+              <th mat-header-cell *matHeaderCellDef class="header-cell">vs Team</th>
               <td mat-cell *matCellDef="let element" class="data-cell team-cell">
-                <span class="team-logo">{{ element.teamLogo }}</span>
-                <span class="team-name">{{ element.team }}</span>
+                <img class="team-logo" [src]="element.vsTeamLogo" alt="vs team logo" class="team-logo">
+                <span class="team-name">{{ element.vsTeamName }}</span>
               </td>
             </ng-container>
 
@@ -274,7 +262,7 @@
             <ng-container matColumnDef="faceOffWinPercentage">
               <th mat-header-cell *matHeaderCellDef class="header-cell center">Face Off</th>
               <td mat-cell *matCellDef="let element" class="data-cell center">
-                {{ element.faceOffWinPercentage }}%
+                {{ element.faceOffWinPercentage.toFixed(1) }}%
               </td>
             </ng-container>
 
@@ -282,6 +270,12 @@
             <tr mat-row *matRowDef="let row; columns: recentGameStatsColumns"></tr>
           </table>
         </div>
+        } @else {
+        <div class="empty-state">
+          <mat-icon class="empty-icon">history</mat-icon>
+          <p class="empty-message">No recent game statistics available for this player.</p>
+        </div>
+        }
       </mat-card-content>
     </mat-card>
 
@@ -294,20 +288,14 @@
         </mat-card-title>
       </mat-card-header>
       <mat-card-content>
+        @if (getSeasonStats().length > 0) {
         <div class="table-container">
           <table mat-table [dataSource]="getSeasonStats()" class="stats-table">
             <!-- Season Column -->
             <ng-container matColumnDef="season">
               <th mat-header-cell *matHeaderCellDef class="header-cell">Season</th>
-              <td mat-cell *matCellDef="let element" class="data-cell">{{ element.season }}</td>
-            </ng-container>
-
-            <!-- Team Column -->
-            <ng-container matColumnDef="team">
-              <th mat-header-cell *matHeaderCellDef class="header-cell">Team</th>
-              <td mat-cell *matCellDef="let element" class="data-cell team-cell">
-                <span class="team-logo">{{ element.logo }}</span>
-                <span class="team-name">{{ element.team }}</span>
+              <td mat-cell *matCellDef="let element" class="data-cell">
+                {{ getSeasonName(element.seasonId) || element.season }}
               </td>
             </ng-container>
 
@@ -379,7 +367,7 @@
             <ng-container matColumnDef="faceOffWinPercentage">
               <th mat-header-cell *matHeaderCellDef class="header-cell center">Face Off</th>
               <td mat-cell *matCellDef="let element" class="data-cell center">
-                {{ element.faceOffWinPercentage }}%
+                {{ (element.faceOffWinPercentage).toFixed(1) }}%
               </td>
             </ng-container>
 
@@ -387,6 +375,12 @@
             <tr mat-row *matRowDef="let row; columns: seasonStatsColumns"></tr>
           </table>
         </div>
+        } @else {
+        <div class="empty-state">
+          <mat-icon class="empty-icon">table_chart</mat-icon>
+          <p class="empty-message">No season statistics available for this player.</p>
+        </div>
+        }
       </mat-card-content>
     </mat-card>
   </div>

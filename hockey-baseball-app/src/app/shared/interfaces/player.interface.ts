@@ -113,6 +113,11 @@ export interface Player {
   scoringChances: number;
   blockedShots: number;
   penaltiesDrawn: number;
+  penaltyMinutes?: number;
+  turnovers?: number;
+  faceoffWinPercents?: number;
+  shortHandedGoals?: number;
+  powerPlayGoals?: number;
   rink: PlayerRink;
   level: string;
   createdAt?: Date; // Creation date for sorting
@@ -126,6 +131,7 @@ export interface PlayerTableData {
 
 export interface PlayerSeasonStats {
   season: string;
+  seasonId: number;
   logo: string;
   team: string;
   gamesPlayed: number;
@@ -139,12 +145,40 @@ export interface PlayerSeasonStats {
   faceOffWinPercentage: number;
 }
 
+// API response interface for team-seasons endpoint
+export interface PlayerTeamSeasonApiOut {
+  player_id: number;
+  season_id: number;
+  team_id: number;
+  games_played: number;
+  goals: number;
+  assists: number;
+  points: number;
+  shots_on_goal: number;
+  scoring_chances: number;
+  blocked_shots: number;
+  power_play_goals_diff: number;
+  penalty_kill_diff: number;
+  five_on_five_diff: number;
+  overall_diff: number;
+  penalties_drawn: string;
+  penalty_minutes: string;
+  faceoff_win_percents: number;
+  short_handed_goals: number;
+  power_play_goals: number;
+  faceoffs: number;
+  faceoffs_won: number;
+  turnovers: number;
+  shots_on_goal_per_game: number;
+}
+
 export interface PlayerRecentGameStats {
   season: string;
   date: string;
-  vs: string;
+  vsTeamName: string;
+  vsTeamLogo: string;
+  teamName: string;
   teamLogo: string;
-  team: string;
   score: string;
   goals: number;
   assists: number;
@@ -154,4 +188,28 @@ export interface PlayerRecentGameStats {
   penaltiesDrawn: number;
   turnovers: number;
   faceOffWinPercentage: number;
+}
+
+// API response interface for game-player/player endpoint
+export interface GamePlayerOut {
+  id: number;
+  first_name: string;
+  last_name: string;
+  season_name: string;
+  date: string;
+  team_id: number;
+  team_name: string;
+  team_vs_id: number;
+  team_vs_name: string;
+  score: string;
+  goals: number;
+  assists: number;
+  shots_on_goal: number;
+  scoring_chances: number;
+  penalty_minutes: string;
+  turnovers: number;
+  faceoffs: number;
+  faceoffs_won: number;
+  faceoff_win_percents: number;
+  points: number;
 }

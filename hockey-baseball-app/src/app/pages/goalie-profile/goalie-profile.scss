@@ -1,6 +1,5 @@
 .goalie-profile-page {
   padding: 24px;
-  max-width: 1200px;
   margin: 0 auto;
 
   .back-btn {
@@ -375,6 +374,18 @@
 
               &.center {
                 text-align: center !important;
+              }
+
+              .team-logo-img {
+                width: 32px;
+                height: 32px;
+                object-fit: contain;
+                border-radius: 4px;
+              }
+
+              .no-logo {
+                color: var(--color-secondary);
+                opacity: 0.5;
               }
 
               &.team-cell {

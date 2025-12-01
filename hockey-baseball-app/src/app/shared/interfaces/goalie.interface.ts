@@ -120,6 +120,7 @@ export interface GoalieTableData {
 // Season Stats interface
 export interface GoalieSeasonStats {
   season: string;
+  seasonId: number;
   logo: string;
   team: string;
   gamesPlayed: number;
@@ -136,12 +137,52 @@ export interface GoalieSeasonStats {
 export interface GoalieRecentGameStats {
   season: string;
   date: string;
-  vs: string;
-  teamLogo: string;
-  team: string;
+  vsTeamName: string;
+  vsTeamLogo: string;
+  teamName: string;
   score: string;
   goalsAgainst: number;
   shotsAgainst: number;
   saves: number;
   savePercentage: number;
+}
+
+// API response interface for game-player/goalie endpoint
+export interface GameGoalieOut {
+  id: number;
+  first_name: string;
+  last_name: string;
+  season_name: string;
+  date: string;
+  team_id: number;
+  team_name: string;
+  team_vs_id: number;
+  team_vs_name: string;
+  score: string;
+  goals_against: number;
+  shots_against: number;
+  saves: number;
+  save_percents: number;
+}
+
+// API response interface for team-seasons endpoint
+export interface GoalieTeamSeasonApiOut {
+  goalie_id: number;
+  season_id: number;
+  team_id: number;
+  games_played: number;
+  wins: number;
+  losses: number;
+  ties: number;
+  goals_against: number;
+  shots_on_goal: number;
+  saves: number;
+  save_percents: number;
+  goals: number;
+  assists: number;
+  penalty_minutes: string;
+  short_handed_goals_against: number;
+  power_play_goals_against: number;
+  shots_on_goal_per_game: number;
+  points: number;
 }

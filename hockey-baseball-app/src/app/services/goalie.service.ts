@@ -6,6 +6,10 @@ import {
   GoalieTableData,
   GoalieApiInData,
   GoalieApiOutData,
+  GoalieTeamSeasonApiOut,
+  GoalieSeasonStats,
+  GameGoalieOut,
+  GoalieRecentGameStats,
 } from '../shared/interfaces/goalie.interface';
 import { ApiService } from './api.service';
 import { GoalieDataMapper } from '../shared/utils/goalie-data-mapper';
@@ -232,6 +236,56 @@ export class GoalieService {
       );
   }
 
+  getGoalieTeamSeasons(id: string): Observable<GoalieSeasonStats[]> {
+    // Convert string ID to number for API call
+    const numericId = parseInt(id, 10);
+    if (isNaN(numericId)) {
+      console.error(`Invalid goalie ID: ${id}`);
+      return throwError(() => new Error(`Invalid goalie ID: ${id}`));
+    }
+
+    return forkJoin({
+      teamSeasons: this.apiService.get<GoalieTeamSeasonApiOut[]>(
+        `/hockey/goalie/${numericId}/team-seasons`
+      ),
+      teams: this.teamService.getTeams(),
+    }).pipe(
+      map(({ teamSeasons, teams }) => {
+        // Create team ID to name and logo mapping
+        const teamMap = new Map(
+          teams.teams.map((t) => [parseInt(t.id), { name: t.name, logo: t.logo || '' }])
+        );
+
+        // Map API response to frontend format
+        return teamSeasons.map((season) => {
+          const teamInfo = teamMap.get(season.team_id) || {
+            name: `Team ${season.team_id}`,
+            logo: '',
+          };
+
+          return {
+            season: '', // Will be filled from seasons list by seasonId
+            seasonId: season.season_id,
+            logo: teamInfo.logo,
+            team: teamInfo.name,
+            gamesPlayed: season.games_played,
+            wins: season.wins,
+            losses: season.losses,
+            ties: season.ties,
+            goalsAgainst: season.goals_against,
+            shotsAgainst: season.shots_on_goal,
+            saves: season.saves,
+            savePercentage: season.save_percents,
+          };
+        });
+      }),
+      catchError((error) => {
+        console.error(`Failed to fetch team seasons for goalie ${id}:`, error);
+        return throwError(() => error);
+      })
+    );
+  }
+
   private toApiPatchFormat(goalieData: Partial<Goalie>, teamId: number): GoalieApiInData {
     // Include all fields for PATCH (backend expects full data object)
     return {
@@ -264,5 +318,79 @@ export class GoalieService {
         | undefined,
       analysis: (goalieData as Record<string, unknown>)['analysis'] as string | undefined,
     };
+  }
+
+  getGoalieRecentGames(id: string, limit = 5): Observable<GoalieRecentGameStats[]> {
+    // Convert string ID to number for API call
+    const numericId = parseInt(id, 10);
+    if (isNaN(numericId)) {
+      console.error(`Invalid goalie ID: ${id}`);
+      return throwError(() => new Error(`Invalid goalie ID: ${id}`));
+    }
+
+    return forkJoin({
+      games: this.apiService.get<GameGoalieOut[]>(
+        `/hockey/game-player/goalie/${numericId}?limit=${limit}`
+      ),
+      teams: this.teamService.getTeams(),
+    }).pipe(
+      map(({ games, teams }) => {
+        // Create team ID to name and logo mapping
+        const teamMap = new Map(
+          teams.teams.map((t) => [parseInt(t.id), { name: t.name, logo: t.logo || '' }])
+        );
+
+        // Map API response to frontend format
+        return games.map((game) => {
+          // Get opponent team info by team_vs_id
+          const vsTeamInfo = teamMap.get(game.team_vs_id) || {
+            name: game.team_vs_name,
+            logo: '',
+          };
+
+          // Get goalie's team info by team_id
+          const goalieTeamInfo = teamMap.get(game.team_id) || {
+            name: game.team_name,
+            logo: '',
+          };
+
+          // Format date
+          const gameDate = new Date(game.date);
+          const formattedDate = gameDate.toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric',
+          });
+
+          // save_percents is already in percentage format (0-100), convert to decimal (0-1)
+          const savePercentage = game.save_percents !== null && game.save_percents !== undefined && !isNaN(game.save_percents)
+            ? game.save_percents / 100
+            : game.shots_against > 0
+              ? game.saves / game.shots_against
+              : 0;
+
+          // Get base URL for logo endpoint
+          const baseUrl = this.apiService.getBaseUrl();
+          const vsTeamLogoUrl = `${baseUrl}/hockey/team/${game.team_vs_id}/logo`;
+
+          return {
+            season: game.season_name || '',
+            date: formattedDate,
+            vsTeamName: vsTeamInfo.name, // Opponent team name
+            vsTeamLogo: vsTeamLogoUrl, // Logo URL from API endpoint
+            teamName: goalieTeamInfo.name, // Goalie's team name
+            score: game.score,
+            goalsAgainst: game.goals_against,
+            shotsAgainst: game.shots_against,
+            saves: game.saves,
+            savePercentage: savePercentage,
+          };
+        });
+      }),
+      catchError((error) => {
+        console.error(`Failed to fetch recent games for goalie ${id}:`, error);
+        return throwError(() => error);
+      })
+    );
   }
 }
