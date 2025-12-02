@@ -23,6 +23,9 @@ export interface UserProfile {
   city: string;
   street: string;
   postal_code: string;
+  role_id: number;
+  role_name: string;
+  team_id: number | null;
 }
 
 export interface UserEditRequest {
