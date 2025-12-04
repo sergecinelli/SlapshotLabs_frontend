@@ -1,10 +1,8 @@
 import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header';
 import { DataTableComponent, TableColumn, TableAction } from '../../shared/components/data-table/data-table';
 import { TeamService } from '../../services/team.service';
@@ -62,9 +60,7 @@ export class TeamsComponent implements OnInit {
   protected visibilityByRoleMap = visibilityByRoleMap;
 
   private teamService = inject(TeamService);
-  private http = inject(HttpClient);
   private dialog = inject(MatDialog);
-  private snackBar = inject(MatSnackBar);
   private teamOptionsService = inject(TeamOptionsService);
 
   teams = signal<Team[]>([]);
@@ -78,6 +74,7 @@ export class TeamsComponent implements OnInit {
     { key: 'gamesPlayed', label: 'GP', sortable: true, type: 'number', width: '60px' },
     { key: 'wins', label: 'Wins', sortable: true, type: 'number', width: '70px' },
     { key: 'losses', label: 'Losses', sortable: true, type: 'number', width: '75px' },
+    { key: 'ties', label: 'Ties', sortable: true, type: 'number', width: '60px' },
     { key: 'points', label: 'Points', sortable: true, type: 'number', width: '75px' },
     { key: 'goalsFor', label: 'Goals For', sortable: true, type: 'number', width: '90px' },
     { key: 'goalsAgainst', label: 'Goals Against', sortable: true, type: 'number', width: '110px' },

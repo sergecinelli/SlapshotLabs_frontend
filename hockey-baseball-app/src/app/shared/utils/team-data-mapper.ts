@@ -19,6 +19,13 @@ export class TeamDataMapper {
       city: apiTeam.city || '',
       logo: '/assets/icons/teams.svg', // Default logo since API doesn't return it directly
       createdAt: new Date(), // Set creation date for newly created items
+      gamesPlayed: apiTeam.games_played,
+      goalsFor: apiTeam.goals_for,
+      goalsAgainst: apiTeam.goals_against,
+      wins: apiTeam.wins,
+      losses: apiTeam.losses,
+      ties: apiTeam.ties,
+      points: apiTeam.points,
     };
   }
 

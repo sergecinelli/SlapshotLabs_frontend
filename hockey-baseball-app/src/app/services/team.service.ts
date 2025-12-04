@@ -103,6 +103,13 @@ export class TeamService {
           city: teamData.city || '',
           logo: teamData.logo || '/assets/icons/teams.svg',
           createdAt: new Date(), // Set creation date
+          gamesPlayed: teamData.gamesPlayed || 0,
+          goalsFor: teamData.goalsFor || 0,
+          goalsAgainst: teamData.goalsAgainst || 0,
+          wins: teamData.wins || 0,
+          losses: teamData.losses || 0,
+          ties: teamData.ties || 0,
+          points: teamData.points || 0,
         };
 
         return newTeam;
