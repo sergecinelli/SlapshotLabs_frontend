@@ -25,6 +25,13 @@ export class TeamDataMapperService {
       abbreviation: apiTeam.abbreviation,
       logo: `${environment.apiUrl}/hockey/team/${apiTeam.id}/logo`, // Logo fetched from separate endpoint
       createdAt: new Date(),
+      gamesPlayed: apiTeam.games_played,
+      goalsFor: apiTeam.goals_for,
+      goalsAgainst: apiTeam.goals_against,
+      wins: apiTeam.wins,
+      losses: apiTeam.losses,
+      ties: apiTeam.ties,
+      points: apiTeam.points,
     };
   }
 
