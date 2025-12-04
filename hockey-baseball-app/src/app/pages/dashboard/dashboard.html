@@ -1,15 +1,14 @@
-<div class="p-6 pt-0 space-y-6">
+<div class="p-6 pt-0 space-y-6" [appVisibilityMap]="visibilityByRoleMap">
   <!-- Page Header -->
   <app-page-header title="Dashboard"></app-page-header>
 
   <!-- Quick Actions Row -->
   <div class="flex flex-wrap gap-4 justify-center">
-    <app-action-button label="Add Team" (buttonClick)="openAddTeamModal()"> </app-action-button>
-    <app-action-button label="Add Player" (buttonClick)="openAddPlayerModal()"> </app-action-button>
-    <app-action-button label="Add Goalie" (buttonClick)="openAddGoalieModal()"> </app-action-button>
-    <app-action-button label="Add Game" (buttonClick)="openAddGameModal()"> </app-action-button>
-    <app-action-button label="Create Highlight Reel" (buttonClick)="createHighlightReel()">
-    </app-action-button>
+    <app-action-button role-visibility-name="add-team-button" label="Add Team" (buttonClick)="openAddTeamModal()" />
+    <app-action-button role-visibility-name="add-player-button" label="Add Player" (buttonClick)="openAddPlayerModal()" />
+    <app-action-button role-visibility-name="add-goalie-button" label="Add Goalie" (buttonClick)="openAddGoalieModal()" />
+    <app-action-button role-visibility-name="add-game-button" label="Add Game" (buttonClick)="openAddGameModal()" />
+    <app-action-button role-visibility-name="add-highlight-button" label="Create Highlight Reel" (buttonClick)="createHighlightReel()" />
   </div>
 
   <!-- Main Content Grid -->
@@ -21,105 +20,81 @@
       </div>
       <div class="p-6">
         @if (loading()) {
-          <div class="flex justify-center items-center py-8">
-            <div class="text-gray-500">Loading games...</div>
-          </div>
+        <div class="flex justify-center items-center py-8">
+          <div class="text-gray-500">Loading games...</div>
+        </div>
         } @else if (upcomingGames().length === 0) {
-          <div class="text-center py-8 text-gray-500">No upcoming games scheduled.</div>
+        <div class="text-center py-8 text-gray-500">No upcoming games scheduled.</div>
         } @else {
-          <div>
-            @for (game of upcomingGames(); track game.id; let i = $index) {
-              @if (i < 5) {
-                <div
-                  class="game-item flex items-center py-3 border-b border-gray-100 last:border-b-0"
-                >
-                  <div class="flex-1 flex items-center gap-4">
-                    <span class="text-sm text-gray-600 min-w-[120px]"
-                      >{{ game.date }} - {{ game.time }}</span
-                    >
-                    <div class="flex items-center gap-2">
-                      @if (game.awayTeamLogo) {
-                        <img
-                          [src]="game.awayTeamLogo"
-                          [alt]="game.awayTeam"
-                          class="w-8 h-8 rounded-full object-contain border border-gray-200 bg-white p-1"
-                        />
-                      }
-                      <span class="font-medium text-gray-900">{{ game.awayTeam }}</span>
-                    </div>
-                    <span class="text-gray-500">at</span>
-                    <div class="flex items-center gap-2">
-                      @if (game.homeTeamLogo) {
-                        <img
-                          [src]="game.homeTeamLogo"
-                          [alt]="game.homeTeam"
-                          class="w-8 h-8 rounded-full object-contain border border-gray-200 bg-white p-1"
-                        />
-                      }
-                      <span class="font-medium text-gray-900">{{ game.homeTeam }}</span>
-                    </div>
-                  </div>
-                </div>
-              }
-            }
-          </div>
+        <div>
+          @for (game of upcomingGames(); track game.id; let i = $index) {
+          @if (i < 5) { <div class="game-item flex items-center py-3 border-b border-gray-100 last:border-b-0">
+            <div class="flex-1 flex items-center gap-4">
+              <span class="text-sm text-gray-600 min-w-[120px]">{{ game.date }} - {{ game.time }}</span>
+              <div class="flex items-center gap-2">
+                @if (game.awayTeamLogo) {
+                <img [src]="game.awayTeamLogo" [alt]="game.awayTeam"
+                  class="w-8 h-8 rounded-full object-contain border border-gray-200 bg-white p-1" />
+                }
+                <span class="font-medium text-gray-900">{{ game.awayTeam }}</span>
+              </div>
+              <span class="text-gray-500">at</span>
+              <div class="flex items-center gap-2">
+                @if (game.homeTeamLogo) {
+                <img [src]="game.homeTeamLogo" [alt]="game.homeTeam"
+                  class="w-8 h-8 rounded-full object-contain border border-gray-200 bg-white p-1" />
+                }
+                <span class="font-medium text-gray-900">{{ game.homeTeam }}</span>
+              </div>
+            </div>
+        </div>
+        }
         }
       </div>
-    </div>
-
-    <!-- Game Results -->
-    <div class="bg-white rounded-lg shadow-lg border border-gray-200">
-      <div class="px-6 pt-4 border-b border-gray-200">
-        <h2 class="text-xl font-semibold text-gray-900">Game Results</h2>
-      </div>
-      <div class="p-6">
-        @if (loading()) {
-          <div class="flex justify-center items-center py-8">
-            <div class="text-gray-500">Loading games...</div>
-          </div>
-        } @else if (gameResults().length === 0) {
-          <div class="text-center py-8 text-gray-500">No completed games found.</div>
-        } @else {
-          <div>
-            @for (game of gameResults(); track game.id; let i = $index) {
-              @if (i < 5) {
-                <div
-                  class="game-item flex items-center py-3 border-b border-gray-100 last:border-b-0"
-                >
-                  <div class="flex-1 flex items-center gap-4">
-                    <span class="text-sm text-gray-600 min-w-[120px]"
-                      >{{ game.date }} - {{ game.time }}</span
-                    >
-                    <div class="flex items-center gap-2">
-                      @if (game.awayTeamLogo) {
-                        <img
-                          [src]="game.awayTeamLogo"
-                          [alt]="game.awayTeam"
-                          class="w-8 h-8 rounded-full object-contain border border-gray-200 bg-white p-1"
-                        />
-                      }
-                      <span class="font-medium text-gray-900">{{ game.awayTeam }}</span>
-                      <span class="text-lg font-bold text-gray-900">{{ game.awayGoals }}</span>
-                    </div>
-                    <span class="text-gray-500">at</span>
-                    <div class="flex items-center gap-2">
-                      @if (game.homeTeamLogo) {
-                        <img
-                          [src]="game.homeTeamLogo"
-                          [alt]="game.homeTeam"
-                          class="w-8 h-8 rounded-full object-contain border border-gray-200 bg-white p-1"
-                        />
-                      }
-                      <span class="font-medium text-gray-900">{{ game.homeTeam }}</span>
-                      <span class="text-lg font-bold text-gray-900">{{ game.homeGoals }}</span>
-                    </div>
-                  </div>
-                </div>
-              }
-            }
-          </div>
-        }
-      </div>
+      }
     </div>
   </div>
+
+  <!-- Game Results -->
+  <div class="bg-white rounded-lg shadow-lg border border-gray-200">
+    <div class="px-6 pt-4 border-b border-gray-200">
+      <h2 class="text-xl font-semibold text-gray-900">Game Results</h2>
+    </div>
+    <div class="p-6">
+      @if (loading()) {
+      <div class="flex justify-center items-center py-8">
+        <div class="text-gray-500">Loading games...</div>
+      </div>
+      } @else if (gameResults().length === 0) {
+      <div class="text-center py-8 text-gray-500">No completed games found.</div>
+      } @else {
+      <div>
+        @for (game of gameResults(); track game.id; let i = $index) {
+        @if (i < 5) { <div class="game-item flex items-center py-3 border-b border-gray-100 last:border-b-0">
+          <div class="flex-1 flex items-center gap-4">
+            <span class="text-sm text-gray-600 min-w-[120px]">{{ game.date }} - {{ game.time }}</span>
+            <div class="flex items-center gap-2">
+              @if (game.awayTeamLogo) {
+              <img [src]="game.awayTeamLogo" [alt]="game.awayTeam" class="w-8 h-8 rounded-full object-contain border border-gray-200 bg-white p-1" />
+              }
+              <span class="font-medium text-gray-900">{{ game.awayTeam }}</span>
+              <span class="text-lg font-bold text-gray-900">{{ game.awayGoals }}</span>
+            </div>
+            <span class="text-gray-500">at</span>
+            <div class="flex items-center gap-2">
+              @if (game.homeTeamLogo) {
+              <img [src]="game.homeTeamLogo" [alt]="game.homeTeam" class="w-8 h-8 rounded-full object-contain border border-gray-200 bg-white p-1" />
+              }
+              <span class="font-medium text-gray-900">{{ game.homeTeam }}</span>
+              <span class="text-lg font-bold text-gray-900">{{ game.homeGoals }}</span>
+            </div>
+          </div>
+      </div>
+      }
+      }
+    </div>
+    }
+  </div>
+</div>
+</div>
 </div>

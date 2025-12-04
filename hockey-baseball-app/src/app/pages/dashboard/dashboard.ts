@@ -13,38 +13,34 @@ import { Schedule, GameStatus, GameType } from '../../shared/interfaces/schedule
 import { Team } from '../../shared/interfaces/team.interface';
 import { Player } from '../../shared/interfaces/player.interface';
 import { Goalie } from '../../shared/interfaces/goalie.interface';
-import {
-  PlayerFormModalComponent,
-  PlayerFormModalData,
-} from '../../shared/components/player-form-modal/player-form-modal';
-import {
-  TeamFormModalComponent,
-  TeamFormModalData,
-} from '../../shared/components/team-form-modal/team-form-modal';
-import {
-  GoalieFormModalComponent,
-  GoalieFormModalData,
-} from '../../shared/components/goalie-form-modal/goalie-form-modal';
-import {
-  ScheduleFormModalComponent,
-  ScheduleFormModalData,
-} from '../../shared/components/schedule-form-modal/schedule-form-modal';
-import {
-  HighlightReelFormModalComponent,
-  HighlightReelFormModalData,
-} from '../../shared/components/highlight-reel-form-modal/highlight-reel-form-modal';
+import { PlayerFormModalComponent, PlayerFormModalData } from '../../shared/components/player-form-modal/player-form-modal';
+import { TeamFormModalComponent, TeamFormModalData } from '../../shared/components/team-form-modal/team-form-modal';
+import { GoalieFormModalComponent, GoalieFormModalData } from '../../shared/components/goalie-form-modal/goalie-form-modal';
+import { ScheduleFormModalComponent, ScheduleFormModalData } from '../../shared/components/schedule-form-modal/schedule-form-modal';
+import { HighlightReelFormModalComponent, HighlightReelFormModalData } from '../../shared/components/highlight-reel-form-modal/highlight-reel-form-modal';
 import { HighlightReelUpsertPayload } from '../../shared/interfaces/highlight-reel.interface';
 import { HighlightsService } from '../../services/highlights.service';
 import { forkJoin } from 'rxjs';
+import { visibilityByRoleMap } from './dashboard.role-map';
+import { ComponentVisibilityByRoleDirective } from '../../shared/directives/component-visibility-by-role.directive';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, PageHeaderComponent, ActionButtonComponent, MatDialogModule],
+  imports: [
+    CommonModule,
+    PageHeaderComponent,
+    ActionButtonComponent,
+    MatDialogModule,
+    ComponentVisibilityByRoleDirective,
+  ],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
 })
 export class DashboardComponent implements OnInit {
+  // Role-based visibility map
+  protected visibilityByRoleMap = visibilityByRoleMap;
+
   private scheduleService = inject(ScheduleService);
   private teamService = inject(TeamService);
   private playerService = inject(PlayerService);

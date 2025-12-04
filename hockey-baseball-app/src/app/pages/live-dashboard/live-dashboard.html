@@ -1,4 +1,4 @@
-<div class="p-6 pt-0 space-y-6">
+<div class="p-6 pt-0 space-y-6" [appVisibilityMap]="visibilityByRoleMap">
   <!-- Page Header -->
   <app-page-header [title]="pageTitle()"></app-page-header>
 
@@ -108,14 +108,33 @@
     </div>
 
     <!-- Game Event Actions (Unified Section) -->
-    <div *ngIf="!isLoadingGameData" class="p-4">
+    <div *ngIf="!isLoadingGameData" class="p-4" role-visibility-name="add-event-button" [attr.role-visibility-team-id]="[homeTeamId, awayTeamId]">
       <div class="flex flex-wrap gap-3 justify-center">
-        <app-action-button label="Shots" (buttonClick)="onShots()"> </app-action-button>
-        <app-action-button label="Turnover" (buttonClick)="onTurnover()"> </app-action-button>
-        <app-action-button label="Faceoff" (buttonClick)="onFaceoff()"> </app-action-button>
-        <app-action-button label="Goalie Change" (buttonClick)="onGoalieChange()">
+        <app-action-button
+          label="Shots"
+          (buttonClick)="onShots()"
+        >
         </app-action-button>
-        <app-action-button label="Penalty" (buttonClick)="onPenalty()"> </app-action-button>
+        <app-action-button
+          label="Turnover"
+          (buttonClick)="onTurnover()"
+        >
+        </app-action-button>
+        <app-action-button
+          label="Faceoff"
+          (buttonClick)="onFaceoff()"
+        >
+        </app-action-button>
+        <app-action-button
+          label="Goalie Change"
+          (buttonClick)="onGoalieChange()"
+        >
+        </app-action-button>
+        <app-action-button
+          label="Penalty"
+          (buttonClick)="onPenalty()"
+        >
+        </app-action-button>
       </div>
     </div>
 
@@ -714,6 +733,8 @@
                         color="primary"
                         matTooltip="Edit"
                         (click)="onEditEvent(event)"
+                        role-visibility-name="edit-event-button"
+                        [attr.role-visibility-team-id]="[homeTeamId, awayTeamId]"
                       >
                         <mat-icon>edit</mat-icon>
                       </button>
@@ -722,6 +743,8 @@
                         color="warn"
                         matTooltip="Delete"
                         (click)="onDeleteEvent(event.id)"
+                        role-visibility-name="delete-event-button"
+                        [attr.role-visibility-team-id]="[homeTeamId, awayTeamId]"
                       >
                         <mat-icon>delete</mat-icon>
                       </button>

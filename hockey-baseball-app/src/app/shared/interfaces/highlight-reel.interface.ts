@@ -4,6 +4,7 @@ export interface HighlightReelApi {
   name: string;
   description: string;
   created_by: string;
+  user_id: string;
   date: string; // ISO date string (e.g., 2025-11-11)
 }
 
@@ -36,6 +37,7 @@ export interface HighlightReelRow extends Record<string, unknown> {
   name: string;
   description: string;
   createdBy: string;
+  userId: string;
   // For display and sorting
   dateCreated: Date; // raw date for sorting
   dateCreatedFormatted: string; // e.g., "Nov, 7, 25"

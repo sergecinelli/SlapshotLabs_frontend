@@ -13,16 +13,25 @@ import { VideoService } from '../../services/video.service';
 import { Video, VideoApiRequest } from '../../shared/interfaces/video.interface';
 import { VideoFormModalComponent } from '../../shared/components/video-form-modal/video-form-modal';
 import { VideoViewModalComponent } from '../../shared/components/video-view-modal/video-view-modal';
+import { ComponentVisibilityByRoleDirective } from '../../shared/directives/component-visibility-by-role.directive';
+import { visibilityByRoleMap } from './video-library.role-map';
 
 @Component({
   selector: 'app-video-library',
-  imports: [CommonModule, PageHeaderComponent, DataTableComponent, MatButtonModule, MatIconModule],
+  imports: [
+    CommonModule,
+    PageHeaderComponent,
+    DataTableComponent,
+    MatButtonModule,
+    MatIconModule,
+    ComponentVisibilityByRoleDirective,
+  ],
   template: `
-    <div class="p-6 pt-0">
+    <div class="p-6 pt-0" [appVisibilityMap]="visibilityByRoleMap">
       <app-page-header title="Video Library"></app-page-header>
 
       <!-- Add Video Button -->
-      <div class="mb-4 flex justify-end">
+      <div class="mb-4 flex justify-end" role-visibility-name="add-video-button">
         <button
           mat-raised-button
           color="primary"
@@ -49,6 +58,9 @@ import { VideoViewModalComponent } from '../../shared/components/video-view-moda
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class VideoLibraryComponent implements OnInit {
+  // Role-based access map
+  protected visibilityByRoleMap = visibilityByRoleMap;
+
   private videoService = inject(VideoService);
   private dialog = inject(MatDialog);
 
@@ -64,8 +76,8 @@ export class VideoLibraryComponent implements OnInit {
   ];
 
   tableActions: TableAction[] = [
-    { label: 'Delete', action: 'delete', variant: 'danger' },
-    { label: 'Edit', action: 'edit', variant: 'secondary' },
+    { label: 'Delete', action: 'delete', variant: 'danger', roleVisibilityName: 'delete-action' },
+    { label: 'Edit', action: 'edit', variant: 'secondary', roleVisibilityName: 'edit-action' },
     { label: 'View', action: 'view', variant: 'primary' },
   ];
 

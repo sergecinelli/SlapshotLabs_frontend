@@ -18,6 +18,8 @@ import { Rink } from '../../shared/interfaces/arena.interface';
 import { Player } from '../../shared/interfaces/player.interface';
 import { Goalie } from '../../shared/interfaces/goalie.interface';
 import { TeamFormModalComponent } from '../../shared/components/team-form-modal/team-form-modal';
+import { ComponentVisibilityByRoleDirective } from '../../shared/directives/component-visibility-by-role.directive';
+import { visibilityByRoleMap } from './team-profile.role-map';
 import { forkJoin } from 'rxjs';
 
 // Additional interfaces for team profile specific data
@@ -60,11 +62,15 @@ export interface TeamPlayer {
     MatCardModule,
     MatDividerModule,
     MatTableModule,
+    ComponentVisibilityByRoleDirective,
   ],
   templateUrl: './team-profile.html',
   styleUrl: './team-profile.scss',
 })
 export class TeamProfileComponent implements OnInit {
+  // Role-based access map
+  protected visibilityByRoleMap = visibilityByRoleMap;
+
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private teamService = inject(TeamService);

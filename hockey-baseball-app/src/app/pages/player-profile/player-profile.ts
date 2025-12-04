@@ -24,6 +24,8 @@ import { Season } from '../../shared/interfaces/season.interface';
 import { GameEventNameService, GameEventName } from '../../services/game-event-name.service';
 import { GameMetadataService, ShotTypeResponse } from '../../services/game-metadata.service';
 import { SprayChartUtilsService } from '../../services/spray-chart-utils.service';
+import { ComponentVisibilityByRoleDirective } from '../../shared/directives/component-visibility-by-role.directive';
+import { visibilityByRoleMap } from './player-profile.role-map';
 
 @Component({
   selector: 'app-player-profile',
@@ -36,11 +38,15 @@ import { SprayChartUtilsService } from '../../services/spray-chart-utils.service
     MatDividerModule,
     MatTableModule,
     ShotLocationDisplayComponent,
+    ComponentVisibilityByRoleDirective,
   ],
   templateUrl: './player-profile.html',
   styleUrl: './player-profile.scss',
 })
 export class PlayerProfileComponent implements OnInit {
+  // Role-based access map
+  protected visibilityByRoleMap = visibilityByRoleMap;
+
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private playerService = inject(PlayerService);

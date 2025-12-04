@@ -44,6 +44,8 @@ import {
   ShotLocationData,
 } from '../../shared/components/shot-location-display/shot-location-display';
 import { environment } from '../../../environments/environment';
+import { ComponentVisibilityByRoleDirective } from '../../shared/directives/component-visibility-by-role.directive';
+import { visibilityByRoleMap } from './live-dashboard.role-map';
 import { forkJoin, interval, Subscription } from 'rxjs';
 import { switchMap, startWith } from 'rxjs/operators';
 
@@ -110,6 +112,7 @@ interface GameEvent {
     MatIconModule,
     MatButtonModule,
     MatTooltipModule,
+    ComponentVisibilityByRoleDirective,
     MatSelectModule,
     MatFormFieldModule,
     MatProgressSpinnerModule,
@@ -119,6 +122,9 @@ interface GameEvent {
   styleUrl: './live-dashboard.scss',
 })
 export class LiveDashboardComponent implements OnInit, OnDestroy {
+  // Role-based access map
+  protected visibilityByRoleMap = visibilityByRoleMap;
+
   private dialog = inject(MatDialog);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
@@ -596,12 +602,11 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
 
         // Build description with additional info
         let description = event.note || event.goal_type || '';
-        
         // Add player_2 info to description for specific event types
         if (player2Name) {
           if (shotTypeCategory === 'blocked') {
             // For blocked shots, show who blocked it
-            description = description 
+            description = description
               ? `${description} | Blocked by: ${player2Name}`
               : `Blocked by: ${player2Name}`;
           } else if (isPenaltyEvent) {

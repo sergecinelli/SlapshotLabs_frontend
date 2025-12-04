@@ -18,64 +18,67 @@ export class NavigationService {
   private router = inject(Router);
 
   private readonly _currentPath = signal<string>('');
-  private readonly _navigationItems = signal<NavigationItem[]>([
-    {
-      label: 'Dashboard',
-      path: '/dashboard',
-      icon: 'dashboard',
-    },
-    {
-      label: 'Account',
-      path: '/account',
-      icon: 'account',
-      expanded: false,
-      children: [
-        { label: 'Profile', path: '/account/profile', icon: 'profile' },
-        { label: 'Payment Method', path: '/account/payment-method', icon: 'payment' },
-        { label: 'Payment History', path: '/account/payment-history', icon: 'history' },
-      ],
-    },
-    {
-      label: 'Teams',
-      path: '/teams',
-      icon: 'teams',
-      expanded: false,
-      children: [
-        { label: 'Players', path: '/teams/players', icon: 'players' },
-        { label: 'Goalies', path: '/teams/goalies', icon: 'goalies' },
-      ],
-    },
-    {
-      label: 'Schedule',
-      path: '/schedule',
-      icon: 'schedule',
-    },
-    {
-      label: 'Analytics',
-      path: '/analytics',
-      icon: 'analytics',
-    },
-    {
-      label: 'Video Library',
-      path: '/video-library',
-      icon: 'video',
-    },
-    {
-      label: 'Video Highlights',
-      path: '/highlights',
-      icon: 'highlights',
-    },
-    {
-      label: 'GAMESHEET',
-      path: '/gamesheet',
-      icon: 'gamesheet', // Using image instead of SVG
-    },
-    /*{
-      label: 'Live Dashboard',
-      path: '/live-dashboard/10',
-      icon: 'live'
-    }*/
-  ]);
+  private readonly _navigationItems = signal<NavigationItem[]>(this.getFilteredNavigationItems());
+
+  private getFilteredNavigationItems(): NavigationItem[] {
+    const allItems: NavigationItem[] = [
+      {
+        label: 'Dashboard',
+        path: '/dashboard',
+        icon: 'dashboard',
+      },
+      {
+        label: 'Account',
+        path: '/account',
+        icon: 'account',
+        expanded: false,
+        children: [
+          { label: 'Profile', path: '/account/profile', icon: 'profile' },
+          { label: 'Payment Method', path: '/account/payment-method', icon: 'payment' },
+          { label: 'Payment History', path: '/account/payment-history', icon: 'history' },
+        ],
+      },
+      {
+        label: 'Teams',
+        path: '/teams',
+        icon: 'teams',
+        expanded: false,
+        children: [
+          { label: 'Players', path: '/teams/players', icon: 'players' },
+          { label: 'Goalies', path: '/teams/goalies', icon: 'goalies' },
+        ],
+      },
+      {
+        label: 'Schedule',
+        path: '/schedule',
+        icon: 'schedule',
+      },
+      {
+        label: 'Analytics',
+        path: '/analytics',
+        icon: 'analytics',
+      },
+      {
+        label: 'Video Library',
+        path: '/video-library',
+        icon: 'video',
+      },
+      {
+        label: 'Video Highlights',
+        path: '/highlights',
+        icon: 'highlights',
+      },
+      {
+        label: 'GAMESHEET',
+        path: '/gamesheet',
+        icon: 'gamesheet',
+      },
+    ];
+
+    // All pages are accessible to all roles, so no filtering needed
+    // If needed in the future, filter items based on role here
+    return allItems;
+  }
 
   // Getters for signals
   readonly currentPath = this._currentPath.asReadonly();

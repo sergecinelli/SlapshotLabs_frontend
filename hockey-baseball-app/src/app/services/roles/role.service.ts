@@ -8,37 +8,22 @@ export class RoleService {
 
   get current(): Role {
     const user = this.authService.getCurrentUserValue();
-    if (!user || !user.role_name) return Role.Unknown;
+    if (!user || !user.role_id) return Role.Unknown;
 
-    return this.mapRoleNameToRole(user.role_name);
-  }
-
-  get currentRoleName(): string {
-    const user = this.authService.getCurrentUserValue();
-    return user?.role_name || '';
-  }
-
-  get currentRoleId(): number | null {
-    const user = this.authService.getCurrentUserValue();
-    return user?.role_id || null;
+    return this.mapRoleNameToRole(user.role_id);
   }
 
   /**
    * Convert role_name from API to Role enum
    */
-  mapRoleNameToRole(roleName: string): Role {
-    const normalizedName = roleName.toLowerCase().trim();
-
-    switch (normalizedName) {
-      case 'admin':
-        return Role.Admin;
-      case 'coach':
-        return Role.Coach;
-      case 'player':
-        return Role.Player;
-      default:
-        return Role.Unknown;
+  mapRoleNameToRole(roleName: number): Role {
+    switch (roleName) {
+      case 1: return Role.Admin;
+      case 2: return Role.Coach;
+      case 3: return Role.Player;
     }
+
+    return Role.Unknown;
   }
 }
 

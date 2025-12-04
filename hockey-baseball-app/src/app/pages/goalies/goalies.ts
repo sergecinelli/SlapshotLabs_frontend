@@ -18,6 +18,8 @@ import {
   GoalieFormModalComponent,
   GoalieFormModalData,
 } from '../../shared/components/goalie-form-modal/goalie-form-modal';
+import { ComponentVisibilityByRoleDirective } from '../../shared/directives/component-visibility-by-role.directive';
+import { visibilityByRoleMap } from './goalies.role-map';
 
 @Component({
   selector: 'app-goalies',
@@ -29,13 +31,14 @@ import {
     MatButtonModule,
     MatIconModule,
     MatDialogModule,
+    ComponentVisibilityByRoleDirective,
   ],
   template: `
-    <div class="p-6 pt-0">
+    <div class="p-6 pt-0" [appVisibilityMap]="visibilityByRoleMap">
       <app-page-header [title]="pageTitle()"></app-page-header>
 
       <!-- Add Goalie Button -->
-      <div class="mb-4 flex justify-end">
+      <div class="mb-4 flex justify-end" role-visibility-name="add-goalie-button" [attr.role-visibility-team-id]="teamId()">
         <button
           mat-raised-button
           color="primary"
@@ -61,6 +64,9 @@ import {
   styleUrl: './goalies.scss',
 })
 export class GoaliesComponent implements OnInit {
+  // Role-based visibility map
+  protected visibilityByRoleMap = visibilityByRoleMap;
+
   private goalieService = inject(GoalieService);
   private teamService = inject(TeamService);
   private dialog = inject(MatDialog);
@@ -101,8 +107,14 @@ export class GoaliesComponent implements OnInit {
   tableColumns = signal<TableColumn[]>(this.allTableColumns);
 
   tableActions: TableAction[] = [
-    { label: 'Delete', action: 'delete', variant: 'danger' },
-    { label: 'Edit', action: 'edit', variant: 'secondary' },
+    {
+      label: 'Delete', action: 'delete', variant: 'danger', roleVisibilityName: 'delete-action',
+      roleVisibilityTeamId: (item: Record<string, unknown>) => item['teamId']?.toString() ?? '',
+    },
+    {
+      label: 'Edit', action: 'edit', variant: 'secondary', roleVisibilityName: 'edit-action',
+      roleVisibilityTeamId: (item: Record<string, unknown>) => item['teamId']?.toString() ?? '',
+    },
     { label: 'Profile', action: 'view-profile', variant: 'primary' },
     {
       label: 'Spray Chart',

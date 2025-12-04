@@ -1,4 +1,9 @@
-<button class="action-button" [disabled]="disabled" (click)="onClick()">
+<button
+  class="action-button"
+  [disabled]="disabled"
+  (click)="onClick()"
+  [attr.role-visibility-name]="roleVisibilityName"
+>
   <div class="button-content">
     <span class="button-label">{{ label }}</span>
   </div>

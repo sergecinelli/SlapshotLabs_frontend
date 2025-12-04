@@ -1,4 +1,4 @@
-<div class="player-profile-page">
+<div class="player-profile-page" [appVisibilityMap]="visibilityByRoleMap">
   <!-- Loading State -->
   <div *ngIf="loading" class="loading-container">
     <p>Loading player profile...</p>
@@ -8,7 +8,13 @@
   <div *ngIf="!loading && player" class="profile-content">
     <!-- Action Buttons Row -->
     <div class="mb-4 flex justify-end gap-3">
-      <button mat-raised-button color="primary" (click)="onEditProfile()" class="add-player-btn">
+      <button
+        mat-raised-button
+        color="primary"
+        (click)="onEditProfile()"
+        class="add-player-btn"
+        role-visibility-name="edit-player-button"
+      >
         <mat-icon>edit</mat-icon>
         Edit Player Profile
       </button>

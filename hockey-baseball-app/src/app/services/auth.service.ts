@@ -139,7 +139,7 @@ export class AuthService {
     if (this.currentUserRequest$) {
       return this.currentUserRequest$;
     }
-
+    
     // If no cached user data, fetch from API
     this.currentUserRequest$ = this.apiService.get<UserProfile>('/users/get').pipe(
       tap((user) => {

@@ -13,6 +13,7 @@ import { MatIconModule } from '@angular/material/icon';
 export class ActionButtonComponent {
   @Input() label!: string;
   @Input() disabled = false;
+  @Input() roleVisibilityName?: string;
   @Output() buttonClick = new EventEmitter<void>();
 
   onClick(): void {

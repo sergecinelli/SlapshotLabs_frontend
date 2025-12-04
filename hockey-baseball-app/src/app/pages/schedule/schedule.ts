@@ -30,6 +30,8 @@ import {
   ScheduleFormModalComponent,
   ScheduleFormModalData,
 } from '../../shared/components/schedule-form-modal/schedule-form-modal';
+import { ComponentVisibilityByRoleDirective } from '../../shared/directives/component-visibility-by-role.directive';
+import { visibilityByRoleMap } from './schedule.role-map';
 import { forkJoin } from 'rxjs';
 
 @Component({
@@ -42,13 +44,14 @@ import { forkJoin } from 'rxjs';
     MatButtonModule,
     MatIconModule,
     MatDialogModule,
+    ComponentVisibilityByRoleDirective,
   ],
   template: `
-    <div class="p-6 pt-0">
+    <div class="p-6 pt-0" [appVisibilityMap]="visibilityByRoleMap">
       <app-page-header title="Schedule"></app-page-header>
 
       <!-- Add Schedule Button -->
-      <div class="mb-4 flex justify-end">
+      <div class="mb-4 flex justify-end" role-visibility-name="add-schedule-button">
         <button
           mat-raised-button
           color="primary"
@@ -74,6 +77,9 @@ import { forkJoin } from 'rxjs';
   styleUrl: './schedule.scss',
 })
 export class ScheduleComponent implements OnInit {
+  // Role-based visibility map
+  protected visibilityByRoleMap = visibilityByRoleMap;
+
   private scheduleService = inject(ScheduleService);
   private teamService = inject(TeamService);
   private arenaService = inject(ArenaService);
@@ -118,17 +124,17 @@ export class ScheduleComponent implements OnInit {
   >();
 
   tableColumns: TableColumn[] = [
-    { key: 'homeTeam', label: 'Home Team', sortable: true, width: '150px' },
+    { key: 'homeTeam', label: 'Home Team', sortable: true, width: '220px' },
     { key: 'homeGoals', label: 'Home Goals', sortable: true, type: 'number', width: '100px' },
-    { key: 'homeTeamGoalie', label: 'Home Goalie', sortable: true, width: '120px' },
-    { key: 'awayTeam', label: 'Away Team', sortable: true, width: '150px' },
+    { key: 'homeTeamGoalie', label: 'Home Goalie', sortable: true, width: '180px' },
+    { key: 'awayTeam', label: 'Away Team', sortable: true, width: '180px' },
     { key: 'awayGoals', label: 'Away Goals', sortable: true, type: 'number', width: '90px' },
     { key: 'awayTeamGoalie', label: 'Away Goalie', sortable: true, width: '120px' },
-    { key: 'gameType', label: 'Game Type', sortable: true, type: 'custom', width: '120px' },
-    { key: 'tournamentName', label: 'Tournament', sortable: true, width: '130px' },
-    { key: 'date', label: 'Date', sortable: true, width: '120px' },
-    { key: 'time', label: 'Time', sortable: true, width: '80px' },
-    { key: 'rink', label: 'Rink', sortable: true, width: '180px' },
+    { key: 'gameType', label: 'Game Type', sortable: true, type: 'custom', width: '150px' },
+    { key: 'tournamentName', label: 'Tournament', sortable: true, width: '250px' },
+    { key: 'date', label: 'Date', sortable: true, width: '100px' },
+    { key: 'time', label: 'Time', sortable: true, width: '100px' },
+    { key: 'rink', label: 'Rink', sortable: true, width: '250px' },
     { key: 'status', label: 'Status', sortable: true, type: 'custom', width: '140px' },
   ];
 
@@ -142,8 +148,8 @@ export class ScheduleComponent implements OnInit {
         return status === GameStatus.GameInProgress || status === GameStatus.GameOver;
       },
     },
-    { label: 'Edit', action: 'edit', variant: 'secondary' },
-    { label: 'Delete', action: 'delete', variant: 'danger' },
+    { label: 'Edit', action: 'edit', variant: 'secondary', roleVisibilityName: 'edit-action' },
+    { label: 'Delete', action: 'delete', variant: 'danger', roleVisibilityName: 'delete-action' },
   ];
 
   ngOnInit(): void {

@@ -6,18 +6,13 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header';
-import {
-  DataTableComponent,
-  TableColumn,
-  TableAction,
-} from '../../shared/components/data-table/data-table';
+import { DataTableComponent, TableColumn, TableAction } from '../../shared/components/data-table/data-table';
 import { TeamService } from '../../services/team.service';
 import { Team } from '../../shared/interfaces/team.interface';
-import {
-  TeamFormModalComponent,
-  TeamFormModalData,
-} from '../../shared/components/team-form-modal/team-form-modal';
+import { TeamFormModalComponent, TeamFormModalData } from '../../shared/components/team-form-modal/team-form-modal';
 import { TeamOptionsService } from '../../services/team-options.service';
+import { ComponentVisibilityByRoleDirective } from '../../shared/directives/component-visibility-by-role.directive';
+import { visibilityByRoleMap } from './teams.role-map';
 import { forkJoin } from 'rxjs';
 
 @Component({
@@ -30,14 +25,20 @@ import { forkJoin } from 'rxjs';
     MatButtonModule,
     MatIconModule,
     MatDialogModule,
+    ComponentVisibilityByRoleDirective,
   ],
   template: `
-    <div class="p-6 pt-0">
+    <div class="p-6 pt-0" [appVisibilityMap]="visibilityByRoleMap">
       <app-page-header title="Teams"></app-page-header>
 
       <!-- Add Team Button -->
-      <div class="mb-4 flex justify-end">
-        <button mat-raised-button color="primary" (click)="openAddTeamModal()" class="add-team-btn">
+      <div class="mb-4 flex justify-end" role-visibility-name="add-team-button">
+        <button
+          mat-raised-button
+          color="primary"
+          (click)="openAddTeamModal()"
+          class="add-team-btn"
+        >
           <mat-icon>add</mat-icon>
           Add a Team
         </button>
@@ -57,6 +58,9 @@ import { forkJoin } from 'rxjs';
   styleUrl: './teams.scss',
 })
 export class TeamsComponent implements OnInit {
+  // Role-based access map
+  protected visibilityByRoleMap = visibilityByRoleMap;
+
   private teamService = inject(TeamService);
   private http = inject(HttpClient);
   private dialog = inject(MatDialog);
@@ -80,8 +84,14 @@ export class TeamsComponent implements OnInit {
   ];
 
   tableActions: TableAction[] = [
-    { label: 'Delete', action: 'delete', variant: 'danger' },
-    { label: 'Edit', action: 'edit', variant: 'secondary' },
+    {
+      label: 'Delete', action: 'delete', variant: 'danger', roleVisibilityName: 'delete-action',
+      roleVisibilityTeamId: (item: Record<string, unknown>) => item['id']?.toString() ?? '',
+    },
+    {
+      label: 'Edit', action: 'edit', variant: 'secondary', roleVisibilityName: 'edit-action',
+      roleVisibilityTeamId: (item: Record<string, unknown>) => item['id']?.toString() ?? '',
+    },
     { label: 'View', action: 'view-profile', variant: 'primary' },
     { label: 'Players', action: 'players', variant: 'secondary' },
     { label: 'Goalies', action: 'goalies', variant: 'secondary' },

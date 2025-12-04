@@ -32,6 +32,10 @@ export interface TableAction {
   action: string;
   variant?: 'primary' | 'secondary' | 'danger';
   iconOnly?: boolean; // When true, only show icon without label
+  roleAccessName?: string; // Optional role access name for directive
+  roleVisibilityName?: string; // Optional role visibility name for directive
+  roleVisibilityTeamId?: string | ((item: Record<string, unknown>) => string | undefined); // Optional team_id for role visibility check
+  roleVisibilityAuthorId?: (item: Record<string, unknown>) => string; // Optional condition to show/hide action
   condition?: (item: Record<string, unknown>) => boolean; // Optional condition to show/hide action
 }
 

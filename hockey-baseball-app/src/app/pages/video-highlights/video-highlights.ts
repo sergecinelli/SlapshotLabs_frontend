@@ -20,6 +20,10 @@ import {
   HighlightReelFormModalData,
 } from '../../shared/components/highlight-reel-form-modal/highlight-reel-form-modal';
 import { HighlightReelViewModalComponent } from '../../shared/components/highlight-reel-view-modal/highlight-reel-view-modal';
+import { ComponentVisibilityByRoleDirective } from '../../shared/directives/component-visibility-by-role.directive';
+import { visibilityByRoleMap } from './video-highlights.role-map';
+import { AuthService } from '../../services/auth.service';
+import { RoleService } from '../../services/roles/role.service';
 
 @Component({
   selector: 'app-video-highlights',
@@ -31,9 +35,10 @@ import { HighlightReelViewModalComponent } from '../../shared/components/highlig
     MatButtonModule,
     MatIconModule,
     MatDialogModule,
+    ComponentVisibilityByRoleDirective,
   ],
   template: `
-    <div class="p-6 pt-0">
+    <div class="p-6 pt-0" [appVisibilityMap]="visibilityByRoleMap">
       <app-page-header title="Video Highlights"></app-page-header>
 
       <!-- Create Highlight Reel Button -->
@@ -43,6 +48,7 @@ import { HighlightReelViewModalComponent } from '../../shared/components/highlig
           color="primary"
           (click)="openCreateHighlightModal()"
           class="add-video-btn"
+          role-visibility-name="create-highlight-button"
         >
           <mat-icon>add</mat-icon>
           Create New Highlight Reel
@@ -63,8 +69,13 @@ import { HighlightReelViewModalComponent } from '../../shared/components/highlig
   styleUrl: './video-highlights.scss',
 })
 export class VideoHighlightsComponent implements OnInit {
+  // Role-based access map
+  protected visibilityByRoleMap = visibilityByRoleMap;
+
   private highlightsService = inject(HighlightsService);
   private dialog = inject(MatDialog);
+  private authService = inject(AuthService);
+  private roleService = inject(RoleService);
 
   rows = signal<HighlightReelRow[]>([]);
   loading = signal(true);
@@ -84,8 +95,20 @@ export class VideoHighlightsComponent implements OnInit {
 
   tableActions: TableAction[] = [
     { label: 'View', action: 'view', variant: 'primary' },
-    { label: 'Edit', action: 'edit', variant: 'secondary' },
-    { label: 'Delete', action: 'delete', variant: 'danger' },
+    {
+      label: 'Edit',
+      action: 'edit',
+      variant: 'secondary',
+      roleVisibilityName: 'edit-action',
+      roleVisibilityAuthorId: (item: Record<string, unknown>) => item['userId']?.toString() ?? '',
+    },
+    {
+      label: 'Delete',
+      action: 'delete',
+      variant: 'danger',
+      roleVisibilityName: 'delete-action',
+      roleVisibilityAuthorId: (item: Record<string, unknown>) => item['userId']?.toString() ?? '',
+    },
   ];
 
   ngOnInit(): void {
@@ -103,6 +126,7 @@ export class VideoHighlightsComponent implements OnInit {
             name: item.name,
             description: item.description,
             createdBy: item.created_by,
+            userId: item.user_id,
             dateCreated: date,
             dateCreatedFormatted: this.formatDateShort(date),
           } as HighlightReelRow;
