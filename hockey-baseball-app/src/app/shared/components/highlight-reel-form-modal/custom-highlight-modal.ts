@@ -4,7 +4,8 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
+import { ButtonComponent } from '../buttons/button/button.component';
+import { ButtonLoadingComponent } from '../buttons/button-loading/button-loading.component';
 import { MatIconModule } from '@angular/material/icon';
 
 export interface CustomHighlightFormResult {
@@ -24,7 +25,8 @@ export interface CustomHighlightFormResult {
     MatDialogModule,
     MatFormFieldModule,
     MatInputModule,
-    MatButtonModule,
+    ButtonComponent,
+    ButtonLoadingComponent,
     MatIconModule,
   ],
   templateUrl: './custom-highlight-modal.html',

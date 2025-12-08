@@ -1,31 +1,50 @@
-<div class="team-profile-page" [appVisibilityMap]="visibilityByRoleMap">
-  <!-- Loading State -->
-  <div *ngIf="loading" class="loading-container">
-    <p>Loading team profile...</p>
-  </div>
-
-  <!-- Profile Content -->
-  <div *ngIf="!loading && team" class="profile-content">
+<div class="page-content" [appVisibilityMap]="visibilityByRoleMap">
+  <!-- Content with padding -->
+  <div>
     <!-- Action Buttons Row -->
-    <div class="mb-4 flex justify-end gap-3">
-      <button
-        mat-raised-button
-        color="primary"
-        (click)="onEditTeamProfile()"
-        class="add-team-btn"
+    <div class="flex flex-wrap gap-4 justify-end mb-4">
+      <app-button
+        materialIcon="stylus"
+        [bg]="'orange'"
+        [bghover]="'orange'"
+        [color]="'white'"
+        [colorhover]="'white'"
+        [haveContent]="true"
+        (clicked)="onEditTeamProfile()"
         role-visibility-name="edit-team-button"
       >
-        <mat-icon>edit</mat-icon>
         Edit Team Profile
-      </button>
-      <button mat-raised-button color="accent" (click)="onRequestTeamAnalysis()" class="add-team-btn">
-        <mat-icon>analytics</mat-icon>
+      </app-button>
+      <app-button
+        materialIcon="analytics"
+        [bg]="'upcoming'"
+        [bghover]="'upcoming'"
+        [color]="'white'"
+        [colorhover]="'white'"
+        [haveContent]="true"
+        (clicked)="onRequestTeamAnalysis()"
+      >
         Request Team Analysis
-      </button>
+      </app-button>
     </div>
 
+    <!-- Loading State -->
+    @if (loading) {
+    <div class="dashboard-card">
+      <div class="dashboard-card-content">
+        <div class="dashboard-loading">
+          <div class="dashboard-loading-text">Loading team profile...</div>
+        </div>
+      </div>
+    </div>
+    }
+
+    <!-- Profile Content -->
+    @if (!loading && team) {
+    <div class="dashboard-cards-container">
     <!-- Header Section with Basic Info -->
-    <div class="profile-header">
+    <div class="dashboard-card team-header-card">
+      <div class="dashboard-card-content">
       <div class="team-header-layout">
         <!-- First Row: Logo + Team Name + Season/City + Team Record -->
         <div class="team-main-info">
@@ -53,19 +72,20 @@
           <span class="age-group">{{ team.group }}</span>
           <span class="level">{{ team.level }}</span>
           <span class="division">{{ team.division }}</span>
+          </div>
         </div>
       </div>
     </div>
 
     <!-- Season Stats Table -->
-    <mat-card class="info-card season-stats-card">
-      <mat-card-header>
-        <mat-card-title>
+    <div class="dashboard-card">
+      <div class="dashboard-card-header">
+        <h2 class="dashboard-card-title">
           <mat-icon>table_chart</mat-icon>
-          SEASON
-        </mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
+          Season
+        </h2>
+      </div>
+      <div class="dashboard-card-content">
         <!-- Season Navigation -->
         <div class="season-navigation">
           <span class="current-season">{{ getCurrentSeason() }}</span>
@@ -120,26 +140,23 @@
           </table>
         </div>
         } @else {
-        <div class="empty-state">
-          <mat-icon class="empty-icon">table_chart</mat-icon>
-          <p class="empty-message">No season statistics available for this team.</p>
-        </div>
+        <div class="dashboard-empty">No season statistics available for this team.</div>
         }
-      </mat-card-content>
-    </mat-card>
+      </div>
+    </div>
 
     <!-- Schedule Section -->
-    <mat-card class="info-card schedule-card">
-      <mat-card-header>
-        <mat-card-title>
-          <mat-icon>schedule</mat-icon>
+    <div class="dashboard-card">
+      <div class="dashboard-card-header">
+        <h2 class="dashboard-card-title">
+          <mat-icon>calendar_today</mat-icon>
           Schedule
-        </mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
+        </h2>
+      </div>
+      <div class="dashboard-card-content">
         <!-- Recent Games -->
         <div class="schedule-section">
-          <h3 class="schedule-subtitle red-text">{{ getRecentGamesTitle() }}</h3>
+          <h3 class="schedule-subtitle">{{ getRecentGamesTitle() }}</h3>
           @if (getRecentGames().length > 0) {
           <div class="table-container">
             <table mat-table [dataSource]="getRecentGames()" class="schedule-table recent-games-table">
@@ -180,16 +197,13 @@
             </table>
           </div>
           } @else {
-          <div class="empty-state">
-            <mat-icon class="empty-icon">schedule</mat-icon>
-            <p class="empty-message">No recent games available for this team.</p>
-          </div>
+          <div class="dashboard-empty">No recent games available for this team.</div>
           }
         </div>
 
         <!-- Upcoming Games -->
         <div class="schedule-section">
-          <h3 class="schedule-subtitle red-text">{{ getUpcomingGamesTitle() }}</h3>
+          <h3 class="schedule-subtitle">{{ getUpcomingGamesTitle() }}</h3>
           @if (getUpcomingGames().length > 0) {
           <div class="table-container">
             <table mat-table [dataSource]="getUpcomingGames()" class="schedule-table upcoming-games-table">
@@ -228,36 +242,36 @@
             </table>
           </div>
           } @else {
-          <div class="empty-state">
-            <mat-icon class="empty-icon">schedule</mat-icon>
-            <p class="empty-message">No upcoming games available for this team.</p>
-          </div>
+          <div class="dashboard-empty">No upcoming games available for this team.</div>
           }
         </div>
-      </mat-card-content>
-    </mat-card>
+      </div>
+    </div>
 
     <!-- Roster Section -->
-    <mat-card class="info-card roster-card">
-      <mat-card-header>
-        <mat-card-title>
-          <mat-icon>group</mat-icon>
+    <div class="dashboard-card">
+      <div class="dashboard-card-header">
+        <h2 class="dashboard-card-title">
+          <mat-icon>people</mat-icon>
           Roster
-        </mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
+        </h2>
+      </div>
+      <div class="dashboard-card-content">
         <!-- Loading state -->
-        <div *ngIf="loadingRoster" class="loading-container">
-          <p>Loading roster...</p>
+        @if (loadingRoster) {
+        <div class="dashboard-loading">
+          <div class="dashboard-loading-text">Loading roster...</div>
         </div>
+        }
 
         <!-- Empty state -->
-        <div *ngIf="!loadingRoster && getTeamRoster().length === 0" class="empty-container">
-          <p>No players found for this team.</p>
-        </div>
+        @if (!loadingRoster && getTeamRoster().length === 0) {
+        <div class="dashboard-empty">No players found for this team.</div>
+        }
 
         <!-- Roster table -->
-        <div *ngIf="!loadingRoster && getTeamRoster().length > 0" class="table-container">
+        @if (!loadingRoster && getTeamRoster().length > 0) {
+        <div class="table-container">
           <table mat-table [dataSource]="getTeamRoster()" class="roster-table">
             <!-- Jersey Number Column -->
             <ng-container matColumnDef="jerseyNumber">
@@ -307,12 +321,21 @@
             <tr mat-row *matRowDef="let row; columns: rosterColumns"></tr>
           </table>
         </div>
-      </mat-card-content>
-    </mat-card>
-  </div>
+        }
+      </div>
+    </div>
+    </div>
+    }
 
   <!-- Error State -->
-  <div *ngIf="!loading && !team" class="error-container">
-    <p>Team not found.</p>
+    @if (!loading && !team) {
+    <div class="dashboard-card">
+      <div class="dashboard-card-content">
+        <div class="dashboard-error">
+          <div class="dashboard-error-message">Team not found.</div>
+        </div>
+      </div>
+    </div>
+    }
   </div>
 </div>

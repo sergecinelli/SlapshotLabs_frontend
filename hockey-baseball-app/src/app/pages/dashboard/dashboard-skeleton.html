@@ -1,0 +1,72 @@
+<div class="dashboard-skeleton-container">
+  <!-- Upcoming Games Skeleton Card -->
+  <div class="dashboard-card">
+    <div class="dashboard-card-header">
+      <div class="skeleton-title"></div>
+    </div>
+    <div class="dashboard-card-content">
+      <div class="dashboard-game-list">
+        @for (item of [].constructor(skeletonCount); track $index) {
+          <div class="dashboard-game-item">
+            <div class="dashboard-game-content">
+              <!-- Date/Time Skeleton - using same class as real data -->
+              <span class="dashboard-game-date skeleton-date"></span>
+              
+              <!-- Team Info Skeleton - using same structure as real data -->
+              <div class="dashboard-team-info">
+                <div class="dashboard-team-logo skeleton-logo"></div>
+                <span class="dashboard-team-name skeleton-team-name"></span>
+              </div>
+              
+              <!-- Separator Skeleton - using same class as real data -->
+              <span class="dashboard-game-separator skeleton-separator"></span>
+              
+              <!-- Team Info Skeleton - using same structure as real data -->
+              <div class="dashboard-team-info">
+                <div class="dashboard-team-logo skeleton-logo"></div>
+                <span class="dashboard-team-name skeleton-team-name"></span>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Game Results Skeleton Card -->
+  <div class="dashboard-card">
+    <div class="dashboard-card-header">
+      <div class="skeleton-title"></div>
+    </div>
+    <div class="dashboard-card-content">
+      <div class="dashboard-game-list">
+        @for (item of [].constructor(skeletonCount); track $index) {
+          <div class="dashboard-game-item">
+            <div class="dashboard-game-content">
+              <!-- Date/Time Skeleton - using same class as real data -->
+              <span class="dashboard-game-date skeleton-date"></span>
+              
+              <!-- Team Info with Score Skeleton - using same structure as real data -->
+              <div class="dashboard-team-info">
+                <div class="dashboard-team-logo skeleton-logo"></div>
+                <span class="dashboard-team-name skeleton-team-name"></span>
+                <span class="dashboard-score skeleton-score"></span>
+              </div>
+              
+              <!-- Separator Skeleton - using same class as real data -->
+              <span class="dashboard-game-separator skeleton-separator"></span>
+              
+              <!-- Team Info with Score Skeleton - using same structure as real data -->
+              <div class="dashboard-team-info">
+                <div class="dashboard-team-logo skeleton-logo"></div>
+                <span class="dashboard-team-name skeleton-team-name"></span>
+                <span class="dashboard-score skeleton-score"></span>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</div>
+

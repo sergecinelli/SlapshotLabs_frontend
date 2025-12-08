@@ -28,7 +28,10 @@
                 "input": "public"
               }
             ],
-            "styles": ["src/styles.scss"]
+            "styles": [
+              "src/styles.scss",
+              "node_modules/material-symbols/index.css"
+            ]
           },
           "configurations": {
             "production": {
@@ -118,7 +121,10 @@
                 "input": "public"
               }
             ],
-            "styles": ["src/styles.scss"]
+            "styles": [
+              "src/styles.scss",
+              "node_modules/material-symbols/index.css"
+            ]
           }
         },
         "lint": {

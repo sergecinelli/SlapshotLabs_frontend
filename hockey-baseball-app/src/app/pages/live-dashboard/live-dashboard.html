@@ -1,6 +1,4 @@
-<div class="p-6 pt-0 space-y-6" [appVisibilityMap]="visibilityByRoleMap">
-  <!-- Page Header -->
-  <app-page-header [title]="pageTitle()"></app-page-header>
+<div class="page-content space-y-6" [appVisibilityMap]="visibilityByRoleMap">
 
   <!-- Loading Spinner -->
   <div *ngIf="isLoadingGameData" class="flex items-center justify-center min-h-[60vh]">
@@ -11,24 +9,24 @@
   </div>
 
   <!-- All content wrapped to hide while loading -->
-  <div *ngIf="!isLoadingGameData" class="space-y-6">
+  <div *ngIf="!isLoadingGameData" class="dashboard-cards-container">
     <!-- Tournament Info Header -->
-    <div class="bg-gray-700 text-white px-6 py-2 rounded-md flex justify-between items-center">
+    <div class="live-dashboard-tournament-header">
       <div>
         <span class="font-medium text-lg">{{ tournamentName() }}</span>
       </div>
       <div class="text-center">
         <div class="font-semibold">{{ tournamentType() }}</div>
-        <div>{{ tournamentCategory() }}</div>
+        <div class="text-sm opacity-90">{{ tournamentCategory() }}</div>
       </div>
       <div class="text-right">
-        <div>{{ tournamentDate() }}</div>
-        <div class="text-sm">{{ arenaInfo() }}</div>
+        <div class="font-medium">{{ tournamentDate() }}</div>
+        <div class="text-sm opacity-90">{{ arenaInfo() }}</div>
       </div>
     </div>
 
     <!-- Game Score Section -->
-    <div class="bg-white rounded-lg shadow-lg border border-gray-200 pb-4">
+    <div class="live-dashboard-card live-dashboard-score-card">
       <div class="flex justify-center items-center gap-8 mb-6">
         <!-- Away Team -->
         <div class="flex items-center justify-around gap-4 text-right">
@@ -108,56 +106,85 @@
     </div>
 
     <!-- Game Event Actions (Unified Section) -->
-    <div *ngIf="!isLoadingGameData" class="p-4" role-visibility-name="add-event-button" [attr.role-visibility-team-id]="[homeTeamId, awayTeamId]">
+    <div *ngIf="!isLoadingGameData" class="live-dashboard-actions-wrapper" role-visibility-name="add-event-button" [attr.role-visibility-team-id]="[homeTeamId, awayTeamId]">
       <div class="flex flex-wrap gap-3 justify-center">
-        <app-action-button
-          label="Shots"
-          (buttonClick)="onShots()"
+        <app-button
+          [bg]="'primary'"
+          [bghover]="'primary_dark'"
+          [color]="'white'"
+          [colorhover]="'white'"
+          [materialIcon]="'sports_hockey'"
+          [haveContent]="true"
+          (clicked)="onShots()"
         >
-        </app-action-button>
-        <app-action-button
-          label="Turnover"
-          (buttonClick)="onTurnover()"
+          Shots
+        </app-button>
+        <app-button
+          [bg]="'primary'"
+          [bghover]="'primary_dark'"
+          [color]="'white'"
+          [colorhover]="'white'"
+          [materialIcon]="'swap_horiz'"
+          [haveContent]="true"
+          (clicked)="onTurnover()"
         >
-        </app-action-button>
-        <app-action-button
-          label="Faceoff"
-          (buttonClick)="onFaceoff()"
+          Turnover
+        </app-button>
+        <app-button
+          [bg]="'primary'"
+          [bghover]="'primary_dark'"
+          [color]="'white'"
+          [colorhover]="'white'"
+          [materialIcon]="'sports'"
+          [haveContent]="true"
+          (clicked)="onFaceoff()"
         >
-        </app-action-button>
-        <app-action-button
-          label="Goalie Change"
-          (buttonClick)="onGoalieChange()"
+          Faceoff
+        </app-button>
+        <app-button
+          [bg]="'primary'"
+          [bghover]="'primary_dark'"
+          [color]="'white'"
+          [colorhover]="'white'"
+          [materialIcon]="'shield'"
+          [haveContent]="true"
+          (clicked)="onGoalieChange()"
         >
-        </app-action-button>
-        <app-action-button
-          label="Penalty"
-          (buttonClick)="onPenalty()"
+          Goalie Change
+        </app-button>
+        <app-button
+          [bg]="'primary'"
+          [bghover]="'primary_dark'"
+          [color]="'white'"
+          [colorhover]="'white'"
+          [materialIcon]="'gavel'"
+          [haveContent]="true"
+          (clicked)="onPenalty()"
         >
-        </app-action-button>
+          Penalty
+        </app-button>
       </div>
     </div>
 
     <!-- Stats Section - Two Team Boxes Side by Side -->
-    <div class="grid grid-cols-2 gap-4">
+    <div class="grid grid-cols-2 gap-6">
       <!-- Away Team Stats Box -->
-      <div class="bg-white rounded-lg shadow-lg border border-gray-200 p-4">
-        <div class="text-center mb-4">
-          <div class="text-sm font-bold text-gray-900">{{ awayTeam().name }}</div>
-        </div>
+      <div class="live-dashboard-stats-card">
+        <div class="stats-card-title">{{ awayTeam().name }}</div>
 
-        <div class="space-y-0">
+        <div class="stats-card-content">
+          <div class="space-y-4">
           <!-- Faceoff Win % and Defensive Zone Exit Row -->
-          <div class="grid grid-cols-[auto_2.5fr] gap-3">
+          <div class="grid grid-cols-[auto_2.5fr] gap-4">
             <!-- Faceoff Win % -->
-            <div class="border border-solid h-16 rounded p-3">
-              <div class="text-sm mb-2 font-semibold">Faceoff Win %</div>
-              <div class="text-lg font-bold">{{ awayStats().faceoffWinPct }}%</div>
+            <div class="stat-card">
+              <div class="stat-label">Faceoff Win %</div>
+              <div class="stat-value">{{ awayStats().faceoffWinPct }}%</div>
             </div>
 
             <!-- Defensive Zone Exit -->
-            <div class="p-3">
-              <div class="text-sm font-semibold border border-solid rounded p-2 mb-1">
+            <div class="stat-section">
+              <div class="stat-section-title">
                 Defensive Zone Exit
               </div>
               <div class="grid grid-cols-5 gap-1 text-center">
@@ -256,8 +283,8 @@
           </div>
 
           <!-- Offensive Zone Entry -->
-          <div class="p-3">
-            <div class="text-sm font-semibold border border-solid rounded p-2 mb-1">
+          <div class="stat-section">
+            <div class="stat-section-title">
               Offensive Zone Entry
             </div>
             <div class="grid grid-cols-4 gap-1 text-center">
@@ -337,8 +364,8 @@
           </div>
 
           <!-- Shots -->
-          <div class="p-3">
-            <div class="text-sm font-semibold border border-solid rounded p-2 mb-1">Shots</div>
+          <div class="stat-section">
+            <div class="stat-section-title">Shots</div>
             <div class="grid grid-cols-4 gap-1 text-center">
               <div>
                 <div class="text-[12px]">Shots on Goal</div>
@@ -360,8 +387,8 @@
           </div>
 
           <!-- Turnovers -->
-          <div class="p-3">
-            <div class="text-sm font-semibold border border-solid rounded p-2 mb-1">Turnovers</div>
+          <div class="stat-section">
+            <div class="stat-section-title">Turnovers</div>
             <div class="grid grid-cols-3 gap-2 text-center">
               <div>
                 <div class="text-[12px]">Off Zone</div>
@@ -377,27 +404,27 @@
               </div>
             </div>
           </div>
+          </div>
         </div>
       </div>
 
       <!-- Home Team Stats Box -->
-      <div class="bg-white rounded-lg shadow-lg border border-gray-200 p-4">
-        <div class="text-center mb-4">
-          <div class="text-sm font-bold text-gray-900">{{ homeTeam().name }}</div>
-        </div>
+      <div class="live-dashboard-stats-card">
+        <div class="stats-card-title">{{ homeTeam().name }}</div>
 
-        <div class="space-y-0">
+        <div class="stats-card-content">
+          <div class="space-y-4">
           <!-- Faceoff Win % and Defensive Zone Exit Row -->
-          <div class="grid grid-cols-[auto_2.5fr] gap-3">
+          <div class="grid grid-cols-[auto_2.5fr] gap-4">
             <!-- Faceoff Win % -->
-            <div class="border border-solid h-16 rounded p-3">
-              <div class="text-sm mb-2 font-semibold">Faceoff Win %</div>
-              <div class="text-lg font-bold">{{ homeStats().faceoffWinPct }}%</div>
+            <div class="stat-card">
+              <div class="stat-label">Faceoff Win %</div>
+              <div class="stat-value">{{ homeStats().faceoffWinPct }}%</div>
             </div>
 
             <!-- Defensive Zone Exit -->
-            <div class="p-3">
-              <div class="text-sm font-semibold border border-solid rounded p-2 mb-1">
+            <div class="stat-section">
+              <div class="stat-section-title">
                 Defensive Zone Exit
               </div>
               <div class="grid grid-cols-5 gap-1 text-center">
@@ -496,8 +523,8 @@
           </div>
 
           <!-- Offensive Zone Entry -->
-          <div class="p-3">
-            <div class="text-sm font-semibold border border-solid rounded p-2 mb-1">
+          <div class="stat-section">
+            <div class="stat-section-title">
               Offensive Zone Entry
             </div>
             <div class="grid grid-cols-4 gap-1 text-center">
@@ -577,8 +604,8 @@
           </div>
 
           <!-- Shots -->
-          <div class="p-3">
-            <div class="text-sm font-semibold border border-solid rounded p-2 mb-1">Shots</div>
+          <div class="stat-section">
+            <div class="stat-section-title">Shots</div>
             <div class="grid grid-cols-4 gap-1 text-center">
               <div>
                 <div class="text-[12px]">Shots on Goal</div>
@@ -600,8 +627,8 @@
           </div>
 
           <!-- Turnovers -->
-          <div class="p-3">
-            <div class="text-sm font-semibold border border-solid rounded p-2 mb-1">Turnovers</div>
+          <div class="stat-section">
+            <div class="stat-section-title">Turnovers</div>
             <div class="grid grid-cols-3 gap-2 text-center">
               <div>
                 <div class="text-[12px]">Off Zone</div>
@@ -617,103 +644,74 @@
               </div>
             </div>
           </div>
+          </div>
         </div>
       </div>
     </div>
   </div>
 
   <!-- Events Section (Full Width) -->
-  <div *ngIf="!isLoadingGameData" class="bg-white rounded-lg shadow-lg border border-gray-200">
-    <div class="px-6 pt-4 pb-2 border-b border-gray-200">
-      <h2 class="text-xl font-semibold text-gray-900">Game Events</h2>
+  <div *ngIf="!isLoadingGameData" class="live-dashboard-card">
+    <div class="live-dashboard-card-header">
+      <h2 class="live-dashboard-card-title">Game Events</h2>
     </div>
+    <div class="live-dashboard-card-content">
 
-    <!-- Events Table -->
-    <div class="overflow-x-auto">
-      <table class="w-full border-collapse">
-        <thead class="bg-gray-50 border-b border-gray-200">
-          <tr>
-            <th
-              class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
-            >
-              Time
-            </th>
-            <th
-              class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
-            >
-              Team
-            </th>
-            <th
-              class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
-            >
-              Event
-            </th>
-            <th
-              class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
-            >
-              Player
-            </th>
-            <th
-              class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
-            >
-              Description
-            </th>
-            <th
-              class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
-            >
-              Actions
-            </th>
-          </tr>
-        </thead>
-        <tbody class="bg-white divide-y divide-gray-200">
+      <!-- Events Table -->
+      <div class="live-dashboard-table-wrapper">
+        <table class="live-dashboard-table">
+          <thead class="live-dashboard-table-header">
+            <tr>
+              <th class="live-dashboard-table-th">Time</th>
+              <th class="live-dashboard-table-th">Team</th>
+              <th class="live-dashboard-table-th">Event</th>
+              <th class="live-dashboard-table-th">Player</th>
+              <th class="live-dashboard-table-th">Description</th>
+              <th class="live-dashboard-table-th">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="live-dashboard-table-body">
           @if (gameEvents().length === 0) {
             <tr>
-              <td colspan="6" class="px-4 py-8 text-center text-gray-500">
-                <div class="flex flex-col items-center justify-center">
-                  <mat-icon
-                    class="text-gray-400 mb-2"
-                    style="font-size: 48px; width: 48px; height: 48px"
-                    >event_note</mat-icon
-                  >
-                  <p class="text-lg font-medium">No game events yet</p>
-                  <p class="text-sm">Events will appear here as the game progresses</p>
+              <td colspan="6" class="live-dashboard-table-empty">
+                <div class="live-dashboard-empty-content">
+                  <mat-icon class="live-dashboard-empty-icon">event_note</mat-icon>
+                  <p class="live-dashboard-empty-title">No game events yet</p>
+                  <p class="live-dashboard-empty-text">Events will appear here as the game progresses</p>
                 </div>
               </td>
             </tr>
           } @else {
             @for (event of gameEvents(); track event.id) {
               @if (event.period) {
-                <tr class="bg-gray-700">
-                  <td class="px-4 py-3 text-xs font-medium text-white" colspan="6">
+                <tr class="live-dashboard-period-row">
+                  <td class="live-dashboard-period-cell" colspan="6">
                     {{ event.period }}
                   </td>
                 </tr>
               } @else {
                 <tr
-                  class="transition-colors"
-                  [class.bg-red-200]="event.shotType === 'goal'"
-                  [class.goal-row]="event.shotType === 'goal'"
+                  class="live-dashboard-table-row"
+                  [class.live-dashboard-goal-row]="event.shotType === 'goal'"
                 >
-                  <td class="px-4 py-3 text-sm text-gray-900">{{ event.time }}</td>
-                  <td class="px-4 py-3">
-                    <div class="flex items-center gap-2">
-                      <div
-                        class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden flex-shrink-0"
-                      >
+                  <td class="live-dashboard-table-td">{{ event.time }}</td>
+                  <td class="live-dashboard-table-td">
+                    <div class="live-dashboard-team-cell">
+                      <div class="live-dashboard-team-logo-wrapper">
                         <img
                           *ngIf="event.teamId"
                           [src]="getTeamLogoUrl(event.teamId)"
                           [alt]="event.team"
-                          class="w-full h-full object-cover"
+                          class="live-dashboard-team-logo"
                         />
                       </div>
-                      <span class="text-sm text-gray-900">{{ event.team }}</span>
+                      <span class="live-dashboard-team-name">{{ event.team }}</span>
                     </div>
                   </td>
-                  <td class="px-4 py-3 text-sm text-gray-900">{{ event.event }}</td>
-                  <td class="px-4 py-3 text-sm text-gray-900">{{ event.player }}</td>
-                  <td class="px-4 py-3 text-sm text-gray-900">{{ event.description }}</td>
-                  <td class="px-4 py-3 text-sm">
+                  <td class="live-dashboard-table-td">{{ event.event }}</td>
+                  <td class="live-dashboard-table-td">{{ event.player }}</td>
+                  <td class="live-dashboard-table-td">{{ event.description }}</td>
+                  <td class="live-dashboard-table-td">
                     <div class="flex gap-1">
                       <button
                         mat-icon-button
@@ -736,7 +734,7 @@
                         role-visibility-name="edit-event-button"
                         [attr.role-visibility-team-id]="[homeTeamId, awayTeamId]"
                       >
-                        <mat-icon>edit</mat-icon>
+                        <mat-icon>stylus</mat-icon>
                       </button>
                       <button
                         mat-icon-button
@@ -754,90 +752,78 @@
               }
             }
           }
-        </tbody>
-      </table>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 
   <!-- Spray Charts Section (Full Width) -->
   <div
     *ngIf="!isLoadingGameData"
-    class="bg-white rounded-lg shadow-lg border border-gray-200 px-6 pb-6"
+    class="live-dashboard-card"
   >
-    <div>
-      <h2 class="text-xl font-semibold text-gray-900 text-center">Spray Charts</h2>
+    <div class="live-dashboard-card-header">
+      <h2 class="live-dashboard-card-title live-dashboard-card-title-center">Spray Charts</h2>
     </div>
-
-    <div *ngIf="isLoadingSprayCharts()" class="flex items-center justify-center min-h-[400px]">
-      <div class="text-center">
+    <div class="live-dashboard-card-content">
+      <div *ngIf="isLoadingSprayCharts()" class="live-dashboard-loading">
         <mat-spinner diameter="60" class="mx-auto"></mat-spinner>
-        <p class="mt-2 text-gray-600">Loading spray charts...</p>
+        <p class="live-dashboard-loading-text">Loading spray charts...</p>
       </div>
-    </div>
 
-    <div *ngIf="!isLoadingSprayCharts()" class="grid grid-cols-2 gap-6">
-      <!-- Away Team Spray Chart -->
-      <div>
-        <div class="text-center mb-4">
-          <div class="flex items-center justify-center gap-2">
+      <div *ngIf="!isLoadingSprayCharts()" class="grid grid-cols-2 gap-6">
+        <!-- Away Team Spray Chart -->
+        <div>
+          <div class="live-dashboard-spray-chart-header">
             <img
               [src]="getTeamLogoUrl(awayTeamId)"
               [alt]="awayTeam().name"
-              class="w-8 h-8 rounded-full object-cover"
+              class="live-dashboard-spray-chart-logo"
             />
-            <h3 class="text-lg font-semibold text-gray-900">{{ awayTeam().name }}</h3>
+            <h3 class="live-dashboard-spray-chart-title">{{ awayTeam().name }}</h3>
           </div>
-        </div>
-        @if (awaySprayChartData().length > 0) {
-          <app-shot-location-display
-            [data]="awaySprayChartData()"
-            [storageKey]="'liveDashboardAwaySprayChart'"
-            [teamId]="awayTeamId"
-            [teamName]="awayTeam().name"
-            [showDirection]="true"
-          ></app-shot-location-display>
-        } @else {
-          <div
-            class="flex items-center justify-center min-h-[400px] border border-gray-200 rounded-lg bg-gray-50"
-          >
-            <div class="text-center">
-              <mat-icon class="text-gray-400 text-6xl">sports_hockey</mat-icon>
-              <p class="text-gray-500 mt-2">No spray chart data available</p>
+          @if (awaySprayChartData().length > 0) {
+            <app-shot-location-display
+              [data]="awaySprayChartData()"
+              [storageKey]="'liveDashboardAwaySprayChart'"
+              [teamId]="awayTeamId"
+              [teamName]="awayTeam().name"
+              [showDirection]="true"
+            ></app-shot-location-display>
+          } @else {
+            <div class="live-dashboard-empty-chart">
+              <mat-icon class="live-dashboard-empty-chart-icon">sports_hockey</mat-icon>
+              <p class="live-dashboard-empty-chart-text">No spray chart data available</p>
             </div>
-          </div>
-        }
-      </div>
+          }
+        </div>
 
-      <!-- Home Team Spray Chart -->
-      <div>
-        <div class="text-center mb-4">
-          <div class="flex items-center justify-center gap-2">
+        <!-- Home Team Spray Chart -->
+        <div>
+          <div class="live-dashboard-spray-chart-header">
             <img
               [src]="getTeamLogoUrl(homeTeamId)"
               [alt]="homeTeam().name"
-              class="w-8 h-8 rounded-full object-cover"
+              class="live-dashboard-spray-chart-logo"
             />
-            <h3 class="text-lg font-semibold text-gray-900">{{ homeTeam().name }}</h3>
+            <h3 class="live-dashboard-spray-chart-title">{{ homeTeam().name }}</h3>
           </div>
-        </div>
-        @if (homeSprayChartData().length > 0) {
-          <app-shot-location-display
-            [data]="homeSprayChartData()"
-            [storageKey]="'liveDashboardHomeSprayChart'"
-            [teamId]="homeTeamId"
-            [teamName]="homeTeam().name"
-            [showDirection]="true"
-          ></app-shot-location-display>
-        } @else {
-          <div
-            class="flex items-center justify-center min-h-[400px] border border-gray-200 rounded-lg bg-gray-50"
-          >
-            <div class="text-center">
-              <mat-icon class="text-gray-400 text-6xl">sports_hockey</mat-icon>
-              <p class="text-gray-500 mt-2">No spray chart data available</p>
+          @if (homeSprayChartData().length > 0) {
+            <app-shot-location-display
+              [data]="homeSprayChartData()"
+              [storageKey]="'liveDashboardHomeSprayChart'"
+              [teamId]="homeTeamId"
+              [teamName]="homeTeam().name"
+              [showDirection]="true"
+            ></app-shot-location-display>
+          } @else {
+            <div class="live-dashboard-empty-chart">
+              <mat-icon class="live-dashboard-empty-chart-icon">sports_hockey</mat-icon>
+              <p class="live-dashboard-empty-chart-text">No spray chart data available</p>
             </div>
-          </div>
-        }
+          }
+        </div>
       </div>
     </div>
   </div>

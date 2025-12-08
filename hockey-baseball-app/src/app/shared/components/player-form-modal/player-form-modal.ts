@@ -2,7 +2,6 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
-import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
@@ -13,6 +12,8 @@ import { Player } from '../../interfaces/player.interface';
 import { Team } from '../../interfaces/team.interface';
 import { TeamService } from '../../../services/team.service';
 import { PositionService, PositionOption } from '../../../services/position.service';
+import { ButtonComponent } from '../buttons/button/button.component';
+import { ButtonLoadingComponent } from '../buttons/button-loading/button-loading.component';
 
 export interface PlayerFormModalData {
   player?: Player;
@@ -34,12 +35,13 @@ export interface TeamOption {
     CommonModule,
     ReactiveFormsModule,
     MatDialogModule,
-    MatButtonModule,
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
     MatIconModule,
     MatDividerModule,
+    ButtonComponent,
+    ButtonLoadingComponent,
   ],
   templateUrl: './player-form-modal.html',
   styleUrl: './player-form-modal.scss',

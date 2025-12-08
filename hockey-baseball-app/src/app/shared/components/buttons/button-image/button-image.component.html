@@ -1,0 +1,26 @@
+<button class="app-button" matRipple [matRippleColor]="rippleColor" [matTooltip]="tooltip ?? ''" [matTooltipShowDelay]="tooltipDelay"
+  [matTooltipPosition]="tooltipPos" [class.have-content]="haveContent" [class.dev]="dev" [class.rounded]="rounded" [class.fill]="width !== 'auto'"
+  [ngStyle]="styles" [type]="type" (click)="click($event)" (mousedown)="onMouseDown()" (mouseup)="onMouseUp()" (mouseenter)="onMouseEnter()"
+  (mouseleave)="onMouseLeave()">
+  <div class="icon-box material" *ngIf="materialIcon && !isLoading">
+    <span class="icon" [class]="isMatSymbolClass ? materialSymbolClass : materialIconClass" [class.fill]="isMatIconFillCurrent">
+      {{ materialIcon }}
+    </span>
+    <span class="counter" *ngIf="counter > 0" [style.background]="getColor(counterBgColor)" [style.color]="getColor(counterColor)">
+      {{ counter }}
+    </span>
+    <span class="counter-icon" *ngIf="hasDot" [class]="materialSymbolClass" [style.color]="getColor(counterBgColor)">circle</span>
+  </div>
+
+  <div class="icon-box material" *ngIf="isLoading">
+    <span [class]="materialSymbolClass" class="icon loading">progress_activity</span>
+  </div>
+
+  <span class="text">
+    <ng-content></ng-content>
+  </span>
+
+  <img class="image-icon" [src]="image" alt="" />
+
+  <span class="dev-text" [style.background]="getColor(color)" [style.color]="getColor(bg)" *ngIf="dev">DEMO</span>
+</button>

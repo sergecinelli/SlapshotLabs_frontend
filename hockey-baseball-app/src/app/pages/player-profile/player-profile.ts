@@ -1,12 +1,11 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatTableModule } from '@angular/material/table';
 import { MatDialog } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
 import { forkJoin } from 'rxjs';
 import { PlayerService } from '../../services/player.service';
 import {
@@ -25,6 +24,7 @@ import { GameEventNameService, GameEventName } from '../../services/game-event-n
 import { GameMetadataService, ShotTypeResponse } from '../../services/game-metadata.service';
 import { SprayChartUtilsService } from '../../services/spray-chart-utils.service';
 import { ComponentVisibilityByRoleDirective } from '../../shared/directives/component-visibility-by-role.directive';
+import { ButtonComponent } from '../../shared/components/buttons/button/button.component';
 import { visibilityByRoleMap } from './player-profile.role-map';
 
 @Component({
@@ -32,13 +32,13 @@ import { visibilityByRoleMap } from './player-profile.role-map';
   standalone: true,
   imports: [
     CommonModule,
-    MatButtonModule,
     MatIconModule,
     MatCardModule,
     MatDividerModule,
     MatTableModule,
     ShotLocationDisplayComponent,
     ComponentVisibilityByRoleDirective,
+    ButtonComponent,
   ],
   templateUrl: './player-profile.html',
   styleUrl: './player-profile.scss',
@@ -96,7 +96,7 @@ export class PlayerProfileComponent implements OnInit {
     if (playerId) {
       this.loadPlayer(playerId);
     } else {
-      this.router.navigate(['/teams/players']);
+      this.router.navigate(['/teams-and-rosters/players']);
     }
   }
 
@@ -129,7 +129,7 @@ export class PlayerProfileComponent implements OnInit {
           this.loadSprayChartData(id, lastSeason.id, eventNames, shotTypes);
         } else {
           console.error(`Player not found with ID: ${id}`);
-          this.router.navigate(['/teams/players']);
+          this.router.navigate(['/teams-and-rosters/players']);
           this.loading = false;
         }
       },
@@ -139,7 +139,7 @@ export class PlayerProfileComponent implements OnInit {
         // Set empty arrays on error so component still renders
         this.seasonStats = [];
         this.recentGameStats = [];
-        this.router.navigate(['/teams/players']);
+        this.router.navigate(['/teams-and-rosters/players']);
       },
     });
   }

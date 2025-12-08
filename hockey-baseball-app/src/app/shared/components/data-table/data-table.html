@@ -126,31 +126,28 @@
         <!-- Actions Column -->
         @if (actions.length > 0) {
           <ng-container matColumnDef="actions">
-            <th mat-header-cell *matHeaderCellDef class="text-center" style="width: 200px">
+            <th mat-header-cell *matHeaderCellDef class="text-center" style="width: 300px">
               Actions
             </th>
             <td
               mat-cell
               *matCellDef="let element"
               class="text-center actions-cell"
-              style="width: 200px"
+              style="width: 300px"
             >
-              <div class="flex flex-wrap items-center justify-end gap-1">
+              <div class="flex flex-wrap items-center justify-end" style="gap: 15px;">
                 @for (action of actions; track action.action) {
                   @if (!action.condition || action.condition(element)) {
-                    <button
-                      mat-button
-                      (click)="onActionClick(action.action, element)"
-                      [color]="
-                        action.variant === 'primary'
-                          ? 'primary'
-                          : action.variant === 'danger'
-                            ? 'warn'
-                            : ''
-                      "
-                      [class]="action.iconOnly ? 'action-button icon-only-button' : 'action-button'"
-                      [matTooltip]="action.iconOnly ? action.label : ''"
-                      matTooltipPosition="above"
+                    <app-button-small
+                      [materialIcon]="getActionIcon(action.action)"
+                      [bg]="'transparent'"
+                      [bghover]="'transparent'"
+                      [color]="getActionColor(action.variant, action.action)"
+                      [colorhover]="getActionColorHover(action.variant, action.action)"
+                      [tooltip]="action.iconOnly ? action.label : null"
+                      [haveContent]="!action.iconOnly"
+                      [rounded]="false"
+                      (clicked)="onActionClick(action.action, element)"
                       [attr.role-access-name]="action.roleAccessName"
                       [attr.role-visibility-name]="action.roleVisibilityName"
                       [attr.role-visibility-author-id]="
@@ -168,18 +165,10 @@
                           : null
                       "
                     >
-                      @if (action.icon) {
-                        <img
-                          [src]="iconService.getIconPath(action.icon)"
-                          [alt]="action.label"
-                          class="action-icon"
-                          [class.mr-1]="!action.iconOnly"
-                        />
-                      }
                       @if (!action.iconOnly) {
                         {{ action.label }}
                       }
-                    </button>
+                    </app-button-small>
                   }
                 }
               </div>

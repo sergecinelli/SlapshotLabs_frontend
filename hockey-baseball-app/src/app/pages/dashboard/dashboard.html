@@ -1,100 +1,128 @@
-<div class="p-6 pt-0 space-y-6" [appVisibilityMap]="visibilityByRoleMap">
-  <!-- Page Header -->
-  <app-page-header title="Dashboard"></app-page-header>
+<div class="page-content" [appVisibilityMap]="visibilityByRoleMap">
 
-  <!-- Quick Actions Row -->
-  <div class="flex flex-wrap gap-4 justify-center">
-    <app-action-button role-visibility-name="add-team-button" label="Add Team" (buttonClick)="openAddTeamModal()" />
-    <app-action-button role-visibility-name="add-player-button" label="Add Player" (buttonClick)="openAddPlayerModal()" />
-    <app-action-button role-visibility-name="add-goalie-button" label="Add Goalie" (buttonClick)="openAddGoalieModal()" />
-    <app-action-button role-visibility-name="add-game-button" label="Add Game" (buttonClick)="openAddGameModal()" />
-    <app-action-button role-visibility-name="add-highlight-button" label="Create Highlight Reel" (buttonClick)="createHighlightReel()" />
-  </div>
-
-  <!-- Main Content Grid -->
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-    <!-- Upcoming Games -->
-    <div class="bg-white rounded-lg shadow-lg border border-gray-200">
-      <div class="px-6 pt-4 border-b border-gray-200">
-        <h2 class="text-xl font-semibold text-gray-900">Upcoming Games</h2>
-      </div>
-      <div class="p-6">
-        @if (loading()) {
-        <div class="flex justify-center items-center py-8">
-          <div class="text-gray-500">Loading games...</div>
-        </div>
-        } @else if (upcomingGames().length === 0) {
-        <div class="text-center py-8 text-gray-500">No upcoming games scheduled.</div>
-        } @else {
-        <div>
-          @for (game of upcomingGames(); track game.id; let i = $index) {
-          @if (i < 5) { <div class="game-item flex items-center py-3 border-b border-gray-100 last:border-b-0">
-            <div class="flex-1 flex items-center gap-4">
-              <span class="text-sm text-gray-600 min-w-[120px]">{{ game.date }} - {{ game.time }}</span>
-              <div class="flex items-center gap-2">
-                @if (game.awayTeamLogo) {
-                <img [src]="game.awayTeamLogo" [alt]="game.awayTeam"
-                  class="w-8 h-8 rounded-full object-contain border border-gray-200 bg-white p-1" />
-                }
-                <span class="font-medium text-gray-900">{{ game.awayTeam }}</span>
-              </div>
-              <span class="text-gray-500">at</span>
-              <div class="flex items-center gap-2">
-                @if (game.homeTeamLogo) {
-                <img [src]="game.homeTeamLogo" [alt]="game.homeTeam"
-                  class="w-8 h-8 rounded-full object-contain border border-gray-200 bg-white p-1" />
-                }
-                <span class="font-medium text-gray-900">{{ game.homeTeam }}</span>
-              </div>
-            </div>
-        </div>
-        }
-        }
-      </div>
-      }
+  <!-- Content with padding -->
+  <div>
+    <!-- Quick Actions Row -->
+    <div class="flex flex-wrap gap-4 justify-center dashboard-actions-row">
+      <app-button role-visibility-name="add-team-button" [bg]="'primary'" [bghover]="'primary_dark'" [color]="'white'" [colorhover]="'white'"
+        [materialIcon]="'group_add'" [haveContent]="true" (clicked)="openAddTeamModal()">
+        Add Team
+      </app-button>
+      <app-button role-visibility-name="add-player-button" [bg]="'primary'" [bghover]="'primary_dark'" [color]="'white'" [colorhover]="'white'"
+        [materialIcon]="'person_add'" [haveContent]="true" (clicked)="openAddPlayerModal()">
+        Add Player
+      </app-button>
+      <app-button role-visibility-name="add-goalie-button" [bg]="'primary'" [bghover]="'primary_dark'" [color]="'white'" [colorhover]="'white'"
+        [materialIcon]="'shield'" [haveContent]="true" (clicked)="openAddGoalieModal()">
+        Add Goalie
+      </app-button>
+      <app-button role-visibility-name="add-game-button" [bg]="'primary'" [bghover]="'primary_dark'" [color]="'white'" [colorhover]="'white'"
+        [materialIcon]="'sports_hockey'" [haveContent]="true" (clicked)="openAddGameModal()">
+        Add Game
+      </app-button>
+      <app-button role-visibility-name="add-highlight-button" [bg]="'primary'" [bghover]="'primary_dark'" [color]="'white'" [colorhover]="'white'"
+        [materialIcon]="'video_library'" [haveContent]="true" (clicked)="createHighlightReel()">
+        Create Highlight Reel
+      </app-button>
     </div>
-  </div>
 
-  <!-- Game Results -->
-  <div class="bg-white rounded-lg shadow-lg border border-gray-200">
-    <div class="px-6 pt-4 border-b border-gray-200">
-      <h2 class="text-xl font-semibold text-gray-900">Game Results</h2>
-    </div>
-    <div class="p-6">
-      @if (loading()) {
-      <div class="flex justify-center items-center py-8">
-        <div class="text-gray-500">Loading games...</div>
-      </div>
-      } @else if (gameResults().length === 0) {
-      <div class="text-center py-8 text-gray-500">No completed games found.</div>
-      } @else {
-      <div>
-        @for (game of gameResults(); track game.id; let i = $index) {
-        @if (i < 5) { <div class="game-item flex items-center py-3 border-b border-gray-100 last:border-b-0">
-          <div class="flex-1 flex items-center gap-4">
-            <span class="text-sm text-gray-600 min-w-[120px]">{{ game.date }} - {{ game.time }}</span>
-            <div class="flex items-center gap-2">
-              @if (game.awayTeamLogo) {
-              <img [src]="game.awayTeamLogo" [alt]="game.awayTeam" class="w-8 h-8 rounded-full object-contain border border-gray-200 bg-white p-1" />
-              }
-              <span class="font-medium text-gray-900">{{ game.awayTeam }}</span>
-              <span class="text-lg font-bold text-gray-900">{{ game.awayGoals }}</span>
-            </div>
-            <span class="text-gray-500">at</span>
-            <div class="flex items-center gap-2">
-              @if (game.homeTeamLogo) {
-              <img [src]="game.homeTeamLogo" [alt]="game.homeTeam" class="w-8 h-8 rounded-full object-contain border border-gray-200 bg-white p-1" />
-              }
-              <span class="font-medium text-gray-900">{{ game.homeTeam }}</span>
-              <span class="text-lg font-bold text-gray-900">{{ game.homeGoals }}</span>
-            </div>
+    <!-- Main Content Grid -->
+    @if (loading()) {
+      <app-dashboard-skeleton></app-dashboard-skeleton>
+    } @else {
+    <div class="dashboard-grid-flex">
+      <!-- Upcoming Games -->
+      <div class="dashboard-card">
+        <div class="dashboard-card-header">
+          <h2 class="dashboard-card-title">Upcoming Games</h2>
+        </div>
+        <div class="dashboard-card-content">
+            @if (upcomingGames().length === 0) {
+          <div class="dashboard-empty">No upcoming games scheduled.</div>
+          } @else {
+          <div class="dashboard-game-list">
+            @for (game of upcomingGames(); track game.id; let i = $index) {
+                  @if (i < 5) {
+                    <div class="dashboard-game-item">
+              <div class="dashboard-game-content">
+                <span class="dashboard-game-date">{{ game.date }} - {{ game.time }}</span>
+                <div class="dashboard-team-info">
+                  @if (game.awayTeamLogo) {
+                  <img [src]="game.awayTeamLogo" [alt]="game.awayTeam" class="dashboard-team-logo" />
+                  }
+                          @if (game.awayTeamId) {
+                            <a class="dashboard-team-name" (click)="goToTeamProfile(game.awayTeamId!)" [attr.href]="'/teams-and-rosters/teams/team-profile/' + game.awayTeamId">{{ game.awayTeam }}</a>
+                          } @else {
+                  <span class="dashboard-team-name">{{ game.awayTeam }}</span>
+                          }
+                </div>
+                <span class="dashboard-game-separator">at</span>
+                <div class="dashboard-team-info">
+                  @if (game.homeTeamLogo) {
+                  <img [src]="game.homeTeamLogo" [alt]="game.homeTeam" class="dashboard-team-logo" />
+                  }
+                          @if (game.homeTeamId) {
+                            <a class="dashboard-team-name" (click)="goToTeamProfile(game.homeTeamId!)" [attr.href]="'/teams-and-rosters/teams/team-profile/' + game.homeTeamId">{{ game.homeTeam }}</a>
+                          } @else {
+                  <span class="dashboard-team-name">{{ game.homeTeam }}</span>
+                          }
+                </div>
+              </div>
           </div>
+          }
+          }
+        </div>
+        }
+      </div>
+    </div>
+
+    <!-- Game Results -->
+    <div class="dashboard-card">
+      <div class="dashboard-card-header">
+        <h2 class="dashboard-card-title">Game Results</h2>
+      </div>
+      <div class="dashboard-card-content">
+            @if (gameResults().length === 0) {
+        <div class="dashboard-empty">No completed games found.</div>
+        } @else {
+        <div class="dashboard-game-list">
+          @for (game of gameResults(); track game.id; let i = $index) {
+                  @if (i < 5) {
+                    <div class="dashboard-game-item">
+            <div class="dashboard-game-content">
+              <span class="dashboard-game-date">{{ game.date }} - {{ game.time }}</span>
+              <div class="dashboard-team-info">
+                @if (game.awayTeamLogo) {
+                <img [src]="game.awayTeamLogo" [alt]="game.awayTeam" class="dashboard-team-logo" />
+                }
+                          @if (game.awayTeamId) {
+                            <a class="dashboard-team-name" (click)="goToTeamProfile(game.awayTeamId!)" [attr.href]="'/teams-and-rosters/teams/team-profile/' + game.awayTeamId">{{ game.awayTeam }}</a>
+                          } @else {
+                <span class="dashboard-team-name">{{ game.awayTeam }}</span>
+                          }
+                <span class="dashboard-score">{{ game.awayGoals }}</span>
+              </div>
+              <span class="dashboard-game-separator">at</span>
+              <div class="dashboard-team-info">
+                @if (game.homeTeamLogo) {
+                <img [src]="game.homeTeamLogo" [alt]="game.homeTeam" class="dashboard-team-logo" />
+                }
+                          @if (game.homeTeamId) {
+                            <a class="dashboard-team-name" (click)="goToTeamProfile(game.homeTeamId!)" [attr.href]="'/teams-and-rosters/teams/team-profile/' + game.homeTeamId">{{ game.homeTeam }}</a>
+                          } @else {
+                <span class="dashboard-team-name">{{ game.homeTeam }}</span>
+                          }
+                <span class="dashboard-score">{{ game.homeGoals }}</span>
+              </div>
+            </div>
+        </div>
+        }
+        }
       </div>
       }
-      }
     </div>
-    }
   </div>
-</div>
+      </div>
+    }
 </div>
 </div>

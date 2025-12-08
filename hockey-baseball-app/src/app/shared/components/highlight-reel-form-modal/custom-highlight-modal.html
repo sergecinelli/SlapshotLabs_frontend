@@ -67,16 +67,37 @@
   </mat-dialog-content>
 
   <mat-dialog-actions class="modal-actions">
-    <button mat-stroked-button (click)="onCancel()" class="cancel-btn">Cancel</button>
-    <button
-      mat-raised-button
-      color="primary"
-      (click)="onSave()"
-      class="submit-btn"
-      [disabled]="form.invalid"
+    <app-button
+      [bg]="'transparent'"
+      [bghover]="'button_background'"
+      [br]="'border'"
+      [color]="'text_primary'"
+      [colorhover]="'text_primary'"
+      [opacity]="1"
+      [opacityhover]="1"
+      [width]="'auto'"
+      [rounded]="false"
+      [haveContent]="true"
+      (clicked)="onCancel()"
     >
-      <mat-icon>save</mat-icon>
+      Cancel
+    </app-button>
+    <app-button-loading
+      [isLoading]="false"
+      [isDisabled]="form.invalid"
+      materialIcon="save"
+      [bg]="'primary'"
+      [bghover]="'primary_dark'"
+      [color]="'white'"
+      [colorhover]="'white'"
+      [opacity]="1"
+      [opacityhover]="1"
+      [width]="'auto'"
+      [rounded]="false"
+      [haveContent]="true"
+      (clicked)="onSave()"
+    >
       Save
-    </button>
+    </app-button-loading>
   </mat-dialog-actions>
 </div>

@@ -11,7 +11,7 @@ import {
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { AuthLayoutComponent } from '../../shared/components/auth-layout/auth-layout';
-import { AuthButtonComponent } from '../../shared/components/auth-button/auth-button';
+import { ButtonLoadingComponent } from '../../shared/components/buttons/button-loading/button-loading.component';
 import { AuthService } from '../../services/auth.service';
 import { PasswordResetConfirm } from '../../shared/interfaces/auth.interfaces';
 
@@ -23,7 +23,7 @@ import { PasswordResetConfirm } from '../../shared/interfaces/auth.interfaces';
     MatFormFieldModule,
     MatInputModule,
     AuthLayoutComponent,
-    AuthButtonComponent,
+    ButtonLoadingComponent,
   ],
   templateUrl: './reset-password.html',
   styleUrl: './reset-password.scss',

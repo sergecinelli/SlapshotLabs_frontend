@@ -7,7 +7,8 @@ import {
   MatDialogModule,
   MatDialogRef,
 } from '@angular/material/dialog';
-import { MatButtonModule } from '@angular/material/button';
+import { ButtonComponent } from '../buttons/button/button.component';
+import { ButtonLoadingComponent } from '../buttons/button-loading/button-loading.component';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatExpansionModule } from '@angular/material/expansion';
@@ -51,7 +52,8 @@ interface GameListItem {
     CommonModule,
     ReactiveFormsModule,
     MatDialogModule,
-    MatButtonModule,
+    ButtonComponent,
+    ButtonLoadingComponent,
     MatFormFieldModule,
     MatInputModule,
     MatExpansionModule,

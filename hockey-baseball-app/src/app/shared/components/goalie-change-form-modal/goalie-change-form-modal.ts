@@ -2,7 +2,6 @@ import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatDialogRef, MatDialogModule, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
@@ -13,6 +12,8 @@ import { TeamService } from '../../../services/team.service';
 import { GoalieService } from '../../../services/goalie.service';
 import { GameMetadataService } from '../../../services/game-metadata.service';
 import { GameEventService, GoalieChangeEventRequest } from '../../../services/game-event.service';
+import { ButtonComponent } from '../buttons/button/button.component';
+import { ButtonLoadingComponent } from '../buttons/button-loading/button-loading.component';
 import { environment } from '../../../../environments/environment';
 
 export interface GoalieChangeFormData {
@@ -31,12 +32,13 @@ export interface GoalieChangeFormData {
     CommonModule,
     ReactiveFormsModule,
     MatDialogModule,
-    MatButtonModule,
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
     MatIconModule,
     MatDividerModule,
+    ButtonComponent,
+    ButtonLoadingComponent,
   ],
   templateUrl: './goalie-change-form-modal.html',
   styleUrl: './goalie-change-form-modal.scss',

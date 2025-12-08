@@ -134,7 +134,21 @@
 
     <div class="flex justify-center flex-col text-center mt-6">
       <!-- Sign Up Button -->
-      <app-auth-button text="SIGN UP" type="submit"></app-auth-button>
+      <app-button-loading
+        [isLoading]="isLoading"
+        [isDisabled]="signUpForm.invalid || isLoading"
+        type="submit"
+        [bg]="'primary'"
+        [bghover]="'primary'"
+        [color]="'white'"
+        [colorhover]="'white'"
+        [opacity]="signUpForm.invalid || isLoading ? 0.5 : 1"
+        [opacityhover]="1"
+        [width]="'auto'"
+        [rounded]="false"
+      >
+        {{ isLoading ? 'SIGNING UP...' : 'SIGN UP' }}
+      </app-button-loading>
 
       <app-auth-link
         text="Already have an account?"

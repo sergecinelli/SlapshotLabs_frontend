@@ -1,0 +1,102 @@
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+@mixin skeleton-base {
+  background: linear-gradient(
+    90deg,
+    var(--border-light) 0%,
+    var(--gray-tone2) 50%,
+    var(--border-light) 100%
+  );
+  background-size: 2000px 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+}
+
+.dashboard-skeleton-container {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+// Title Skeleton - matches dashboard-card-title
+.skeleton-title {
+  @include skeleton-base;
+  height: 18px;
+  width: 150px;
+}
+
+// Date Skeleton - applied to dashboard-game-date class
+.dashboard-game-date.skeleton-date {
+  @include skeleton-base;
+  display: inline-block;
+  color: transparent !important;
+  width: 140px;
+  min-width: 140px;
+}
+
+// Team Name Skeleton - applied to dashboard-team-name class
+.dashboard-team-name.skeleton-team-name {
+  @include skeleton-base;
+  display: inline-block;
+  color: transparent !important;
+  width: 120px;
+  min-width: 0;
+}
+
+// Separator Skeleton - applied to dashboard-game-separator class
+.dashboard-game-separator.skeleton-separator {
+  @include skeleton-base;
+  display: inline-block;
+  color: transparent !important;
+  width: 18px;
+}
+
+// Logo Skeleton - applied to dashboard-team-logo class
+.dashboard-team-logo.skeleton-logo {
+  @include skeleton-base;
+  display: block;
+  object-fit: none;
+  background: var(--white);
+}
+
+// Score Skeleton - applied to dashboard-score class
+.dashboard-score.skeleton-score {
+  @include skeleton-base;
+  display: inline-block;
+  color: transparent !important;
+  width: 20px;
+  min-width: 24px;
+}
+
+// Responsive adjustments - matches dashboard.scss
+@media (max-width: 768px) {
+  .skeleton-date {
+    min-width: 100px;
+    height: 11px;
+  }
+
+  .skeleton-logo {
+    width: 24px;
+    height: 24px;
+  }
+
+  .skeleton-team-name {
+    height: 13px;
+  }
+
+  .skeleton-score {
+    height: 14px;
+  }
+}
+

@@ -8,7 +8,7 @@ module.exports = {
       },
       colors: {
         custom: {
-          primary: '#cf142b', // Primary red
+          primary: '#CF142B', // Primary red
           dark: '#090b0c', // Dark text
           secondary: '#778f9c', // Secondary background
           white: '#ffffff', // White background

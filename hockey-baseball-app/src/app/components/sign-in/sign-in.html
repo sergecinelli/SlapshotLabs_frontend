@@ -64,9 +64,25 @@
       </a>
     </div>
 
-    <div class="flex justify-center flex-col text-center">
+    <div class="flex flex-col items-center text-center">
       <!-- Login Button -->
-      <app-auth-button text="LOGIN" type="submit"></app-auth-button>
+      <app-button-loading
+        [isLoading]="isLoading"
+        [isDisabled]="signInForm.invalid || isLoading"
+        type="submit"
+        [bg]="'primary'"
+        [bghover]="'primary_dark'"
+        [color]="'white'"
+        [colorhover]="'white'"
+        [opacity]="1"
+        [opacityhover]="1"
+        [width]="'auto'"
+        [rounded]="false"
+        [materialIcon]="'login'"
+        [haveContent]="true"
+      >
+        {{ isLoading ? 'LOGGING IN...' : 'LOGIN' }}
+      </app-button-loading>
 
       <app-auth-link
         text="Don't have an account yet?"

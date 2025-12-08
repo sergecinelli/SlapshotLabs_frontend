@@ -1,9 +1,8 @@
 import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { ButtonComponent } from '../../shared/components/buttons/button/button.component';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { PageHeaderComponent } from '../../shared/components/page-header/page-header';
 import {
   DataTableComponent,
   TableAction,
@@ -30,29 +29,29 @@ import { RoleService } from '../../services/roles/role.service';
   standalone: true,
   imports: [
     CommonModule,
-    PageHeaderComponent,
     DataTableComponent,
-    MatButtonModule,
     MatIconModule,
     MatDialogModule,
     ComponentVisibilityByRoleDirective,
+    ButtonComponent,
   ],
   template: `
-    <div class="p-6 pt-0" [appVisibilityMap]="visibilityByRoleMap">
-      <app-page-header title="Video Highlights"></app-page-header>
+    <div class="page-content" [appVisibilityMap]="visibilityByRoleMap">
 
       <!-- Create Highlight Reel Button -->
       <div class="mb-4 flex justify-end">
-        <button
-          mat-raised-button
-          color="primary"
-          (click)="openCreateHighlightModal()"
-          class="add-video-btn"
+        <app-button
+          [bg]="'primary'"
+          [bghover]="'primary_dark'"
+          [color]="'white'"
+          [colorhover]="'white'"
+          [materialIcon]="'add'"
+          [haveContent]="true"
+          (clicked)="openCreateHighlightModal()"
           role-visibility-name="create-highlight-button"
         >
-          <mat-icon>add</mat-icon>
           Create New Highlight Reel
-        </button>
+        </app-button>
       </div>
 
       <app-data-table

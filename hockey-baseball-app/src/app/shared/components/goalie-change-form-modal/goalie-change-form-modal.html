@@ -148,16 +148,37 @@
   </mat-dialog-content>
 
   <mat-dialog-actions class="modal-actions">
-    <button mat-stroked-button (click)="onCancel()" class="cancel-btn">Cancel</button>
-    <button
-      mat-raised-button
-      color="primary"
-      (click)="onSubmit()"
-      class="submit-btn"
-      [disabled]="goalieChangeForm.invalid || isSubmitting"
+    <app-button
+      [bg]="'transparent'"
+      [bghover]="'button_background'"
+      [br]="'border'"
+      [color]="'text_primary'"
+      [colorhover]="'text_primary'"
+      [opacity]="1"
+      [opacityhover]="1"
+      [width]="'auto'"
+      [rounded]="false"
+      [haveContent]="true"
+      (clicked)="onCancel()"
     >
-      <mat-icon>save</mat-icon>
-      {{ isSubmitting ? 'Saving...' : isEditMode ? 'Save Goalie Change' : 'Add Goalie Change' }}
-    </button>
+      Cancel
+    </app-button>
+    <app-button-loading
+      [isLoading]="isSubmitting"
+      [isDisabled]="goalieChangeForm.invalid"
+      materialIcon="save"
+      [bg]="isEditMode ? 'orange' : 'green'"
+      [bghover]="isEditMode ? 'orange' : 'green'"
+      [color]="'white'"
+      [colorhover]="'white'"
+      [opacity]="1"
+      [opacityhover]="1"
+      [width]="'auto'"
+      [rounded]="false"
+      [haveContent]="true"
+      (clicked)="onSubmit()"
+    >
+      {{ isEditMode ? 'Save Goalie Change' : 'Add Goalie Change' }}
+    </app-button-loading>
   </mat-dialog-actions>
 </div>

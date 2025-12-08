@@ -5,7 +5,7 @@ import { AuthService } from '../../services/auth.service';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { AuthLayoutComponent } from '../../shared/components/auth-layout/auth-layout';
-import { AuthButtonComponent } from '../../shared/components/auth-button/auth-button';
+import { ButtonLoadingComponent } from '../../shared/components/buttons/button-loading/button-loading.component';
 import { AuthLinkComponent } from '../../shared/components/auth-link/auth-link';
 
 @Component({
@@ -16,7 +16,7 @@ import { AuthLinkComponent } from '../../shared/components/auth-link/auth-link';
     MatFormFieldModule,
     MatInputModule,
     AuthLayoutComponent,
-    AuthButtonComponent,
+    ButtonLoadingComponent,
     AuthLinkComponent,
   ],
   templateUrl: './forgot-password.html',

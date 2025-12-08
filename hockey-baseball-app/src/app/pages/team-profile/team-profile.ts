@@ -1,7 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
-import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
@@ -19,6 +18,7 @@ import { Player } from '../../shared/interfaces/player.interface';
 import { Goalie } from '../../shared/interfaces/goalie.interface';
 import { TeamFormModalComponent } from '../../shared/components/team-form-modal/team-form-modal';
 import { ComponentVisibilityByRoleDirective } from '../../shared/directives/component-visibility-by-role.directive';
+import { ButtonComponent } from '../../shared/components/buttons/button/button.component';
 import { visibilityByRoleMap } from './team-profile.role-map';
 import { forkJoin } from 'rxjs';
 
@@ -57,12 +57,12 @@ export interface TeamPlayer {
   standalone: true,
   imports: [
     CommonModule,
-    MatButtonModule,
     MatIconModule,
     MatCardModule,
     MatDividerModule,
     MatTableModule,
     ComponentVisibilityByRoleDirective,
+    ButtonComponent,
   ],
   templateUrl: './team-profile.html',
   styleUrl: './team-profile.scss',
@@ -112,7 +112,7 @@ export class TeamProfileComponent implements OnInit {
     if (teamId) {
       this.loadTeam(teamId);
     } else {
-      this.router.navigate(['/teams']);
+      this.router.navigate(['/teams-and-rosters/teams']);
     }
   }
 
@@ -220,7 +220,7 @@ export class TeamProfileComponent implements OnInit {
           }
         } else {
           console.error(`Team not found with ID: ${id}`);
-          this.router.navigate(['/teams']);
+          this.router.navigate(['/teams-and-rosters/teams']);
         }
         this.loading = false;
       },
@@ -230,7 +230,7 @@ export class TeamProfileComponent implements OnInit {
         this.recentGames = [];
         this.upcomingGames = [];
         this.seasonStats = [];
-        this.router.navigate(['/teams']);
+        this.router.navigate(['/teams-and-rosters/teams']);
       },
     });
   }

@@ -64,16 +64,37 @@
   </mat-dialog-content>
 
   <mat-dialog-actions class="modal-actions">
-    <button mat-stroked-button (click)="onCancel()" class="cancel-btn">Cancel</button>
-    <button
-      mat-raised-button
-      color="primary"
-      (click)="onSubmit()"
-      class="submit-btn"
-      [disabled]="videoForm.invalid"
+    <app-button
+      [bg]="'transparent'"
+      [bghover]="'button_background'"
+      [br]="'border'"
+      [color]="'text_primary'"
+      [colorhover]="'text_primary'"
+      [opacity]="1"
+      [opacityhover]="1"
+      [width]="'auto'"
+      [rounded]="false"
+      [haveContent]="true"
+      (clicked)="onCancel()"
     >
-      <mat-icon>save</mat-icon>
+      Cancel
+    </app-button>
+    <app-button-loading
+      [isLoading]="false"
+      [isDisabled]="videoForm.invalid"
+      materialIcon="save"
+      [bg]="'primary'"
+      [bghover]="'primary_dark'"
+      [color]="'white'"
+      [colorhover]="'white'"
+      [opacity]="1"
+      [opacityhover]="1"
+      [width]="'auto'"
+      [rounded]="false"
+      [haveContent]="true"
+      (clicked)="onSubmit()"
+    >
       {{ isEditMode ? 'Update Video' : 'Add Video' }}
-    </button>
+    </app-button-loading>
   </mat-dialog-actions>
 </div>

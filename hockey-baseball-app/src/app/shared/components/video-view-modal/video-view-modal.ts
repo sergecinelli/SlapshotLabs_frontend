@@ -1,7 +1,7 @@
 import { Component, inject, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
-import { MatButtonModule } from '@angular/material/button';
+import { ButtonComponent } from '../buttons/button/button.component';
 import { MatIconModule } from '@angular/material/icon';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { Video } from '../../interfaces/video.interface';
@@ -12,7 +12,7 @@ export interface VideoViewModalData {
 
 @Component({
   selector: 'app-video-view-modal',
-  imports: [CommonModule, MatDialogModule, MatButtonModule, MatIconModule],
+  imports: [CommonModule, MatDialogModule, ButtonComponent, MatIconModule],
   templateUrl: './video-view-modal.html',
   styleUrl: './video-view-modal.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

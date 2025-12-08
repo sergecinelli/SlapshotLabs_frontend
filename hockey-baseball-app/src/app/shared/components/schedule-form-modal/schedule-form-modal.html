@@ -46,17 +46,23 @@
         </div>
 
         <div class="form-row">
-          <button
-            type="button"
-            mat-stroked-button
-            color="primary"
-            (click)="openAwayRosterModal()"
-            class="roster-button"
-            [disabled]="!scheduleForm.get('awayTeam')?.value"
+          <app-button
+            [bg]="'transparent'"
+            [bghover]="'button_background'"
+            [br]="'border'"
+            [color]="'primary'"
+            [colorhover]="'primary'"
+            [opacity]="1"
+            [opacityhover]="1"
+            [width]="'auto'"
+            [rounded]="false"
+            [materialIcon]="'groups'"
+            [haveContent]="true"
+            [isDisabled]="!scheduleForm.get('awayTeam')?.value"
+            (clicked)="openAwayRosterModal()"
           >
-            <mat-icon>groups</mat-icon>
             Select Away Team Roster
-          </button>
+          </app-button>
         </div>
 
         <div class="form-row">
@@ -88,17 +94,23 @@
         </div>
 
         <div class="form-row">
-          <button
-            type="button"
-            mat-stroked-button
-            color="primary"
-            (click)="openHomeRosterModal()"
-            class="roster-button"
-            [disabled]="!scheduleForm.get('homeTeam')?.value"
+          <app-button
+            [bg]="'transparent'"
+            [bghover]="'button_background'"
+            [br]="'border'"
+            [color]="'primary'"
+            [colorhover]="'primary'"
+            [opacity]="1"
+            [opacityhover]="1"
+            [width]="'auto'"
+            [rounded]="false"
+            [materialIcon]="'groups'"
+            [haveContent]="true"
+            [isDisabled]="!scheduleForm.get('homeTeam')?.value"
+            (clicked)="openHomeRosterModal()"
           >
-            <mat-icon>groups</mat-icon>
             Select Home Team Roster
-          </button>
+          </app-button>
         </div>
 
         <div class="form-row">
@@ -257,16 +269,37 @@
   </mat-dialog-content>
 
   <mat-dialog-actions class="modal-actions">
-    <button mat-stroked-button (click)="onCancel()" class="cancel-btn">Cancel</button>
-    <button
-      mat-raised-button
-      color="primary"
-      (click)="onSubmit()"
-      class="submit-btn"
-      [disabled]="isLoading || scheduleForm.invalid"
+    <app-button
+      [bg]="'transparent'"
+      [bghover]="'button_background'"
+      [br]="'border'"
+      [color]="'text_primary'"
+      [colorhover]="'text_primary'"
+      [opacity]="1"
+      [opacityhover]="1"
+      [width]="'auto'"
+      [rounded]="false"
+      [haveContent]="true"
+      (clicked)="onCancel()"
     >
-      <mat-icon>save</mat-icon>
+      Cancel
+    </app-button>
+    <app-button-loading
+      [isLoading]="isLoading"
+      [isDisabled]="scheduleForm.invalid"
+      materialIcon="save"
+      [bg]="isEditMode ? 'orange' : 'green'"
+      [bghover]="isEditMode ? 'orange' : 'green'"
+      [color]="'white'"
+      [colorhover]="'white'"
+      [opacity]="1"
+      [opacityhover]="1"
+      [width]="'auto'"
+      [rounded]="false"
+      [haveContent]="true"
+      (clicked)="onSubmit()"
+    >
       {{ isEditMode ? 'Update Game' : 'Add Game' }}
-    </button>
+    </app-button-loading>
   </mat-dialog-actions>
 </div>

@@ -1,173 +1,154 @@
 <div class="flex h-screen">
   <!-- Left Navigation Panel -->
-  <div class="w-64 flex flex-col">
-    <!-- Logo Section -->
-    <div class="py-8 border-b bg-white">
-      <div class="flex items-center space-x-3">
-        <img
-          src="assets/logo.png"
-          fetchpriority="high"
-          loading="eager"
-          alt="Hockey Baseball App"
-          class="rounded-lg mx-auto"
-        />
+  <div [class]="'flex flex-col transition-all duration-300 bg-sidebar-dark relative ' + (isCollapsed() ? 'w-20' : 'w-64')">
+    <!-- Logo and Menu Header -->
+    <div class="px-4 border-b border-sidebar-border flex items-center" style="height: 143px;">
+      <div class="flex items-center justify-between w-full">
+        <div class="flex items-center space-x-3">
+          <img src="assets/logo-circle.png" fetchpriority="high" loading="eager" alt="Slapshot Labs"
+            class="logo-image rounded object-contain flex-shrink-0"
+            [class.h-12]="isCollapsed()"
+            [class.w-12]="isCollapsed()"
+            [class.h-16]="!isCollapsed()"
+            [class.w-16]="!isCollapsed()" />
+          @if (!isCollapsed()) {
+          <div class="flex flex-col logo-text-container">
+            <span class="text-custom-primary leading-tight uppercase logo-text-line logo-text-primary">SLAPSHOT</span>
+            <span class="text-white leading-tight uppercase logo-text-line logo-text-white">LABS</span>
+          </div>
+          }
+        </div>
       </div>
     </div>
 
-    <!-- Navigation Menu -->
-    <nav>
-      @for (item of navigationItems(); track item.path) {
-        <div>
-          <!-- Main Navigation Item -->
-          <button
-            (click)="navigate(item.path)"
-            [class.gamesheet]="item.path === '/gamesheet'"
-            [class]="
-              'flex items-center justify-between w-full px-4 py-3 text-sm transition-colors duration-200 text-left bg-transparent border-none cursor-pointer ' +
-              (isActive(item.path) || isParentActive(item)
-                ? 'text-custom-primary font-semibold active'
-                : 'text-custom-dark hover:text-custom-primary font-medium')
-            "
-          >
-            <div class="flex items-center space-x-3 flex-1">
-              @if (item.icon) {
-                <img
-                  [src]="getIconPath(item.icon)"
-                  [alt]="item.label + ' icon'"
-                  [class]="
-                    'w-5 h-5 nav-icon ' +
-                    (isActive(item.path) || isParentActive(item) ? 'active' : '')
-                  "
-                />
-              }
-              <span>{{ item.label }}</span>
-            </div>
-            @if (item.children) {
-              <svg
-                (click)="toggleSubmenu(item); $event.stopPropagation()"
-                (keyup.enter)="toggleSubmenu(item); $event.stopPropagation()"
-                (keyup.space)="toggleSubmenu(item); $event.stopPropagation()"
-                [class]="
-                  'w-4 h-4 transition-transform duration-200 cursor-pointer flex-shrink-0 ml-2 ' +
-                  (isActive(item.path) || isParentActive(item)
-                    ? 'text-custom-primary'
-                    : 'text-custom-secondary hover:text-custom-primary')
-                "
-                [style.transform]="item.expanded ? 'rotate(90deg)' : 'rotate(0deg)'"
-                tabindex="0"
-                role="button"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M9 5l7 7-7 7"
-                />
-              </svg>
-            }
-          </button>
+    <!-- Collapse Toggle Button - positioned at the edge -->
+    <button (click)="toggleCollapse()" class="collapse-button" [attr.aria-label]="isCollapsed() ? 'Expand menu' : 'Collapse menu'" type="button">
+      <span [class]="'material-symbols-rounded transition-transform duration-300 ' + (isCollapsed() ? 'rotate-180' : '')"
+        style="font-size: 20px;">chevron_left</span>
+    </button>
 
-          <!-- Submenu -->
-          @if (item.children && item.expanded) {
-            <div class="ml-6 mt-1 space-y-1 border-l border-gray-300 pl-4">
-              @for (child of item.children; track child.path) {
-                <button
-                  (click)="navigate(child.path)"
-                  [class]="
-                    'w-full px-4 py-2 text-sm transition-colors duration-200 text-left bg-transparent border-none cursor-pointer ' +
+    <!-- Navigation Menu -->
+    <nav class="flex-1 overflow-y-auto">
+      @for (item of navigationItems(); track item.path) {
+      <div>
+        <!-- Main Navigation Item -->
+        <a [href]="item.path" matRipple [matRippleColor]="getRippleColor()" (click)="handleNavigationClick($event, item.path, item)"
+          (auxclick)="handleNavigationClick($event, item.path, item)" [class.gamesheet]="item.path === '/gamesheet'" [class]="
+              'flex items-center w-full py-3 text-sm text-left border-none cursor-pointer no-underline ' +
+              (isCollapsed() ? 'px-2 justify-center' : 'px-4 justify-between') +
+              ' ' +
+              (isItemActive(item)
+                ? 'bg-custom-primary text-white font-semibold active'
+                : 'bg-transparent font-medium')
+            " [title]="isCollapsed() ? item.label : ''">
+          <div [class]="'flex items-center flex-1 min-w-0 ' + (isCollapsed() ? 'justify-center' : 'space-x-3')">
+            @if (item.icon) {
+            <span [class]="'material-symbols-rounded nav-icon flex-shrink-0 ' + (isItemActive(item) ? 'active' : '')" style="font-size: 20px;">
+              {{ getMaterialIcon(item.icon) }}
+            </span>
+            }
+            @if (!isCollapsed()) {
+            <span class="truncate nav-item-text">{{ item.label }}</span>
+            }
+          </div>
+          @if (item.children && !isCollapsed()) {
+          <span (click)="handleChevronClick($event, item)" (keyup.enter)="handleChevronClick($event, item)"
+            (keyup.space)="handleChevronClick($event, item)" [class]="
+                  'material-symbols-rounded transition-transform duration-200 cursor-pointer flex-shrink-0 text-white submenu-chevron'
+                " [style.font-size]="'20px'" [style.transform]="item.expanded ? 'rotate(90deg)' : 'rotate(0deg)'" tabindex="0"
+            role="button">chevron_right</span>
+          }
+        </a>
+
+        <!-- Submenu -->
+        @if (item.children && item.expanded && !isCollapsed()) {
+        <div class="ml-6 mt-1 space-y-1 border-l border-sidebar-border pl-4">
+          @for (child of item.children; track child.path) {
+          <a [href]="child.path" matRipple [matRippleColor]="getRippleColor()" (click)="handleNavigationClick($event, child.path)"
+            (auxclick)="handleNavigationClick($event, child.path)" [class]="
+                    'w-full px-4 py-2 text-sm text-left bg-transparent border-none cursor-pointer submenu-item no-underline ' +
                     (isActive(child.path)
-                      ? 'text-custom-primary font-semibold active'
-                      : 'text-custom-dark hover:text-custom-primary font-medium')
-                  "
-                >
-                  <div class="flex items-center space-x-3">
-                    @if (child.icon) {
-                      <img
-                        [src]="getIconPath(child.icon)"
-                        [alt]="child.label + ' icon'"
-                        [class]="'w-4 h-4 submenu-icon ' + (isActive(child.path) ? 'active' : '')"
-                      />
-                    }
-                    <span>{{ child.label }}</span>
-                  </div>
-                </button>
+                      ? 'text-white font-semibold active'
+                      : 'font-medium')
+                  " [style.color]="isActive(child.path) ? 'white' : '#878787'">
+            <div class="flex items-center space-x-3">
+              @if (child.icon) {
+              <span [class]="'material-symbols-rounded submenu-icon ' + (isActive(child.path) ? 'active' : '')" style="font-size: 18px;">
+                {{ getMaterialIcon(child.icon) }}
+              </span>
               }
+              <span class="nav-item-text">{{ child.label }}</span>
             </div>
+          </a>
           }
         </div>
+        }
+      </div>
       }
     </nav>
+
+    <!-- User Profile Section -->
+    <div class="px-4 py-4 user-profile-section">
+      <div [class]="'flex items-center ' + (isCollapsed() ? 'justify-center' : 'space-x-3')">
+        <!-- User Avatar -->
+        <div class="flex-shrink-0">
+          <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold text-sm user-avatar">
+            {{ getUserInitials() }}
+          </div>
+        </div>
+        @if (!isCollapsed()) {
+        <div class="flex-1 min-w-0">
+          <div 
+            class="text-white font-semibold text-sm truncate user-name-link"
+            (click)="goToProfile()"
+            (keyup.enter)="goToProfile()"
+            (keyup.space)="goToProfile()"
+            tabindex="0"
+            role="button"
+            [attr.aria-label]="'Go to profile page'"
+          >
+            {{ getUserFullName() }}
+          </div>
+          <div class="inline-flex items-center gap-1" [class.cursor-help]="getRoleTooltip() !== null" [matTooltip]="getRoleTooltip() ?? ''"
+            [matTooltipDisabled]="!getRoleTooltip()" [matTooltipPosition]="'right'">
+            <div class="text-gray-400 text-xs">
+              {{ currentUser()?.role_name || 'User' }}
+            </div>
+            @if (getRoleTooltip()) {
+            <span class="material-symbols-rounded text-gray-400 text-xs" style="font-size: 12px;">
+              help
+            </span>
+            }
+          </div>
+        </div>
+        <div class="flex-shrink-0">
+          <app-button-loading [isLoading]="isLoggingOut()" [isDisabled]="isLoggingOut()" materialIcon="logout" [bg]="'transparent'"
+            [color]="'text_white'" [colorhover]="'primary'" [bghover]="'dark_tone2'" [opacity]="1" [opacityhover]="1" [width]="'auto'"
+            [rounded]="false" (clicked)="logout()" tooltip="Logout">
+          </app-button-loading>
+        </div>
+        }
+      </div>
+    </div>
   </div>
 
   <!-- Main Content Area -->
   <div class="flex-1 flex flex-col overflow-hidden">
     <!-- Header -->
-    <header class="bg-white h-[120px] flex justify-between">
-      <div class="flex w-full h-full">
+    <header class="app-header">
+      <div class="app-header-container">
         <!-- Live banner: horizontally scrollable -->
-        <div
-          class="flex-1 min-w-0 flex items-center bg-white px-6 py-0 overflow-x-auto no-scrollbar"
-        >
-          <app-live-banner class="w-full min-w-max"></app-live-banner>
-        </div>
-        <!-- Right: Support / Alerts / Logout, fixed width -->
-        <div
-          class="flex items-center justify-end bg-white pr-6 py-6"
-          style="min-width: 260px; max-width: 270px; flex: 0 0 270px"
-        >
-          <div class="flex items-center space-x-6 my-auto">
-            <a
-              href="#"
-              class="flex items-center space-x-2 text-custom-secondary hover:text-custom-dark font-medium text-sm"
-            >
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192L5.636 18.364M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"
-                />
-              </svg>
-              <span>Support</span>
-            </a>
-            <a
-              href="#"
-              class="flex items-center space-x-2 text-custom-secondary hover:text-custom-dark font-medium text-sm"
-            >
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M15 17h5l-5 5v-5zM9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-              <span>Alerts</span>
-            </a>
-            <button
-              (click)="logout()"
-              class="flex items-center space-x-2 text-custom-primary hover:text-red-800 font-medium text-sm bg-transparent border-none cursor-pointer"
-            >
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                />
-              </svg>
-              <span>Logout</span>
-            </button>
-          </div>
+        <div class="live-banner-container">
+          <app-live-banner class="live-banner"></app-live-banner>
         </div>
       </div>
     </header>
 
-    <!-- Page Content -->
-    <main class="flex-1 overflow-x-hidden overflow-y-auto p-6 pt-0 mt-0">
+    <!-- Breadcrumbs - Sticky -->
+    <!-- <app-breadcrumbs></app-breadcrumbs> -->
+
+    <!-- Page Content - Scrollable -->
+    <main class="flex-1 overflow-x-hidden overflow-y-auto page-content-wrapper">
       <router-outlet></router-outlet>
     </main>
   </div>

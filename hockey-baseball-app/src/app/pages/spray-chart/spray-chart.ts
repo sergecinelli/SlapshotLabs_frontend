@@ -1,9 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatCardModule } from '@angular/material/card';
 import { forkJoin } from 'rxjs';
 import { GoalieService } from '../../services/goalie.service';
 import { PlayerService } from '../../services/player.service';
@@ -16,15 +13,14 @@ import {
 import { GameEventNameService } from '../../services/game-event-name.service';
 import { GameMetadataService } from '../../services/game-metadata.service';
 import { SprayChartUtilsService } from '../../services/spray-chart-utils.service';
+import { ButtonComponent } from '../../shared/components/buttons/button/button.component';
 
 @Component({
   selector: 'app-spray-chart',
   imports: [
     CommonModule,
-    MatButtonModule,
-    MatIconModule,
-    MatCardModule,
     ShotLocationDisplayComponent,
+    ButtonComponent,
   ],
   templateUrl: './spray-chart.html',
   styleUrl: './spray-chart.scss',
@@ -56,7 +52,7 @@ export class SprayChartComponent implements OnInit {
         this.loadGoalieSprayChartData(id);
       }
     } else {
-      this.router.navigate(['/teams/goalies']);
+      this.router.navigate(['/teams-and-rosters/goalies']);
     }
   }
 
@@ -80,14 +76,14 @@ export class SprayChartComponent implements OnInit {
           );
         } else {
           console.error(`Goalie not found with ID: ${goalieId}`);
-          this.router.navigate(['/teams/goalies']);
+          this.router.navigate(['/teams-and-rosters/goalies']);
         }
         this.loading = false;
       },
       error: (error) => {
         console.error('Error loading spray chart data:', error);
         this.loading = false;
-        this.router.navigate(['/teams/goalies']);
+        this.router.navigate(['/teams-and-rosters/goalies']);
       },
     });
   }
@@ -112,23 +108,23 @@ export class SprayChartComponent implements OnInit {
           );
         } else {
           console.error(`Player not found with ID: ${playerId}`);
-          this.router.navigate(['/teams/players']);
+          this.router.navigate(['/teams-and-rosters/players']);
         }
         this.loading = false;
       },
       error: (error) => {
         console.error('Error loading spray chart data:', error);
         this.loading = false;
-        this.router.navigate(['/teams/players']);
+        this.router.navigate(['/teams-and-rosters/players']);
       },
     });
   }
 
   goBack(): void {
     if (this.entityType === 'player') {
-      this.router.navigate(['/teams/players']);
+      this.router.navigate(['/teams-and-rosters/players']);
     } else {
-      this.router.navigate(['/teams/goalies']);
+      this.router.navigate(['/teams-and-rosters/goalies']);
     }
   }
 

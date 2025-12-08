@@ -6,8 +6,11 @@
 
   <!-- Profile Content -->
   <div *ngIf="!loading && goalie" class="profile-content">
+    <div class="dashboard-cards-container">
     <!-- Header Section with Basic Info -->
-    <div class="profile-header">
+    <div class="dashboard-card profile-header-card">
+      <div class="dashboard-card-content">
+        <div class="profile-header">
       <div class="player-info">
         <h1 class="player-name">{{ goalie.firstName }} {{ goalie.lastName }}</h1>
         <div class="player-details">
@@ -16,20 +19,24 @@
           <span class="jersey">#{{ goalie.jerseyNumber }}</span>
         </div>
       </div>
-      <div class="player-avatar">
-        <mat-icon class="avatar-icon">sports_hockey</mat-icon>
+      <div class="player-photo-container">
+        <div class="player-photo">
+          <mat-icon class="photo-placeholder">sports_hockey</mat-icon>
+        </div>
+      </div>
+        </div>
       </div>
     </div>
 
     <!-- Personal Information Card -->
-    <mat-card class="info-card">
-      <mat-card-header>
-        <mat-card-title>
+    <div class="dashboard-card info-card">
+      <div class="dashboard-card-header">
+        <h2 class="dashboard-card-title">
           <mat-icon>person</mat-icon>
           Personal Information
-        </mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
+        </h2>
+      </div>
+      <div class="dashboard-card-content">
         <div class="info-grid">
           <div class="info-item">
             <span class="label">Age:</span>
@@ -56,102 +63,101 @@
             <span class="value">{{ getCountry() }}</span>
           </div>
         </div>
-      </mat-card-content>
-    </mat-card>
+      </div>
+    </div>
 
     <!-- Statistics Card -->
-    <mat-card class="info-card">
-      <mat-card-header>
-        <mat-card-title>
-          <mat-icon>analytics</mat-icon>
+    <div class="dashboard-card">
+      <div class="dashboard-card-header">
+        <h2 class="dashboard-card-title">
+          <mat-icon>bar_chart</mat-icon>
           Season Statistics
-        </mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <div class="stats-grid">
-          <div class="stat-item highlight">
-            <span class="stat-value">{{ calculateSavePercentage() }}%</span>
-            <span class="stat-label">Save %</span>
+        </h2>
+      </div>
+      <div class="dashboard-card-content">
+        <!-- First Row: 3 main stats (highlighted) -->
+        <div class="stats-row stats-row-3">
+          <div class="stat-box highlight">
+            <div class="stat-value">{{ calculateSavePercentage() }}%</div>
+            <div class="stat-label">Save %</div>
           </div>
-          <div class="stat-item highlight">
-            <span class="stat-value">{{ calculateGoalsAgainstAverage() }}</span>
-            <span class="stat-label">GAA</span>
+          <div class="stat-box highlight">
+            <div class="stat-value">{{ calculateGoalsAgainstAverage() }}</div>
+            <div class="stat-label">GAA</div>
           </div>
-          <div class="stat-item highlight">
-            <span class="stat-value">{{ calculateWinPercentage() }}%</span>
-            <span class="stat-label">Win %</span>
-          </div>
-        </div>
-
-        <mat-divider></mat-divider>
-
-        <div class="stats-grid">
-          <div class="stat-item">
-            <span class="stat-value">{{ goalie.gamesPlayed }}</span>
-            <span class="stat-label">GP</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-value">{{ goalie.wins }}</span>
-            <span class="stat-label">Wins</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-value">{{ goalie.losses }}</span>
-            <span class="stat-label">Losses</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-value">{{ goalie.shotsOnGoal }}</span>
-            <span class="stat-label">SOG</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-value">{{ goalie.saves }}</span>
-            <span class="stat-label">Saves</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-value">{{ goalie.goalsAgainst }}</span>
-            <span class="stat-label">GA</span>
+          <div class="stat-box highlight">
+            <div class="stat-value">{{ calculateWinPercentage() }}%</div>
+            <div class="stat-label">Win %</div>
           </div>
         </div>
 
-        <mat-divider></mat-divider>
-
-        <div class="stats-grid">
-          <div class="stat-item">
-            <span class="stat-value">{{ goalie.shotsOnGoalPerGame | number: '1.1-1' }}</span>
-            <span class="stat-label">SOG/Game</span>
+        <!-- Second Row: 6 stats -->
+        <div class="stats-row stats-row-6">
+          <div class="stat-box">
+            <div class="stat-value">{{ goalie.gamesPlayed }}</div>
+            <div class="stat-label">Games Played</div>
           </div>
-          <div class="stat-item">
-            <span class="stat-value">{{ goalie.goals }}</span>
-            <span class="stat-label">Goals</span>
+          <div class="stat-box">
+            <div class="stat-value">{{ goalie.wins }}</div>
+            <div class="stat-label">Wins</div>
           </div>
-          <div class="stat-item">
-            <span class="stat-value">{{ goalie.assists }}</span>
-            <span class="stat-label">Assists</span>
+          <div class="stat-box">
+            <div class="stat-value">{{ goalie.losses }}</div>
+            <div class="stat-label">Losses</div>
           </div>
-          <div class="stat-item">
-            <span class="stat-value">{{ goalie.points }}</span>
-            <span class="stat-label">Points</span>
+          <div class="stat-box">
+            <div class="stat-value">{{ goalie.shotsOnGoal }}</div>
+            <div class="stat-label">Shots on Goal</div>
           </div>
-          <div class="stat-item">
-            <span class="stat-value">{{ goalie.ppga }}</span>
-            <span class="stat-label">PPGA</span>
+          <div class="stat-box">
+            <div class="stat-value">{{ goalie.saves }}</div>
+            <div class="stat-label">Saves</div>
           </div>
-          <div class="stat-item">
-            <span class="stat-value">{{ goalie.shga }}</span>
-            <span class="stat-label">SHGA</span>
+          <div class="stat-box">
+            <div class="stat-value">{{ goalie.goalsAgainst }}</div>
+            <div class="stat-label">Goals Against</div>
           </div>
         </div>
-      </mat-card-content>
-    </mat-card>
+
+        <!-- Third Row: 6 stats -->
+        <div class="stats-row stats-row-6">
+          <div class="stat-box">
+            <div class="stat-value">{{ goalie.shotsOnGoalPerGame | number: '1.1-1' }}</div>
+            <div class="stat-label">SOG/Game</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value">{{ goalie.points }}</div>
+            <div class="stat-label">Points</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value">{{ goalie.goals }}</div>
+            <div class="stat-label">Goals</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value">{{ goalie.assists }}</div>
+            <div class="stat-label">Assists</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value">{{ goalie.ppga }}</div>
+            <div class="stat-label">PPGA</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value">{{ goalie.shga }}</div>
+            <div class="stat-label">SHGA</div>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- Shot Location Display Card -->
-    <mat-card class="info-card">
-      <mat-card-header>
-        <mat-card-title>
+    <div class="dashboard-card info-card">
+      <div class="dashboard-card-header">
+        <h2 class="dashboard-card-title">
           <mat-icon>sports_hockey</mat-icon>
           Shot Locations
-        </mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
+        </h2>
+      </div>
+      <div class="dashboard-card-content">
         @if (getShotLocationData().length > 0) {
           <app-shot-location-display
             [data]="getShotLocationData()"
@@ -165,18 +171,18 @@
             </p>
           </div>
         }
-      </mat-card-content>
-    </mat-card>
+      </div>
+    </div>
 
     <!-- Season Stats Table -->
-    <mat-card class="info-card stats-table-card">
-      <mat-card-header>
-        <mat-card-title>
+    <div class="dashboard-card info-card stats-table-card">
+      <div class="dashboard-card-header">
+        <h2 class="dashboard-card-title">
           <mat-icon>table_chart</mat-icon>
           Season Stats
-        </mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
+        </h2>
+      </div>
+      <div class="dashboard-card-content">
         @if (getSeasonStats().length > 0) {
           <div class="table-container">
             <table mat-table [dataSource]="getSeasonStats()" class="stats-table">
@@ -270,21 +276,21 @@
         } @else {
           <div class="empty-state">
             <mat-icon class="empty-icon">table_chart</mat-icon>
-            <p class="empty-message">No season statistics available for this goalie.</p>
+            <p class="empty-message">No season statistics available for this goalie.            </p>
           </div>
         }
-      </mat-card-content>
-    </mat-card>
+      </div>
+    </div>
 
     <!-- Recent Game Stats Table -->
-    <mat-card class="info-card stats-table-card">
-      <mat-card-header>
-        <mat-card-title>
+    <div class="dashboard-card info-card stats-table-card">
+      <div class="dashboard-card-header">
+        <h2 class="dashboard-card-title">
           <mat-icon>history</mat-icon>
           Recent Game Stats (show last 5 games)
-        </mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
+        </h2>
+      </div>
+      <div class="dashboard-card-content">
         @if (getRecentGameStats().length > 0) {
           <div class="table-container">
             <table
@@ -360,11 +366,12 @@
         } @else {
           <div class="empty-state">
             <mat-icon class="empty-icon">history</mat-icon>
-            <p class="empty-message">No recent game statistics available for this goalie.</p>
+            <p class="empty-message">No recent game statistics available for this goalie.            </p>
           </div>
         }
-      </mat-card-content>
-    </mat-card>
+      </div>
+    </div>
+    </div>
   </div>
 
   <!-- Error State -->

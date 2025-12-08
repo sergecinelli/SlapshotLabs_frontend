@@ -1,0 +1,20 @@
+<a matRipple [matRippleColor]="rippleColor" [matTooltip]="tooltip ?? ''" [matTooltipShowDelay]="tooltipDelay" [matTooltipPosition]="tooltipPos"
+  download class="app-button" [class.have-content]="haveContent" [class.dev]="dev" [class.rounded]="rounded" [class.fill]="width !== 'auto'"
+  [ngStyle]="styles" [href]="download" (mousedown)="onMouseDown()" (mouseup)="onMouseUp()" (mouseenter)="onMouseEnter()"
+  (mouseleave)="onMouseLeave()">
+  <div class="icon-box material" *ngIf="materialIcon">
+    <span class="icon" [class]="isMatSymbolClass ? materialSymbolClass : materialIconClass" [class.fill]="isMatIconFillCurrent">
+      {{ materialIcon }}
+    </span>
+    <span class="counter" *ngIf="counter > 0" [style.background]="getColor(counterBgColor)" [style.color]="getColor(counterColor)">
+      {{ counter }}
+    </span>
+    <span class="counter-icon" *ngIf="hasDot" [class]="materialSymbolClass" [style.color]="getColor(counterBgColor)">circle</span>
+  </div>
+
+  <span class="text">
+    <ng-content></ng-content>
+  </span>
+
+  <span class="dev-text" [style.background]="getColor(color)" [style.color]="getColor(bg)" *ngIf="dev">DEMO</span>
+</a>

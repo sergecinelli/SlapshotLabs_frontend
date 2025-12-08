@@ -6,7 +6,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { AuthLayoutComponent } from '../../shared/components/auth-layout/auth-layout';
-import { AuthButtonComponent } from '../../shared/components/auth-button/auth-button';
+import { ButtonLoadingComponent } from '../../shared/components/buttons/button-loading/button-loading.component';
 import { AuthLinkComponent } from '../../shared/components/auth-link/auth-link';
 import { AuthService } from '../../services/auth.service';
 import { UserSignInForm } from '../../shared/interfaces/auth.interfaces';
@@ -20,7 +20,7 @@ import { UserSignInForm } from '../../shared/interfaces/auth.interfaces';
     MatFormFieldModule,
     MatInputModule,
     AuthLayoutComponent,
-    AuthButtonComponent,
+    ButtonLoadingComponent,
     AuthLinkComponent,
   ],
   templateUrl: './sign-in.html',

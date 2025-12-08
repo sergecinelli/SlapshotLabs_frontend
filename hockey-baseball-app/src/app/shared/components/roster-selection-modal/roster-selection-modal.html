@@ -129,16 +129,37 @@
   </mat-dialog-content>
 
   <mat-dialog-actions class="modal-actions">
-    <button mat-stroked-button (click)="onCancel()" class="cancel-btn">Cancel</button>
-    <button
-      mat-raised-button
-      color="primary"
-      (click)="onConfirm()"
-      class="confirm-btn"
-      [disabled]="isLoading()"
+    <app-button
+      [bg]="'transparent'"
+      [bghover]="'button_background'"
+      [br]="'border'"
+      [color]="'text_primary'"
+      [colorhover]="'text_primary'"
+      [opacity]="1"
+      [opacityhover]="1"
+      [width]="'auto'"
+      [rounded]="false"
+      [haveContent]="true"
+      (clicked)="onCancel()"
     >
-      <mat-icon>check</mat-icon>
+      Cancel
+    </app-button>
+    <app-button-loading
+      [isLoading]="isLoading()"
+      [isDisabled]="isLoading()"
+      materialIcon="check"
+      [bg]="'primary'"
+      [bghover]="'primary_dark'"
+      [color]="'white'"
+      [colorhover]="'white'"
+      [opacity]="1"
+      [opacityhover]="1"
+      [width]="'auto'"
+      [rounded]="false"
+      [haveContent]="true"
+      (clicked)="onConfirm()"
+    >
       Confirm Selection
-    </button>
+    </app-button-loading>
   </mat-dialog-actions>
 </div>

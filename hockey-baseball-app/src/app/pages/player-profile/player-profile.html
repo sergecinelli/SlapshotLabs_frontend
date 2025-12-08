@@ -1,32 +1,52 @@
-<div class="player-profile-page" [appVisibilityMap]="visibilityByRoleMap">
-  <!-- Loading State -->
-  <div *ngIf="loading" class="loading-container">
-    <p>Loading player profile...</p>
-  </div>
-
-  <!-- Profile Content -->
-  <div *ngIf="!loading && player" class="profile-content">
+<div class="page-content" [appVisibilityMap]="visibilityByRoleMap">
+  <!-- Content with padding -->
+  <div>
     <!-- Action Buttons Row -->
-    <div class="mb-4 flex justify-end gap-3">
-      <button
-        mat-raised-button
-        color="primary"
-        (click)="onEditProfile()"
-        class="add-player-btn"
+    <div class="flex flex-wrap gap-4 justify-end mb-4">
+      <app-button
+        materialIcon="stylus"
+        [bg]="'orange'"
+        [bghover]="'orange'"
+        [color]="'white'"
+        [colorhover]="'white'"
+        [haveContent]="true"
+        (clicked)="onEditProfile()"
         role-visibility-name="edit-player-button"
       >
-        <mat-icon>edit</mat-icon>
         Edit Player Profile
-      </button>
-      <button mat-raised-button color="accent" (click)="onRequestAnalysis()" class="add-player-btn">
-        <mat-icon>analytics</mat-icon>
+      </app-button>
+      <app-button
+        materialIcon="analytics"
+        [bg]="'upcoming'"
+        [bghover]="'upcoming'"
+        [color]="'white'"
+        [colorhover]="'white'"
+        [haveContent]="true"
+        (clicked)="onRequestAnalysis()"
+      >
         Request Player Analysis
-      </button>
+      </app-button>
     </div>
 
+    <!-- Loading State -->
+    @if (loading) {
+    <div class="dashboard-card">
+      <div class="dashboard-card-content">
+        <div class="dashboard-loading">
+          <div class="dashboard-loading-text">Loading player profile...</div>
+        </div>
+      </div>
+    </div>
+    }
+
+    <!-- Profile Content -->
+    @if (!loading && player) {
+    <div class="dashboard-cards-container">
     <!-- Header Section with Basic Info -->
-    <div class="profile-header">
-      <div class="player-info-section">
+    <div class="dashboard-card player-header-card">
+      <div class="dashboard-card-content">
+        <div class="player-header-layout">
+          <div class="player-main-info">
         <div class="player-photo-container">
           <div class="player-photo">
             <mat-icon class="photo-placeholder">person</mat-icon>
@@ -50,43 +70,44 @@
             </div>
           </div>
         </div>
-      </div>
-
       <div class="team-info">
         <div class="current-team">
           <div class="team-logo-placeholder">
             <mat-icon>sports_hockey</mat-icon>
           </div>
           <p class="team-name">{{ player.team }}</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
     <!-- Player Bio Section -->
-    <mat-card class="info-card bio-card">
-      <mat-card-header>
-        <mat-card-title>
+    <div class="dashboard-card">
+      <div class="dashboard-card-header">
+        <h2 class="dashboard-card-title">
           <mat-icon>person</mat-icon>
           Player Bio
-        </mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
+        </h2>
+      </div>
+      <div class="dashboard-card-content">
         <p>
           {{ player.firstName }} {{ player.lastName }} is a skilled {{ player.position }} known for
           exceptional playmaking abilities and strong offensive presence on the ice.
         </p>
-      </mat-card-content>
-    </mat-card>
+      </div>
+    </div>
 
     <!-- Current Season Stats Card -->
-    <mat-card class="info-card current-season-stats">
-      <mat-card-header>
-        <mat-card-title>
-          <mat-icon>analytics</mat-icon>
+    <div class="dashboard-card">
+      <div class="dashboard-card-header">
+        <h2 class="dashboard-card-title">
+          <mat-icon>bar_chart</mat-icon>
           Current Season Stats
-        </mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
+        </h2>
+      </div>
+      <div class="dashboard-card-content">
         <!-- First Row: 4 main stats -->
         <div class="stats-row">
           <div class="stat-box">
@@ -142,40 +163,35 @@
             <span class="penalty-value">{{ player.turnovers || 0 }}</span>
           </div>
         </div>
-      </mat-card-content>
-    </mat-card>
+      </div>
+    </div>
 
     <!-- Shot Location Display Card -->
-    <mat-card class="info-card">
-      <mat-card-header>
-        <mat-card-title>
+    <div class="dashboard-card">
+      <div class="dashboard-card-header">
+        <h2 class="dashboard-card-title">
           <mat-icon>sports_hockey</mat-icon>
           Shot Locations
-        </mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
+        </h2>
+      </div>
+      <div class="dashboard-card-content">
         @if (getShotLocationData().length > 0) {
         <app-shot-location-display [data]="getShotLocationData()" [storageKey]="'playerSprayChartFilters'"></app-shot-location-display>
         } @else {
-        <div class="empty-state">
-          <mat-icon class="empty-icon">sports_hockey</mat-icon>
-          <p class="empty-message">
-            No shot data available for this player in the current season.
-          </p>
-        </div>
+        <div class="dashboard-empty">No shot data available for this player in the current season.</div>
         }
-      </mat-card-content>
-    </mat-card>
+      </div>
+    </div>
 
     <!-- Recent Game Stats Table -->
-    <mat-card class="info-card stats-table-card">
-      <mat-card-header>
-        <mat-card-title>
+    <div class="dashboard-card">
+      <div class="dashboard-card-header">
+        <h2 class="dashboard-card-title">
           <mat-icon>history</mat-icon>
-          Recent Game Stats (this will show the last 5 games)
-        </mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
+          Recent Game Stats
+        </h2>
+      </div>
+      <div class="dashboard-card-content">
         @if (getRecentGameStats().length > 0) {
         <div class="table-container">
           <table mat-table [dataSource]="getRecentGameStats()" class="stats-table recent-games-table">
@@ -277,23 +293,20 @@
           </table>
         </div>
         } @else {
-        <div class="empty-state">
-          <mat-icon class="empty-icon">history</mat-icon>
-          <p class="empty-message">No recent game statistics available for this player.</p>
-        </div>
+        <div class="dashboard-empty">No recent game statistics available for this player.</div>
         }
-      </mat-card-content>
-    </mat-card>
+      </div>
+    </div>
 
     <!-- Season Stats Table -->
-    <mat-card class="info-card stats-table-card">
-      <mat-card-header>
-        <mat-card-title>
+    <div class="dashboard-card">
+      <div class="dashboard-card-header">
+        <h2 class="dashboard-card-title">
           <mat-icon>table_chart</mat-icon>
-          Season Stats (list of all the stats for each of the seasons the person played)
-        </mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
+          Season Stats
+        </h2>
+      </div>
+      <div class="dashboard-card-content">
         @if (getSeasonStats().length > 0) {
         <div class="table-container">
           <table mat-table [dataSource]="getSeasonStats()" class="stats-table">
@@ -382,17 +395,22 @@
           </table>
         </div>
         } @else {
-        <div class="empty-state">
-          <mat-icon class="empty-icon">table_chart</mat-icon>
-          <p class="empty-message">No season statistics available for this player.</p>
-        </div>
+        <div class="dashboard-empty">No season statistics available for this player.</div>
         }
-      </mat-card-content>
-    </mat-card>
-  </div>
+      </div>
+    </div>
+    </div>
+    }
 
   <!-- Error State -->
-  <div *ngIf="!loading && !player" class="error-container">
-    <p>Player not found.</p>
+    @if (!loading && !player) {
+    <div class="dashboard-card">
+      <div class="dashboard-card-content">
+        <div class="dashboard-error">
+          <div class="dashboard-error-message">Player not found.</div>
+        </div>
+      </div>
+    </div>
+    }
   </div>
 </div>

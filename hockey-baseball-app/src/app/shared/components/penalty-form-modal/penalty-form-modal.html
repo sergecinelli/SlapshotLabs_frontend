@@ -183,16 +183,38 @@
   </mat-dialog-content>
 
   <mat-dialog-actions class="modal-actions">
-    <button mat-stroked-button (click)="onCancel()" class="cancel-btn">Cancel</button>
-    <button
-      mat-raised-button
-      color="primary"
-      (click)="onSubmit()"
-      class="submit-btn"
-      [disabled]="penaltyForm.invalid || isSubmitting"
+    <app-button
+      [bg]="'transparent'"
+      [bghover]="'button_background'"
+      [br]="'border'"
+      [color]="'text_primary'"
+      [colorhover]="'text_primary'"
+      [opacity]="1"
+      [opacityhover]="1"
+      [width]="'auto'"
+      [rounded]="false"
+      [haveContent]="true"
+      [isDisabled]="isSubmitting"
+      (clicked)="onCancel()"
     >
-      <mat-icon>save</mat-icon>
-      {{ isSubmitting ? 'Saving...' : isEditMode ? 'Save Penalty' : 'Add Penalty' }}
-    </button>
+      Cancel
+    </app-button>
+    <app-button-loading
+      [isLoading]="isSubmitting"
+      [isDisabled]="penaltyForm.invalid || isSubmitting"
+      materialIcon="save"
+      [bg]="'primary'"
+      [bghover]="'primary_dark'"
+      [color]="'white'"
+      [colorhover]="'white'"
+      [opacity]="1"
+      [opacityhover]="1"
+      [width]="'auto'"
+      [rounded]="false"
+      [haveContent]="true"
+      (clicked)="onSubmit()"
+    >
+      {{ isEditMode ? 'Save Penalty' : 'Add Penalty' }}
+    </app-button-loading>
   </mat-dialog-actions>
 </div>

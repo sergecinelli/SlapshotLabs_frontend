@@ -2,7 +2,8 @@ import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatDialogRef, MatDialogModule, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { MatButtonModule } from '@angular/material/button';
+import { ButtonComponent } from '../buttons/button/button.component';
+import { ButtonLoadingComponent } from '../buttons/button-loading/button-loading.component';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
@@ -38,7 +39,8 @@ export interface PenaltyFormData {
     CommonModule,
     ReactiveFormsModule,
     MatDialogModule,
-    MatButtonModule,
+    ButtonComponent,
+    ButtonLoadingComponent,
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,

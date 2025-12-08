@@ -11,8 +11,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { VideoViewModalComponent } from '../../shared/components/video-view-modal/video-view-modal';
 import { Video } from '../../shared/interfaces/video.interface';
 import { ActivatedRoute, Router } from '@angular/router';
-import { PageHeaderComponent } from '../../shared/components/page-header/page-header';
-import { ActionButtonComponent } from '../../shared/components/action-button/action-button';
+import { ButtonComponent } from '../../shared/components/buttons/button/button.component';
 import { TurnoverFormModalComponent } from '../../shared/components/turnover-form-modal/turnover-form-modal';
 import { ShotFormModalComponent } from '../../shared/components/shot-form-modal/shot-form-modal';
 import { FaceoffFormModalComponent } from '../../shared/components/faceoff-form-modal/faceoff-form-modal';
@@ -107,8 +106,7 @@ interface GameEvent {
   imports: [
     CommonModule,
     FormsModule,
-    PageHeaderComponent,
-    ActionButtonComponent,
+    ButtonComponent,
     MatIconModule,
     MatButtonModule,
     MatTooltipModule,

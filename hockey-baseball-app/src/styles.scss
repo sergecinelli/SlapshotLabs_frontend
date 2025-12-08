@@ -1,4 +1,10 @@
 @use "@angular/material" as mat;
+@use "./app/shared/styles/dashboard-card.scss";
+
+// Global CSS Variables
+// Note: All colors are defined in colors.ts and set via ThemeService
+// ThemeService automatically creates CSS variables in format: --[key] (with _ replaced by -)
+// Legacy variables (--color-primary, --sidebar-dark, etc.) are also created from colors.ts
 
 // Inter Font Family
 @font-face {
@@ -94,6 +100,7 @@ $custom-secondary-palette: (
 
 * {
   font-family: "Inter";
+  box-sizing: border-box;
 }
 
 html {
@@ -123,14 +130,6 @@ body {
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-:root {
-  --color-primary: #cf142b;
-  --color-dark: #090b0c;
-  --color-secondary: #778f9c;
-  --color-teritary: #999999;
-  --color-white: #ffffff;
-}
 
 @layer utilities {
   .text-custom-primary {
@@ -254,6 +253,10 @@ mat-error {
   padding-left: 0 !important;
   margin-left: -16px !important;
   font-size: 0.875rem;
+}
+
+.page-content {
+  padding: 20px;
 }
 
 .mat-mdc-tooltip {
@@ -399,4 +402,46 @@ mat-error {
 .cdk-overlay-pane[aria-label*="select"] .mat-mdc-option,
 .cdk-overlay-pane .mat-mdc-select-panel .mat-mdc-option {
   font-size: 14px !important;
+}
+
+/* Material Design Global Scrollbar Styles - Subtle and Professional */
+* {
+  // Firefox scrollbar
+  scrollbar-width: thin;
+  scrollbar-color: var(--gray, #878787) var(--border-light, #f0f1f3);
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--border-light, #f0f1f3);
+  border-radius: 5px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: var(--gray, #878787);
+  border-radius: 5px;
+  border: 2px solid var(--border-light, #f0f1f3);
+  transition: background-color 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &:hover {
+    background-color: var(--gray-tone1, #2d2d2d);
+  }
+
+  &:active {
+    background-color: var(--text-primary, #0f0f0f);
+  }
+}
+
+// Horizontal scrollbar specific styling
+*::-webkit-scrollbar:horizontal {
+  height: 10px;
+}
+
+// Vertical scrollbar specific styling
+*::-webkit-scrollbar:vertical {
+  width: 10px;
 }

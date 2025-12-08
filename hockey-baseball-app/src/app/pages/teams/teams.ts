@@ -1,15 +1,14 @@
 import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { PageHeaderComponent } from '../../shared/components/page-header/page-header';
+import { Router } from '@angular/router';
 import { DataTableComponent, TableColumn, TableAction } from '../../shared/components/data-table/data-table';
 import { TeamService } from '../../services/team.service';
 import { Team } from '../../shared/interfaces/team.interface';
 import { TeamFormModalComponent, TeamFormModalData } from '../../shared/components/team-form-modal/team-form-modal';
 import { TeamOptionsService } from '../../services/team-options.service';
 import { ComponentVisibilityByRoleDirective } from '../../shared/directives/component-visibility-by-role.directive';
+import { ButtonComponent } from '../../shared/components/buttons/button/button.component';
 import { visibilityByRoleMap } from './teams.role-map';
 import { forkJoin } from 'rxjs';
 
@@ -18,28 +17,31 @@ import { forkJoin } from 'rxjs';
   standalone: true,
   imports: [
     CommonModule,
-    PageHeaderComponent,
     DataTableComponent,
-    MatButtonModule,
-    MatIconModule,
     MatDialogModule,
     ComponentVisibilityByRoleDirective,
+    ButtonComponent,
   ],
   template: `
-    <div class="p-6 pt-0" [appVisibilityMap]="visibilityByRoleMap">
-      <app-page-header title="Teams"></app-page-header>
+    <div class="page-content" [appVisibilityMap]="visibilityByRoleMap">
 
       <!-- Add Team Button -->
       <div class="mb-4 flex justify-end" role-visibility-name="add-team-button">
-        <button
-          mat-raised-button
-          color="primary"
-          (click)="openAddTeamModal()"
-          class="add-team-btn"
+        <app-button
+          materialIcon="add"
+          [bg]="'primary'"
+          [bghover]="'primary_dark'"
+          [color]="'white'"
+          [colorhover]="'white'"
+          [opacity]="1"
+          [opacityhover]="1"
+          [width]="'auto'"
+          [rounded]="false"
+          [haveContent]="true"
+          (clicked)="openAddTeamModal()"
         >
-          <mat-icon>add</mat-icon>
           Add a Team
-        </button>
+        </app-button>
       </div>
 
       <app-data-table
@@ -62,6 +64,7 @@ export class TeamsComponent implements OnInit {
   private teamService = inject(TeamService);
   private dialog = inject(MatDialog);
   private teamOptionsService = inject(TeamOptionsService);
+  private router = inject(Router);
 
   teams = signal<Team[]>([]);
   loading = signal(true);
@@ -217,27 +220,25 @@ export class TeamsComponent implements OnInit {
   }
 
   private viewTeamProfile(team: Team): void {
-    // Build the full URL including the base URL
-    const baseUrl = window.location.origin;
-    const url = `${baseUrl}/team-profile/${team.id}`;
-
-    window.location.assign(url);
+    this.router.navigate(['/teams-and-rosters/teams/team-profile', team.id]);
   }
 
   private viewTeamPlayers(team: Team): void {
-    // Navigate to players page with team context
-    const baseUrl = window.location.origin;
-    const url = `${baseUrl}/teams/players?teamId=${team.id}&teamName=${encodeURIComponent(team.name)}`;
-
-    window.location.assign(url);
+    this.router.navigate(['/teams-and-rosters/players'], {
+      queryParams: {
+        teamId: team.id,
+        teamName: team.name,
+      },
+    });
   }
 
   private viewTeamGoalies(team: Team): void {
-    // Navigate to goalies page with team context
-    const baseUrl = window.location.origin;
-    const url = `${baseUrl}/teams/goalies?teamId=${team.id}&teamName=${encodeURIComponent(team.name)}`;
-
-    window.location.assign(url);
+    this.router.navigate(['/teams-and-rosters/goalies'], {
+      queryParams: {
+        teamId: team.id,
+        teamName: team.name,
+      },
+    });
   }
 
   openAddTeamModal(): void {

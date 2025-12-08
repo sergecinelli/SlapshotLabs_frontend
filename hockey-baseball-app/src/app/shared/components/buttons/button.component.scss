@@ -1,0 +1,167 @@
+.app-button {
+  display: none;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 5px;
+  padding: 0;
+  height: 37px;
+  width: 37px;
+  font-size: 14px;
+  color: var(--background-invert);
+  outline: none;
+  border: 1px solid transparent;
+  user-select: auto;
+  cursor: pointer;
+
+  &.rounded {
+    border-radius: 20px;
+
+    &:hover {
+      box-shadow: 0 0 3px rgba(0, 0, 0, 0.1);
+
+      &:active {
+        box-shadow: none;
+      }
+    }
+  }
+
+  &.small {
+    height: 16px;
+    width: 16px;
+    gap: 5px;
+    font-size: 12px;
+
+    &.have-content {
+      padding: 0;
+    }
+
+    .icon-box {
+      &.material {
+        .icon {
+          font-size: 18px;
+          font-variation-settings: 'wght' 600;
+
+          &.fill {
+            font-variation-settings: 'FILL' 1, 'wght' 600;
+          }
+        }
+      }
+    }
+  }
+
+  .text {
+    display: none;
+    text-wrap: nowrap;
+    font-family: 'Inter';
+    position: relative;
+    font-weight: 500;
+  }
+
+  .image-icon {
+    max-height: 16px;
+  }
+
+  .icon-box {
+    width: 18px;
+    user-select: none;
+    position: relative;
+
+    .icon {
+      display: flex;
+      width: 18px;
+    }
+
+    &.material {
+      .icon {
+        justify-content: center;
+        align-items: center;
+        font-size: 22px;
+
+        &.fill {
+          font-variation-settings: 'FILL' 1;
+        }
+
+        &.loading {
+          animation: rotate-icon 1s infinite both;
+
+          @keyframes rotate-icon {
+            100% {
+              transform: rotateZ(360deg);
+            }
+          }
+        }
+      }
+    }
+
+    .counter {
+      position: absolute;
+      border-radius: 50px;
+      font-size: 10px;
+      font-weight: 600;
+      top: -10px;
+      bottom: -8px;
+    }
+
+    .counter-icon {
+      position: absolute;
+      font-size: 6px;
+      font-weight: 600;
+      top: -2px;
+      right: -2px;
+      line-height: 1;
+      font-variation-settings: 'FILL' 1, 'wght' 600;
+    }
+  }
+
+  &.have-content {
+    width: fit-content;
+    padding: 0 14px;
+
+    .text {
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      text-align: left;
+      width: 100%;
+    }
+  }
+
+  &.dev {
+    position: relative;
+    overflow: hidden;
+    padding-right: 0;
+    padding-top: 0;
+
+    .icon,
+    .text {
+      align-self: center;
+    }
+
+    .dev-text {
+      top: 0;
+      right: 0;
+      font-size: 10px;
+      font-weight: 500;
+      z-index: 8;
+      padding: 2px 6px;
+      border-radius: 0 0 0 4px;
+      align-self: flex-start;
+    }
+  }
+
+  &.fill {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  &:not(:disabled) {
+    cursor: pointer;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+

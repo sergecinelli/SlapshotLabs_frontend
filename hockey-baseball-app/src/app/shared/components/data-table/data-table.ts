@@ -15,6 +15,8 @@ import { MatSortModule, Sort } from '@angular/material/sort';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule, MatTooltip } from '@angular/material/tooltip';
 import { IconService } from '../../../services/icon.service';
+import { ButtonSmallComponent } from '../buttons/button-small/button-small.component';
+import { AppColor } from '../../constants/colors';
 
 export interface TableColumn {
   key: string;
@@ -49,6 +51,7 @@ export interface TableAction {
     MatSortModule,
     MatProgressSpinnerModule,
     MatTooltipModule,
+    ButtonSmallComponent,
   ],
   templateUrl: './data-table.html',
   styleUrl: './data-table.scss',
@@ -210,5 +213,105 @@ export class DataTableComponent<T extends Record<string, unknown> = Record<strin
       'Summer League': 'game-type-badge summer-league',
     };
     return typeMap[typeStr] || 'game-type-badge';
+  }
+
+  getActionIcon(action: string): string {
+    const iconMap: Record<string, string> = {
+      dashboard: 'dashboard',
+      edit: 'stylus',
+      delete: 'delete',
+      view: 'visibility',
+      'view-profile': 'person',
+      players: 'groups',
+      goalies: 'shield',
+      'shot-spray-chart': 'show_chart',
+    };
+    return iconMap[action] || 'more_vert';
+  }
+
+  getActionBg(variant?: 'primary' | 'secondary' | 'danger', action?: string): AppColor {
+    // Special cases for specific actions
+    if (action === 'delete') {
+      return 'primary'; // Red background for delete
+    }
+    
+    switch (variant) {
+      case 'primary':
+        return 'primary';
+      case 'danger':
+        return 'primary'; // Red background for delete
+      case 'secondary':
+      default:
+        return 'button_background';
+    }
+  }
+
+  getActionBgHover(variant?: 'primary' | 'secondary' | 'danger', action?: string): AppColor {
+    // Special cases for specific actions
+    if (action === 'delete') {
+      return 'primary'; // Red background for delete (same on hover)
+    }
+    
+    switch (variant) {
+      case 'primary':
+        return 'primary_dark';
+      case 'danger':
+        return 'primary'; // Red background for delete (same on hover)
+      case 'secondary':
+      default:
+        return 'gray_tone1';
+    }
+  }
+
+  getActionColor(variant?: 'primary' | 'secondary' | 'danger', action?: string): AppColor {
+    // Special cases for specific actions
+    if (action === 'view-profile') {
+      return 'upcoming'; // Blue for profile
+    }
+    if (action === 'edit') {
+      return 'orange'; // Orange for edit
+    }
+    if (action === 'delete') {
+      return 'primary'; // Red for delete
+    }
+    if (action === 'shot-spray-chart') {
+      return 'purple'; // Purple for spray chart
+    }
+    
+    switch (variant) {
+      case 'primary':
+        return 'primary';
+      case 'danger':
+        return 'primary'; // Red for delete
+      case 'secondary':
+      default:
+        return 'text_secondary';
+    }
+  }
+
+  getActionColorHover(variant?: 'primary' | 'secondary' | 'danger', action?: string): AppColor {
+    // Special cases for specific actions
+    if (action === 'view-profile') {
+      return 'upcoming'; // Blue for profile
+    }
+    if (action === 'edit') {
+      return 'orange'; // Orange for edit (same on hover)
+    }
+    if (action === 'delete') {
+      return 'primary'; // Red for delete (same on hover)
+    }
+    if (action === 'shot-spray-chart') {
+      return 'purple'; // Purple for spray chart (same on hover)
+    }
+    
+    switch (variant) {
+      case 'primary':
+        return 'primary_dark';
+      case 'danger':
+        return 'primary'; // Red for delete (same on hover)
+      case 'secondary':
+      default:
+        return 'text_primary';
+    }
   }
 }

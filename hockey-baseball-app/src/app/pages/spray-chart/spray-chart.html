@@ -1,37 +1,38 @@
-<div class="spray-chart-page">
-  <!-- Loading State -->
-  <div *ngIf="loading" class="loading-container">
-    <p>Loading spray chart data...</p>
-  </div>
-
-  <!-- Spray Chart Content -->
-  <div *ngIf="!loading && (goalie || player)" class="spray-chart-content">
-    <!-- Spray Chart Display Card -->
-    <mat-card class="spray-chart-card">
-      <mat-card-header>
-        <mat-card-title>
-          <mat-icon>sports_hockey</mat-icon>
+<div class="page-content">
+  <!-- Content with padding -->
+  <div>
+    <!-- Spray Chart Card -->
+    <div class="dashboard-card">
+      <div class="dashboard-card-header">
+        <h2 class="dashboard-card-title">
           Spray Chart for {{ displayName }}
-        </mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        @if (shotLocationData.length > 0) {
+        </h2>
+      </div>
+      <div class="dashboard-card-content">
+        @if (loading) {
+          <div class="dashboard-loading">
+            <div class="dashboard-loading-text">Loading spray chart data...</div>
+          </div>
+        } @else if (!goalie && !player) {
+          <div class="dashboard-empty">{{ entityType === 'player' ? 'Player' : 'Goalie' }} not found.</div>
+          <div class="flex justify-center mt-4">
+            <app-button 
+              [bg]="'primary'" 
+              [bghover]="'primary_dark'" 
+              [color]="'white'" 
+              [colorhover]="'white'"
+              [materialIcon]="'arrow_back'"
+              [haveContent]="true"
+              (clicked)="goBack()">
+              Back to {{ entityType === 'player' ? 'Players' : 'Goalies' }}
+            </app-button>
+          </div>
+        } @else if (shotLocationData.length > 0) {
           <app-shot-location-display [data]="shotLocationData"></app-shot-location-display>
         } @else {
-          <div class="empty-state">
-            <mat-icon class="empty-icon">sports_hockey</mat-icon>
-            <p class="empty-message">No shot data available for this {{ entityType }}.</p>
-          </div>
+          <div class="dashboard-empty">No shot data available for this {{ entityType }}.</div>
         }
-      </mat-card-content>
-    </mat-card>
-  </div>
-
-  <!-- Error State -->
-  <div *ngIf="!loading && !goalie && !player" class="error-container">
-    <p>{{ entityType === 'player' ? 'Player' : 'Goalie' }} not found.</p>
-    <button mat-raised-button color="primary" (click)="goBack()">
-      Back to {{ entityType === 'player' ? 'Players' : 'Goalies' }}
-    </button>
+      </div>
+    </div>
   </div>
 </div>

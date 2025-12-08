@@ -2,8 +2,7 @@ import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { PageHeaderComponent } from '../../shared/components/page-header/page-header';
-import { ActionButtonComponent } from '../../shared/components/action-button/action-button';
+import { ButtonComponent } from '../../shared/components/buttons/button/button.component';
 import { ScheduleService } from '../../services/schedule.service';
 import { TeamService } from '../../services/team.service';
 import { PlayerService } from '../../services/player.service';
@@ -23,16 +22,17 @@ import { HighlightsService } from '../../services/highlights.service';
 import { forkJoin } from 'rxjs';
 import { visibilityByRoleMap } from './dashboard.role-map';
 import { ComponentVisibilityByRoleDirective } from '../../shared/directives/component-visibility-by-role.directive';
+import { DashboardSkeletonComponent } from './dashboard-skeleton.component';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
   imports: [
     CommonModule,
-    PageHeaderComponent,
-    ActionButtonComponent,
+    ButtonComponent,
     MatDialogModule,
     ComponentVisibilityByRoleDirective,
+    DashboardSkeletonComponent,
   ],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
@@ -158,7 +158,7 @@ export class DashboardComponent implements OnInit {
     const { logoFile, ...team } = teamData;
     this.teamService.addTeam(team, logoFile).subscribe({
       next: () => {
-        this.router.navigate(['/teams']);
+        this.router.navigate(['/teams-and-rosters/teams']);
       },
       error: (error) => {
         console.error('Error adding team:', error);
@@ -185,7 +185,7 @@ export class DashboardComponent implements OnInit {
   private addPlayer(playerData: Partial<Player>): void {
     this.playerService.addPlayer(playerData).subscribe({
       next: () => {
-        this.router.navigate(['/teams/players']);
+        this.router.navigate(['/teams-and-rosters/players']);
       },
       error: (error) => {
         console.error('Error adding player:', error);
@@ -212,7 +212,7 @@ export class DashboardComponent implements OnInit {
   private addGoalie(goalieData: Partial<Goalie>): void {
     this.goalieService.addGoalie(goalieData).subscribe({
       next: () => {
-        this.router.navigate(['/teams/goalies']);
+        this.router.navigate(['/teams-and-rosters/goalies']);
       },
       error: (error) => {
         console.error('Error adding goalie:', error);
@@ -273,5 +273,9 @@ export class DashboardComponent implements OnInit {
 
   getTeamById(teamId: number): Team | undefined {
     return this.teamsMap.get(teamId);
+  }
+
+  goToTeamProfile(teamId: number): void {
+    this.router.navigate([`/teams-and-rosters/teams/team-profile/${teamId}`]);
   }
 }

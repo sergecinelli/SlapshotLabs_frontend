@@ -2,7 +2,6 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
-import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
@@ -11,6 +10,8 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Team } from '../../interfaces/team.interface';
 import { TeamOptionsService } from '../../../services/team-options.service';
+import { ButtonComponent } from '../buttons/button/button.component';
+import { ButtonLoadingComponent } from '../buttons/button-loading/button-loading.component';
 import { forkJoin } from 'rxjs';
 
 export interface TeamFormModalData {
@@ -25,13 +26,14 @@ export interface TeamFormModalData {
     CommonModule,
     ReactiveFormsModule,
     MatDialogModule,
-    MatButtonModule,
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
     MatIconModule,
     MatDividerModule,
     MatProgressSpinnerModule,
+    ButtonComponent,
+    ButtonLoadingComponent,
   ],
   templateUrl: './team-form-modal.html',
   styleUrl: './team-form-modal.scss',

@@ -30,16 +30,22 @@
       </div>
 
       <div class="flex justify-end">
-        <button
-          mat-stroked-button
-          color="primary"
-          type="button"
-          class="add-custom-btn"
-          (click)="openAddCustomHighlightModal()"
+        <app-button
+          [bg]="'transparent'"
+          [bghover]="'button_background'"
+          [br]="'border'"
+          [color]="'primary'"
+          [colorhover]="'primary'"
+          [opacity]="1"
+          [opacityhover]="1"
+          [width]="'auto'"
+          [rounded]="false"
+          [materialIcon]="'add'"
+          [haveContent]="true"
+          (clicked)="openAddCustomHighlightModal()"
         >
-          <mat-icon>add</mat-icon>
           Add Custom Highlight
-        </button>
+        </app-button>
       </div>
 
       <div class="two-column-layout">
@@ -184,16 +190,37 @@
   </mat-dialog-content>
 
   <mat-dialog-actions class="modal-actions">
-    <button mat-stroked-button (click)="onCancel()" class="cancel-btn">Cancel</button>
-    <button
-      mat-raised-button
-      color="primary"
-      (click)="onSubmit()"
-      class="submit-btn"
-      [disabled]="form.invalid"
+    <app-button
+      [bg]="'transparent'"
+      [bghover]="'button_background'"
+      [br]="'border'"
+      [color]="'text_primary'"
+      [colorhover]="'text_primary'"
+      [opacity]="1"
+      [opacityhover]="1"
+      [width]="'auto'"
+      [rounded]="false"
+      [haveContent]="true"
+      (clicked)="onCancel()"
     >
-      <mat-icon>save</mat-icon>
+      Cancel
+    </app-button>
+    <app-button-loading
+      [isLoading]="false"
+      [isDisabled]="form.invalid"
+      materialIcon="save"
+      [bg]="'primary'"
+      [bghover]="'primary_dark'"
+      [color]="'white'"
+      [colorhover]="'white'"
+      [opacity]="1"
+      [opacityhover]="1"
+      [width]="'auto'"
+      [rounded]="false"
+      [haveContent]="true"
+      (clicked)="onSubmit()"
+    >
       {{ isEditMode ? 'Update Highlight Reel' : 'Create Highlight Reel' }}
-    </button>
+    </app-button-loading>
   </mat-dialog-actions>
 </div>

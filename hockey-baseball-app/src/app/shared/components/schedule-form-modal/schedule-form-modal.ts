@@ -7,7 +7,6 @@ import {
   MatDialogModule,
   MatDialog,
 } from '@angular/material/dialog';
-import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
@@ -15,6 +14,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
+import { ButtonComponent } from '../buttons/button/button.component';
+import { ButtonLoadingComponent } from '../buttons/button-loading/button-loading.component';
 import { Schedule, GameStatus } from '../../interfaces/schedule.interface';
 import { Team } from '../../interfaces/team.interface';
 import { Arena, Rink } from '../../interfaces/arena.interface';
@@ -79,7 +80,6 @@ export interface ScheduleFormModalData {
     CommonModule,
     ReactiveFormsModule,
     MatDialogModule,
-    MatButtonModule,
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
@@ -87,6 +87,8 @@ export interface ScheduleFormModalData {
     MatDividerModule,
     MatDatepickerModule,
     MatNativeDateModule,
+    ButtonComponent,
+    ButtonLoadingComponent,
   ],
   templateUrl: './schedule-form-modal.html',
   styleUrl: './schedule-form-modal.scss',

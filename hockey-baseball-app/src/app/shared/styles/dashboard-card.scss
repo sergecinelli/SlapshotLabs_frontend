@@ -1,0 +1,177 @@
+// Modern Material Design Dashboard Card - Common Styles
+// Use this mixin for consistent card styling across all pages
+// Business-focused Material Design without animations
+
+@mixin dashboard-card-base {
+  background: var(--white);
+  border-radius: 8px;
+  border: 1px solid var(--border-light);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  // Material Design elevation (shadow)
+  box-shadow: 
+    0 1px 3px rgba(0, 0, 0, 0.08),
+    0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+// General card class - use this for all cards across the site
+.card {
+  @include dashboard-card-base;
+}
+
+// Main dashboard card class
+.dashboard-card {
+  @include dashboard-card-base;
+}
+
+// Container for dashboard cards with consistent spacing
+.dashboard-cards-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  > .dashboard-card {
+    margin-bottom: 0;
+  }
+}
+
+// Card header with modern Material Design styling
+.dashboard-card-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border-light);
+  background-color: var(--white);
+  display: flex;
+  align-items: center;
+  min-height: 60px;
+}
+
+.dashboard-card-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+  line-height: 1.4;
+  letter-spacing: -0.2px;
+}
+
+// Card content area
+.dashboard-card-content {
+  padding: 24px;
+  flex: 1;
+  background-color: var(--white);
+}
+
+// Loading state
+.dashboard-loading {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 48px 24px;
+  gap: 16px;
+}
+
+.dashboard-loading-text {
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+// Empty state
+.dashboard-empty {
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+// Error state
+.dashboard-error {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 48px 24px;
+  gap: 16px;
+}
+
+.dashboard-error-message {
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+// Stat card variant for displaying statistics
+.stat-card {
+  @include dashboard-card-base;
+  padding: 20px;
+  text-align: center;
+  
+  .stat-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+  }
+  
+  .stat-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1.2;
+  }
+}
+
+// Info card variant for displaying information
+.info-card {
+  @include dashboard-card-base;
+  padding: 20px 24px;
+  
+  .info-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+  }
+  
+  .info-value {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    line-height: 1.4;
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .dashboard-card-header {
+    padding: 16px 20px;
+  }
+
+  .dashboard-card-content {
+    padding: 20px;
+  }
+
+  .dashboard-card-title {
+    font-size: 18px;
+  }
+  
+  .stat-card {
+    padding: 16px;
+    
+    .stat-value {
+      font-size: 24px;
+    }
+  }
+  
+  .info-card {
+    padding: 16px 20px;
+  }
+}
+

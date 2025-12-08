@@ -39,13 +39,14 @@ export class NavigationService {
         ],
       },
       {
-        label: 'Teams',
-        path: '/teams',
+        label: 'Teams & Rosters',
+        path: '/teams-and-rosters',
         icon: 'teams',
         expanded: false,
         children: [
-          { label: 'Players', path: '/teams/players', icon: 'players' },
-          { label: 'Goalies', path: '/teams/goalies', icon: 'goalies' },
+          { label: 'Teams', path: '/teams-and-rosters/teams', icon: 'teams' },
+          { label: 'Players', path: '/teams-and-rosters/players', icon: 'players' },
+          { label: 'Goalies', path: '/teams-and-rosters/goalies', icon: 'goalies' },
         ],
       },
       {
@@ -126,8 +127,43 @@ export class NavigationService {
 
   getPageTitle(path: string): string {
     const flatItems = this.getFlatNavigationItems();
-    const activeItem = flatItems.find((item) => path.startsWith(item.path));
+    // First, try to find exact match or child items (longer paths first)
+    // Sort by path length descending to prioritize more specific paths
+    const sortedItems = [...flatItems].sort((a, b) => b.path.length - a.path.length);
+    const activeItem = sortedItems.find((item) => path.startsWith(item.path));
     return activeItem?.label || 'Dashboard';
+  }
+
+  getPageIcon(path: string): string | null {
+    const flatItems = this.getFlatNavigationItems();
+    // First, try to find exact match or child items (longer paths first)
+    // Sort by path length descending to prioritize more specific paths
+    const sortedItems = [...flatItems].sort((a, b) => b.path.length - a.path.length);
+    const activeItem = sortedItems.find((item) => path.startsWith(item.path));
+    if (!activeItem?.icon) return null;
+    
+    return this.getMaterialIcon(activeItem.icon);
+  }
+
+  getMaterialIcon(iconName: string): string | null {
+    // Map navigation icons to material-symbols icons
+    const iconMap: Record<string, string> = {
+      'dashboard': 'dashboard',
+      'account': 'account_circle',
+      'profile': 'person',
+      'payment': 'credit_card',
+      'history': 'history',
+      'teams': 'groups',
+      'players': 'sports_hockey',
+      'goalies': 'shield',
+      'schedule': 'event',
+      'analytics': 'analytics',
+      'video': 'video_library',
+      'highlights': 'movie',
+      'gamesheet': 'description',
+    };
+    
+    return iconMap[iconName] || null;
   }
 
   private updateExpandedState(): void {

@@ -1,23 +1,142 @@
-// Game list styles - simple line format
-.game-item {
-  padding: 8px 0;
-  border-bottom: 1px solid #e5e7eb;
+// Dashboard Actions Row
+.dashboard-actions-row {
+  margin-bottom: 20px;
+}
+
+.dashboard-grid-flex {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 20px;
+
+  > * {
+    // flex: 1 1 calc(50% - 12px);
+    flex: 1;
+    min-width: 500px;
+  }
+}
+
+.dashboard-game-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.dashboard-game-item {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-light);
 
   &:last-child {
     border-bottom: none;
   }
 }
 
-.game-line {
+.dashboard-game-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.dashboard-game-date {
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-weight: 500;
+  min-width: 140px;
+  white-space: nowrap;
+}
+
+.dashboard-team-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
+.dashboard-team-logo {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1.5px solid var(--border-light);
+  background: var(--white);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.12),
+    0 1px 1px rgba(0, 0, 0, 0.24);
+  flex-shrink: 0;
+}
+
+.dashboard-team-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  min-width: 0;
+  text-decoration: none;
+}
+
+// Only links (a tags) get hover underline and cursor
+a.dashboard-team-name {
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.dashboard-game-separator {
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-weight: 400;
+  flex-shrink: 0;
+}
+
+.dashboard-score {
   font-size: 16px;
-  color: #374151;
-  line-height: 1.5;
-  font-weight: bold;
+  font-weight: 700;
+  color: var(--text-primary);
+  min-width: 24px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
 }
 
 // Responsive adjustments
 @media (max-width: 768px) {
-  .game-line {
+  .dashboard-card-header {
+    padding: 12px 16px;
+  }
+
+  .dashboard-card-content {
+    padding: 10px 16px 16px;
+  }
+
+  .dashboard-card-title {
+    font-size: 16px;
+  }
+
+  .dashboard-game-content {
+    gap: 8px;
+  }
+
+  .dashboard-game-date {
+    min-width: 100px;
+    font-size: 11px;
+  }
+
+  .dashboard-team-logo {
+    width: 24px;
+    height: 24px;
+  }
+
+  .dashboard-team-name {
+    font-size: 13px;
+  }
+
+  .dashboard-score {
     font-size: 14px;
   }
 }

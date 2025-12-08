@@ -1,9 +1,8 @@
 import { Component, OnInit, signal, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { ButtonComponent } from '../../shared/components/buttons/button/button.component';
 import { MatDialog } from '@angular/material/dialog';
-import { PageHeaderComponent } from '../../shared/components/page-header/page-header';
 import {
   DataTableComponent,
   TableColumn,
@@ -20,27 +19,27 @@ import { visibilityByRoleMap } from './video-library.role-map';
   selector: 'app-video-library',
   imports: [
     CommonModule,
-    PageHeaderComponent,
     DataTableComponent,
-    MatButtonModule,
     MatIconModule,
     ComponentVisibilityByRoleDirective,
+    ButtonComponent,
   ],
   template: `
-    <div class="p-6 pt-0" [appVisibilityMap]="visibilityByRoleMap">
-      <app-page-header title="Video Library"></app-page-header>
+    <div class="page-content" [appVisibilityMap]="visibilityByRoleMap">
 
       <!-- Add Video Button -->
       <div class="mb-4 flex justify-end" role-visibility-name="add-video-button">
-        <button
-          mat-raised-button
-          color="primary"
-          (click)="openAddVideoModal()"
-          class="add-video-btn"
+        <app-button
+          [bg]="'primary'"
+          [bghover]="'primary_dark'"
+          [color]="'white'"
+          [colorhover]="'white'"
+          [materialIcon]="'add'"
+          [haveContent]="true"
+          (clicked)="openAddVideoModal()"
         >
-          <mat-icon>add</mat-icon>
           Add a Video
-        </button>
+        </app-button>
       </div>
 
       <app-data-table

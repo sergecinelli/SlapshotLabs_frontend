@@ -1,605 +1,455 @@
-.add-team-btn {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background-color: var(--color-primary) !important;
-  color: white !important;
-  font-weight: 500;
-  padding: 8px 16px;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(207, 20, 43, 0.3);
-  transition: all 0.3s ease;
+@use '../../shared/styles/dashboard-card.scss' as *;
 
-  &:hover {
-    background-color: #b8122a !important;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(207, 20, 43, 0.4);
+// Card headers - same style as player-profile and goalie-profile
+.dashboard-card {
+  .dashboard-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border-light);
+    background-color: var(--white);
+    min-height: 60px;
   }
 
-  &:active {
-    transform: translateY(0);
-  }
-
-  mat-icon {
+  .dashboard-card-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
     font-size: 20px;
-    width: 20px;
-    height: 20px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+    line-height: 1;
+    letter-spacing: -0.2px;
+    height: 100%;
+
+    mat-icon {
+      color: var(--color-primary);
+      font-size: 24px;
+      width: 24px;
+      height: 24px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      line-height: 1;
+    }
+  }
+
+  .dashboard-card-content {
+    padding: 24px;
   }
 }
 
-.red-text {
-  color: var(--color-primary) !important;
-}
+// Team Header Card
+.team-header-card {
+  @include dashboard-card-base;
+  .team-header-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
 
-.team-profile-page {
-  padding: 24px;
-  margin: 0 auto;
+    .team-main-info {
+      display: flex;
+      align-items: center;
+      gap: 24px;
 
-  .loading-container {
-    text-align: center;
-    padding: 48px;
-    color: var(--color-secondary);
-    font-size: 1.125rem;
-  }
+      .team-logo-container {
+        flex-shrink: 0;
 
-  .error-container {
-    text-align: center;
-    padding: 48px;
-    color: var(--color-dark);
-
-    p {
-      font-size: 1.125rem;
-      margin-bottom: 24px;
-      color: var(--color-secondary);
-    }
-  }
-
-  .profile-content {
-    .profile-header {
-      margin-bottom: 32px;
-      padding: 24px;
-      background-color: white;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-
-      .team-header-layout {
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
-
-        .team-main-info {
+        .team-logo {
+          width: 120px;
+          height: 120px;
+          background-color: #f3f4f6;
+          border-radius: 12px;
           display: flex;
-          align-items: center;
-          gap: 24px;
-
-          .team-logo-container {
-            flex-shrink: 0;
-
-            .team-logo {
-              width: 120px;
-              height: 120px;
-              background-color: #f3f4f6;
-              border-radius: 12px;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              overflow: hidden;
-
-              .logo-placeholder {
-                font-size: 3rem;
-                color: var(--color-secondary);
-                width: 3rem;
-                height: 3rem;
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-              }
-            }
-          }
-
-          .team-name-container {
-            flex: 0.5;
-
-            .team-name {
-              font-size: 2rem;
-              font-weight: 600;
-              color: var(--color-dark);
-              margin: 0;
-            }
-          }
-
-          .team-stats-container {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            align-items: flex-start;
-
-            .stats-row {
-              display: flex;
-              gap: 12px;
-
-              span {
-                background-color: var(--color-secondary);
-                color: white;
-                padding: 4px 12px;
-                border-radius: 16px;
-                font-weight: 500;
-                font-size: 0.75rem;
-                white-space: nowrap;
-
-                &.current-season {
-                  background-color: var(--color-primary);
-                }
-
-                &.city {
-                  background-color: #6b7280;
-                }
-
-                &.team-record {
-                  background-color: var(--color-dark);
-                }
-              }
-            }
-          }
-        }
-
-        .team-categories {
-          display: flex;
-          gap: 16px;
-
-          span {
-            background-color: var(--color-secondary);
-            color: white;
-            padding: 6px 16px;
-            border-radius: 16px;
-            font-weight: 500;
-            font-size: 0.75rem;
-            white-space: nowrap;
-
-            &.age-group {
-              background-color: #6366f1;
-            }
-
-            &.level {
-              background-color: #10b981;
-            }
-
-            &.division {
-              background-color: #f59e0b;
-            }
-          }
-        }
-      }
-    }
-
-    .info-card {
-      margin-bottom: 32px;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-
-      &:last-child {
-        margin-bottom: 0;
-      }
-
-      mat-card-header {
-        padding-bottom: 8px;
-
-        mat-card-title {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          color: var(--color-dark);
-          font-size: 1.125rem;
-          font-weight: 500;
-
-          mat-icon {
-            color: var(--color-primary);
-            font-size: 1.125rem;
-            display: flex;
-            align-items: center;
-          }
-        }
-      }
-
-      mat-card-content {
-        padding-top: 16px;
-      }
-    }
-
-    // Season Stats Card
-    .season-stats-card {
-      .season-navigation {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 16px;
-
-        .current-season {
-          font-size: 1rem;
-          font-weight: 600;
-          color: var(--color-dark);
-        }
-
-        .previous-season-btn {
-          color: var(--color-secondary);
-          font-size: 0.875rem;
-
-          &:hover {
-            color: var(--color-primary);
-          }
-        }
-      }
-
-      .table-container {
-        background-color: white;
-        border-radius: 0.5rem;
-        box-shadow:
-          0 1px 3px 0 rgb(0 0 0 / 0.1),
-          0 1px 2px -1px rgb(0 0 0 / 0.1);
-        overflow-x: auto;
-        overflow-y: hidden;
-        margin-top: 8px;
-
-        .season-table {
-          width: 100%;
-          min-width: 600px;
-
-          .mat-mdc-header-row {
-            .mat-mdc-header-cell {
-              background-color: #e5e7eb;
-              color: #4b5563;
-              font-weight: 500;
-              font-size: 14px !important;
-              padding: 8px 12px !important;
-              border: 0;
-              text-align: center;
-
-              &:first-child {
-                border-top-left-radius: 8px;
-                text-align: left;
-              }
-
-              &:last-child {
-                border-top-right-radius: 8px;
-              }
-            }
-          }
-
-          .mat-mdc-row {
-            &:hover {
-              .mat-mdc-cell {
-                background-color: #f9fafb !important;
-              }
-            }
-
-            .mat-mdc-cell {
-              font-size: 12px !important;
-              color: #111827 !important;
-              border-bottom: 1px solid #e5e7eb !important;
-              padding: 12px !important;
-              text-align: center;
-              font-weight: 500;
-
-              &:first-child {
-                text-align: left !important;
-                font-weight: 600;
-              }
-            }
-          }
-        }
-      }
-    }
-
-    // Schedule Card
-    .schedule-card {
-      .schedule-section {
-        margin-bottom: 32px;
-
-        &:last-child {
-          margin-bottom: 0;
-        }
-
-        .schedule-subtitle {
-          font-size: 0.875rem;
-          color: var(--color-secondary);
-          margin: 0 0 16px 0;
-          font-weight: 600;
-          text-transform: uppercase;
-          letter-spacing: 0.5px;
-        }
-
-        .table-container {
-          background-color: white;
-          border-radius: 0.5rem;
-          box-shadow:
-            0 1px 3px 0 rgb(0 0 0 / 0.1),
-            0 1px 2px -1px rgb(0 0 0 / 0.1);
-          overflow-x: auto;
-          overflow-y: hidden;
-          margin-top: 8px;
-
-          &::-webkit-scrollbar {
-            height: 8px;
-          }
-
-          &::-webkit-scrollbar-track {
-            background-color: #f1f5f9;
-            border-radius: 4px;
-          }
-
-          &::-webkit-scrollbar-thumb {
-            background-color: #cbd5e1;
-            border-radius: 4px;
-
-            &:hover {
-              background-color: #94a3b8;
-            }
-          }
-
-          .schedule-table {
-            width: 100%;
-            min-width: 700px;
-            table-layout: fixed;
-
-            // Header styling
-            .mat-mdc-header-row {
-              .mat-mdc-header-cell {
-                background-color: #e5e7eb;
-                color: #4b5563;
-                font-weight: 500;
-                font-size: 14px !important;
-                padding: 8px 12px !important;
-                border: 0;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-
-                &:first-child {
-                  border-top-left-radius: 8px;
-                }
-
-                &:last-child {
-                  border-top-right-radius: 8px;
-                }
-              }
-            }
-
-            // Row styling
-            .mat-mdc-row {
-              transition-property: color, background-color, border-color;
-              transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-              transition-duration: 150ms;
-
-              &:hover {
-                .mat-mdc-cell {
-                  background-color: #f9fafb !important;
-                }
-              }
-
-              .mat-mdc-cell {
-                font-size: 12px !important;
-                color: #111827 !important;
-                border-bottom: 1px solid #e5e7eb !important;
-                padding: 8px 12px !important;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-
-                &.result-cell {
-                  font-weight: 600;
-
-                  &.win {
-                    color: #10b981 !important;
-                  }
-
-                  &.loss {
-                    color: #ef4444 !important;
-                  }
-
-                  &.tie {
-                    color: #f59e0b !important;
-                  }
-                }
-              }
-            }
-          }
-        }
-
-        .empty-state {
-          display: flex;
-          flex-direction: column;
           align-items: center;
           justify-content: center;
-          padding: 48px 24px;
-          color: var(--color-secondary);
+          overflow: hidden;
 
-          .empty-icon {
-            font-size: 4rem;
-            width: 4rem;
-            height: 4rem;
-            color: var(--color-secondary);
-            opacity: 0.5;
-            margin-bottom: 16px;
-          }
-
-          .empty-message {
-            font-size: 1rem;
-            text-align: center;
-            margin: 0;
-            max-width: 400px;
-          }
-        }
-      }
-    }
-
-    // Roster Card
-    .roster-card {
-      .table-container {
-        background-color: white;
-        border-radius: 0.5rem;
-        box-shadow:
-          0 1px 3px 0 rgb(0 0 0 / 0.1),
-          0 1px 2px -1px rgb(0 0 0 / 0.1);
-        overflow-x: auto;
-        overflow-y: hidden;
-        margin-top: 8px;
-
-        &::-webkit-scrollbar {
-          height: 8px;
-        }
-
-        &::-webkit-scrollbar-track {
-          background-color: #f1f5f9;
-          border-radius: 4px;
-        }
-
-        &::-webkit-scrollbar-thumb {
-          background-color: #cbd5e1;
-          border-radius: 4px;
-
-          &:hover {
-            background-color: #94a3b8;
-          }
-        }
-
-        .roster-table {
-          width: 100%;
-          min-width: 800px;
-          table-layout: fixed;
-
-          // Header styling
-          .mat-mdc-header-row {
-            .mat-mdc-header-cell {
-              background-color: #e5e7eb;
-              color: #4b5563;
-              font-weight: 500;
-              font-size: 14px !important;
-              padding: 8px 12px !important;
-              border: 0;
-              white-space: nowrap;
-              overflow: hidden;
-              text-overflow: ellipsis;
-
-              &:first-child {
-                border-top-left-radius: 8px;
-              }
-
-              &:last-child {
-                border-top-right-radius: 8px;
-              }
-            }
-          }
-
-          // Row styling
-          .mat-mdc-row {
-            transition-property: color, background-color, border-color;
-            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-            transition-duration: 150ms;
-
-            &:hover {
-              .mat-mdc-cell {
-                background-color: #f9fafb !important;
-              }
-            }
-
-            .mat-mdc-cell {
-              font-size: 12px !important;
-              color: #111827 !important;
-              border-bottom: 1px solid #e5e7eb !important;
-              padding: 8px 12px !important;
-              white-space: nowrap;
-              overflow: hidden;
-              text-overflow: ellipsis;
-            }
-          }
-        }
-      }
-    }
-  }
-}
-
-// Responsive design
-@media (max-width: 1024px) {
-  .team-profile-page {
-    padding: 16px;
-
-    .profile-content {
-      .profile-header {
-        .team-header-layout {
-          .team-main-info {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 16px;
-
-            .team-logo-container {
-              .team-logo {
-                width: 100px;
-                height: 100px;
-
-                .logo-placeholder {
-                  font-size: 2.5rem;
-                  width: 2.5rem;
-                  height: 2.5rem;
-                }
-              }
-            }
-
-            .team-name-container {
-              .team-name {
-                font-size: 1.5rem;
-              }
-            }
-
-            .team-stats-container {
-              align-items: flex-start;
-            }
-          }
-
-          .team-categories {
-            margin-left: 0;
-            flex-wrap: wrap;
-          }
-        }
-      }
-
-      .season-stats-card {
-        .table-container {
-          .season-table {
-            min-width: 500px;
-          }
-        }
-      }
-    }
-  }
-}
-
-@media (max-width: 768px) {
-  .team-profile-page {
-    .profile-content {
-      .profile-header {
-        .team-header-layout {
-          .team-main-info {
-            text-align: center;
+          .logo-placeholder {
+            font-size: 3rem;
+            color: var(--text-secondary);
+            width: 3rem;
+            height: 3rem;
+            display: inline-flex;
             align-items: center;
-
-            .team-stats-container {
-              align-items: center;
-            }
-          }
-
-          .team-categories {
             justify-content: center;
           }
         }
       }
 
-      .roster-card {
-        .table-container {
-          .roster-table {
-            min-width: 600px;
+      .team-name-container {
+        flex: 0.5;
+
+        .team-name {
+          font-size: 2rem;
+          font-weight: 600;
+          color: var(--text-primary);
+          margin: 0;
+        }
+      }
+
+      .team-stats-container {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        align-items: flex-start;
+
+        .stats-row {
+          display: flex;
+          gap: 12px;
+
+          span {
+            background-color: var(--secondary);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-weight: 500;
+            font-size: 0.75rem;
+            white-space: nowrap;
+
+            &.current-season {
+              background-color: var(--primary);
+            }
+
+            &.city {
+              background-color: #6b7280;
+            }
+
+            &.team-record {
+              background-color: var(--text-primary);
+            }
           }
         }
       }
     }
+
+    .team-categories {
+      display: flex;
+      gap: 16px;
+
+      span {
+        background-color: var(--secondary);
+        color: white;
+        padding: 6px 16px;
+        border-radius: 16px;
+        font-weight: 500;
+        font-size: 0.75rem;
+        white-space: nowrap;
+
+        &.age-group {
+          background-color: #6366f1;
+        }
+
+        &.level {
+          background-color: #10b981;
+        }
+
+        &.division {
+          background-color: #f59e0b;
+        }
+      }
+    }
+  }
+}
+
+// Season Stats Card
+.season-navigation {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+
+  .current-season {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .previous-season-btn {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+
+    &:hover {
+      color: var(--primary);
+    }
+  }
+}
+
+// Table Container
+.table-container {
+  background-color: var(--white);
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  overflow-x: auto;
+  overflow-y: hidden;
+  margin-top: 8px;
+
+  &::-webkit-scrollbar {
+    height: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background-color: #f1f5f9;
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: #cbd5e1;
+    border-radius: 4px;
+
+    &:hover {
+      background-color: #94a3b8;
+    }
+  }
+}
+
+// Season Table
+.season-table {
+  width: 100%;
+  min-width: 600px;
+
+  .mat-mdc-header-row {
+    .mat-mdc-header-cell {
+      background-color: #e5e7eb;
+      color: #4b5563;
+      font-weight: 500;
+      font-size: 14px !important;
+      padding: 8px 12px !important;
+      border: 0;
+      text-align: center;
+
+      &:first-child {
+        border-top-left-radius: 4px;
+        text-align: left;
+      }
+
+      &:last-child {
+        border-top-right-radius: 4px;
+      }
+    }
+  }
+
+  .mat-mdc-row {
+    .mat-mdc-cell {
+      font-size: 12px !important;
+      color: var(--text-primary) !important;
+      border-bottom: 1px solid var(--border-light) !important;
+      padding: 12px !important;
+      text-align: center;
+      font-weight: 500;
+
+      &:first-child {
+        text-align: left !important;
+        font-weight: 600;
+      }
+    }
+  }
+}
+
+// Schedule Card
+.schedule-section {
+  margin-bottom: 32px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  .schedule-subtitle {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    margin: 0 0 16px 0;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .schedule-table {
+    width: 100%;
+    min-width: 700px;
+    table-layout: fixed;
+
+    .mat-mdc-header-row {
+      .mat-mdc-header-cell {
+        background-color: #e5e7eb;
+        color: #4b5563;
+        font-weight: 500;
+        font-size: 14px !important;
+        padding: 8px 12px !important;
+        border: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+
+        &:first-child {
+          border-top-left-radius: 4px;
+        }
+
+        &:last-child {
+          border-top-right-radius: 4px;
+        }
+      }
+    }
+
+    .mat-mdc-row {
+      .mat-mdc-cell {
+        font-size: 12px !important;
+        color: var(--text-primary) !important;
+        border-bottom: 1px solid var(--border-light) !important;
+        padding: 8px 12px !important;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+
+        &.result-cell {
+          font-weight: 600;
+
+          &.win {
+            color: #10b981 !important;
+          }
+
+          &.loss {
+            color: #ef4444 !important;
+          }
+
+          &.tie {
+            color: #f59e0b !important;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Roster Table
+.roster-table {
+  width: 100%;
+  min-width: 800px;
+  table-layout: fixed;
+
+  .mat-mdc-header-row {
+    .mat-mdc-header-cell {
+      background-color: #e5e7eb;
+      color: #4b5563;
+      font-weight: 500;
+      font-size: 14px !important;
+      padding: 8px 12px !important;
+      border: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+
+      &:first-child {
+        border-top-left-radius: 4px;
+      }
+
+      &:last-child {
+        border-top-right-radius: 4px;
+      }
+    }
+  }
+
+  .mat-mdc-row {
+    .mat-mdc-cell {
+      font-size: 12px !important;
+      color: var(--text-primary) !important;
+      border-bottom: 1px solid var(--border-light) !important;
+      padding: 8px 12px !important;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 1024px) {
+  .team-header-card {
+    .team-header-layout {
+      .team-main-info {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+
+        .team-logo-container {
+          .team-logo {
+            width: 100px;
+            height: 100px;
+
+            .logo-placeholder {
+              font-size: 2.5rem;
+              width: 2.5rem;
+              height: 2.5rem;
+            }
+          }
+        }
+
+        .team-name-container {
+          .team-name {
+            font-size: 1.5rem;
+          }
+        }
+
+        .team-stats-container {
+          align-items: flex-start;
+        }
+      }
+
+      .team-categories {
+        margin-left: 0;
+        flex-wrap: wrap;
+      }
+    }
+  }
+
+  .season-table {
+    min-width: 500px;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-card {
+    .dashboard-card-header {
+      padding: 16px 20px;
+      min-height: 56px;
+    }
+
+    .dashboard-card-title {
+      font-size: 18px;
+      gap: 10px;
+
+      mat-icon {
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+      }
+    }
+  }
+
+  .dashboard-card-content {
+    padding: 20px;
+  }
+
+  .team-header-card {
+    .team-header-layout {
+      .team-main-info {
+        text-align: center;
+        align-items: center;
+
+        .team-stats-container {
+          align-items: center;
+        }
+      }
+
+      .team-categories {
+        justify-content: center;
+      }
+    }
+  }
+
+  .roster-table {
+    min-width: 600px;
   }
 }

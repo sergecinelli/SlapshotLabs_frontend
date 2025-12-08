@@ -1,0 +1,53 @@
+<div class="skeleton-banner-container">
+  @for (item of [].constructor(skeletonCount); track $index) {
+    <div class="skeleton-card">
+      <!-- Game Header Skeleton -->
+      <div class="skeleton-header">
+        <div class="skeleton-venue-info">
+          <div class="skeleton-line skeleton-arena-name"></div>
+          <div class="skeleton-line skeleton-rink-name"></div>
+        </div>
+        <div class="skeleton-header-right">
+          <div class="skeleton-period-badge"></div>
+          <div class="skeleton-status-badge"></div>
+        </div>
+      </div>
+
+      <!-- Teams Section Skeleton -->
+      <div class="skeleton-teams-section">
+        <!-- Away Team -->
+        <div class="skeleton-team-row">
+          <div class="skeleton-team-info">
+            <div class="skeleton-logo"></div>
+            <div class="skeleton-team-name"></div>
+          </div>
+          <div class="skeleton-score"></div>
+        </div>
+
+        <!-- Home Team -->
+        <div class="skeleton-team-row">
+          <div class="skeleton-team-info">
+            <div class="skeleton-logo"></div>
+            <div class="skeleton-team-name"></div>
+          </div>
+          <div class="skeleton-score"></div>
+        </div>
+      </div>
+
+      <!-- Game Footer Skeleton -->
+      <div class="skeleton-footer">
+        <div class="skeleton-time-info">
+          <div class="skeleton-icon"></div>
+          <div class="skeleton-time-text"></div>
+        </div>
+        <div class="skeleton-time-info">
+          <div class="skeleton-icon"></div>
+          <div class="skeleton-time-text"></div>
+        </div>
+      </div>
+    </div>
+  }
+</div>
+
+
+

@@ -81,8 +81,17 @@ export const routes: Routes = [
       },
 
       // Teams routes
+      { path: 'teams-and-rosters', redirectTo: 'teams-and-rosters/teams', pathMatch: 'full' },
       {
         path: 'teams',
+        loadComponent: () => import('./pages/teams/teams').then((m) => m.TeamsComponent),
+        canActivate: [RoleAccessGuard],
+        data: {
+          pageRolesAccessMap: teamsPageRolesAccessMap,
+        },
+      },
+      {
+        path: 'teams-and-rosters/teams',
         loadComponent: () => import('./pages/teams/teams').then((m) => m.TeamsComponent),
         canActivate: [RoleAccessGuard],
         data: {
@@ -99,6 +108,22 @@ export const routes: Routes = [
       },
       {
         path: 'teams/goalies',
+        loadComponent: () => import('./pages/goalies/goalies').then((m) => m.GoaliesComponent),
+        canActivate: [RoleAccessGuard],
+        data: {
+          pageRolesAccessMap: goaliesPageRolesAccessMap,
+        },
+      },
+      {
+        path: 'teams-and-rosters/players',
+        loadComponent: () => import('./pages/players/players').then((m) => m.PlayersComponent),
+        canActivate: [RoleAccessGuard],
+        data: {
+          pageRolesAccessMap: playersPageRolesAccessMap,
+        },
+      },
+      {
+        path: 'teams-and-rosters/goalies',
         loadComponent: () => import('./pages/goalies/goalies').then((m) => m.GoaliesComponent),
         canActivate: [RoleAccessGuard],
         data: {
@@ -126,7 +151,7 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/spray-chart/spray-chart').then((m) => m.SprayChartComponent),
       },
       {
-        path: 'team-profile/:id',
+        path: 'teams-and-rosters/teams/team-profile/:id',
         loadComponent: () =>
           import('./pages/team-profile/team-profile').then((m) => m.TeamProfileComponent),
         canActivate: [RoleAccessGuard],

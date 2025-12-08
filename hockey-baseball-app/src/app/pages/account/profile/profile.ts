@@ -1,10 +1,8 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { AuthButtonComponent } from '../../../shared/components/auth-button/auth-button';
-import { PageHeaderComponent } from '../../../shared/components/page-header/page-header';
+import { ButtonLoadingComponent } from '../../../shared/components/buttons/button-loading/button-loading.component';
+import { ButtonComponent } from '../../../shared/components/buttons/button/button.component';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
 import { UserProfile, UserEditRequest } from '../../../shared/interfaces/auth.interfaces';
@@ -15,10 +13,8 @@ import { UserProfile, UserEditRequest } from '../../../shared/interfaces/auth.in
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    MatFormFieldModule,
-    MatInputModule,
-    AuthButtonComponent,
-    PageHeaderComponent,
+    ButtonLoadingComponent,
+    ButtonComponent,
   ],
   templateUrl: './profile.html',
   styleUrl: './profile.scss',

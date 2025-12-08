@@ -2,7 +2,8 @@ import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/cor
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
-import { MatButtonModule } from '@angular/material/button';
+import { ButtonComponent } from '../buttons/button/button.component';
+import { ButtonLoadingComponent } from '../buttons/button-loading/button-loading.component';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
@@ -20,7 +21,8 @@ export interface VideoFormModalData {
     CommonModule,
     ReactiveFormsModule,
     MatDialogModule,
-    MatButtonModule,
+    ButtonComponent,
+    ButtonLoadingComponent,
     MatFormFieldModule,
     MatInputModule,
     MatIconModule,

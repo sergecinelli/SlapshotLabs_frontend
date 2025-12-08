@@ -1,10 +1,9 @@
 import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { PageHeaderComponent } from '../../shared/components/page-header/page-header';
+import { ButtonComponent } from '../../shared/components/buttons/button/button.component';
 import {
   DataTableComponent,
   TableColumn,
@@ -39,28 +38,28 @@ import { forkJoin } from 'rxjs';
   standalone: true,
   imports: [
     CommonModule,
-    PageHeaderComponent,
     DataTableComponent,
-    MatButtonModule,
     MatIconModule,
     MatDialogModule,
     ComponentVisibilityByRoleDirective,
+    ButtonComponent,
   ],
   template: `
-    <div class="p-6 pt-0" [appVisibilityMap]="visibilityByRoleMap">
-      <app-page-header title="Schedule"></app-page-header>
+    <div class="page-content" [appVisibilityMap]="visibilityByRoleMap">
 
       <!-- Add Schedule Button -->
       <div class="mb-4 flex justify-end" role-visibility-name="add-schedule-button">
-        <button
-          mat-raised-button
-          color="primary"
-          (click)="openAddScheduleModal()"
-          class="add-schedule-btn"
+        <app-button
+          [bg]="'primary'"
+          [bghover]="'primary_dark'"
+          [color]="'white'"
+          [colorhover]="'white'"
+          [materialIcon]="'add'"
+          [haveContent]="true"
+          (clicked)="openAddScheduleModal()"
         >
-          <mat-icon>add</mat-icon>
           Add to Schedule
-        </button>
+        </app-button>
       </div>
 
       <app-data-table
@@ -228,6 +227,7 @@ export class ScheduleComponent implements OnInit {
           events: [],
         }));
 
+        console.log(mappedSchedules);
         this.schedules.set(mappedSchedules);
         this.loading.set(false);
       },
@@ -394,10 +394,7 @@ export class ScheduleComponent implements OnInit {
   }
 
   private openLiveDashboard(schedule: Schedule): void {
-    const url = this.router.serializeUrl(
-      this.router.createUrlTree(['/live-dashboard', schedule.id])
-    );
-    window.location.assign(url);
+    this.router.navigate(['/live-dashboard', schedule.id]);
   }
 
   openAddScheduleModal(): void {

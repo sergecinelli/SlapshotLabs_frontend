@@ -19,12 +19,7 @@
       cursor: pointer;
       padding: 6px 10px;
       border-radius: 6px;
-      transition: all 0.2s ease;
       user-select: none;
-
-      &:hover {
-        background-color: rgba(0, 0, 0, 0.05);
-      }
 
       &.inactive {
         opacity: 0.4;
@@ -127,11 +122,6 @@
 
           &.marker-large .marker-number {
             font-size: 7px;
-          }
-
-          &:hover {
-            transform: translate(-50%, -50%) scale(1.2);
-            transition: transform 0.2s ease;
           }
         }
       }

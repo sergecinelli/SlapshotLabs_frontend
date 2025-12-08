@@ -1,5 +1,150 @@
-.profile-form-single-column {
+@use '../../../shared/styles/dashboard-card.scss' as *;
+
+// Center the card
+:host {
+  display: block;
+  
+  .page-content {
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+  }
+  
+  .dashboard-card {
+    max-width: 900px;
+    width: 100%;
+  }
+}
+
+// Profile form - matching dashboard style
+.profile-form {
   display: flex;
   flex-direction: column;
-  margin-bottom: 1.5rem;
+  gap: 24px;
+}
+
+.profile-form-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+// Custom input field styling
+.custom-input-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+
+.custom-input-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.custom-input {
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text-primary);
+  background-color: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  outline: none;
+  
+  &::placeholder {
+    color: var(--text-secondary);
+    opacity: 0.6;
+  }
+  
+  // Normal focus state - use dark color
+  &:focus:not(.error) {
+    border-color: var(--text-primary);
+    box-shadow: 0 0 0 3px rgba(15, 15, 15, 0.1);
+  }
+  
+  &:hover:not(:focus) {
+    border-color: var(--text-primary);
+  }
+  
+  // Show red border only when input has error and is NOT focused
+  &.error:not(:focus) {
+    border-color: var(--primary);
+  }
+  
+  // When input with error is focused, use dark color (not red)
+  &.error:focus {
+    border-color: var(--text-primary);
+    box-shadow: 0 0 0 3px rgba(15, 15, 15, 0.1);
+  }
+  
+  &:disabled {
+    background-color: var(--gray-tone3);
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+}
+
+.custom-input-error {
+  font-size: 12px;
+  color: var(--primary);
+  line-height: 1.4;
+  margin-top: -2px;
+}
+
+.profile-password-section {
+  grid-column: 1 / -1;
+  padding-top: 8px;
+}
+
+.profile-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 16px;
+  margin-top: 8px;
+  border-top: 1px solid var(--border-light);
+}
+
+// Success message styling
+.dashboard-success {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+  margin-bottom: 20px;
+  background-color: #d1fae5;
+  border: 1px solid #10b981;
+  border-radius: 4px;
+}
+
+.dashboard-success-message {
+  color: #065f46;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+// Error message styling
+.dashboard-error {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+  margin-bottom: 20px;
+  background-color: #fee2e2;
+  border: 1px solid #ef4444;
+  border-radius: 4px;
+}
+
+.dashboard-error-message {
+  color: #991b1b;
+  font-size: 14px;
+  font-weight: 500;
 }

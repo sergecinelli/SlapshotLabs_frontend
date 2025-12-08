@@ -1,7 +1,8 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
-import { MatButtonModule } from '@angular/material/button';
+import { ButtonComponent } from '../buttons/button/button.component';
+import { ButtonLoadingComponent } from '../buttons/button-loading/button-loading.component';
 import { MatTableModule } from '@angular/material/table';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatIconModule } from '@angular/material/icon';
@@ -36,7 +37,8 @@ export interface RosterSelectionResult {
   imports: [
     CommonModule,
     MatDialogModule,
-    MatButtonModule,
+    ButtonComponent,
+    ButtonLoadingComponent,
     MatTableModule,
     MatCheckboxModule,
     MatIconModule,

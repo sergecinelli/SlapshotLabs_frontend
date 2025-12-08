@@ -1,10 +1,7 @@
 import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
-import { PageHeaderComponent } from '../../shared/components/page-header/page-header';
 import {
   DataTableComponent,
   TableColumn,
@@ -19,6 +16,7 @@ import {
   PlayerFormModalData,
 } from '../../shared/components/player-form-modal/player-form-modal';
 import { ComponentVisibilityByRoleDirective } from '../../shared/directives/component-visibility-by-role.directive';
+import { ButtonComponent } from '../../shared/components/buttons/button/button.component';
 import { visibilityByRoleMap } from './players.role-map';
 
 @Component({
@@ -26,28 +24,31 @@ import { visibilityByRoleMap } from './players.role-map';
   standalone: true,
   imports: [
     CommonModule,
-    PageHeaderComponent,
     DataTableComponent,
-    MatButtonModule,
-    MatIconModule,
     MatDialogModule,
     ComponentVisibilityByRoleDirective,
+    ButtonComponent,
   ],
   template: `
-    <div class="p-6 pt-0" [appVisibilityMap]="visibilityByRoleMap">
-      <app-page-header [title]="pageTitle()"></app-page-header>
+    <div class="page-content" [appVisibilityMap]="visibilityByRoleMap">
 
       <!-- Add Player Button -->
       <div class="mb-4 flex justify-end" role-visibility-name="add-player-button" [attr.role-visibility-team-id]="teamId()">
-        <button
-          mat-raised-button
-          color="primary"
-          (click)="openAddPlayerModal()"
-          class="add-player-btn"
+        <app-button
+          materialIcon="add"
+          [bg]="'primary'"
+          [bghover]="'primary_dark'"
+          [color]="'white'"
+          [colorhover]="'white'"
+          [opacity]="1"
+          [opacityhover]="1"
+          [width]="'auto'"
+          [rounded]="false"
+          [haveContent]="true"
+          (clicked)="openAddPlayerModal()"
         >
-          <mat-icon>add</mat-icon>
           Add a Player
-        </button>
+        </app-button>
       </div>
 
       <app-data-table
@@ -129,7 +130,6 @@ export class PlayersComponent implements OnInit {
       icon: 'spray-chart',
       action: 'shot-spray-chart',
       variant: 'secondary',
-      iconOnly: true,
     },
   ];
 
@@ -291,11 +291,7 @@ export class PlayersComponent implements OnInit {
   }
 
   private viewPlayerProfile(player: Player): void {
-    // Build the full URL including the base URL
-    const baseUrl = window.location.origin;
-    const url = `${baseUrl}/player-profile/${player.id}`;
-
-    window.location.assign(url);
+    this.router.navigate(['/player-profile', player.id]);
   }
 
   private viewShotSprayChart(player: Player): void {

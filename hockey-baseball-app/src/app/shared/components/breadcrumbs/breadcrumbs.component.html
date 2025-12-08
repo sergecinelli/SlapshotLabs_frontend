@@ -1,0 +1,43 @@
+<nav class="breadcrumbs-container" aria-label="Breadcrumb">
+  <div class="breadcrumbs-content">
+    <!-- Breadcrumb Navigation -->
+    @if (breadcrumbs().length > 1) {
+      <ol class="breadcrumbs-list">
+        @for (item of breadcrumbs(); track item.path; let i = $index) {
+          <li class="breadcrumbs-item">
+            @if (isLast(i)) {
+              <!-- Last item is shown as part of title -->
+            } @else {
+              <a 
+                class="breadcrumbs-link"
+                [routerLink]="item.path"
+                (click)="navigateTo(item.path)"
+              >
+                @if (item.icon) {
+                  <span class="material-symbols-rounded breadcrumbs-icon">{{ item.icon }}</span>
+                }
+                <span class="breadcrumbs-label">{{ item.label }}</span>
+              </a>
+              <span class="material-symbols-rounded breadcrumbs-separator">chevron_right</span>
+            }
+          </li>
+        }
+      </ol>
+    }
+
+    <!-- Page Title with Icon -->
+    @if (breadcrumbs().length > 0) {
+      <div class="breadcrumbs-page-title">
+        @if (breadcrumbs()[breadcrumbs().length - 1].icon) {
+          <div class="breadcrumbs-title-icon-wrapper">
+            <span class="material-symbols-rounded breadcrumbs-title-icon">
+              {{ breadcrumbs()[breadcrumbs().length - 1].icon }}
+            </span>
+          </div>
+        }
+        <h1 class="breadcrumbs-title">{{ breadcrumbs()[breadcrumbs().length - 1].label }}</h1>
+      </div>
+    }
+  </div>
+</nav>
+
