@@ -1,12 +1,8 @@
 import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
 import { ActivatedRoute, Router } from '@angular/router';
-import {
-  DataTableComponent,
-  TableColumn,
-  TableAction,
-} from '../../shared/components/data-table/data-table';
 import { GoalieService } from '../../services/goalie.service';
 import { TeamService } from '../../services/team.service';
 import { Goalie } from '../../shared/interfaces/goalie.interface';
@@ -24,42 +20,234 @@ import { visibilityByRoleMap } from './goalies.role-map';
   standalone: true,
   imports: [
     CommonModule,
-    DataTableComponent,
     MatDialogModule,
+    MatIconModule,
     ComponentVisibilityByRoleDirective,
     ButtonComponent,
   ],
   template: `
     <div class="page-content" [appVisibilityMap]="visibilityByRoleMap">
 
-      <!-- Add Goalie Button -->
-      <div class="mb-4 flex justify-end" role-visibility-name="add-goalie-button" [attr.role-visibility-team-id]="teamId()">
-        <app-button
-          materialIcon="add"
-          [bg]="'primary'"
-          [bghover]="'primary_dark'"
-          [color]="'white'"
-          [colorhover]="'white'"
-          [opacity]="1"
-          [opacityhover]="1"
-          [width]="'auto'"
-          [rounded]="false"
-          [haveContent]="true"
-          (clicked)="openAddGoalieModal()"
-        >
-          Add a Goalie
-        </app-button>
+      <!-- Header with Add Button -->
+      <div class="goalies-header">
+        <div class="goalies-header-left"></div>
+        <div class="add-goalie-button-wrapper" role-visibility-name="add-goalie-button" [attr.role-visibility-team-id]="teamId()">
+          <app-button
+            materialIcon="add"
+            [bg]="'primary'"
+            [bghover]="'primary_dark'"
+            [color]="'white'"
+            [colorhover]="'white'"
+            [opacity]="1"
+            [opacityhover]="1"
+            [width]="'auto'"
+            [rounded]="false"
+            [haveContent]="true"
+            (clicked)="openAddGoalieModal()"
+          >
+            Add a Goalie
+          </app-button>
+        </div>
       </div>
 
-      <app-data-table
-        [columns]="tableColumns()"
-        [data]="goalies()"
-        [actions]="tableActions"
-        [loading]="loading()"
-        (actionClick)="onActionClick($event)"
-        (sort)="onSort($event)"
-        emptyMessage="No goalies found."
-      ></app-data-table>
+      <!-- Loading State -->
+      @if (loading()) {
+        <div class="goalies-loading">
+          <div class="loading-text">Loading goalies...</div>
+        </div>
+      }
+
+      <!-- Empty State -->
+      @if (!loading() && goalies().length === 0) {
+        <div class="goalies-empty">
+          <div class="empty-text">No goalies found.</div>
+        </div>
+      }
+
+      <!-- Goalie Cards -->
+      @if (!loading() && goalies().length > 0) {
+        <div class="goalies-cards-container">
+          @for (goalie of goalies(); track goalie.id) {
+            <div class="goalie-card">
+              <!-- Card Header -->
+              <div class="goalie-card-header">
+                <div class="header-left">
+                  <div class="goalie-name-row">
+                    @if (goalie['teamLogo']) {
+                      <img [src]="goalie['teamLogo']" [alt]="goalie.team" class="team-logo" />
+                    } @else {
+                      <div class="team-logo-placeholder"></div>
+                    }
+                    <div class="goalie-name-group">
+                      <div 
+                        class="goalie-name goalie-link"
+                        (click)="viewGoalieProfile(goalie)"
+                        (keyup.enter)="viewGoalieProfile(goalie)"
+                        (keyup.space)="viewGoalieProfile(goalie)"
+                        tabindex="0"
+                        role="button"
+                        [attr.aria-label]="'View ' + goalie.firstName + ' ' + goalie.lastName + ' profile'"
+                      >{{ goalie.firstName }} {{ goalie.lastName }}</div>
+                      @if (goalie.jerseyNumber) {
+                        <div class="goalie-jersey">#{{ goalie.jerseyNumber }}</div>
+                      }
+                    </div>
+                  </div>
+                  <div class="goalie-info-row">
+                    <div class="goalie-info-item">
+                      <span class="goalie-info-label">Position:</span>
+                      <span class="goalie-info-value">{{ goalie.position || 'Goalie' }}</span>
+                    </div>
+                    @if (goalie.height) {
+                      <div class="goalie-info-item">
+                        <span class="goalie-info-label">Height:</span>
+                        <span class="goalie-info-value">{{ goalie.height }}</span>
+                      </div>
+                    }
+                    @if (goalie.weight) {
+                      <div class="goalie-info-item">
+                        <span class="goalie-info-label">Weight:</span>
+                        <span class="goalie-info-value">{{ goalie.weight }} lbs</span>
+                      </div>
+                    }
+                    @if (goalie.shoots) {
+                      <div class="goalie-info-item">
+                        <span class="goalie-info-label">Shoots:</span>
+                        <span class="goalie-info-value">{{ goalie.shoots }}</span>
+                      </div>
+                    }
+                    @if (goalie.team) {
+                      <div class="goalie-info-item">
+                        <span class="goalie-info-label">Team:</span>
+                        <div class="team-name-with-logo">
+                          @if (goalie['teamLogo']) {
+                            <img [src]="goalie['teamLogo']" [alt]="goalie.team" class="team-logo-small" />
+                          }
+                          @if (goalie.teamId) {
+                            <span
+                              class="goalie-info-value team-link"
+                              (click)="goToTeamProfile(goalie.teamId)"
+                              (keyup.enter)="goToTeamProfile(goalie.teamId)"
+                              (keyup.space)="goToTeamProfile(goalie.teamId)"
+                              tabindex="0"
+                              role="button"
+                              [attr.aria-label]="'View ' + goalie.team + ' profile'"
+                            >{{ goalie.team }}</span>
+                          } @else {
+                            <span class="goalie-info-value">{{ goalie.team }}</span>
+                          }
+                        </div>
+                      </div>
+                    }
+                    @if (goalie.birthYear) {
+                      <div class="goalie-info-item">
+                        <span class="goalie-info-label">Birth Year:</span>
+                        <span class="goalie-info-value">{{ goalie.birthYear }}</span>
+                      </div>
+                    }
+                  </div>
+                </div>
+              </div>
+
+              <!-- Stats Section -->
+              <div class="goalie-stats-section">
+                <div class="stats-grid">
+                  <div class="stat-item">
+                    <div class="stat-label">GP</div>
+                    <div class="stat-value">{{ goalie.gamesPlayed || 0 }}</div>
+                  </div>
+                  <div class="stat-item">
+                    <div class="stat-label">W</div>
+                    <div class="stat-value">{{ goalie.wins || 0 }}</div>
+                  </div>
+                  <div class="stat-item">
+                    <div class="stat-label">L</div>
+                    <div class="stat-value">{{ goalie.losses || 0 }}</div>
+                  </div>
+                  <div class="stat-item">
+                    <div class="stat-label">SOG</div>
+                    <div class="stat-value">{{ goalie.shotsOnGoal || 0 }}</div>
+                  </div>
+                  <div class="stat-item">
+                    <div class="stat-label">Saves</div>
+                    <div class="stat-value">{{ goalie.saves || 0 }}</div>
+                  </div>
+                  <div class="stat-item">
+                    <div class="stat-label">GA</div>
+                    <div class="stat-value">{{ goalie.goalsAgainst || 0 }}</div>
+                  </div>
+                  <div class="stat-item">
+                    <div class="stat-label">G</div>
+                    <div class="stat-value">{{ goalie.goals || 0 }}</div>
+                  </div>
+                  <div class="stat-item">
+                    <div class="stat-label">A</div>
+                    <div class="stat-value">{{ goalie.assists || 0 }}</div>
+                  </div>
+                  <div class="stat-item">
+                    <div class="stat-label">PTS</div>
+                    <div class="stat-value stat-value-highlight">{{ goalie.points || 0 }}</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="goalie-card-actions">
+                <app-button
+                  [bg]="'secondary'"
+                  [bghover]="'secondary_tone1'"
+                  [color]="'white'"
+                  [colorhover]="'white'"
+                  [materialIcon]="'scatter_plot'"
+                  [haveContent]="true"
+                  (clicked)="viewShotSprayChart(goalie)"
+                  class="action-button"
+                >
+                  Spray Chart
+                </app-button>
+                <app-button
+                  [bg]="'green'"
+                  [bghover]="'green'"
+                  [color]="'white'"
+                  [colorhover]="'white'"
+                  [materialIcon]="'visibility'"
+                  [haveContent]="true"
+                  (clicked)="viewGoalieProfile(goalie)"
+                  class="action-button"
+                >
+                  Profile
+                </app-button>
+                <app-button
+                  [bg]="'orange'"
+                  [bghover]="'orange'"
+                  [color]="'white'"
+                  [colorhover]="'white'"
+                  materialIcon="stylus"
+                  [haveContent]="true"
+                  (clicked)="editGoalie(goalie)"
+                  class="action-button"
+                  role-visibility-name="edit-action"
+                >
+                  Edit
+                </app-button>
+                <app-button
+                  [bg]="'primary'"
+                  [bghover]="'primary_dark'"
+                  [color]="'white'"
+                  [colorhover]="'white'"
+                  [materialIcon]="'delete'"
+                  [haveContent]="true"
+                  (clicked)="deleteGoalie(goalie)"
+                  class="action-button"
+                  role-visibility-name="delete-action"
+                >
+                  Delete
+                </app-button>
+              </div>
+            </div>
+          }
+        </div>
+      }
     </div>
   `,
   styleUrl: './goalies.scss',
@@ -81,50 +269,6 @@ export class GoaliesComponent implements OnInit {
   teamName = signal<string>('Goalies');
   pageTitle = signal<string>('Goalies');
 
-  private allTableColumns: TableColumn[] = [
-    { key: 'team', label: 'Team', sortable: true, type: 'dropdown', width: '100px' },
-    { key: 'position', label: 'Pos', sortable: false, width: '75px' },
-    { key: 'height', label: 'Ht', sortable: true, width: '65px' },
-    { key: 'weight', label: 'Wt', sortable: true, type: 'number', width: '65px' },
-    { key: 'shoots', label: 'Shoots (R/L)', sortable: true, type: 'dropdown', width: '100px' },
-    { key: 'jerseyNumber', label: 'Jersey #', sortable: true, type: 'number', width: '70px' },
-    { key: 'firstName', label: 'First Name', sortable: true, width: '100px' },
-    { key: 'lastName', label: 'Last Name', sortable: true, width: '100px' },
-    { key: 'birthYear', label: 'Birth Year', sortable: true, type: 'number', width: '90px' },
-    { key: 'shotsOnGoal', label: 'SOG', sortable: true, type: 'number', width: '70px' },
-    { key: 'saves', label: 'Saves', sortable: true, type: 'number', width: '75px' },
-    { key: 'goalsAgainst', label: 'GA', sortable: true, type: 'number', width: '60px' },
-    { key: 'shotsOnGoalPerGame', label: 'SOG/Game', sortable: true, type: 'number', width: '90px' },
-    { key: 'gamesPlayed', label: 'GP', sortable: true, type: 'number', width: '60px' },
-    { key: 'wins', label: 'Wins', sortable: true, type: 'number', width: '65px' },
-    { key: 'losses', label: 'Losses', sortable: true, type: 'number', width: '75px' },
-    { key: 'goals', label: 'Goals', sortable: true, type: 'number', width: '70px' },
-    { key: 'assists', label: 'Assists', sortable: true, type: 'number', width: '75px' },
-    { key: 'points', label: 'Pts', sortable: true, type: 'number', width: '60px' },
-    { key: 'ppga', label: 'PPGA', sortable: true, type: 'number', width: '70px' },
-    { key: 'shga', label: 'SHGA', sortable: true, type: 'number', width: '70px' },
-  ];
-
-  tableColumns = signal<TableColumn[]>(this.allTableColumns);
-
-  tableActions: TableAction[] = [
-    {
-      label: 'Delete', action: 'delete', variant: 'danger', roleVisibilityName: 'delete-action',
-      roleVisibilityTeamId: (item: Record<string, unknown>) => item['teamId']?.toString() ?? '',
-    },
-    {
-      label: 'Edit', action: 'edit', variant: 'secondary', roleVisibilityName: 'edit-action',
-      roleVisibilityTeamId: (item: Record<string, unknown>) => item['teamId']?.toString() ?? '',
-    },
-    { label: 'Profile', action: 'view-profile', variant: 'primary' },
-    {
-      label: 'Spray Chart',
-      icon: 'spray-chart',
-      action: 'shot-spray-chart',
-      variant: 'secondary',
-    },
-  ];
-
   ngOnInit(): void {
     // Check for teamId query parameter
     this.route.queryParams.subscribe((params) => {
@@ -137,15 +281,11 @@ export class GoaliesComponent implements OnInit {
           this.teamName.set(teamName);
           this.pageTitle.set(`Goalies | ${teamName}`);
         }
-        // Hide team column when viewing team-specific goalies
-        this.tableColumns.set(this.allTableColumns.filter((col) => col.key !== 'team'));
         this.loadGoaliesByTeam(parseInt(teamId, 10));
       } else {
         this.teamId.set(null);
         this.teamName.set('Goalies');
         this.pageTitle.set('Goalies');
-        // Show all columns including team
-        this.tableColumns.set(this.allTableColumns);
         this.loadGoalies();
       }
     });
@@ -155,12 +295,26 @@ export class GoaliesComponent implements OnInit {
     this.loading.set(true);
     this.goalieService.getGoalies({ excludeDefault: true }).subscribe({
       next: (data) => {
-        // Sort by creation date (newest to oldest) by default
-        const sortedGoalies = this.sortByDate(data.goalies, 'desc');
-        this.goalies.set(sortedGoalies);
-        this.loading.set(false);
-        // Fetch all teams separately for modals
-        this.loadTeams();
+        // Load teams first to get team data for mapping
+        this.loadTeams(() => {
+          // Map goalies with team information
+          const mappedGoalies = data.goalies.map((goalie) => {
+            if (goalie.teamId) {
+              const team = this.teams.find((t) => parseInt(t.id) === goalie.teamId);
+              if (team) {
+                return {
+                  ...goalie,
+                  teamLogo: team.logo,
+                };
+              }
+            }
+            return goalie;
+          });
+          // Sort by creation date (newest to oldest) by default
+          const sortedGoalies = this.sortByDate(mappedGoalies, 'desc');
+          this.goalies.set(sortedGoalies);
+          this.loading.set(false);
+        });
       },
       error: (error) => {
         console.error('Error loading goalies:', error);
@@ -173,12 +327,26 @@ export class GoaliesComponent implements OnInit {
     this.loading.set(true);
     this.goalieService.getGoaliesByTeam(teamId, { excludeDefault: true }).subscribe({
       next: (goalies) => {
-        // Sort by creation date (newest to oldest) by default
-        const sortedGoalies = this.sortByDate(goalies, 'desc');
-        this.goalies.set(sortedGoalies);
-        this.loading.set(false);
-        // Fetch all teams separately for modals
-        this.loadTeams();
+        // Load teams first to get team data for mapping
+        this.loadTeams(() => {
+          // Map goalies with team information
+          const mappedGoalies = goalies.map((goalie) => {
+            if (goalie.teamId) {
+              const team = this.teams.find((t) => parseInt(t.id) === goalie.teamId);
+              if (team) {
+                return {
+                  ...goalie,
+                  teamLogo: team.logo,
+                };
+              }
+            }
+            return goalie;
+          });
+          // Sort by creation date (newest to oldest) by default
+          const sortedGoalies = this.sortByDate(mappedGoalies, 'desc');
+          this.goalies.set(sortedGoalies);
+          this.loading.set(false);
+        });
       },
       error: (error) => {
         console.error('Error loading goalies for team:', error);
@@ -187,58 +355,23 @@ export class GoaliesComponent implements OnInit {
     });
   }
 
-  private loadTeams(): void {
+  private loadTeams(callback?: () => void): void {
     this.teamService.getTeams().subscribe({
       next: (data) => {
         this.teams = data.teams;
+        if (callback) {
+          callback();
+        }
       },
       error: (error) => {
         console.error('Error loading teams:', error);
+        if (callback) {
+          callback();
+        }
       },
     });
   }
 
-  onActionClick(event: { action: string; item: Goalie }): void {
-    const { action, item } = event;
-
-    switch (action) {
-      case 'delete':
-        this.deleteGoalie(item);
-        break;
-      case 'edit':
-        this.editGoalie(item);
-        break;
-      case 'view-profile':
-        this.viewGoalieProfile(item);
-        break;
-      case 'shot-spray-chart':
-        this.viewShotSprayChart(item);
-        break;
-      default:
-        console.log(`Unknown action: ${action}`);
-    }
-  }
-
-  onSort(event: { column: string; direction: 'asc' | 'desc' }): void {
-    const { column, direction } = event;
-    const sortedGoalies = [...this.goalies()].sort((a, b) => {
-      const aValue = this.getNestedValue(a, column);
-      const bValue = this.getNestedValue(b, column);
-
-      if (aValue === bValue) return 0;
-
-      const result = (aValue as string | number) < (bValue as string | number) ? -1 : 1;
-      return direction === 'asc' ? result : -result;
-    });
-
-    this.goalies.set(sortedGoalies);
-  }
-
-  private getNestedValue(obj: Goalie, path: string): unknown {
-    return path
-      .split('.')
-      .reduce((current: unknown, key: string) => (current as Record<string, unknown>)?.[key], obj);
-  }
 
   private sortByDate(goalies: Goalie[], direction: 'asc' | 'desc'): Goalie[] {
     return [...goalies].sort((a, b) => {
@@ -250,7 +383,7 @@ export class GoaliesComponent implements OnInit {
     });
   }
 
-  private deleteGoalie(goalie: Goalie): void {
+  deleteGoalie(goalie: Goalie): void {
     if (confirm(`Are you sure you want to delete ${goalie.firstName} ${goalie.lastName}?`)) {
       this.goalieService.deleteGoalie(goalie.id).subscribe({
         next: (success) => {
@@ -282,11 +415,15 @@ export class GoaliesComponent implements OnInit {
     }
   }
 
-  private viewGoalieProfile(goalie: Goalie): void {
-    this.router.navigate(['/goalie-profile', goalie.id]);
+  viewGoalieProfile(goalie: Goalie): void {
+    this.router.navigate(['/teams-and-rosters/goalies/goalie-profile', goalie.id]);
   }
 
-  private viewShotSprayChart(goalie: Goalie): void {
+  goToTeamProfile(teamId: number): void {
+    this.router.navigate([`/teams-and-rosters/teams/team-profile/${teamId}`]);
+  }
+
+  viewShotSprayChart(goalie: Goalie): void {
     this.router.navigate(['/spray-chart', goalie.id]);
   }
 
@@ -330,7 +467,7 @@ export class GoaliesComponent implements OnInit {
     });
   }
 
-  private editGoalie(goalie: Goalie): void {
+  editGoalie(goalie: Goalie): void {
     const dialogRef = this.dialog.open(GoalieFormModalComponent, {
       width: '800px',
       maxWidth: '95vw',

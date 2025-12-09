@@ -1,0 +1,164 @@
+.week-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  padding: 12px 16px;
+  background: var(--white);
+  border-radius: 8px;
+  border: 1px solid var(--border-light);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  min-width: fit-content;
+  flex-shrink: 0;
+}
+
+.nav-button {
+  color: var(--text-primary);
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+
+  &:hover:not(:disabled) {
+    background-color: var(--gray-tone3);
+    color: var(--primary);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+.week-display {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  min-width: 0;
+  gap: 12px;
+}
+
+.week-range {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap;
+  line-height: 1.5;
+}
+
+.week-start,
+.week-end {
+  white-space: nowrap;
+}
+
+.week-separator {
+  color: var(--text-secondary);
+  font-weight: 400;
+  margin: 0 4px;
+}
+
+.calendar-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.calendar-button {
+  color: var(--text-primary);
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  margin: 0;
+
+  &:hover {
+    background-color: var(--gray-tone3);
+    color: var(--primary);
+  }
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    line-height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+.calendar-field-hidden {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: -1;
+}
+
+// Override datepicker overlay positioning and styling
+::ng-deep {
+  .cdk-overlay-pane {
+    &.mat-datepicker-popup {
+      margin-left: auto;
+      margin-right: auto;
+    }
+  }
+
+  .mat-datepicker-content {
+    background-color: var(--white) !important;
+    color: var(--text-primary);
+    
+    .mat-calendar {
+      background-color: var(--white) !important;
+      
+      .mat-calendar-table {
+        background-color: var(--white) !important;
+      }
+      
+      .mat-calendar-body-cell-content {
+        color: var(--text-primary);
+      }
+      
+      .mat-calendar-header {
+        background-color: var(--white) !important;
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .week-pagination {
+    gap: 12px;
+    padding: 10px 12px;
+    width: 100%;
+  }
+
+  .schedule-header-left {
+    display: none;
+  }
+
+  .week-range {
+    font-size: 13px;
+    gap: 4px;
+  }
+
+  .week-separator {
+    margin: 0 2px;
+  }
+
+  .week-display {
+    gap: 8px;
+  }
+}
+

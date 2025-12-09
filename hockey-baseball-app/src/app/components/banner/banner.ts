@@ -330,7 +330,7 @@ export class BannerComponent implements OnInit, OnDestroy, AfterViewInit {
   getTimeDisplay(item: GameBannerItem): string {
     // status: 2 = In Progress
     if (item.status === 2) {
-      return 'In Progress';
+      return 'Live';
     }
     // status: 1 = Not Started, format time as 12-hour clock
     if (item.status === 1) {

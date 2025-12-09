@@ -4,6 +4,7 @@ export interface TeamApiOut {
   name: string;
   age_group: string;
   level_id: number;
+  level_name?: string;
   division_id: number;
   city: string;
   games_played: number;

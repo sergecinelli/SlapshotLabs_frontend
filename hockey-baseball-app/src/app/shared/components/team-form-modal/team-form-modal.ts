@@ -5,6 +5,7 @@ import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/materia
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -12,7 +13,8 @@ import { Team } from '../../interfaces/team.interface';
 import { TeamOptionsService } from '../../../services/team-options.service';
 import { ButtonComponent } from '../buttons/button/button.component';
 import { ButtonLoadingComponent } from '../buttons/button-loading/button-loading.component';
-import { forkJoin } from 'rxjs';
+import { forkJoin, Observable, of } from 'rxjs';
+import { map, startWith } from 'rxjs/operators';
 
 export interface TeamFormModalData {
   team?: Team;
@@ -29,6 +31,7 @@ export interface TeamFormModalData {
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
+    MatAutocompleteModule,
     MatIconModule,
     MatDividerModule,
     MatProgressSpinnerModule,
@@ -51,6 +54,7 @@ export class TeamFormModalComponent implements OnInit {
   groupOptions: { value: string; label: string }[] = [];
   levelOptions: { value: string; label: string }[] = [];
   divisionOptions: { value: string; label: string }[] = [];
+  filteredGroupOptions: Observable<{ value: string; label: string }[]> = of([]);
 
   // Image picker properties
   selectedFile: File | null = null;
@@ -73,6 +77,28 @@ export class TeamFormModalComponent implements OnInit {
     this.loadOptions();
   }
 
+  private setupGroupFilter(): void {
+    this.filteredGroupOptions = this.teamForm.get('group')!.valueChanges.pipe(
+      startWith(''),
+      map((value: string) => {
+        if (!value || typeof value !== 'string') {
+          return this.groupOptions;
+        }
+        const filterValue = value.toLowerCase();
+        return this.groupOptions.filter((option) =>
+          option.label.toLowerCase().includes(filterValue) ||
+          option.value.toLowerCase().includes(filterValue)
+        );
+      })
+    );
+  }
+
+  protected displayGroupFn = (value: string): string => {
+    if (!value) return '';
+    const option = this.groupOptions.find((opt) => opt.value === value);
+    return option ? option.label : value;
+  };
+
   private createForm(): FormGroup {
     return this.fb.group({
       name: ['', [Validators.required, Validators.minLength(2)]],
@@ -93,6 +119,9 @@ export class TeamFormModalComponent implements OnInit {
 
     // Get group options (static)
     this.groupOptions = this.teamOptionsService.getGroupOptions();
+    
+    // Setup autocomplete filter after options are loaded
+    this.setupGroupFilter();
 
     // Fetch levels and divisions from API
     forkJoin({

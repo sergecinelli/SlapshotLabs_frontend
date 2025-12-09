@@ -9,6 +9,7 @@ import {
   inject,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSortModule, Sort } from '@angular/material/sort';
@@ -37,7 +38,7 @@ export interface TableAction {
   roleAccessName?: string; // Optional role access name for directive
   roleVisibilityName?: string; // Optional role visibility name for directive
   roleVisibilityTeamId?: string | ((item: Record<string, unknown>) => string | undefined); // Optional team_id for role visibility check
-  roleVisibilityAuthorId?: (item: Record<string, unknown>) => string; // Optional condition to show/hide action
+  roleVisibilityAuthorId?: string | ((item: Record<string, unknown>) => string | undefined); // Optional author_id for role visibility check
   condition?: (item: Record<string, unknown>) => boolean; // Optional condition to show/hide action
 }
 
@@ -46,6 +47,7 @@ export interface TableAction {
   standalone: true,
   imports: [
     CommonModule,
+    RouterLink,
     MatTableModule,
     MatButtonModule,
     MatSortModule,
@@ -95,6 +97,10 @@ export class DataTableComponent<T extends Record<string, unknown> = Record<strin
 
   getCellValue(item: T, column: TableColumn): unknown {
     return this.getNestedValue(item, column.key);
+  }
+
+  getCellValueByKey(item: T, key: string): unknown {
+    return this.getNestedValue(item, key);
   }
 
   getDateValue(item: T, column: TableColumn): Date | null {

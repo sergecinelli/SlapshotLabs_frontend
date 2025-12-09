@@ -1,136 +1,85 @@
 <div class="banner-wrapper" [class.scrolled]="isScrolled()" [class.skeleton-removed]="!showSkeleton()">
   @if (showSkeleton()) {
-    <app-banner-skeleton 
-      [class.fade-out]="!loading() && bannerItems().length > 0"
-    ></app-banner-skeleton>
+  <app-banner-skeleton [class.fade-out]="!loading() && bannerItems().length > 0"></app-banner-skeleton>
   }
   @if (bannerItems().length > 0) {
-    <div class="banner-container" [class.scrolled]="isScrolled()" [class.fade-in]="!loading()">
+  <div class="banner-container" [class.scrolled]="isScrolled()" [class.fade-in]="!loading()">
     @for (item of bannerItems(); track item.id) {
-      <div
-        class="game-card"
-        [class.clickable]="item.status === 2"
-        [class.live]="item.status === 2"
-        [class.upcoming]="item.status === 1"
-        [class.completed]="item.status === 3"
-        role="button"
-        tabindex="0"
-        (click)="item.status === 2 && goToLiveDashboard(item.id)"
-        (keyup.enter)="item.status === 2 && goToLiveDashboard(item.id)"
-        (keyup.space)="item.status === 2 && goToLiveDashboard(item.id)"
-        [title]="item.status === 2 ? 'Go To Game Dashboard' : ''"
-        [attr.aria-label]="getAriaLabel(item)"
-      >
-        <!-- Game Header -->
-        <div class="game-header">
-          <div class="venue-info">
-            <span class="arena-name">{{ item.arena_name }}</span>
-            @if (item.rink_name) {
-              <span class="rink-name">{{ item.rink_name }}</span>
-            }
-          </div>
-          <div class="header-right">
-            @if (item.status !== 1 && item.game_period_name) {
-              <span class="period-badge">{{ item.game_period_name }}</span>
-            }
-            <!-- Status Badge -->
-            <div class="status-badge" [class.live-badge]="item.status === 2" [class.upcoming-badge]="item.status === 1" [class.completed-badge]="item.status === 3">
-              @if (item.status === 2) {
-                <span class="live-indicator"></span>
-                <span class="status-text">LIVE</span>
-              } @else if (item.status === 1) {
-                <span class="status-text">UPCOMING</span>
-              } @else {
-                <span class="status-text">FINAL</span>
-              }
-            </div>
-          </div>
-        </div>
-
-        <!-- Teams Section -->
-        <div class="teams-section" [class.hidden-on-scroll]="isScrolled()">
-          <!-- Away Team -->
-          <div 
-            class="team-row" 
-            [class.winning]="isWinning(item, false)"
-          >
-            <div class="team-info">
-              <img
-                [src]="getTeamLogoUrl(item.away_team_id)"
-                [alt]="item.away_team_name"
-                class="team-logo"
-              />
-              <span 
-                class="team-name"
-                (click)="goToTeamProfile(item.away_team_id)"
-                (keyup.enter)="goToTeamProfile(item.away_team_id)"
-                (keyup.space)="goToTeamProfile(item.away_team_id)"
-                tabindex="0"
-                role="button"
-                [attr.aria-label]="'View ' + getTeamDisplay(item.away_team_abbreviation, item.away_team_name) + ' profile'"
-              >{{
-                getTeamDisplay(item.away_team_abbreviation, item.away_team_name)
-              }}</span>
-            </div>
-            <span class="score" [class.winning-score]="isWinning(item, false)">{{ item.away_goals }}</span>
-          </div>
-
-          <!-- Home Team -->
-          <div 
-            class="team-row" 
-            [class.winning]="isWinning(item, true)"
-          >
-            <div class="team-info">
-              <img
-                [src]="getTeamLogoUrl(item.home_team_id)"
-                [alt]="item.home_team_name"
-                class="team-logo"
-              />
-              <span 
-                class="team-name"
-                (click)="goToTeamProfile(item.home_team_id)"
-                (keyup.enter)="goToTeamProfile(item.home_team_id)"
-                (keyup.space)="goToTeamProfile(item.home_team_id)"
-                tabindex="0"
-                role="button"
-                [attr.aria-label]="'View ' + getTeamDisplay(item.home_team_abbreviation, item.home_team_name) + ' profile'"
-              >{{
-                getTeamDisplay(item.home_team_abbreviation, item.home_team_name)
-              }}</span>
-            </div>
-            <span class="score" [class.winning-score]="isWinning(item, true)">{{ item.home_goals }}</span>
-          </div>
-        </div>
-
-        <!-- Time/Date Footer -->
-        <div class="game-footer" [class.hidden-on-scroll]="isScrolled()">
-          @if (item.status === 1) {
-            <div class="time-info">
-              <span class="date-icon material-symbols-rounded">calendar_today</span>
-              <span class="date-text">{{ getDateDisplay(item.date) }}</span>
-            </div>
-            <div class="time-info">
-              <span class="time-icon material-symbols-rounded">schedule</span>
-              <span class="time-text">{{ getTimeDisplay(item) }}</span>
-            </div>
-          } @else {
-            <div class="time-info">
-              <span class="time-text">{{ getTimeDisplay(item) }}</span>
-            </div>
+    <div class="game-card" [class.clickable]="item.status === 2" [class.live]="item.status === 2" [class.upcoming]="item.status === 1"
+      [class.completed]="item.status === 3" role="button" tabindex="0" (click)="item.status === 2 && goToLiveDashboard(item.id)"
+      (keyup.enter)="item.status === 2 && goToLiveDashboard(item.id)" (keyup.space)="item.status === 2 && goToLiveDashboard(item.id)"
+      [title]="item.status === 2 ? 'Go To Game Dashboard' : ''" [attr.aria-label]="getAriaLabel(item)">
+      <!-- Game Header -->
+      <div class="game-header">
+        <div class="venue-info">
+          <span class="arena-name">{{ item.arena_name }}</span>
+          @if (item.rink_name) {
+          <span class="rink-name">{{ item.rink_name }}</span>
           }
         </div>
-
-        <!-- Hover Overlay for Live Games -->
-        @if (item.status === 2) {
-          <div class="hover-overlay">
-            <div class="overlay-content">
-              <span class="material-symbols-rounded overlay-icon">dashboard</span>
-              <span class="overlay-text">View Game Dashboard</span>
-            </div>
+        <div class="header-right">
+          <!-- Hover Text for Live Games -->
+          @if (item.status === 2) {
+          <div class="hover-text">
+            <span class="material-symbols-rounded hover-icon">dashboard</span>
+            <span class="hover-text-label">View Game Dashboard</span>
           </div>
-        }
+          }
+          <!-- Status Badge -->
+          <div class="status-badge" [class.live-badge]="item.status === 2" [class.upcoming-badge]="item.status === 1"
+            [class.completed-badge]="item.status === 3">
+            @if (item.status === 2) {
+            <span class="live-indicator"></span>
+            <span class="status-text">LIVE</span>
+            } @else if (item.status === 1) {
+            <span class="status-text">UPCOMING</span>
+            } @else {
+            <span class="status-text">FINAL</span>
+            }
+          </div>
+        </div>
       </div>
-    }
+
+      <!-- Teams Section -->
+      <div class="teams-section" [class.hidden-on-scroll]="isScrolled()">
+        <!-- Away Team -->
+        <div class="team-row" [class.winning]="isWinning(item, false)">
+          <div class="team-info">
+            <img [src]="getTeamLogoUrl(item.away_team_id)" [alt]="item.away_team_name" class="team-logo" />
+            <span class="team-name" (click)="goToTeamProfile(item.away_team_id)" (keyup.enter)="goToTeamProfile(item.away_team_id)"
+              (keyup.space)="goToTeamProfile(item.away_team_id)" tabindex="0" role="button"
+              [attr.aria-label]="'View ' + getTeamDisplay(item.away_team_abbreviation, item.away_team_name) + ' profile'">{{
+              getTeamDisplay(item.away_team_abbreviation, item.away_team_name)
+              }}</span>
+          </div>
+          <span class="score" [class.winning-score]="isWinning(item, false)">{{ item.away_goals }}</span>
+        </div>
+
+        <!-- Home Team -->
+        <div class="team-row" [class.winning]="isWinning(item, true)">
+          <div class="team-info">
+            <img [src]="getTeamLogoUrl(item.home_team_id)" [alt]="item.home_team_name" class="team-logo" />
+            <span class="team-name" (click)="goToTeamProfile(item.home_team_id)" (keyup.enter)="goToTeamProfile(item.home_team_id)"
+              (keyup.space)="goToTeamProfile(item.home_team_id)" tabindex="0" role="button"
+              [attr.aria-label]="'View ' + getTeamDisplay(item.home_team_abbreviation, item.home_team_name) + ' profile'">{{
+              getTeamDisplay(item.home_team_abbreviation, item.home_team_name)
+              }}</span>
+          </div>
+          <span class="score" [class.winning-score]="isWinning(item, true)">{{ item.home_goals }}</span>
+        </div>
+      </div>
+
+      <!-- Time/Date Footer -->
+      <div class="game-footer" [class.hidden-on-scroll]="isScrolled()">
+        <div class="footer-left">
+          @if (item.status !== 1 && item.game_period_name) {
+          <span class="period-badge">{{ item.game_period_name }}</span>
+          }
+        </div>
+      </div>
+
     </div>
+    }
+  </div>
   }
 </div>

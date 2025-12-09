@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable, throwError, forkJoin } from 'rxjs';
-import { map, catchError, switchMap } from 'rxjs/operators';
+import { map, catchError, switchMap, shareReplay } from 'rxjs/operators';
 import { Team, TeamTableData, TeamApiOut, TeamSeasonOut, TeamSeasonStat } from '../shared/interfaces/team.interface';
 import { ApiService } from './api.service';
 import { TeamDataMapperService } from './team-data-mapper.service';
@@ -13,9 +13,23 @@ export class TeamService {
   private apiService = inject(ApiService);
   private teamDataMapper = inject(TeamDataMapperService);
   private seasonService = inject(SeasonService);
+  private teamsCache$: Observable<TeamTableData> | null = null;
+
+  /**
+   * Clear the teams cache to force a fresh fetch on next getTeams() call
+   */
+  private clearTeamsCache(): void {
+    this.teamsCache$ = null;
+  }
 
   getTeams(): Observable<TeamTableData> {
-    return this.apiService.get<TeamApiOut[]>('/hockey/team/list').pipe(
+    // If there's already a cached Observable, return it
+    if (this.teamsCache$) {
+      return this.teamsCache$;
+    }
+
+    // Create and cache the Observable
+    this.teamsCache$ = this.apiService.get<TeamApiOut[]>('/hockey/team/list').pipe(
       map((apiTeams) => {
         const teams = this.teamDataMapper.fromApiOutArrayFormat(apiTeams);
         return {
@@ -25,9 +39,14 @@ export class TeamService {
       }),
       catchError((error) => {
         console.error('Failed to fetch teams:', error);
+        // Clear cache on error so next call will retry
+        this.teamsCache$ = null;
         return throwError(() => error);
-      })
+      }),
+      shareReplay(1)
     );
+
+    return this.teamsCache$;
   }
 
   getTeamById(id: string): Observable<Team | undefined> {
@@ -57,6 +76,7 @@ export class TeamService {
 
     return this.apiService.delete<void>(`/hockey/team/${numericId}`).pipe(
       map(() => {
+        this.clearTeamsCache(); // Clear cache after deletion
         return true;
       }),
       catchError((error) => {
@@ -93,6 +113,7 @@ export class TeamService {
 
     return this.apiService.postMultipart<{ id: number }>('/hockey/team', formData).pipe(
       map((response) => {
+        this.clearTeamsCache(); // Clear cache after adding
         // Create a complete team object with the returned ID
         const newTeam: Team = {
           id: response.id.toString(),
@@ -164,6 +185,7 @@ export class TeamService {
 
     return this.apiService.patchMultipart<void>(`/hockey/team/${numericId}`, formData).pipe(
       switchMap(() => {
+        this.clearTeamsCache(); // Clear cache after update
         // After successful update, fetch the updated team data
         return this.getTeamById(id);
       }),

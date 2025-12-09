@@ -17,9 +17,9 @@ export class TeamDataMapperService {
       id: apiTeam.id.toString(),
       name: apiTeam.name,
       group: apiTeam.age_group || '1U', // Use age_group as group
-      level: this.teamOptionsService.getLevelName(apiTeam.level_id),
+      level: apiTeam.level_name || this.teamOptionsService.getLevelName(apiTeam.level_id), // Use level_name from API if available
       levelId: apiTeam.level_id, // Store ID for form selection
-      division: this.teamOptionsService.getDivisionName(apiTeam.division_id),
+      division: this.teamOptionsService.getDivisionName(apiTeam.division_id), // Keep using service for division until division_name is available
       divisionId: apiTeam.division_id, // Store ID for form selection
       city: apiTeam.city || '',
       abbreviation: apiTeam.abbreviation,

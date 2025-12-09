@@ -51,7 +51,15 @@
                   <img [src]="game.awayTeamLogo" [alt]="game.awayTeam" class="dashboard-team-logo" />
                   }
                           @if (game.awayTeamId) {
-                            <a class="dashboard-team-name" (click)="goToTeamProfile(game.awayTeamId!)" [attr.href]="'/teams-and-rosters/teams/team-profile/' + game.awayTeamId">{{ game.awayTeam }}</a>
+                            <span 
+                              class="dashboard-team-name dashboard-team-link"
+                              (click)="goToTeamProfile(game.awayTeamId!)"
+                              (keyup.enter)="goToTeamProfile(game.awayTeamId!)"
+                              (keyup.space)="goToTeamProfile(game.awayTeamId!)"
+                              tabindex="0"
+                              role="button"
+                              [attr.aria-label]="'View ' + game.awayTeam + ' profile'"
+                            >{{ game.awayTeam }}</span>
                           } @else {
                   <span class="dashboard-team-name">{{ game.awayTeam }}</span>
                           }
@@ -62,7 +70,15 @@
                   <img [src]="game.homeTeamLogo" [alt]="game.homeTeam" class="dashboard-team-logo" />
                   }
                           @if (game.homeTeamId) {
-                            <a class="dashboard-team-name" (click)="goToTeamProfile(game.homeTeamId!)" [attr.href]="'/teams-and-rosters/teams/team-profile/' + game.homeTeamId">{{ game.homeTeam }}</a>
+                            <span 
+                              class="dashboard-team-name dashboard-team-link"
+                              (click)="goToTeamProfile(game.homeTeamId!)"
+                              (keyup.enter)="goToTeamProfile(game.homeTeamId!)"
+                              (keyup.space)="goToTeamProfile(game.homeTeamId!)"
+                              tabindex="0"
+                              role="button"
+                              [attr.aria-label]="'View ' + game.homeTeam + ' profile'"
+                            >{{ game.homeTeam }}</span>
                           } @else {
                   <span class="dashboard-team-name">{{ game.homeTeam }}</span>
                           }

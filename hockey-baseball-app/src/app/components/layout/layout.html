@@ -2,15 +2,12 @@
   <!-- Left Navigation Panel -->
   <div [class]="'flex flex-col transition-all duration-300 bg-sidebar-dark relative ' + (isCollapsed() ? 'w-20' : 'w-64')">
     <!-- Logo and Menu Header -->
-    <div class="px-4 border-b border-sidebar-border flex items-center" style="height: 143px;">
+    <div class="logo-header">
       <div class="flex items-center justify-between w-full">
         <div class="flex items-center space-x-3">
           <img src="assets/logo-circle.png" fetchpriority="high" loading="eager" alt="Slapshot Labs"
-            class="logo-image rounded object-contain flex-shrink-0"
-            [class.h-12]="isCollapsed()"
-            [class.w-12]="isCollapsed()"
-            [class.h-16]="!isCollapsed()"
-            [class.w-16]="!isCollapsed()" />
+            class="logo-image"
+            [class.logo-collapsed]="isCollapsed()" />
           @if (!isCollapsed()) {
           <div class="flex flex-col logo-text-container">
             <span class="text-custom-primary leading-tight uppercase logo-text-line logo-text-primary">SLAPSHOT</span>
@@ -62,7 +59,7 @@
 
         <!-- Submenu -->
         @if (item.children && item.expanded && !isCollapsed()) {
-        <div class="ml-6 mt-1 space-y-1 border-l border-sidebar-border pl-4">
+        <div class="ml-6 mt-1 border-l border-sidebar-border pl-4">
           @for (child of item.children; track child.path) {
           <a [href]="child.path" matRipple [matRippleColor]="getRippleColor()" (click)="handleNavigationClick($event, child.path)"
             (auxclick)="handleNavigationClick($event, child.path)" [class]="

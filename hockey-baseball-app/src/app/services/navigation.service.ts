@@ -57,7 +57,7 @@ export class NavigationService {
       {
         label: 'Analytics',
         path: '/analytics',
-        icon: 'analytics',
+        icon: 'bar_chart',
       },
       {
         label: 'Video Library',
@@ -72,7 +72,7 @@ export class NavigationService {
       {
         label: 'GAMESHEET',
         path: '/gamesheet',
-        icon: 'gamesheet',
+        icon: 'scoreboard',
       },
     ];
 

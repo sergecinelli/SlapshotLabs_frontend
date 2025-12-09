@@ -412,8 +412,8 @@ export class ScheduleFormModalComponent implements OnInit {
       // Fallback: extract from mapped strings (less reliable)
       const awayTeamId = this.extractIdFromString(schedule.awayTeam);
       const homeTeamId = this.extractIdFromString(schedule.homeTeam);
-      const awayGoalieId = this.extractIdFromString(schedule.awayTeamGoalie);
-      const homeGoalieId = this.extractIdFromString(schedule.homeTeamGoalie);
+      const awayGoalieId = schedule.awayTeamGoalie ? this.extractIdFromString(schedule.awayTeamGoalie) : '';
+      const homeGoalieId = schedule.homeTeamGoalie ? this.extractIdFromString(schedule.homeTeamGoalie) : '';
       const rinkId = this.extractIdFromString(schedule.rink);
 
       // Find the arena for this rink
@@ -440,7 +440,7 @@ export class ScheduleFormModalComponent implements OnInit {
         awayTeamGoalie: awayGoalieId,
         homeTeamGoalie: homeGoalieId,
         date: schedule.date,
-        time: this.convertTo12Hour(schedule.time),
+        time: schedule.time ? this.convertTo12Hour(schedule.time) : '',
         arena: arenaId,
         rink: rinkId,
         tournamentName: schedule.tournamentName || '',

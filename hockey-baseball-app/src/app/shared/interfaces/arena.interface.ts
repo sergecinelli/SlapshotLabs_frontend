@@ -2,6 +2,7 @@ export interface Arena {
   id: number;
   name: string;
   address?: string;
+  arena_address?: string;
   city?: string;
   province?: string;
   postalCode?: string;

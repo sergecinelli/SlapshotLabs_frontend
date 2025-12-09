@@ -96,6 +96,9 @@ export interface Player {
   id: string;
   teamId?: number; // Team ID from API
   team: string;
+  teamLogo?: string; // Team logo URL
+  teamAgeGroup?: string; // Team age group
+  teamLevelName?: string; // Team level name
   position: 'Left Wing' | 'Center' | 'Right Wing' | 'Left Defense' | 'Right Defense' | 'Goalie';
   height: string; // e.g., "5'6""
   weight: number; // in lbs

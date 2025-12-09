@@ -1,8 +1,8 @@
 import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
 import { Router } from '@angular/router';
-import { DataTableComponent, TableColumn, TableAction } from '../../shared/components/data-table/data-table';
 import { TeamService } from '../../services/team.service';
 import { Team } from '../../shared/interfaces/team.interface';
 import { TeamFormModalComponent, TeamFormModalData } from '../../shared/components/team-form-modal/team-form-modal';
@@ -17,42 +17,211 @@ import { forkJoin } from 'rxjs';
   standalone: true,
   imports: [
     CommonModule,
-    DataTableComponent,
     MatDialogModule,
+    MatIconModule,
     ComponentVisibilityByRoleDirective,
     ButtonComponent,
   ],
   template: `
     <div class="page-content" [appVisibilityMap]="visibilityByRoleMap">
 
-      <!-- Add Team Button -->
-      <div class="mb-4 flex justify-end" role-visibility-name="add-team-button">
-        <app-button
-          materialIcon="add"
-          [bg]="'primary'"
-          [bghover]="'primary_dark'"
-          [color]="'white'"
-          [colorhover]="'white'"
-          [opacity]="1"
-          [opacityhover]="1"
-          [width]="'auto'"
-          [rounded]="false"
-          [haveContent]="true"
-          (clicked)="openAddTeamModal()"
-        >
-          Add a Team
-        </app-button>
+      <!-- Header with Add Button -->
+      <div class="teams-header">
+        <div class="teams-header-left"></div>
+        <div class="add-team-button-wrapper" role-visibility-name="add-team-button">
+          <app-button
+            materialIcon="add"
+            [bg]="'primary'"
+            [bghover]="'primary_dark'"
+            [color]="'white'"
+            [colorhover]="'white'"
+            [opacity]="1"
+            [opacityhover]="1"
+            [width]="'auto'"
+            [rounded]="false"
+            [haveContent]="true"
+            (clicked)="openAddTeamModal()"
+          >
+            Add a Team
+          </app-button>
+        </div>
       </div>
 
-      <app-data-table
-        [columns]="tableColumns"
-        [data]="teams()"
-        [actions]="tableActions"
-        [loading]="loading()"
-        (actionClick)="onActionClick($event)"
-        (sort)="onSort($event)"
-        emptyMessage="No teams found."
-      ></app-data-table>
+      <!-- Loading State -->
+      @if (loading()) {
+        <div class="teams-loading">
+          <div class="loading-text">Loading teams...</div>
+        </div>
+      }
+
+      <!-- Empty State -->
+      @if (!loading() && teams().length === 0) {
+        <div class="teams-empty">
+          <div class="empty-text">No teams found.</div>
+        </div>
+      }
+
+      <!-- Team Cards -->
+      @if (!loading() && teams().length > 0) {
+        <div class="teams-cards-container">
+          @for (team of teams(); track team.id) {
+            <div class="team-card">
+              <!-- Card Header -->
+              <div class="team-card-header">
+                <div class="header-left">
+                  <div class="team-name-row">
+                    @if (team.logo) {
+                      <img [src]="team.logo" [alt]="team.name" class="team-logo" />
+                    } @else {
+                      <div class="team-logo-placeholder"></div>
+                    }
+                    <div class="team-name-group">
+                      <div 
+                        class="team-name team-link"
+                        (click)="viewTeamProfile(team)"
+                        (keyup.enter)="viewTeamProfile(team)"
+                        (keyup.space)="viewTeamProfile(team)"
+                        tabindex="0"
+                        role="button"
+                        [attr.aria-label]="'View ' + team.name + ' profile'"
+                      >{{ team.name }}</div>
+                      @if (team.abbreviation) {
+                        <div class="team-abbreviation">{{ team.abbreviation }}</div>
+                      }
+                    </div>
+                  </div>
+                  <div class="team-info-row">
+                    <div class="team-info-item">
+                      <span class="team-info-label">Group:</span>
+                      <span class="team-info-value">{{ team.group }}</span>
+                    </div>
+                    <div class="team-info-item">
+                      <span class="team-info-label">Level:</span>
+                      <span class="team-info-value">{{ team.level }}</span>
+                    </div>
+                    @if (team.division) {
+                      <div class="team-info-item">
+                        <span class="team-info-label">Division:</span>
+                        <span class="team-info-value">{{ team.division }}</span>
+                      </div>
+                    }
+                    @if (team.city) {
+                      <div class="team-info-item">
+                        <span class="team-info-label">City:</span>
+                        <span class="team-info-value">{{ team.city }}</span>
+                      </div>
+                    }
+                  </div>
+                </div>
+              </div>
+
+              <!-- Stats Section -->
+              <div class="team-stats-section">
+                <div class="stats-grid">
+                  <div class="stat-item">
+                    <div class="stat-label">GP</div>
+                    <div class="stat-value">{{ team.gamesPlayed }}</div>
+                  </div>
+                  <div class="stat-item">
+                    <div class="stat-label">W</div>
+                    <div class="stat-value">{{ team.wins }}</div>
+                  </div>
+                  <div class="stat-item">
+                    <div class="stat-label">L</div>
+                    <div class="stat-value">{{ team.losses }}</div>
+                  </div>
+                  <div class="stat-item">
+                    <div class="stat-label">T</div>
+                    <div class="stat-value">{{ team.ties }}</div>
+                  </div>
+                  <div class="stat-item">
+                    <div class="stat-label">PTS</div>
+                    <div class="stat-value stat-value-highlight">{{ team.points }}</div>
+                  </div>
+                  <div class="stat-item">
+                    <div class="stat-label">GF</div>
+                    <div class="stat-value">{{ team.goalsFor }}</div>
+                  </div>
+                  <div class="stat-item">
+                    <div class="stat-label">GA</div>
+                    <div class="stat-value">{{ team.goalsAgainst }}</div>
+                  </div>
+                  <div class="stat-item">
+                    <div class="stat-label">GD</div>
+                    <div class="stat-value">{{ team.goalsFor - team.goalsAgainst }}</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="team-card-actions">
+                <app-button
+                  [bg]="'secondary'"
+                  [bghover]="'secondary_tone1'"
+                  [color]="'white'"
+                  [colorhover]="'white'"
+                  [materialIcon]="'people'"
+                  [haveContent]="true"
+                  (clicked)="viewTeamPlayers(team)"
+                  class="action-button"
+                >
+                  Players
+                </app-button>
+                <app-button
+                  [bg]="'secondary'"
+                  [bghover]="'secondary_tone1'"
+                  [color]="'white'"
+                  [colorhover]="'white'"
+                  [materialIcon]="'sports_hockey'"
+                  [haveContent]="true"
+                  (clicked)="viewTeamGoalies(team)"
+                  class="action-button"
+                >
+                  Goalies
+                </app-button>
+                <app-button
+                  [bg]="'green'"
+                  [bghover]="'green'"
+                  [color]="'white'"
+                  [colorhover]="'white'"
+                  [materialIcon]="'visibility'"
+                  [haveContent]="true"
+                  (clicked)="viewTeamProfile(team)"
+                  class="action-button"
+                >
+                  View
+                </app-button>
+                <app-button
+                  [bg]="'orange'"
+                  [bghover]="'orange'"
+                  [color]="'white'"
+                  [colorhover]="'white'"
+                  materialIcon="stylus"
+                  [haveContent]="true"
+                  (clicked)="editTeam(team)"
+                  class="action-button"
+                  role-visibility-name="edit-action"
+                >
+                  Edit
+                </app-button>
+                <app-button
+                  [bg]="'primary'"
+                  [bghover]="'primary_dark'"
+                  [color]="'white'"
+                  [colorhover]="'white'"
+                  [materialIcon]="'delete'"
+                  [haveContent]="true"
+                  (clicked)="deleteTeam(team)"
+                  class="action-button"
+                  role-visibility-name="delete-action"
+                >
+                  Delete
+                </app-button>
+              </div>
+            </div>
+          }
+        </div>
+      }
     </div>
   `,
   styleUrl: './teams.scss',
@@ -68,34 +237,6 @@ export class TeamsComponent implements OnInit {
 
   teams = signal<Team[]>([]);
   loading = signal(true);
-
-  tableColumns: TableColumn[] = [
-    { key: 'name', label: 'Team Name', sortable: true, width: '150px' },
-    { key: 'group', label: 'Group', sortable: true, width: '100px' },
-    { key: 'level', label: 'Level', sortable: true, type: 'dropdown', width: '100px' },
-    { key: 'division', label: 'Division', sortable: true, type: 'dropdown', width: '100px' },
-    { key: 'gamesPlayed', label: 'GP', sortable: true, type: 'number', width: '60px' },
-    { key: 'wins', label: 'Wins', sortable: true, type: 'number', width: '70px' },
-    { key: 'losses', label: 'Losses', sortable: true, type: 'number', width: '75px' },
-    { key: 'ties', label: 'Ties', sortable: true, type: 'number', width: '60px' },
-    { key: 'points', label: 'Points', sortable: true, type: 'number', width: '75px' },
-    { key: 'goalsFor', label: 'Goals For', sortable: true, type: 'number', width: '90px' },
-    { key: 'goalsAgainst', label: 'Goals Against', sortable: true, type: 'number', width: '110px' },
-  ];
-
-  tableActions: TableAction[] = [
-    {
-      label: 'Delete', action: 'delete', variant: 'danger', roleVisibilityName: 'delete-action',
-      roleVisibilityTeamId: (item: Record<string, unknown>) => item['id']?.toString() ?? '',
-    },
-    {
-      label: 'Edit', action: 'edit', variant: 'secondary', roleVisibilityName: 'edit-action',
-      roleVisibilityTeamId: (item: Record<string, unknown>) => item['id']?.toString() ?? '',
-    },
-    { label: 'View', action: 'view-profile', variant: 'primary' },
-    { label: 'Players', action: 'players', variant: 'secondary' },
-    { label: 'Goalies', action: 'goalies', variant: 'secondary' },
-  ];
 
   ngOnInit(): void {
     // Load team options first to populate the mapping, then load teams
@@ -132,50 +273,6 @@ export class TeamsComponent implements OnInit {
     });
   }
 
-  onActionClick(event: { action: string; item: Team }): void {
-    const { action, item } = event;
-
-    switch (action) {
-      case 'delete':
-        this.deleteTeam(item);
-        break;
-      case 'edit':
-        this.editTeam(item);
-        break;
-      case 'view-profile':
-        this.viewTeamProfile(item);
-        break;
-      case 'players':
-        this.viewTeamPlayers(item);
-        break;
-      case 'goalies':
-        this.viewTeamGoalies(item);
-        break;
-      default:
-        console.log(`Unknown action: ${action}`);
-    }
-  }
-
-  onSort(event: { column: string; direction: 'asc' | 'desc' }): void {
-    const { column, direction } = event;
-    const sortedTeams = [...this.teams()].sort((a, b) => {
-      const aValue = this.getNestedValue(a, column);
-      const bValue = this.getNestedValue(b, column);
-
-      if (aValue === bValue) return 0;
-
-      const result = (aValue as string | number) < (bValue as string | number) ? -1 : 1;
-      return direction === 'asc' ? result : -result;
-    });
-
-    this.teams.set(sortedTeams);
-  }
-
-  private getNestedValue(obj: Team, path: string): unknown {
-    return path
-      .split('.')
-      .reduce((current: unknown, key: string) => (current as Record<string, unknown>)?.[key], obj);
-  }
 
   private sortByDate(teams: Team[], direction: 'asc' | 'desc'): Team[] {
     return [...teams].sort((a, b) => {
@@ -187,7 +284,7 @@ export class TeamsComponent implements OnInit {
     });
   }
 
-  private deleteTeam(team: Team): void {
+  deleteTeam(team: Team): void {
     if (confirm(`Are you sure you want to delete ${team.name}?`)) {
       this.teamService.deleteTeam(team.id).subscribe({
         next: (success) => {
@@ -219,11 +316,11 @@ export class TeamsComponent implements OnInit {
     }
   }
 
-  private viewTeamProfile(team: Team): void {
+  viewTeamProfile(team: Team): void {
     this.router.navigate(['/teams-and-rosters/teams/team-profile', team.id]);
   }
 
-  private viewTeamPlayers(team: Team): void {
+  viewTeamPlayers(team: Team): void {
     this.router.navigate(['/teams-and-rosters/players'], {
       queryParams: {
         teamId: team.id,
@@ -232,7 +329,7 @@ export class TeamsComponent implements OnInit {
     });
   }
 
-  private viewTeamGoalies(team: Team): void {
+  viewTeamGoalies(team: Team): void {
     this.router.navigate(['/teams-and-rosters/goalies'], {
       queryParams: {
         teamId: team.id,
@@ -259,7 +356,7 @@ export class TeamsComponent implements OnInit {
     });
   }
 
-  private editTeam(team: Team): void {
+  editTeam(team: Team): void {
     const dialogRef = this.dialog.open(TeamFormModalComponent, {
       width: '800px',
       maxWidth: '95vw',

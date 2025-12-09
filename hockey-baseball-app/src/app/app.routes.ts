@@ -131,7 +131,7 @@ export const routes: Routes = [
         },
       },
       {
-        path: 'player-profile/:id',
+        path: 'teams-and-rosters/players/player-profile/:id',
         loadComponent: () => import('./pages/player-profile/player-profile').then((m) => m.PlayerProfileComponent),
         canActivate: [RoleAccessGuard],
         data: {
@@ -139,7 +139,7 @@ export const routes: Routes = [
         },
       },
       {
-        path: 'goalie-profile/:id',
+        path: 'teams-and-rosters/goalies/goalie-profile/:id',
         loadComponent: () => import('./pages/goalie-profile/goalie-profile').then((m) => m.GoalieProfileComponent),
         canActivate: [RoleAccessGuard],
         data: {

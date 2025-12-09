@@ -1,12 +1,8 @@
 import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
 import { ActivatedRoute, Router } from '@angular/router';
-import {
-  DataTableComponent,
-  TableColumn,
-  TableAction,
-} from '../../shared/components/data-table/data-table';
 import { PlayerService } from '../../services/player.service';
 import { TeamService } from '../../services/team.service';
 import { Player } from '../../shared/interfaces/player.interface';
@@ -24,42 +20,230 @@ import { visibilityByRoleMap } from './players.role-map';
   standalone: true,
   imports: [
     CommonModule,
-    DataTableComponent,
     MatDialogModule,
+    MatIconModule,
     ComponentVisibilityByRoleDirective,
     ButtonComponent,
   ],
   template: `
     <div class="page-content" [appVisibilityMap]="visibilityByRoleMap">
 
-      <!-- Add Player Button -->
-      <div class="mb-4 flex justify-end" role-visibility-name="add-player-button" [attr.role-visibility-team-id]="teamId()">
-        <app-button
-          materialIcon="add"
-          [bg]="'primary'"
-          [bghover]="'primary_dark'"
-          [color]="'white'"
-          [colorhover]="'white'"
-          [opacity]="1"
-          [opacityhover]="1"
-          [width]="'auto'"
-          [rounded]="false"
-          [haveContent]="true"
-          (clicked)="openAddPlayerModal()"
-        >
-          Add a Player
-        </app-button>
+      <!-- Header with Add Button -->
+      <div class="players-header">
+        <div class="players-header-left"></div>
+        <div class="add-player-button-wrapper" role-visibility-name="add-player-button" [attr.role-visibility-team-id]="teamId()">
+          <app-button
+            materialIcon="add"
+            [bg]="'primary'"
+            [bghover]="'primary_dark'"
+            [color]="'white'"
+            [colorhover]="'white'"
+            [opacity]="1"
+            [opacityhover]="1"
+            [width]="'auto'"
+            [rounded]="false"
+            [haveContent]="true"
+            (clicked)="openAddPlayerModal()"
+          >
+            Add a Player
+          </app-button>
+        </div>
       </div>
 
-      <app-data-table
-        [columns]="tableColumns()"
-        [data]="players()"
-        [actions]="tableActions"
-        [loading]="loading()"
-        (actionClick)="onActionClick($event)"
-        (sort)="onSort($event)"
-        emptyMessage="No players found."
-      ></app-data-table>
+      <!-- Loading State -->
+      @if (loading()) {
+        <div class="players-loading">
+          <div class="loading-text">Loading players...</div>
+        </div>
+      }
+
+      <!-- Empty State -->
+      @if (!loading() && players().length === 0) {
+        <div class="players-empty">
+          <div class="empty-text">No players found.</div>
+        </div>
+      }
+
+      <!-- Player Cards -->
+      @if (!loading() && players().length > 0) {
+        <div class="players-cards-container">
+          @for (player of players(); track player.id) {
+            <div class="player-card">
+              <!-- Card Header -->
+              <div class="player-card-header">
+                <div class="header-left">
+                  <div class="player-name-row">
+                    @if (player.teamLogo) {
+                      <img [src]="player.teamLogo" [alt]="player.team" class="team-logo" />
+                    } @else {
+                      <div class="team-logo-placeholder"></div>
+                    }
+                    <div class="player-name-group">
+                      <div 
+                        class="player-name player-link"
+                        (click)="viewPlayerProfile(player)"
+                        (keyup.enter)="viewPlayerProfile(player)"
+                        (keyup.space)="viewPlayerProfile(player)"
+                        tabindex="0"
+                        role="button"
+                        [attr.aria-label]="'View ' + player.firstName + ' ' + player.lastName + ' profile'"
+                      >{{ player.firstName }} {{ player.lastName }}</div>
+                      @if (player.jerseyNumber) {
+                        <div class="player-jersey">#{{ player.jerseyNumber }}</div>
+                      }
+                    </div>
+                  </div>
+                  <div class="player-info-row">
+                    <div class="player-info-item">
+                      <span class="player-info-label">Position:</span>
+                      <span class="player-info-value">{{ player.position }}</span>
+                    </div>
+                    @if (player.height) {
+                      <div class="player-info-item">
+                        <span class="player-info-label">Height:</span>
+                        <span class="player-info-value">{{ player.height }}</span>
+                      </div>
+                    }
+                    @if (player.weight) {
+                      <div class="player-info-item">
+                        <span class="player-info-label">Weight:</span>
+                        <span class="player-info-value">{{ player.weight }} lbs</span>
+                      </div>
+                    }
+                    @if (player.shoots) {
+                      <div class="player-info-item">
+                        <span class="player-info-label">Shoots:</span>
+                        <span class="player-info-value">{{ player.shoots }}</span>
+                      </div>
+                    }
+                    @if (player.team) {
+                      <div class="player-info-item">
+                        <span class="player-info-label">Team:</span>
+                        <div class="team-name-with-logo">
+                          @if (player.teamLogo) {
+                            <img [src]="player.teamLogo" [alt]="player.team" class="team-logo-small" />
+                          }
+                          @if (player.teamId) {
+                            <span
+                              class="player-info-value team-link"
+                              (click)="goToTeamProfile(player.teamId)"
+                              (keyup.enter)="goToTeamProfile(player.teamId)"
+                              (keyup.space)="goToTeamProfile(player.teamId)"
+                              tabindex="0"
+                              role="button"
+                              [attr.aria-label]="'View ' + player.team + ' profile'"
+                            >{{ player.team }}</span>
+                          } @else {
+                            <span class="player-info-value">{{ player.team }}</span>
+                          }
+                        </div>
+                      </div>
+                    }
+                    @if (player.birthYear) {
+                      <div class="player-info-item">
+                        <span class="player-info-label">Birth Year:</span>
+                        <span class="player-info-value">{{ player.birthYear }}</span>
+                      </div>
+                    }
+                  </div>
+                </div>
+              </div>
+
+              <!-- Stats Section -->
+              <div class="player-stats-section">
+                <div class="stats-grid">
+                  <div class="stat-item">
+                    <div class="stat-label">GP</div>
+                    <div class="stat-value">{{ player.gamesPlayed || 0 }}</div>
+                  </div>
+                  <div class="stat-item">
+                    <div class="stat-label">G</div>
+                    <div class="stat-value">{{ player.goals || 0 }}</div>
+                  </div>
+                  <div class="stat-item">
+                    <div class="stat-label">A</div>
+                    <div class="stat-value">{{ player.assists || 0 }}</div>
+                  </div>
+                  <div class="stat-item">
+                    <div class="stat-label">PTS</div>
+                    <div class="stat-value stat-value-highlight">{{ player.points || 0 }}</div>
+                  </div>
+                  <div class="stat-item">
+                    <div class="stat-label">SOG</div>
+                    <div class="stat-value">{{ player.shotsOnGoal || 0 }}</div>
+                  </div>
+                  <div class="stat-item">
+                    <div class="stat-label">SC</div>
+                    <div class="stat-value">{{ player.scoringChances || 0 }}</div>
+                  </div>
+                  <div class="stat-item">
+                    <div class="stat-label">BS</div>
+                    <div class="stat-value">{{ player.blockedShots || 0 }}</div>
+                  </div>
+                  <div class="stat-item">
+                    <div class="stat-label">PD</div>
+                    <div class="stat-value">{{ player.penaltiesDrawn || 0 }}</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="player-card-actions">
+                <app-button
+                  [bg]="'secondary'"
+                  [bghover]="'secondary_tone1'"
+                  [color]="'white'"
+                  [colorhover]="'white'"
+                  [materialIcon]="'scatter_plot'"
+                  [haveContent]="true"
+                  (clicked)="viewShotSprayChart(player)"
+                  class="action-button"
+                >
+                  Spray Chart
+                </app-button>
+                <app-button
+                  [bg]="'green'"
+                  [bghover]="'green'"
+                  [color]="'white'"
+                  [colorhover]="'white'"
+                  [materialIcon]="'visibility'"
+                  [haveContent]="true"
+                  (clicked)="viewPlayerProfile(player)"
+                  class="action-button"
+                >
+                  Profile
+                </app-button>
+                <app-button
+                  [bg]="'orange'"
+                  [bghover]="'orange'"
+                  [color]="'white'"
+                  [colorhover]="'white'"
+                  materialIcon="stylus"
+                  [haveContent]="true"
+                  (clicked)="editPlayer(player)"
+                  class="action-button"
+                  role-visibility-name="edit-action"
+                >
+                  Edit
+                </app-button>
+                <app-button
+                  [bg]="'primary'"
+                  [bghover]="'primary_dark'"
+                  [color]="'white'"
+                  [colorhover]="'white'"
+                  [materialIcon]="'delete'"
+                  [haveContent]="true"
+                  (clicked)="deletePlayer(player)"
+                  class="action-button"
+                  role-visibility-name="delete-action"
+                >
+                  Delete
+                </app-button>
+              </div>
+            </div>
+          }
+        </div>
+      }
     </div>
   `,
   styleUrl: './players.scss',
@@ -81,58 +265,6 @@ export class PlayersComponent implements OnInit {
   teamName = signal<string>('Players');
   pageTitle = signal<string>('Players');
 
-  private allTableColumns: TableColumn[] = [
-    { key: 'team', label: 'Team', sortable: true, type: 'dropdown', width: '100px' },
-    { key: 'position', label: 'Pos', sortable: true, type: 'dropdown', width: '100px' },
-    { key: 'height', label: 'Ht', sortable: true, width: '65px' },
-    { key: 'weight', label: 'Wt', sortable: true, type: 'number', width: '65px' },
-    { key: 'shoots', label: 'Shoots (R/L)', sortable: true, type: 'dropdown', width: '100px' },
-    { key: 'jerseyNumber', label: 'Jersey #', sortable: true, type: 'number', width: '70px' },
-    { key: 'firstName', label: 'First Name', sortable: true, width: '100px' },
-    { key: 'lastName', label: 'Last Name', sortable: true, width: '100px' },
-    { key: 'birthYear', label: 'Birth Year', sortable: true, type: 'number', width: '90px' },
-    { key: 'shotsOnGoal', label: 'SOG', sortable: true, type: 'number', width: '70px' },
-    { key: 'gamesPlayed', label: 'GP', sortable: true, type: 'number', width: '60px' },
-    { key: 'goals', label: 'Goals', sortable: true, type: 'number', width: '70px' },
-    { key: 'assists', label: 'Assists', sortable: true, type: 'number', width: '75px' },
-    { key: 'points', label: 'Pts', sortable: true, type: 'number', width: '60px' },
-    {
-      key: 'scoringChances',
-      label: 'Scoring Chances',
-      sortable: true,
-      type: 'number',
-      width: '120px',
-    },
-    { key: 'blockedShots', label: 'Blocked Shots', sortable: true, type: 'number', width: '110px' },
-    {
-      key: 'penaltiesDrawn',
-      label: 'Penalties Drawn',
-      sortable: true,
-      type: 'number',
-      width: '120px',
-    },
-  ];
-
-  tableColumns = signal<TableColumn[]>(this.allTableColumns);
-
-  tableActions: TableAction[] = [
-    {
-      label: 'Delete', action: 'delete', variant: 'danger', roleVisibilityName: 'delete-action',
-      roleVisibilityTeamId: (item: Record<string, unknown>) => item['teamId']?.toString() ?? '',
-    },
-    {
-      label: 'Edit', action: 'edit', variant: 'secondary', roleVisibilityName: 'edit-action',
-      roleVisibilityTeamId: (item: Record<string, unknown>) => item['teamId']?.toString() ?? '',
-    },
-    { label: 'Profile', action: 'view-profile', variant: 'primary' },
-    {
-      label: 'Spray Chart',
-      icon: 'spray-chart',
-      action: 'shot-spray-chart',
-      variant: 'secondary',
-    },
-  ];
-
   ngOnInit(): void {
     // Check for teamId query parameter
     this.route.queryParams.subscribe((params) => {
@@ -145,15 +277,11 @@ export class PlayersComponent implements OnInit {
           this.teamName.set(teamName);
           this.pageTitle.set(`Players | ${teamName}`);
         }
-        // Hide team column when viewing team-specific players
-        this.tableColumns.set(this.allTableColumns.filter((col) => col.key !== 'team'));
         this.loadPlayersByTeam(parseInt(teamId, 10));
       } else {
         this.teamId.set(null);
         this.teamName.set('Players');
         this.pageTitle.set('Players');
-        // Show all columns including team
-        this.tableColumns.set(this.allTableColumns);
         this.loadPlayers();
       }
     });
@@ -163,12 +291,28 @@ export class PlayersComponent implements OnInit {
     this.loading.set(true);
     this.playerService.getPlayers().subscribe({
       next: (data) => {
-        // Sort by creation date (newest to oldest) by default
-        const sortedPlayers = this.sortByDate(data.players, 'desc');
-        this.players.set(sortedPlayers);
-        this.loading.set(false);
-        // Fetch all teams separately for modals
-        this.loadTeams();
+        // Load teams first to get team data for mapping
+        this.loadTeams(() => {
+          // Map players with team information
+          const mappedPlayers = data.players.map((player) => {
+            if (player.teamId) {
+              const team = this.teams.find((t) => parseInt(t.id) === player.teamId);
+              if (team) {
+                return {
+                  ...player,
+                  teamLogo: team.logo,
+                  teamAgeGroup: team.group,
+                  teamLevelName: team.level,
+                };
+              }
+            }
+            return player;
+          });
+          // Sort by creation date (newest to oldest) by default
+          const sortedPlayers = this.sortByDate(mappedPlayers, 'desc');
+          this.players.set(sortedPlayers);
+          this.loading.set(false);
+        });
       },
       error: (error) => {
         console.error('Error loading players:', error);
@@ -181,12 +325,28 @@ export class PlayersComponent implements OnInit {
     this.loading.set(true);
     this.playerService.getPlayersByTeam(teamId).subscribe({
       next: (players) => {
-        // Sort by creation date (newest to oldest) by default
-        const sortedPlayers = this.sortByDate(players, 'desc');
-        this.players.set(sortedPlayers);
-        this.loading.set(false);
-        // Fetch all teams separately for modals
-        this.loadTeams();
+        // Load teams first to get team data for mapping
+        this.loadTeams(() => {
+          // Map players with team information
+          const mappedPlayers = players.map((player) => {
+            if (player.teamId) {
+              const team = this.teams.find((t) => parseInt(t.id) === player.teamId);
+              if (team) {
+                return {
+                  ...player,
+                  teamLogo: team.logo,
+                  teamAgeGroup: team.group,
+                  teamLevelName: team.level,
+                };
+              }
+            }
+            return player;
+          });
+          // Sort by creation date (newest to oldest) by default
+          const sortedPlayers = this.sortByDate(mappedPlayers, 'desc');
+          this.players.set(sortedPlayers);
+          this.loading.set(false);
+        });
       },
       error: (error) => {
         console.error('Error loading players for team:', error);
@@ -195,58 +355,23 @@ export class PlayersComponent implements OnInit {
     });
   }
 
-  private loadTeams(): void {
+  private loadTeams(callback?: () => void): void {
     this.teamService.getTeams().subscribe({
       next: (data) => {
         this.teams = data.teams;
+        if (callback) {
+          callback();
+        }
       },
       error: (error) => {
         console.error('Error loading teams:', error);
+        if (callback) {
+          callback();
+        }
       },
     });
   }
 
-  onActionClick(event: { action: string; item: Player }): void {
-    const { action, item } = event;
-
-    switch (action) {
-      case 'delete':
-        this.deletePlayer(item);
-        break;
-      case 'edit':
-        this.editPlayer(item);
-        break;
-      case 'view-profile':
-        this.viewPlayerProfile(item);
-        break;
-      case 'shot-spray-chart':
-        this.viewShotSprayChart(item);
-        break;
-      default:
-        console.log(`Unknown action: ${action}`);
-    }
-  }
-
-  onSort(event: { column: string; direction: 'asc' | 'desc' }): void {
-    const { column, direction } = event;
-    const sortedPlayers = [...this.players()].sort((a, b) => {
-      const aValue = this.getNestedValue(a, column);
-      const bValue = this.getNestedValue(b, column);
-
-      if (aValue === bValue) return 0;
-
-      const result = (aValue as string | number) < (bValue as string | number) ? -1 : 1;
-      return direction === 'asc' ? result : -result;
-    });
-
-    this.players.set(sortedPlayers);
-  }
-
-  private getNestedValue(obj: Player, path: string): unknown {
-    return path
-      .split('.')
-      .reduce((current: unknown, key: string) => (current as Record<string, unknown>)?.[key], obj);
-  }
 
   private sortByDate(players: Player[], direction: 'asc' | 'desc'): Player[] {
     return [...players].sort((a, b) => {
@@ -258,7 +383,7 @@ export class PlayersComponent implements OnInit {
     });
   }
 
-  private deletePlayer(player: Player): void {
+  deletePlayer(player: Player): void {
     if (confirm(`Are you sure you want to delete ${player.firstName} ${player.lastName}?`)) {
       this.playerService.deletePlayer(player.id).subscribe({
         next: (success) => {
@@ -290,11 +415,15 @@ export class PlayersComponent implements OnInit {
     }
   }
 
-  private viewPlayerProfile(player: Player): void {
-    this.router.navigate(['/player-profile', player.id]);
+  viewPlayerProfile(player: Player): void {
+    this.router.navigate(['/teams-and-rosters/players/player-profile', player.id]);
   }
 
-  private viewShotSprayChart(player: Player): void {
+  goToTeamProfile(teamId: number): void {
+    this.router.navigate([`/teams-and-rosters/teams/team-profile/${teamId}`]);
+  }
+
+  viewShotSprayChart(player: Player): void {
     this.router.navigate(['/spray-chart', player.id], { queryParams: { type: 'player' } });
   }
 
@@ -338,7 +467,7 @@ export class PlayersComponent implements OnInit {
     });
   }
 
-  private editPlayer(player: Player): void {
+  editPlayer(player: Player): void {
     const dialogRef = this.dialog.open(PlayerFormModalComponent, {
       width: '800px',
       maxWidth: '95vw',

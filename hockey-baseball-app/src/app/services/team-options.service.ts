@@ -25,6 +25,7 @@ export class TeamOptionsService {
           this.levelMap.set(level.name, level.id);
           this.levelIdMap.set(level.id, level.name);
         });
+        console.log(levels);
         return levels;
       }),
       catchError((error) => {

@@ -1,12 +1,21 @@
 // Dark sidebar theme colors
 // Using global CSS variables from styles.scss
 
+.logo-header {
+  height: 138px;
+  padding: 0 1rem; // px-4
+  border-bottom: 1px solid var(--sidebar-border);
+  display: flex;
+  align-items: center;
+}
+
 .page-content-wrapper {
   background-color: var(--page-background);
 }
 
 .user-profile-section {
   border-top: 1px solid var(--border-dark);
+  padding: 15px;
 }
 
 .user-avatar {
@@ -48,7 +57,7 @@
 // Collapse button styles
 .collapse-button {
   position: absolute;
-  top: 132px;
+  top: 127px;
   right: 28px;
   width: 24px;
   height: 24px;
@@ -182,11 +191,22 @@ nav::-webkit-scrollbar-thumb:hover {
 }
 
 .logo-image {
+  background-color: white;
+  border-radius: 10px;
+  object-fit: contain;
+  flex-shrink: 0;
+  width: 70px;
+  height: 70px;
   transition:
     width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
     height 0.3s cubic-bezier(0.4, 0, 0.2, 1),
     transform 0.2s ease-in-out;
   will-change: width, height;
+
+  &.logo-collapsed {
+    width: 50px;
+    height: 50px;
+  }
 }
 
 .logo-container:hover .logo-image {
@@ -214,7 +234,6 @@ nav::-webkit-scrollbar-thumb:hover {
 nav {
   display: flex;
   flex-direction: column;
-  gap: 3px;
   background-color: transparent;
   overflow-y: auto;
   overflow-x: hidden;
@@ -223,8 +242,9 @@ nav {
   padding: 10px;
 
   // margin-top: 34px;
-  padding-top: 30px;
-  border-top: 1px solid var(--border-dark);
+  padding-top: 15px;
+  // padding-top: 15px;
+  // border-top: 1px solid var(--border-dark);
 
   // Navigation items text animation - only when menu is expanded
   .nav-item-text {
@@ -258,7 +278,6 @@ nav {
     font-weight: 500;
     padding: 12px;
     white-space: nowrap;
-    margin-bottom: 2px;
     color: #949494;
     text-decoration: none;
     flex-wrap: nowrap !important;
@@ -384,7 +403,7 @@ nav {
   // padding-bottom: 5px;
   display: flex;
   justify-content: space-between;
-  // border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
   background-color: #f5f5f5;
   // height: 160px;
 }

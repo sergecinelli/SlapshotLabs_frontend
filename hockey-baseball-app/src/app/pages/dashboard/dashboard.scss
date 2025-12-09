@@ -79,12 +79,19 @@
   text-decoration: none;
 }
 
-// Only links (a tags) get hover underline and cursor
-a.dashboard-team-name {
+// Only links get hover underline and cursor
+.dashboard-team-link {
   cursor: pointer;
+  transition: text-decoration 0.2s ease;
 
   &:hover {
     text-decoration: underline;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+    border-radius: 2px;
   }
 }
 
