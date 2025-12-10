@@ -121,7 +121,7 @@ export class BreadcrumbsComponent implements OnInit {
   private addEntityTypeBreadcrumb(items: BreadcrumbItem[], entityType: 'player' | 'goalie'): void {
     const entityTypePath =
       entityType === 'player' ? '/teams-and-rosters/players' : '/teams-and-rosters/goalies';
-    const entityTypeLabel = entityType === 'player' ? 'Player' : 'Goalie';
+    const entityTypeLabel = entityType === 'player' ? 'Players' : 'Goalies';
     const entityTypeIcon =
       entityType === 'player'
         ? this.navigationService.getMaterialIcon('players')
