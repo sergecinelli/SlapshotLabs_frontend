@@ -1,6 +1,6 @@
 <a class="app-button" matRipple [matRippleColor]="rippleColor" [matTooltip]="tooltip ?? ''" [matTooltipShowDelay]="tooltipDelay"
   [matTooltipPosition]="tooltipPos" [class.have-content]="haveContent" [class.dev]="dev" [class.rounded]="rounded" [class.fill]="width !== 'auto'"
-  [class.active]="isActive" [ngStyle]="styles" [routerLink]="route" [target]="target" (mousedown)="onMouseDown()" (mouseup)="onMouseUp()"
+  [class.active]="isActive" [ngStyle]="styles" [routerLink]="route" [queryParams]="queryParams" [target]="target" (mousedown)="onMouseDown()" (mouseup)="onMouseUp()"
   (mouseenter)="onMouseEnter()" (mouseleave)="onMouseLeave()">
   <div class="icon-box material" *ngIf="materialIcon">
     <span class="icon" [class]="isMatSymbolClass ? materialSymbolClass : materialIconClass" [class.fill]="isMatIconFillCurrent">

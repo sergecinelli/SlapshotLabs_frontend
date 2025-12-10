@@ -9,6 +9,7 @@ import { TeamFormModalComponent, TeamFormModalData } from '../../shared/componen
 import { TeamOptionsService } from '../../services/team-options.service';
 import { ComponentVisibilityByRoleDirective } from '../../shared/directives/component-visibility-by-role.directive';
 import { ButtonComponent } from '../../shared/components/buttons/button/button.component';
+import { ButtonRouteComponent } from '../../shared/components/buttons/button-route/button-route.component';
 import { visibilityByRoleMap } from './teams.role-map';
 import { forkJoin } from 'rxjs';
 
@@ -21,6 +22,7 @@ import { forkJoin } from 'rxjs';
     MatIconModule,
     ComponentVisibilityByRoleDirective,
     ButtonComponent,
+    ButtonRouteComponent,
   ],
   template: `
     <div class="page-content" [appVisibilityMap]="visibilityByRoleMap">
@@ -155,42 +157,44 @@ import { forkJoin } from 'rxjs';
 
               <!-- Action Buttons -->
               <div class="team-card-actions">
-                <app-button
+                <app-button-route
+                  [route]="'/teams-and-rosters/players'"
+                  [queryParams]="getPlayersQueryParams(team)"
                   [bg]="'secondary'"
                   [bghover]="'secondary_tone1'"
                   [color]="'white'"
                   [colorhover]="'white'"
                   [materialIcon]="'people'"
                   [haveContent]="true"
-                  (clicked)="viewTeamPlayers(team)"
                   class="action-button"
                 >
                   Players
-                </app-button>
-                <app-button
+                </app-button-route>
+                <app-button-route
+                  [route]="'/teams-and-rosters/goalies'"
+                  [queryParams]="getGoaliesQueryParams(team)"
                   [bg]="'secondary'"
                   [bghover]="'secondary_tone1'"
                   [color]="'white'"
                   [colorhover]="'white'"
                   [materialIcon]="'sports_hockey'"
                   [haveContent]="true"
-                  (clicked)="viewTeamGoalies(team)"
                   class="action-button"
                 >
                   Goalies
-                </app-button>
-                <app-button
+                </app-button-route>
+                <app-button-route
+                  [route]="'/teams-and-rosters/teams/team-profile/' + team.id"
                   [bg]="'green'"
                   [bghover]="'green'"
                   [color]="'white'"
                   [colorhover]="'white'"
                   [materialIcon]="'visibility'"
                   [haveContent]="true"
-                  (clicked)="viewTeamProfile(team)"
                   class="action-button"
                 >
                   View
-                </app-button>
+                </app-button-route>
                 <app-button
                   [bg]="'orange'"
                   [bghover]="'orange'"
@@ -336,6 +340,20 @@ export class TeamsComponent implements OnInit {
         teamName: team.name,
       },
     });
+  }
+
+  getPlayersQueryParams(team: Team): Record<string, string | number> {
+    return {
+      teamId: team.id,
+      teamName: team.name,
+    };
+  }
+
+  getGoaliesQueryParams(team: Team): Record<string, string | number> {
+    return {
+      teamId: team.id,
+      teamName: team.name,
+    };
   }
 
   openAddTeamModal(): void {

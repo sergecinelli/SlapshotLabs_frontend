@@ -5,6 +5,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ButtonComponent } from '../../shared/components/buttons/button/button.component';
+import { ButtonRouteComponent } from '../../shared/components/buttons/button-route/button-route.component';
 import { WeekPaginationComponent } from '../../shared/components/week-pagination/week-pagination';
 import { ScheduleService } from '../../services/schedule.service';
 import { TeamService } from '../../services/team.service';
@@ -40,6 +41,7 @@ import { forkJoin } from 'rxjs';
     MatDialogModule,
     ComponentVisibilityByRoleDirective,
     ButtonComponent,
+    ButtonRouteComponent,
     WeekPaginationComponent,
   ],
   template: `
@@ -256,18 +258,18 @@ import { forkJoin } from 'rxjs';
               <!-- Action Buttons -->
               <div class="game-card-actions">
                 @if (schedule.status === 2 || schedule.status === 3) {
-                  <app-button
+                  <app-button-route
+                    [route]="'/live-dashboard/' + schedule.id"
                     [bg]="'green'"
                     [bghover]="'green'"
                     [color]="'white'"
                     [colorhover]="'white'"
                     [materialIcon]="'dashboard'"
                     [haveContent]="true"
-                    (clicked)="openLiveDashboard(schedule)"
                     class="action-button"
                   >
                     Dashboard
-                  </app-button>
+                  </app-button-route>
                 }
                 <app-button
                   [bg]="'orange'"

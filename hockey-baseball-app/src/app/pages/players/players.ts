@@ -13,6 +13,7 @@ import {
 } from '../../shared/components/player-form-modal/player-form-modal';
 import { ComponentVisibilityByRoleDirective } from '../../shared/directives/component-visibility-by-role.directive';
 import { ButtonComponent } from '../../shared/components/buttons/button/button.component';
+import { ButtonRouteComponent } from '../../shared/components/buttons/button-route/button-route.component';
 import { visibilityByRoleMap } from './players.role-map';
 
 @Component({
@@ -24,6 +25,7 @@ import { visibilityByRoleMap } from './players.role-map';
     MatIconModule,
     ComponentVisibilityByRoleDirective,
     ButtonComponent,
+    ButtonRouteComponent,
   ],
   template: `
     <div class="page-content" [appVisibilityMap]="visibilityByRoleMap">
@@ -73,11 +75,9 @@ import { visibilityByRoleMap } from './players.role-map';
               <div class="player-card-header">
                 <div class="header-left">
                   <div class="player-name-row">
-                    @if (player.teamLogo) {
-                      <img [src]="player.teamLogo" [alt]="player.team" class="team-logo" />
-                    } @else {
-                      <div class="team-logo-placeholder"></div>
-                    }
+                    <div class="player-avatar">
+                      {{ getPlayerInitials(player) }}
+                    </div>
                     <div class="player-name-group">
                       <div 
                         class="player-name player-link"
@@ -201,18 +201,18 @@ import { visibilityByRoleMap } from './players.role-map';
                 >
                   Spray Chart
                 </app-button>
-                <app-button
+                <app-button-route
+                  [route]="'/teams-and-rosters/players/player-profile/' + player.id"
                   [bg]="'green'"
                   [bghover]="'green'"
                   [color]="'white'"
                   [colorhover]="'white'"
                   [materialIcon]="'visibility'"
                   [haveContent]="true"
-                  (clicked)="viewPlayerProfile(player)"
                   class="action-button"
                 >
                   Profile
-                </app-button>
+                </app-button-route>
                 <app-button
                   [bg]="'orange'"
                   [bghover]="'orange'"
@@ -381,6 +381,12 @@ export class PlayersComponent implements OnInit {
       const result = aDate.getTime() - bDate.getTime();
       return direction === 'desc' ? -result : result; // desc = newest first
     });
+  }
+
+  protected getPlayerInitials(player: Player): string {
+    const first = player.firstName?.[0] || '';
+    const last = player.lastName?.[0] || '';
+    return (first + last).toUpperCase() || 'P';
   }
 
   deletePlayer(player: Player): void {

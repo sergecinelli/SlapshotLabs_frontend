@@ -100,38 +100,18 @@
   gap: 12px;
 }
 
-.team-logo {
+.player-avatar {
   width: 60px;
   height: 60px;
   border-radius: 10px;
-  object-fit: cover;
-  border: 1px solid var(--border-light);
-  background: var(--white);
-  flex-shrink: 0;
-}
-
-.team-logo-placeholder {
-  width: 60px;
-  height: 60px;
-  border-radius: 10px;
-  background: var(--primary);
-  border: 1px solid var(--border-light);
-  flex-shrink: 0;
+  background-color: var(--gray-tone3);
   display: flex;
   align-items: center;
   justify-content: center;
-
-  &::after {
-    content: "";
-    width: 30px;
-    height: 30px;
-    background: var(--white);
-    border-radius: 2px;
-    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z'/%3E%3C/svg%3E");
-    mask-size: contain;
-    mask-repeat: no-repeat;
-    mask-position: center;
-  }
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: 18px;
+  flex-shrink: 0;
 }
 
 .player-name-group {

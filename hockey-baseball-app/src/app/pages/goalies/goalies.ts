@@ -13,6 +13,7 @@ import {
 } from '../../shared/components/goalie-form-modal/goalie-form-modal';
 import { ComponentVisibilityByRoleDirective } from '../../shared/directives/component-visibility-by-role.directive';
 import { ButtonComponent } from '../../shared/components/buttons/button/button.component';
+import { ButtonRouteComponent } from '../../shared/components/buttons/button-route/button-route.component';
 import { visibilityByRoleMap } from './goalies.role-map';
 
 @Component({
@@ -24,6 +25,7 @@ import { visibilityByRoleMap } from './goalies.role-map';
     MatIconModule,
     ComponentVisibilityByRoleDirective,
     ButtonComponent,
+    ButtonRouteComponent,
   ],
   template: `
     <div class="page-content" [appVisibilityMap]="visibilityByRoleMap">
@@ -73,11 +75,9 @@ import { visibilityByRoleMap } from './goalies.role-map';
               <div class="goalie-card-header">
                 <div class="header-left">
                   <div class="goalie-name-row">
-                    @if (goalie['teamLogo']) {
-                      <img [src]="goalie['teamLogo']" [alt]="goalie.team" class="team-logo" />
-                    } @else {
-                      <div class="team-logo-placeholder"></div>
-                    }
+                    <div class="goalie-avatar">
+                      {{ getGoalieInitials(goalie) }}
+                    </div>
                     <div class="goalie-name-group">
                       <div 
                         class="goalie-name goalie-link"
@@ -205,18 +205,18 @@ import { visibilityByRoleMap } from './goalies.role-map';
                 >
                   Spray Chart
                 </app-button>
-                <app-button
+                <app-button-route
+                  [route]="'/teams-and-rosters/goalies/goalie-profile/' + goalie.id"
                   [bg]="'green'"
                   [bghover]="'green'"
                   [color]="'white'"
                   [colorhover]="'white'"
                   [materialIcon]="'visibility'"
                   [haveContent]="true"
-                  (clicked)="viewGoalieProfile(goalie)"
                   class="action-button"
                 >
                   Profile
-                </app-button>
+                </app-button-route>
                 <app-button
                   [bg]="'orange'"
                   [bghover]="'orange'"
@@ -381,6 +381,12 @@ export class GoaliesComponent implements OnInit {
       const result = aDate.getTime() - bDate.getTime();
       return direction === 'desc' ? -result : result; // desc = newest first
     });
+  }
+
+  protected getGoalieInitials(goalie: Goalie): string {
+    const first = goalie.firstName?.[0] || '';
+    const last = goalie.lastName?.[0] || '';
+    return (first + last).toUpperCase() || 'G';
   }
 
   deleteGoalie(goalie: Goalie): void {

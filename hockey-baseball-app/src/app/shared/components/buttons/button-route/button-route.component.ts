@@ -14,6 +14,7 @@ import { ButtonBaseClass } from '../button-base.class';
 })
 export class ButtonRouteComponent extends ButtonBaseClass {
   @Input() route = '.';
+  @Input() queryParams: Record<string, string | number> | null = null;
   @Input() target: '_self' | '_blank' | '_parent' | '_top' = '_self';
 }
 

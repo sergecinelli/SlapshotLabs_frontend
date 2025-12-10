@@ -21,7 +21,7 @@
   width: 100%;
   height: 100%;
   min-height: 118px; // Minimum height to show skeleton
-  
+
   // Remove min-height when scrolled or when skeleton is removed to allow container to shrink
   &.scrolled,
   &.skeleton-removed {
@@ -200,21 +200,21 @@
   line-height: 1;
 
   &.live-badge {
-    background: linear-gradient(135deg, rgba-from-color("primary", 0.15) 0%, rgba-from-color("primary", 0.08) 100%);
+    background: linear-gradient(135deg, rgba-from-color("primary", 0.1));
     color: var(--primary);
     border: 1px solid rgba-from-color("primary", 0.2);
     box-shadow: 0 1px 3px rgba-from-color("primary", 0.1);
   }
 
   &.upcoming-badge {
-    background: linear-gradient(135deg, rgba-from-color("upcoming", 0.15) 0%, rgba-from-color("upcoming", 0.08) 100%);
+    background: linear-gradient(135deg, rgba-from-color("upcoming", 0.1));
     color: var(--upcoming);
     border: 1px solid rgba-from-color("upcoming", 0.2);
     box-shadow: 0 1px 3px rgba-from-color("upcoming", 0.1);
   }
 
   &.completed-badge {
-    background: linear-gradient(135deg, rgba-from-color("completed", 0.15) 0%, rgba-from-color("completed", 0.08) 100%);
+    background: linear-gradient(135deg, rgba-from-color("completed", 0.1));
     color: var(--completed);
     border: 1px solid rgba-from-color("completed", 0.2);
     box-shadow: 0 1px 3px rgba-from-color("completed", 0.1);
@@ -570,7 +570,6 @@
     font-weight: 600;
   }
 }
-
 
 // Responsive adjustments
 @media (max-width: 768px) {
