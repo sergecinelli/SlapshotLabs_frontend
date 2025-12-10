@@ -20,7 +20,7 @@ import {
 import { SeasonService } from '../../services/season.service';
 import { Season } from '../../shared/interfaces/season.interface';
 import { GameEventNameService, GameEventName } from '../../services/game-event-name.service';
-import { GameMetadataService, ShotTypeResponse } from '../../services/game-metadata.service';
+import { GameMetadataService, ShotTypeResponse, GamePeriodResponse } from '../../services/game-metadata.service';
 import {
   SprayChartTransformOptions,
   SprayChartUtilsService,
@@ -99,10 +99,11 @@ export class GoalieProfileComponent implements OnInit {
       seasons: this.seasonService.getSeasons(),
       eventNames: this.gameEventNameService.getGameEventNames(),
       shotTypes: this.gameMetadataService.getShotTypes(),
+      periods: this.gameMetadataService.getGamePeriods(),
       teamSeasons: this.goalieService.getGoalieTeamSeasons(id),
       recentGames: this.goalieService.getGoalieRecentGames(id, 5),
     }).subscribe({
-      next: ({ goalie, seasons, eventNames, shotTypes, teamSeasons, recentGames }) => {
+      next: ({ goalie, seasons, eventNames, shotTypes, periods, teamSeasons, recentGames }) => {
         if (goalie) {
           this.goalie = goalie;
           this.seasonStats = teamSeasons;
@@ -116,7 +117,7 @@ export class GoalieProfileComponent implements OnInit {
           );
 
           // Fetch spray chart data for the last season
-          this.loadSprayChartData(id, lastSeason.id, eventNames, shotTypes);
+          this.loadSprayChartData(id, lastSeason.id, eventNames, shotTypes, periods);
         } else {
           console.error(`Goalie not found with ID: ${id}`);
           this.router.navigate(['/teams-and-rosters/goalies']);
@@ -138,14 +139,22 @@ export class GoalieProfileComponent implements OnInit {
     goalieId: string,
     seasonId: number,
     eventNames: GameEventName[],
-    shotTypes: ShotTypeResponse[]
+    shotTypes: ShotTypeResponse[],
+    periods: GamePeriodResponse[]
   ): void {
     // Fetch spray chart with season filter only (game_id and shot_type_id are empty)
     this.goalieService.getGoalieSprayChart(goalieId, { season_id: seasonId }).subscribe({
       next: (sprayChartEvents) => {
+        // Create period names map
+        const periodNames = new Map<number, string>();
+        periods.forEach((period) => {
+          periodNames.set(period.id, period.name);
+        });
+
         const transformOptions: SprayChartTransformOptions = {
           defaultPlayerName: `${this.goalie?.firstName ?? ''} ${this.goalie?.lastName ?? ''}`.trim(),
           defaultTeamName: this.goalie?.team,
+          periodNames,
           formatTime: (time) => time,
         };
         this.shotLocationData = this.sprayChartUtils.transformSprayChartData(

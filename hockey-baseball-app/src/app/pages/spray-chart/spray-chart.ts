@@ -67,14 +67,22 @@ export class SprayChartComponent implements OnInit {
       goalie: this.goalieService.getGoalieById(goalieId),
       eventNames: this.gameEventNameService.getGameEventNames(),
       shotTypes: this.gameMetadataService.getShotTypes(),
+      periods: this.gameMetadataService.getGamePeriods(),
       sprayChartEvents: this.goalieService.getGoalieSprayChart(goalieId, {}), // Empty filter = all seasons
     }).subscribe({
-      next: ({ goalie, eventNames, shotTypes, sprayChartEvents }) => {
+      next: ({ goalie, eventNames, shotTypes, periods, sprayChartEvents }) => {
         if (goalie) {
           this.goalie = goalie;
+          // Create period names map
+          const periodNames = new Map<number, string>();
+          periods.forEach((period) => {
+            periodNames.set(period.id, period.name);
+          });
+
           const transformOptions: SprayChartTransformOptions = {
             defaultPlayerName: `${goalie.firstName} ${goalie.lastName}`,
             defaultTeamName: goalie.team,
+            periodNames,
             formatTime: (time) => time,
           };
           this.shotLocationData = this.sprayChartUtils.transformSprayChartData(
@@ -105,14 +113,22 @@ export class SprayChartComponent implements OnInit {
       player: this.playerService.getPlayerById(playerId),
       eventNames: this.gameEventNameService.getGameEventNames(),
       shotTypes: this.gameMetadataService.getShotTypes(),
+      periods: this.gameMetadataService.getGamePeriods(),
       sprayChartEvents: this.playerService.getPlayerSprayChart(playerId, {}), // Empty filter = all seasons
     }).subscribe({
-      next: ({ player, eventNames, shotTypes, sprayChartEvents }) => {
+      next: ({ player, eventNames, shotTypes, periods, sprayChartEvents }) => {
         if (player) {
           this.player = player;
+          // Create period names map
+          const periodNames = new Map<number, string>();
+          periods.forEach((period) => {
+            periodNames.set(period.id, period.name);
+          });
+
           const transformOptions: SprayChartTransformOptions = {
             defaultPlayerName: `${player.firstName} ${player.lastName}`,
             defaultTeamName: player.team,
+            periodNames,
             formatTime: (time) => time,
           };
           this.shotLocationData = this.sprayChartUtils.transformPlayerSprayChartData(

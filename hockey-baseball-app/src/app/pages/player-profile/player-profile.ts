@@ -21,7 +21,7 @@ import {
 import { SeasonService } from '../../services/season.service';
 import { Season } from '../../shared/interfaces/season.interface';
 import { GameEventNameService, GameEventName } from '../../services/game-event-name.service';
-import { GameMetadataService, ShotTypeResponse } from '../../services/game-metadata.service';
+import { GameMetadataService, ShotTypeResponse, GamePeriodResponse } from '../../services/game-metadata.service';
 import {
   SprayChartTransformOptions,
   SprayChartUtilsService,
@@ -112,10 +112,11 @@ export class PlayerProfileComponent implements OnInit {
       seasons: this.seasonService.getSeasons(),
       eventNames: this.gameEventNameService.getGameEventNames(),
       shotTypes: this.gameMetadataService.getShotTypes(),
+      periods: this.gameMetadataService.getGamePeriods(),
       teamSeasons: this.playerService.getPlayerTeamSeasons(id),
       recentGames: this.playerService.getPlayerRecentGames(id, 5),
     }).subscribe({
-      next: ({ player, seasons, eventNames, shotTypes, teamSeasons, recentGames }) => {
+      next: ({ player, seasons, eventNames, shotTypes, periods, teamSeasons, recentGames }) => {
         if (player) {
           this.player = player;
           this.seasonStats = teamSeasons;
@@ -129,7 +130,7 @@ export class PlayerProfileComponent implements OnInit {
           );
 
           // Fetch spray chart data for the last season
-          this.loadSprayChartData(id, lastSeason.id, eventNames, shotTypes);
+          this.loadSprayChartData(id, lastSeason.id, eventNames, shotTypes, periods);
         } else {
           console.error(`Player not found with ID: ${id}`);
           this.router.navigate(['/teams-and-rosters/players']);
@@ -151,14 +152,22 @@ export class PlayerProfileComponent implements OnInit {
     playerId: string,
     seasonId: number,
     eventNames: GameEventName[],
-    shotTypes: ShotTypeResponse[]
+    shotTypes: ShotTypeResponse[],
+    periods: GamePeriodResponse[]
   ): void {
     // Fetch spray chart with season filter only (game_id and shot_type_id are empty)
     this.playerService.getPlayerSprayChart(playerId, { season_id: seasonId }).subscribe({
       next: (sprayChartEvents) => {
+        // Create period names map
+        const periodNames = new Map<number, string>();
+        periods.forEach((period) => {
+          periodNames.set(period.id, period.name);
+        });
+
         const transformOptions: SprayChartTransformOptions = {
           defaultPlayerName: `${this.player?.firstName ?? ''} ${this.player?.lastName ?? ''}`.trim(),
           defaultTeamName: this.player?.team,
+          periodNames,
           formatTime: (time) => time,
         };
         this.shotLocationData = this.sprayChartUtils.transformPlayerSprayChartData(
