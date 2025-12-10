@@ -1,7 +1,8 @@
 import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
 import { ButtonComponent } from '../../shared/components/buttons/button/button.component';
 import { ScheduleService } from '../../services/schedule.service';
 import { TeamService } from '../../services/team.service';
@@ -29,6 +30,8 @@ import { DashboardSkeletonComponent } from './dashboard-skeleton.component';
   standalone: true,
   imports: [
     CommonModule,
+    RouterLink,
+    MatIconModule,
     ButtonComponent,
     MatDialogModule,
     ComponentVisibilityByRoleDirective,
@@ -79,9 +82,11 @@ export class DashboardComponent implements OnInit {
           home_team_id: number;
           home_goals: number;
           home_start_goalie_id: number | null;
+          home_start_goalie_name?: string;
           away_team_id: number;
           away_goals: number;
           away_start_goalie_id: number | null;
+          away_start_goalie_name?: string;
           game_type_id: number;
           game_type_name: string | null;
           tournament_name?: string;
@@ -101,13 +106,19 @@ export class DashboardComponent implements OnInit {
             homeTeam: homeTeam?.name || `Team ${game.home_team_id}`,
             homeTeamId: game.home_team_id,
             homeTeamLogo: `${apiUrl}/hockey/team/${game.home_team_id}/logo`,
+            homeTeamAgeGroup: homeTeam?.group || '',
+            homeTeamLevelName: homeTeam?.level || '',
             homeGoals: game.home_goals,
-            homeTeamGoalie: game.home_start_goalie_id ? `Goalie ${game.home_start_goalie_id}` : '—', // TODO: Map to actual goalie names
+            homeTeamGoalie: game.home_start_goalie_name || (game.home_start_goalie_id ? `Goalie ${game.home_start_goalie_id}` : '—'),
+            homeTeamGoalieId: game.home_start_goalie_id || undefined,
             awayTeam: awayTeam?.name || `Team ${game.away_team_id}`,
             awayTeamId: game.away_team_id,
             awayTeamLogo: `${apiUrl}/hockey/team/${game.away_team_id}/logo`,
+            awayTeamAgeGroup: awayTeam?.group || '',
+            awayTeamLevelName: awayTeam?.level || '',
             awayGoals: game.away_goals,
-            awayTeamGoalie: game.away_start_goalie_id ? `Goalie ${game.away_start_goalie_id}` : '—',
+            awayTeamGoalie: game.away_start_goalie_name || (game.away_start_goalie_id ? `Goalie ${game.away_start_goalie_id}` : '—'),
+            awayTeamGoalieId: game.away_start_goalie_id || undefined,
             gameType: '' as GameType, // TODO: Map game_type_id to game type name
             tournamentName: game.game_type_name || undefined,
             date: game.date,
@@ -277,5 +288,63 @@ export class DashboardComponent implements OnInit {
 
   goToTeamProfile(teamId: number): void {
     this.router.navigate([`/teams-and-rosters/teams/team-profile/${teamId}`]);
+  }
+
+  goToGoalieProfile(goalieId: number): void {
+    this.router.navigate([`/teams-and-rosters/goalies/goalie-profile/${goalieId}`]);
+  }
+
+  getTeamLocation(game: Schedule, isHome: boolean): string {
+    if (isHome) {
+      if (game.homeTeamAgeGroup && game.homeTeamLevelName) {
+        return `${game.homeTeamAgeGroup} ${game.homeTeamLevelName}`;
+      }
+      return game.homeTeamAgeGroup || game.homeTeamLevelName || '';
+    } else {
+      if (game.awayTeamAgeGroup && game.awayTeamLevelName) {
+        return `${game.awayTeamAgeGroup} ${game.awayTeamLevelName}`;
+      }
+      return game.awayTeamAgeGroup || game.awayTeamLevelName || '';
+    }
+  }
+
+  formatTimeTo12Hour(time: string): string {
+    if (!time) return '';
+
+    // Parse time string (format: "HH:MM:SS" or "HH:MM")
+    const parts = time.split(':');
+    if (parts.length < 2) return time;
+
+    let hours = parseInt(parts[0], 10);
+    const minutes = parts[1];
+
+    if (isNaN(hours)) return time;
+
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    hours = hours ? hours : 12; // the hour '0' should be '12'
+
+    return `${hours}:${minutes} ${ampm}`;
+  }
+
+  formatDate(dateStr: string): string {
+    if (!dateStr) return '';
+    // If date is already formatted, return as is
+    if (dateStr.includes(',')) {
+      return dateStr;
+    }
+    // Otherwise format it
+    try {
+      const date = new Date(dateStr);
+      const options: Intl.DateTimeFormatOptions = { 
+        weekday: 'short', 
+        month: 'short', 
+        day: 'numeric' 
+      };
+      const formatted = date.toLocaleDateString('en-US', options);
+      return formatted.replace(/(\w+), (\w+) (\d+)/, '$1., $2. $3');
+    } catch {
+      return dateStr;
+    }
   }
 }

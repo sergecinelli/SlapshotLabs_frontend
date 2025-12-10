@@ -13,11 +13,12 @@ import { ButtonLoadingComponent } from '../../shared/components/buttons/button-l
 import { ThemeService } from '../../services/theme.service';
 import { Role } from '../../services/roles/role.interface';
 import { RoleService } from '../../services/roles/role.service';
+import { BreadcrumbsComponent } from '../../shared/components/breadcrumbs/breadcrumbs.component';
 
 @Component({
   selector: 'app-layout',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, BannerComponent, ButtonLoadingComponent, MatRippleModule, MatTooltipModule],
+  imports: [CommonModule, RouterOutlet, BannerComponent, ButtonLoadingComponent, MatRippleModule, MatTooltipModule, BreadcrumbsComponent],
   templateUrl: './layout.html',
   styleUrl: './layout.scss',
 })

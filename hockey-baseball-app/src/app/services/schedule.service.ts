@@ -14,9 +14,11 @@ export class ScheduleService {
       home_team_id: number;
       home_goals: number;
       home_start_goalie_id: number | null;
+      home_start_goalie_name?: string;
       away_team_id: number;
       away_goals: number;
       away_start_goalie_id: number | null;
+      away_start_goalie_name?: string;
       game_type_id: number;
       game_type_name: string | null;
       tournament_name?: string;
@@ -32,9 +34,11 @@ export class ScheduleService {
       home_team_id: number;
       home_goals: number;
       home_start_goalie_id: number | null;
+      home_start_goalie_name?: string;
       away_team_id: number;
       away_goals: number;
       away_start_goalie_id: number | null;
+      away_start_goalie_name?: string;
       game_type_id: number;
       game_type_name: string | null;
       tournament_name?: string;
@@ -62,9 +66,11 @@ export class ScheduleService {
         home_team_id: number;
         home_goals: number;
         home_start_goalie_id: number | null;
+        home_start_goalie_name?: string;
         away_team_id: number;
         away_goals: number;
         away_start_goalie_id: number | null;
+        away_start_goalie_name?: string;
         game_type_id: number;
         game_type_name: string | null;
         tournament_name?: string;
@@ -80,9 +86,11 @@ export class ScheduleService {
         home_team_id: number;
         home_goals: number;
         home_start_goalie_id: number | null;
+        home_start_goalie_name?: string;
         away_team_id: number;
         away_goals: number;
         away_start_goalie_id: number | null;
+        away_start_goalie_name?: string;
         game_type_id: number;
         game_type_name: string | null;
         tournament_name?: string;

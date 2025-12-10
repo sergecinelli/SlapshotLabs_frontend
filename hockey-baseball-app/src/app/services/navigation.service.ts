@@ -57,7 +57,7 @@ export class NavigationService {
       {
         label: 'Analytics',
         path: '/analytics',
-        icon: 'bar_chart',
+        icon: 'analytics',
       },
       {
         label: 'Video Library',
@@ -72,7 +72,7 @@ export class NavigationService {
       {
         label: 'GAMESHEET',
         path: '/gamesheet',
-        icon: 'scoreboard',
+        icon: 'gamesheet',
       },
     ];
 
@@ -181,7 +181,7 @@ export class NavigationService {
     this._navigationItems.set(items);
   }
 
-  private getFlatNavigationItems(): NavigationItem[] {
+  getFlatNavigationItems(): NavigationItem[] {
     const items = this._navigationItems();
     const flatItems: NavigationItem[] = [];
 

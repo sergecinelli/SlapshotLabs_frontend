@@ -9,7 +9,7 @@ import { CommonModule } from '@angular/common';
   styleUrl: './dashboard-skeleton.scss',
 })
 export class DashboardSkeletonComponent {
-  // Number of skeleton items to show
-  skeletonCount = 5;
+  // Number of skeleton items to show per section (max 3)
+  skeletonCount = 3;
 }
 

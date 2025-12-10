@@ -154,13 +154,8 @@ import { forkJoin } from 'rxjs';
               <!-- Teams and Score Section -->
               <div class="game-teams-section">
                 <!-- Home Team -->
-                <div class="team-section" [class.winning]="isWinning(schedule, true)">
-                  <div class="team-info">
-                    @if (schedule.homeTeamLogo) {
-                      <img [src]="schedule.homeTeamLogo" [alt]="schedule.homeTeam" class="team-logo" />
-                    } @else {
-                      <div class="team-logo-placeholder"></div>
-                    }
+                <div class="team-section team-section-left" [class.winning]="isWinning(schedule, true)">
+                  <div class="team-info team-info-left">
                     <div class="team-name-group">
                       @if (schedule.homeTeamId) {
                         <div 
@@ -186,36 +181,35 @@ import { forkJoin } from 'rxjs';
                           role="button"
                           [attr.aria-label]="'View ' + schedule.homeTeamGoalie + ' profile'"
                         >
-                          <mat-icon class="goalie-icon">sports_hockey</mat-icon>
                           <span>{{ schedule.homeTeamGoalie }}</span>
+                          <mat-icon class="goalie-icon">sports_hockey</mat-icon>
                         </div>
                       } @else if (schedule.homeTeamGoalie) {
                         <div class="team-goalie">
-                          <mat-icon class="goalie-icon">sports_hockey</mat-icon>
                           <span>{{ schedule.homeTeamGoalie }}</span>
+                          <mat-icon class="goalie-icon">sports_hockey</mat-icon>
                         </div>
                       }
                     </div>
-                  </div>
-                  <div class="team-score-wrapper">
-                    <div class="team-score" [class.winning-score]="isWinning(schedule, true)">{{ schedule.homeGoals }}</div>
+                    <img [src]="schedule.homeTeamLogo || ''" [alt]="schedule.homeTeam" class="team-logo" />
                   </div>
                 </div>
 
-                <!-- Score Separator -->
-                <div class="score-separator">-</div>
-
-                <!-- Away Team -->
-                <div class="team-section" [class.winning]="isWinning(schedule, false)">
-                  <div class="team-score-wrapper">
+                <!-- Score in Center -->
+                <div class="score-center-container">
+                  <div class="team-score-wrapper" [class.winning-home]="isWinning(schedule, true)">
+                    <div class="team-score" [class.winning-score]="isWinning(schedule, true)">{{ schedule.homeGoals }}</div>
+                  </div>
+                  <div class="score-separator">-</div>
+                  <div class="team-score-wrapper" [class.winning-away]="isWinning(schedule, false)">
                     <div class="team-score" [class.winning-score]="isWinning(schedule, false)">{{ schedule.awayGoals }}</div>
                   </div>
-                  <div class="team-info">
-                    @if (schedule.awayTeamLogo) {
-                      <img [src]="schedule.awayTeamLogo" [alt]="schedule.awayTeam" class="team-logo" />
-                    } @else {
-                      <div class="team-logo-placeholder"></div>
-                    }
+                </div>
+
+                <!-- Away Team (Reversed) -->
+                <div class="team-section team-section-right" [class.winning]="isWinning(schedule, false)">
+                  <div class="team-info team-info-right">
+                    <img [src]="schedule.awayTeamLogo || ''" [alt]="schedule.awayTeam" class="team-logo" />
                     <div class="team-name-group">
                       @if (schedule.awayTeamId) {
                         <div 

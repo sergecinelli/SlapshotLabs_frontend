@@ -1,72 +1,123 @@
 <div class="dashboard-skeleton-container">
-  <!-- Upcoming Games Skeleton Card -->
-  <div class="dashboard-card">
-    <div class="dashboard-card-header">
-      <div class="skeleton-title"></div>
-    </div>
-    <div class="dashboard-card-content">
-      <div class="dashboard-game-list">
-        @for (item of [].constructor(skeletonCount); track $index) {
-          <div class="dashboard-game-item">
-            <div class="dashboard-game-content">
-              <!-- Date/Time Skeleton - using same class as real data -->
-              <span class="dashboard-game-date skeleton-date"></span>
-              
-              <!-- Team Info Skeleton - using same structure as real data -->
-              <div class="dashboard-team-info">
-                <div class="dashboard-team-logo skeleton-logo"></div>
-                <span class="dashboard-team-name skeleton-team-name"></span>
-              </div>
-              
-              <!-- Separator Skeleton - using same class as real data -->
-              <span class="dashboard-game-separator skeleton-separator"></span>
-              
-              <!-- Team Info Skeleton - using same structure as real data -->
-              <div class="dashboard-team-info">
-                <div class="dashboard-team-logo skeleton-logo"></div>
-                <span class="dashboard-team-name skeleton-team-name"></span>
+  <!-- Upcoming Games Skeleton -->
+  <div class="dashboard-section">
+    <div class="skeleton-title"></div>
+    <div class="dashboard-cards-container">
+      @for (item of [].constructor(skeletonCount); track $index) {
+        <div class="dashboard-game-card skeleton-card">
+          <!-- Card Header Skeleton -->
+          <div class="game-card-header">
+            <div class="header-left">
+              <div class="game-date-time-row">
+                <div class="date-time-item">
+                  <div class="skeleton-icon"></div>
+                  <div class="skeleton-date"></div>
+                </div>
+                <div class="date-time-item">
+                  <div class="skeleton-icon"></div>
+                  <div class="skeleton-time"></div>
+                </div>
               </div>
             </div>
           </div>
-        }
-      </div>
+
+          <!-- Teams Section Skeleton -->
+          <div class="game-teams-section">
+            <!-- Left Team Skeleton -->
+            <div class="team-section team-section-left">
+              <div class="team-info team-info-left">
+                <div class="team-name-group">
+                  <div class="skeleton-team-name"></div>
+                  <div class="skeleton-team-location"></div>
+                  <div class="skeleton-team-goalie"></div>
+                </div>
+                <div class="skeleton-logo"></div>
+              </div>
+            </div>
+
+            <!-- Center Separator Skeleton -->
+            <div class="score-center-container">
+              <div class="skeleton-separator"></div>
+            </div>
+
+            <!-- Right Team Skeleton -->
+            <div class="team-section team-section-right">
+              <div class="team-info team-info-right">
+                <div class="skeleton-logo"></div>
+                <div class="team-name-group">
+                  <div class="skeleton-team-name"></div>
+                  <div class="skeleton-team-location"></div>
+                  <div class="skeleton-team-goalie"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
     </div>
   </div>
 
-  <!-- Game Results Skeleton Card -->
-  <div class="dashboard-card">
-    <div class="dashboard-card-header">
-      <div class="skeleton-title"></div>
-    </div>
-    <div class="dashboard-card-content">
-      <div class="dashboard-game-list">
-        @for (item of [].constructor(skeletonCount); track $index) {
-          <div class="dashboard-game-item">
-            <div class="dashboard-game-content">
-              <!-- Date/Time Skeleton - using same class as real data -->
-              <span class="dashboard-game-date skeleton-date"></span>
-              
-              <!-- Team Info with Score Skeleton - using same structure as real data -->
-              <div class="dashboard-team-info">
-                <div class="dashboard-team-logo skeleton-logo"></div>
-                <span class="dashboard-team-name skeleton-team-name"></span>
-                <span class="dashboard-score skeleton-score"></span>
-              </div>
-              
-              <!-- Separator Skeleton - using same class as real data -->
-              <span class="dashboard-game-separator skeleton-separator"></span>
-              
-              <!-- Team Info with Score Skeleton - using same structure as real data -->
-              <div class="dashboard-team-info">
-                <div class="dashboard-team-logo skeleton-logo"></div>
-                <span class="dashboard-team-name skeleton-team-name"></span>
-                <span class="dashboard-score skeleton-score"></span>
+  <!-- Game Results Skeleton -->
+  <div class="dashboard-section">
+    <div class="skeleton-title"></div>
+    <div class="dashboard-cards-container">
+      @for (item of [].constructor(skeletonCount); track $index) {
+        <div class="dashboard-game-card skeleton-card">
+          <!-- Card Header Skeleton -->
+          <div class="game-card-header">
+            <div class="header-left">
+              <div class="game-date-time-row">
+                <div class="date-time-item">
+                  <div class="skeleton-icon"></div>
+                  <div class="skeleton-date"></div>
+                </div>
+                <div class="date-time-item">
+                  <div class="skeleton-icon"></div>
+                  <div class="skeleton-time"></div>
+                </div>
               </div>
             </div>
           </div>
-        }
-      </div>
+
+          <!-- Teams Section Skeleton -->
+          <div class="game-teams-section">
+            <!-- Left Team Skeleton -->
+            <div class="team-section team-section-left">
+              <div class="team-info team-info-left">
+                <div class="team-name-group">
+                  <div class="skeleton-team-name"></div>
+                  <div class="skeleton-team-location"></div>
+                  <div class="skeleton-team-goalie"></div>
+                </div>
+                <div class="skeleton-logo"></div>
+              </div>
+            </div>
+
+            <!-- Center Score Skeleton -->
+            <div class="score-center-container">
+              <div class="skeleton-score-wrapper">
+                <div class="skeleton-score"></div>
+              </div>
+              <div class="skeleton-separator"></div>
+              <div class="skeleton-score-wrapper">
+                <div class="skeleton-score"></div>
+              </div>
+            </div>
+
+            <!-- Right Team Skeleton -->
+            <div class="team-section team-section-right">
+              <div class="team-info team-info-right">
+                <div class="skeleton-logo"></div>
+                <div class="team-name-group">
+                  <div class="skeleton-team-name"></div>
+                  <div class="skeleton-team-location"></div>
+                  <div class="skeleton-team-goalie"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
     </div>
   </div>
 </div>
-

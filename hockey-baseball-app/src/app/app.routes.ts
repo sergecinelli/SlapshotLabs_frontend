@@ -80,7 +80,7 @@ export const routes: Routes = [
           ),
       },
 
-      // Teams routes
+      // Teams & Rosters routes
       { path: 'teams-and-rosters', redirectTo: 'teams-and-rosters/teams', pathMatch: 'full' },
       {
         path: 'teams',
@@ -107,19 +107,19 @@ export const routes: Routes = [
         },
       },
       {
-        path: 'teams/goalies',
-        loadComponent: () => import('./pages/goalies/goalies').then((m) => m.GoaliesComponent),
-        canActivate: [RoleAccessGuard],
-        data: {
-          pageRolesAccessMap: goaliesPageRolesAccessMap,
-        },
-      },
-      {
         path: 'teams-and-rosters/players',
         loadComponent: () => import('./pages/players/players').then((m) => m.PlayersComponent),
         canActivate: [RoleAccessGuard],
         data: {
           pageRolesAccessMap: playersPageRolesAccessMap,
+        },
+      },
+      {
+        path: 'teams/goalies',
+        loadComponent: () => import('./pages/goalies/goalies').then((m) => m.GoaliesComponent),
+        canActivate: [RoleAccessGuard],
+        data: {
+          pageRolesAccessMap: goaliesPageRolesAccessMap,
         },
       },
       {
@@ -132,7 +132,8 @@ export const routes: Routes = [
       },
       {
         path: 'teams-and-rosters/players/player-profile/:id',
-        loadComponent: () => import('./pages/player-profile/player-profile').then((m) => m.PlayerProfileComponent),
+        loadComponent: () =>
+          import('./pages/player-profile/player-profile').then((m) => m.PlayerProfileComponent),
         canActivate: [RoleAccessGuard],
         data: {
           pageRolesAccessMap: playerProfilePageRolesAccessMap,
@@ -140,15 +141,12 @@ export const routes: Routes = [
       },
       {
         path: 'teams-and-rosters/goalies/goalie-profile/:id',
-        loadComponent: () => import('./pages/goalie-profile/goalie-profile').then((m) => m.GoalieProfileComponent),
+        loadComponent: () =>
+          import('./pages/goalie-profile/goalie-profile').then((m) => m.GoalieProfileComponent),
         canActivate: [RoleAccessGuard],
         data: {
           pageRolesAccessMap: goalieProfilePageRolesAccessMap,
         },
-      },
-      {
-        path: 'spray-chart/:id',
-        loadComponent: () => import('./pages/spray-chart/spray-chart').then((m) => m.SprayChartComponent),
       },
       {
         path: 'teams-and-rosters/teams/team-profile/:id',
@@ -160,6 +158,18 @@ export const routes: Routes = [
         },
       },
       {
+        path: 'teams-and-rosters/players/:id/spray-chart',
+        loadComponent: () =>
+          import('./pages/spray-chart/spray-chart').then((m) => m.SprayChartComponent),
+      },
+      {
+        path: 'teams-and-rosters/goalies/:id/spray-chart',
+        loadComponent: () =>
+          import('./pages/spray-chart/spray-chart').then((m) => m.SprayChartComponent),
+      },
+
+      // Schedule routes
+      {
         path: 'schedule',
         loadComponent: () => import('./pages/schedule/schedule').then((m) => m.ScheduleComponent),
         canActivate: [RoleAccessGuard],
@@ -167,6 +177,8 @@ export const routes: Routes = [
           pageRolesAccessMap: schedulePageRolesAccessMap,
         },
       },
+
+      // Analytics routes
       {
         path: 'analytics',
         loadComponent: () =>
@@ -176,6 +188,8 @@ export const routes: Routes = [
           pageRolesAccessMap: analyticsPageRolesAccessMap,
         },
       },
+
+      // Video routes
       {
         path: 'video-library',
         loadComponent: () =>
@@ -196,6 +210,8 @@ export const routes: Routes = [
           pageRolesAccessMap: videoHighlightsPageRolesAccessMap,
         },
       },
+
+      // Gamesheet routes
       {
         path: 'gamesheet',
         loadComponent: () =>
@@ -205,6 +221,8 @@ export const routes: Routes = [
           pageRolesAccessMap: gamesheetPageRolesAccessMap,
         },
       },
+
+      // Live Dashboard routes
       {
         path: 'live-dashboard/:gameId',
         loadComponent: () =>

@@ -1,17 +1,30 @@
 <nav class="breadcrumbs-container" aria-label="Breadcrumb">
   <div class="breadcrumbs-content">
-    <!-- Breadcrumb Navigation -->
-    @if (breadcrumbs().length > 1) {
+    @if (breadcrumbs().length > 0) {
       <ol class="breadcrumbs-list">
         @for (item of breadcrumbs(); track item.path; let i = $index) {
           <li class="breadcrumbs-item">
             @if (isLast(i)) {
-              <!-- Last item is shown as part of title -->
+              <!-- Last item with icon and title -->
+              <div class="breadcrumbs-current">
+                @if (item.icon) {
+                  <div class="breadcrumbs-title-icon-wrapper">
+                    <span class="material-symbols-rounded breadcrumbs-title-icon">
+                      {{ item.icon }}
+                    </span>
+                  </div>
+                }
+                <h1 class="breadcrumbs-title">{{ item.label }}</h1>
+              </div>
             } @else {
               <a 
                 class="breadcrumbs-link"
-                [routerLink]="item.path"
-                (click)="navigateTo(item.path)"
+                (click)="navigateTo(item.path, $event)"
+                (keyup.enter)="navigateTo(item.path, $event)"
+                (keyup.space)="navigateTo(item.path, $event)"
+                tabindex="0"
+                role="link"
+                [attr.aria-label]="'Navigate to ' + item.label"
               >
                 @if (item.icon) {
                   <span class="material-symbols-rounded breadcrumbs-icon">{{ item.icon }}</span>
@@ -23,20 +36,6 @@
           </li>
         }
       </ol>
-    }
-
-    <!-- Page Title with Icon -->
-    @if (breadcrumbs().length > 0) {
-      <div class="breadcrumbs-page-title">
-        @if (breadcrumbs()[breadcrumbs().length - 1].icon) {
-          <div class="breadcrumbs-title-icon-wrapper">
-            <span class="material-symbols-rounded breadcrumbs-title-icon">
-              {{ breadcrumbs()[breadcrumbs().length - 1].icon }}
-            </span>
-          </div>
-        }
-        <h1 class="breadcrumbs-title">{{ breadcrumbs()[breadcrumbs().length - 1].label }}</h1>
-      </div>
     }
   </div>
 </nav>

@@ -152,59 +152,65 @@ import { visibilityByRoleMap } from './goalies.role-map';
               <!-- Stats Section -->
               <div class="goalie-stats-section">
                 <div class="stats-grid">
-                  <div class="stat-item">
-                    <div class="stat-label">GP</div>
-                    <div class="stat-value">{{ goalie.gamesPlayed || 0 }}</div>
+                  <!-- First Row: 4 most important stats -->
+                  <div class="stats-row-first">
+                    <div class="stat-item">
+                      <div class="stat-label">GP</div>
+                      <div class="stat-value">{{ goalie.gamesPlayed || 0 }}</div>
+                    </div>
+                    <div class="stat-item">
+                      <div class="stat-label">W</div>
+                      <div class="stat-value">{{ goalie.wins || 0 }}</div>
+                    </div>
+                    <div class="stat-item">
+                      <div class="stat-label">Saves</div>
+                      <div class="stat-value">{{ goalie.saves || 0 }}</div>
+                    </div>
+                    <div class="stat-item">
+                      <div class="stat-label">GA</div>
+                      <div class="stat-value">{{ goalie.goalsAgainst || 0 }}</div>
+                    </div>
                   </div>
-                  <div class="stat-item">
-                    <div class="stat-label">W</div>
-                    <div class="stat-value">{{ goalie.wins || 0 }}</div>
-                  </div>
-                  <div class="stat-item">
-                    <div class="stat-label">L</div>
-                    <div class="stat-value">{{ goalie.losses || 0 }}</div>
-                  </div>
-                  <div class="stat-item">
-                    <div class="stat-label">SOG</div>
-                    <div class="stat-value">{{ goalie.shotsOnGoal || 0 }}</div>
-                  </div>
-                  <div class="stat-item">
-                    <div class="stat-label">Saves</div>
-                    <div class="stat-value">{{ goalie.saves || 0 }}</div>
-                  </div>
-                  <div class="stat-item">
-                    <div class="stat-label">GA</div>
-                    <div class="stat-value">{{ goalie.goalsAgainst || 0 }}</div>
-                  </div>
-                  <div class="stat-item">
-                    <div class="stat-label">G</div>
-                    <div class="stat-value">{{ goalie.goals || 0 }}</div>
-                  </div>
-                  <div class="stat-item">
-                    <div class="stat-label">A</div>
-                    <div class="stat-value">{{ goalie.assists || 0 }}</div>
-                  </div>
-                  <div class="stat-item">
-                    <div class="stat-label">PTS</div>
-                    <div class="stat-value stat-value-highlight">{{ goalie.points || 0 }}</div>
+                  <!-- Second Row: 5 remaining stats -->
+                  <div class="stats-row-second">
+                    <div class="stat-item">
+                      <div class="stat-label">L</div>
+                      <div class="stat-value">{{ goalie.losses || 0 }}</div>
+                    </div>
+                    <div class="stat-item">
+                      <div class="stat-label">SOG</div>
+                      <div class="stat-value">{{ goalie.shotsOnGoal || 0 }}</div>
+                    </div>
+                    <div class="stat-item">
+                      <div class="stat-label">G</div>
+                      <div class="stat-value">{{ goalie.goals || 0 }}</div>
+                    </div>
+                    <div class="stat-item">
+                      <div class="stat-label">A</div>
+                      <div class="stat-value">{{ goalie.assists || 0 }}</div>
+                    </div>
+                    <div class="stat-item">
+                      <div class="stat-label">PTS</div>
+                      <div class="stat-value stat-value-highlight">{{ goalie.points || 0 }}</div>
+                    </div>
                   </div>
                 </div>
               </div>
 
               <!-- Action Buttons -->
               <div class="goalie-card-actions">
-                <app-button
+                <app-button-route
+                  [route]="'/teams-and-rosters/goalies/' + goalie.id + '/spray-chart'"
                   [bg]="'secondary'"
                   [bghover]="'secondary_tone1'"
                   [color]="'white'"
                   [colorhover]="'white'"
                   [materialIcon]="'scatter_plot'"
                   [haveContent]="true"
-                  (clicked)="viewShotSprayChart(goalie)"
                   class="action-button"
                 >
                   Spray Chart
-                </app-button>
+                </app-button-route>
                 <app-button-route
                   [route]="'/teams-and-rosters/goalies/goalie-profile/' + goalie.id"
                   [bg]="'green'"
@@ -430,7 +436,7 @@ export class GoaliesComponent implements OnInit {
   }
 
   viewShotSprayChart(goalie: Goalie): void {
-    this.router.navigate(['/spray-chart', goalie.id]);
+    this.router.navigate(['/teams-and-rosters/goalies', goalie.id, 'spray-chart']);
   }
 
   openAddGoalieModal(): void {

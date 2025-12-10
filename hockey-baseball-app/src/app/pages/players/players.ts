@@ -189,18 +189,19 @@ import { visibilityByRoleMap } from './players.role-map';
 
               <!-- Action Buttons -->
               <div class="player-card-actions">
-                <app-button
+                <app-button-route
+                  [route]="'/teams-and-rosters/players/' + player.id + '/spray-chart'"
+                  [queryParams]="{ type: 'player' }"
                   [bg]="'secondary'"
                   [bghover]="'secondary_tone1'"
                   [color]="'white'"
                   [colorhover]="'white'"
                   [materialIcon]="'scatter_plot'"
                   [haveContent]="true"
-                  (clicked)="viewShotSprayChart(player)"
                   class="action-button"
                 >
                   Spray Chart
-                </app-button>
+                </app-button-route>
                 <app-button-route
                   [route]="'/teams-and-rosters/players/player-profile/' + player.id"
                   [bg]="'green'"
@@ -430,7 +431,7 @@ export class PlayersComponent implements OnInit {
   }
 
   viewShotSprayChart(player: Player): void {
-    this.router.navigate(['/spray-chart', player.id], { queryParams: { type: 'player' } });
+    this.router.navigate(['/teams-and-rosters/players', player.id, 'spray-chart'], { queryParams: { type: 'player' } });
   }
 
   openAddPlayerModal(): void {
