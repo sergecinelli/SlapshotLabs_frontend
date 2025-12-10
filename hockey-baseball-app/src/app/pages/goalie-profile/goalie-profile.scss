@@ -1,5 +1,19 @@
 @use '../../shared/styles/dashboard-card.scss' as *;
 
+// Force team logo sizes globally
+.goalie-profile-page img.team-logo {
+  width: 30px !important;
+  height: 30px !important;
+  max-width: 30px !important;
+  max-height: 30px !important;
+  min-width: 30px !important;
+  min-height: 30px !important;
+  object-fit: cover !important;
+  border-radius: 5px;
+  display: block !important;
+  flex-shrink: 0 !important;
+}
+
 .goalie-profile-page {
   padding: 20px;
   margin: 0 auto;
@@ -463,10 +477,16 @@
               }
 
               .team-logo {
-                width: 30px;
-                height: 30px;
+                width: 30px !important;
+                height: 30px !important;
+                max-width: 30px !important;
+                max-height: 30px !important;
+                min-width: 30px !important;
+                min-height: 30px !important;
                 border-radius: 5px;
                 object-fit: cover;
+                flex-shrink: 0;
+                display: block;
               }
 
               .no-logo {
@@ -475,7 +495,8 @@
               }
 
               &.team-cell {
-                display: flex;
+                display: flex !important;
+                flex-direction: row !important;
                 align-items: center;
                 gap: 8px;
                 white-space: normal !important;
@@ -483,22 +504,23 @@
                 text-overflow: initial !important;
 
                 .team-logo {
-                  font-size: 1rem;
-                  display: inline-flex;
-                  align-items: center;
-                  justify-content: center;
-                  width: 20px;
-                  height: 20px;
-                  // Hide empty logos
-                  &:empty {
-                    display: none;
-                  }
+                  width: 30px !important;
+                  height: 30px !important;
+                  max-width: 30px !important;
+                  max-height: 30px !important;
+                  min-width: 30px !important;
+                  min-height: 30px !important;
+                  border-radius: 5px;
+                  object-fit: cover;
+                  flex-shrink: 0;
+                  order: 1;
                 }
 
                 .team-name {
                   font-weight: 500;
-                  color: #111827;
+                  color: var(--text-primary);
                   font-size: 12px;
+                  order: 2;
                 }
               }
 
@@ -525,8 +547,32 @@
               padding: 8px 16px !important; // Same as season stats
 
               &.team-cell {
+                display: flex !important;
+                flex-direction: row !important;
+                align-items: center;
+                gap: 8px;
+                white-space: normal !important;
+                overflow: visible !important;
+                text-overflow: initial !important;
+
+                .team-logo {
+                  width: 30px !important;
+                  height: 30px !important;
+                  max-width: 30px !important;
+                  max-height: 30px !important;
+                  min-width: 30px !important;
+                  min-height: 30px !important;
+                  border-radius: 5px;
+                  object-fit: cover;
+                  flex-shrink: 0;
+                  order: 1;
+                }
+
                 .team-name {
                   font-size: 12px; // Same as season stats
+                  font-weight: 500;
+                  color: var(--text-primary);
+                  order: 2;
                 }
               }
             }
@@ -583,9 +629,16 @@
                     gap: 6px;
 
                     .team-logo {
-                      font-size: 0.875rem;
-                      width: 16px;
-                      height: 16px;
+                      width: 30px !important;
+                      height: 30px !important;
+                      max-width: 30px !important;
+                      max-height: 30px !important;
+                      min-width: 30px !important;
+                      min-height: 30px !important;
+                      border-radius: 5px;
+                      object-fit: cover;
+                      flex-shrink: 0;
+                      display: block;
                     }
 
                     .team-name {
@@ -610,9 +663,16 @@
 
                   &.team-cell {
                     .team-logo {
-                      font-size: 0.75rem;
-                      width: 14px;
-                      height: 14px;
+                      width: 30px !important;
+                      height: 30px !important;
+                      max-width: 30px !important;
+                      max-height: 30px !important;
+                      min-width: 30px !important;
+                      min-height: 30px !important;
+                      border-radius: 5px;
+                      object-fit: cover;
+                      flex-shrink: 0;
+                      display: block;
                     }
 
                     .team-name {
@@ -696,9 +756,16 @@
                       gap: 4px;
 
                       .team-logo {
-                        font-size: 0.75rem;
-                        width: 14px;
-                        height: 14px;
+                        width: 30px !important;
+                        height: 30px !important;
+                        max-width: 30px !important;
+                        max-height: 30px !important;
+                        min-width: 30px !important;
+                        min-height: 30px !important;
+                        border-radius: 5px;
+                        object-fit: cover;
+                        flex-shrink: 0;
+                        display: block;
                       }
 
                       .team-name {
@@ -723,9 +790,16 @@
 
                     &.team-cell {
                       .team-logo {
-                        font-size: 0.625rem;
-                        width: 12px;
-                        height: 12px;
+                        width: 30px !important;
+                        height: 30px !important;
+                        max-width: 30px !important;
+                        max-height: 30px !important;
+                        min-width: 30px !important;
+                        min-height: 30px !important;
+                        border-radius: 5px;
+                        object-fit: cover;
+                        flex-shrink: 0;
+                        display: block;
                       }
 
                       .team-name {
