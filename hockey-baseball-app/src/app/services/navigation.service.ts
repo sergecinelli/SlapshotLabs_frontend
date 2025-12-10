@@ -126,6 +126,11 @@ export class NavigationService {
   }
 
   getPageTitle(path: string): string {
+    // Check for spray-chart route
+    if (path.includes('/spray-chart')) {
+      return 'Spray Chart';
+    }
+    
     const flatItems = this.getFlatNavigationItems();
     // First, try to find exact match or child items (longer paths first)
     // Sort by path length descending to prioritize more specific paths
@@ -135,6 +140,11 @@ export class NavigationService {
   }
 
   getPageIcon(path: string): string | null {
+    // Check for spray-chart route
+    if (path.includes('/spray-chart')) {
+      return 'scatter_plot';
+    }
+    
     const flatItems = this.getFlatNavigationItems();
     // First, try to find exact match or child items (longer paths first)
     // Sort by path length descending to prioritize more specific paths

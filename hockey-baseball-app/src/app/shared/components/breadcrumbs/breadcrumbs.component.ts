@@ -61,14 +61,14 @@ export class BreadcrumbsComponent implements OnInit {
 
     // Check if this is a spray-chart route
     const sprayChartIndex = segments.findIndex(seg => seg === 'spray-chart');
-    if (sprayChartIndex !== -1 && sprayChartIndex > 0) {
+    if (sprayChartIndex !== -1 && sprayChartIndex > 1) {
       const entityId = segments[sprayChartIndex - 1];
+      const entityTypeSegment = segments[sprayChartIndex - 2];
       
-      // Build breadcrumbs up to spray-chart (Teams & Rosters > Players/Goalies)
-      let currentPath = '';
+      // Build breadcrumbs up to the entity type (Teams & Rosters > Players/Goalies)
       const seenLabels = new Set<string>();
+      let currentPath = '';
       
-      // Process segments up to (but not including) the ID before spray-chart
       for (let i = 0; i < sprayChartIndex - 1; i++) {
         const segment = segments[i];
         currentPath += '/' + segment;
@@ -91,10 +91,10 @@ export class BreadcrumbsComponent implements OnInit {
         }
       }
       
-      // Determine entity type from segment before ID (players or goalies)
-      const entityType = sprayChartIndex > 1 && segments[sprayChartIndex - 2] === 'players' ? 'player' : 'goalie';
+      // Determine entity type (players or goalies)
+      const entityType = entityTypeSegment === 'players' ? 'player' : 'goalie';
       
-      // Fetch entity name asynchronously and add both entity name and "Spray Chart" (Spray Chart as last, non-clickable)
+      // Fetch entity name asynchronously and add both entity name and "Spray Chart"
       if (entityType === 'player') {
         this.playerService.getPlayerById(entityId).subscribe({
           next: (player) => {
@@ -179,28 +179,14 @@ export class BreadcrumbsComponent implements OnInit {
     }
 
     // Build breadcrumb path
-    let currentPath = '';
     const seenLabels = new Set<string>();
     
-    // Check if this is a spray-chart route to skip it in normal processing
-    const isSprayChartRoute = segments.includes('spray-chart');
-    const sprayChartIdx = isSprayChartRoute ? segments.findIndex(seg => seg === 'spray-chart') : -1;
-    
-    for (let i = 0; i < segments.length; i++) {
-      const segment = segments[i];
-      
-      // Skip spray-chart segment and the ID before it in normal processing (it's handled separately above)
-      if (isSprayChartRoute && sprayChartIdx !== -1) {
-        if (segment === 'spray-chart' || (i === sprayChartIdx - 1)) {
-          continue;
-        }
-      }
-      
-      currentPath += '/' + segment;
+    segments.reduce((currentPath, segment) => {
+      const newPath = currentPath + '/' + segment;
       
       // Get label and icon from navigation service
-      const label = this.navigationService.getPageTitle(currentPath);
-      const icon = this.navigationService.getPageIcon(currentPath);
+      const label = this.navigationService.getPageTitle(newPath);
+      const icon = this.navigationService.getPageIcon(newPath);
 
       // Only add if we have a valid label (not empty)
       if (label) {
@@ -209,12 +195,14 @@ export class BreadcrumbsComponent implements OnInit {
           seenLabels.add(label);
           items.push({
             label,
-            path: currentPath,
+            path: newPath,
             icon,
           });
         }
       }
-    }
+      
+      return newPath;
+    }, '');
 
     // If no items were added, add Dashboard as fallback
     if (items.length === 0) {
