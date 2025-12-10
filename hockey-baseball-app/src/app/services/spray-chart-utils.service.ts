@@ -4,6 +4,17 @@ import { ShotLocationData } from '../shared/components/shot-location-display/sho
 import { GameEventName } from './game-event-name.service';
 import { ShotTypeResponse } from './game-metadata.service';
 
+export interface SprayChartTransformOptions {
+  indexMap?: Map<number, number>;
+  teamNames?: Map<number, string>;
+  playerNames?: Map<number, string>;
+  goalieNames?: Map<number, string>;
+  periodNames?: Map<number, string>;
+  defaultTeamName?: string;
+  defaultPlayerName?: string;
+  formatTime?: (time: string) => string | undefined;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -14,13 +25,15 @@ export class SprayChartUtilsService {
   transformSprayChartData(
     events: SprayChartEvent[],
     eventNames: GameEventName[],
-    shotTypes: ShotTypeResponse[]
+    shotTypes: ShotTypeResponse[],
+    options?: SprayChartTransformOptions
   ): ShotLocationData[] {
     // Create lookup maps for event names and shot types
     const eventNameMap = new Map(eventNames.map((e) => [e.id, e.name]));
     const shotTypeMap = new Map(shotTypes.map((s) => [s.id, s.name]));
 
     const results: ShotLocationData[] = [];
+    let fallbackIndex = 0;
 
     for (const event of events) {
       const eventName = eventNameMap.get(event.event_name_id);
@@ -44,12 +57,40 @@ export class SprayChartUtilsService {
         continue;
       }
 
+      const index = this.resolveIndex(event, options, fallbackIndex++);
+      const teamName = options?.teamNames?.get(event.team_id) ?? options?.defaultTeamName;
+      const playerName =
+        options?.playerNames?.get(event.player_id) ??
+        options?.goalieNames?.get(event.goalie_id) ??
+        options?.defaultPlayerName;
+      const description = event.note || event.goal_type || '';
+      const periodLabel =
+        options?.periodNames?.get(event.period_id) ?? (event.period_id ? `Period ${event.period_id}` : undefined);
+      const timeLabel = options?.formatTime ? options.formatTime(event.time) : event.time;
+
       results.push({
+        index,
+        eventId: event.id,
+        eventTypeLabel: type,
+        playerName,
+        teamName,
+        timeLabel,
+        periodLabel,
+        description,
         iceTopOffset: this.convertCoordinateToPercentage(event.ice_top_offset),
         iceLeftOffset: this.convertCoordinateToPercentage(event.ice_left_offset),
         netTopOffset: this.convertCoordinateToPercentage(event.net_top_offset),
         netLeftOffset: this.convertCoordinateToPercentage(event.net_left_offset),
         type,
+        tooltip: this.buildTooltip({
+          index,
+          typeLabel: type,
+          playerName,
+          teamName,
+          timeLabel,
+          periodLabel,
+          description,
+        }),
       });
     }
 
@@ -62,13 +103,15 @@ export class SprayChartUtilsService {
   transformPlayerSprayChartData(
     events: SprayChartEvent[],
     eventNames: GameEventName[],
-    shotTypes: ShotTypeResponse[]
+    shotTypes: ShotTypeResponse[],
+    options?: SprayChartTransformOptions
   ): ShotLocationData[] {
     // Create lookup maps for event names and shot types
     const eventNameMap = new Map(eventNames.map((e) => [e.id, e.name]));
     const shotTypeMap = new Map(shotTypes.map((s) => [s.id, s.name]));
 
     const results: ShotLocationData[] = [];
+    let fallbackIndex = 0;
 
     for (const event of events) {
       const eventName = eventNameMap.get(event.event_name_id);
@@ -112,12 +155,40 @@ export class SprayChartUtilsService {
         continue;
       }
 
+      const index = this.resolveIndex(event, options, fallbackIndex++);
+      const teamName = options?.teamNames?.get(event.team_id) ?? options?.defaultTeamName;
+      const playerName =
+        options?.playerNames?.get(event.player_id) ??
+        options?.goalieNames?.get(event.goalie_id) ??
+        options?.defaultPlayerName;
+      const description = event.note || event.goal_type || '';
+      const periodLabel =
+        options?.periodNames?.get(event.period_id) ?? (event.period_id ? `Period ${event.period_id}` : undefined);
+      const timeLabel = options?.formatTime ? options.formatTime(event.time) : event.time;
+
       results.push({
+        index,
+        eventId: event.id,
+        eventTypeLabel: type,
+        playerName,
+        teamName,
+        timeLabel,
+        periodLabel,
+        description,
         iceTopOffset: this.convertCoordinateToPercentage(event.ice_top_offset),
         iceLeftOffset: this.convertCoordinateToPercentage(event.ice_left_offset),
         netTopOffset: this.convertCoordinateToPercentage(event.net_top_offset),
         netLeftOffset: this.convertCoordinateToPercentage(event.net_left_offset),
         type,
+        tooltip: this.buildTooltip({
+          index,
+          typeLabel: type,
+          playerName,
+          teamName,
+          timeLabel,
+          periodLabel,
+          description,
+        }),
       });
     }
 
@@ -130,13 +201,15 @@ export class SprayChartUtilsService {
   transformGameSprayChartData(
     events: SprayChartEvent[],
     eventNames: GameEventName[],
-    shotTypes: ShotTypeResponse[]
+    shotTypes: ShotTypeResponse[],
+    options?: SprayChartTransformOptions
   ): ShotLocationData[] {
     // Create lookup maps for event names and shot types
     const eventNameMap = new Map(eventNames.map((e) => [e.id, e.name]));
     const shotTypeMap = new Map(shotTypes.map((s) => [s.id, s.name]));
 
     const results: ShotLocationData[] = [];
+    let fallbackIndex = 0;
 
     for (const event of events) {
       const eventName = eventNameMap.get(event.event_name_id);
@@ -186,12 +259,39 @@ export class SprayChartUtilsService {
         continue;
       }
 
+      const index = this.resolveIndex(event, options, fallbackIndex++);
+      const teamName = options?.teamNames?.get(event.team_id) ?? options?.defaultTeamName;
+      const playerName =
+        options?.playerNames?.get(event.player_id) ??
+        options?.goalieNames?.get(event.goalie_id) ??
+        options?.defaultPlayerName;
+      const periodLabel =
+        options?.periodNames?.get(event.period_id) ?? (event.period_id ? `Period ${event.period_id}` : undefined);
+      const timeLabel = options?.formatTime ? options.formatTime(event.time) : event.time;
+
       results.push({
+        index,
+        eventId: event.id,
+        eventTypeLabel: type,
+        playerName,
+        teamName,
+        timeLabel,
+        periodLabel,
+        description: event.note || event.goal_type || '',
         iceTopOffset: this.convertCoordinateToPercentage(event.ice_top_offset),
         iceLeftOffset: this.convertCoordinateToPercentage(event.ice_left_offset),
         netTopOffset: this.convertCoordinateToPercentage(event.net_top_offset),
         netLeftOffset: this.convertCoordinateToPercentage(event.net_left_offset),
         type,
+        tooltip: this.buildTooltip({
+          index,
+          typeLabel: type,
+          playerName,
+          teamName,
+          timeLabel,
+          periodLabel,
+          description: event.note || event.goal_type || '',
+        }),
       });
     }
 
@@ -203,5 +303,45 @@ export class SprayChartUtilsService {
    */
   private convertCoordinateToPercentage(coordinate: number): number {
     return (coordinate / 1000) * 100;
+  }
+
+  private resolveIndex(
+    event: SprayChartEvent,
+    options: SprayChartTransformOptions | undefined,
+    fallbackIndex: number
+  ): number {
+    const existing = options?.indexMap?.get(event.id);
+    if (existing) {
+      return existing;
+    }
+    return fallbackIndex + 1;
+  }
+
+  private buildTooltip(args: {
+    index: number;
+    typeLabel: string;
+    playerName?: string;
+    teamName?: string;
+    timeLabel?: string;
+    periodLabel?: string;
+    description?: string;
+  }): string {
+    const lines = [`#${args.index} — ${args.typeLabel}`];
+    if (args.playerName) {
+      lines.push(`Player: ${args.playerName}`);
+    }
+    if (args.teamName) {
+      lines.push(`Team: ${args.teamName}`);
+    }
+    if (args.timeLabel) {
+      lines.push(`Time: ${args.timeLabel}`);
+    }
+    if (args.periodLabel) {
+      lines.push(`Period: ${args.periodLabel}`);
+    }
+    if (args.description) {
+      lines.push(args.description);
+    }
+    return lines.join('\n');
   }
 }

@@ -12,7 +12,10 @@ import {
 } from '../../shared/components/shot-location-display/shot-location-display';
 import { GameEventNameService } from '../../services/game-event-name.service';
 import { GameMetadataService } from '../../services/game-metadata.service';
-import { SprayChartUtilsService } from '../../services/spray-chart-utils.service';
+import {
+  SprayChartTransformOptions,
+  SprayChartUtilsService,
+} from '../../services/spray-chart-utils.service';
 import { ButtonComponent } from '../../shared/components/buttons/button/button.component';
 
 @Component({
@@ -69,10 +72,16 @@ export class SprayChartComponent implements OnInit {
       next: ({ goalie, eventNames, shotTypes, sprayChartEvents }) => {
         if (goalie) {
           this.goalie = goalie;
+          const transformOptions: SprayChartTransformOptions = {
+            defaultPlayerName: `${goalie.firstName} ${goalie.lastName}`,
+            defaultTeamName: goalie.team,
+            formatTime: (time) => time,
+          };
           this.shotLocationData = this.sprayChartUtils.transformSprayChartData(
             sprayChartEvents,
             eventNames,
-            shotTypes
+            shotTypes,
+            transformOptions
           );
         } else {
           console.error(`Goalie not found with ID: ${goalieId}`);
@@ -101,10 +110,16 @@ export class SprayChartComponent implements OnInit {
       next: ({ player, eventNames, shotTypes, sprayChartEvents }) => {
         if (player) {
           this.player = player;
+          const transformOptions: SprayChartTransformOptions = {
+            defaultPlayerName: `${player.firstName} ${player.lastName}`,
+            defaultTeamName: player.team,
+            formatTime: (time) => time,
+          };
           this.shotLocationData = this.sprayChartUtils.transformPlayerSprayChartData(
             sprayChartEvents,
             eventNames,
-            shotTypes
+            shotTypes,
+            transformOptions
           );
         } else {
           console.error(`Player not found with ID: ${playerId}`);

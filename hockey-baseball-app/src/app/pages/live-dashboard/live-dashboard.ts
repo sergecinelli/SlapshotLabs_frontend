@@ -37,7 +37,10 @@ import { TeamOptionsService } from '../../services/team-options.service';
 import { GameEventService } from '../../services/game-event.service';
 import { GameEventNameService } from '../../services/game-event-name.service';
 import { ScheduleService } from '../../services/schedule.service';
-import { SprayChartUtilsService } from '../../services/spray-chart-utils.service';
+import {
+  SprayChartTransformOptions,
+  SprayChartUtilsService,
+} from '../../services/spray-chart-utils.service';
 import {
   ShotLocationDisplayComponent,
   ShotLocationData,
@@ -98,6 +101,7 @@ interface GameEvent {
   shotType?: 'save' | 'goal' | 'missed' | 'blocked';
   eventNameId?: number; // Added to track event type for editing
   rawEventData?: ServiceGameEvent; // Store full event data for editing
+  index?: number;
 }
 
 @Component({
@@ -280,6 +284,8 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
   homeSprayChartData = signal<ShotLocationData[]>([]);
   awaySprayChartData = signal<ShotLocationData[]>([]);
   isLoadingSprayCharts = signal(true);
+  private eventIndexMap = new Map<number, number>();
+  private highestEventIndex = 0;
 
   ngOnInit(): void {
     // Get game ID from route parameter
@@ -517,6 +523,9 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
     periods: GamePeriodResponse[],
     teams: { id: string; name: string }[]
   ): void {
+    // Capture indexes for each event (stable across refreshes)
+    liveData.events.forEach((evt) => this.ensureEventIndex(evt.id));
+
     // Group events by period
     const eventsByPeriod = new Map<number, ServiceGameEvent[]>();
 
@@ -633,11 +642,25 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
           shotType: shotTypeCategory,
           eventNameId: event.event_name_id,
           rawEventData: event,
+          index: this.eventIndexMap.get(event.id),
         });
       });
     });
 
     this.gameEvents.set(groupedEvents);
+  }
+
+  /**
+   * Keep a consistent index per event id
+   */
+  private ensureEventIndex(eventId: number): number {
+    const existing = this.eventIndexMap.get(eventId);
+    if (existing) {
+      return existing;
+    }
+    this.highestEventIndex += 1;
+    this.eventIndexMap.set(eventId, this.highestEventIndex);
+    return this.highestEventIndex;
   }
 
   /**
@@ -712,6 +735,33 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
     return undefined;
   }
 
+  private buildSprayChartTransformOptions(): SprayChartTransformOptions {
+    const periodMap = new Map<number, string>();
+    this.periodOptions.forEach((p) => {
+      periodMap.set(p.value, p.label);
+    });
+
+    const teamMap = new Map<number, string>();
+    this.teamOptions.forEach((t) => {
+      teamMap.set(t.value, t.label);
+    });
+
+    const playerMap = new Map<number, string>();
+    this.playerOptions.forEach((p) => playerMap.set(p.value, p.label));
+    this.goalieOptions.forEach((g) => playerMap.set(g.value, g.label));
+
+    const timeFormatter = (time: string) => this.formatElapsedTime(this.parseEventTime(time));
+
+    return {
+      indexMap: this.eventIndexMap,
+      teamNames: teamMap,
+      playerNames: playerMap,
+      goalieNames: playerMap,
+      periodNames: periodMap,
+      formatTime: timeFormatter,
+    };
+  }
+
   /**
    * Load game spray chart data
    */
@@ -729,21 +779,27 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
         const allTransformedData = this.sprayChartUtils.transformGameSprayChartData(
           sprayChartEvents,
           eventNames,
-          shotTypes
+          shotTypes,
+          this.buildSprayChartTransformOptions()
         );
 
         // Split data by team
         const homeData: ShotLocationData[] = [];
         const awayData: ShotLocationData[] = [];
+        const transformedById = new Map<number, ShotLocationData>();
+        allTransformedData.forEach((item) => {
+          if (item.eventId != null) {
+            transformedById.set(item.eventId, item);
+          }
+        });
 
-        sprayChartEvents.forEach((event, index) => {
-          if (index < allTransformedData.length) {
-            const transformedItem = allTransformedData[index];
-            if (event.team_id === this.homeTeamId) {
-              homeData.push(transformedItem);
-            } else if (event.team_id === this.awayTeamId) {
-              awayData.push(transformedItem);
-            }
+        sprayChartEvents.forEach((event) => {
+          const transformedItem = transformedById.get(event.id);
+          if (!transformedItem) return;
+          if (event.team_id === this.homeTeamId) {
+            homeData.push(transformedItem);
+          } else if (event.team_id === this.awayTeamId) {
+            awayData.push(transformedItem);
           }
         });
 
@@ -776,21 +832,27 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
         const allTransformedData = this.sprayChartUtils.transformGameSprayChartData(
           sprayChartEvents,
           eventNames,
-          shotTypes
+          shotTypes,
+          this.buildSprayChartTransformOptions()
         );
 
         // Split data by team
         const homeData: ShotLocationData[] = [];
         const awayData: ShotLocationData[] = [];
+        const transformedById = new Map<number, ShotLocationData>();
+        allTransformedData.forEach((item) => {
+          if (item.eventId != null) {
+            transformedById.set(item.eventId, item);
+          }
+        });
 
-        sprayChartEvents.forEach((event, index) => {
-          if (index < allTransformedData.length) {
-            const transformedItem = allTransformedData[index];
-            if (event.team_id === this.homeTeamId) {
-              homeData.push(transformedItem);
-            } else if (event.team_id === this.awayTeamId) {
-              awayData.push(transformedItem);
-            }
+        sprayChartEvents.forEach((event) => {
+          const transformedItem = transformedById.get(event.id);
+          if (!transformedItem) return;
+          if (event.team_id === this.homeTeamId) {
+            homeData.push(transformedItem);
+          } else if (event.team_id === this.awayTeamId) {
+            awayData.push(transformedItem);
           }
         });
 

@@ -446,3 +446,35 @@ mat-error {
 *::-webkit-scrollbar:vertical {
   width: 10px;
 }
+
+// Spray chart tooltip styles - support line breaks
+// Material tooltip applies class to the overlay pane, not the surface
+// So we need to target the surface inside the pane with the class
+.cdk-overlay-pane[class*="spray-chart-tooltip"] .mdc-tooltip__surface,
+.cdk-overlay-container .cdk-overlay-pane[class*="spray-chart-tooltip"] .mdc-tooltip__surface {
+  white-space: pre-line !important;
+  max-width: 260px !important;
+  line-height: 1.5 !important;
+  text-align: left !important;
+  word-wrap: break-word !important;
+}
+
+// Also target if class is on the surface itself
+.mdc-tooltip__surface.spray-chart-tooltip,
+.spray-chart-tooltip .mdc-tooltip__surface {
+  white-space: pre-line !important;
+  max-width: 260px !important;
+  line-height: 1.5 !important;
+  text-align: left !important;
+  word-wrap: break-word !important;
+}
+
+// Universal fallback - apply to all tooltip surfaces in overlay
+.cdk-overlay-container .mdc-tooltip__surface {
+  &[class*="spray-chart"] {
+    white-space: pre-line !important;
+    max-width: 260px !important;
+    line-height: 1.5 !important;
+    text-align: left !important;
+  }
+}

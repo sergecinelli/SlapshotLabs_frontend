@@ -666,6 +666,7 @@
         <table class="live-dashboard-table">
           <thead class="live-dashboard-table-header">
             <tr>
+              <th class="live-dashboard-table-th w-12">#</th>
               <th class="live-dashboard-table-th">Time</th>
               <th class="live-dashboard-table-th">Team</th>
               <th class="live-dashboard-table-th">Event</th>
@@ -677,7 +678,7 @@
           <tbody class="live-dashboard-table-body">
           @if (gameEvents().length === 0) {
             <tr>
-              <td colspan="6" class="live-dashboard-table-empty">
+              <td colspan="7" class="live-dashboard-table-empty">
                 <div class="live-dashboard-empty-content">
                   <mat-icon class="live-dashboard-empty-icon">event_note</mat-icon>
                   <p class="live-dashboard-empty-title">No game events yet</p>
@@ -689,7 +690,7 @@
             @for (event of gameEvents(); track event.id) {
               @if (event.period) {
                 <tr class="live-dashboard-period-row">
-                  <td class="live-dashboard-period-cell" colspan="6">
+                  <td class="live-dashboard-period-cell" colspan="7">
                     {{ event.period }}
                   </td>
                 </tr>
@@ -698,6 +699,9 @@
                   class="live-dashboard-table-row"
                   [class.live-dashboard-goal-row]="event.shotType === 'goal'"
                 >
+                  <td class="live-dashboard-table-td text-center font-semibold">
+                    {{ event.index ?? '—' }}
+                  </td>
                   <td class="live-dashboard-table-td">{{ event.time }}</td>
                   <td class="live-dashboard-table-td">
                     <div class="live-dashboard-team-cell">

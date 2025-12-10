@@ -1,6 +1,7 @@
 import { Component, input, computed, ChangeDetectionStrategy, signal, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { environment } from '../../../../environments/environment';
 
 export interface ShotLocationData {
@@ -8,6 +9,15 @@ export interface ShotLocationData {
   iceLeftOffset: number;
   netTopOffset?: number | null;
   netLeftOffset?: number | null;
+  index: number;
+  eventId?: number;
+  eventTypeLabel?: string;
+  playerName?: string;
+  teamName?: string;
+  timeLabel?: string;
+  periodLabel?: string;
+  description?: string;
+  tooltip?: string;
   type:
     | 'Goal'
     | 'Save'
@@ -28,7 +38,7 @@ interface TypeStats {
 
 @Component({
   selector: 'app-shot-location-display',
-  imports: [CommonModule, MatIconModule],
+  imports: [CommonModule, MatIconModule, MatTooltipModule],
   templateUrl: './shot-location-display.html',
   styleUrl: './shot-location-display.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -123,17 +133,11 @@ export class ShotLocationDisplayComponent {
       .filter((item) => visible.has(item.type))
       .filter((item) => !(item.iceTopOffset === 0 && item.iceLeftOffset === 0));
 
-    // Add sequential numbering per type
-    const counters = new Map<ShotLocationData['type'], number>();
-    return filtered.map((item) => {
-      const currentCount = counters.get(item.type) || 0;
-      counters.set(item.type, currentCount + 1);
-      return {
-        ...item,
-        color: this.typeColors[item.type],
-        number: currentCount + 1,
-      };
-    });
+    return filtered.map((item) => ({
+      ...item,
+      color: this.typeColors[item.type],
+      tooltip: item.tooltip || this.buildTooltip(item),
+    }));
   });
 
   netItems = computed(() => {
@@ -143,17 +147,11 @@ export class ShotLocationDisplayComponent {
       .filter((item) => !(item.netTopOffset === 0 && item.netLeftOffset === 0))
       .filter((item) => visible.has(item.type));
 
-    // Add sequential numbering per type
-    const counters = new Map<ShotLocationData['type'], number>();
-    return filtered.map((item) => {
-      const currentCount = counters.get(item.type) || 0;
-      counters.set(item.type, currentCount + 1);
-      return {
-        ...item,
-        color: this.typeColors[item.type],
-        number: currentCount + 1,
-      };
-    });
+    return filtered.map((item) => ({
+      ...item,
+      color: this.typeColors[item.type],
+      tooltip: item.tooltip || this.buildTooltip(item),
+    }));
   });
 
   toggleType(type: ShotLocationData['type']): void {
@@ -170,6 +168,26 @@ export class ShotLocationDisplayComponent {
     const teamId = this.teamId();
     return teamId ? `${environment.apiUrl}/hockey/team/${teamId}/logo` : '';
   });
+
+  buildTooltip(item: ShotLocationData): string {
+    const lines = [`#${item.index} — ${item.eventTypeLabel || item.type}`];
+    if (item.playerName) {
+      lines.push(`Player: ${item.playerName}`);
+    }
+    if (item.teamName) {
+      lines.push(`Team: ${item.teamName}`);
+    }
+    if (item.timeLabel) {
+      lines.push(`Time: ${item.timeLabel}`);
+    }
+    if (item.periodLabel) {
+      lines.push(`Period: ${item.periodLabel}`);
+    }
+    if (item.description) {
+      lines.push(item.description);
+    }
+    return lines.join('\n');
+  }
 
   private loadFiltersFromStorage(key: string): void {
     try {

@@ -22,7 +22,10 @@ import { SeasonService } from '../../services/season.service';
 import { Season } from '../../shared/interfaces/season.interface';
 import { GameEventNameService, GameEventName } from '../../services/game-event-name.service';
 import { GameMetadataService, ShotTypeResponse } from '../../services/game-metadata.service';
-import { SprayChartUtilsService } from '../../services/spray-chart-utils.service';
+import {
+  SprayChartTransformOptions,
+  SprayChartUtilsService,
+} from '../../services/spray-chart-utils.service';
 import { ComponentVisibilityByRoleDirective } from '../../shared/directives/component-visibility-by-role.directive';
 import { ButtonComponent } from '../../shared/components/buttons/button/button.component';
 import { visibilityByRoleMap } from './player-profile.role-map';
@@ -153,10 +156,16 @@ export class PlayerProfileComponent implements OnInit {
     // Fetch spray chart with season filter only (game_id and shot_type_id are empty)
     this.playerService.getPlayerSprayChart(playerId, { season_id: seasonId }).subscribe({
       next: (sprayChartEvents) => {
+        const transformOptions: SprayChartTransformOptions = {
+          defaultPlayerName: `${this.player?.firstName ?? ''} ${this.player?.lastName ?? ''}`.trim(),
+          defaultTeamName: this.player?.team,
+          formatTime: (time) => time,
+        };
         this.shotLocationData = this.sprayChartUtils.transformPlayerSprayChartData(
           sprayChartEvents,
           eventNames,
-          shotTypes
+          shotTypes,
+          transformOptions
         );
         this.loading = false;
       },

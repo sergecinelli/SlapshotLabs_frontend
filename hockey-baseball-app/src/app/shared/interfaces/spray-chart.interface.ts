@@ -29,4 +29,5 @@ export interface SprayChartEvent {
   time_length: string;
   youtube_link: string;
   id: number;
+  index?: number;
 }

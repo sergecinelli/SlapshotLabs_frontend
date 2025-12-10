@@ -95,36 +95,114 @@
 
         .location-marker {
           position: absolute;
-          width: 24px;
-          height: 24px;
+          width: 26px;
+          height: 26px;
           border-radius: 50%;
           transform: translate(-50%, -50%);
           border: 2px solid rgba(255, 255, 255, 0.9);
           box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-          pointer-events: none;
+          pointer-events: auto;
           z-index: 10;
           display: flex;
           align-items: center;
           justify-content: center;
+          cursor: help;
+          transition: transform 0.12s ease;
 
-          .marker-number {
-            color: white;
+          &:hover {
+            transform: translate(-50%, -50%) scale(1.05);
+          }
+
+          .marker-dot {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background-color: inherit;
+          }
+
+          .marker-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            min-width: 18px;
+            height: 18px;
+            padding: 0 4px;
+            background: var(--color-dark);
+            color: var(--color-white);
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            border-radius: 999px;
             font-weight: 700;
-            font-size: 11px;
-            line-height: 1;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+            font-size: 10px;
+            line-height: 18px;
+            text-align: center;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
             user-select: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
           }
 
-          &.marker-medium .marker-number {
-            font-size: 9px;
+          &.marker-medium {
+            width: 22px;
+            height: 22px;
+
+            .marker-badge {
+              min-width: 16px;
+              height: 16px;
+              font-size: 9px;
+              line-height: 16px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+            }
           }
 
-          &.marker-large .marker-number {
-            font-size: 7px;
+          &.marker-large {
+            width: 20px;
+            height: 20px;
+
+            .marker-badge {
+              min-width: 14px;
+              height: 14px;
+              font-size: 8px;
+              line-height: 14px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+            }
           }
         }
       }
     }
+  }
+}
+
+:host ::ng-deep .spray-chart-tooltip {
+  white-space: pre-line !important;
+  max-width: 260px;
+  line-height: 1.5;
+  text-align: left;
+}
+
+:host ::ng-deep .mat-mdc-tooltip .mdc-tooltip__surface {
+  white-space: pre-line !important;
+  max-width: 260px;
+  line-height: 1.5;
+  text-align: left;
+}
+
+::ng-deep .spray-chart-tooltip .mdc-tooltip__surface {
+  white-space: pre-line !important;
+  max-width: 260px !important;
+  line-height: 1.5 !important;
+  text-align: left !important;
+}
+
+::ng-deep .cdk-overlay-container .mdc-tooltip__surface {
+  &.spray-chart-tooltip {
+    white-space: pre-line !important;
+    max-width: 260px !important;
+    line-height: 1.5 !important;
+    text-align: left !important;
   }
 }

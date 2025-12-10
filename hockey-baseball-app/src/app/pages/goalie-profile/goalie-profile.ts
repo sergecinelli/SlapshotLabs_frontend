@@ -21,7 +21,10 @@ import { SeasonService } from '../../services/season.service';
 import { Season } from '../../shared/interfaces/season.interface';
 import { GameEventNameService, GameEventName } from '../../services/game-event-name.service';
 import { GameMetadataService, ShotTypeResponse } from '../../services/game-metadata.service';
-import { SprayChartUtilsService } from '../../services/spray-chart-utils.service';
+import {
+  SprayChartTransformOptions,
+  SprayChartUtilsService,
+} from '../../services/spray-chart-utils.service';
 
 @Component({
   selector: 'app-goalie-profile',
@@ -140,12 +143,17 @@ export class GoalieProfileComponent implements OnInit {
     // Fetch spray chart with season filter only (game_id and shot_type_id are empty)
     this.goalieService.getGoalieSprayChart(goalieId, { season_id: seasonId }).subscribe({
       next: (sprayChartEvents) => {
+        const transformOptions: SprayChartTransformOptions = {
+          defaultPlayerName: `${this.goalie?.firstName ?? ''} ${this.goalie?.lastName ?? ''}`.trim(),
+          defaultTeamName: this.goalie?.team,
+          formatTime: (time) => time,
+        };
         this.shotLocationData = this.sprayChartUtils.transformSprayChartData(
           sprayChartEvents,
           eventNames,
-          shotTypes
+          shotTypes,
+          transformOptions
         );
-        console.log(this.shotLocationData);
         this.loading = false;
       },
       error: (error) => {
