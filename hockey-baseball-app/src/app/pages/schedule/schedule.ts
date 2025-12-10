@@ -253,7 +253,7 @@ import { forkJoin } from 'rxjs';
               <div class="game-card-actions">
                 @if (schedule.status === 2 || schedule.status === 3) {
                   <app-button-route
-                    [route]="'/live-dashboard/' + schedule.id"
+                    [route]="'/schedule/live/' + schedule.id"
                     [bg]="'green'"
                     [bghover]="'green'"
                     [color]="'white'"
@@ -868,7 +868,7 @@ export class ScheduleComponent implements OnInit {
   }
 
   openLiveDashboard(schedule: Schedule): void {
-    this.router.navigate(['/live-dashboard', schedule.id]);
+    this.router.navigate(['/schedule/live', schedule.id]);
   }
 
   openAddScheduleModal(): void {

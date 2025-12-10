@@ -224,7 +224,7 @@ export const routes: Routes = [
 
       // Live Dashboard routes
       {
-        path: 'live-dashboard/:gameId',
+        path: 'schedule/live/:gameId',
         loadComponent: () =>
           import('./pages/live-dashboard/live-dashboard').then((m) => m.LiveDashboardComponent),
         canActivate: [RoleAccessGuard],

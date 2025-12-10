@@ -12,97 +12,95 @@
   <div *ngIf="!isLoadingGameData" class="dashboard-cards-container">
     <!-- Tournament Info Header -->
     <div class="live-dashboard-tournament-header">
-      <div>
-        <span class="font-medium text-lg">{{ tournamentName() }}</span>
+      <div class="tournament-header-left">
+        <div class="tournament-name">{{ tournamentName() }}</div>
       </div>
-      <div class="text-center">
-        <div class="font-semibold">{{ tournamentType() }}</div>
-        <div class="text-sm opacity-90">{{ tournamentCategory() }}</div>
+      <div class="tournament-header-center">
+        <div class="tournament-type">{{ tournamentType() }}</div>
+        <div class="tournament-category">{{ tournamentCategory() }}</div>
       </div>
-      <div class="text-right">
-        <div class="font-medium">{{ tournamentDate() }}</div>
-        <div class="text-sm opacity-90">{{ arenaInfo() }}</div>
+      <div class="tournament-header-right">
+        <div class="tournament-info-item">
+          <mat-icon class="tournament-info-icon">event</mat-icon>
+          <span class="tournament-info-text">{{ tournamentDate() }}</span>
+        </div>
+        <div class="tournament-info-item">
+          <mat-icon class="tournament-info-icon">place</mat-icon>
+          <span class="tournament-info-text">{{ arenaInfo() }}</span>
+        </div>
       </div>
     </div>
 
     <!-- Game Score Section -->
-    <div class="live-dashboard-card live-dashboard-score-card">
-      <div class="flex justify-center items-center gap-8 mb-6">
+    <div class="live-dashboard-score-card">
+      <!-- Period Selector Header -->
+      <div class="score-card-period-header">
+        <ng-container *ngIf="!isGameOver; else finalLabel">
+          <mat-form-field class="period-select-field">
+            <mat-select
+              [(ngModel)]="currentPeriodId"
+              (selectionChange)="onPeriodChange($event.value)"
+              [panelClass]="'period-select-panel'"
+            >
+              <mat-option *ngFor="let period of periodOptions" [value]="period.value">
+                {{ period.label }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </ng-container>
+        <ng-template #finalLabel>
+          <div class="period-final-label">Final</div>
+        </ng-template>
+      </div>
+
+      <!-- Teams and Score Section -->
+      <div class="game-teams-section">
         <!-- Away Team -->
-        <div class="flex items-center justify-around gap-4 text-right">
-          <div>
-            <div class="text-xs text-gray-500">
-              {{ awayTeam().teamLevel }}
-              <span class="font-bold text-custom-dark ml-3 uppercase">Visitor</span>
+        <div class="team-section team-section-left" [class.winning]="awayTeam().score > homeTeam().score">
+          <div class="team-info team-info-left">
+            <div class="team-name-group">
+              <div class="team-location">
+                {{ awayTeam().teamLevel }}
+                <span class="team-role-label">Visitor</span>
+              </div>
+              <div class="team-name">{{ awayTeam().name }}</div>
+              <div class="team-record">{{ awayTeam().record }}</div>
             </div>
-            <div class="font-semibold text-base tracking-wider max-w-56">{{ awayTeam().name }}</div>
-            <div class="text-sm font-medium">{{ awayTeam().record }}</div>
-          </div>
-          <div
-            class="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden"
-          >
-            <img
-              [src]="awayTeam().logo"
-              [alt]="awayTeam().name"
-              class="w-full h-full object-cover"
-            />
+            <img [src]="awayTeam().logo" [alt]="awayTeam().name" class="team-logo" />
           </div>
         </div>
 
-        <!-- Score -->
-        <div class="flex-col gap-0 mb-14">
-          <div class="text-center mb-4">
-            <ng-container *ngIf="!isGameOver; else finalLabel">
-              <mat-form-field class="period-select-field">
-                <mat-select
-                  [(ngModel)]="currentPeriodId"
-                  (selectionChange)="onPeriodChange($event.value)"
-                  [panelClass]="'period-select-panel'"
-                >
-                  <mat-option *ngFor="let period of periodOptions" [value]="period.value">
-                    {{ period.label }}
-                  </mat-option>
-                </mat-select>
-              </mat-form-field>
-            </ng-container>
-            <ng-template #finalLabel>
-              <div class="text-xl font-semibold">Final</div>
-            </ng-template>
-          </div>
-          <div class="flex items-center gap-2">
-            <div class="text-center">
-              <div class="text-8xl font-bold">{{ awayTeam().score }}</div>
-              <div class="text-sm text-gray-500">SOG: {{ awayTeam().sog }}</div>
+        <!-- Score in Center -->
+        <div class="score-center-container">
+          <div class="score-wrapper">
+            <div class="team-score-wrapper" [class.winning-away]="awayTeam().score > homeTeam().score">
+              <div class="team-score" [class.winning-score]="awayTeam().score > homeTeam().score">{{ awayTeam().score }}</div>
+              <div class="team-sog">SOG: {{ awayTeam().sog }}</div>
             </div>
-            <div class="text-[72px] text-custom-dark mx-2">⁃</div>
-            <div class="text-center">
-              <div class="text-8xl font-bold">{{ homeTeam().score }}</div>
-              <div class="text-sm text-gray-500">SOG: {{ homeTeam().sog }}</div>
+            <div class="score-separator">-</div>
+            <div class="team-score-wrapper" [class.winning-home]="homeTeam().score > awayTeam().score">
+              <div class="team-score" [class.winning-score]="homeTeam().score > awayTeam().score">{{ homeTeam().score }}</div>
+              <div class="team-sog">SOG: {{ homeTeam().sog }}</div>
             </div>
           </div>
         </div>
 
         <!-- Home Team -->
-        <div class="flex items-center gap-4">
-          <div
-            class="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden"
-          >
-            <img
-              [src]="homeTeam().logo"
-              [alt]="homeTeam().name"
-              class="w-full h-full object-cover"
-            />
-          </div>
-          <div>
-            <div class="text-xs text-gray-500">
-              {{ homeTeam().teamLevel }}
-              <span class="font-bold text-custom-dark ml-3 uppercase">Home</span>
+        <div class="team-section team-section-right" [class.winning]="homeTeam().score > awayTeam().score">
+          <div class="team-info team-info-right">
+            <img [src]="homeTeam().logo" [alt]="homeTeam().name" class="team-logo" />
+            <div class="team-name-group">
+              <div class="team-location">
+                {{ homeTeam().teamLevel }}
+                <span class="team-role-label">Home</span>
+              </div>
+              <div class="team-name">{{ homeTeam().name }}</div>
+              <div class="team-record">{{ homeTeam().record }}</div>
             </div>
-            <div class="font-semibold text-base tracking-wider max-w-56">{{ homeTeam().name }}</div>
-            <div class="text-sm font-medium">{{ homeTeam().record }}</div>
           </div>
         </div>
       </div>
+
     </div>
 
     <!-- Game Event Actions (Unified Section) -->
@@ -170,7 +168,10 @@
     <div class="grid grid-cols-2 gap-6">
       <!-- Away Team Stats Box -->
       <div class="live-dashboard-stats-card">
-        <div class="stats-card-title">{{ awayTeam().name }}</div>
+        <div class="stats-card-title">
+          <img [src]="awayTeam().logo" [alt]="awayTeam().name" class="stats-card-team-logo" />
+          <span>{{ awayTeam().name }}</span>
+        </div>
 
         <div class="stats-card-content">
           <div class="space-y-4">
@@ -410,7 +411,10 @@
 
       <!-- Home Team Stats Box -->
       <div class="live-dashboard-stats-card">
-        <div class="stats-card-title">{{ homeTeam().name }}</div>
+        <div class="stats-card-title">
+          <img [src]="homeTeam().logo" [alt]="homeTeam().name" class="stats-card-team-logo" />
+          <span>{{ homeTeam().name }}</span>
+        </div>
 
         <div class="stats-card-content">
           <div class="space-y-4">

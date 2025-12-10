@@ -308,7 +308,7 @@ export class BannerComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   goToLiveDashboard(gameId: number): void {
-    this.router.navigate([`/live-dashboard/${gameId}`]);
+    this.router.navigate([`/schedule/live/${gameId}`]);
   }
 
   goToTeamProfile(teamId: number): void {

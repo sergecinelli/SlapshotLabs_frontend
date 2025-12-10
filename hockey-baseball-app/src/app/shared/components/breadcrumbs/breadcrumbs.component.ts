@@ -6,11 +6,14 @@ import { NavigationService } from '../../../services/navigation.service';
 import { GoalieService } from '../../../services/goalie.service';
 import { PlayerService } from '../../../services/player.service';
 import { TeamService } from '../../../services/team.service';
+import { LiveGameService } from '../../../services/live-game.service';
 
 export interface BreadcrumbItem {
   label: string;
   path: string;
   icon?: string | null;
+  isLive?: boolean;
+  tournamentName?: string;
 }
 
 @Component({
@@ -26,6 +29,7 @@ export class BreadcrumbsComponent implements OnInit {
   private goalieService = inject(GoalieService);
   private playerService = inject(PlayerService);
   private teamService = inject(TeamService);
+  private liveGameService = inject(LiveGameService);
 
   breadcrumbs = signal<BreadcrumbItem[]>([]);
 
@@ -54,6 +58,11 @@ export class BreadcrumbsComponent implements OnInit {
       return;
     }
 
+    if (this.isLiveDashboardRoute(segments)) {
+      this.handleLiveDashboardRoute(segments);
+      return;
+    }
+
     const items = this.buildStandardBreadcrumbs(segments);
     this.handleSpecialRoutes(segments, items, url);
   }
@@ -77,6 +86,12 @@ export class BreadcrumbsComponent implements OnInit {
     return sprayChartIndex !== -1 && sprayChartIndex > 1;
   }
 
+  private isLiveDashboardRoute(segments: string[]): boolean {
+    const scheduleIndex = segments.findIndex((seg) => seg === 'schedule');
+    const liveIndex = segments.findIndex((seg) => seg === 'live');
+    return scheduleIndex !== -1 && liveIndex !== -1 && liveIndex === scheduleIndex + 1;
+  }
+
   private handleSprayChartRoute(segments: string[], url: string): void {
     const sprayChartIndex = segments.findIndex((seg) => seg === 'spray-chart');
     const entityId = segments[sprayChartIndex - 1];
@@ -91,6 +106,55 @@ export class BreadcrumbsComponent implements OnInit {
 
     this.addEntityTypeBreadcrumb(items, entityType);
     this.loadEntityAndSetBreadcrumbs(entityType, entityId, items, url);
+  }
+
+  private handleLiveDashboardRoute(segments: string[]): void {
+    const liveIndex = segments.findIndex((seg) => seg === 'live');
+    const gameId = segments[liveIndex + 1];
+
+    if (!gameId || isNaN(parseInt(gameId, 10))) {
+      // Fallback to standard breadcrumbs if gameId is invalid
+      const items = this.buildStandardBreadcrumbs(segments);
+      this.breadcrumbs.set(items);
+      return;
+    }
+
+    // Set initial breadcrumbs: Schedule
+    const items: BreadcrumbItem[] = [
+      {
+        label: 'Schedule',
+        path: '/schedule',
+        icon: this.navigationService.getMaterialIcon('schedule'),
+      },
+    ];
+
+    // Set initial breadcrumbs while loading tournament name
+    this.breadcrumbs.set(items);
+
+    // Load game data to get tournament name
+    this.liveGameService.getGameExtra(parseInt(gameId, 10)).subscribe({
+      next: (gameExtra) => {
+        const tournamentName = gameExtra.game_type_name || 'Tournament';
+        const updatedItems: BreadcrumbItem[] = [
+          {
+            label: 'Schedule',
+            path: '/schedule',
+            icon: this.navigationService.getMaterialIcon('schedule'),
+          },
+          {
+            label: tournamentName,
+            path: '',
+            icon: null,
+            isLive: true,
+          },
+        ];
+        this.breadcrumbs.set(updatedItems);
+      },
+      error: () => {
+        // Keep existing breadcrumbs on error (Schedule)
+        this.breadcrumbs.set(items);
+      },
+    });
   }
 
   private isValidEntityId(entityId: string): boolean {

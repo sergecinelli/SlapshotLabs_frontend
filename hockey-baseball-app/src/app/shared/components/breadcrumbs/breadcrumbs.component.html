@@ -4,7 +4,36 @@
       <ol class="breadcrumbs-list">
         @for (item of breadcrumbs(); track item.path; let i = $index) {
           <li class="breadcrumbs-item">
-            @if (isLast(i)) {
+            @if (isLast(i) && item.isLive) {
+              <!-- Last item with live indicator (pulsing circle) -->
+              <div class="breadcrumbs-current">
+                <div class="breadcrumbs-title-icon-wrapper">
+                  <span class="live-indicator"></span>
+                </div>
+                <h1 class="breadcrumbs-title">{{ item.label }}</h1>
+              </div>
+            } @else if (item.isLive) {
+              <!-- Live item with pulsing indicator and tournament name -->
+              <a 
+                class="breadcrumbs-link"
+                (click)="navigateTo(item.path, $event)"
+                (keyup.enter)="navigateTo(item.path, $event)"
+                (keyup.space)="navigateTo(item.path, $event)"
+                tabindex="0"
+                role="link"
+                [attr.aria-label]="'Navigate to ' + item.label"
+              >
+                <span class="live-indicator"></span>
+                <span class="breadcrumbs-label">{{ item.label }}</span>
+                @if (item.tournamentName) {
+                  <span class="breadcrumbs-divider">|</span>
+                  <span class="breadcrumbs-tournament-name">{{ item.tournamentName }}</span>
+                }
+              </a>
+              @if (!isLast(i)) {
+                <span class="material-symbols-rounded breadcrumbs-separator">chevron_right</span>
+              }
+            } @else if (isLast(i)) {
               <!-- Last item with icon and title -->
               <div class="breadcrumbs-current">
                 @if (item.icon) {

@@ -44,6 +44,8 @@ export type AppColor =
   | 'orange'
   | 'purple'
   | 'green'
+  | 'blue'
+  | 'blue_dark'
   // Legacy CSS variable aliases (for backward compatibility)
   | 'color_primary'
   | 'color_dark'
@@ -110,6 +112,8 @@ export const appColors: IKeyValue<AppColor, string>[] = [
   { key: 'orange', value: '#ff8509' },
   { key: 'purple', value: '#9C27B0' },
   { key: 'green', value: '#10b981' },
+  { key: 'blue', value: '#3b82f6' },
+  { key: 'blue_dark', value: '#2563eb' },
   
   // Legacy CSS variable aliases (for backward compatibility)
   { key: 'color_primary', value: '#CF142B' },
