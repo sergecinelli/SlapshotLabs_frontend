@@ -81,12 +81,12 @@
               [routerLink]="['/teams-and-rosters/goalies/goalie-profile', game.homeTeamGoalieId]"
               [attr.aria-label]="'View ' + game.homeTeamGoalie + ' profile'"
             >
-              <span>{{ game.homeTeamGoalie }}</span>
+              <span class="goalie-name">{{ game.homeTeamGoalie }}</span>
               <span class="material-symbols-rounded goalie-icon">shield</span>
             </a>
           } @else if (game.homeTeamGoalie) {
             <div class="team-goalie">
-              <span>{{ game.homeTeamGoalie }}</span>
+              <span class="goalie-name">{{ game.homeTeamGoalie }}</span>
               <span class="material-symbols-rounded goalie-icon">shield</span>
             </div>
           }
@@ -140,12 +140,12 @@
               [attr.aria-label]="'View ' + game.awayTeamGoalie + ' profile'"
             >
               <span class="material-symbols-rounded goalie-icon">shield</span>
-              <span>{{ game.awayTeamGoalie }}</span>
+              <span class="goalie-name">{{ game.awayTeamGoalie }}</span>
             </a>
           } @else if (game.awayTeamGoalie) {
             <div class="team-goalie">
               <span class="material-symbols-rounded goalie-icon">shield</span>
-              <span>{{ game.awayTeamGoalie }}</span>
+              <span class="goalie-name">{{ game.awayTeamGoalie }}</span>
             </div>
           }
         </div>
