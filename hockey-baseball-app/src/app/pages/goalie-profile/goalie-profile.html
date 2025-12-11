@@ -21,7 +21,7 @@
             </div>
             <div class="player-photo-container">
               <div class="player-photo">
-                <mat-icon class="photo-placeholder">sports_hockey</mat-icon>
+                <span class="material-symbols-rounded photo-placeholder">sports_hockey</span>
               </div>
             </div>
           </div>
@@ -32,7 +32,7 @@
       <div class="dashboard-card info-card">
         <div class="dashboard-card-header">
           <h2 class="dashboard-card-title">
-            <mat-icon>person</mat-icon>
+            <span class="material-symbols-rounded">person</span>
             Personal Information
           </h2>
         </div>
@@ -70,7 +70,7 @@
       <div class="dashboard-card">
         <div class="dashboard-card-header">
           <h2 class="dashboard-card-title">
-            <mat-icon>bar_chart</mat-icon>
+            <span class="material-symbols-rounded">bar_chart</span>
             Season Statistics
           </h2>
         </div>
@@ -153,7 +153,7 @@
       <div class="dashboard-card info-card">
         <div class="dashboard-card-header">
           <h2 class="dashboard-card-title">
-            <mat-icon>sports_hockey</mat-icon>
+            <span class="material-symbols-rounded">sports_hockey</span>
             Shot Locations
           </h2>
         </div>
@@ -162,7 +162,7 @@
           <app-shot-location-display [data]="getShotLocationData()" [storageKey]="'goalieSprayChartFilters'"></app-shot-location-display>
           } @else {
           <div class="empty-state">
-            <mat-icon class="empty-icon">sports_hockey</mat-icon>
+            <span class="material-symbols-rounded empty-icon">sports_hockey</span>
             <p class="empty-message">
               No shot data available for this goalie in the current season.
             </p>
@@ -175,7 +175,7 @@
       <div class="dashboard-card info-card stats-table-card">
         <div class="dashboard-card-header">
           <h2 class="dashboard-card-title">
-            <mat-icon>table_chart</mat-icon>
+            <span class="material-symbols-rounded">table_chart</span>
             Season Stats
           </h2>
         </div>
@@ -274,7 +274,7 @@
           </div>
           } @else {
           <div class="empty-state">
-            <mat-icon class="empty-icon">table_chart</mat-icon>
+            <span class="material-symbols-rounded empty-icon">table_chart</span>
             <p class="empty-message">No season statistics available for this goalie. </p>
           </div>
           }
@@ -285,7 +285,7 @@
       <div class="dashboard-card info-card stats-table-card">
         <div class="dashboard-card-header">
           <h2 class="dashboard-card-title">
-            <mat-icon>history</mat-icon>
+            <span class="material-symbols-rounded">history</span>
             Recent Game Stats (show last 5 games)
           </h2>
         </div>
@@ -362,7 +362,7 @@
           </div>
           } @else {
           <div class="empty-state">
-            <mat-icon class="empty-icon">history</mat-icon>
+            <span class="material-symbols-rounded empty-icon">history</span>
             <p class="empty-message">No recent game statistics available for this goalie. </p>
           </div>
           }

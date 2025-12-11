@@ -5,7 +5,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ButtonComponent } from '../../shared/components/buttons/button/button.component';
-import { ButtonRouteComponent } from '../../shared/components/buttons/button-route/button-route.component';
 import { WeekPaginationComponent } from '../../shared/components/week-pagination/week-pagination';
 import { ScheduleService } from '../../services/schedule.service';
 import { TeamService } from '../../services/team.service';
@@ -28,7 +27,9 @@ import {
   ScheduleFormModalData,
 } from '../../shared/components/schedule-form-modal/schedule-form-modal';
 import { ComponentVisibilityByRoleDirective } from '../../shared/directives/component-visibility-by-role.directive';
+import { GameCardComponent } from '../../shared/components/game-card/game-card.component';
 import { visibilityByRoleMap } from './schedule.role-map';
+import { getGameStatusLabel } from '../../shared/constants/game-status.constants';
 import { forkJoin } from 'rxjs';
 
 @Component({
@@ -41,24 +42,25 @@ import { forkJoin } from 'rxjs';
     MatDialogModule,
     ComponentVisibilityByRoleDirective,
     ButtonComponent,
-    ButtonRouteComponent,
     WeekPaginationComponent,
+    GameCardComponent,
   ],
   template: `
     <div class="page-content" [appVisibilityMap]="visibilityByRoleMap">
 
-      <!-- Header with Week Pagination and Add Button -->
+      <!-- Header with Month Pagination and Add Button -->
       <div class="schedule-header">
         <div class="schedule-header-left"></div>
         <app-week-pagination
-          [weekStart]="currentWeekStart()"
-          [weekEnd]="currentWeekEnd()"
+          [weekStart]="currentMonthStart()"
+          [weekEnd]="currentMonthEnd()"
           [isFirstWeek]="false"
           [isLastWeek]="false"
-          (weekChange)="onWeekChange($event)"
+          (weekChange)="onMonthChange($event)"
         />
-        <div class="add-schedule-button-wrapper" role-visibility-name="add-schedule-button">
+        <div class="add-schedule-button-wrapper" >
           <app-button
+            role-visibility-name="add-schedule-button"
             [bg]="'primary'"
             [bghover]="'primary_dark'"
             [color]="'white'"
@@ -90,209 +92,13 @@ import { forkJoin } from 'rxjs';
       @if (!loading() && schedules().length > 0) {
         <div class="schedule-cards-container">
           @for (schedule of schedules(); track schedule.id) {
-            <div class="schedule-game-card" [class.completed]="schedule.status === 3" [class.in-progress]="schedule.status === 2" [class.not-started]="schedule.status === 1">
-              <!-- Card Header -->
-              <div class="game-card-header">
-                <div class="header-left">
-                  <div class="game-date-time-row">
-                    <div class="date-time-item">
-                      <mat-icon class="date-time-icon">today</mat-icon>
-                      <span class="game-date">{{ schedule.date }}</span>
-                    </div>
-                    @if (schedule.time) {
-                      <div class="date-time-item">
-                        <mat-icon class="date-time-icon">schedule</mat-icon>
-                        <span class="game-time">{{ formatTimeTo12Hour(schedule.time) }}</span>
-                        @if (schedule.statusName && schedule.status !== 1) {
-                          <span class="game-period-separator">-</span>
-                          <span class="game-period-text">{{ schedule.statusName }}</span>
-                        }
-                      </div>
-                    }
-                  </div>
-                  @if (schedule.gameType || schedule.gameTypeName) {
-                    <div class="game-type-info">
-                      <div class="game-type-text">
-                        @if (schedule.gameType && schedule.gameTypeName) {
-                          <span class="game-type-bold">{{ schedule.gameType }}</span><span class="game-type-separator"> - </span>{{ schedule.gameTypeName }}
-                        } @else {
-                          <span class="game-type-bold">{{ schedule.gameType || schedule.gameTypeName }}</span>
-                        }
-                      </div>
-                    </div>
-                  }
-                </div>
-                <div class="header-right">
-                  <div class="game-status-row">
-                    <div class="status-badge" [class.live-badge]="schedule.status === 2" [class.upcoming-badge]="schedule.status === 1" [class.completed-badge]="schedule.status === 3">
-                      @if (schedule.status === 2) {
-                        <span class="live-indicator"></span>
-                      }
-                      <span class="status-text">{{ getCompletionStatus(schedule).toUpperCase() }}</span>
-                    </div>
-                    @if (schedule.statusName && (schedule.statusName.includes('OT') || schedule.statusName.includes('Overtime'))) {
-                      <span class="game-period-badge">OT</span>
-                    }
-                  </div>
-                  <div class="venue-info">
-                    <div class="venue-name">
-                      @if (schedule.arenaName && schedule.rinkName) {
-                        {{ schedule.arenaName }} - {{ schedule.rinkName }}
-                      } @else if (schedule.arenaRink) {
-                        {{ schedule.arenaRink }}
-                      } @else {
-                        {{ getVenueName(schedule) }}
-                      }
-                    </div>
-                    @if (getVenueLocation(schedule)) {
-                      <div class="venue-location">{{ getVenueLocation(schedule) }}</div>
-                    }
-                  </div>
-                </div>
-              </div>
-
-              <!-- Teams and Score Section -->
-              <div class="game-teams-section">
-                <!-- Home Team -->
-                <div class="team-section team-section-left" [class.winning]="isWinning(schedule, true)">
-                  <div class="team-info team-info-left">
-                    <div class="team-name-group">
-                      @if (schedule.homeTeamId) {
-                        <div 
-                          class="team-name team-link"
-                          (click)="goToTeamProfile(schedule.homeTeamId!)"
-                          (keyup.enter)="goToTeamProfile(schedule.homeTeamId!)"
-                          (keyup.space)="goToTeamProfile(schedule.homeTeamId!)"
-                          tabindex="0"
-                          role="button"
-                          [attr.aria-label]="'View ' + schedule.homeTeam + ' profile'"
-                        >{{ schedule.homeTeam }}</div>
-                      } @else {
-                        <div class="team-name">{{ schedule.homeTeam }}</div>
-                      }
-                      <div class="team-location">{{ getTeamLocation(schedule, true) }}</div>
-                      @if (schedule.homeTeamGoalie && schedule.homeTeamGoalieId) {
-                        <div 
-                          class="team-goalie goalie-link"
-                          (click)="goToGoalieProfile(schedule.homeTeamGoalieId!)"
-                          (keyup.enter)="goToGoalieProfile(schedule.homeTeamGoalieId!)"
-                          (keyup.space)="goToGoalieProfile(schedule.homeTeamGoalieId!)"
-                          tabindex="0"
-                          role="button"
-                          [attr.aria-label]="'View ' + schedule.homeTeamGoalie + ' profile'"
-                        >
-                          <span>{{ schedule.homeTeamGoalie }}</span>
-                          <mat-icon class="goalie-icon">sports_hockey</mat-icon>
-                        </div>
-                      } @else if (schedule.homeTeamGoalie) {
-                        <div class="team-goalie">
-                          <span>{{ schedule.homeTeamGoalie }}</span>
-                          <mat-icon class="goalie-icon">sports_hockey</mat-icon>
-                        </div>
-                      }
-                    </div>
-                    <img [src]="schedule.homeTeamLogo || ''" [alt]="schedule.homeTeam" class="team-logo" />
-                  </div>
-                </div>
-
-                <!-- Score in Center -->
-                <div class="score-center-container">
-                  <div class="team-score-wrapper" [class.winning-home]="isWinning(schedule, true)">
-                    <div class="team-score" [class.winning-score]="isWinning(schedule, true)">{{ schedule.homeGoals }}</div>
-                  </div>
-                  <div class="score-separator">-</div>
-                  <div class="team-score-wrapper" [class.winning-away]="isWinning(schedule, false)">
-                    <div class="team-score" [class.winning-score]="isWinning(schedule, false)">{{ schedule.awayGoals }}</div>
-                  </div>
-                </div>
-
-                <!-- Away Team (Reversed) -->
-                <div class="team-section team-section-right" [class.winning]="isWinning(schedule, false)">
-                  <div class="team-info team-info-right">
-                    <img [src]="schedule.awayTeamLogo || ''" [alt]="schedule.awayTeam" class="team-logo" />
-                    <div class="team-name-group">
-                      @if (schedule.awayTeamId) {
-                        <div 
-                          class="team-name team-link"
-                          (click)="goToTeamProfile(schedule.awayTeamId!)"
-                          (keyup.enter)="goToTeamProfile(schedule.awayTeamId!)"
-                          (keyup.space)="goToTeamProfile(schedule.awayTeamId!)"
-                          tabindex="0"
-                          role="button"
-                          [attr.aria-label]="'View ' + schedule.awayTeam + ' profile'"
-                        >{{ schedule.awayTeam }}</div>
-                      } @else {
-                        <div class="team-name">{{ schedule.awayTeam }}</div>
-                      }
-                      <div class="team-location">{{ getTeamLocation(schedule, false) }}</div>
-                      @if (schedule.awayTeamGoalie && schedule.awayTeamGoalieId) {
-                        <div 
-                          class="team-goalie goalie-link"
-                          (click)="goToGoalieProfile(schedule.awayTeamGoalieId!)"
-                          (keyup.enter)="goToGoalieProfile(schedule.awayTeamGoalieId!)"
-                          (keyup.space)="goToGoalieProfile(schedule.awayTeamGoalieId!)"
-                          tabindex="0"
-                          role="button"
-                          [attr.aria-label]="'View ' + schedule.awayTeamGoalie + ' profile'"
-                        >
-                          <mat-icon class="goalie-icon">sports_hockey</mat-icon>
-                          <span>{{ schedule.awayTeamGoalie }}</span>
-                        </div>
-                      } @else if (schedule.awayTeamGoalie) {
-                        <div class="team-goalie">
-                          <mat-icon class="goalie-icon">sports_hockey</mat-icon>
-                          <span>{{ schedule.awayTeamGoalie }}</span>
-                        </div>
-                      }
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Action Buttons -->
-              <div class="game-card-actions">
-                @if (schedule.status === 2 || schedule.status === 3) {
-                  <app-button-route
-                    [route]="'/schedule/live/' + schedule.id"
-                    [bg]="'green'"
-                    [bghover]="'green'"
-                    [color]="'white'"
-                    [colorhover]="'white'"
-                    [materialIcon]="'dashboard'"
-                    [haveContent]="true"
-                    class="action-button"
-                  >
-                    Dashboard
-                  </app-button-route>
-                }
-                <app-button
-                  [bg]="'orange'"
-                  [bghover]="'orange'"
-                  [color]="'white'"
-                  [colorhover]="'white'"
-                  materialIcon="stylus"
-                  [haveContent]="true"
-                  (clicked)="editSchedule(schedule)"
-                  class="action-button"
-                  role-visibility-name="edit-action"
-                >
-                  Edit
-                </app-button>
-                <app-button
-                  [bg]="'primary'"
-                  [bghover]="'primary_dark'"
-                  [color]="'white'"
-                  [colorhover]="'white'"
-                  [materialIcon]="'delete'"
-                  [haveContent]="true"
-                  (clicked)="deleteSchedule(schedule)"
-                  class="action-button"
-                  role-visibility-name="delete-action"
-                >
-                  Delete
-                </app-button>
-              </div>
-            </div>
+            <app-game-card
+              [game]="schedule"
+              [showActions]="true"
+              [showScore]="true"
+              (edit)="editSchedule($event)"
+              (delete)="deleteSchedule($event)"
+            />
           }
         </div>
       }
@@ -316,8 +122,8 @@ export class ScheduleComponent implements OnInit {
 
   schedules = signal<Schedule[]>([]);
   loading = signal(true);
-  currentWeekStart = signal<Date>(this.getWeekStart(new Date()));
-  currentWeekEnd = signal<Date>(this.getWeekEnd(this.currentWeekStart()));
+  currentMonthStart = signal<Date>(this.getMonthStart(new Date()));
+  currentMonthEnd = signal<Date>(this.getMonthEnd(this.currentMonthStart()));
 
   // Cached data for form modals
   teams: Team[] = [];
@@ -362,23 +168,23 @@ export class ScheduleComponent implements OnInit {
     this.loadInitialData();
   }
 
-  onWeekChange(event: { start: Date; end: Date }): void {
-    this.currentWeekStart.set(event.start);
-    this.currentWeekEnd.set(event.end);
+  onMonthChange(event: { start: Date; end: Date }): void {
+    this.currentMonthStart.set(event.start);
+    this.currentMonthEnd.set(event.end);
     this.loadSchedules();
   }
 
-  private getWeekStart(date: Date): Date {
+  private getMonthStart(date: Date): Date {
     const d = new Date(date);
     d.setHours(0, 0, 0, 0);
-    const day = d.getDay();
-    const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Adjust when day is Sunday
-    return new Date(d.setDate(diff));
+    d.setDate(1);
+    return d;
   }
 
-  private getWeekEnd(weekStart: Date): Date {
-    const end = new Date(weekStart);
-    end.setDate(end.getDate() + 6);
+  private getMonthEnd(monthStart: Date): Date {
+    const end = new Date(monthStart);
+    end.setMonth(end.getMonth() + 1);
+    end.setDate(0);
     end.setHours(23, 59, 59, 999);
     return end;
   }
@@ -393,10 +199,10 @@ export class ScheduleComponent implements OnInit {
   private loadInitialData(): void {
     this.loading.set(true);
 
-    const weekStart = this.currentWeekStart();
-    const weekEnd = this.currentWeekEnd();
-    const from = this.formatDateForAPI(weekStart);
-    const to = this.formatDateForAPI(new Date(weekEnd.getTime() + 24 * 60 * 60 * 1000)); // Add 1 day since 'to' is exclusive
+    const monthStart = this.currentMonthStart();
+    const monthEnd = this.currentMonthEnd();
+    const from = this.formatDateForAPI(monthStart);
+    const to = this.formatDateForAPI(new Date(monthEnd.getTime() + 24 * 60 * 60 * 1000)); // Add 1 day since 'to' is exclusive
 
     // Load all necessary data for the schedule page and form
     forkJoin({
@@ -560,6 +366,7 @@ export class ScheduleComponent implements OnInit {
             arenaAddress: game.arena_id ? (arenaAddressMap.get(game.arena_id) || '') : '',
             status: statusValue,
             statusName: getStatusName(game.status, periodName),
+            periodName: periodName || undefined,
             events: [],
           };
         });
@@ -576,10 +383,10 @@ export class ScheduleComponent implements OnInit {
 
   private loadSchedules(): void {
     // Reload just the schedules without refetching all data
-    const weekStart = this.currentWeekStart();
-    const weekEnd = this.currentWeekEnd();
-    const from = this.formatDateForAPI(weekStart);
-    const to = this.formatDateForAPI(new Date(weekEnd.getTime() + 24 * 60 * 60 * 1000)); // Add 1 day since 'to' is exclusive
+    const monthStart = this.currentMonthStart();
+    const monthEnd = this.currentMonthEnd();
+    const from = this.formatDateForAPI(monthStart);
+    const to = this.formatDateForAPI(new Date(monthEnd.getTime() + 24 * 60 * 60 * 1000)); // Add 1 day since 'to' is exclusive
 
     this.loading.set(true);
     this.scheduleService.getGameList(from, to).subscribe({
@@ -721,6 +528,7 @@ export class ScheduleComponent implements OnInit {
             arenaAddress: game.arena_id ? (arenaAddressMap.get(game.arena_id) || '') : '',
             status: statusValue,
             statusName: getStatusName(game.status, periodName),
+            periodName: periodName || undefined,
             events: [],
           };
         });
@@ -746,13 +554,7 @@ export class ScheduleComponent implements OnInit {
   }
 
   getCompletionStatus(schedule: Schedule): string {
-    if (schedule.status === GameStatus.GameOver) {
-      return 'Completed';
-    } else if (schedule.status === GameStatus.GameInProgress) {
-      return 'Live';
-    } else {
-      return 'Scheduled';
-    }
+    return getGameStatusLabel(schedule.status);
   }
 
   getVenueName(schedule: Schedule): string {

@@ -1,6 +1,6 @@
 <div class="schedule-form-modal">
   <h2 mat-dialog-title class="modal-title">
-    <mat-icon class="title-icon">event</mat-icon>
+    <span class="material-symbols-rounded title-icon">event</span>
     {{ isEditMode ? 'Edit Game' : 'Add Game' }}
   </h2>
 
@@ -22,7 +22,7 @@
             <mat-label class="uppercase text-custom-secondary">Away Team</mat-label>
             <mat-select
               formControlName="awayTeam"
-              (selectionChange)="onAwayTeamChange($event.value)"
+              (selectionChange)="onAwayTeamChange($event)"
             >
               <mat-option *ngFor="let option of teamOptions" [value]="option.value">
                 {{ option.label }}
@@ -70,7 +70,7 @@
             <mat-label class="uppercase text-custom-secondary">Home Team</mat-label>
             <mat-select
               formControlName="homeTeam"
-              (selectionChange)="onHomeTeamChange($event.value)"
+              (selectionChange)="onHomeTeamChange($event)"
             >
               <mat-option *ngFor="let option of teamOptions" [value]="option.value">
                 {{ option.label }}
@@ -146,7 +146,7 @@
         <div class="form-row">
           <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
             <mat-label class="uppercase text-custom-secondary">Arena</mat-label>
-            <mat-select formControlName="arena" (selectionChange)="onArenaChange($event.value)">
+            <mat-select formControlName="arena" (selectionChange)="onArenaChange($event)">
               <mat-option *ngFor="let option of arenaOptions" [value]="option.value">
                 {{ option.label }}
               </mat-option>

@@ -1,6 +1,6 @@
 <div class="highlight-reel-form-modal">
   <h2 mat-dialog-title class="modal-title">
-    <mat-icon class="title-icon">video_library</mat-icon>
+    <span class="material-symbols-rounded title-icon">video_library</span>
     {{ isEditMode ? 'Edit Highlight Reel' : 'Create Highlight Reel' }}
   </h2>
 
@@ -143,7 +143,7 @@
         <div class="column selected-column">
           <div class="selected-events-table">
             <div *ngIf="selectedEvents().length === 0" class="empty-state">
-              <mat-icon>info</mat-icon>
+              <span class="material-symbols-rounded">info</span>
               <p>Click events from the games list to add them here</p>
             </div>
 
@@ -162,7 +162,7 @@
                 <tbody cdkDropList (cdkDropListDropped)="onSelectedEventDrop($event)">
                   <tr class="table-row" *ngFor="let event of selectedEvents()" cdkDrag>
                     <td class="table-cell drag-handle-cell">
-                      <mat-icon class="drag-handle" cdkDragHandle>drag_indicator</mat-icon>
+                      <span class="material-symbols-rounded drag-handle" cdkDragHandle>drag_indicator</span>
                     </td>
                     <td class="table-cell">{{ event.eventName }}</td>
                     <td class="table-cell">{{ event.description || '-' }}</td>
@@ -176,7 +176,7 @@
                         class="remove-button"
                         title="Remove"
                       >
-                        <mat-icon class="icon-small">delete</mat-icon>
+                        <span class="material-symbols-rounded icon-small">delete</span>
                       </button>
                     </td>
                   </tr>

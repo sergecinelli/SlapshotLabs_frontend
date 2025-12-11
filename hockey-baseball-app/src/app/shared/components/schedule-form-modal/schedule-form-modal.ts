@@ -9,7 +9,7 @@ import {
 } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
+import { MatSelectModule, MatSelectChange } from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -617,8 +617,8 @@ export class ScheduleFormModalComponent implements OnInit {
       const defaultGamePeriod =
         this.gamePeriods.length > 0
           ? this.gamePeriods.reduce((min, period) =>
-              (period.order ?? Infinity) < (min.order ?? Infinity) ? period : min
-            )
+            (period.order ?? Infinity) < (min.order ?? Infinity) ? period : min
+          )
           : null;
 
       const hasGameTypeName = !!formValue.gameTypeName;
@@ -695,7 +695,8 @@ export class ScheduleFormModalComponent implements OnInit {
   /**
    * Handle arena selection change and filter rinks
    */
-  onArenaChange(arenaId: number): void {
+  onArenaChange(event: MatSelectChange): void {
+    const arenaId = event.value;
     this.filterRinksByArena(arenaId);
     // Reset rink selection when arena changes
     this.scheduleForm.patchValue({ rink: '' });
@@ -724,7 +725,8 @@ export class ScheduleFormModalComponent implements OnInit {
   /**
    * Handle away team selection change
    */
-  onAwayTeamChange(teamId: string): void {
+  onAwayTeamChange(event: MatSelectChange): void {
+    const teamId = event.value;
     this.filterGoaliesByTeam(teamId, 'away');
     // Reset away goalie selection
     if (this.awayGoalieOptions.length > 0) {
@@ -737,7 +739,8 @@ export class ScheduleFormModalComponent implements OnInit {
   /**
    * Handle home team selection change
    */
-  onHomeTeamChange(teamId: string): void {
+  onHomeTeamChange(event: MatSelectChange): void {
+    const teamId = event.value;
     this.filterGoaliesByTeam(teamId, 'home');
     // Reset home goalie selection
     if (this.homeGoalieOptions.length > 0) {

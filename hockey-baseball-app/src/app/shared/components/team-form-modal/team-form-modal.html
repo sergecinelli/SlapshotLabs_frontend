@@ -1,6 +1,6 @@
 <div class="team-form-modal">
   <h2 mat-dialog-title class="modal-title">
-    <mat-icon class="title-icon">groups</mat-icon>
+    <span class="material-symbols-rounded title-icon">groups</span>
     {{ isEditMode ? 'Edit Team' : 'Add New Team' }}
   </h2>
 
@@ -123,7 +123,7 @@
                 class="upload-placeholder"
                 (click)="triggerFileInput()"
               >
-                <mat-icon class="upload-icon">cloud_upload</mat-icon>
+                <span class="material-symbols-rounded upload-icon">cloud_upload</span>
                 <span class="upload-text">{{
                   isDragging ? 'Drop image here' : 'Click or drag to upload logo'
                 }}</span>
@@ -150,14 +150,14 @@
                   (click)="removeImage()"
                   type="button"
                 >
-                  <mat-icon>close</mat-icon>
+                  <span class="material-symbols-rounded">close</span>
                 </button>
               </div>
             </div>
 
             <!-- Error message -->
             <div *ngIf="imageError" class="image-error">
-              <mat-icon class="error-icon">error</mat-icon>
+              <span class="material-symbols-rounded error-icon">error</span>
               <span>{{ imageError }}</span>
             </div>
           </div>

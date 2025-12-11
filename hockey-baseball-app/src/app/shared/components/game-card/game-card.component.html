@@ -1,0 +1,202 @@
+<div class="game-card" [class.completed]="game.status === GameStatus.GameOver" [class.in-progress]="game.status === GameStatus.GameInProgress" [class.not-started]="game.status === GameStatus.NotStarted">
+  <!-- Card Header -->
+  <div class="game-card-header">
+    <div class="header-left">
+      <div class="game-date-time-row">
+        <div class="date-time-item">
+          <span class="material-symbols-rounded date-time-icon">today</span>
+          <span class="game-date">{{ game.date }}</span>
+        </div>
+        @if (game.time) {
+          <div class="date-time-item">
+            <span class="material-symbols-rounded date-time-icon">schedule</span>
+            <span class="game-time">{{ formatTimeTo12Hour(game.time) }}</span>
+            @if (game.periodName && game.status !== GameStatus.NotStarted) {
+              <span class="game-period-separator">-</span>
+              <span class="game-period-text">{{ game.periodName }}</span>
+            }
+          </div>
+        }
+      </div>
+      @if (game.gameType || game.gameTypeName) {
+        <div class="game-type-info">
+          <div class="game-type-text">
+            @if (game.gameType && game.gameTypeName) {
+              <span class="game-type-bold">{{ game.gameType }}</span><span class="game-type-separator"> - </span>{{ game.gameTypeName }}
+            } @else {
+              <span class="game-type-bold">{{ game.gameType || game.gameTypeName }}</span>
+            }
+          </div>
+        </div>
+      }
+    </div>
+    <div class="header-right">
+      <div class="game-status-row">
+        <div class="status-badge" [class.live-badge]="game.status === GameStatus.GameInProgress" [class.upcoming-badge]="game.status === GameStatus.NotStarted" [class.completed-badge]="game.status === GameStatus.GameOver">
+          @if (game.status === GameStatus.GameInProgress) {
+            <span class="live-indicator"></span>
+          }
+          <span class="status-text">{{ getGameStatusLabel(game.status).toUpperCase() }}</span>
+        </div>
+        @if (isOvertimeStatus(game.statusName)) {
+          <span class="game-period-badge">OT</span>
+        }
+      </div>
+      <div class="venue-info">
+        <div class="venue-name">
+          @if (game.arenaName && game.rinkName) {
+            {{ game.arenaName }} - {{ game.rinkName }}
+          } @else if (game.arenaRink) {
+            {{ game.arenaRink }}
+          } @else {
+            {{ getVenueName() }}
+          }
+        </div>
+        @if (getVenueLocation()) {
+          <div class="venue-location">{{ getVenueLocation() }}</div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Teams and Score Section -->
+  <div class="game-teams-section">
+    <!-- Home Team -->
+    <div class="team-section team-section-left" [class.winning]="isWinning(true)">
+      <div class="team-info team-info-left">
+        <div class="team-name-group">
+          @if (game.homeTeamId) {
+            <a 
+              class="team-name team-link"
+              [routerLink]="['/teams-and-rosters/teams/team-profile', game.homeTeamId]"
+              [attr.aria-label]="'View ' + game.homeTeam + ' profile'"
+            >{{ game.homeTeam }}</a>
+          } @else {
+            <div class="team-name">{{ game.homeTeam }}</div>
+          }
+          <div class="team-location">{{ getTeamLocation(true) }}</div>
+          @if (game.homeTeamGoalie && game.homeTeamGoalieId) {
+            <a 
+              class="team-goalie goalie-link"
+              [routerLink]="['/teams-and-rosters/goalies/goalie-profile', game.homeTeamGoalieId]"
+              [attr.aria-label]="'View ' + game.homeTeamGoalie + ' profile'"
+            >
+              <span>{{ game.homeTeamGoalie }}</span>
+              <span class="material-symbols-rounded goalie-icon">shield</span>
+            </a>
+          } @else if (game.homeTeamGoalie) {
+            <div class="team-goalie">
+              <span>{{ game.homeTeamGoalie }}</span>
+              <span class="material-symbols-rounded goalie-icon">shield</span>
+            </div>
+          }
+        </div>
+        @if (game.homeTeamLogo) {
+          <img [src]="game.homeTeamLogo" [alt]="game.homeTeam" class="team-logo" />
+        } @else {
+          <div class="team-logo-placeholder"></div>
+        }
+      </div>
+    </div>
+
+    <!-- Score in Center -->
+    <div class="score-center-container">
+      @if (showScore) {
+        <div class="team-score-wrapper" [class.winning-home]="isWinning(true)">
+          <div class="team-score" [class.winning-score]="isWinning(true)">{{ game.homeGoals }}</div>
+        </div>
+        <div class="score-separator">-</div>
+        <div class="team-score-wrapper" [class.winning-away]="isWinning(false)">
+          <div class="team-score" [class.winning-score]="isWinning(false)">{{ game.awayGoals }}</div>
+        </div>
+      } @else {
+        <div class="score-separator">at</div>
+      }
+    </div>
+
+    <!-- Away Team (Reversed) -->
+    <div class="team-section team-section-right" [class.winning]="isWinning(false)">
+      <div class="team-info team-info-right">
+        @if (game.awayTeamLogo) {
+          <img [src]="game.awayTeamLogo" [alt]="game.awayTeam" class="team-logo" />
+        } @else {
+          <div class="team-logo-placeholder"></div>
+        }
+        <div class="team-name-group">
+          @if (game.awayTeamId) {
+            <a 
+              class="team-name team-link"
+              [routerLink]="['/teams-and-rosters/teams/team-profile', game.awayTeamId]"
+              [attr.aria-label]="'View ' + game.awayTeam + ' profile'"
+            >{{ game.awayTeam }}</a>
+          } @else {
+            <div class="team-name">{{ game.awayTeam }}</div>
+          }
+          <div class="team-location">{{ getTeamLocation(false) }}</div>
+          @if (game.awayTeamGoalie && game.awayTeamGoalieId) {
+            <a 
+              class="team-goalie goalie-link"
+              [routerLink]="['/teams-and-rosters/goalies/goalie-profile', game.awayTeamGoalieId]"
+              [attr.aria-label]="'View ' + game.awayTeamGoalie + ' profile'"
+            >
+              <span class="material-symbols-rounded goalie-icon">shield</span>
+              <span>{{ game.awayTeamGoalie }}</span>
+            </a>
+          } @else if (game.awayTeamGoalie) {
+            <div class="team-goalie">
+              <span class="material-symbols-rounded goalie-icon">shield</span>
+              <span>{{ game.awayTeamGoalie }}</span>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Action Buttons -->
+  @if (showActions) {
+    <div class="game-card-actions">
+      @if (game.status === GameStatus.GameInProgress || game.status === GameStatus.GameOver) {
+        <app-button-route
+          [route]="'/schedule/live/' + game.id"
+          [bg]="'green'"
+          [bghover]="'green'"
+          [color]="'white'"
+          [colorhover]="'white'"
+          [materialIcon]="'dashboard'"
+          [haveContent]="true"
+          class="action-button"
+        >
+          Dashboard
+        </app-button-route>
+      }
+      <app-button
+        [bg]="'orange'"
+        [bghover]="'orange'"
+        [color]="'white'"
+        [colorhover]="'white'"
+        materialIcon="stylus"
+        [haveContent]="true"
+        (clicked)="onEdit()"
+        class="action-button"
+        role-visibility-name="edit-action"
+      >
+        Edit
+      </app-button>
+      <app-button
+        [bg]="'primary'"
+        [bghover]="'primary_dark'"
+        [color]="'white'"
+        [colorhover]="'white'"
+        [materialIcon]="'delete'"
+        [haveContent]="true"
+        (clicked)="onDelete()"
+        class="action-button"
+        role-visibility-name="delete-action"
+      >
+        Delete
+      </app-button>
+    </div>
+  }
+</div>
+

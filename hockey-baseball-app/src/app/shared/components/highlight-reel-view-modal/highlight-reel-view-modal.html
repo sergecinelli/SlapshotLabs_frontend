@@ -1,6 +1,6 @@
 <div class="highlight-reel-view-modal">
   <h2 mat-dialog-title class="modal-title">
-    <mat-icon class="title-icon">play_circle</mat-icon>
+    <span class="material-symbols-rounded title-icon">play_circle</span>
     View Highlight Reel — {{ data.reelName }}
   </h2>
 
@@ -21,7 +21,7 @@
         </div>
         <ng-template #noVideo>
           <div class="no-video">
-            <mat-icon>info</mat-icon>
+            <span class="material-symbols-rounded">info</span>
             <p>{{ videoMessage() || 'Select a highlight on the right to play' }}</p>
           </div>
         </ng-template>
@@ -30,7 +30,7 @@
       <!-- RIGHT: Reused Selected Events Table (read-only, clickable rows) -->
       <div class="column right selected-events-table">
         <div *ngIf="highlights().length === 0" class="empty-state">
-          <mat-icon>info</mat-icon>
+          <span class="material-symbols-rounded">info</span>
           <p>No highlights in this reel.</p>
         </div>
 

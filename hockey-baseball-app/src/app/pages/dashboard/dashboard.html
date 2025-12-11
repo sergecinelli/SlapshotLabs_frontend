@@ -27,262 +27,52 @@
     </div>
 
     <!-- Main Content -->
-    @if (loading()) {
-      <app-dashboard-skeleton></app-dashboard-skeleton>
-    } @else {
-      <!-- Upcoming Games -->
-      @if (upcomingGames().length === 0) {
+    <!-- Upcoming Games -->
+    <div class="dashboard-section">
+      <h2 class="dashboard-section-title">Upcoming Games</h2>
+      @if (loading()) {
+        <app-game-card-skeleton></app-game-card-skeleton>
+      } @else if (upcomingGames().length === 0) {
         <div class="dashboard-empty">
           <div class="empty-text">No upcoming games scheduled.</div>
         </div>
       } @else {
-        <div class="dashboard-section">
-          <h2 class="dashboard-section-title">Upcoming Games</h2>
-          <div class="dashboard-cards-container">
-            @for (game of upcomingGames(); track game.id; let i = $index) {
-              @if (i < 5) {
-                <div class="dashboard-game-card upcoming-game">
-                  <!-- Card Header -->
-                  <div class="game-card-header">
-                    <div class="header-left">
-                      <div class="game-date-time-row">
-                        <div class="date-time-item">
-                          <mat-icon class="date-time-icon">today</mat-icon>
-                          <span class="game-date">{{ formatDate(game.date) }}</span>
-                        </div>
-                        @if (game.time) {
-                          <div class="date-time-item">
-                            <mat-icon class="date-time-icon">schedule</mat-icon>
-                            <span class="game-time">{{ formatTimeTo12Hour(game.time) }}</span>
-                          </div>
-                        }
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Teams Section -->
-                  <div class="game-teams-section">
-                    <!-- Away Team -->
-                    <div class="team-section team-section-left">
-                      <div class="team-info team-info-left">
-                        <div class="team-name-group">
-                          @if (game.awayTeamId) {
-                            <a 
-                              class="team-name team-link"
-                              [routerLink]="'/teams-and-rosters/teams/team-profile/' + game.awayTeamId"
-                              [attr.aria-label]="'View ' + game.awayTeam + ' profile'"
-                            >{{ game.awayTeam }}</a>
-                          } @else {
-                            <div class="team-name">{{ game.awayTeam }}</div>
-                          }
-                          <div class="team-location">{{ getTeamLocation(game, false) }}</div>
-                          @if (game.awayTeamGoalie && game.awayTeamGoalieId) {
-                            <div 
-                              class="team-goalie goalie-link"
-                              (click)="goToGoalieProfile(game.awayTeamGoalieId!)"
-                              (keyup.enter)="goToGoalieProfile(game.awayTeamGoalieId!)"
-                              (keyup.space)="goToGoalieProfile(game.awayTeamGoalieId!)"
-                              tabindex="0"
-                              role="button"
-                              [attr.aria-label]="'View ' + game.awayTeamGoalie + ' profile'"
-                            >
-                              <span>{{ game.awayTeamGoalie }}</span>
-                              <mat-icon class="goalie-icon">sports_hockey</mat-icon>
-                            </div>
-                          } @else if (game.awayTeamGoalie) {
-                            <div class="team-goalie">
-                              <span>{{ game.awayTeamGoalie }}</span>
-                              <mat-icon class="goalie-icon">sports_hockey</mat-icon>
-                            </div>
-                          }
-                        </div>
-                        @if (game.awayTeamLogo) {
-                          <img [src]="game.awayTeamLogo" [alt]="game.awayTeam" class="team-logo" />
-                        } @else {
-                          <div class="team-logo-placeholder"></div>
-                        }
-                      </div>
-                    </div>
-
-                    <!-- Separator in Center -->
-                    <div class="score-center-container">
-                      <div class="score-separator">at</div>
-                    </div>
-
-                    <!-- Home Team -->
-                    <div class="team-section team-section-right">
-                      <div class="team-info team-info-right">
-                        @if (game.homeTeamLogo) {
-                          <img [src]="game.homeTeamLogo" [alt]="game.homeTeam" class="team-logo" />
-                        } @else {
-                          <div class="team-logo-placeholder"></div>
-                        }
-                        <div class="team-name-group">
-                          @if (game.homeTeamId) {
-                            <a 
-                              class="team-name team-link"
-                              [routerLink]="'/teams-and-rosters/teams/team-profile/' + game.homeTeamId"
-                              [attr.aria-label]="'View ' + game.homeTeam + ' profile'"
-                            >{{ game.homeTeam }}</a>
-                          } @else {
-                            <div class="team-name">{{ game.homeTeam }}</div>
-                          }
-                          <div class="team-location">{{ getTeamLocation(game, true) }}</div>
-                          @if (game.homeTeamGoalie && game.homeTeamGoalieId) {
-                            <div 
-                              class="team-goalie goalie-link"
-                              (click)="goToGoalieProfile(game.homeTeamGoalieId!)"
-                              (keyup.enter)="goToGoalieProfile(game.homeTeamGoalieId!)"
-                              (keyup.space)="goToGoalieProfile(game.homeTeamGoalieId!)"
-                              tabindex="0"
-                              role="button"
-                              [attr.aria-label]="'View ' + game.homeTeamGoalie + ' profile'"
-                            >
-                              <mat-icon class="goalie-icon">sports_hockey</mat-icon>
-                              <span>{{ game.homeTeamGoalie }}</span>
-                            </div>
-                          } @else if (game.homeTeamGoalie) {
-                            <div class="team-goalie">
-                              <mat-icon class="goalie-icon">sports_hockey</mat-icon>
-                              <span>{{ game.homeTeamGoalie }}</span>
-                            </div>
-                          }
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              }
+        <div class="dashboard-cards-container">
+          @for (game of upcomingGames(); track game.id; let i = $index) {
+            @if (i < 5) {
+              <app-game-card
+                [game]="game"
+                [showActions]="false"
+                [showScore]="false"
+              />
             }
-          </div>
+          }
         </div>
       }
+    </div>
 
-      <!-- Game Results -->
-      @if (gameResults().length === 0) {
+    <!-- Game Results -->
+    <div class="dashboard-section">
+      <h2 class="dashboard-section-title">Game Results</h2>
+      @if (loading()) {
+        <app-game-card-skeleton></app-game-card-skeleton>
+      } @else if (gameResults().length === 0) {
         <div class="dashboard-empty">
           <div class="empty-text">No completed games found.</div>
         </div>
       } @else {
-        <div class="dashboard-section">
-          <h2 class="dashboard-section-title">Game Results</h2>
-          <div class="dashboard-cards-container">
-            @for (game of gameResults(); track game.id; let i = $index) {
-              @if (i < 5) {
-                <div class="dashboard-game-card game-result">
-                  <!-- Card Header -->
-                  <div class="game-card-header">
-                    <div class="header-left">
-                      <div class="game-date-time-row">
-                        <div class="date-time-item">
-                          <mat-icon class="date-time-icon">today</mat-icon>
-                          <span class="game-date">{{ formatDate(game.date) }}</span>
-                        </div>
-                        @if (game.time) {
-                          <div class="date-time-item">
-                            <mat-icon class="date-time-icon">schedule</mat-icon>
-                            <span class="game-time">{{ formatTimeTo12Hour(game.time) }}</span>
-                          </div>
-                        }
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Teams and Score Section -->
-                  <div class="game-teams-section">
-                    <!-- Home Team -->
-                    <div class="team-section team-section-left" [class.winning]="game.homeGoals > game.awayGoals">
-                      <div class="team-info team-info-left">
-                        <div class="team-name-group">
-                          @if (game.homeTeamId) {
-                            <a 
-                              class="team-name team-link"
-                              [routerLink]="'/teams-and-rosters/teams/team-profile/' + game.homeTeamId"
-                              [attr.aria-label]="'View ' + game.homeTeam + ' profile'"
-                            >{{ game.homeTeam }}</a>
-                          } @else {
-                            <div class="team-name">{{ game.homeTeam }}</div>
-                          }
-                          <div class="team-location">{{ getTeamLocation(game, true) }}</div>
-                          @if (game.homeTeamGoalie && game.homeTeamGoalieId) {
-                            <div 
-                              class="team-goalie goalie-link"
-                              (click)="goToGoalieProfile(game.homeTeamGoalieId!)"
-                              (keyup.enter)="goToGoalieProfile(game.homeTeamGoalieId!)"
-                              (keyup.space)="goToGoalieProfile(game.homeTeamGoalieId!)"
-                              tabindex="0"
-                              role="button"
-                              [attr.aria-label]="'View ' + game.homeTeamGoalie + ' profile'"
-                            >
-                              <span>{{ game.homeTeamGoalie }}</span>
-                              <mat-icon class="goalie-icon">sports_hockey</mat-icon>
-                            </div>
-                          } @else if (game.homeTeamGoalie) {
-                            <div class="team-goalie">
-                              <span>{{ game.homeTeamGoalie }}</span>
-                              <mat-icon class="goalie-icon">sports_hockey</mat-icon>
-                            </div>
-                          }
-                        </div>
-                        <img [src]="game.homeTeamLogo || ''" [alt]="game.homeTeam" class="team-logo" />
-                      </div>
-                    </div>
-
-                    <!-- Score in Center -->
-                    <div class="score-center-container">
-                      <div class="team-score-wrapper" [class.winning-home]="game.homeGoals > game.awayGoals">
-                        <div class="team-score" [class.winning-score]="game.homeGoals > game.awayGoals">{{ game.homeGoals }}</div>
-                      </div>
-                      <div class="score-separator">-</div>
-                      <div class="team-score-wrapper" [class.winning-away]="game.awayGoals > game.homeGoals">
-                        <div class="team-score" [class.winning-score]="game.awayGoals > game.homeGoals">{{ game.awayGoals }}</div>
-                      </div>
-                    </div>
-
-                    <!-- Away Team (Reversed) -->
-                    <div class="team-section team-section-right" [class.winning]="game.awayGoals > game.homeGoals">
-                      <div class="team-info team-info-right">
-                        <img [src]="game.awayTeamLogo || ''" [alt]="game.awayTeam" class="team-logo" />
-                        <div class="team-name-group">
-                          @if (game.awayTeamId) {
-                            <a 
-                              class="team-name team-link"
-                              [routerLink]="'/teams-and-rosters/teams/team-profile/' + game.awayTeamId"
-                              [attr.aria-label]="'View ' + game.awayTeam + ' profile'"
-                            >{{ game.awayTeam }}</a>
-                          } @else {
-                            <div class="team-name">{{ game.awayTeam }}</div>
-                          }
-                          <div class="team-location">{{ getTeamLocation(game, false) }}</div>
-                          @if (game.awayTeamGoalie && game.awayTeamGoalieId) {
-                            <div 
-                              class="team-goalie goalie-link"
-                              (click)="goToGoalieProfile(game.awayTeamGoalieId!)"
-                              (keyup.enter)="goToGoalieProfile(game.awayTeamGoalieId!)"
-                              (keyup.space)="goToGoalieProfile(game.awayTeamGoalieId!)"
-                              tabindex="0"
-                              role="button"
-                              [attr.aria-label]="'View ' + game.awayTeamGoalie + ' profile'"
-                            >
-                              <mat-icon class="goalie-icon">sports_hockey</mat-icon>
-                              <span>{{ game.awayTeamGoalie }}</span>
-                            </div>
-                          } @else if (game.awayTeamGoalie) {
-                            <div class="team-goalie">
-                              <mat-icon class="goalie-icon">sports_hockey</mat-icon>
-                              <span>{{ game.awayTeamGoalie }}</span>
-                            </div>
-                          }
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              }
+        <div class="dashboard-cards-container">
+          @for (game of gameResults(); track game.id; let i = $index) {
+            @if (i < 5) {
+              <app-game-card
+                [game]="game"
+                [showActions]="false"
+                [showScore]="true"
+              />
             }
-          </div>
+          }
         </div>
       }
-    }
+    </div>
   </div>
 </div>

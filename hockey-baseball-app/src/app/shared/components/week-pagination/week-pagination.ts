@@ -23,19 +23,17 @@ import { MatNativeDateModule } from '@angular/material/core';
     <div class="week-pagination">
       <button
         mat-icon-button
-        (click)="goToPreviousWeek()"
+        (click)="goToPreviousMonth()"
         [disabled]="isFirstWeek()"
         class="nav-button"
-        [attr.aria-label]="'Previous week'"
+        [attr.aria-label]="'Previous month'"
       >
-        <mat-icon>chevron_left</mat-icon>
+        <span class="material-symbols-rounded">chevron_left</span>
       </button>
 
       <div class="week-display">
         <div class="week-range">
-          <span class="week-start">{{ formatDateWithDay(weekStart()) }}</span>
-          <span class="week-separator">-</span>
-          <span class="week-end">{{ formatDateWithDay(weekEnd()) }}</span>
+          <span class="week-start">{{ formatMonthYear(weekStart()) }}</span>
         </div>
         <div class="calendar-wrapper">
           <button
@@ -43,9 +41,9 @@ import { MatNativeDateModule } from '@angular/material/core';
             mat-icon-button
             (click)="openCalendar()"
             class="calendar-button"
-            [attr.aria-label]="'Select week from calendar'"
+            [attr.aria-label]="'Select month from calendar'"
           >
-            <mat-icon>calendar_month</mat-icon>
+            <span class="material-symbols-rounded">calendar_month</span>
           </button>
           <mat-form-field class="calendar-field-hidden">
             <input
@@ -53,7 +51,7 @@ import { MatNativeDateModule } from '@angular/material/core';
               [matDatepicker]="picker"
               [value]="weekStart()"
               (dateChange)="onDateSelected($event)"
-              [attr.aria-label]="'Select week'"
+              [attr.aria-label]="'Select month'"
             />
             <mat-datepicker #picker xPosition="start" yPosition="below"></mat-datepicker>
           </mat-form-field>
@@ -62,12 +60,12 @@ import { MatNativeDateModule } from '@angular/material/core';
 
       <button
         mat-icon-button
-        (click)="goToNextWeek()"
+        (click)="goToNextMonth()"
         [disabled]="isLastWeek()"
         class="nav-button"
-        [attr.aria-label]="'Next week'"
+        [attr.aria-label]="'Next month'"
       >
-        <mat-icon>chevron_right</mat-icon>
+        <span class="material-symbols-rounded">chevron_right</span>
       </button>
     </div>
   `,
@@ -84,19 +82,19 @@ export class WeekPaginationComponent {
   isFirstWeek = input<boolean>(false);
   isLastWeek = input<boolean>(false);
 
-  goToPreviousWeek(): void {
-    const start = this.weekStart();
+  goToPreviousMonth(): void {
+    const start = this.getMonthStart(this.weekStart());
     const newStart = new Date(start);
-    newStart.setDate(newStart.getDate() - 7);
-    const newEnd = this.getWeekEnd(newStart);
+    newStart.setMonth(newStart.getMonth() - 1);
+    const newEnd = this.getMonthEnd(newStart);
     this.weekChange.emit({ start: newStart, end: newEnd });
   }
 
-  goToNextWeek(): void {
-    const start = this.weekStart();
+  goToNextMonth(): void {
+    const start = this.getMonthStart(this.weekStart());
     const newStart = new Date(start);
-    newStart.setDate(newStart.getDate() + 7);
-    const newEnd = this.getWeekEnd(newStart);
+    newStart.setMonth(newStart.getMonth() + 1);
+    const newEnd = this.getMonthEnd(newStart);
     this.weekChange.emit({ start: newStart, end: newEnd });
   }
 
@@ -108,32 +106,27 @@ export class WeekPaginationComponent {
     if (event.value) {
       const selectedDate = new Date(event.value);
       selectedDate.setHours(0, 0, 0, 0);
-      const weekStart = this.getWeekStart(selectedDate);
-      const weekEnd = this.getWeekEnd(weekStart);
-      this.weekChange.emit({ start: weekStart, end: weekEnd });
+      const monthStart = this.getMonthStart(selectedDate);
+      const monthEnd = this.getMonthEnd(monthStart);
+      this.weekChange.emit({ start: monthStart, end: monthEnd });
     }
   }
 
-  formatDateWithDay(date: Date): string {
-    const dayOfWeek = date.toLocaleDateString('en-US', { weekday: 'short' });
-    const month = date.toLocaleDateString('en-US', { month: 'short' });
-    const day = date.getDate();
-    return `${dayOfWeek}. ${month}. ${day}`;
+  formatMonthYear(date: Date): string {
+    return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
   }
 
-  private getWeekStart(date: Date): Date {
+  private getMonthStart(date: Date): Date {
     const d = new Date(date);
     d.setHours(0, 0, 0, 0);
-    const day = d.getDay();
-    const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Adjust when day is Sunday
-    const result = new Date(d);
-    result.setDate(diff);
-    return result;
+    d.setDate(1);
+    return d;
   }
 
-  private getWeekEnd(weekStart: Date): Date {
-    const end = new Date(weekStart);
-    end.setDate(end.getDate() + 6);
+  private getMonthEnd(monthStart: Date): Date {
+    const end = new Date(monthStart);
+    end.setMonth(end.getMonth() + 1);
+    end.setDate(0);
     end.setHours(23, 59, 59, 999);
     return end;
   }

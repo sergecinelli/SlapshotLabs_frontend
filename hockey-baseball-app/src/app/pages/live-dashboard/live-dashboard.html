@@ -21,11 +21,11 @@
       </div>
       <div class="tournament-header-right">
         <div class="tournament-info-item">
-          <mat-icon class="tournament-info-icon">event</mat-icon>
+          <span class="material-symbols-rounded tournament-info-icon">event</span>
           <span class="tournament-info-text">{{ tournamentDate() }}</span>
         </div>
         <div class="tournament-info-item">
-          <mat-icon class="tournament-info-icon">place</mat-icon>
+          <span class="material-symbols-rounded tournament-info-icon">place</span>
           <span class="tournament-info-text">{{ arenaInfo() }}</span>
         </div>
       </div>
@@ -680,7 +680,7 @@
             <tr>
               <td colspan="7" class="live-dashboard-table-empty">
                 <div class="live-dashboard-empty-content">
-                  <mat-icon class="live-dashboard-empty-icon">event_note</mat-icon>
+                  <span class="material-symbols-rounded live-dashboard-empty-icon">event_note</span>
                   <p class="live-dashboard-empty-title">No game events yet</p>
                   <p class="live-dashboard-empty-text">Events will appear here as the game progresses</p>
                 </div>
@@ -732,7 +732,7 @@
                         "
                         (click)="onViewEventVideo(event)"
                       >
-                        <mat-icon>videocam</mat-icon>
+                        <span class="material-symbols-rounded">videocam</span>
                       </button>
                       <button
                         mat-icon-button
@@ -742,7 +742,7 @@
                         role-visibility-name="edit-event-button"
                         [attr.role-visibility-team-id]="[homeTeamId, awayTeamId]"
                       >
-                        <mat-icon>stylus</mat-icon>
+                        <span class="material-symbols-rounded">stylus</span>
                       </button>
                       <button
                         mat-icon-button
@@ -752,7 +752,7 @@
                         role-visibility-name="delete-event-button"
                         [attr.role-visibility-team-id]="[homeTeamId, awayTeamId]"
                       >
-                        <mat-icon>delete</mat-icon>
+                        <span class="material-symbols-rounded">delete</span>
                       </button>
                     </div>
                   </td>
@@ -801,7 +801,7 @@
             ></app-shot-location-display>
           } @else {
             <div class="live-dashboard-empty-chart">
-              <mat-icon class="live-dashboard-empty-chart-icon">sports_hockey</mat-icon>
+              <span class="material-symbols-rounded live-dashboard-empty-chart-icon">sports_hockey</span>
               <p class="live-dashboard-empty-chart-text">No spray chart data available</p>
             </div>
           }
@@ -827,7 +827,7 @@
             ></app-shot-location-display>
           } @else {
             <div class="live-dashboard-empty-chart">
-              <mat-icon class="live-dashboard-empty-chart-icon">sports_hockey</mat-icon>
+              <span class="material-symbols-rounded live-dashboard-empty-chart-icon">sports_hockey</span>
               <p class="live-dashboard-empty-chart-text">No spray chart data available</p>
             </div>
           }

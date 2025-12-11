@@ -20,7 +20,9 @@ export class ScheduleService {
       away_start_goalie_id: number | null;
       away_start_goalie_name?: string;
       game_type_id: number;
+      game_type?: string;
       game_type_name: string | null;
+      game_period_name?: string;
       tournament_name?: string;
       date: string;
       time: string;
@@ -40,7 +42,9 @@ export class ScheduleService {
       away_start_goalie_id: number | null;
       away_start_goalie_name?: string;
       game_type_id: number;
+      game_type?: string;
       game_type_name: string | null;
+      game_period_name?: string;
       tournament_name?: string;
       date: string;
       time: string;
@@ -72,7 +76,9 @@ export class ScheduleService {
         away_start_goalie_id: number | null;
         away_start_goalie_name?: string;
         game_type_id: number;
+        game_type?: string;
         game_type_name: string | null;
+        game_period_name?: string;
         tournament_name?: string;
         date: string;
         time: string;
@@ -92,7 +98,9 @@ export class ScheduleService {
         away_start_goalie_id: number | null;
         away_start_goalie_name?: string;
         game_type_id: number;
+        game_type?: string;
         game_type_name: string | null;
+        game_period_name?: string;
         tournament_name?: string;
         date: string;
         time: string;

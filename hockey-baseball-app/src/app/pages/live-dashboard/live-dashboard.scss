@@ -1,4 +1,4 @@
-@use '../../shared/styles/dashboard-card.scss' as *;
+@use "../../shared/styles/dashboard-card.scss" as *;
 @use "sass:map";
 
 // Helper function to convert colors from colors.ts to rgba with opacity
@@ -37,7 +37,7 @@
 .live-dashboard-score-card {
   @include dashboard-card-base;
   padding: 24px;
-  
+
   .score-card-period-header {
     display: flex;
     justify-content: center;
@@ -54,6 +54,10 @@
     text-transform: uppercase;
     letter-spacing: 1px;
   }
+}
+
+.live-dashboard-actions-wrapper {
+  padding: 10px 0;
 }
 
 // Teams Section (reusing Schedule styles)
@@ -312,7 +316,7 @@
   margin-bottom: 0;
   background: var(--background-invert);
   border-bottom: 2px solid var(--border-light);
-  
+
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
     gap: 16px;
@@ -323,7 +327,7 @@
 .tournament-header-left {
   min-width: 0;
   text-align: left;
-  
+
   @media (max-width: 768px) {
     text-align: center;
   }
@@ -347,7 +351,7 @@
   gap: 4px;
   padding: 0 24px;
   flex-shrink: 0;
-  
+
   @media (max-width: 768px) {
     padding: 0;
   }
@@ -376,7 +380,7 @@
   align-items: flex-end;
   min-width: 0;
   text-align: right;
-  
+
   @media (max-width: 768px) {
     align-items: center;
     text-align: center;
@@ -391,20 +395,20 @@
   color: var(--white);
   line-height: 1.4;
   white-space: nowrap;
-  
+
   @media (max-width: 768px) {
     justify-content: center;
   }
-  
+
   // Darker style for arena info (second item)
   &:nth-child(2) {
     color: rgba-from-color("white", 0.75);
-    
+
     .tournament-info-icon {
       color: rgba-from-color("white", 0.75);
       opacity: 1;
     }
-    
+
     .tournament-info-text {
       color: rgba-from-color("white", 0.75);
     }
@@ -432,7 +436,7 @@
 // Stats Cards - Modern Material Design
 .live-dashboard-stats-card {
   @include dashboard-card-base;
-  
+
   .stats-card-title {
     font-size: 16px;
     font-weight: 600;
@@ -446,19 +450,19 @@
     gap: 12px;
     min-height: 48px;
   }
-  
+
   .stats-card-content {
     padding: 24px;
   }
-  
+
   .stat-section {
     margin-bottom: 20px;
-    
+
     &:last-child {
       margin-bottom: 0;
     }
   }
-  
+
   .stat-section-title {
     font-size: 13px;
     font-weight: 600;
@@ -481,7 +485,7 @@
   background: var(--white);
   border: 1px solid var(--border-light);
   flex-shrink: 0;
-  box-shadow: 
+  box-shadow:
     0 1px 2px rgba(0, 0, 0, 0.1),
     0 1px 1px rgba(0, 0, 0, 0.08);
 }
@@ -513,11 +517,11 @@
   letter-spacing: 0.8px;
   white-space: nowrap;
   border-bottom: 2px solid var(--border);
-  
+
   &:first-child {
     border-top-left-radius: 4px;
   }
-  
+
   &:last-child {
     border-top-right-radius: 4px;
   }
@@ -547,7 +551,7 @@
       color: var(--primary);
       font-weight: 600;
     }
-    
+
     &:hover {
       background-color: rgba-from-color("primary", 0.1);
     }
@@ -556,7 +560,7 @@
 
 .live-dashboard-period-row {
   background: var(--dark-tone2);
-  
+
   .live-dashboard-period-cell {
     padding: 12px 16px;
     font-size: 12px;
@@ -591,7 +595,7 @@
   overflow: hidden;
   flex-shrink: 0;
   border: 2px solid var(--border-light);
-  box-shadow: 
+  box-shadow:
     0 2px 4px rgba(0, 0, 0, 0.1),
     0 1px 2px rgba(0, 0, 0, 0.06);
 }
@@ -663,7 +667,7 @@
   border-radius: 50%;
   object-fit: cover;
   border: 1.5px solid var(--border-light);
-  box-shadow: 
+  box-shadow:
     0 1px 2px rgba(0, 0, 0, 0.12),
     0 1px 1px rgba(0, 0, 0, 0.24);
 }
@@ -832,7 +836,8 @@
   opacity: 0.7 !important;
   cursor: not-allowed !important;
 
-  mat-icon {
+  mat-icon,
+  .material-symbols-rounded {
     color: rgba-from-color("black", 0.26) !important;
   }
 }

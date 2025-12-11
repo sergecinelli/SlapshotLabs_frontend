@@ -83,7 +83,7 @@
     color: var(--primary);
   }
 
-  mat-icon {
+  .material-symbols-rounded {
     font-size: 18px;
     width: 18px;
     height: 18px;
@@ -116,22 +116,35 @@
   }
 
   .mat-datepicker-content {
-    background-color: var(--white) !important;
+    background-color: var(--white);
     color: var(--text-primary);
-    
+
     .mat-calendar {
-      background-color: var(--white) !important;
-      
+      background-color: var(--white);
+
       .mat-calendar-table {
-        background-color: var(--white) !important;
+        background-color: var(--white);
       }
-      
+
       .mat-calendar-body-cell-content {
         color: var(--text-primary);
       }
-      
+
+      // Selected date styling - target all possible combinations
+      .mat-calendar-body-cell.mat-calendar-body-selected .mat-calendar-body-cell-content,
+      .mat-calendar-body-selected .mat-calendar-body-cell-content,
+      .mat-calendar-body-cell-content.mat-calendar-body-selected {
+        background-color: var(--primary);
+        color: var(--text-white);
+      }
+
+      .mat-calendar-body-selected {
+        background-color: var(--primary);
+        color: var(--text-white);
+      }
+
       .mat-calendar-header {
-        background-color: var(--white) !important;
+        background-color: var(--white);
       }
     }
   }
@@ -161,4 +174,3 @@
     gap: 8px;
   }
 }
-

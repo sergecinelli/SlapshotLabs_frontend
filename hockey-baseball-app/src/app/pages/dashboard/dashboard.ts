@@ -1,6 +1,6 @@
 import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { ButtonComponent } from '../../shared/components/buttons/button/button.component';
@@ -8,11 +8,13 @@ import { ScheduleService } from '../../services/schedule.service';
 import { TeamService } from '../../services/team.service';
 import { PlayerService } from '../../services/player.service';
 import { GoalieService } from '../../services/goalie.service';
+import { ArenaService } from '../../services/arena.service';
 import { ApiService } from '../../services/api.service';
 import { Schedule, GameStatus, GameType } from '../../shared/interfaces/schedule.interface';
 import { Team } from '../../shared/interfaces/team.interface';
 import { Player } from '../../shared/interfaces/player.interface';
 import { Goalie } from '../../shared/interfaces/goalie.interface';
+import { Arena, Rink } from '../../shared/interfaces/arena.interface';
 import { PlayerFormModalComponent, PlayerFormModalData } from '../../shared/components/player-form-modal/player-form-modal';
 import { TeamFormModalComponent, TeamFormModalData } from '../../shared/components/team-form-modal/team-form-modal';
 import { GoalieFormModalComponent, GoalieFormModalData } from '../../shared/components/goalie-form-modal/goalie-form-modal';
@@ -23,19 +25,21 @@ import { HighlightsService } from '../../services/highlights.service';
 import { forkJoin } from 'rxjs';
 import { visibilityByRoleMap } from './dashboard.role-map';
 import { ComponentVisibilityByRoleDirective } from '../../shared/directives/component-visibility-by-role.directive';
-import { DashboardSkeletonComponent } from './dashboard-skeleton.component';
+import { GameCardComponent } from '../../shared/components/game-card/game-card.component';
+import { GameCardSkeletonComponent } from '../../shared/components/game-card/game-card-skeleton.component';
+import { getGameStatusLabel } from '../../shared/constants/game-status.constants';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
   imports: [
     CommonModule,
-    RouterLink,
     MatIconModule,
     ButtonComponent,
     MatDialogModule,
     ComponentVisibilityByRoleDirective,
-    DashboardSkeletonComponent,
+    GameCardComponent,
+    GameCardSkeletonComponent,
   ],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
@@ -48,6 +52,7 @@ export class DashboardComponent implements OnInit {
   private teamService = inject(TeamService);
   private playerService = inject(PlayerService);
   private goalieService = inject(GoalieService);
+  private arenaService = inject(ArenaService);
   private apiService = inject(ApiService);
   private highlightsService = inject(HighlightsService);
   private dialog = inject(MatDialog);
@@ -58,6 +63,8 @@ export class DashboardComponent implements OnInit {
   loading = signal(true);
   teams = signal<Team[]>([]);
   teamsMap = new Map<number, Team>();
+  arenas: Arena[] = [];
+  rinks: Rink[] = [];
 
   ngOnInit(): void {
     this.loadData();
@@ -66,15 +73,65 @@ export class DashboardComponent implements OnInit {
   private loadData(): void {
     this.loading.set(true);
 
-    // Load teams and games concurrently
+    // Load teams, games, arenas, and rinks concurrently
     forkJoin({
       teams: this.teamService.getTeams(),
       games: this.scheduleService.getDashboardGames(),
+      arenas: this.arenaService.getArenas(),
+      rinks: this.arenaService.getAllRinks(),
     }).subscribe({
-      next: ({ teams, games }) => {
+      next: ({ teams, games, arenas, rinks }) => {
         // Store teams and create mapping
         this.teams.set(teams.teams);
         this.teamsMap = new Map(teams.teams.map((team) => [parseInt(team.id), team]));
+        this.arenas = arenas;
+        this.rinks = rinks;
+
+        // Create mappings for arenas and rinks
+        const arenaNameMap = new Map(arenas.map((a) => [a.id, a.name || '']));
+        const rinkNameMap = new Map(rinks.map((r) => [r.id, r.name || '']));
+        const arenaAddressMap = new Map(arenas.map((a) => [a.id, a.address || a.arena_address || '']));
+        const rinkMap = new Map(
+          rinks.map((r) => {
+            const arena = arenas.find((a) => a.id === r.arena_id);
+            const arenaName = arena?.name || '';
+            const rinkName = r.name || '';
+            return [r.id, arena ? `${arenaName} – ${rinkName}` : rinkName];
+          })
+        );
+
+        // Helper function to format date
+        const formatDate = (dateStr: string): string => {
+          if (!dateStr) return '';
+          // If date is already formatted, return as is
+          if (dateStr.includes(',')) {
+            return dateStr;
+          }
+          // Otherwise format it
+          try {
+            const date = new Date(dateStr);
+            const options: Intl.DateTimeFormatOptions = { 
+              weekday: 'short', 
+              month: 'short', 
+              day: 'numeric' 
+            };
+            const formatted = date.toLocaleDateString('en-US', options);
+            return formatted.replace(/(\w+), (\w+) (\d+)/, '$1., $2. $3');
+          } catch {
+            return dateStr;
+          }
+        };
+
+        // Helper function to get status name
+        const getStatusName = (status: number): string => {
+          const statusEnum = 
+            status === 0 || status === 1
+              ? GameStatus.NotStarted
+              : status === 2
+                ? GameStatus.GameInProgress
+                : GameStatus.GameOver;
+          return getGameStatusLabel(statusEnum);
+        };
 
         // Map API response to Schedule interface
         const mapGameToSchedule = (game: {
@@ -88,7 +145,9 @@ export class DashboardComponent implements OnInit {
           away_start_goalie_id: number | null;
           away_start_goalie_name?: string;
           game_type_id: number;
+          game_type?: string;
           game_type_name: string | null;
+          game_period_name?: string;
           tournament_name?: string;
           date: string;
           time: string;
@@ -100,6 +159,12 @@ export class DashboardComponent implements OnInit {
           const homeTeam = this.teamsMap.get(game.home_team_id);
           const awayTeam = this.teamsMap.get(game.away_team_id);
           const apiUrl = this.apiService.getBaseUrl();
+          const statusValue =
+            game.status === 0 || game.status === 1
+              ? GameStatus.NotStarted
+              : game.status === 2
+                ? GameStatus.GameInProgress
+                : GameStatus.GameOver;
 
           return {
             id: game.id.toString(),
@@ -119,17 +184,19 @@ export class DashboardComponent implements OnInit {
             awayGoals: game.away_goals,
             awayTeamGoalie: game.away_start_goalie_name || (game.away_start_goalie_id ? `Goalie ${game.away_start_goalie_id}` : '—'),
             awayTeamGoalieId: game.away_start_goalie_id || undefined,
-            gameType: '' as GameType, // TODO: Map game_type_id to game type name
-            tournamentName: game.game_type_name || undefined,
-            date: game.date,
+            gameType: game.game_type || '' as GameType,
+            gameTypeName: game.game_type_name || undefined,
+            tournamentName: game.tournament_name || undefined,
+            date: formatDate(game.date),
             time: game.time,
-            rink: game.rink_id ? `Rink ${game.rink_id}` : '—', // TODO: Map to actual rink name
-            status:
-              game.status === 0
-                ? GameStatus.NotStarted
-                : game.status === 1
-                  ? GameStatus.GameInProgress
-                  : GameStatus.GameOver,
+            rink: game.rink_id ? (rinkMap.get(game.rink_id) || `Rink ${game.rink_id}`) : '',
+            arenaRink: game.rink_id ? (rinkMap.get(game.rink_id) || `Rink ${game.rink_id}`) : '',
+            arenaName: game.arena_id ? (arenaNameMap.get(game.arena_id) || '') : '',
+            rinkName: game.rink_id ? (rinkNameMap.get(game.rink_id) || '') : '',
+            arenaAddress: game.arena_id ? (arenaAddressMap.get(game.arena_id) || '') : '',
+            status: statusValue,
+            statusName: getStatusName(game.status),
+            periodName: game.game_period_name || undefined,
             events: [],
           };
         };
@@ -346,5 +413,9 @@ export class DashboardComponent implements OnInit {
     } catch {
       return dateStr;
     }
+  }
+
+  getCompletionStatus(game: Schedule): string {
+    return getGameStatusLabel(game.status);
   }
 }

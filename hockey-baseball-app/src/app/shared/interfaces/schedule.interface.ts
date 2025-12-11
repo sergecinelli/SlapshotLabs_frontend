@@ -29,6 +29,7 @@ export interface Schedule extends Record<string, unknown> {
   arenaAddress?: string; // Arena address
   status: GameStatus;
   statusName?: string; // Human-readable status
+  periodName?: string; // Game period name (e.g., "1st Period", "2nd Period", "Overtime")
   events: GameEvent[];
 }
 
