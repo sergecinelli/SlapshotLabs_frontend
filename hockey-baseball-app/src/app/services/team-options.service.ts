@@ -25,7 +25,7 @@ export class TeamOptionsService {
           this.levelMap.set(level.name, level.id);
           this.levelIdMap.set(level.id, level.name);
         });
-        console.log(levels);
+
         return levels;
       }),
       catchError((error) => {
@@ -56,7 +56,21 @@ export class TeamOptionsService {
   }
 
   /**
+   * Fetch all age groups from the API
+   * API returns an array of strings: ["1U", "5U", "6U", ...]
+   */
+  getTeamAgeGroups(): Observable<string[]> {
+    return this.apiService.get<string[]>('/hockey/team-age-group/list').pipe(
+      catchError((error) => {
+        console.error('Failed to fetch age groups:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  /**
    * Generate group options (1U through 22U)
+   * @deprecated Use getTeamAgeGroups() instead
    */
   getGroupOptions(): { value: string; label: string }[] {
     const groups = [];
@@ -91,6 +105,17 @@ export class TeamOptionsService {
     return divisions.map((division) => ({
       value: division.id.toString(),
       label: division.name,
+    }));
+  }
+
+  /**
+   * Transform age groups to dropdown options
+   * Using name as value to maintain compatibility with existing form structure
+   */
+  transformAgeGroupsToOptions(ageGroups: string[]): { value: string; label: string }[] {
+    return ageGroups.map((ageGroup) => ({
+      value: ageGroup,
+      label: ageGroup,
     }));
   }
 

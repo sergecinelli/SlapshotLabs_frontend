@@ -117,18 +117,19 @@ export class TeamFormModalComponent implements OnInit {
   private loadOptions(): void {
     this.isLoading = true;
 
-    // Get group options (static)
-    this.groupOptions = this.teamOptionsService.getGroupOptions();
-    
-    // Setup autocomplete filter after options are loaded
-    this.setupGroupFilter();
-
-    // Fetch levels and divisions from API
+    // Fetch age groups, levels and divisions from API
     forkJoin({
+      ageGroups: this.teamOptionsService.getTeamAgeGroups(),
       levels: this.teamOptionsService.getTeamLevels(),
       divisions: this.teamOptionsService.getDivisions(),
     }).subscribe({
-      next: ({ levels, divisions }) => {
+      next: ({ ageGroups, levels, divisions }) => {
+        // Transform age groups to options
+        this.groupOptions = this.teamOptionsService.transformAgeGroupsToOptions(ageGroups);
+        
+        // Setup autocomplete filter after options are loaded
+        this.setupGroupFilter();
+
         this.levelOptions = this.teamOptionsService.transformLevelsToOptions(levels);
         this.divisionOptions = this.teamOptionsService.transformDivisionsToOptions(divisions);
 
@@ -144,6 +145,9 @@ export class TeamFormModalComponent implements OnInit {
       },
       error: (error) => {
         console.error('Failed to load options:', error);
+        // Fallback to hardcoded options if API fails
+        this.groupOptions = this.teamOptionsService.getGroupOptions();
+        this.setupGroupFilter();
         this.setDefaultValues();
 
         if (this.isEditMode && this.data.team) {
