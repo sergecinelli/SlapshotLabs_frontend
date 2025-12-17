@@ -1,6 +1,12 @@
-<div class="banner-wrapper" [class.scrolled]="isScrolled()" [class.skeleton-removed]="!showSkeleton()">
+<div class="banner-wrapper" [class.scrolled]="isScrolled()" [class.skeleton-removed]="!showSkeleton()" [class.has-banners]="bannerItems().length > 0">
   @if (showSkeleton()) {
   <app-banner-skeleton [class.fade-out]="!loading() && bannerItems().length > 0"></app-banner-skeleton>
+  }
+  @if (!loading() && bannerItems().length === 0) {
+  <div class="empty-banner-message">
+    <span class="material-symbols-rounded empty-message-icon">event_available</span>
+    <span class="empty-message-text">No upcoming or recent events</span>
+  </div>
   }
   @if (bannerItems().length > 0) {
   <div class="banner-container" [class.scrolled]="isScrolled()" [class.fade-in]="!loading()">

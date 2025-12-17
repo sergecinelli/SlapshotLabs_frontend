@@ -47,6 +47,7 @@ export class BannerComponent implements OnInit, OnDestroy, AfterViewInit {
   error = signal<string | null>(null);
   isScrolled = signal<boolean>(false);
   showSkeleton = signal<boolean>(true);
+  private isInitialLoad = true;
   private scrollListener?: () => void;
   private scrollElement?: HTMLElement;
 
@@ -55,6 +56,7 @@ export class BannerComponent implements OnInit, OnDestroy, AfterViewInit {
 
     // Subscribe to refresh events
     this.refreshSubscription = this.bannerService.refreshBanner$.subscribe(() => {
+      this.isInitialLoad = false; // Mark as not initial load for refresh events
       this.fetchBanner();
     });
   }
@@ -266,7 +268,10 @@ export class BannerComponent implements OnInit, OnDestroy, AfterViewInit {
   fetchBanner(): void {
     this.loading.set(true);
     this.error.set(null);
-    this.showSkeleton.set(true);
+    // Show skeleton only on initial load, not on refresh
+    if (this.isInitialLoad) {
+      this.showSkeleton.set(true);
+    }
     this.api.get<GameBannerItem[]>('/hockey/game/list/banner').subscribe({
       next: (items) => {
         const realItems = Array.isArray(items) ? items : [];
@@ -278,9 +283,11 @@ export class BannerComponent implements OnInit, OnDestroy, AfterViewInit {
           this.bannerItems.set(realItems);
         }
         this.loading.set(false);
+        this.isInitialLoad = false; // Mark initial load as complete
         
         // Remove skeleton from DOM after fade-out animation completes (0.5s)
-        if (this.bannerItems().length > 0) {
+        // Hide skeleton regardless of whether there are banner items or not
+        if (this.showSkeleton()) {
           setTimeout(() => {
             this.showSkeleton.set(false);
           }, 500); // Match the transition duration
@@ -294,14 +301,25 @@ export class BannerComponent implements OnInit, OnDestroy, AfterViewInit {
           this.bannerItems.set(testItems);
           this.error.set(null);
           this.loading.set(false);
+          this.isInitialLoad = false; // Mark initial load as complete
           
           // Remove skeleton from DOM after fade-out animation completes
-          setTimeout(() => {
-            this.showSkeleton.set(false);
-          }, 500);
+          if (this.showSkeleton()) {
+            setTimeout(() => {
+              this.showSkeleton.set(false);
+            }, 500);
+          }
         } else {
           this.error.set('Failed to load banner data');
           this.loading.set(false);
+          this.isInitialLoad = false; // Mark initial load as complete
+          
+          // Remove skeleton from DOM after fade-out animation completes
+          if (this.showSkeleton()) {
+            setTimeout(() => {
+              this.showSkeleton.set(false);
+            }, 500);
+          }
         }
       },
     });

@@ -63,7 +63,7 @@ interface TeamDisplay {
 interface GameStats {
   faceoffWinPct: number;
   defensiveZoneExit: {
-    long: number;
+    icing: number;
     skate: number;
     soWin: number;
     soLose: number;
@@ -217,7 +217,7 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
   homeStats = signal<GameStats>({
     faceoffWinPct: 0,
     defensiveZoneExit: {
-      long: 0,
+      icing: 0,
       skate: 0,
       soWin: 0,
       soLose: 0,
@@ -245,7 +245,7 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
   awayStats = signal<GameStats>({
     faceoffWinPct: 0,
     defensiveZoneExit: {
-      long: 0,
+      icing: 0,
       skate: 0,
       soWin: 0,
       soLose: 0,
@@ -935,7 +935,7 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
     this.homeStats.set({
       faceoffWinPct: homeFaceoffPct,
       defensiveZoneExit: {
-        long: liveData.home_defensive_zone_exit.icing,
+        icing: liveData.home_defensive_zone_exit.icing,
         skate: liveData.home_defensive_zone_exit.skate_out,
         soWin: liveData.home_defensive_zone_exit.so_win,
         soLose: liveData.home_defensive_zone_exit.so_lose,
@@ -964,7 +964,7 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
     this.awayStats.set({
       faceoffWinPct: awayFaceoffPct,
       defensiveZoneExit: {
-        long: liveData.away_defensive_zone_exit.icing,
+        icing: liveData.away_defensive_zone_exit.icing,
         skate: liveData.away_defensive_zone_exit.skate_out,
         soWin: liveData.away_defensive_zone_exit.so_win,
         soLose: liveData.away_defensive_zone_exit.so_lose,
@@ -998,9 +998,9 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
   gameEvents = signal<GameEvent[]>([]);
 
   // Helpers to map UI keys to API fields
-  private mapDefensiveField(type: 'long' | 'skate' | 'soWin' | 'soLose' | 'pass') {
+  private mapDefensiveField(type: 'icing' | 'skate' | 'soWin' | 'soLose' | 'pass') {
     const mapping: Record<typeof type, 'icing' | 'skate_out' | 'so_win' | 'so_lose' | 'passes'> = {
-      long: 'icing',
+      icing: 'icing',
       skate: 'skate_out',
       soWin: 'so_win',
       soLose: 'so_lose',
@@ -1048,21 +1048,21 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
   // Defensive Zone Exit increment/decrement methods (with backend PATCH)
   incrementDefensiveZoneExit(
     team: 'away' | 'home',
-    type: 'long' | 'skate' | 'soWin' | 'soLose' | 'pass'
+    type: 'icing' | 'skate' | 'soWin' | 'soLose' | 'pass'
   ): void {
     this.updateDefensiveZoneExit(team, type, +1);
   }
 
   decrementDefensiveZoneExit(
     team: 'away' | 'home',
-    type: 'long' | 'skate' | 'soWin' | 'soLose' | 'pass'
+    type: 'icing' | 'skate' | 'soWin' | 'soLose' | 'pass'
   ): void {
     this.updateDefensiveZoneExit(team, type, -1);
   }
 
   private updateDefensiveZoneExit(
     team: 'away' | 'home',
-    type: 'long' | 'skate' | 'soWin' | 'soLose' | 'pass',
+    type: 'icing' | 'skate' | 'soWin' | 'soLose' | 'pass',
     delta: 1 | -1
   ): void {
     const field = this.mapDefensiveField(type);

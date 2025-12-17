@@ -183,7 +183,9 @@
       >
         Edit
       </app-button>
-      <app-button
+      <app-button-loading
+        [isLoading]="isDeleting"
+        [isDisabled]="isDeleting"
         [bg]="'primary'"
         [bghover]="'primary_dark'"
         [color]="'white'"
@@ -195,7 +197,7 @@
         role-visibility-name="delete-action"
       >
         Delete
-      </app-button>
+      </app-button-loading>
     </div>
   }
 </div>

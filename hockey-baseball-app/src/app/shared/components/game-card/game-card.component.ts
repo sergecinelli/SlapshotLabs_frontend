@@ -5,6 +5,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { Schedule, GameStatus } from '../../interfaces/schedule.interface';
 import { ButtonComponent } from '../buttons/button/button.component';
 import { ButtonRouteComponent } from '../buttons/button-route/button-route.component';
+import { ButtonLoadingComponent } from '../buttons/button-loading/button-loading.component';
 import { getGameStatusLabel, isOvertimeStatus } from '../../constants/game-status.constants';
 
 @Component({
@@ -16,6 +17,7 @@ import { getGameStatusLabel, isOvertimeStatus } from '../../constants/game-statu
     MatIconModule,
     ButtonComponent,
     ButtonRouteComponent,
+    ButtonLoadingComponent,
   ],
   templateUrl: './game-card.component.html',
   styleUrl: './game-card.component.scss',
@@ -24,6 +26,7 @@ export class GameCardComponent {
   @Input({ required: true }) game!: Schedule;
   @Input() showActions = false;
   @Input() showScore = true; // Show score or "at" separator for upcoming games
+  @Input() isDeleting = false; // Loading state for delete action
   @Output() edit = new EventEmitter<Schedule>();
   @Output() delete = new EventEmitter<Schedule>();
 

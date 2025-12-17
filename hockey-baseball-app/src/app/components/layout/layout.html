@@ -89,7 +89,12 @@
       <div [class]="'flex items-center ' + (isCollapsed() ? 'justify-center' : 'space-x-3')">
         <!-- User Avatar -->
         <div class="flex-shrink-0">
-          <div class="user-avatar">
+          <div 
+            class="user-avatar"
+            [matTooltip]="isCollapsed() ? getUserFullName() : ''"
+            [matTooltipDisabled]="!isCollapsed()"
+            [matTooltipPosition]="'right'"
+          >
             {{ getUserInitials() }}
           </div>
         </div>
@@ -103,6 +108,9 @@
             tabindex="0"
             role="button"
             [attr.aria-label]="'Go to profile page'"
+            [matTooltipShowDelay]="500"
+            [matTooltip]="getUserFullName()"
+            [matTooltipPosition]="'right'"
           >
             {{ getUserFullName() }}
           </div>

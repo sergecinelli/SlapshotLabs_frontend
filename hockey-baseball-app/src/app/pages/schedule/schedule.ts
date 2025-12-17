@@ -96,6 +96,7 @@ import { forkJoin } from 'rxjs';
               [game]="schedule"
               [showActions]="true"
               [showScore]="true"
+              [isDeleting]="deletingGameIds.has(schedule.id)"
               (edit)="editSchedule($event)"
               (delete)="deleteSchedule($event)"
             />
@@ -121,6 +122,7 @@ export class ScheduleComponent implements OnInit {
   private router = inject(Router);
 
   schedules = signal<Schedule[]>([]);
+  deletingGameIds = new Set<string>();
   loading = signal(true);
   currentMonthStart = signal<Date>(this.getMonthStart(new Date()));
   currentMonthEnd = signal<Date>(this.getMonthEnd(this.currentMonthStart()));
@@ -656,12 +658,17 @@ export class ScheduleComponent implements OnInit {
         `Are you sure you want to delete the game between ${schedule.homeTeam} and ${schedule.awayTeam}?`
       )
     ) {
-      const gameId = parseInt(schedule.id);
-      this.scheduleService.deleteGame(gameId).subscribe({
+      const gameId = schedule.id;
+      this.deletingGameIds.add(gameId);
+      const numericGameId = parseInt(gameId);
+      this.scheduleService.deleteGame(numericGameId).subscribe({
         next: () => {
+          this.deletingGameIds.delete(gameId);
           this.loadSchedules(); // Always reload the list after successful API call
+          this.bannerService.triggerRefresh(); // Refresh the banner
         },
         error: (error) => {
+          this.deletingGameIds.delete(gameId);
           console.error('Error deleting game:', error);
           alert('Error deleting game. Please try again.');
         },

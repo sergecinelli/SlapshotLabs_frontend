@@ -22,6 +22,7 @@ import { ScheduleFormModalComponent, ScheduleFormModalData } from '../../shared/
 import { HighlightReelFormModalComponent, HighlightReelFormModalData } from '../../shared/components/highlight-reel-form-modal/highlight-reel-form-modal';
 import { HighlightReelUpsertPayload } from '../../shared/interfaces/highlight-reel.interface';
 import { HighlightsService } from '../../services/highlights.service';
+import { BannerService } from '../../services/banner.service';
 import { forkJoin } from 'rxjs';
 import { visibilityByRoleMap } from './dashboard.role-map';
 import { ComponentVisibilityByRoleDirective } from '../../shared/directives/component-visibility-by-role.directive';
@@ -55,6 +56,7 @@ export class DashboardComponent implements OnInit {
   private arenaService = inject(ArenaService);
   private apiService = inject(ApiService);
   private highlightsService = inject(HighlightsService);
+  private bannerService = inject(BannerService);
   private dialog = inject(MatDialog);
   private router = inject(Router);
 
@@ -317,6 +319,7 @@ export class DashboardComponent implements OnInit {
   private addGame(gameData: Record<string, unknown>): void {
     this.scheduleService.createGame(gameData).subscribe({
       next: () => {
+        this.bannerService.triggerRefresh(); // Refresh the banner
         this.router.navigate(['/schedule']);
       },
       error: (error) => {
