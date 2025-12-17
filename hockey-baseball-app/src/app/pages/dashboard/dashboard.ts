@@ -29,7 +29,7 @@ import { ComponentVisibilityByRoleDirective } from '../../shared/directives/comp
 import { GameCardComponent } from '../../shared/components/game-card/game-card.component';
 import { GameCardSkeletonComponent } from '../../shared/components/game-card/game-card-skeleton.component';
 import { getGameStatusLabel } from '../../shared/constants/game-status.constants';
-import { convertGMTToLocal } from '../../shared/utils/time-converter.util';
+import { convertGMTToLocalWithDateShift, formatDateForDisplay } from '../../shared/utils/time-converter.util';
 
 @Component({
   selector: 'app-dashboard',
@@ -103,31 +103,10 @@ export class DashboardComponent implements OnInit {
           })
         );
 
-        // Helper function to format date
-        const formatDate = (dateStr: string): string => {
-          if (!dateStr) return '';
-          // If date is already formatted, return as is
-          if (dateStr.includes(',')) {
-            return dateStr;
-          }
-          // Otherwise format it
-          try {
-            const date = new Date(dateStr);
-            const options: Intl.DateTimeFormatOptions = { 
-              weekday: 'short', 
-              month: 'short', 
-              day: 'numeric' 
-            };
-            const formatted = date.toLocaleDateString('en-US', options);
-            return formatted.replace(/(\w+), (\w+) (\d+)/, '$1., $2. $3');
-          } catch {
-            return dateStr;
-          }
-        };
 
         // Helper function to get status name
         const getStatusName = (status: number): string => {
-          const statusEnum = 
+          const statusEnum =
             status === 0 || status === 1
               ? GameStatus.NotStarted
               : status === 2
@@ -190,8 +169,8 @@ export class DashboardComponent implements OnInit {
             gameType: game.game_type || '' as GameType,
             gameTypeName: game.game_type_name || undefined,
             tournamentName: game.tournament_name || undefined,
-            date: formatDate(game.date),
-            time: convertGMTToLocal(game.date, game.time).time,
+            date: formatDateForDisplay(convertGMTToLocalWithDateShift(game.date, game.time).date),
+            time: convertGMTToLocalWithDateShift(game.date, game.time).time,
             rink: game.rink_id ? (rinkMap.get(game.rink_id) || `Rink ${game.rink_id}`) : '',
             arenaRink: game.rink_id ? (rinkMap.get(game.rink_id) || `Rink ${game.rink_id}`) : '',
             arenaName: game.arena_id ? (arenaNameMap.get(game.arena_id) || '') : '',
@@ -408,10 +387,10 @@ export class DashboardComponent implements OnInit {
     // Otherwise format it
     try {
       const date = new Date(dateStr);
-      const options: Intl.DateTimeFormatOptions = { 
-        weekday: 'short', 
-        month: 'short', 
-        day: 'numeric' 
+      const options: Intl.DateTimeFormatOptions = {
+        weekday: 'short',
+        month: 'short',
+        day: 'numeric'
       };
       const formatted = date.toLocaleDateString('en-US', options);
       return formatted.replace(/(\w+), (\w+) (\d+)/, '$1., $2. $3');

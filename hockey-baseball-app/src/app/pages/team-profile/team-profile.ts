@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
@@ -20,7 +20,8 @@ import { TeamFormModalComponent } from '../../shared/components/team-form-modal/
 import { ComponentVisibilityByRoleDirective } from '../../shared/directives/component-visibility-by-role.directive';
 import { ButtonComponent } from '../../shared/components/buttons/button/button.component';
 import { visibilityByRoleMap } from './team-profile.role-map';
-import { forkJoin } from 'rxjs';
+import { forkJoin, Subject } from 'rxjs';
+import { switchMap, takeUntil } from 'rxjs/operators';
 
 // Additional interfaces for team profile specific data
 export interface TeamGame {
@@ -67,7 +68,7 @@ export interface TeamPlayer {
   templateUrl: './team-profile.html',
   styleUrl: './team-profile.scss',
 })
-export class TeamProfileComponent implements OnInit {
+export class TeamProfileComponent implements OnInit, OnDestroy {
   // Role-based access map
   protected visibilityByRoleMap = visibilityByRoleMap;
 
@@ -80,6 +81,8 @@ export class TeamProfileComponent implements OnInit {
   private gameMetadataService = inject(GameMetadataService);
   private arenaService = inject(ArenaService);
   private dialog = inject(MatDialog);
+
+  private destroy$ = new Subject<void>();
 
   team: Team | null = null;
   roster: (Player | Goalie)[] = [];
@@ -108,12 +111,21 @@ export class TeamProfileComponent implements OnInit {
   ];
 
   ngOnInit(): void {
-    const teamId = this.route.snapshot.paramMap.get('id');
-    if (teamId) {
-      this.loadTeam(teamId);
-    } else {
-      this.router.navigate(['/teams-and-rosters/teams']);
-    }
+    this.route.params
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((params) => {
+        const teamId = params['id'];
+        if (teamId) {
+          this.loadTeam(teamId);
+        } else {
+          this.router.navigate(['/teams-and-rosters/teams']);
+        }
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   private loadTeam(id: string): void {
