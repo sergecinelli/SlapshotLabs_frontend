@@ -37,6 +37,8 @@ import {
   RosterSelectionResult,
 } from '../roster-selection-modal/roster-selection-modal';
 import { forkJoin } from 'rxjs';
+import { convertLocalToGMT, convertGMTToLocal } from '../../utils/time-converter.util';
+import { ScheduleService } from '../../../services/schedule.service';
 
 export interface GameData {
   id: number;
@@ -103,11 +105,13 @@ export class ScheduleFormModalComponent implements OnInit {
   private goalieService = inject(GoalieService);
   private playerService = inject(PlayerService);
   private gamePlayerService = inject(GamePlayerService);
+  private scheduleService = inject(ScheduleService);
   data = inject<ScheduleFormModalData>(MAT_DIALOG_DATA);
 
   scheduleForm: FormGroup;
   isEditMode: boolean;
   isLoading = true;
+  isSubmitting = false;
 
   teams: Team[] = [];
   arenas: Arena[] = [];
@@ -387,6 +391,9 @@ export class ScheduleFormModalComponent implements OnInit {
       // Find the game type by matching game_type_name with game type names
       const gameTypeId = game.game_type_id;
 
+      // Convert GMT date and time to local timezone
+      const localDateTime = convertGMTToLocal(game.date, game.time);
+
       this.scheduleForm.patchValue({
         awayTeam: game.away_team_id.toString(),
         homeTeam: game.home_team_id.toString(),
@@ -394,8 +401,8 @@ export class ScheduleFormModalComponent implements OnInit {
         awayGoals: game.away_goals,
         awayTeamGoalie: awayGoalieId > 0 ? awayGoalieId.toString() : '',
         homeTeamGoalie: homeGoalieId > 0 ? homeGoalieId.toString() : '',
-        date: game.date,
-        time: this.convertTo12Hour(game.time),
+        date: localDateTime.date,
+        time: this.convertTo12Hour(localDateTime.time),
         arena: arenaId,
         rink: game.rink_id,
         tournamentName: game.tournament_name || '',
@@ -588,11 +595,12 @@ export class ScheduleFormModalComponent implements OnInit {
   }
 
   onSubmit(): void {
-    if (this.isLoading) {
+    if (this.isLoading || this.isSubmitting) {
       return;
     }
 
     if (this.scheduleForm.valid) {
+      this.isSubmitting = true;
       const formValue = this.scheduleForm.value;
 
       const homeTeamId = parseInt(formValue.homeTeam);
@@ -622,6 +630,13 @@ export class ScheduleFormModalComponent implements OnInit {
           : null;
 
       const hasGameTypeName = !!formValue.gameTypeName;
+      
+      // Convert local time to 24-hour format first
+      const time24Hour = this.convertTo24Hour(formValue.time);
+      
+      // Convert local date and time to GMT
+      const gmtDateTime = convertLocalToGMT(formValue.date, time24Hour);
+      
       // Create API request body
       const gameData: Record<string, unknown> & { id?: number } = {
         home_team_id: homeTeamId,
@@ -631,8 +646,8 @@ export class ScheduleFormModalComponent implements OnInit {
         game_type_id: formValue.gameType,
         ...(hasGameTypeName ? { game_type_name_id: parseInt(formValue.gameTypeName) } : {}),
         status: formValue.status,
-        date: formValue.date,
-        time: this.convertTo24Hour(formValue.time),
+        date: gmtDateTime.date,
+        time: gmtDateTime.time,
         rink_id: formValue.rink,
         home_goalies: homeGoalies,
         away_goalies: awayGoalies,
@@ -647,7 +662,33 @@ export class ScheduleFormModalComponent implements OnInit {
         gameData.id = parseInt(this.data.schedule.id);
       }
 
-      this.dialogRef.close(gameData);
+      // Make API call directly from modal
+      if (this.isEditMode && this.data.schedule) {
+        const gameId = parseInt(this.data.schedule.id);
+        this.scheduleService.updateGame(gameId, gameData).subscribe({
+          next: () => {
+            this.isSubmitting = false;
+            this.dialogRef.close({ success: true, gameData });
+          },
+          error: (error) => {
+            this.isSubmitting = false;
+            console.error('Error updating game:', error);
+            alert('Error updating game. Please try again.');
+          },
+        });
+      } else {
+        this.scheduleService.createGame(gameData).subscribe({
+          next: () => {
+            this.isSubmitting = false;
+            this.dialogRef.close({ success: true, gameData });
+          },
+          error: (error) => {
+            this.isSubmitting = false;
+            console.error('Error adding game:', error);
+            alert('Error adding game. Please try again.');
+          },
+        });
+      }
     } else {
       // Mark all fields as touched to show validation errors
       Object.keys(this.scheduleForm.controls).forEach((key) => {
@@ -657,7 +698,9 @@ export class ScheduleFormModalComponent implements OnInit {
   }
 
   onCancel(): void {
-    this.dialogRef.close();
+    if (!this.isSubmitting) {
+      this.dialogRef.close();
+    }
   }
 
   getErrorMessage(fieldName: string): string {
@@ -817,6 +860,32 @@ export class ScheduleFormModalComponent implements OnInit {
   }
 
   /**
+   * Convert GMT (UTC) time to local time
+   * @param dateString Date in format YYYY-MM-DD
+   * @param gmtTime Time in format HH:mm:ss (GMT/UTC)
+   * @returns Time in format h:mm AM/PM (local time)
+   */
+  private convertGMTToLocalTime(dateString: string, gmtTime: string): string {
+    if (!dateString || !gmtTime) return '';
+
+    // Parse GMT time
+    const [hours, minutes] = gmtTime.split(':');
+    if (!hours || !minutes) return this.convertTo12Hour(gmtTime); // Fallback to simple conversion
+
+    // Create a Date object in UTC
+    const utcDate = new Date(`${dateString}T${hours}:${minutes}:00Z`);
+
+    // Get local time
+    const localHours = utcDate.getHours();
+    const localMinutes = utcDate.getMinutes();
+
+    // Convert to 12-hour format
+    const hours24 = localHours.toString().padStart(2, '0');
+    const minutesStr = localMinutes.toString().padStart(2, '0');
+    return this.convertTo12Hour(`${hours24}:${minutesStr}`);
+  }
+
+  /**
    * Convert 12-hour AM/PM format to 24-hour format
    * @param time12 Time in format h:mm AM/PM
    * @returns Time in format HH:mm:ss
@@ -844,6 +913,37 @@ export class ScheduleFormModalComponent implements OnInit {
 
     const hours24 = hours.toString().padStart(2, '0');
     return `${hours24}:${minutes}:00`;
+  }
+
+  /**
+   * Convert local time to GMT (UTC) format for API
+   * @param dateString Date in format YYYY-MM-DD (local date)
+   * @param time12 Time in format h:mm AM/PM (local time)
+   * @returns Time in format HH:mm:ss (GMT/UTC)
+   */
+  private convertLocalTimeToGMT(dateString: string, time12: string): string {
+    if (!dateString || !time12) return '';
+
+    // Parse 12-hour time to 24-hour format
+    const time24 = this.convertTo24Hour(time12);
+    if (!time24 || time24 === time12) return time24; // Return as-is if conversion failed
+
+    // Parse time components
+    const [hours, minutes] = time24.split(':');
+    if (!hours || !minutes) return time24;
+
+    // Create a Date object with local date and time
+    // dateString is in format YYYY-MM-DD, which creates a date at midnight local time
+    const localDate = new Date(dateString + 'T00:00:00');
+    // Set local hours and minutes
+    localDate.setHours(parseInt(hours, 10), parseInt(minutes, 10), 0, 0);
+
+    // Get UTC (GMT) time components
+    const utcHours = localDate.getUTCHours().toString().padStart(2, '0');
+    const utcMinutes = localDate.getUTCMinutes().toString().padStart(2, '0');
+    const utcSeconds = localDate.getUTCSeconds().toString().padStart(2, '0');
+
+    return `${utcHours}:${utcMinutes}:${utcSeconds}`;
   }
 
   /**

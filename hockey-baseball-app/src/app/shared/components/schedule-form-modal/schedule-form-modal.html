@@ -280,13 +280,14 @@
       [width]="'auto'"
       [rounded]="false"
       [haveContent]="true"
+      [isDisabled]="isSubmitting"
       (clicked)="onCancel()"
     >
       Cancel
     </app-button>
     <app-button-loading
-      [isLoading]="isLoading"
-      [isDisabled]="scheduleForm.invalid"
+      [isLoading]="isSubmitting"
+      [isDisabled]="scheduleForm.invalid || isSubmitting"
       materialIcon="save"
       [bg]="isEditMode ? 'orange' : 'green'"
       [bghover]="isEditMode ? 'orange' : 'green'"

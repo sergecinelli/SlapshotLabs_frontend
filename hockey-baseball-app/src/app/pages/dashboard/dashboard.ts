@@ -29,6 +29,7 @@ import { ComponentVisibilityByRoleDirective } from '../../shared/directives/comp
 import { GameCardComponent } from '../../shared/components/game-card/game-card.component';
 import { GameCardSkeletonComponent } from '../../shared/components/game-card/game-card-skeleton.component';
 import { getGameStatusLabel } from '../../shared/constants/game-status.constants';
+import { convertGMTToLocal } from '../../shared/utils/time-converter.util';
 
 @Component({
   selector: 'app-dashboard',
@@ -190,7 +191,7 @@ export class DashboardComponent implements OnInit {
             gameTypeName: game.game_type_name || undefined,
             tournamentName: game.tournament_name || undefined,
             date: formatDate(game.date),
-            time: game.time,
+            time: convertGMTToLocal(game.date, game.time).time,
             rink: game.rink_id ? (rinkMap.get(game.rink_id) || `Rink ${game.rink_id}`) : '',
             arenaRink: game.rink_id ? (rinkMap.get(game.rink_id) || `Rink ${game.rink_id}`) : '',
             arenaName: game.arena_id ? (arenaNameMap.get(game.arena_id) || '') : '',
@@ -377,6 +378,7 @@ export class DashboardComponent implements OnInit {
       return game.awayTeamAgeGroup || game.awayTeamLevelName || '';
     }
   }
+
 
   formatTimeTo12Hour(time: string): string {
     if (!time) return '';

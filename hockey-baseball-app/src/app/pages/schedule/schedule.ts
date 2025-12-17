@@ -31,6 +31,7 @@ import { GameCardComponent } from '../../shared/components/game-card/game-card.c
 import { visibilityByRoleMap } from './schedule.role-map';
 import { getGameStatusLabel } from '../../shared/constants/game-status.constants';
 import { forkJoin } from 'rxjs';
+import { convertGMTToLocal, formatDateForDisplay } from '../../shared/utils/time-converter.util';
 
 @Component({
   selector: 'app-schedule',
@@ -280,27 +281,8 @@ export class ScheduleComponent implements OnInit {
           this.rawGames.set(game.id.toString(), game);
         });
 
-        // Helper function to format date
-        const formatDate = (dateStr: string): string => {
-          if (!dateStr) return '';
-          // If date is already formatted, return as is
-          if (dateStr.includes(',')) {
-            return dateStr;
-          }
-          // Otherwise format it
-          try {
-            const date = new Date(dateStr);
-            const options: Intl.DateTimeFormatOptions = { 
-              weekday: 'short', 
-              month: 'short', 
-              day: 'numeric' 
-            };
-            const formatted = date.toLocaleDateString('en-US', options);
-            return formatted.replace(/(\w+), (\w+) (\d+)/, '$1., $2. $3');
-          } catch {
-            return dateStr;
-          }
-        };
+        // Helper function to format date (uses formatDateForDisplay from utils)
+        const formatDate = formatDateForDisplay;
 
         // Helper function to get status name
         const getStatusName = (status: number, periodName?: string): string => {
@@ -337,6 +319,9 @@ export class ScheduleComponent implements OnInit {
           const periodName = game.game_period_name || 
             (game.game_period_id ? gamePeriodMap.get(game.game_period_id) : undefined);
 
+          // Convert GMT date and time to local timezone
+          const localDateTime = convertGMTToLocal(game.date, game.time);
+
           return {
             id: game.id.toString(),
             homeTeam: homeTeamData?.name || teamMap.get(game.home_team_id) || `Team ${game.home_team_id}`,
@@ -358,9 +343,9 @@ export class ScheduleComponent implements OnInit {
             gameType: game.game_type || gameTypeMap.get(game.game_type_id) || '',
             gameTypeName: game.game_type_name || '',
             tournamentName: game.tournament_name || undefined,
-            date: formatDate(game.date),
-            dateTime: game.time ? `${formatDate(game.date)} ${game.time}` : formatDate(game.date),
-            time: game.time,
+            date: formatDate(localDateTime.date),
+            dateTime: localDateTime.time ? `${formatDate(localDateTime.date)} ${localDateTime.time}` : formatDate(localDateTime.date),
+            time: localDateTime.time,
             rink: game.rink_id ? (rinkMap.get(game.rink_id) || `Rink ${game.rink_id}`) : '',
             arenaRink: game.rink_id ? (rinkMap.get(game.rink_id) || `Rink ${game.rink_id}`) : '',
             arenaName: game.arena_id ? (arenaNameMap.get(game.arena_id) || '') : '',
@@ -383,14 +368,16 @@ export class ScheduleComponent implements OnInit {
     });
   }
 
-  private loadSchedules(): void {
+  private loadSchedules(showLoading = true): void {
     // Reload just the schedules without refetching all data
     const monthStart = this.currentMonthStart();
     const monthEnd = this.currentMonthEnd();
     const from = this.formatDateForAPI(monthStart);
     const to = this.formatDateForAPI(new Date(monthEnd.getTime() + 24 * 60 * 60 * 1000)); // Add 1 day since 'to' is exclusive
 
-    this.loading.set(true);
+    if (showLoading) {
+      this.loading.set(true);
+    }
     this.scheduleService.getGameList(from, to).subscribe({
       next: (games) => {
         const teamMap = new Map(this.teams.map((t) => [parseInt(t.id), t.name]));
@@ -443,27 +430,8 @@ export class ScheduleComponent implements OnInit {
           this.rawGames.set(game.id.toString(), game);
         });
 
-        // Helper function to format date
-        const formatDate = (dateStr: string): string => {
-          if (!dateStr) return '';
-          // If date is already formatted, return as is
-          if (dateStr.includes(',')) {
-            return dateStr;
-          }
-          // Otherwise format it
-          try {
-            const date = new Date(dateStr);
-            const options: Intl.DateTimeFormatOptions = { 
-              weekday: 'short', 
-              month: 'short', 
-              day: 'numeric' 
-            };
-            const formatted = date.toLocaleDateString('en-US', options);
-            return formatted.replace(/(\w+), (\w+) (\d+)/, '$1., $2. $3');
-          } catch {
-            return dateStr;
-          }
-        };
+        // Helper function to format date (uses formatDateForDisplay from utils)
+        const formatDate = formatDateForDisplay;
 
         // Helper function to get status name
         const getStatusName = (status: number, periodName?: string): string => {
@@ -499,6 +467,9 @@ export class ScheduleComponent implements OnInit {
           const periodName = game.game_period_name || 
             (game.game_period_id ? gamePeriodMap.get(game.game_period_id) : undefined);
 
+          // Convert GMT date and time to local timezone
+          const localDateTime = convertGMTToLocal(game.date, game.time);
+
           return {
             id: game.id.toString(),
             homeTeam: homeTeamData?.name || teamMap.get(game.home_team_id) || `Team ${game.home_team_id}`,
@@ -520,9 +491,9 @@ export class ScheduleComponent implements OnInit {
             gameType: game.game_type || gameTypeMap.get(game.game_type_id) || '',
             gameTypeName: game.game_type_name || '',
             tournamentName: game.tournament_name || undefined,
-            date: formatDate(game.date),
-            dateTime: game.time ? `${formatDate(game.date)} ${game.time}` : formatDate(game.date),
-            time: game.time,
+            date: formatDate(localDateTime.date),
+            dateTime: localDateTime.time ? `${formatDate(localDateTime.date)} ${localDateTime.time}` : formatDate(localDateTime.date),
+            time: localDateTime.time,
             rink: game.rink_id ? (rinkMap.get(game.rink_id) || `Rink ${game.rink_id}`) : '',
             arenaRink: game.rink_id ? (rinkMap.get(game.rink_id) || `Rink ${game.rink_id}`) : '',
             arenaName: game.arena_id ? (arenaNameMap.get(game.arena_id) || '') : '',
@@ -536,11 +507,15 @@ export class ScheduleComponent implements OnInit {
         });
 
         this.schedules.set(mappedSchedules);
-        this.loading.set(false);
+        if (showLoading) {
+          this.loading.set(false);
+        }
       },
       error: (error) => {
         console.error('Error loading schedules:', error);
-        this.loading.set(false);
+        if (showLoading) {
+          this.loading.set(false);
+        }
       },
     });
   }
@@ -637,17 +612,10 @@ export class ScheduleComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
-        const gameId = parseInt(schedule.id);
-        this.scheduleService.updateGame(gameId, result).subscribe({
-          next: () => {
-            this.loadSchedules(); // Reload the list
-            this.bannerService.triggerRefresh(); // Refresh the banner
-          },
-          error: (error) => {
-            console.error('Error updating game:', error);
-          },
-        });
+      if (result && result.success) {
+        // Reload the list without showing loading indicator
+        this.loadSchedules(false);
+        this.bannerService.triggerRefresh(); // Refresh the banner
       }
     });
   }
@@ -664,8 +632,17 @@ export class ScheduleComponent implements OnInit {
       this.scheduleService.deleteGame(numericGameId).subscribe({
         next: () => {
           this.deletingGameIds.delete(gameId);
-          this.loadSchedules(); // Always reload the list after successful API call
-          this.bannerService.triggerRefresh(); // Refresh the banner
+          
+          // Remove the game from the list immediately without full reload
+          const currentSchedules = this.schedules();
+          const updatedSchedules = currentSchedules.filter((s) => s.id !== gameId);
+          this.schedules.set(updatedSchedules);
+          
+          // Also remove from rawGames map
+          this.rawGames.delete(gameId);
+          
+          // Refresh the banner
+          this.bannerService.triggerRefresh();
         },
         error: (error) => {
           this.deletingGameIds.delete(gameId);
@@ -699,16 +676,10 @@ export class ScheduleComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
-        this.scheduleService.createGame(result).subscribe({
-          next: () => {
-            this.loadSchedules(); // Reload the list
-            this.bannerService.triggerRefresh(); // Refresh the banner
-          },
-          error: (error) => {
-            console.error('Error adding game:', error);
-          },
-        });
+      if (result && result.success) {
+        // Reload the list without showing loading indicator
+        this.loadSchedules(false);
+        this.bannerService.triggerRefresh(); // Refresh the banner
       }
     });
   }
