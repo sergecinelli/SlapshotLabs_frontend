@@ -27,6 +27,7 @@ import { HighlightReelUpsertPayload } from '../../interfaces/highlight-reel.inte
 import { CustomHighlightModalComponent, CustomHighlightFormResult } from './custom-highlight-modal';
 import { environment } from '../../../../environments/environment';
 import { forkJoin } from 'rxjs';
+import { convertLocalToGMT, convertGMTToLocal } from '../../utils/time-converter.util';
 
 export interface HighlightReelFormModalData {
   isEditMode: boolean;
@@ -131,27 +132,40 @@ export class HighlightReelFormModalComponent implements OnInit {
         // Convert existing highlights to selected events format
         const selectedItems = highlights
           .sort((a, b) => a.order - b.order)
-          .map((highlight) => ({
-            id: this.nextSelectedEventId++,
-            gameEventId: highlight.game_event_id,
-            highlightId: highlight.id,
-            is_custom: highlight.is_custom,
-            eventName: highlight.event_name || '',
-            description: highlight.note || '-',
-            date: highlight.date,
-            periodTime: highlight.time, // display raw
-            gameLabel: '', // Not available from highlight data
-            youtubeLink: highlight.youtube_link,
-            customTime: highlight.time,
-            fullEvent: {
-              id: highlight.game_event_id,
-              event_name_id: 0,
-              note: highlight.note,
-              youtube_link: highlight.youtube_link,
-              time: highlight.time,
-              date: highlight.date,
-            } as LiveGameEvent,
-          }));
+          .map((highlight) => {
+            // Convert GMT time from API to local time for display
+            let localDate = highlight.date;
+            let localTime = highlight.time;
+            
+            if (highlight.is_custom && highlight.date && highlight.time) {
+              // For custom highlights, convert GMT to local time
+              const localDateTime = convertGMTToLocal(highlight.date, highlight.time);
+              localDate = localDateTime.date;
+              localTime = localDateTime.time;
+            }
+            
+            return {
+              id: this.nextSelectedEventId++,
+              gameEventId: highlight.game_event_id,
+              highlightId: highlight.id,
+              is_custom: highlight.is_custom,
+              eventName: highlight.event_name || '',
+              description: highlight.note || '-',
+              date: localDate, // Use local date for display
+              periodTime: localTime, // Use local time for display
+              gameLabel: '', // Not available from highlight data
+              youtubeLink: highlight.youtube_link,
+              customTime: localTime, // Store local time for editing
+              fullEvent: {
+                id: highlight.game_event_id,
+                event_name_id: 0,
+                note: highlight.note,
+                youtube_link: highlight.youtube_link,
+                time: highlight.time, // Keep original GMT time
+                date: highlight.date, // Keep original GMT date
+              } as LiveGameEvent,
+            };
+          });
 
         this.selectedEvents.set(selectedItems);
       },
@@ -465,18 +479,18 @@ export class HighlightReelFormModalComponent implements OnInit {
         is_custom: true,
         eventName: result.name,
         description: result.description,
-        date: result.date,
-        periodTime: result.time,
+        date: result.date, // Local date for display
+        periodTime: result.time, // Local time for display
         gameLabel: 'Custom',
         youtubeLink: result.youtube_link,
-        customTime: result.time,
+        customTime: result.time, // Local time for editing
         fullEvent: {
           id: 0,
           event_name_id: 0,
           note: result.description,
           youtube_link: result.youtube_link,
-          time: result.time,
-          date: result.date,
+          time: result.gmtTime, // Store GMT time for API
+          date: result.gmtDate, // Store GMT date for API
         } as LiveGameEvent,
       };
       this.selectedEvents.set([...this.selectedEvents(), newSelection]);
@@ -490,6 +504,25 @@ export class HighlightReelFormModalComponent implements OnInit {
     const highlights = this.selectedEvents().map((selectedEvent, index) => {
       // Custom highlights: send all fields except game_event_id
       if (selectedEvent.is_custom) {
+        // Use GMT values from fullEvent (stored when creating/editing)
+        // If not available (old data), convert local time to GMT
+        let gmtDate = selectedEvent.fullEvent.date;
+        let gmtTime = selectedEvent.fullEvent.time;
+        
+        if (!gmtDate || !gmtTime || !gmtTime.includes(':')) {
+          // Fallback: convert local date/time to GMT
+          let time24Hour = selectedEvent.customTime || '';
+          if (time24Hour && time24Hour.split(':').length === 2) {
+            time24Hour = `${time24Hour}:00`;
+          }
+          const gmtDateTime = convertLocalToGMT(selectedEvent.date || '', time24Hour);
+          gmtDate = gmtDateTime.date;
+          gmtTime = `${gmtDateTime.time}.000Z`;
+        } else if (!gmtTime.endsWith('Z') && !gmtTime.includes('.')) {
+          // Ensure time is in HH:mm:ss.sssZ format
+          gmtTime = this.formatTimeForApi(gmtTime);
+        }
+        
         return {
           ...(this.isEditMode && selectedEvent.highlightId
             ? { id: selectedEvent.highlightId }
@@ -498,8 +531,8 @@ export class HighlightReelFormModalComponent implements OnInit {
           event_name: selectedEvent.eventName || '',
           note: selectedEvent.description || '',
           youtube_link: selectedEvent.youtubeLink || '',
-          date: selectedEvent.date || '',
-          time: this.formatTimeForApi((selectedEvent.customTime || '').toString()),
+          date: gmtDate,
+          time: gmtTime,
           order: index,
         };
       }

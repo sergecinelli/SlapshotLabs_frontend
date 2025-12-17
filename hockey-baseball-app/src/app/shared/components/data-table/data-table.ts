@@ -240,7 +240,10 @@ export class DataTableComponent<T extends Record<string, unknown> = Record<strin
     if (action === 'delete') {
       return 'primary'; // Red background for delete
     }
-    
+    if (action === 'view') {
+      return 'green'; // Green background for view
+    }
+
     switch (variant) {
       case 'primary':
         return 'primary';
@@ -257,7 +260,10 @@ export class DataTableComponent<T extends Record<string, unknown> = Record<strin
     if (action === 'delete') {
       return 'primary'; // Red background for delete (same on hover)
     }
-    
+    if (action === 'view') {
+      return 'green'; // Green background for view (same on hover, or could use darker green if available)
+    }
+
     switch (variant) {
       case 'primary':
         return 'primary_dark';
@@ -271,6 +277,9 @@ export class DataTableComponent<T extends Record<string, unknown> = Record<strin
 
   getActionColor(variant?: 'primary' | 'secondary' | 'danger', action?: string): AppColor {
     // Special cases for specific actions
+    if (action === 'view') {
+      return 'green'; // Green text for green view button
+    }
     if (action === 'view-profile') {
       return 'upcoming'; // Blue for profile
     }
@@ -283,7 +292,7 @@ export class DataTableComponent<T extends Record<string, unknown> = Record<strin
     if (action === 'shot-spray-chart') {
       return 'purple'; // Purple for spray chart
     }
-    
+
     switch (variant) {
       case 'primary':
         return 'primary';
@@ -297,6 +306,9 @@ export class DataTableComponent<T extends Record<string, unknown> = Record<strin
 
   getActionColorHover(variant?: 'primary' | 'secondary' | 'danger', action?: string): AppColor {
     // Special cases for specific actions
+    if (action === 'view') {
+      return 'green'; // Green text for green view button (same on hover)
+    }
     if (action === 'view-profile') {
       return 'upcoming'; // Blue for profile
     }
@@ -309,7 +321,7 @@ export class DataTableComponent<T extends Record<string, unknown> = Record<strin
     if (action === 'shot-spray-chart') {
       return 'purple'; // Purple for spray chart (same on hover)
     }
-    
+
     switch (variant) {
       case 'primary':
         return 'primary_dark';

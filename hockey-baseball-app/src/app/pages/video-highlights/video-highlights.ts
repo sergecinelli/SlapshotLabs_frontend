@@ -14,6 +14,7 @@ import {
   HighlightReelRow,
   HighlightReelUpsertPayload,
 } from '../../shared/interfaces/highlight-reel.interface';
+import { formatDateForDisplay } from '../../shared/utils/time-converter.util';
 import {
   HighlightReelFormModalComponent,
   HighlightReelFormModalData,
@@ -119,7 +120,9 @@ export class VideoHighlightsComponent implements OnInit {
     this.highlightsService.getHighlightReels().subscribe({
       next: (data: HighlightReelApi[]) => {
         const mapped: HighlightReelRow[] = data.map((item) => {
-          const date = new Date(item.date);
+          // Date from API is in GMT format (YYYY-MM-DD), use it directly for Date object
+          // The Date object will interpret it as local midnight, which is fine for sorting
+          const date = new Date(item.date + 'T00:00:00Z'); // Parse as UTC to avoid timezone issues
           return {
             id: item.id,
             name: item.name,
@@ -127,7 +130,7 @@ export class VideoHighlightsComponent implements OnInit {
             createdBy: item.created_by,
             userId: item.user_id,
             dateCreated: date,
-            dateCreatedFormatted: this.formatDateShort(date),
+            dateCreatedFormatted: formatDateForDisplay(item.date), // Use utility function for proper formatting
           } as HighlightReelRow;
         });
         this.rows.set(mapped);
@@ -189,12 +192,6 @@ export class VideoHighlightsComponent implements OnInit {
     return (row as Record<string, unknown>)[column];
   }
 
-  private formatDateShort(date: Date): string {
-    const month = date.toLocaleString('en-US', { month: 'short' });
-    const day = date.getDate();
-    const year = date.toLocaleString('en-US', { year: '2-digit' });
-    return `${month}, ${day}, ${year}`; // e.g., Nov, 7, 25
-  }
 
   openCreateHighlightModal(): void {
     const dialogRef = this.dialog.open(HighlightReelFormModalComponent, {

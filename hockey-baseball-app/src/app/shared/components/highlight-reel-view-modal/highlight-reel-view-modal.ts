@@ -5,6 +5,7 @@ import { ButtonComponent } from '../buttons/button/button.component';
 import { MatIconModule } from '@angular/material/icon';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { HighlightApi } from '../../interfaces/highlight-reel.interface';
+import { formatDateForDisplay, convertGMTToLocalWithDateShift } from '../../utils/time-converter.util';
 
 export interface HighlightReelViewModalData {
   reelName: string;
@@ -173,17 +174,65 @@ export class HighlightReelViewModalComponent implements OnInit {
   }
 
   // UI helpers
-  formatDate(d?: string): string {
-    return d || '-';
+  formatDate(d?: string, time?: string): string {
+    if (!d) return '-';
+    
+    // If time is provided, convert GMT date and time to local (accounting for date shifts)
+    if (time) {
+      const localDateTime = convertGMTToLocalWithDateShift(d, this.extractTimeFromApiFormat(time));
+      return formatDateForDisplay(localDateTime.date);
+    }
+    
+    // Date from API is in UTC format (YYYY-MM-DD), convert to local for display
+    return formatDateForDisplay(d);
   }
 
-  formatPeriodTime(time?: string): string {
+  formatPeriodTime(time?: string, date?: string): string {
     if (!time) return '-';
-    // Show MM:SS from HH:MM:SS(.sss) if possible
-    const m = time.match(/^(\d{2}):(\d{2}):(\d{2})/);
+    
+    // Extract time in HH:mm:ss format from API format (HH:mm:ss.sssZ or HH:mm:ss)
+    const timeStr = this.extractTimeFromApiFormat(time);
+    
+    // If date is provided, convert GMT to local time (accounting for date shifts)
+    if (date) {
+      const localDateTime = convertGMTToLocalWithDateShift(date, timeStr);
+      const localTimeStr = localDateTime.time;
+      // Show MM:SS from HH:MM:SS
+      const m = localTimeStr.match(/^(\d{2}):(\d{2}):(\d{2})/);
+      if (m) {
+        const minutes = (parseInt(m[1], 10) || 0) * 60 + (parseInt(m[2], 10) || 0);
+        const ss = parseInt(m[3], 10) || 0;
+        return `${minutes}:${ss.toString().padStart(2, '0')}`;
+      }
+      return localTimeStr;
+    }
+    
+    // Fallback: Show MM:SS from HH:MM:SS(.sss) if possible
+    const m = timeStr.match(/^(\d{2}):(\d{2}):(\d{2})/);
     if (!m) return time;
     const minutes = (parseInt(m[1], 10) || 0) * 60 + (parseInt(m[2], 10) || 0);
     const ss = parseInt(m[3], 10) || 0;
     return `${minutes}:${ss.toString().padStart(2, '0')}`;
+  }
+
+  /**
+   * Extract time in HH:mm:ss format from API format (HH:mm:ss.sssZ or HH:mm:ss)
+   */
+  private extractTimeFromApiFormat(timeStr: string): string {
+    if (!timeStr) return '00:00:00';
+    
+    // Remove Z suffix and milliseconds if present
+    const cleaned = timeStr.replace(/Z$/, '').split('.')[0];
+    
+    // Ensure it's in HH:mm:ss format
+    const parts = cleaned.split(':');
+    if (parts.length === 2) {
+      return `${cleaned}:00`;
+    }
+    if (parts.length === 3) {
+      return cleaned;
+    }
+    
+    return '00:00:00';
   }
 }

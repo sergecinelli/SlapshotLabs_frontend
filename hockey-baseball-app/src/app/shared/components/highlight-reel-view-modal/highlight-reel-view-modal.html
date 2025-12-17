@@ -53,8 +53,8 @@
               >
                 <td class="table-cell">{{ h.event_name || '-' }}</td>
                 <td class="table-cell">{{ h.note || '-' }}</td>
-                <td class="table-cell">{{ formatDate(h.date) }}</td>
-                <td class="table-cell">{{ formatPeriodTime(h.time) }}</td>
+                <td class="table-cell">{{ formatDate(h.date, h.time) }}</td>
+                <td class="table-cell">{{ formatPeriodTime(h.time, h.date) }}</td>
               </tr>
             </tbody>
           </table>
