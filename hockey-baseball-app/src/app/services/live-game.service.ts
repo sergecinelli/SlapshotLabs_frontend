@@ -93,6 +93,7 @@ export interface GameExtra {
   away_start_goalie_id: number;
   away_goals: number;
   game_type_id: number;
+  game_type: string;
   game_type_name: string;
   status: number;
   date: string;

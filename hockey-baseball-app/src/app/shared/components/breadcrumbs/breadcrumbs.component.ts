@@ -134,7 +134,7 @@ export class BreadcrumbsComponent implements OnInit {
     // Load game data to get tournament name
     this.liveGameService.getGameExtra(parseInt(gameId, 10)).subscribe({
       next: (gameExtra) => {
-        const tournamentName = gameExtra.game_type_name || 'Tournament';
+        const tournamentName = (gameExtra.game_type_name ? `${gameExtra.game_type_name} | ` : '') + gameExtra.game_type;
         const updatedItems: BreadcrumbItem[] = [
           {
             label: 'Schedule',
