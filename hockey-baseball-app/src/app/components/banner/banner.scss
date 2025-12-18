@@ -68,7 +68,6 @@
 
 .banner-container {
   display: flex;
-  gap: 10px;
   align-items: stretch;
   overflow-x: auto;
   overflow-y: hidden;
@@ -76,17 +75,9 @@
   height: 100%;
   scroll-behavior: smooth;
   transition:
-    gap 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-    padding 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-    opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  will-change: gap, padding, opacity;
+    padding 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  will-change: padding;
   scrollbar-width: thin;
-  scrollbar-color: red var(--border-light);
-  opacity: 0;
-
-  &.fade-in {
-    opacity: 1;
-  }
 
   &::-webkit-scrollbar {
     height: 8px;
@@ -129,8 +120,10 @@
 .game-card {
   display: flex;
   flex-direction: column;
-  min-width: 300px;
-  max-width: 360px;
+  width: 320px;
+  min-width: 320px;
+  margin-right: 10px;
+  flex-shrink: 0;
   padding: 10px;
   padding-bottom: 2px;
   border-radius: 4px;
@@ -141,8 +134,6 @@
     border-color 0.28s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   cursor: default;
-  flex-shrink: 0;
-  // gap: 2px;
   overflow: hidden;
 
   // Default hover state for all cards
@@ -332,7 +323,6 @@
   transition:
     opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1),
     transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  pointer-events: none;
   white-space: nowrap;
   position: absolute;
   right: 0;
@@ -342,6 +332,12 @@
   border-radius: 10px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   z-index: 20;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: none;
+    background-color: var(--gray-tone3);
+  }
 }
 
 .game-card.clickable:hover .hover-text {
@@ -494,10 +490,12 @@
   letter-spacing: -0.1px;
   line-height: 1;
   text-decoration: none;
+  display: inline-block;
 
   &:hover {
     text-decoration: underline;
     cursor: pointer;
+    color: var(--text-primary);
   }
 }
 
@@ -609,13 +607,13 @@
 // Responsive adjustments
 @media (max-width: 768px) {
   .banner-container {
-    gap: 10px;
     padding: 8px 0;
   }
 
   .game-card {
-    min-width: 260px;
-    max-width: 280px;
+    width: 280px;
+    min-width: 280px;
+    margin-right: 10px;
     padding: 10px 14px;
     gap: 6px;
   }

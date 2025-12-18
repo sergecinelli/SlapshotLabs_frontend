@@ -9,7 +9,7 @@
   </div>
   }
   @if (bannerItems().length > 0) {
-  <div class="banner-container" [class.scrolled]="isScrolled()" [class.fade-in]="!loading()">
+  <div class="banner-container" [class.scrolled]="isScrolled()" [@listAnimation]="bannerItems()">
     @for (item of bannerItems(); track item.id) {
     <div class="game-card" [class.clickable]="item.status === 2" [class.live]="item.status === 2" [class.upcoming]="item.status === 1"
       [class.completed]="item.status === 3" role="button" tabindex="0" (click)="item.status === 2 && goToLiveDashboard(item.id)"
@@ -26,10 +26,10 @@
         <div class="header-right">
           <!-- Hover Text for Live Games -->
           @if (item.status === 2) {
-          <div class="hover-text">
+          <a [routerLink]="['/schedule/live/', item.id]" class="hover-text">
             <span class="material-symbols-rounded hover-icon">dashboard</span>
             <span class="hover-text-label">View Game Dashboard</span>
-          </div>
+          </a>
           }
           <!-- Status Badge -->
           <div class="status-badge" [class.live-badge]="item.status === 2" [class.upcoming-badge]="item.status === 1"
@@ -52,11 +52,10 @@
         <div class="team-row" [class.winning]="isWinning(item, false)">
           <div class="team-info">
             <img [src]="getTeamLogoUrl(item.away_team_id)" [alt]="item.away_team_name" class="team-logo" />
-            <span class="team-name" (click)="goToTeamProfile(item.away_team_id)" (keyup.enter)="goToTeamProfile(item.away_team_id)"
-              (keyup.space)="goToTeamProfile(item.away_team_id)" tabindex="0" role="button"
+            <a [routerLink]="['/teams-and-rosters/teams/team-profile/', item.away_team_id]" class="team-name"
               [attr.aria-label]="'View ' + getTeamDisplay(item.away_team_abbreviation, item.away_team_name) + ' profile'">{{
               getTeamDisplay(item.away_team_abbreviation, item.away_team_name)
-              }}</span>
+              }}</a>
           </div>
           <span class="score" [class.winning-score]="isWinning(item, false)">{{ item.away_goals }}</span>
         </div>
@@ -65,11 +64,10 @@
         <div class="team-row" [class.winning]="isWinning(item, true)">
           <div class="team-info">
             <img [src]="getTeamLogoUrl(item.home_team_id)" [alt]="item.home_team_name" class="team-logo" />
-            <span class="team-name" (click)="goToTeamProfile(item.home_team_id)" (keyup.enter)="goToTeamProfile(item.home_team_id)"
-              (keyup.space)="goToTeamProfile(item.home_team_id)" tabindex="0" role="button"
+            <a [routerLink]="['/teams-and-rosters/teams/team-profile/', item.home_team_id]" class="team-name"
               [attr.aria-label]="'View ' + getTeamDisplay(item.home_team_abbreviation, item.home_team_name) + ' profile'">{{
               getTeamDisplay(item.home_team_abbreviation, item.home_team_name)
-              }}</span>
+              }}</a>
           </div>
           <span class="score" [class.winning-score]="isWinning(item, true)">{{ item.home_goals }}</span>
         </div>

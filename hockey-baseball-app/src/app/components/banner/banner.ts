@@ -1,7 +1,8 @@
 import { Component, inject, OnInit, OnDestroy, signal, ElementRef, AfterViewInit } from '@angular/core';
+import { trigger, transition, style, animate, query, stagger } from '@angular/animations';
 import { CommonModule } from '@angular/common';
 import { ApiService } from '../../services/api.service';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { environment } from '../../../environments/environment';
 import { BannerService } from '../../services/banner.service';
 import { Subscription } from 'rxjs';
@@ -29,9 +30,74 @@ interface GameBannerItem {
 @Component({
   selector: 'app-live-banner',
   standalone: true,
-  imports: [CommonModule, BannerSkeletonComponent],
+  imports: [CommonModule, BannerSkeletonComponent, RouterLink],
   templateUrl: './banner.html',
   styleUrl: './banner.scss',
+  animations: [
+    trigger('listAnimation', [
+      transition('* <=> *', [
+        query(':enter', [
+          style({ 
+            opacity: 0, 
+            transform: 'translateY(-20px)', 
+            width: '0px', 
+            minWidth: '0px',
+            marginRight: '0px', 
+            marginLeft: '0px',
+            paddingLeft: '0px', 
+            paddingRight: '0px', 
+            borderLeftWidth: '0px',
+            borderRightWidth: '0px',
+            overflow: 'hidden'
+          }),
+          stagger(60, [
+            // Smooth expansion without inertia
+            animate('350ms cubic-bezier(0.4, 0, 0.2, 1)', style({ 
+              width: '*', 
+              minWidth: '*',
+              marginRight: '*',
+              marginLeft: '*',
+              paddingLeft: '*',
+              paddingRight: '*',
+              borderLeftWidth: '*',
+              borderRightWidth: '*'
+            })),
+            // Appearance from top to bottom strictly and smoothly
+            animate('300ms cubic-bezier(0.4, 0, 0.2, 1)', style({ 
+              opacity: 1, 
+              transform: 'translateY(0)' 
+            }))
+          ])
+        ], { optional: true }),
+        query(':leave', [
+          style({ 
+            opacity: 1, 
+            transform: 'translateY(0)', 
+            width: '*', 
+            minWidth: '*', 
+            marginRight: '*',
+            overflow: 'hidden' 
+          }),
+          // Card slightly "jumps" before falling down
+          animate('300ms cubic-bezier(0.6, -0.28, 0.735, 0.045)', style({ 
+            opacity: 0, 
+            transform: 'translateY(40px)' 
+          })),
+          // Collapsing space with inertia effect
+          animate('400ms cubic-bezier(0.4, 0, 0.2, 1)', style({ 
+            width: '0px', 
+            minWidth: '0px',
+            marginRight: '0px', 
+            marginLeft: '0px',
+            paddingLeft: '0px', 
+            paddingRight: '0px', 
+            borderLeftWidth: '0px',
+            borderRightWidth: '0px'
+          }))
+        ], { optional: true })
+      ])
+    ])
+  ]
 })
 export class BannerComponent implements OnInit, OnDestroy, AfterViewInit {
   private api = inject(ApiService);
@@ -266,27 +332,40 @@ export class BannerComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   fetchBanner(): void {
-    this.loading.set(true);
-    this.error.set(null);
-    // Show skeleton only on initial load, not on refresh
     if (this.isInitialLoad) {
+      this.loading.set(true);
       this.showSkeleton.set(true);
     }
+    
+    this.error.set(null);
+    
     this.api.get<GameBannerItem[]>('/hockey/game/list/banner').subscribe({
       next: (items) => {
         const realItems = Array.isArray(items) ? items : [];
+        let finalItems: GameBannerItem[] = [];
+
         // Add test data if enabled
         if (this.USE_TEST_DATA) {
           const testItems = this.getTestData();
-          this.bannerItems.set([...testItems, ...realItems]);
+          finalItems = [...testItems, ...realItems];
         } else {
-          this.bannerItems.set(realItems);
+          finalItems = realItems;
         }
+
+        // Only update if data actually changed to avoid unnecessary re-renders
+        // or animations if the list is identical
+        const currentItems = this.bannerItems();
+        const isIdentical = currentItems.length === finalItems.length && 
+                           currentItems.every((item, index) => item.id === finalItems[index].id);
+        
+        if (!isIdentical) {
+          this.bannerItems.set(finalItems);
+        }
+
         this.loading.set(false);
         this.isInitialLoad = false; // Mark initial load as complete
 
         // Remove skeleton from DOM after fade-out animation completes (0.5s)
-        // Hide skeleton regardless of whether there are banner items or not
         if (this.showSkeleton()) {
           setTimeout(() => {
             this.showSkeleton.set(false);
@@ -300,26 +379,17 @@ export class BannerComponent implements OnInit, OnDestroy, AfterViewInit {
           const testItems = this.getTestData();
           this.bannerItems.set(testItems);
           this.error.set(null);
-          this.loading.set(false);
-          this.isInitialLoad = false; // Mark initial load as complete
-
-          // Remove skeleton from DOM after fade-out animation completes
-          if (this.showSkeleton()) {
-            setTimeout(() => {
-              this.showSkeleton.set(false);
-            }, 500);
-          }
         } else {
           this.error.set('Failed to load banner data');
-          this.loading.set(false);
-          this.isInitialLoad = false; // Mark initial load as complete
-
-          // Remove skeleton from DOM after fade-out animation completes
-          if (this.showSkeleton()) {
-            setTimeout(() => {
-              this.showSkeleton.set(false);
-            }, 500);
-          }
+        }
+        
+        this.loading.set(false);
+        this.isInitialLoad = false;
+        
+        if (this.showSkeleton()) {
+          setTimeout(() => {
+            this.showSkeleton.set(false);
+          }, 500);
         }
       },
     });
