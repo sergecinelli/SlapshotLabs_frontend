@@ -13,6 +13,7 @@ export interface SprayChartTransformOptions {
   defaultTeamName?: string;
   defaultPlayerName?: string;
   formatTime?: (time: string) => string | undefined;
+  flipCoordinates?: boolean; // Flip coordinates horizontally for goalie perspective
 }
 
 @Injectable({
@@ -166,6 +167,9 @@ export class SprayChartUtilsService {
         options?.periodNames?.get(event.period_id) ?? (event.period_id ? `Period ${event.period_id}` : undefined);
       const timeLabel = options?.formatTime ? options.formatTime(event.time) : event.time;
 
+      const iceLeftOffset = this.convertCoordinateToPercentage(event.ice_left_offset);
+      const netLeftOffset = this.convertCoordinateToPercentage(event.net_left_offset);
+
       results.push({
         index,
         eventId: event.id,
@@ -176,9 +180,9 @@ export class SprayChartUtilsService {
         periodLabel,
         description,
         iceTopOffset: this.convertCoordinateToPercentage(event.ice_top_offset),
-        iceLeftOffset: this.convertCoordinateToPercentage(event.ice_left_offset),
+        iceLeftOffset: options?.flipCoordinates ? 100 - iceLeftOffset : iceLeftOffset,
         netTopOffset: this.convertCoordinateToPercentage(event.net_top_offset),
-        netLeftOffset: this.convertCoordinateToPercentage(event.net_left_offset),
+        netLeftOffset: options?.flipCoordinates ? 100 - netLeftOffset : netLeftOffset,
         type,
         tooltip: this.buildTooltip({
           index,
@@ -269,6 +273,9 @@ export class SprayChartUtilsService {
         options?.periodNames?.get(event.period_id) ?? (event.period_id ? `Period ${event.period_id}` : undefined);
       const timeLabel = options?.formatTime ? options.formatTime(event.time) : event.time;
 
+      const iceLeftOffset = this.convertCoordinateToPercentage(event.ice_left_offset);
+      const netLeftOffset = this.convertCoordinateToPercentage(event.net_left_offset);
+
       results.push({
         index,
         eventId: event.id,
@@ -279,9 +286,9 @@ export class SprayChartUtilsService {
         periodLabel,
         description: event.note || event.goal_type || '',
         iceTopOffset: this.convertCoordinateToPercentage(event.ice_top_offset),
-        iceLeftOffset: this.convertCoordinateToPercentage(event.ice_left_offset),
+        iceLeftOffset: options?.flipCoordinates ? 100 - iceLeftOffset : iceLeftOffset,
         netTopOffset: this.convertCoordinateToPercentage(event.net_top_offset),
-        netLeftOffset: this.convertCoordinateToPercentage(event.net_left_offset),
+        netLeftOffset: options?.flipCoordinates ? 100 - netLeftOffset : netLeftOffset,
         type,
         tooltip: this.buildTooltip({
           index,

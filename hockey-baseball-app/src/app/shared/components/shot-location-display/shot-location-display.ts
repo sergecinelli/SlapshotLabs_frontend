@@ -59,6 +59,7 @@ export class ShotLocationDisplayComponent {
   visibleTypes = signal<Set<ShotLocationData['type']>>(new Set());
   private isInitialized = signal(false);
   goaliePhotoLoaded = signal(true); // Start as true, will be set to false on error
+  teamLogoLoaded = signal(true); // Start as true, will be set to false on error
 
   constructor() {
     // Load filters from local storage once storageKey is available
@@ -84,6 +85,14 @@ export class ShotLocationDisplayComponent {
       const goalieId = this.goalieId();
       if (goalieId) {
         this.goaliePhotoLoaded.set(true); // Try to load the new photo
+      }
+    });
+
+    // Reset team logo loaded state when teamId changes
+    effect(() => {
+      const teamId = this.teamId();
+      if (teamId) {
+        this.teamLogoLoaded.set(true); // Try to load the new logo
       }
     });
   }
@@ -176,10 +185,10 @@ export class ShotLocationDisplayComponent {
     this.visibleTypes.set(current);
   }
 
-  getTeamLogoUrl = computed(() => {
+  getTeamLogoUrl(): string {
     const teamId = this.teamId();
     return teamId ? `${environment.apiUrl}/hockey/team/${teamId}/logo` : '';
-  });
+  }
 
   getGoalieLogoUrl = computed(() => {
     const goalieId = this.goalieId();
@@ -256,6 +265,14 @@ export class ShotLocationDisplayComponent {
     this.goaliePhotoLoaded.set(true);
   }
 
+  onTeamLogoError(): void {
+    this.teamLogoLoaded.set(false);
+  }
+
+  onTeamLogoLoad(): void {
+    this.teamLogoLoaded.set(true);
+  }
+
   getGoalieInitials(): string {
     const name = this.goalieName();
     if (!name) return 'G';
@@ -267,5 +284,22 @@ export class ShotLocationDisplayComponent {
     const last = parts[parts.length - 1]?.[0] || '';
     
     return (first + last).toUpperCase() || 'G';
+  }
+
+  getTeamInitials(): string {
+    const name = this.teamName();
+    if (!name) return 'T';
+    
+    const parts = name.trim().split(' ');
+    if (parts.length === 0) return 'T';
+    
+    if (parts.length === 1) {
+      return parts[0].substring(0, 2).toUpperCase();
+    }
+    
+    const first = parts[0]?.[0] || '';
+    const last = parts[parts.length - 1]?.[0] || '';
+    
+    return (first + last).toUpperCase() || 'T';
   }
 }

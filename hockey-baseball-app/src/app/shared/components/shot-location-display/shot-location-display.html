@@ -67,22 +67,22 @@
 
     <!-- Net Image -->
     <div class="location-container">
-      @if (goalieId() && goalieName() && showGoalieName()) {
+      @if ((goalieId() || teamId()) && (goalieName() || teamName()) && showGoalieName()) {
         <div class="goalie-info">
           <div class="goalie-photo-container">
-            @if (goaliePhotoLoaded()) {
+            @if (teamLogoLoaded()) {
               <img 
-                [src]="getGoalieLogoUrl()" 
-                alt="Goalie Photo" 
+                [src]="getTeamLogoUrl()" 
+                [alt]="(teamName() || 'Team') + ' logo'" 
                 class="goalie-logo" 
-                (error)="onGoaliePhotoError()"
-                (load)="onGoaliePhotoLoad()"
+                (error)="onTeamLogoError()"
+                (load)="onTeamLogoLoad()"
               />
             } @else {
-              <div class="goalie-initials">{{ getGoalieInitials() }}</div>
+              <div class="goalie-initials">{{ getTeamInitials() }}</div>
             }
           </div>
-          <span class="goalie-name">{{ goalieName() }}</span>
+          <span class="goalie-name">{{ goalieName() || teamName() }}</span>
         </div>
       }
       <div class="location-wrapper">

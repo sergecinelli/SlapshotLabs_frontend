@@ -84,6 +84,7 @@ export class SprayChartComponent implements OnInit {
             defaultTeamName: goalie.team,
             periodNames,
             formatTime: (time) => time,
+            flipCoordinates: true, // Flip coordinates for goalie perspective
           };
           this.shotLocationData = this.sprayChartUtils.transformSprayChartData(
             sprayChartEvents,
@@ -182,5 +183,18 @@ export class SprayChartComponent implements OnInit {
 
   get goalieName(): string | undefined {
     return this.goalie ? `${this.goalie.firstName} ${this.goalie.lastName}` : undefined;
+  }
+
+  get teamId(): number | undefined {
+    if (this.goalie?.teamId) {
+      return Number(this.goalie.teamId);
+    } else if (this.player?.teamId) {
+      return Number(this.player.teamId);
+    }
+    return undefined;
+  }
+
+  get teamName(): string | undefined {
+    return this.goalie?.team || this.player?.team;
   }
 }

@@ -30,6 +30,8 @@
         } @else if (shotLocationData.length > 0) {
           <app-shot-location-display 
             [data]="shotLocationData"
+            [teamId]="teamId"
+            [teamName]="teamName"
             [goalieId]="goalieId"
             [goalieName]="goalieName"
             [showGoalieName]="false">
