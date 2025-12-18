@@ -21,7 +21,8 @@ import { ComponentVisibilityByRoleDirective } from '../../shared/directives/comp
 import { ButtonComponent } from '../../shared/components/buttons/button/button.component';
 import { visibilityByRoleMap } from './team-profile.role-map';
 import { forkJoin, Subject } from 'rxjs';
-import { switchMap, takeUntil } from 'rxjs/operators';
+import { takeUntil } from 'rxjs/operators';
+import { convertGMTToLocalWithDateShift, formatDateShort } from '../../shared/utils/time-converter.util';
 
 // Additional interfaces for team profile specific data
 export interface TeamGame {
@@ -275,16 +276,13 @@ export class TeamProfileComponent implements OnInit, OnDestroy {
       const opponent =
         game.home_team_id === currentTeamId ? awayTeamName : homeTeamName;
 
-      // Format date
-      const gameDate = new Date(game.date);
-      const formattedDate = gameDate.toLocaleDateString('en-US', {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric',
-      });
+      // Format date - convert from GMT to local timezone
+      // The date and time from API are in UTC
+      const { date: localDate, time: localTime } = convertGMTToLocalWithDateShift(game.date, game.time);
+      const formattedDate = formatDateShort(localDate);
 
-      // Format time from "HH:MM:SS" to "H:MM AM/PM"
-      const formattedTime = this.formatTime(game.time || '');
+      // Format time from "HH:MM:SS" (local) to "H:MM AM/PM"
+      const formattedTime = this.formatTime(localTime);
 
       // Determine result for completed games
       let result: string | undefined;

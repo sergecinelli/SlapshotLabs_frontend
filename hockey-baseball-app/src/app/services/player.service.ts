@@ -17,6 +17,7 @@ import {
 import { ApiService } from './api.service';
 import { TeamService } from './team.service';
 import { SprayChartFilter, SprayChartEvent } from '../shared/interfaces/spray-chart.interface';
+import { formatDateShort } from '../shared/utils/time-converter.util';
 
 @Injectable({
   providedIn: 'root',
@@ -513,12 +514,7 @@ export class PlayerService {
           };
 
           // Format date
-          const gameDate = new Date(game.date);
-          const formattedDate = gameDate.toLocaleDateString('en-US', {
-            month: 'short',
-            day: 'numeric',
-            year: 'numeric',
-          });
+          const formattedDate = formatDateShort(game.date);
 
           // faceoff_win_percents is already in percentage format (0-100)
           const faceOffWinPercentage = game.faceoff_win_percents || 0;

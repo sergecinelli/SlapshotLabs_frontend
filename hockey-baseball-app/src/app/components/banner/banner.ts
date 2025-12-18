@@ -233,7 +233,7 @@ export class BannerComponent implements OnInit, OnDestroy, AfterViewInit {
   private setupScrollListener(): void {
     // Find the scrollable main content element
     const mainContent = document.querySelector('.page-content-wrapper') as HTMLElement;
-    
+
     if (mainContent) {
       this.scrollElement = mainContent;
       this.scrollListener = () => {
@@ -241,7 +241,7 @@ export class BannerComponent implements OnInit, OnDestroy, AfterViewInit {
         const threshold = 50; // Start minimizing after 50px scroll
         this.isScrolled.set(scrollTop > threshold);
       };
-      
+
       mainContent.addEventListener('scroll', this.scrollListener, { passive: true });
     } else {
       // Fallback to window scroll if main content not found
@@ -250,7 +250,7 @@ export class BannerComponent implements OnInit, OnDestroy, AfterViewInit {
         const threshold = 50;
         this.isScrolled.set(scrollY > threshold);
       };
-      
+
       window.addEventListener('scroll', this.scrollListener, { passive: true });
     }
   }
@@ -284,7 +284,7 @@ export class BannerComponent implements OnInit, OnDestroy, AfterViewInit {
         }
         this.loading.set(false);
         this.isInitialLoad = false; // Mark initial load as complete
-        
+
         // Remove skeleton from DOM after fade-out animation completes (0.5s)
         // Hide skeleton regardless of whether there are banner items or not
         if (this.showSkeleton()) {
@@ -302,7 +302,7 @@ export class BannerComponent implements OnInit, OnDestroy, AfterViewInit {
           this.error.set(null);
           this.loading.set(false);
           this.isInitialLoad = false; // Mark initial load as complete
-          
+
           // Remove skeleton from DOM after fade-out animation completes
           if (this.showSkeleton()) {
             setTimeout(() => {
@@ -313,7 +313,7 @@ export class BannerComponent implements OnInit, OnDestroy, AfterViewInit {
           this.error.set('Failed to load banner data');
           this.loading.set(false);
           this.isInitialLoad = false; // Mark initial load as complete
-          
+
           // Remove skeleton from DOM after fade-out animation completes
           if (this.showSkeleton()) {
             setTimeout(() => {
@@ -343,29 +343,6 @@ export class BannerComponent implements OnInit, OnDestroy, AfterViewInit {
 
   getTeamLogoUrl(teamId: number): string {
     return `${environment.apiUrl}/hockey/team/${teamId}/logo`;
-  }
-
-  getTimeDisplay(item: GameBannerItem): string {
-    // status: 2 = In Progress
-    if (item.status === 2) {
-      return 'Live';
-    }
-    // status: 1 = Not Started, format time as 12-hour clock
-    if (item.status === 1) {
-      return this.formatTimeTo12Hour(item.time);
-    }
-    return item.time;
-  }
-
-  getDateDisplay(dateString: string): string {
-    // Parse YYYY-MM-DD format
-    const date = new Date(dateString);
-    const options: Intl.DateTimeFormatOptions = {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    };
-    return date.toLocaleDateString('en-US', options);
   }
 
   isWinning(item: GameBannerItem, isHomeTeam: boolean): boolean {

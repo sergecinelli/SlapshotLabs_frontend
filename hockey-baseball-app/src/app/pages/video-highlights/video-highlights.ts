@@ -14,7 +14,6 @@ import {
   HighlightReelRow,
   HighlightReelUpsertPayload,
 } from '../../shared/interfaces/highlight-reel.interface';
-import { formatDateForDisplay } from '../../shared/utils/time-converter.util';
 import {
   HighlightReelFormModalComponent,
   HighlightReelFormModalData,
@@ -24,6 +23,7 @@ import { ComponentVisibilityByRoleDirective } from '../../shared/directives/comp
 import { visibilityByRoleMap } from './video-highlights.role-map';
 import { AuthService } from '../../services/auth.service';
 import { RoleService } from '../../services/roles/role.service';
+import { formatDateShortWithCommas } from '../../shared/utils/time-converter.util';
 
 @Component({
   selector: 'app-video-highlights',
@@ -120,9 +120,7 @@ export class VideoHighlightsComponent implements OnInit {
     this.highlightsService.getHighlightReels().subscribe({
       next: (data: HighlightReelApi[]) => {
         const mapped: HighlightReelRow[] = data.map((item) => {
-          // Date from API is in GMT format (YYYY-MM-DD), use it directly for Date object
-          // The Date object will interpret it as local midnight, which is fine for sorting
-          const date = new Date(item.date + 'T00:00:00Z'); // Parse as UTC to avoid timezone issues
+          const date = new Date(item.date);
           return {
             id: item.id,
             name: item.name,
@@ -130,7 +128,7 @@ export class VideoHighlightsComponent implements OnInit {
             createdBy: item.created_by,
             userId: item.user_id,
             dateCreated: date,
-            dateCreatedFormatted: formatDateForDisplay(item.date), // Use utility function for proper formatting
+            dateCreatedFormatted: formatDateShortWithCommas(date),
           } as HighlightReelRow;
         });
         this.rows.set(mapped);

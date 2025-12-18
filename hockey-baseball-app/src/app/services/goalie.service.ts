@@ -16,6 +16,7 @@ import { GoalieDataMapper } from '../shared/utils/goalie-data-mapper';
 import { TeamService } from './team.service';
 import { isDefaultGoalieName } from '../shared/constants/goalie.constants';
 import { SprayChartFilter, SprayChartEvent } from '../shared/interfaces/spray-chart.interface';
+import { formatDateShort } from '../shared/utils/time-converter.util';
 
 export interface GetGoaliesOptions {
   excludeDefault?: boolean;
@@ -355,12 +356,7 @@ export class GoalieService {
           };
 
           // Format date
-          const gameDate = new Date(game.date);
-          const formattedDate = gameDate.toLocaleDateString('en-US', {
-            month: 'short',
-            day: 'numeric',
-            year: 'numeric',
-          });
+          const formattedDate = formatDateShort(game.date);
 
           // save_percents is already in percentage format (0-100), convert to decimal (0-1)
           const savePercentage = game.save_percents !== null && game.save_percents !== undefined && !isNaN(game.save_percents)

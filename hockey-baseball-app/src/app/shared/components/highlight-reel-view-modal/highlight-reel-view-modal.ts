@@ -5,7 +5,7 @@ import { ButtonComponent } from '../buttons/button/button.component';
 import { MatIconModule } from '@angular/material/icon';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { HighlightApi } from '../../interfaces/highlight-reel.interface';
-import { formatDateForDisplay, convertGMTToLocalWithDateShift } from '../../utils/time-converter.util';
+import { convertGMTToLocalWithDateShift, formatDateShort } from '../../utils/time-converter.util';
 
 export interface HighlightReelViewModalData {
   reelName: string;
@@ -178,13 +178,14 @@ export class HighlightReelViewModalComponent implements OnInit {
     if (!d) return '-';
     
     // If time is provided, convert GMT date and time to local (accounting for date shifts)
+    let dateStr = d;
     if (time) {
       const localDateTime = convertGMTToLocalWithDateShift(d, this.extractTimeFromApiFormat(time));
-      return formatDateForDisplay(localDateTime.date);
+      dateStr = localDateTime.date;
     }
     
-    // Date from API is in UTC format (YYYY-MM-DD), convert to local for display
-    return formatDateForDisplay(d);
+    // Format date as "Nov 12, 2025"
+    return formatDateShort(dateStr);
   }
 
   formatPeriodTime(time?: string, date?: string): string {

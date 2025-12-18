@@ -50,6 +50,7 @@ import { ComponentVisibilityByRoleDirective } from '../../shared/directives/comp
 import { visibilityByRoleMap } from './live-dashboard.role-map';
 import { forkJoin, interval, Subscription } from 'rxjs';
 import { switchMap, startWith } from 'rxjs/operators';
+import { formatDateTimeFromGMT } from '../../shared/utils/time-converter.util';
 
 interface TeamDisplay {
   name: string;
@@ -492,19 +493,13 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
     const ageGroup = homeTeam?.group || '';
     this.tournamentType.set(ageGroup);
 
-    // Update date and time
-    const gameDate = new Date(gameExtra.date + 'T' + gameExtra.time);
+    // Update date and time - convert from GMT to local timezone and format
+    const formattedDateTime = formatDateTimeFromGMT(gameExtra.date, gameExtra.time);
+    this.tournamentDate.set(formattedDateTime);
+    
+    // Store game start time as Date object (for any other uses)
+    const gameDate = new Date(gameExtra.date + 'T' + gameExtra.time + 'Z'); // Add Z to indicate UTC
     this.gameStartTime = gameDate;
-    this.tournamentDate.set(
-      gameDate.toLocaleString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-        hour: 'numeric',
-        minute: '2-digit',
-        hour12: true,
-      })
-    );
 
     // arenaInfo - format: "Arena - Rink"
     const rink = rinks.find((r) => r.id === gameExtra.rink_id);
