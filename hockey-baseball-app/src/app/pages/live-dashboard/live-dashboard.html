@@ -797,6 +797,8 @@
               [storageKey]="'liveDashboardAwaySprayChart'"
               [teamId]="awayTeamId"
               [teamName]="awayTeam().name"
+              [goalieId]="awayStartGoalieId"
+              [goalieName]="awayGoalieName"
               [showDirection]="true"
             ></app-shot-location-display>
           } @else {
@@ -823,6 +825,8 @@
               [storageKey]="'liveDashboardHomeSprayChart'"
               [teamId]="homeTeamId"
               [teamName]="homeTeam().name"
+              [goalieId]="homeStartGoalieId"
+              [goalieName]="homeGoalieName"
               [showDirection]="true"
             ></app-shot-location-display>
           } @else {

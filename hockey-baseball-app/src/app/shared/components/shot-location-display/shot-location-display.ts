@@ -51,10 +51,14 @@ export class ShotLocationDisplayComponent {
   storageKey = input<string>('shotLocationFilters');
   teamId = input<number>();
   teamName = input<string>();
+  goalieId = input<number>();
+  goalieName = input<string>();
+  showGoalieName = input<boolean>(true); // Show goalie name by default
   attackingDirection = input<'left' | 'right'>('right');
   showDirection = input<boolean>(false);
   visibleTypes = signal<Set<ShotLocationData['type']>>(new Set());
   private isInitialized = signal(false);
+  goaliePhotoLoaded = signal(true); // Start as true, will be set to false on error
 
   constructor() {
     // Load filters from local storage once storageKey is available
@@ -72,6 +76,14 @@ export class ShotLocationDisplayComponent {
         const filters = Array.from(this.visibleTypes());
         const key = this.storageKey();
         localStorage.setItem(key, JSON.stringify(filters));
+      }
+    });
+
+    // Reset goalie photo loaded state when goalieId changes
+    effect(() => {
+      const goalieId = this.goalieId();
+      if (goalieId) {
+        this.goaliePhotoLoaded.set(true); // Try to load the new photo
       }
     });
   }
@@ -169,6 +181,11 @@ export class ShotLocationDisplayComponent {
     return teamId ? `${environment.apiUrl}/hockey/team/${teamId}/logo` : '';
   });
 
+  getGoalieLogoUrl = computed(() => {
+    const goalieId = this.goalieId();
+    return goalieId ? `${environment.apiUrl}/hockey/goalie/${goalieId}/photo` : '';
+  });
+
   buildTooltip(item: ShotLocationData): string {
     const lines = [`#${item.index} — ${item.eventTypeLabel || item.type}`];
     if (item.playerName) {
@@ -229,5 +246,26 @@ export class ShotLocationDisplayComponent {
         ])
       );
     }
+  }
+
+  onGoaliePhotoError(): void {
+    this.goaliePhotoLoaded.set(false);
+  }
+
+  onGoaliePhotoLoad(): void {
+    this.goaliePhotoLoaded.set(true);
+  }
+
+  getGoalieInitials(): string {
+    const name = this.goalieName();
+    if (!name) return 'G';
+    
+    const parts = name.trim().split(' ');
+    if (parts.length === 0) return 'G';
+    
+    const first = parts[0]?.[0] || '';
+    const last = parts[parts.length - 1]?.[0] || '';
+    
+    return (first + last).toUpperCase() || 'G';
   }
 }

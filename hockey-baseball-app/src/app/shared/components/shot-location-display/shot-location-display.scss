@@ -65,6 +65,54 @@
       gap: 12px;
       margin: auto 0;
 
+      .goalie-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 5px 10px;
+        background-color: var(--color-white);
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+        .goalie-photo-container {
+          width: 40px;
+          height: 40px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+        }
+
+        .goalie-logo {
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          object-fit: cover;
+          border: 2px solid var(--color-primary);
+          display: block;
+        }
+
+        .goalie-initials {
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          background-color: var(--gray-tone3);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: var(--text-secondary);
+          font-weight: 600;
+          font-size: 14px;
+          flex-shrink: 0;
+        }
+
+        .goalie-name {
+          font-size: 16px;
+          font-weight: 600;
+          color: var(--color-dark);
+        }
+      }
+
       .direction-indicator {
         display: flex;
         align-items: center;

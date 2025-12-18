@@ -175,4 +175,12 @@ export class SprayChartComponent implements OnInit {
     }
     return '';
   }
+
+  get goalieId(): number | undefined {
+    return this.goalie ? Number(this.goalie.id) : undefined;
+  }
+
+  get goalieName(): string | undefined {
+    return this.goalie ? `${this.goalie.firstName} ${this.goalie.lastName}` : undefined;
+  }
 }

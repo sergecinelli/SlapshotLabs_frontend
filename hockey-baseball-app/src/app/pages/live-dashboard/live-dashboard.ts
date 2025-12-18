@@ -278,8 +278,8 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
   private awayOffensiveZoneEntryId?: number;
 
   // Starting goalies for defaults in forms
-  private homeStartGoalieId?: number;
-  private awayStartGoalieId?: number;
+  protected homeStartGoalieId?: number;
+  protected awayStartGoalieId?: number;
 
   // Spray chart data
   homeSprayChartData = signal<ShotLocationData[]>([]);
@@ -1773,5 +1773,23 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
         },
       });
     }
+  }
+
+  /**
+   * Get home goalie name
+   */
+  get homeGoalieName(): string | undefined {
+    if (!this.homeStartGoalieId) return undefined;
+    const goalie = this.goalieOptions.find((g) => g.value === this.homeStartGoalieId);
+    return goalie?.label;
+  }
+
+  /**
+   * Get away goalie name
+   */
+  get awayGoalieName(): string | undefined {
+    if (!this.awayStartGoalieId) return undefined;
+    const goalie = this.goalieOptions.find((g) => g.value === this.awayStartGoalieId);
+    return goalie?.label;
   }
 }

@@ -28,7 +28,12 @@
             </app-button>
           </div>
         } @else if (shotLocationData.length > 0) {
-          <app-shot-location-display [data]="shotLocationData"></app-shot-location-display>
+          <app-shot-location-display 
+            [data]="shotLocationData"
+            [goalieId]="goalieId"
+            [goalieName]="goalieName"
+            [showGoalieName]="false">
+          </app-shot-location-display>
         } @else {
           <div class="dashboard-empty">No shot data available for this {{ entityType }}.</div>
         }

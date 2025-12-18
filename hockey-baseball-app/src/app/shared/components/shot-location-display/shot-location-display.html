@@ -67,6 +67,24 @@
 
     <!-- Net Image -->
     <div class="location-container">
+      @if (goalieId() && goalieName() && showGoalieName()) {
+        <div class="goalie-info">
+          <div class="goalie-photo-container">
+            @if (goaliePhotoLoaded()) {
+              <img 
+                [src]="getGoalieLogoUrl()" 
+                alt="Goalie Photo" 
+                class="goalie-logo" 
+                (error)="onGoaliePhotoError()"
+                (load)="onGoaliePhotoLoad()"
+              />
+            } @else {
+              <div class="goalie-initials">{{ getGoalieInitials() }}</div>
+            }
+          </div>
+          <span class="goalie-name">{{ goalieName() }}</span>
+        </div>
+      }
       <div class="location-wrapper">
         <img src="/assets/images/net.svg" alt="Net" class="location-image" />
         @for (item of netItems(); track $index) {
