@@ -154,7 +154,7 @@
   </div>
 
   <!-- Action Buttons -->
-  @if (showActions) {
+  @if (game.status === GameStatus.GameInProgress || game.status === GameStatus.GameOver || showActions) {
     <div class="game-card-actions">
       @if (game.status === GameStatus.GameInProgress || game.status === GameStatus.GameOver) {
         <app-button-route
@@ -170,34 +170,36 @@
           Dashboard
         </app-button-route>
       }
-      <app-button
-        [bg]="'orange'"
-        [bghover]="'orange'"
-        [color]="'white'"
-        [colorhover]="'white'"
-        materialIcon="stylus"
-        [haveContent]="true"
-        (clicked)="onEdit()"
-        class="action-button"
-        role-visibility-name="edit-action"
-      >
-        Edit
-      </app-button>
-      <app-button-loading
-        [isLoading]="isDeleting"
-        [isDisabled]="isDeleting"
-        [bg]="'primary'"
-        [bghover]="'primary_dark'"
-        [color]="'white'"
-        [colorhover]="'white'"
-        [materialIcon]="'delete'"
-        [haveContent]="true"
-        (clicked)="onDelete()"
-        class="action-button"
-        role-visibility-name="delete-action"
-      >
-        Delete
-      </app-button-loading>
+      @if (showActions) {
+        <app-button
+          [bg]="'orange'"
+          [bghover]="'orange'"
+          [color]="'white'"
+          [colorhover]="'white'"
+          materialIcon="stylus"
+          [haveContent]="true"
+          (clicked)="onEdit()"
+          class="action-button"
+          role-visibility-name="edit-action"
+        >
+          Edit
+        </app-button>
+        <app-button-loading
+          [isLoading]="isDeleting"
+          [isDisabled]="isDeleting"
+          [bg]="'primary'"
+          [bghover]="'primary_dark'"
+          [color]="'white'"
+          [colorhover]="'white'"
+          [materialIcon]="'delete'"
+          [haveContent]="true"
+          (clicked)="onDelete()"
+          class="action-button"
+          role-visibility-name="delete-action"
+        >
+          Delete
+        </app-button-loading>
+      }
     </div>
   }
 </div>

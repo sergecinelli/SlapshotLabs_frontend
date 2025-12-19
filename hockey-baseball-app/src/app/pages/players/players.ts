@@ -88,9 +88,17 @@ import { visibilityByRoleMap } from './players.role-map';
                         role="button"
                         [attr.aria-label]="'View ' + player.firstName + ' ' + player.lastName + ' profile'"
                       >{{ player.firstName }} {{ player.lastName }}</div>
-                      @if (player.jerseyNumber) {
-                        <div class="player-jersey">#{{ player.jerseyNumber }}</div>
-                      }
+                      <div class="player-jersey-row">
+                        @if (player.jerseyNumber) {
+                          <div class="player-jersey">#{{ player.jerseyNumber }}</div>
+                        }
+                        @if (player.birthYear) {
+                          <div class="player-info-item">
+                            <span class="player-info-label">Birth Year:</span>
+                            <span class="player-info-value">{{ player.birthYear }}</span>
+                          </div>
+                        }
+                      </div>
                     </div>
                   </div>
                   <div class="player-info-row">
@@ -137,12 +145,6 @@ import { visibilityByRoleMap } from './players.role-map';
                             <span class="player-info-value">{{ player.team }}</span>
                           }
                         </div>
-                      </div>
-                    }
-                    @if (player.birthYear) {
-                      <div class="player-info-item">
-                        <span class="player-info-label">Birth Year:</span>
-                        <span class="player-info-value">{{ player.birthYear }}</span>
                       </div>
                     }
                   </div>

@@ -148,6 +148,17 @@
   }
 }
 
+.goalie-jersey-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 16px 24px;
+
+  .goalie-info-item {
+    font-size: 12px;
+  }
+}
+
 .goalie-jersey {
   font-size: 12px;
   color: var(--text-secondary);
@@ -217,46 +228,23 @@
 }
 
 .stats-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.stats-row-first {
-  display: flex;
-  gap: 12px;
-  width: 100%;
-  
-  // 4 items evenly distributed (each takes equal space)
-  .stat-item {
-    flex: 1;
-    min-width: 0;
-  }
-}
-
-.stats-row-second {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 12px;
-  
-  // 5 items, one per column
-  .stat-item {
-    grid-column: span 1;
-  }
+  grid-template-columns: repeat(9, 1fr);
+  gap: 8px;
 }
 
 .stat-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-  padding: 8px;
+  gap: 3px;
+  padding: 6px 4px;
   background-color: var(--gray-tone3);
   border-radius: 4px;
 }
 
 .stat-label {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 600;
   color: var(--text-secondary);
   text-transform: uppercase;
@@ -297,8 +285,8 @@
   }
 
   .stats-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
+    grid-template-columns: repeat(9, 1fr);
+    gap: 6px;
   }
 
   .stat-item {
