@@ -717,7 +717,12 @@
                     </div>
                   </td>
                   <td class="live-dashboard-table-td">{{ event.event }}</td>
-                  <td class="live-dashboard-table-td">{{ event.player }}</td>
+                  <td class="live-dashboard-table-td">
+                    @if (event.playerNumber) {
+                      <span class="live-dashboard-player-number">{{ event.playerNumber }}</span>
+                    }
+                    {{ event.player }}
+                  </td>
                   <td class="live-dashboard-table-td">{{ event.description }}</td>
                   <td class="live-dashboard-table-td">
                     <div class="flex gap-1">

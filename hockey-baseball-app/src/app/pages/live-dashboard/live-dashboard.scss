@@ -612,6 +612,13 @@
   color: var(--text-primary);
 }
 
+.live-dashboard-player-number {
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-right: 6px;
+  font-variant-numeric: tabular-nums;
+}
+
 .live-dashboard-actions {
   display: flex;
   gap: 4px;

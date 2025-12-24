@@ -68,8 +68,8 @@ export class ShotFormModalComponent implements OnInit {
     periodOptions?: { value: number; label: string }[];
     shotTypeOptions?: { value: number; label: string }[];
     teamOptions?: { value: number; label: string; logo?: string }[];
-    playerOptions?: { value: number; label: string; teamId: number }[];
-    goalieOptions?: { value: number; label: string; teamId: number }[];
+    playerOptions?: { value: number; label: string; teamId: number; number?: number }[];
+    goalieOptions?: { value: number; label: string; teamId: number; number?: number }[];
     gameStartTimeIso?: string;
     homeTeamId?: number;
     awayTeamId?: number;
@@ -111,9 +111,9 @@ export class ShotFormModalComponent implements OnInit {
   shotTypeOptions: { value: number; label: string }[] = [];
 
   // Filtered options based on selected team
-  playerOptions: { value: number; label: string }[] = [];
-  blockingPlayerOptions: { value: number; label: string }[] = [];
-  goalieOptions: { value: number; label: string }[] = [];
+  playerOptions: { value: number; label: string; number?: number }[] = [];
+  blockingPlayerOptions: { value: number; label: string; number?: number }[] = [];
+  goalieOptions: { value: number; label: string; number?: number }[] = [];
 
   // Loading states
   isSubmitting = false;
@@ -256,7 +256,7 @@ export class ShotFormModalComponent implements OnInit {
     if (this.dialogData.playerOptions) {
       this.playerOptions = this.dialogData.playerOptions
         .filter((p) => p.teamId === teamId)
-        .map((p) => ({ value: p.value, label: p.label }));
+        .map((p) => ({ value: p.value, label: p.label, number: p.number }));
     } else {
       this.playerOptions = [];
     }
@@ -265,16 +265,17 @@ export class ShotFormModalComponent implements OnInit {
     if (oppositeTeam && this.dialogData.playerOptions) {
       this.blockingPlayerOptions = this.dialogData.playerOptions
         .filter((p) => p.teamId === oppositeTeam.value)
-        .map((p) => ({ value: p.value, label: p.label }));
+        .map((p) => ({ value: p.value, label: p.label, number: p.number }));
     } else {
       this.blockingPlayerOptions = [];
     }
 
     // Goalies should be from the OPPOSITE team
     if (oppositeTeam && this.dialogData.goalieOptions) {
+      debugger
       const oppositeGoalies = this.dialogData.goalieOptions
         .filter((g) => g.teamId === oppositeTeam.value)
-        .map((g) => ({ value: g.value, label: g.label }));
+        .map((g) => ({ value: g.value, label: g.label, number: g.number }));
       this.goalieOptions = oppositeGoalies;
 
       // Only set default goalie if not skipping (i.e., not in edit mode with existing data)

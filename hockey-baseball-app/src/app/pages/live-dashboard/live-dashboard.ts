@@ -97,6 +97,7 @@ interface GameEvent {
   teamId?: number;
   event: string;
   player: string;
+  playerNumber?: number;
   description: string;
   // For shot events
   shotType?: 'save' | 'goal' | 'missed' | 'blocked';
@@ -170,8 +171,8 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
   teamOptions: { value: number; label: string; logo?: string }[] = [];
 
   // Players and goalies for both teams
-  playerOptions: { value: number; label: string; teamId: number }[] = [];
-  goalieOptions: { value: number; label: string; teamId: number }[] = [];
+  playerOptions: { value: number; label: string; teamId: number; number?: number }[] = [];
+  goalieOptions: { value: number; label: string; teamId: number; number?: number }[] = [];
 
   // Loading state
   isLoadingGameData = true;
@@ -570,20 +571,24 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
         const team = teams.find((t) => parseInt(t.id) === event.team_id);
         const eventTime = this.parseEventTime(event.time);
 
-        // Find player name from playerOptions
+        // Find player name and number from playerOptions
         let playerName = '';
+        let playerNumber: number | undefined;
         if (event.player_id) {
           const player = this.playerOptions.find((p) => p.value === event.player_id);
           if (player) {
             playerName = player.label;
+            playerNumber = player.number;
           } else {
             // Try goalies if not found in players
             const goalie = this.goalieOptions.find((g) => g.value === event.player_id);
             if (goalie) {
               playerName = goalie.label;
+              playerNumber = goalie.number;
             } else {
               // Player not found - leave empty rather than showing ID
               playerName = '';
+              playerNumber = undefined;
             }
           }
         }
@@ -633,6 +638,7 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
           // Show shotType in Event column for shot events; otherwise show event name
           event: shotTypeCategory?.toUpperCase() ?? this.getEventName(event.event_name_id),
           player: playerName,
+          playerNumber: playerNumber,
           description: description,
           shotType: shotTypeCategory,
           eventNameId: event.event_name_id,
@@ -872,11 +878,13 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
             value: player.id,
             label: `${player.first_name} ${player.last_name}`,
             teamId: this.homeTeamId,
+            number: player.number,
           })),
           ...roster.away_players.map((player) => ({
             value: player.id,
             label: `${player.first_name} ${player.last_name}`,
             teamId: this.awayTeamId,
+            number: player.number,
           })),
         ];
 
@@ -886,11 +894,13 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
             value: goalie.id,
             label: `${goalie.first_name} ${goalie.last_name}`,
             teamId: this.homeTeamId,
+            number: goalie.number,
           })),
           ...roster.away_goalies.map((goalie) => ({
             value: goalie.id,
             label: `${goalie.first_name} ${goalie.last_name}`,
             teamId: this.awayTeamId,
+            number: goalie.number,
           })),
         ];
 

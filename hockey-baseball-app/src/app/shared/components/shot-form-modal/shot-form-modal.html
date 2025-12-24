@@ -92,7 +92,12 @@
               [class.selected]="shotForm.get('scoringPlayer')?.value === player.value"
               (click)="selectPlayer(player.value, 'scoringPlayer')"
             >
-              <div class="player-name">{{ player.label }}</div>
+              <div class="player-name">
+                @if (player.number !== undefined && player.number !== null) {
+                  <span class="player-number">{{ player.number }}</span>
+                }
+                <span class="player-label">{{ player.label }}</span>
+              </div>
             </button>
           </div>
           <div
@@ -115,7 +120,12 @@
               [class.selected]="shotForm.get('assistPlayer')?.value === player.value"
               (click)="selectPlayer(player.value, 'assistPlayer')"
             >
-              <div class="player-name">{{ player.label }}</div>
+              <div class="player-name">
+                @if (player.number !== undefined && player.number !== null) {
+                  <span class="player-number">{{ player.number }}</span>
+                }
+                <span class="player-label">{{ player.label }}</span>
+              </div>
             </button>
           </div>
         </div>
@@ -132,7 +142,12 @@
               [class.selected]="shotForm.get('goalieScored')?.value === goalie.value"
               (click)="selectGoalie(goalie.value, 'goalieScored')"
             >
-              <div class="goalie-name">{{ goalie.label }}</div>
+              <div class="goalie-name">
+                @if (goalie.number) {
+                  <span class="player-number">{{ goalie.number }}</span>
+                }
+                <span class="player-label">{{ goalie.label }}</span>
+              </div>
             </button>
           </div>
           <div
@@ -224,7 +239,12 @@
               [class.selected]="shotForm.get('shootingPlayer')?.value === player.value"
               (click)="selectPlayer(player.value, 'shootingPlayer')"
             >
-              <div class="player-name">{{ player.label }}</div>
+              <div class="player-name">
+                @if (player.number !== undefined && player.number !== null) {
+                  <span class="player-number">{{ player.number }}</span>
+                }
+                <span class="player-label">{{ player.label }}</span>
+              </div>
             </button>
           </div>
           <div
@@ -249,7 +269,12 @@
               [class.selected]="shotForm.get('blockingPlayer')?.value === player.value"
               (click)="selectPlayer(player.value, 'blockingPlayer')"
             >
-              <div class="player-name">{{ player.label }}</div>
+              <div class="player-name">
+                @if (player.number) {
+                  <span class="player-number">{{ player.number }}</span>
+                }
+                <span class="player-label">{{ player.label }}</span>
+              </div>
             </button>
           </div>
         </div>
@@ -264,7 +289,12 @@
               [class.selected]="shotForm.get('goalieInNet')?.value === goalie.value"
               (click)="selectGoalie(goalie.value, 'goalieInNet')"
             >
-              <div class="goalie-name">{{ goalie.label }}</div>
+              <div class="goalie-name">
+                @if (goalie.number) {
+                  <span class="player-number">{{ goalie.number }}</span>
+                }
+                <span class="player-label">{{ goalie.label }}</span>
+              </div>
             </button>
           </div>
           <div
