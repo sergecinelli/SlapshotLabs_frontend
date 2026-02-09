@@ -1,31 +1,11 @@
 import { Component, inject, OnInit, OnDestroy, signal, ElementRef, AfterViewInit } from '@angular/core';
 import { trigger, transition, style, animate, query, stagger } from '@angular/animations';
 import { CommonModule } from '@angular/common';
-import { ApiService } from '../../services/api.service';
 import { Router, RouterLink } from '@angular/router';
 import { environment } from '../../../environments/environment';
-import { BannerService } from '../../services/banner.service';
+import { BannerService, GameBannerItem } from '../../services/banner.service';
 import { Subscription } from 'rxjs';
 import { BannerSkeletonComponent } from './banner-skeleton.component';
-
-interface GameBannerItem {
-  id: number;
-  home_team_id: number;
-  away_team_id: number;
-  home_team_name: string;
-  away_team_name: string;
-  home_team_abbreviation: string | null;
-  away_team_abbreviation: string | null;
-  date: string; // YYYY-MM-DD
-  time: string; // time string from API
-  game_type_name: string;
-  game_period_name: string | null;
-  arena_name: string;
-  rink_name: string | null;
-  home_goals: number;
-  away_goals: number;
-  status: number; // 1 = Not Started, 2 = In Progress, 3 = Completed
-}
 
 @Component({
   selector: 'app-live-banner',
@@ -100,31 +80,55 @@ interface GameBannerItem {
   ]
 })
 export class BannerComponent implements OnInit, OnDestroy, AfterViewInit {
-  private api = inject(ApiService);
   private router = inject(Router);
   private bannerService = inject(BannerService);
-  private refreshSubscription?: Subscription;
   private elementRef = inject(ElementRef);
 
-  // Toggle test data on/off
-  private readonly USE_TEST_DATA = false
   bannerItems = signal<GameBannerItem[]>([]);
   loading = signal<boolean>(true);
   error = signal<string | null>(null);
   isScrolled = signal<boolean>(false);
   showSkeleton = signal<boolean>(true);
-  private isInitialLoad = true;
+  
+  private subscriptions = new Subscription();
   private scrollListener?: () => void;
   private scrollElement?: HTMLElement;
 
   ngOnInit(): void {
-    this.fetchBanner();
+    // Subscribe to service state
+    this.subscriptions.add(
+      this.bannerService.bannerItems$.subscribe((items) => {
+        const currentItems = this.bannerItems();
+        // Only update if data actually changed to avoid unnecessary re-renders/animations
+        const isIdentical = currentItems.length === items.length && 
+                           currentItems.every((item, index) => item.id === items[index].id && item.status === items[index].status && item.home_goals === items[index].home_goals && item.away_goals === items[index].away_goals);
+        
+        if (!isIdentical) {
+          this.bannerItems.set(items);
+        }
+      })
+    );
 
-    // Subscribe to refresh events
-    this.refreshSubscription = this.bannerService.refreshBanner$.subscribe(() => {
-      this.isInitialLoad = false; // Mark as not initial load for refresh events
-      this.fetchBanner();
-    });
+    this.subscriptions.add(
+      this.bannerService.loading$.subscribe((isLoading) => {
+        this.loading.set(isLoading);
+        
+        if (!isLoading) {
+          // Remove skeleton from DOM after fade-out animation completes (0.5s)
+          if (this.showSkeleton()) {
+            setTimeout(() => {
+              this.showSkeleton.set(false);
+            }, 500); // Match the transition duration
+          }
+        }
+      })
+    );
+
+    this.subscriptions.add(
+      this.bannerService.error$.subscribe((err) => {
+        this.error.set(err);
+      })
+    );
   }
 
   ngAfterViewInit(): void {
@@ -134,165 +138,8 @@ export class BannerComponent implements OnInit, OnDestroy, AfterViewInit {
     }, 100);
   }
 
-  private getTestData(): GameBannerItem[] {
-    return [
-      // Live game - short names
-      // {
-      //   id: 9991,
-      //   home_team_id: 1,
-      //   away_team_id: 2,
-      //   home_team_name: 'Toronto Maple Leafs',
-      //   away_team_name: 'Montreal Canadiens',
-      //   home_team_abbreviation: 'TOR',
-      //   away_team_abbreviation: 'MTL',
-      //   date: '2024-01-15',
-      //   time: '19:30:00',
-      //   game_type_name: 'Regular Season',
-      //   game_period_name: '2nd Period',
-      //   arena_name: 'Scotiabank Arena',
-      //   rink_name: 'Rink 1',
-      //   home_goals: 3,
-      //   away_goals: 2,
-      //   status: 2, // In Progress
-      // },
-      // // Live game - long names
-      // {
-      //   id: 9992,
-      //   home_team_id: 3,
-      //   away_team_id: 4,
-      //   home_team_name: 'New York Rangers Hockey Club',
-      //   away_team_name: 'Boston Bruins Professional Hockey Team',
-      //   home_team_abbreviation: 'NYR',
-      //   away_team_abbreviation: 'BOS',
-      //   date: '2024-01-15',
-      //   time: '20:00:00',
-      //   game_type_name: 'Playoffs',
-      //   game_period_name: '3rd Period',
-      //   arena_name: 'Madison Square Garden',
-      //   rink_name: 'Main Rink',
-      //   home_goals: 5,
-      //   away_goals: 4,
-      //   status: 2, // In Progress
-      // },
-      // // Upcoming game - short venue
-      // {
-      //   id: 9993,
-      //   home_team_id: 5,
-      //   away_team_id: 6,
-      //   home_team_name: 'Chicago Blackhawks',
-      //   away_team_name: 'Detroit Red Wings',
-      //   home_team_abbreviation: 'CHI',
-      //   away_team_abbreviation: 'DET',
-      //   date: '2024-01-16',
-      //   time: '18:00:00',
-      //   game_type_name: 'Regular Season',
-      //   game_period_name: null,
-      //   arena_name: 'United Center',
-      //   rink_name: null,
-      //   home_goals: 0,
-      //   away_goals: 0,
-      //   status: 1, // Not Started
-      // },
-      // // Upcoming game - long venue name
-      // {
-      //   id: 9994,
-      //   home_team_id: 7,
-      //   away_team_id: 8,
-      //   home_team_name: 'Vancouver Canucks',
-      //   away_team_name: 'Edmonton Oilers',
-      //   home_team_abbreviation: 'VAN',
-      //   away_team_abbreviation: 'EDM',
-      //   date: '2024-01-16',
-      //   time: '19:30:00',
-      //   game_type_name: 'Regular Season',
-      //   game_period_name: null,
-      //   arena_name: 'Rogers Arena - Main Ice Surface',
-      //   rink_name: 'Practice Rink 2',
-      //   home_goals: 0,
-      //   away_goals: 0,
-      //   status: 1, // Not Started
-      // },
-      // Completed game - close score
-      {
-        id: 9995,
-        home_team_id: 9,
-        away_team_id: 10,
-        home_team_name: 'Pittsburgh Penguins',
-        away_team_name: 'Washington Capitals',
-        home_team_abbreviation: 'PIT',
-        away_team_abbreviation: 'WSH',
-        date: '2024-01-15',
-        time: '17:00:00',
-        game_type_name: 'Regular Season',
-        game_period_name: 'Final',
-        arena_name: 'PPG Paints Arena',
-        rink_name: 'Main',
-        home_goals: 4,
-        away_goals: 3,
-        status: 3, // Completed
-      },
-      // Completed game - blowout
-      {
-        id: 9996,
-        home_team_id: 11,
-        away_team_id: 12,
-        home_team_name: 'Tampa Bay Lightning',
-        away_team_name: 'Florida Panthers',
-        home_team_abbreviation: 'TB',
-        away_team_abbreviation: 'FLA',
-        date: '2024-01-15',
-        time: '16:30:00',
-        game_type_name: 'Regular Season',
-        game_period_name: 'Final',
-        arena_name: 'Amalie Arena',
-        rink_name: null,
-        home_goals: 7,
-        away_goals: 1,
-        status: 3, // Completed
-      },
-      // Live game - overtime
-      {
-        id: 9997,
-        home_team_id: 13,
-        away_team_id: 14,
-        home_team_name: 'Colorado Avalanche',
-        away_team_name: 'Dallas Stars',
-        home_team_abbreviation: 'COL',
-        away_team_abbreviation: 'DAL',
-        date: '2024-01-15',
-        time: '21:00:00',
-        game_type_name: 'Playoffs',
-        game_period_name: 'OT',
-        arena_name: 'Ball Arena',
-        rink_name: 'Rink 1',
-        home_goals: 2,
-        away_goals: 2,
-        status: 2, // In Progress
-      },
-      // Upcoming game - very long team names
-      {
-        id: 9998,
-        home_team_id: 15,
-        away_team_id: 16,
-        home_team_name: 'San Jose Sharks Professional Hockey Organization',
-        away_team_name: 'Los Angeles Kings Hockey Club',
-        home_team_abbreviation: 'SJ',
-        away_team_abbreviation: 'LAK',
-        date: '2024-01-17',
-        time: '22:00:00',
-        game_type_name: 'Regular Season',
-        game_period_name: null,
-        arena_name: 'SAP Center at San Jose',
-        rink_name: 'Main Ice Surface',
-        home_goals: 0,
-        away_goals: 0,
-        status: 1, // Not Started
-      },
-    ];
-  }
-
   ngOnDestroy(): void {
-    this.refreshSubscription?.unsubscribe();
+    this.subscriptions.unsubscribe();
     this.removeScrollListener();
   }
 
@@ -329,70 +176,6 @@ export class BannerComponent implements OnInit, OnDestroy, AfterViewInit {
         window.removeEventListener('scroll', this.scrollListener);
       }
     }
-  }
-
-  fetchBanner(): void {
-    if (this.isInitialLoad) {
-      this.loading.set(true);
-      this.showSkeleton.set(true);
-    }
-    
-    this.error.set(null);
-    
-    this.api.get<GameBannerItem[]>('/hockey/game/list/banner').subscribe({
-      next: (items) => {
-        const realItems = Array.isArray(items) ? items : [];
-        let finalItems: GameBannerItem[] = [];
-
-        // Add test data if enabled
-        if (this.USE_TEST_DATA) {
-          const testItems = this.getTestData();
-          finalItems = [...testItems, ...realItems];
-        } else {
-          finalItems = realItems;
-        }
-
-        // Only update if data actually changed to avoid unnecessary re-renders
-        // or animations if the list is identical
-        const currentItems = this.bannerItems();
-        const isIdentical = currentItems.length === finalItems.length && 
-                           currentItems.every((item, index) => item.id === finalItems[index].id);
-        
-        if (!isIdentical) {
-          this.bannerItems.set(finalItems);
-        }
-
-        this.loading.set(false);
-        this.isInitialLoad = false; // Mark initial load as complete
-
-        // Remove skeleton from DOM after fade-out animation completes (0.5s)
-        if (this.showSkeleton()) {
-          setTimeout(() => {
-            this.showSkeleton.set(false);
-          }, 500); // Match the transition duration
-        }
-      },
-      error: (e) => {
-        console.error('Failed to load banner:', e);
-        // Show test data on error only if enabled
-        if (this.USE_TEST_DATA) {
-          const testItems = this.getTestData();
-          this.bannerItems.set(testItems);
-          this.error.set(null);
-        } else {
-          this.error.set('Failed to load banner data');
-        }
-        
-        this.loading.set(false);
-        this.isInitialLoad = false;
-        
-        if (this.showSkeleton()) {
-          setTimeout(() => {
-            this.showSkeleton.set(false);
-          }, 500);
-        }
-      },
-    });
   }
 
   goToLiveDashboard(gameId: number): void {

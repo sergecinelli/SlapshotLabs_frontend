@@ -51,6 +51,7 @@ import { visibilityByRoleMap } from './live-dashboard.role-map';
 import { forkJoin, interval, Subscription } from 'rxjs';
 import { switchMap, startWith } from 'rxjs/operators';
 import { formatDateTimeFromGMT } from '../../shared/utils/time-converter.util';
+import { BannerService } from '../../services/banner.service';
 
 interface TeamDisplay {
   name: string;
@@ -144,6 +145,7 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
   private gameEventNameService = inject(GameEventNameService);
   private scheduleService = inject(ScheduleService);
   private sprayChartUtils = inject(SprayChartUtilsService);
+  private bannerService = inject(BannerService);
 
   // Polling subscription for live data
   private liveDataPollingSubscription?: Subscription;
@@ -1266,6 +1268,7 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         this.refreshLiveData();
+        this.bannerService.triggerRefresh();
       }
     });
   }
@@ -1387,6 +1390,8 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
           this.pageTitle.set('Game Dashboard');
         }
         this.refreshLiveDataOnce();
+        // Update banner immediately as game status might have changed
+        this.bannerService.triggerRefresh();
       },
       error: (e) => {
         console.error('Failed to update game period:', e);
@@ -1500,6 +1505,8 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         this.refreshLiveData();
+        // Trigger banner refresh if score might have changed (for shots)
+        this.bannerService.triggerRefresh();
       }
     });
   }
@@ -1648,7 +1655,7 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
         penaltyTimeString = `${minutes}:${seconds.toString().padStart(2, '0')}`;
       } else {
         // Try mm:ss directly
-        const msMatch = dur.match(/^(\d{1,3}):([0-5]\d)$/);
+        const msMatch = dur.match(/^([0-5]?\d):([0-5]\d)$/);
         if (msMatch) {
           const minutes = parseInt(msMatch[1], 10);
           const seconds = parseInt(msMatch[2], 10);
@@ -1776,6 +1783,8 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
       this.gameEventService.deleteGameEvent(eventId).subscribe({
         next: () => {
           this.refreshLiveData();
+          // Trigger banner refresh in case a goal was deleted
+          this.bannerService.triggerRefresh();
         },
         error: (error) => {
           console.error('Failed to delete event:', error);
