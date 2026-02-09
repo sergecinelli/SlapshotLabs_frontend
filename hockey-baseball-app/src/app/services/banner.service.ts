@@ -86,7 +86,7 @@ export class BannerService implements OnDestroy {
     this.refreshBannerSubject.next(); // For backward compatibility
     if (this.isLeader) {
       if (this.isAuthenticated) {
-        this.fetchBanner();
+        this.fetchBanner(true); // Background refresh
       }
     } else {
       this.broadcastChannel.postMessage({ type: 'REQUEST_REFRESH' });
@@ -147,7 +147,7 @@ export class BannerService implements OnDestroy {
 
     // Poll every 60 seconds
     this.pollingSubscription = interval(60000).subscribe(() => {
-      this.fetchBanner();
+      this.fetchBanner(true);
     });
   }
 
@@ -159,8 +159,10 @@ export class BannerService implements OnDestroy {
     }
   }
 
-  private fetchBanner() {
-    this.loadingSubject.next(true);
+  private fetchBanner(isBackground: boolean = false) {
+    if (!isBackground) {
+      this.loadingSubject.next(true);
+    }
     this.api.get<GameBannerItem[]>('/hockey/game/list/banner').subscribe({
       next: (items) => {
         const data = Array.isArray(items) ? items : [];
@@ -169,6 +171,10 @@ export class BannerService implements OnDestroy {
       },
       error: (err) => {
         console.error('Failed to load banner', err);
+        // Only clear loading state, preserve existing data if background update fails?
+        // Or should we clear data on error?
+        // Existing behavior clears data: this.updateState([], false, 'Failed to load banner data');
+        // Let's keep it consistent for now, but maybe in future we want to keep stale data.
         this.updateState([], false, 'Failed to load banner data');
       },
     });
@@ -186,7 +192,7 @@ export class BannerService implements OnDestroy {
       } else if (event.data.type === 'REQUEST_REFRESH') {
         // If we are leader, someone requested a refresh
         if (this.isLeader && this.isAuthenticated) {
-          this.fetchBanner();
+          this.fetchBanner(true);
         }
       }
     };
