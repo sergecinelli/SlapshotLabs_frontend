@@ -1648,7 +1648,7 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
         penaltyTimeString = `${minutes}:${seconds.toString().padStart(2, '0')}`;
       } else {
         // Try mm:ss directly
-        const msMatch = dur.match(/^([0-5]?\d):([0-5]\d)$/);
+        const msMatch = dur.match(/^(\d{1,3}):([0-5]\d)$/);
         if (msMatch) {
           const minutes = parseInt(msMatch[1], 10);
           const seconds = parseInt(msMatch[2], 10);

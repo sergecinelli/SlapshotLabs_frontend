@@ -221,7 +221,7 @@ export class ShotFormModalComponent implements OnInit {
       shotType: [null as number | null, Validators.required],
       isScoringChance: [false],
       period: [null as number | null, Validators.required],
-      time: ['', [Validators.required, Validators.pattern(/^([0-5]?[0-9]):([0-5][0-9])$/)]],
+      time: ['', [Validators.required, Validators.pattern(/^([0-9]{1,2}|1[0-9][0-9]|200):([0-5][0-9])$/)]],
       youtubeLink: [''],
       // Goal fields
       scoringTeam: [null as number | null],
@@ -532,7 +532,7 @@ export class ShotFormModalComponent implements OnInit {
         return `${this.getFieldLabel(fieldName)} is required`;
       }
       if (control.errors['pattern']) {
-        return 'Time must be in mm:ss format (e.g., 12:45)';
+        return 'Time must be in mm:ss format (max 200:00)';
       }
     }
     return '';

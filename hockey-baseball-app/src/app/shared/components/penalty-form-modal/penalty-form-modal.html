@@ -87,7 +87,7 @@
         <div class="form-row">
           <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
             <mat-label class="uppercase text-custom-secondary">Length of Penalty</mat-label>
-            <input matInput formControlName="penaltyLength" placeholder="mm:ss" maxlength="5" />
+            <input matInput formControlName="penaltyLength" placeholder="mm:ss" maxlength="6" />
             <mat-error
               *ngIf="
                 penaltyForm.get('penaltyLength')?.errors &&
@@ -124,7 +124,7 @@
         <div class="form-row">
           <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
             <mat-label class="uppercase text-custom-secondary">Time</mat-label>
-            <input matInput formControlName="time" placeholder="mm:ss" maxlength="5" />
+            <input matInput formControlName="time" placeholder="mm:ss" maxlength="6" />
             <mat-error *ngIf="penaltyForm.get('time')?.errors && penaltyForm.get('time')?.touched">
               {{ getErrorMessage('time') }}
             </mat-error>

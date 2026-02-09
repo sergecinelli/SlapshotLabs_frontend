@@ -369,7 +369,7 @@
         <div class="form-row">
           <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
             <mat-label class="uppercase text-custom-secondary">Time</mat-label>
-            <input matInput formControlName="time" placeholder="mm:ss" maxlength="5" />
+            <input matInput formControlName="time" placeholder="mm:ss" maxlength="6" />
             <mat-error *ngIf="shotForm.get('time')?.errors && shotForm.get('time')?.touched">
               {{ getErrorMessage('time') }}
             </mat-error>

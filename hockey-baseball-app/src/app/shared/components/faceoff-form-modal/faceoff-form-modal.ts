@@ -202,7 +202,7 @@ export class FaceoffFormModalComponent implements OnInit {
       loserTeam: ['', Validators.required],
       loserPlayer: ['', Validators.required],
       period: ['', Validators.required],
-      time: ['', [Validators.required, Validators.pattern(/^([0-5]?[0-9]):([0-5][0-9])$/)]],
+      time: ['', [Validators.required, Validators.pattern(/^([0-9]{1,2}|1[0-9][0-9]|200):([0-5][0-9])$/)]],
       location: [''],
       youtubeLink: [''],
     });
@@ -519,7 +519,7 @@ export class FaceoffFormModalComponent implements OnInit {
         return `${this.getFieldLabel(fieldName)} is required`;
       }
       if (control.errors['pattern']) {
-        return 'Time must be in mm:ss format (e.g., 12:45)';
+        return 'Time must be in mm:ss format (max 200:00)';
       }
     }
     return '';
