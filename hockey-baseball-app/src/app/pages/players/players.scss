@@ -20,6 +20,13 @@
   flex: 1;
 }
 
+.players-header-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+}
+
 .add-player-button-wrapper {
   display: flex;
   justify-content: flex-end;
@@ -53,6 +60,16 @@
   @media (max-width: 1100px) {
     grid-template-columns: 1fr;
   }
+}
+
+// Table Container
+.players-table-container {
+  overflow-x: auto;
+  border-radius: 4px;
+  background: var(--white);
+  border: 1px solid var(--border-light);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  margin-top: 20px;
 }
 
 // Player Card

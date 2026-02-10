@@ -272,7 +272,6 @@ export class ShotFormModalComponent implements OnInit {
 
     // Goalies should be from the OPPOSITE team
     if (oppositeTeam && this.dialogData.goalieOptions) {
-      debugger
       const oppositeGoalies = this.dialogData.goalieOptions
         .filter((g) => g.teamId === oppositeTeam.value)
         .map((g) => ({ value: g.value, label: g.label, number: g.number }));
