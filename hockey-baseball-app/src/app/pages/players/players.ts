@@ -37,7 +37,9 @@ import { LocalStorageService, StorageKey } from '../../services/local-storage.se
 
       <!-- Header with Add Button -->
       <div class="players-header">
-        <div class="players-header-left"></div>
+        <div class="players-header-left">
+          <h2>{{ pageTitle() }}</h2>
+        </div>
         <div class="players-header-actions" style="display: flex; gap: 10px; align-items: center;">
           <!-- View Toggle Button -->
           <app-button

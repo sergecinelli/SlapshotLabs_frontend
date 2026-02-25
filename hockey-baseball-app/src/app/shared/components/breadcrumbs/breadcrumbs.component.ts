@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@angular/core';
+import { Title } from '@angular/platform-browser';
 import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs';
 import { BreadcrumbDataService } from '../../../services/breadcrumb-data.service';
@@ -27,6 +28,7 @@ export interface BreadcrumbRouteData {
 })
 export class BreadcrumbsComponent {
   private router = inject(Router);
+  private title = inject(Title);
   private breadcrumbData = inject(BreadcrumbDataService);
 
   breadcrumbs = signal<BreadcrumbItem[]>([]);
@@ -95,6 +97,19 @@ export class BreadcrumbsComponent {
     }
 
     this.breadcrumbs.set(items);
+    this.updateDocumentTitle(items);
+  }
+
+  private updateDocumentTitle(items: BreadcrumbItem[]): void {
+    if (items.length === 0) return;
+
+    if (items.length === 1) {
+      this.title.setTitle(items[0].label);
+    } else {
+      const secondToLast = items[items.length - 2].label;
+      const last = items[items.length - 1].label;
+      this.title.setTitle(`${secondToLast} | ${last}`);
+    }
   }
 
   private getDeepestRoute(): ActivatedRoute {
