@@ -17,6 +17,7 @@ import { Rink } from '../../shared/interfaces/arena.interface';
 import { Player } from '../../shared/interfaces/player.interface';
 import { Goalie } from '../../shared/interfaces/goalie.interface';
 import { TeamFormModalComponent } from '../../shared/components/team-form-modal/team-form-modal';
+import { BreadcrumbDataService } from '../../services/breadcrumb-data.service';
 import { ComponentVisibilityByRoleDirective } from '../../shared/directives/component-visibility-by-role.directive';
 import { ButtonComponent } from '../../shared/components/buttons/button/button.component';
 import { visibilityByRoleMap } from './team-profile.role-map';
@@ -82,6 +83,7 @@ export class TeamProfileComponent implements OnInit, OnDestroy {
   private gameMetadataService = inject(GameMetadataService);
   private arenaService = inject(ArenaService);
   private dialog = inject(MatDialog);
+  private breadcrumbData = inject(BreadcrumbDataService);
 
   private destroy$ = new Subject<void>();
 
@@ -143,6 +145,7 @@ export class TeamProfileComponent implements OnInit, OnDestroy {
       next: ({ team, teams, games, gameTypes, teamSeasons }) => {
         if (team) {
           this.team = team;
+          this.breadcrumbData.entityName.set(team.name);
           // Create teams map for lookup
           this.teamsMap = new Map(teams.teams.map((t) => [parseInt(t.id), t]));
           // Create game types map for lookup

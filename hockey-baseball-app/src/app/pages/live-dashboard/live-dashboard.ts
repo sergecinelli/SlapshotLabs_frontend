@@ -53,6 +53,7 @@ import { switchMap, startWith } from 'rxjs/operators';
 import { formatDateTimeFromGMT } from '../../shared/utils/time-converter.util';
 import { BannerService } from '../../services/banner.service';
 import { StorageKey } from '../../services/local-storage.service';
+import { BreadcrumbDataService } from '../../services/breadcrumb-data.service';
 
 interface TeamDisplay {
   name: string;
@@ -148,6 +149,7 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
   private scheduleService = inject(ScheduleService);
   private sprayChartUtils = inject(SprayChartUtilsService);
   private bannerService = inject(BannerService);
+  private breadcrumbData = inject(BreadcrumbDataService);
 
   // Polling subscription for live data
   private liveDataPollingSubscription?: Subscription;
@@ -492,6 +494,12 @@ export class LiveDashboardComponent implements OnInit, OnDestroy {
 
     // tournamentName - game_type_name from API
     this.tournamentName.set(gameExtra.game_type_name || '');
+
+    // Set breadcrumb entity name
+    const breadcrumbLabel = (gameExtra.game_type_name ? `${gameExtra.game_type_name} | ` : '') + (gameType ? gameType.name : '');
+    if (breadcrumbLabel) {
+      this.breadcrumbData.entityName.set(breadcrumbLabel);
+    }
 
     // tournamentType - team's age_group
     const homeTeam = teams.find((t) => parseInt(t.id) === gameExtra.home_team_id);

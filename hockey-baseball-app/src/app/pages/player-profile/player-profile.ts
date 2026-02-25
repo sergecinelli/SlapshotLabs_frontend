@@ -30,6 +30,7 @@ import { ComponentVisibilityByRoleDirective } from '../../shared/directives/comp
 import { ButtonComponent } from '../../shared/components/buttons/button/button.component';
 import { visibilityByRoleMap } from './player-profile.role-map';
 import { StorageKey } from '../../services/local-storage.service';
+import { BreadcrumbDataService } from '../../services/breadcrumb-data.service';
 
 @Component({
   selector: 'app-player-profile',
@@ -60,6 +61,7 @@ export class PlayerProfileComponent implements OnInit {
   private gameEventNameService = inject(GameEventNameService);
   private gameMetadataService = inject(GameMetadataService);
   private sprayChartUtils = inject(SprayChartUtilsService);
+  private breadcrumbData = inject(BreadcrumbDataService);
 
   player: Player | null = null;
   loading = true;
@@ -121,6 +123,7 @@ export class PlayerProfileComponent implements OnInit {
       next: ({ player, seasons, eventNames, shotTypes, periods, teamSeasons, recentGames }) => {
         if (player) {
           this.player = player;
+          this.breadcrumbData.entityName.set(`${player.firstName} ${player.lastName}`);
           this.seasonStats = teamSeasons;
           this.recentGameStats = recentGames;
           this.seasons = seasons;

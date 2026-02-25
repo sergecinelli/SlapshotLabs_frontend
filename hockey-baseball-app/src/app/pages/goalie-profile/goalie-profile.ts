@@ -26,6 +26,7 @@ import {
   SprayChartUtilsService,
 } from '../../services/spray-chart-utils.service';
 import { StorageKey } from '../../services/local-storage.service';
+import { BreadcrumbDataService } from '../../services/breadcrumb-data.service';
 
 @Component({
   selector: 'app-goalie-profile',
@@ -52,6 +53,7 @@ export class GoalieProfileComponent implements OnInit {
   private gameEventNameService = inject(GameEventNameService);
   private gameMetadataService = inject(GameMetadataService);
   private sprayChartUtils = inject(SprayChartUtilsService);
+  private breadcrumbData = inject(BreadcrumbDataService);
 
   goalie: Goalie | null = null;
   loading = true;
@@ -109,6 +111,7 @@ export class GoalieProfileComponent implements OnInit {
       next: ({ goalie, seasons, eventNames, shotTypes, periods, teamSeasons, recentGames }) => {
         if (goalie) {
           this.goalie = goalie;
+          this.breadcrumbData.entityName.set(`${goalie.firstName} ${goalie.lastName}`);
           this.seasonStats = teamSeasons;
           this.recentGameStats = recentGames;
           this.seasons = seasons;

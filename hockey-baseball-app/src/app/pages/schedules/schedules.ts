@@ -4,6 +4,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ScheduleService, DashboardGame } from '../../services/schedule.service';
 import { TeamService } from '../../services/team.service';
+import { BreadcrumbDataService } from '../../services/breadcrumb-data.service';
 import { ComponentVisibilityByRoleDirective } from '../../shared/directives/component-visibility-by-role.directive';
 import { ButtonComponent } from '../../shared/components/buttons/button/button.component';
 import { GameCardComponent } from '../../shared/components/game-card/game-card.component';
@@ -130,6 +131,7 @@ export class SchedulesComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private storage = inject(LocalStorageService);
+  private breadcrumbData = inject(BreadcrumbDataService);
 
   games = signal<GameDisplay[]>([]);
   schedules = signal<Schedule[]>([]);
@@ -165,7 +167,6 @@ export class SchedulesComponent implements OnInit {
       if (teamId) {
         const numericId = parseInt(teamId, 10);
         this.teamId.set(teamId);
-        this.loadTeamName(numericId);
         this.loadGames(numericId);
       }
     });
@@ -209,6 +210,16 @@ export class SchedulesComponent implements OnInit {
       arenas: this.arenaService.getArenas(),
     }).subscribe({
       next: ({ gamesData, teamsData, arenas }) => {
+        // Set team name from already-loaded teams data
+        if (this.teamId()) {
+          const team = teamsData.teams.find((t) => t.id === this.teamId());
+          if (team) {
+            this.teamName.set(team.name);
+            this.pageTitle.set(`Schedule | ${team.name}`);
+            this.breadcrumbData.entityName.set(team.name);
+          }
+        }
+
         const allGames = [...gamesData.upcoming_games, ...gamesData.previous_games];
 
         // Build team lookup map for age group / level
@@ -254,19 +265,6 @@ export class SchedulesComponent implements OnInit {
       error: (error) => {
         console.error('Error loading schedules:', error);
         this.loading.set(false);
-      },
-    });
-  }
-
-  private loadTeamName(teamId: number): void {
-    this.teamService.getTeamById(teamId.toString()).subscribe({
-      next: (team) => {
-        const name = team?.name || '';
-        this.teamName.set(name);
-        this.pageTitle.set(`Schedule | ${name}`);
-      },
-      error: () => {
-        this.pageTitle.set('Schedule');
       },
     });
   }

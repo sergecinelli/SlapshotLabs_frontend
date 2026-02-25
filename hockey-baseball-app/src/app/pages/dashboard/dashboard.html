@@ -27,14 +27,14 @@
     </div>
 
     <!-- Main Content -->
-    <!-- Upcoming Games -->
+    <!-- Current and Upcoming Games -->
     <div class="dashboard-section">
-      <h2 class="dashboard-section-title">Upcoming Games</h2>
+      <h2 class="dashboard-section-title">Current and Upcoming Games</h2>
       @if (loading()) {
         <app-game-card-skeleton></app-game-card-skeleton>
       } @else if (upcomingGames().length === 0) {
         <div class="dashboard-empty">
-          <div class="empty-text">No upcoming games scheduled.</div>
+          <div class="empty-text">No current or upcoming games scheduled.</div>
         </div>
       } @else {
         <div class="dashboard-cards-container">

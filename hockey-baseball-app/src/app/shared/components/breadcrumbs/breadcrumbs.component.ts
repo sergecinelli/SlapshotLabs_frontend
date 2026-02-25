@@ -1,12 +1,9 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, effect, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs';
 import { NavigationService } from '../../../services/navigation.service';
-import { GoalieService } from '../../../services/goalie.service';
-import { PlayerService } from '../../../services/player.service';
-import { TeamService } from '../../../services/team.service';
-import { LiveGameService } from '../../../services/live-game.service';
+import { BreadcrumbDataService } from '../../../services/breadcrumb-data.service';
 
 export interface BreadcrumbItem {
   label: string;
@@ -26,12 +23,18 @@ export interface BreadcrumbItem {
 export class BreadcrumbsComponent implements OnInit {
   private router = inject(Router);
   private navigationService = inject(NavigationService);
-  private goalieService = inject(GoalieService);
-  private playerService = inject(PlayerService);
-  private teamService = inject(TeamService);
-  private liveGameService = inject(LiveGameService);
+  private breadcrumbData = inject(BreadcrumbDataService);
 
   breadcrumbs = signal<BreadcrumbItem[]>([]);
+
+  constructor() {
+    effect(() => {
+      const name = this.breadcrumbData.entityName();
+      if (name) {
+        this.updateBreadcrumbs();
+      }
+    });
+  }
 
   ngOnInit(): void {
     this.updateBreadcrumbs();
@@ -39,6 +42,7 @@ export class BreadcrumbsComponent implements OnInit {
     this.router.events
       .pipe(filter((event) => event instanceof NavigationEnd))
       .subscribe(() => {
+        this.breadcrumbData.reset();
         this.updateBreadcrumbs();
       });
   }
@@ -64,7 +68,7 @@ export class BreadcrumbsComponent implements OnInit {
     }
 
     if (this.isLiveDashboardRoute(segments)) {
-      this.handleLiveDashboardRoute(segments);
+      this.handleLiveDashboardRoute();
       return;
     }
 
@@ -93,6 +97,7 @@ export class BreadcrumbsComponent implements OnInit {
   private handleSchedulesRoute(segments: string[], url: string): void {
     const schedulesIndex = segments.indexOf('schedule');
     const teamId = segments[schedulesIndex - 1];
+    const entityName = this.breadcrumbData.entityName();
 
     const items: BreadcrumbItem[] = [
       {
@@ -107,40 +112,21 @@ export class BreadcrumbsComponent implements OnInit {
       },
     ];
 
-    if (teamId && !isNaN(parseInt(teamId, 10))) {
-      this.teamService.getTeamById(teamId).subscribe({
-        next: (team) => {
-          if (team) {
-            items.push({
-              label: team.name,
-              path: `/teams-and-rosters/teams/${teamId}/profile`,
-              icon: 'groups',
-            });
-          }
-          items.push({
-            label: 'Schedule',
-            path: url,
-            icon: 'scoreboard',
-          });
-          this.breadcrumbs.set(items);
-        },
-        error: () => {
-          items.push({
-            label: 'Schedule',
-            path: url,
-            icon: 'scoreboard',
-          });
-          this.breadcrumbs.set(items);
-        },
-      });
-    } else {
+    if (entityName && teamId && !isNaN(parseInt(teamId, 10))) {
       items.push({
-        label: 'Schedule',
-        path: url,
-        icon: 'scoreboard',
+        label: entityName,
+        path: `/teams-and-rosters/teams/${teamId}/profile`,
+        icon: 'groups',
       });
-      this.breadcrumbs.set(items);
     }
+
+    items.push({
+      label: 'Schedule',
+      path: url,
+      icon: 'scoreboard',
+    });
+
+    this.breadcrumbs.set(items);
   }
 
   private isSprayChartRoute(segments: string[]): boolean {
@@ -158,6 +144,7 @@ export class BreadcrumbsComponent implements OnInit {
     const sprayChartIndex = segments.findIndex((seg) => seg === 'spray-chart');
     const entityId = segments[sprayChartIndex - 1];
     const entityTypeSegment = segments[sprayChartIndex - 2];
+    const entityName = this.breadcrumbData.entityName();
 
     if (!this.isValidEntityId(entityId)) {
       return;
@@ -167,21 +154,30 @@ export class BreadcrumbsComponent implements OnInit {
     const entityType = entityTypeSegment === 'players' ? 'player' : 'goalie';
 
     this.addEntityTypeBreadcrumb(items, entityType);
-    this.loadEntityAndSetBreadcrumbs(entityType, entityId, items, url);
-  }
 
-  private handleLiveDashboardRoute(segments: string[]): void {
-    const liveIndex = segments.findIndex((seg) => seg === 'live');
-    const gameId = segments[liveIndex + 1];
-
-    if (!gameId || isNaN(parseInt(gameId, 10))) {
-      // Fallback to standard breadcrumbs if gameId is invalid
-      const items = this.buildStandardBreadcrumbs(segments);
-      this.breadcrumbs.set(items);
-      return;
+    if (entityName) {
+      const profilePath = entityType === 'player'
+        ? `/teams-and-rosters/players/${entityId}/profile`
+        : `/teams-and-rosters/goalies/${entityId}/profile`;
+      items.push({
+        label: entityName,
+        path: profilePath,
+        icon: 'person',
+      });
     }
 
-    // Set initial breadcrumbs: Schedule
+    items.push({
+      label: 'Spray Chart',
+      path: url,
+      icon: 'scatter_plot',
+    });
+
+    this.breadcrumbs.set(items);
+  }
+
+  private handleLiveDashboardRoute(): void {
+    const entityName = this.breadcrumbData.entityName();
+
     const items: BreadcrumbItem[] = [
       {
         label: 'Schedule',
@@ -190,33 +186,16 @@ export class BreadcrumbsComponent implements OnInit {
       },
     ];
 
-    // Set initial breadcrumbs while loading tournament name
-    this.breadcrumbs.set(items);
+    if (entityName) {
+      items.push({
+        label: entityName,
+        path: '',
+        icon: null,
+        isLive: true,
+      });
+    }
 
-    // Load game data to get tournament name
-    this.liveGameService.getGameExtra(parseInt(gameId, 10)).subscribe({
-      next: (gameExtra) => {
-        const tournamentName = (gameExtra.game_type_name ? `${gameExtra.game_type_name} | ` : '') + gameExtra.game_type;
-        const updatedItems: BreadcrumbItem[] = [
-          {
-            label: 'Schedule',
-            path: '/schedule',
-            icon: this.navigationService.getMaterialIcon('schedule'),
-          },
-          {
-            label: tournamentName,
-            path: '',
-            icon: null,
-            isLive: true,
-          },
-        ];
-        this.breadcrumbs.set(updatedItems);
-      },
-      error: () => {
-        // Keep existing breadcrumbs on error (Schedule)
-        this.breadcrumbs.set(items);
-      },
-    });
+    this.breadcrumbs.set(items);
   }
 
   private isValidEntityId(entityId: string): boolean {
@@ -257,89 +236,6 @@ export class BreadcrumbsComponent implements OnInit {
       label: entityTypeLabel,
       path: entityTypePath,
       icon: entityTypeIcon,
-    });
-  }
-
-  private loadEntityAndSetBreadcrumbs(
-    entityType: 'player' | 'goalie',
-    entityId: string,
-    items: BreadcrumbItem[],
-    url: string
-  ): void {
-    if (entityType === 'player') {
-      this.loadPlayerAndSetBreadcrumbs(entityId, items, url);
-    } else {
-      this.loadGoalieAndSetBreadcrumbs(entityId, items, url);
-    }
-  }
-
-  private loadPlayerAndSetBreadcrumbs(
-    entityId: string,
-    items: BreadcrumbItem[],
-    url: string
-  ): void {
-    const profilePath = `/teams-and-rosters/players/${entityId}/profile`;
-
-    this.playerService.getPlayerById(entityId).subscribe({
-      next: (player) => {
-        const updatedItems = [...items];
-        if (player) {
-          updatedItems.push({
-            label: `${player.firstName} ${player.lastName}`,
-            path: profilePath,
-            icon: 'person',
-          });
-        }
-        updatedItems.push({
-          label: 'Spray Chart',
-          path: url,
-          icon: 'scatter_plot',
-        });
-        this.breadcrumbs.set(updatedItems);
-      },
-      error: () => {
-        items.push({
-          label: 'Spray Chart',
-          path: url,
-          icon: 'scatter_plot',
-        });
-        this.breadcrumbs.set(items);
-      },
-    });
-  }
-
-  private loadGoalieAndSetBreadcrumbs(
-    entityId: string,
-    items: BreadcrumbItem[],
-    url: string
-  ): void {
-    const profilePath = `/teams-and-rosters/goalies/${entityId}/profile`;
-
-    this.goalieService.getGoalieById(entityId).subscribe({
-      next: (goalie) => {
-        const updatedItems = [...items];
-        if (goalie) {
-          updatedItems.push({
-            label: `${goalie.firstName} ${goalie.lastName}`,
-            path: profilePath,
-            icon: 'person',
-          });
-        }
-        updatedItems.push({
-          label: 'Spray Chart',
-          path: url,
-          icon: 'scatter_plot',
-        });
-        this.breadcrumbs.set(updatedItems);
-      },
-      error: () => {
-        items.push({
-          label: 'Spray Chart',
-          path: url,
-          icon: 'scatter_plot',
-        });
-        this.breadcrumbs.set(items);
-      },
     });
   }
 
@@ -398,97 +294,18 @@ export class BreadcrumbsComponent implements OnInit {
       return;
     }
 
-    const parentSegment = segments[profileIndex - 2];
-    const handlerMap: Record<string, () => void> = {
-      goalies: () => this.handleGoalieProfile(segments, items, url, profileIndex),
-      players: () => this.handlePlayerProfile(segments, items, url, profileIndex),
-      teams: () => this.handleTeamProfile(segments, items, url, profileIndex),
-    };
-
-    const handler = handlerMap[parentSegment];
-    if (handler) {
-      handler();
-    } else {
-      this.breadcrumbs.set(items);
-    }
-  }
-
-  private handleGoalieProfile(segments: string[], items: BreadcrumbItem[], url: string, profileIndex: number): void {
-    const goalieId = segments[profileIndex - 1];
-    if (!goalieId) {
-      this.breadcrumbs.set(items);
-      return;
+    const entityName = this.breadcrumbData.entityName();
+    if (entityName) {
+      const parentSegment = segments[profileIndex - 2];
+      const icon = parentSegment === 'teams' ? 'groups' : 'person';
+      items.push({
+        label: entityName,
+        path: url,
+        icon,
+      });
     }
 
     this.breadcrumbs.set(items);
-    this.goalieService.getGoalieById(goalieId).subscribe({
-      next: (goalie) => {
-        if (goalie) {
-          const updatedItems = [...items];
-          updatedItems.push({
-            label: `${goalie.firstName} ${goalie.lastName}`,
-            path: url,
-            icon: 'person',
-          });
-          this.breadcrumbs.set(updatedItems);
-        }
-      },
-      error: () => {
-        // Keep existing breadcrumbs on error
-      },
-    });
-  }
-
-  private handlePlayerProfile(segments: string[], items: BreadcrumbItem[], url: string, profileIndex: number): void {
-    const playerId = segments[profileIndex - 1];
-    if (!playerId) {
-      this.breadcrumbs.set(items);
-      return;
-    }
-
-    this.breadcrumbs.set(items);
-    this.playerService.getPlayerById(playerId).subscribe({
-      next: (player) => {
-        if (player) {
-          const updatedItems = [...items];
-          updatedItems.push({
-            label: `${player.firstName} ${player.lastName}`,
-            path: url,
-            icon: 'person',
-          });
-          this.breadcrumbs.set(updatedItems);
-        }
-      },
-      error: () => {
-        // Keep existing breadcrumbs on error
-      },
-    });
-  }
-
-  private handleTeamProfile(segments: string[], items: BreadcrumbItem[], url: string, profileIndex: number): void {
-    const teamId = segments[profileIndex - 1];
-    if (!teamId) {
-      this.breadcrumbs.set(items);
-      return;
-    }
-
-    this.breadcrumbs.set(items);
-    this.teamService.getTeamById(teamId).subscribe({
-      next: (team) => {
-        if (team) {
-          const updatedItems = [...items];
-          updatedItems.push({
-            label: team.name,
-            path: url,
-            icon: 'groups',
-          });
-          this.breadcrumbs.set(updatedItems);
-        }
-      },
-      error: () => {
-        // Keep existing breadcrumbs on error
-      },
-    });
   }
 
   navigateTo(path: string, event?: Event): void {

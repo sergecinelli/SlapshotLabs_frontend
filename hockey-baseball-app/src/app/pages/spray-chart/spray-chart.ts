@@ -17,6 +17,7 @@ import {
   SprayChartUtilsService,
 } from '../../services/spray-chart-utils.service';
 import { ButtonComponent } from '../../shared/components/buttons/button/button.component';
+import { BreadcrumbDataService } from '../../services/breadcrumb-data.service';
 
 @Component({
   selector: 'app-spray-chart',
@@ -36,6 +37,7 @@ export class SprayChartComponent implements OnInit {
   private gameEventNameService = inject(GameEventNameService);
   private gameMetadataService = inject(GameMetadataService);
   private sprayChartUtils = inject(SprayChartUtilsService);
+  private breadcrumbData = inject(BreadcrumbDataService);
 
   goalie: Goalie | null = null;
   player: Player | null = null;
@@ -73,6 +75,7 @@ export class SprayChartComponent implements OnInit {
       next: ({ goalie, eventNames, shotTypes, periods, sprayChartEvents }) => {
         if (goalie) {
           this.goalie = goalie;
+          this.breadcrumbData.entityName.set(`${goalie.firstName} ${goalie.lastName}`);
           // Create period names map
           const periodNames = new Map<number, string>();
           periods.forEach((period) => {
@@ -120,6 +123,7 @@ export class SprayChartComponent implements OnInit {
       next: ({ player, eventNames, shotTypes, periods, sprayChartEvents }) => {
         if (player) {
           this.player = player;
+          this.breadcrumbData.entityName.set(`${player.firstName} ${player.lastName}`);
           // Create period names map
           const periodNames = new Map<number, string>();
           periods.forEach((period) => {
