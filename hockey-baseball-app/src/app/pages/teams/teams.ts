@@ -182,7 +182,7 @@ import { LocalStorageService, StorageKey } from '../../services/local-storage.se
                 <!-- Action Buttons -->
                 <div class="team-card-actions">
                   <app-button-route
-                    [route]="'/teams-and-rosters/teams/' + team.id + '/schedules'"
+                    [route]="'/teams-and-rosters/teams/' + team.id + '/schedule'"
                     [bg]="'secondary'"
                     [bghover]="'secondary_dark'"
                     [color]="'white'"
@@ -191,7 +191,7 @@ import { LocalStorageService, StorageKey } from '../../services/local-storage.se
                     [haveContent]="true"
                     class="action-button"
                   >
-                    Schedules
+                    Schedule
                   </app-button-route>
                   <app-button-route
                     [route]="'/teams-and-rosters/players'"
@@ -308,7 +308,7 @@ export class TeamsComponent implements OnInit {
   ];
 
   tableActions: TableAction[] = [
-    { label: 'Schedules', action: 'schedules', variant: 'secondary', icon: 'scoreboard' },
+    { label: 'Schedule', action: 'schedules', variant: 'secondary', icon: 'scoreboard' },
     { label: 'Players', action: 'players', variant: 'secondary', icon: 'people' },
     { label: 'Goalies', action: 'goalies', variant: 'secondary', icon: 'shield' },
     { label: 'View', action: 'view-profile', variant: 'primary', icon: 'visibility' },
@@ -494,7 +494,7 @@ export class TeamsComponent implements OnInit {
   }
 
   viewTeamGames(team: Team): void {
-    this.router.navigate(['/teams-and-rosters/teams', team.id, 'schedules']);
+    this.router.navigate(['/teams-and-rosters/teams', team.id, 'schedule']);
   }
 
   openAddTeamModal(): void {

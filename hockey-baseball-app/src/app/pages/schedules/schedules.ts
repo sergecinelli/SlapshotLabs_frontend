@@ -136,7 +136,7 @@ export class SchedulesComponent implements OnInit {
   loading = signal(true);
   teamId = signal<string | null>(null);
   teamName = signal<string>('');
-  pageTitle = signal<string>('Schedules');
+  pageTitle = signal<string>('Schedule');
   layoutMode = signal<'card' | 'table'>('card');
 
   tableColumns: TableColumn[] = [
@@ -263,10 +263,10 @@ export class SchedulesComponent implements OnInit {
       next: (team) => {
         const name = team?.name || '';
         this.teamName.set(name);
-        this.pageTitle.set(`Schedules | ${name}`);
+        this.pageTitle.set(`Schedule | ${name}`);
       },
       error: () => {
-        this.pageTitle.set('Schedules');
+        this.pageTitle.set('Schedule');
       },
     });
   }

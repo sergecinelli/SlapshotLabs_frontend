@@ -53,6 +53,11 @@ export class BreadcrumbsComponent implements OnInit {
       return;
     }
 
+    if (this.isSchedulesRoute(segments)) {
+      this.handleSchedulesRoute(segments, url);
+      return;
+    }
+
     if (this.isSprayChartRoute(segments)) {
       this.handleSprayChartRoute(segments, url);
       return;
@@ -79,6 +84,63 @@ export class BreadcrumbsComponent implements OnInit {
         icon: this.navigationService.getMaterialIcon('dashboard'),
       },
     ]);
+  }
+
+  private isSchedulesRoute(segments: string[]): boolean {
+    return segments.includes('schedule') && segments.includes('teams');
+  }
+
+  private handleSchedulesRoute(segments: string[], url: string): void {
+    const schedulesIndex = segments.indexOf('schedule');
+    const teamId = segments[schedulesIndex - 1];
+
+    const items: BreadcrumbItem[] = [
+      {
+        label: 'Teams & Rosters',
+        path: '/teams-and-rosters',
+        icon: this.navigationService.getMaterialIcon('teams'),
+      },
+      {
+        label: 'Teams',
+        path: '/teams-and-rosters/teams',
+        icon: this.navigationService.getMaterialIcon('teams'),
+      },
+    ];
+
+    if (teamId && !isNaN(parseInt(teamId, 10))) {
+      this.teamService.getTeamById(teamId).subscribe({
+        next: (team) => {
+          if (team) {
+            items.push({
+              label: team.name,
+              path: `/teams-and-rosters/teams/${teamId}/profile`,
+              icon: 'groups',
+            });
+          }
+          items.push({
+            label: 'Schedule',
+            path: url,
+            icon: 'scoreboard',
+          });
+          this.breadcrumbs.set(items);
+        },
+        error: () => {
+          items.push({
+            label: 'Schedule',
+            path: url,
+            icon: 'scoreboard',
+          });
+          this.breadcrumbs.set(items);
+        },
+      });
+    } else {
+      items.push({
+        label: 'Schedule',
+        path: url,
+        icon: 'scoreboard',
+      });
+      this.breadcrumbs.set(items);
+    }
   }
 
   private isSprayChartRoute(segments: string[]): boolean {

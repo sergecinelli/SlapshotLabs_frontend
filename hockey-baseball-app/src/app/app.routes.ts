@@ -169,7 +169,7 @@ export const routes: Routes = [
           import('./pages/spray-chart/spray-chart').then((m) => m.SprayChartComponent),
       },
       {
-        path: 'teams-and-rosters/teams/:id/schedules',
+        path: 'teams-and-rosters/teams/:id/schedule',
         loadComponent: () => import('./pages/schedules/schedules').then((m) => m.SchedulesComponent),
         canActivate: [RoleAccessGuard],
         data: {
