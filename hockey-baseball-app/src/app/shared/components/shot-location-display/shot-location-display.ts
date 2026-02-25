@@ -1,9 +1,12 @@
-import { Component, input, computed, ChangeDetectionStrategy, signal, effect, inject } from '@angular/core';
+import { Component, input, computed, ChangeDetectionStrategy, signal, effect, inject, viewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
-import { MatTooltipModule } from '@angular/material/tooltip';
+import { ButtonSmallComponent } from '../buttons/button-small/button-small.component';
 import { environment } from '../../../../environments/environment';
 import { LocalStorageService, StorageKey } from '../../../services/local-storage.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { fromEvent } from 'rxjs';
+import { debounceTime } from 'rxjs';
 
 export interface ShotLocationData {
   iceTopOffset: number;
@@ -19,6 +22,7 @@ export interface ShotLocationData {
   periodLabel?: string;
   description?: string;
   tooltip?: string;
+  youtubeLink?: string;
   type:
     | 'Goal'
     | 'Save'
@@ -39,7 +43,7 @@ interface TypeStats {
 
 @Component({
   selector: 'app-shot-location-display',
-  imports: [CommonModule, MatIconModule, MatTooltipModule],
+  imports: [CommonModule, MatIconModule, ButtonSmallComponent],
   templateUrl: './shot-location-display.html',
   styleUrl: './shot-location-display.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -63,6 +67,16 @@ export class ShotLocationDisplayComponent {
   private isInitialized = signal(false);
   goaliePhotoLoaded = signal(true); // Start as true, will be set to false on error
   teamLogoLoaded = signal(true); // Start as true, will be set to false on error
+  selectedIndices = signal<Set<number>>(new Set());
+  linesData = signal<{ x1: number; y1: number; x2: number; y2: number; color: string; viewBox: string }[]>([]);
+  hoveredLine = signal<{ x1: number; y1: number; x2: number; y2: number; color: string; viewBox: string } | null>(null);
+  popoverItem = signal<(ShotLocationData & { color: string }) | null>(null);
+  popoverPosition = signal<{ top: number; left: number } | null>(null);
+  popoverAbove = signal(false);
+
+  private locationImagesRef = viewChild<ElementRef<HTMLElement>>('locationImages');
+  private rinkWrapperRef = viewChild<ElementRef<HTMLElement>>('rinkWrapper');
+  private netWrapperRef = viewChild<ElementRef<HTMLElement>>('netWrapper');
 
   constructor() {
     // Load filters from local storage once storageKey is available
@@ -98,6 +112,23 @@ export class ShotLocationDisplayComponent {
         this.teamLogoLoaded.set(true); // Try to load the new logo
       }
     });
+
+    // Recalculate line position on window resize
+    fromEvent(window, 'resize')
+      .pipe(debounceTime(150), takeUntilDestroyed())
+      .subscribe(() => this.recalculateLineCoords());
+
+    // Close popover when clicking outside
+    fromEvent<MouseEvent>(document, 'click')
+      .pipe(takeUntilDestroyed())
+      .subscribe((event) => {
+        if (this.popoverItem()) {
+          const target = event.target as HTMLElement;
+          if (!target.closest('.marker-popover') && !target.closest('.location-marker')) {
+            this.closePopover();
+          }
+        }
+      });
   }
 
   private readonly typeColors: Record<ShotLocationData['type'], string> = {
@@ -186,6 +217,164 @@ export class ShotLocationDisplayComponent {
       current.add(type);
     }
     this.visibleTypes.set(current);
+    this.selectedIndices.set(new Set());
+    this.linesData.set([]);
+  }
+
+  selectMarker(item: ShotLocationData, event: MouseEvent): void {
+    // Handle popover
+    if (this.popoverItem()?.index === item.index) {
+      this.closePopover();
+    } else {
+      this.showPopover(item, event);
+    }
+
+    // Handle line selection (only for markers with both positions)
+    const hasRinkPos = !(item.iceTopOffset === 0 && item.iceLeftOffset === 0);
+    const hasNetPos =
+      item.netTopOffset != null &&
+      item.netLeftOffset != null &&
+      !(item.netTopOffset === 0 && item.netLeftOffset === 0);
+
+    if (hasRinkPos && hasNetPos) {
+      const current = new Set(this.selectedIndices());
+      if (current.has(item.index)) {
+        current.delete(item.index);
+      } else {
+        current.add(item.index);
+      }
+      this.selectedIndices.set(current);
+      requestAnimationFrame(() => this.recalculateAllLines());
+    }
+  }
+
+  onMarkerHover(item: ShotLocationData): void {
+    // Don't show hover line if already selected
+    if (this.selectedIndices().has(item.index)) {
+      this.hoveredLine.set(null);
+      return;
+    }
+
+    const hasRinkPos = !(item.iceTopOffset === 0 && item.iceLeftOffset === 0);
+    const hasNetPos =
+      item.netTopOffset != null &&
+      item.netLeftOffset != null &&
+      !(item.netTopOffset === 0 && item.netLeftOffset === 0);
+
+    if (!hasRinkPos || !hasNetPos) {
+      this.hoveredLine.set(null);
+      return;
+    }
+
+    const container = this.locationImagesRef()?.nativeElement;
+    const rinkWrapper = this.rinkWrapperRef()?.nativeElement;
+    const netWrapper = this.netWrapperRef()?.nativeElement;
+    if (!container || !rinkWrapper || !netWrapper) return;
+
+    const containerRect = container.getBoundingClientRect();
+    const rinkImg = rinkWrapper.querySelector('.location-image') as HTMLElement;
+    const netImg = netWrapper.querySelector('.location-image') as HTMLElement;
+    if (!rinkImg || !netImg) return;
+
+    const rinkRect = rinkImg.getBoundingClientRect();
+    const netRect = netImg.getBoundingClientRect();
+
+    this.hoveredLine.set({
+      x1: rinkRect.left - containerRect.left + (item.iceLeftOffset / 100) * rinkRect.width,
+      y1: rinkRect.top - containerRect.top + (item.iceTopOffset / 100) * rinkRect.height,
+      x2: netRect.left - containerRect.left + (item.netLeftOffset! / 100) * netRect.width,
+      y2: netRect.top - containerRect.top + (item.netTopOffset! / 100) * netRect.height,
+      color: this.typeColors[item.type],
+      viewBox: `0 0 ${containerRect.width} ${containerRect.height}`,
+    });
+  }
+
+  onMarkerLeave(): void {
+    this.hoveredLine.set(null);
+  }
+
+  private showPopover(item: ShotLocationData, event: MouseEvent): void {
+    const marker = event.currentTarget as HTMLElement;
+    const markerRect = marker.getBoundingClientRect();
+
+    // Check if there's enough space below for the popover (~200px estimate)
+    const spaceBelow = window.innerHeight - markerRect.bottom;
+    const showAbove = spaceBelow < 200;
+
+    this.popoverAbove.set(showAbove);
+    this.popoverPosition.set({
+      top: showAbove
+        ? markerRect.top - 8
+        : markerRect.bottom + 8,
+      left: markerRect.left + markerRect.width / 2,
+    });
+    this.popoverItem.set({ ...item, color: this.typeColors[item.type] });
+  }
+
+  closePopover(): void {
+    this.popoverItem.set(null);
+    this.popoverPosition.set(null);
+  }
+
+  clearAllLines(): void {
+    this.selectedIndices.set(new Set());
+    this.linesData.set([]);
+    this.closePopover();
+  }
+
+  openVideo(youtubeLink?: string): void {
+    if (!youtubeLink) return;
+    window.open(youtubeLink, '_blank', 'noopener');
+  }
+
+  private recalculateLineCoords(): void {
+    this.recalculateAllLines();
+  }
+
+  private recalculateAllLines(): void {
+    const indices = this.selectedIndices();
+    if (indices.size === 0) {
+      this.linesData.set([]);
+      return;
+    }
+
+    const container = this.locationImagesRef()?.nativeElement;
+    const rinkWrapper = this.rinkWrapperRef()?.nativeElement;
+    const netWrapper = this.netWrapperRef()?.nativeElement;
+
+    if (!container || !rinkWrapper || !netWrapper) {
+      this.linesData.set([]);
+      return;
+    }
+
+    const containerRect = container.getBoundingClientRect();
+    const rinkImg = rinkWrapper.querySelector('.location-image') as HTMLElement;
+    const netImg = netWrapper.querySelector('.location-image') as HTMLElement;
+
+    if (!rinkImg || !netImg) {
+      this.linesData.set([]);
+      return;
+    }
+
+    const rinkRect = rinkImg.getBoundingClientRect();
+    const netRect = netImg.getBoundingClientRect();
+    const viewBox = `0 0 ${containerRect.width} ${containerRect.height}`;
+
+    const lines: { x1: number; y1: number; x2: number; y2: number; color: string; viewBox: string }[] = [];
+
+    for (const index of indices) {
+      const item = this.data().find((d) => d.index === index);
+      if (!item || item.netTopOffset == null || item.netLeftOffset == null) continue;
+
+      const x1 = rinkRect.left - containerRect.left + (item.iceLeftOffset / 100) * rinkRect.width;
+      const y1 = rinkRect.top - containerRect.top + (item.iceTopOffset / 100) * rinkRect.height;
+      const x2 = netRect.left - containerRect.left + (item.netLeftOffset / 100) * netRect.width;
+      const y2 = netRect.top - containerRect.top + (item.netTopOffset / 100) * netRect.height;
+
+      lines.push({ x1, y1, x2, y2, color: this.typeColors[item.type], viewBox });
+    }
+
+    this.linesData.set(lines);
   }
 
   getTeamLogoUrl(): string {

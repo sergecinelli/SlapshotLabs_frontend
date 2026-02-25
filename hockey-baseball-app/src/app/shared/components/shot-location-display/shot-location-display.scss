@@ -45,9 +45,17 @@
         white-space: nowrap;
       }
     }
+
+    .clear-lines-btn {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      padding-right: 10px;
+    }
   }
 
   .location-images {
+    position: relative;
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 24px;
@@ -55,6 +63,17 @@
     @media (max-width: 768px) {
       grid-template-columns: 1fr;
       gap: 16px;
+    }
+
+    .line-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 20;
+      overflow: visible;
     }
 
     .location-container {
@@ -68,48 +87,66 @@
       .goalie-info {
         display: flex;
         align-items: center;
-        gap: 10px;
-        padding: 5px 10px;
-        background-color: var(--color-white);
-        border-radius: 8px;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        gap: 12px;
+        padding: 8px 14px;
+        background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
 
         .goalie-photo-container {
-          width: 40px;
-          height: 40px;
+          width: 36px;
+          height: 36px;
           display: flex;
           align-items: center;
           justify-content: center;
           flex-shrink: 0;
+          border-radius: 50%;
+          background: var(--color-white);
+          box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
         }
 
         .goalie-logo {
-          width: 40px;
-          height: 40px;
+          width: 28px;
+          height: 28px;
           border-radius: 50%;
-          object-fit: cover;
-          border: 2px solid var(--color-primary);
+          object-fit: contain;
           display: block;
         }
 
         .goalie-initials {
-          width: 40px;
-          height: 40px;
+          width: 36px;
+          height: 36px;
           border-radius: 50%;
-          background-color: var(--gray-tone3);
+          background-color: var(--color-white);
           display: flex;
           align-items: center;
           justify-content: center;
           color: var(--text-secondary);
           font-weight: 600;
-          font-size: 14px;
+          font-size: 13px;
           flex-shrink: 0;
         }
 
+        .goalie-text {
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+        }
+
+        .goalie-label {
+          font-size: 10px;
+          font-weight: 600;
+          color: var(--text-secondary);
+          text-transform: uppercase;
+          letter-spacing: 0.8px;
+          line-height: 1;
+        }
+
         .goalie-name {
-          font-size: 16px;
+          font-size: 14px;
           font-weight: 600;
           color: var(--color-dark);
+          line-height: 1.2;
         }
       }
 
@@ -154,11 +191,20 @@
           display: flex;
           align-items: center;
           justify-content: center;
-          cursor: help;
+          cursor: pointer;
           transition: transform 0.12s ease;
 
           &:hover {
             transform: translate(-50%, -50%) scale(1.05);
+          }
+
+          &.selected {
+            box-shadow:
+              0 0 0 3px rgba(255, 255, 255, 0.9),
+              0 0 0 5px var(--marker-color),
+              0 2px 8px rgba(0, 0, 0, 0.3);
+            transform: translate(-50%, -50%) scale(1.15);
+            z-index: 15;
           }
 
           .marker-dot {
@@ -223,34 +269,71 @@
       }
     }
   }
-}
 
-:host ::ng-deep .spray-chart-tooltip {
-  white-space: pre-line !important;
-  max-width: 260px;
-  line-height: 1.5;
-  text-align: left;
-}
+  .marker-popover {
+    position: fixed;
+    z-index: 1000;
+    transform: translateX(-50%);
+    min-width: 280px;
+    max-width: 340px;
+    background: var(--color-white, #fff);
+    border-radius: 10px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.18);
+    padding: 14px 18px;
+    font-size: 13px;
+    color: var(--color-dark);
+    pointer-events: auto;
 
-:host ::ng-deep .mat-mdc-tooltip .mdc-tooltip__surface {
-  white-space: pre-line !important;
-  max-width: 260px;
-  line-height: 1.5;
-  text-align: left;
-}
+    &.above {
+      transform: translate(-50%, -100%);
+    }
 
-::ng-deep .spray-chart-tooltip .mdc-tooltip__surface {
-  white-space: pre-line !important;
-  max-width: 260px !important;
-  line-height: 1.5 !important;
-  text-align: left !important;
-}
+    .popover-header {
+      font-weight: 700;
+      font-size: 15px;
+      margin-bottom: 8px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #e5e7eb;
+    }
 
-::ng-deep .cdk-overlay-container .mdc-tooltip__surface {
-  &.spray-chart-tooltip {
-    white-space: pre-line !important;
-    max-width: 260px !important;
-    line-height: 1.5 !important;
-    text-align: left !important;
+    .popover-body {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+
+      .popover-row {
+        font-size: 13px;
+        line-height: 1.5;
+      }
+    }
+
+    .popover-footer {
+      display: flex;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid #e5e7eb;
+
+      .popover-video-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: #ef4444;
+        font-weight: 700;
+        font-size: 14px;
+        cursor: pointer;
+        text-decoration: none;
+        letter-spacing: 0.5px;
+
+        &:hover {
+          text-decoration: underline;
+        }
+
+        mat-icon {
+          font-size: 20px;
+          width: 20px;
+          height: 20px;
+        }
+      }
+    }
   }
 }
