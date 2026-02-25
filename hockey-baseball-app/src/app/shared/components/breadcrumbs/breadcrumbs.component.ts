@@ -216,7 +216,7 @@ export class BreadcrumbsComponent implements OnInit {
     items: BreadcrumbItem[],
     url: string
   ): void {
-    const profilePath = `/teams-and-rosters/players/player-profile/${entityId}`;
+    const profilePath = `/teams-and-rosters/players/${entityId}/profile`;
 
     this.playerService.getPlayerById(entityId).subscribe({
       next: (player) => {
@@ -251,7 +251,7 @@ export class BreadcrumbsComponent implements OnInit {
     items: BreadcrumbItem[],
     url: string
   ): void {
-    const profilePath = `/teams-and-rosters/goalies/goalie-profile/${entityId}`;
+    const profilePath = `/teams-and-rosters/goalies/${entityId}/profile`;
 
     this.goalieService.getGoalieById(entityId).subscribe({
       next: (goalie) => {
@@ -330,25 +330,29 @@ export class BreadcrumbsComponent implements OnInit {
   }
 
   private handleProfileRoutes(segments: string[], items: BreadcrumbItem[], url: string): void {
-    const profileHandlers = [
-      { segment: 'goalie-profile', handler: () => this.handleGoalieProfile(segments, items, url) },
-      { segment: 'player-profile', handler: () => this.handlePlayerProfile(segments, items, url) },
-      { segment: 'team-profile', handler: () => this.handleTeamProfile(segments, items, url) },
-    ];
-
-    for (const { segment, handler } of profileHandlers) {
-      const index = segments.findIndex((seg) => seg === segment);
-      if (index !== -1 && index < segments.length - 1) {
-        handler();
-        return;
-      }
+    const profileIndex = segments.findIndex((seg) => seg === 'profile');
+    if (profileIndex < 2) {
+      this.breadcrumbs.set(items);
+      return;
     }
 
-    this.breadcrumbs.set(items);
+    const parentSegment = segments[profileIndex - 2];
+    const handlerMap: Record<string, () => void> = {
+      goalies: () => this.handleGoalieProfile(segments, items, url, profileIndex),
+      players: () => this.handlePlayerProfile(segments, items, url, profileIndex),
+      teams: () => this.handleTeamProfile(segments, items, url, profileIndex),
+    };
+
+    const handler = handlerMap[parentSegment];
+    if (handler) {
+      handler();
+    } else {
+      this.breadcrumbs.set(items);
+    }
   }
 
-  private handleGoalieProfile(segments: string[], items: BreadcrumbItem[], url: string): void {
-    const goalieId = segments[segments.findIndex((seg) => seg === 'goalie-profile') + 1];
+  private handleGoalieProfile(segments: string[], items: BreadcrumbItem[], url: string, profileIndex: number): void {
+    const goalieId = segments[profileIndex - 1];
     if (!goalieId) {
       this.breadcrumbs.set(items);
       return;
@@ -373,8 +377,8 @@ export class BreadcrumbsComponent implements OnInit {
     });
   }
 
-  private handlePlayerProfile(segments: string[], items: BreadcrumbItem[], url: string): void {
-    const playerId = segments[segments.findIndex((seg) => seg === 'player-profile') + 1];
+  private handlePlayerProfile(segments: string[], items: BreadcrumbItem[], url: string, profileIndex: number): void {
+    const playerId = segments[profileIndex - 1];
     if (!playerId) {
       this.breadcrumbs.set(items);
       return;
@@ -399,8 +403,8 @@ export class BreadcrumbsComponent implements OnInit {
     });
   }
 
-  private handleTeamProfile(segments: string[], items: BreadcrumbItem[], url: string): void {
-    const teamId = segments[segments.findIndex((seg) => seg === 'team-profile') + 1];
+  private handleTeamProfile(segments: string[], items: BreadcrumbItem[], url: string, profileIndex: number): void {
+    const teamId = segments[profileIndex - 1];
     if (!teamId) {
       this.breadcrumbs.set(items);
       return;

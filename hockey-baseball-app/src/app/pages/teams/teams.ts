@@ -182,10 +182,22 @@ import { LocalStorageService, StorageKey } from '../../services/local-storage.se
                 <!-- Action Buttons -->
                 <div class="team-card-actions">
                   <app-button-route
+                    [route]="'/teams-and-rosters/teams/' + team.id + '/schedules'"
+                    [bg]="'secondary'"
+                    [bghover]="'secondary_dark'"
+                    [color]="'white'"
+                    [colorhover]="'white'"
+                    [materialIcon]="'scoreboard'"
+                    [haveContent]="true"
+                    class="action-button"
+                  >
+                    Schedules
+                  </app-button-route>
+                  <app-button-route
                     [route]="'/teams-and-rosters/players'"
                     [queryParams]="getPlayersQueryParams(team)"
                     [bg]="'secondary'"
-                    [bghover]="'secondary_tone1'"
+                    [bghover]="'secondary_dark'"
                     [color]="'white'"
                     [colorhover]="'white'"
                     [materialIcon]="'people'"
@@ -198,19 +210,19 @@ import { LocalStorageService, StorageKey } from '../../services/local-storage.se
                     [route]="'/teams-and-rosters/goalies'"
                     [queryParams]="getGoaliesQueryParams(team)"
                     [bg]="'secondary'"
-                    [bghover]="'secondary_tone1'"
+                    [bghover]="'secondary_dark'"
                     [color]="'white'"
                     [colorhover]="'white'"
-                    [materialIcon]="'sports_hockey'"
+                    [materialIcon]="'shield'"
                     [haveContent]="true"
                     class="action-button"
                   >
                     Goalies
                   </app-button-route>
                   <app-button-route
-                    [route]="'/teams-and-rosters/teams/team-profile/' + team.id"
+                    [route]="'/teams-and-rosters/teams/' + team.id + '/profile'"
                     [bg]="'green'"
-                    [bghover]="'green'"
+                    [bghover]="'green_dark'"
                     [color]="'white'"
                     [colorhover]="'white'"
                     [materialIcon]="'visibility'"
@@ -221,7 +233,7 @@ import { LocalStorageService, StorageKey } from '../../services/local-storage.se
                   </app-button-route>
                   <app-button
                     [bg]="'orange'"
-                    [bghover]="'orange'"
+                    [bghover]="'orange_dark'"
                     [color]="'white'"
                     [colorhover]="'white'"
                     materialIcon="stylus"
@@ -296,8 +308,9 @@ export class TeamsComponent implements OnInit {
   ];
 
   tableActions: TableAction[] = [
+    { label: 'Schedules', action: 'schedules', variant: 'secondary', icon: 'scoreboard' },
     { label: 'Players', action: 'players', variant: 'secondary', icon: 'people' },
-    { label: 'Goalies', action: 'goalies', variant: 'secondary', icon: 'sports_hockey' },
+    { label: 'Goalies', action: 'goalies', variant: 'secondary', icon: 'shield' },
     { label: 'View', action: 'view-profile', variant: 'primary', icon: 'visibility' },
     { label: 'Edit', action: 'edit', variant: 'secondary', icon: 'stylus', roleVisibilityName: 'edit-action' },
     { label: 'Delete', action: 'delete', variant: 'danger', icon: 'delete', roleVisibilityName: 'delete-action' },
@@ -368,6 +381,9 @@ export class TeamsComponent implements OnInit {
         break;
       case 'goalies':
         this.viewTeamGoalies(item);
+        break;
+      case 'schedules':
+        this.viewTeamGames(item);
         break;
       default:
         console.log(`Unknown action: ${action}`);
@@ -442,7 +458,7 @@ export class TeamsComponent implements OnInit {
   }
 
   viewTeamProfile(team: Team): void {
-    this.router.navigate(['/teams-and-rosters/teams/team-profile', team.id]);
+    this.router.navigate(['/teams-and-rosters/teams', team.id, 'profile']);
   }
 
   viewTeamPlayers(team: Team): void {
@@ -475,6 +491,10 @@ export class TeamsComponent implements OnInit {
       teamId: team.id,
       teamName: team.name,
     };
+  }
+
+  viewTeamGames(team: Team): void {
+    this.router.navigate(['/teams-and-rosters/teams', team.id, 'schedules']);
   }
 
   openAddTeamModal(): void {

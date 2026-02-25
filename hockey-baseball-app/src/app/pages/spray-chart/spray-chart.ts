@@ -162,9 +162,9 @@ export class SprayChartComponent implements OnInit {
 
   viewProfile(): void {
     if (this.goalie) {
-      this.router.navigate(['/teams-and-rosters/goalies/goalie-profile', this.goalie.id]);
+      this.router.navigate(['/teams-and-rosters/goalies', this.goalie.id, 'profile']);
     } else if (this.player) {
-      this.router.navigate(['/teams-and-rosters/players/player-profile', this.player.id]);
+      this.router.navigate(['/teams-and-rosters/players', this.player.id, 'profile']);
     }
   }
 

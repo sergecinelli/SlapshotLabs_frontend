@@ -380,7 +380,7 @@
                 @for (action of actions; track action.action) {
                   @if (!action.condition || action.condition(element)) {
                     <app-button-small
-                      [materialIcon]="getActionIcon(action.action)"
+                      [materialIcon]="action.icon || getActionIcon(action.action)"
                       [bg]="'transparent'"
                       [bghover]="'transparent'"
                       [color]="getActionColor(action.variant, action.action)"

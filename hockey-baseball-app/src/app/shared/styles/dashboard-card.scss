@@ -1,10 +1,12 @@
+@use 'variables' as *;
+
 // Modern Material Design Dashboard Card - Common Styles
 // Use this mixin for consistent card styling across all pages
 // Business-focused Material Design without animations
 
 @mixin dashboard-card-base {
   background: var(--white);
-  border-radius: 8px;
+  border-radius: $card-border-radius;
   border: 1px solid var(--border-light);
   overflow: hidden;
   display: flex;

@@ -16,6 +16,7 @@ import { gamesheetPageRolesAccessMap } from './pages/gamesheet/gamesheet.role-ma
 import { playerProfilePageRolesAccessMap } from './pages/player-profile/player-profile.role-map';
 import { goalieProfilePageRolesAccessMap } from './pages/goalie-profile/goalie-profile.role-map';
 import { teamProfilePageRolesAccessMap } from './pages/team-profile/team-profile.role-map';
+import { schedulesPageRolesAccessMap } from './pages/schedules/schedules.role-map';
 
 export const routes: Routes = [
   // Authentication routes (lazy loaded)
@@ -131,7 +132,7 @@ export const routes: Routes = [
         },
       },
       {
-        path: 'teams-and-rosters/players/player-profile/:id',
+        path: 'teams-and-rosters/players/:id/profile',
         loadComponent: () =>
           import('./pages/player-profile/player-profile').then((m) => m.PlayerProfileComponent),
         canActivate: [RoleAccessGuard],
@@ -140,7 +141,7 @@ export const routes: Routes = [
         },
       },
       {
-        path: 'teams-and-rosters/goalies/goalie-profile/:id',
+        path: 'teams-and-rosters/goalies/:id/profile',
         loadComponent: () =>
           import('./pages/goalie-profile/goalie-profile').then((m) => m.GoalieProfileComponent),
         canActivate: [RoleAccessGuard],
@@ -149,7 +150,7 @@ export const routes: Routes = [
         },
       },
       {
-        path: 'teams-and-rosters/teams/team-profile/:id',
+        path: 'teams-and-rosters/teams/:id/profile',
         loadComponent: () =>
           import('./pages/team-profile/team-profile').then((m) => m.TeamProfileComponent),
         canActivate: [RoleAccessGuard],
@@ -166,6 +167,14 @@ export const routes: Routes = [
         path: 'teams-and-rosters/goalies/:id/spray-chart',
         loadComponent: () =>
           import('./pages/spray-chart/spray-chart').then((m) => m.SprayChartComponent),
+      },
+      {
+        path: 'teams-and-rosters/teams/:id/schedules',
+        loadComponent: () => import('./pages/schedules/schedules').then((m) => m.SchedulesComponent),
+        canActivate: [RoleAccessGuard],
+        data: {
+          pageRolesAccessMap: schedulesPageRolesAccessMap,
+        },
       },
 
       // Schedule routes

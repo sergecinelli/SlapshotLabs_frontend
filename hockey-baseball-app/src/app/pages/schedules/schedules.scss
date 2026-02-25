@@ -1,0 +1,292 @@
+@use '../../shared/styles/variables' as *;
+
+// Header
+.schedules-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 24px;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  > * {
+    flex: 1;
+  }
+}
+
+.schedules-header-left {
+  flex: 1;
+
+  h2 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+}
+
+.schedules-header-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+}
+
+// Loading and Empty States
+.schedules-loading,
+.schedules-empty {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 48px 24px;
+  min-height: 200px;
+}
+
+.loading-text,
+.empty-text {
+  color: var(--text-secondary);
+  font-size: 16px;
+  font-weight: 500;
+}
+
+// Cards Container
+.schedules-cards-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-auto-rows: auto;
+  gap: 20px;
+  margin-top: 20px;
+
+  @media (max-width: 1100px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// Table Container
+.schedules-table-container {
+  overflow-x: auto;
+  border-radius: $table-container-border-radius;
+  background: var(--white);
+  border: 1px solid var(--border-light);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  margin-top: 20px;
+}
+
+// Game Card
+.game-card {
+  background: var(--white);
+  border-radius: $card-border-radius;
+  border: 1px solid var(--border-light);
+  padding: 20px;
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.08),
+    0 1px 2px rgba(0, 0, 0, 0.06);
+  transition:
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+
+  &:hover {
+    box-shadow:
+      0 4px 6px rgba(0, 0, 0, 0.1),
+      0 2px 4px rgba(0, 0, 0, 0.08);
+  }
+}
+
+// Card Top: Status badge + Game type
+.game-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.game-type {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.game-status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+
+  &.status-upcoming {
+    background-color: #dbeafe;
+    color: #1d4ed8;
+  }
+
+  &.status-live {
+    background-color: #fee2e2;
+    color: #dc2626;
+  }
+
+  &.status-completed {
+    background-color: #dcfce7;
+    color: #16a34a;
+  }
+}
+
+// Matchup section: Team vs Team with score
+.game-matchup {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 12px 0;
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.game-team {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
+.team-logo {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.team-logo-placeholder {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  background-color: var(--gray-tone3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  mat-icon {
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+    color: var(--text-secondary);
+  }
+}
+
+.team-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+.team-label {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+// Score display between teams
+.game-score {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.score-display {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.score-value {
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--text-primary);
+  min-width: 32px;
+  text-align: center;
+
+  &.score-winner {
+    color: var(--primary);
+  }
+}
+
+.score-separator {
+  font-size: 20px;
+  font-weight: 300;
+  color: var(--text-secondary);
+}
+
+.score-vs {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+// Game details (date, time, location)
+.game-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+}
+
+.game-detail-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-secondary);
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    color: var(--text-secondary);
+  }
+}
+
+.game-detail-value {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .schedules-cards-container {
+    grid-template-columns: 1fr;
+  }
+
+  .game-matchup {
+    gap: 10px;
+  }
+
+  .team-logo,
+  .team-logo-placeholder {
+    width: 36px;
+    height: 36px;
+  }
+
+  .score-value {
+    font-size: 22px;
+  }
+
+  .team-name {
+    font-size: 12px;
+  }
+}

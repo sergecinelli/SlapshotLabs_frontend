@@ -6,7 +6,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ButtonComponent } from '../../shared/components/buttons/button/button.component';
 import { WeekPaginationComponent } from '../../shared/components/week-pagination/week-pagination';
-import { ScheduleService } from '../../services/schedule.service';
+import { ScheduleService, DashboardGame } from '../../services/schedule.service';
 import { TeamService } from '../../services/team.service';
 import { ArenaService } from '../../services/arena.service';
 import { GoalieService } from '../../services/goalie.service';
@@ -138,33 +138,7 @@ export class ScheduleComponent implements OnInit {
   gamePeriods: GamePeriodResponse[] = [];
 
   // Store raw game data for edit mode
-  rawGames = new Map<
-    string,
-    {
-      id: number;
-      home_team_id: number;
-      home_goals: number;
-      home_start_goalie_id: number | null;
-      home_start_goalie_name?: string;
-      away_team_id: number;
-      away_goals: number;
-      away_start_goalie_id: number | null;
-      away_start_goalie_name?: string;
-      game_type_id: number;
-      game_type?: string;
-      game_type_name?: string;
-      game_period_id: number | null;
-      game_period_name?: string;
-      tournament_name?: string;
-      status: number;
-      date: string;
-      time: string;
-      season_id: number | null;
-      arena_id: number | null;
-      rink_id: number | null;
-      analysis: string | null;
-    }
-  >();
+  rawGames = new Map<string, DashboardGame>();
 
 
   ngOnInit(): void {
@@ -582,11 +556,11 @@ export class ScheduleComponent implements OnInit {
   }
 
   goToTeamProfile(teamId: number): void {
-    this.router.navigate([`/teams-and-rosters/teams/team-profile/${teamId}`]);
+    this.router.navigate([`/teams-and-rosters/teams/${teamId}/profile`]);
   }
 
   goToGoalieProfile(goalieId: number): void {
-    this.router.navigate([`/teams-and-rosters/goalies/goalie-profile/${goalieId}`]);
+    this.router.navigate([`/teams-and-rosters/goalies/${goalieId}/profile`]);
   }
 
   editSchedule(schedule: Schedule): void {

@@ -183,7 +183,7 @@ export class BannerComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   goToTeamProfile(teamId: number): void {
-    this.router.navigate([`/teams-and-rosters/teams/team-profile/${teamId}`]);
+    this.router.navigate([`/teams-and-rosters/teams/${teamId}/profile`]);
   }
 
   onKeyUp(gameId: number): void {

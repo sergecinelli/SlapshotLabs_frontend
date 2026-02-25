@@ -222,7 +222,7 @@ import { LocalStorageService, StorageKey } from '../../services/local-storage.se
                   <app-button-route
                     [route]="'/teams-and-rosters/goalies/' + goalie.id + '/spray-chart'"
                     [bg]="'secondary'"
-                    [bghover]="'secondary_tone1'"
+                    [bghover]="'secondary_dark'"
                     [color]="'white'"
                     [colorhover]="'white'"
                     [materialIcon]="'scatter_plot'"
@@ -232,9 +232,9 @@ import { LocalStorageService, StorageKey } from '../../services/local-storage.se
                     Spray Chart
                   </app-button-route>
                   <app-button-route
-                    [route]="'/teams-and-rosters/goalies/goalie-profile/' + goalie.id"
+                    [route]="'/teams-and-rosters/goalies/' + goalie.id + '/profile'"
                     [bg]="'green'"
-                    [bghover]="'green'"
+                    [bghover]="'green_dark'"
                     [color]="'white'"
                     [colorhover]="'white'"
                     [materialIcon]="'visibility'"
@@ -245,7 +245,7 @@ import { LocalStorageService, StorageKey } from '../../services/local-storage.se
                   </app-button-route>
                   <app-button
                     [bg]="'orange'"
-                    [bghover]="'orange'"
+                    [bghover]="'orange_dark'"
                     [color]="'white'"
                     [colorhover]="'white'"
                     materialIcon="stylus"
@@ -546,11 +546,11 @@ export class GoaliesComponent implements OnInit {
   }
 
   viewGoalieProfile(goalie: Goalie): void {
-    this.router.navigate(['/teams-and-rosters/goalies/goalie-profile', goalie.id]);
+    this.router.navigate(['/teams-and-rosters/goalies', goalie.id, 'profile']);
   }
 
   goToTeamProfile(teamId: number): void {
-    this.router.navigate([`/teams-and-rosters/teams/team-profile/${teamId}`]);
+    this.router.navigate([`/teams-and-rosters/teams/${teamId}/profile`]);
   }
 
   viewShotSprayChart(goalie: Goalie): void {

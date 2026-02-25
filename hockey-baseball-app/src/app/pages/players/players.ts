@@ -219,7 +219,7 @@ import { LocalStorageService, StorageKey } from '../../services/local-storage.se
                     [route]="'/teams-and-rosters/players/' + player.id + '/spray-chart'"
                     [queryParams]="{ type: 'player' }"
                     [bg]="'secondary'"
-                    [bghover]="'secondary_tone1'"
+                    [bghover]="'secondary_dark'"
                     [color]="'white'"
                     [colorhover]="'white'"
                     [materialIcon]="'scatter_plot'"
@@ -229,9 +229,9 @@ import { LocalStorageService, StorageKey } from '../../services/local-storage.se
                     Spray Chart
                   </app-button-route>
                   <app-button-route
-                    [route]="'/teams-and-rosters/players/player-profile/' + player.id"
+                    [route]="'/teams-and-rosters/players/' + player.id + '/profile'"
                     [bg]="'green'"
-                    [bghover]="'green'"
+                    [bghover]="'green_dark'"
                     [color]="'white'"
                     [colorhover]="'white'"
                     [materialIcon]="'visibility'"
@@ -242,7 +242,7 @@ import { LocalStorageService, StorageKey } from '../../services/local-storage.se
                   </app-button-route>
                   <app-button
                     [bg]="'orange'"
-                    [bghover]="'orange'"
+                    [bghover]="'orange_dark'"
                     [color]="'white'"
                     [colorhover]="'white'"
                     materialIcon="stylus"
@@ -545,11 +545,11 @@ export class PlayersComponent implements OnInit {
   }
 
   viewPlayerProfile(player: Player): void {
-    this.router.navigate(['/teams-and-rosters/players/player-profile', player.id]);
+    this.router.navigate(['/teams-and-rosters/players', player.id, 'profile']);
   }
 
   goToTeamProfile(teamId: number): void {
-    this.router.navigate([`/teams-and-rosters/teams/team-profile/${teamId}`]);
+    this.router.navigate([`/teams-and-rosters/teams/${teamId}/profile`]);
   }
 
   viewShotSprayChart(player: Player): void {

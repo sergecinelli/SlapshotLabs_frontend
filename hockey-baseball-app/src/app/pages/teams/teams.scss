@@ -1,3 +1,5 @@
+@use '../../shared/styles/variables' as *;
+
 // Header with Add Button
 .teams-header {
   display: flex;
@@ -64,7 +66,7 @@
 // Table Container
 .teams-table-container {
   overflow-x: auto;
-  border-radius: 4px;
+  border-radius: $table-container-border-radius;
   background: var(--white);
   border: 1px solid var(--border-light);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
@@ -74,7 +76,7 @@
 // Team Card
 .team-card {
   background: var(--white);
-  border-radius: 4px;
+  border-radius: $card-border-radius;
   border: 1px solid var(--border-light);
   padding: 16px;
   width: 100%;

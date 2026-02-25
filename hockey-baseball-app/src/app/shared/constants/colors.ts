@@ -7,6 +7,7 @@ export type AppColor =
   // Secondary colors
   | 'secondary'
   | 'secondary_tone1'
+  | 'secondary_dark'
   | 'upcoming'
   // Banner status colors (semantic aliases)
   | 'live'
@@ -42,8 +43,10 @@ export type AppColor =
   | 'text_white'
   // Action colors
   | 'orange'
+  | 'orange_dark'
   | 'purple'
   | 'green'
+  | 'green_dark'
   | 'blue'
   | 'blue_dark'
   // Legacy CSS variable aliases (for backward compatibility)
@@ -66,6 +69,7 @@ export const appColors: IKeyValue<AppColor, string>[] = [
   // Secondary colors
   { key: 'secondary', value: '#778f9c' },
   { key: 'secondary_tone1', value: '#c6cddb' },
+  { key: 'secondary_dark', value: '#5f7a88' },
   { key: 'upcoming', value: '#22a9f2' },
   
   // Banner status colors (semantic aliases - same values as primary/gray)
@@ -110,8 +114,10 @@ export const appColors: IKeyValue<AppColor, string>[] = [
   
   // Action colors
   { key: 'orange', value: '#ff8509' },
+  { key: 'orange_dark', value: '#EB7A08' },
   { key: 'purple', value: '#9C27B0' },
   { key: 'green', value: '#10b981' },
+  { key: 'green_dark', value: '#0d9668' },
   { key: 'blue', value: '#3b82f6' },
   { key: 'blue_dark', value: '#2563eb' },
   
