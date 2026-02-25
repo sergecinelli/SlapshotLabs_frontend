@@ -17,6 +17,13 @@ import { playerProfilePageRolesAccessMap } from './pages/player-profile/player-p
 import { goalieProfilePageRolesAccessMap } from './pages/goalie-profile/goalie-profile.role-map';
 import { teamProfilePageRolesAccessMap } from './pages/team-profile/team-profile.role-map';
 import { schedulesPageRolesAccessMap } from './pages/schedules/schedules.role-map';
+import { BreadcrumbRouteData } from './shared/components/breadcrumbs/breadcrumbs.component';
+
+// Reusable breadcrumb fragments
+const TEAMS_AND_ROSTERS: BreadcrumbRouteData = { label: 'Teams & Rosters', path: '/teams-and-rosters', icon: 'groups' };
+const TEAMS: BreadcrumbRouteData = { label: 'Teams', path: '/teams-and-rosters/teams', icon: 'groups' };
+const PLAYERS: BreadcrumbRouteData = { label: 'Players', path: '/teams-and-rosters/players', icon: 'sports_hockey' };
+const GOALIES: BreadcrumbRouteData = { label: 'Goalies', path: '/teams-and-rosters/goalies', icon: 'shield' };
 
 export const routes: Routes = [
   // Authentication routes (lazy loaded)
@@ -56,6 +63,7 @@ export const routes: Routes = [
         canActivate: [RoleAccessGuard],
         data: {
           pageRolesAccessMap: dashboardPageRolesAccessMap,
+          breadcrumbs: [{ label: 'Dashboard', icon: 'dashboard' }],
         },
       },
 
@@ -65,6 +73,12 @@ export const routes: Routes = [
         path: 'account/profile',
         loadComponent: () =>
           import('./pages/account/profile/profile').then((m) => m.ProfileComponent),
+        data: {
+          breadcrumbs: [
+            { label: 'Account', path: '/account', icon: 'account_circle' },
+            { label: 'Profile', icon: 'person' },
+          ],
+        },
       },
       {
         path: 'account/payment-method',
@@ -72,6 +86,12 @@ export const routes: Routes = [
           import('./pages/account/payment-method/payment-method').then(
             (m) => m.PaymentMethodComponent
           ),
+        data: {
+          breadcrumbs: [
+            { label: 'Account', path: '/account', icon: 'account_circle' },
+            { label: 'Payment Method', icon: 'credit_card' },
+          ],
+        },
       },
       {
         path: 'account/payment-history',
@@ -79,6 +99,12 @@ export const routes: Routes = [
           import('./pages/account/payment-history/payment-history').then(
             (m) => m.PaymentHistoryComponent
           ),
+        data: {
+          breadcrumbs: [
+            { label: 'Account', path: '/account', icon: 'account_circle' },
+            { label: 'Payment History', icon: 'history' },
+          ],
+        },
       },
 
       // Teams & Rosters routes
@@ -89,6 +115,7 @@ export const routes: Routes = [
         canActivate: [RoleAccessGuard],
         data: {
           pageRolesAccessMap: teamsPageRolesAccessMap,
+          breadcrumbs: [TEAMS_AND_ROSTERS, { label: 'Teams', icon: 'groups' }],
         },
       },
       {
@@ -97,6 +124,7 @@ export const routes: Routes = [
         canActivate: [RoleAccessGuard],
         data: {
           pageRolesAccessMap: teamsPageRolesAccessMap,
+          breadcrumbs: [TEAMS_AND_ROSTERS, { label: 'Teams', icon: 'groups' }],
         },
       },
       {
@@ -105,6 +133,7 @@ export const routes: Routes = [
         canActivate: [RoleAccessGuard],
         data: {
           pageRolesAccessMap: playersPageRolesAccessMap,
+          breadcrumbs: [TEAMS_AND_ROSTERS, PLAYERS, { label: ':queryTeamName', icon: 'groups' }],
         },
       },
       {
@@ -113,6 +142,7 @@ export const routes: Routes = [
         canActivate: [RoleAccessGuard],
         data: {
           pageRolesAccessMap: playersPageRolesAccessMap,
+          breadcrumbs: [TEAMS_AND_ROSTERS, PLAYERS, { label: ':queryTeamName', icon: 'groups' }],
         },
       },
       {
@@ -121,6 +151,7 @@ export const routes: Routes = [
         canActivate: [RoleAccessGuard],
         data: {
           pageRolesAccessMap: goaliesPageRolesAccessMap,
+          breadcrumbs: [TEAMS_AND_ROSTERS, GOALIES, { label: ':queryTeamName', icon: 'groups' }],
         },
       },
       {
@@ -129,6 +160,7 @@ export const routes: Routes = [
         canActivate: [RoleAccessGuard],
         data: {
           pageRolesAccessMap: goaliesPageRolesAccessMap,
+          breadcrumbs: [TEAMS_AND_ROSTERS, GOALIES, { label: ':queryTeamName', icon: 'groups' }],
         },
       },
       {
@@ -138,6 +170,7 @@ export const routes: Routes = [
         canActivate: [RoleAccessGuard],
         data: {
           pageRolesAccessMap: playerProfilePageRolesAccessMap,
+          breadcrumbs: [TEAMS_AND_ROSTERS, PLAYERS, { label: ':entityName', icon: 'person' }],
         },
       },
       {
@@ -147,6 +180,7 @@ export const routes: Routes = [
         canActivate: [RoleAccessGuard],
         data: {
           pageRolesAccessMap: goalieProfilePageRolesAccessMap,
+          breadcrumbs: [TEAMS_AND_ROSTERS, GOALIES, { label: ':entityName', icon: 'person' }],
         },
       },
       {
@@ -156,17 +190,34 @@ export const routes: Routes = [
         canActivate: [RoleAccessGuard],
         data: {
           pageRolesAccessMap: teamProfilePageRolesAccessMap,
+          breadcrumbs: [TEAMS_AND_ROSTERS, TEAMS, { label: ':entityName', icon: 'groups' }],
         },
       },
       {
         path: 'teams-and-rosters/players/:id/spray-chart',
         loadComponent: () =>
           import('./pages/spray-chart/spray-chart').then((m) => m.SprayChartComponent),
+        data: {
+          breadcrumbs: [
+            TEAMS_AND_ROSTERS,
+            PLAYERS,
+            { label: ':entityName', path: '/teams-and-rosters/players/:id/profile', icon: 'person' },
+            { label: 'Spray Chart', icon: 'scatter_plot' },
+          ],
+        },
       },
       {
         path: 'teams-and-rosters/goalies/:id/spray-chart',
         loadComponent: () =>
           import('./pages/spray-chart/spray-chart').then((m) => m.SprayChartComponent),
+        data: {
+          breadcrumbs: [
+            TEAMS_AND_ROSTERS,
+            GOALIES,
+            { label: ':entityName', path: '/teams-and-rosters/goalies/:id/profile', icon: 'person' },
+            { label: 'Spray Chart', icon: 'scatter_plot' },
+          ],
+        },
       },
       {
         path: 'teams-and-rosters/teams/:id/schedule',
@@ -174,6 +225,12 @@ export const routes: Routes = [
         canActivate: [RoleAccessGuard],
         data: {
           pageRolesAccessMap: schedulesPageRolesAccessMap,
+          breadcrumbs: [
+            TEAMS_AND_ROSTERS,
+            TEAMS,
+            { label: ':entityName', path: '/teams-and-rosters/teams/:id/profile', icon: 'groups' },
+            { label: 'Schedule', icon: 'scoreboard' },
+          ],
         },
       },
 
@@ -184,6 +241,7 @@ export const routes: Routes = [
         canActivate: [RoleAccessGuard],
         data: {
           pageRolesAccessMap: schedulePageRolesAccessMap,
+          breadcrumbs: [{ label: 'Schedule', icon: 'event' }],
         },
       },
 
@@ -195,6 +253,7 @@ export const routes: Routes = [
         canActivate: [RoleAccessGuard],
         data: {
           pageRolesAccessMap: analyticsPageRolesAccessMap,
+          breadcrumbs: [{ label: 'Analytics', icon: 'analytics' }],
         },
       },
 
@@ -206,6 +265,7 @@ export const routes: Routes = [
         canActivate: [RoleAccessGuard],
         data: {
           pageRolesAccessMap: videoLibraryPageRolesAccessMap,
+          breadcrumbs: [{ label: 'Video Library', icon: 'video_library' }],
         },
       },
       {
@@ -217,6 +277,7 @@ export const routes: Routes = [
         canActivate: [RoleAccessGuard],
         data: {
           pageRolesAccessMap: videoHighlightsPageRolesAccessMap,
+          breadcrumbs: [{ label: 'Video Highlights', icon: 'movie' }],
         },
       },
 
@@ -228,6 +289,7 @@ export const routes: Routes = [
         canActivate: [RoleAccessGuard],
         data: {
           pageRolesAccessMap: gamesheetPageRolesAccessMap,
+          breadcrumbs: [{ label: 'GAMESHEET', icon: 'description' }],
         },
       },
 
@@ -239,6 +301,10 @@ export const routes: Routes = [
         canActivate: [RoleAccessGuard],
         data: {
           pageRolesAccessMap: liveDashboardPageRolesAccessMap,
+          breadcrumbs: [
+            { label: 'Schedule', path: '/schedule', icon: 'event' },
+            { label: ':entityName', isLive: true },
+          ],
         },
       },
     ],
