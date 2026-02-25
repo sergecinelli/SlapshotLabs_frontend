@@ -14,6 +14,7 @@ import { ButtonRouteComponent } from '../../shared/components/buttons/button-rou
 import { visibilityByRoleMap } from './teams.role-map';
 import { forkJoin } from 'rxjs';
 import { DataTableComponent, TableColumn, TableAction } from '../../shared/components/data-table/data-table';
+import { LocalStorageService, StorageKey } from '../../services/local-storage.service';
 
 @Component({
   selector: 'app-teams',
@@ -275,6 +276,7 @@ export class TeamsComponent implements OnInit {
   private dialog = inject(MatDialog);
   private teamOptionsService = inject(TeamOptionsService);
   private router = inject(Router);
+  private storage = inject(LocalStorageService);
 
   teams = signal<Team[]>([]);
   loading = signal(true);
@@ -303,7 +305,7 @@ export class TeamsComponent implements OnInit {
 
   ngOnInit(): void {
     // Initialize layout mode from local storage
-    const savedMode = localStorage.getItem('teamsLayoutMode');
+    const savedMode = this.storage.get(StorageKey.LayoutMode);
     if (savedMode === 'card' || savedMode === 'table') {
       this.layoutMode.set(savedMode);
     }
@@ -329,7 +331,7 @@ export class TeamsComponent implements OnInit {
   toggleLayout(): void {
     const newMode = this.layoutMode() === 'card' ? 'table' : 'card';
     this.layoutMode.set(newMode);
-    localStorage.setItem('teamsLayoutMode', newMode);
+    this.storage.set(StorageKey.LayoutMode, newMode);
   }
 
   private loadTeams(): void {

@@ -25,6 +25,7 @@ import {
   SprayChartTransformOptions,
   SprayChartUtilsService,
 } from '../../services/spray-chart-utils.service';
+import { StorageKey } from '../../services/local-storage.service';
 
 @Component({
   selector: 'app-goalie-profile',
@@ -42,6 +43,8 @@ import {
   styleUrl: './goalie-profile.scss',
 })
 export class GoalieProfileComponent implements OnInit {
+  protected StorageKey = StorageKey;
+
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private goalieService = inject(GoalieService);

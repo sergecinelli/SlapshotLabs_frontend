@@ -1,8 +1,9 @@
-import { Component, input, computed, ChangeDetectionStrategy, signal, effect } from '@angular/core';
+import { Component, input, computed, ChangeDetectionStrategy, signal, effect, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { environment } from '../../../../environments/environment';
+import { LocalStorageService, StorageKey } from '../../../services/local-storage.service';
 
 export interface ShotLocationData {
   iceTopOffset: number;
@@ -47,8 +48,10 @@ interface TypeStats {
   },
 })
 export class ShotLocationDisplayComponent {
+  private storage = inject(LocalStorageService);
+
   data = input.required<ShotLocationData[]>();
-  storageKey = input<string>('shotLocationFilters');
+  storageKey = input<StorageKey>(StorageKey.ShotLocationFilters);
   teamId = input<number>();
   teamName = input<string>();
   goalieId = input<number>();
@@ -76,7 +79,7 @@ export class ShotLocationDisplayComponent {
       if (this.isInitialized()) {
         const filters = Array.from(this.visibleTypes());
         const key = this.storageKey();
-        localStorage.setItem(key, JSON.stringify(filters));
+        this.storage.setJson(key, filters);
       }
     });
 
@@ -215,11 +218,10 @@ export class ShotLocationDisplayComponent {
     return lines.join('\n');
   }
 
-  private loadFiltersFromStorage(key: string): void {
+  private loadFiltersFromStorage(key: StorageKey): void {
     try {
-      const stored = localStorage.getItem(key);
-      if (stored) {
-        const filters = JSON.parse(stored) as ShotLocationData['type'][];
+      const filters = this.storage.getJson<ShotLocationData['type'][]>(key);
+      if (filters) {
         this.visibleTypes.set(new Set(filters));
       } else {
         // By default, show all types

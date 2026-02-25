@@ -29,6 +29,7 @@ import {
 import { ComponentVisibilityByRoleDirective } from '../../shared/directives/component-visibility-by-role.directive';
 import { ButtonComponent } from '../../shared/components/buttons/button/button.component';
 import { visibilityByRoleMap } from './player-profile.role-map';
+import { StorageKey } from '../../services/local-storage.service';
 
 @Component({
   selector: 'app-player-profile',
@@ -49,6 +50,7 @@ import { visibilityByRoleMap } from './player-profile.role-map';
 export class PlayerProfileComponent implements OnInit {
   // Role-based access map
   protected visibilityByRoleMap = visibilityByRoleMap;
+  protected StorageKey = StorageKey;
 
   private route = inject(ActivatedRoute);
   private router = inject(Router);

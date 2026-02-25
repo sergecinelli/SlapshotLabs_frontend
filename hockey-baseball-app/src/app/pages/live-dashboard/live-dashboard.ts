@@ -52,6 +52,7 @@ import { forkJoin, interval, Subscription } from 'rxjs';
 import { switchMap, startWith } from 'rxjs/operators';
 import { formatDateTimeFromGMT } from '../../shared/utils/time-converter.util';
 import { BannerService } from '../../services/banner.service';
+import { StorageKey } from '../../services/local-storage.service';
 
 interface TeamDisplay {
   name: string;
@@ -129,6 +130,7 @@ interface GameEvent {
 export class LiveDashboardComponent implements OnInit, OnDestroy {
   // Role-based access map
   protected visibilityByRoleMap = visibilityByRoleMap;
+  protected StorageKey = StorageKey;
 
   private dialog = inject(MatDialog);
   private route = inject(ActivatedRoute);

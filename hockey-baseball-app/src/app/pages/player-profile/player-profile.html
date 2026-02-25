@@ -176,7 +176,7 @@
       </div>
       <div class="dashboard-card-content">
         @if (getShotLocationData().length > 0) {
-        <app-shot-location-display [data]="getShotLocationData()" [storageKey]="'playerSprayChartFilters'"></app-shot-location-display>
+        <app-shot-location-display [data]="getShotLocationData()" [storageKey]="StorageKey.PlayerSprayChartFilters"></app-shot-location-display>
         } @else {
         <div class="dashboard-empty">No shot data available for this player in the current season.</div>
         }

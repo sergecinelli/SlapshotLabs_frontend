@@ -17,6 +17,7 @@ import { ButtonComponent } from '../../shared/components/buttons/button/button.c
 import { ButtonRouteComponent } from '../../shared/components/buttons/button-route/button-route.component';
 import { visibilityByRoleMap } from './players.role-map';
 import { DataTableComponent, TableColumn, TableAction } from '../../shared/components/data-table/data-table';
+import { LocalStorageService, StorageKey } from '../../services/local-storage.service';
 
 @Component({
   selector: 'app-players',
@@ -297,6 +298,7 @@ export class PlayersComponent implements OnInit {
   private dialog = inject(MatDialog);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private storage = inject(LocalStorageService);
 
   players = signal<Player[]>([]);
   teams: Team[] = [];
@@ -331,7 +333,7 @@ export class PlayersComponent implements OnInit {
 
   ngOnInit(): void {
     // Initialize layout mode from local storage
-    const savedMode = localStorage.getItem('playersLayoutMode');
+    const savedMode = this.storage.get(StorageKey.LayoutMode);
     if (savedMode === 'card' || savedMode === 'table') {
       this.layoutMode.set(savedMode);
     }
@@ -360,7 +362,7 @@ export class PlayersComponent implements OnInit {
   toggleLayout(): void {
     const newMode = this.layoutMode() === 'card' ? 'table' : 'card';
     this.layoutMode.set(newMode);
-    localStorage.setItem('playersLayoutMode', newMode);
+    this.storage.set(StorageKey.LayoutMode, newMode);
   }
 
   private loadPlayers(): void {

@@ -799,7 +799,7 @@
           @if (awaySprayChartData().length > 0) {
             <app-shot-location-display
               [data]="awaySprayChartData()"
-              [storageKey]="'liveDashboardAwaySprayChart'"
+              [storageKey]="StorageKey.LiveDashboardAwaySprayChart"
               [teamId]="homeTeamId"
               [teamName]="homeTeam().name"
               [goalieId]="homeStartGoalieId"
@@ -827,7 +827,7 @@
           @if (homeSprayChartData().length > 0) {
             <app-shot-location-display
               [data]="homeSprayChartData()"
-              [storageKey]="'liveDashboardHomeSprayChart'"
+              [storageKey]="StorageKey.LiveDashboardHomeSprayChart"
               [teamId]="awayTeamId"
               [teamName]="awayTeam().name"
               [goalieId]="awayStartGoalieId"

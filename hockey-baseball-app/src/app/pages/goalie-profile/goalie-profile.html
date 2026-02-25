@@ -159,7 +159,7 @@
         </div>
         <div class="dashboard-card-content">
           @if (getShotLocationData().length > 0) {
-          <app-shot-location-display [data]="getShotLocationData()" [storageKey]="'goalieSprayChartFilters'"></app-shot-location-display>
+          <app-shot-location-display [data]="getShotLocationData()" [storageKey]="StorageKey.GoalieSprayChartFilters"></app-shot-location-display>
           } @else {
           <div class="empty-state">
             <span class="material-symbols-rounded empty-icon">sports_hockey</span>
