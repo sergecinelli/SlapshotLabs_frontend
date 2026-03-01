@@ -1,20 +1,50 @@
-<a class="app-button" matRipple [matRippleColor]="rippleColor" [matTooltip]="tooltip ?? ''" [matTooltipShowDelay]="tooltipDelay"
-  [matTooltipPosition]="tooltipPos" [class.have-content]="haveContent" [class.dev]="dev" [class.rounded]="rounded" [class.fill]="width !== 'auto'"
-  [class.active]="isActive" [ngStyle]="styles" [routerLink]="route" [queryParams]="queryParams" [target]="target" (mousedown)="onMouseDown()" (mouseup)="onMouseUp()"
+@let materialIconValue = materialIcon();
+@let devValue = dev();
+@let tooltipValue = tooltip() ?? '';
+@let tooltipDelayValue = tooltipDelay();
+@let tooltipPosValue = tooltipPos();
+@let hasContentValue = hasContent();
+@let roundedValue = rounded();
+@let widthValue = width();
+@let isActiveValue = isActive();
+@let routeValue = route();
+@let queryParamsValue = queryParams();
+@let targetValue = target();
+
+<a class="app-button" matRipple [matRippleColor]="rippleColor" [matTooltip]="tooltipValue" [matTooltipShowDelay]="tooltipDelayValue"
+  [matTooltipPosition]="tooltipPosValue" [class.have-content]="hasContentValue" [class.dev]="devValue" [class.rounded]="roundedValue" [class.fill]="widthValue !== 'auto'"
+  [class.active]="isActiveValue" [ngStyle]="styles" [routerLink]="routeValue" [queryParams]="queryParamsValue" [target]="targetValue" (mousedown)="onMouseDown()" (mouseup)="onMouseUp()"
   (mouseenter)="onMouseEnter()" (mouseleave)="onMouseLeave()">
-  <div class="icon-box material" *ngIf="materialIcon">
-    <span class="icon" [class]="isMatSymbolClass ? materialSymbolClass : materialIconClass" [class.fill]="isMatIconFillCurrent">
-      {{ materialIcon }}
-    </span>
-    <span class="counter" *ngIf="counter > 0" [style.background]="getColor(counterBgColor)" [style.color]="getColor(counterColor)">
-      {{ counter }}
-    </span>
-    <span class="counter-icon" *ngIf="hasDot" [class]="materialSymbolClass" [style.color]="getColor(counterBgColor)">circle</span>
-  </div>
+  @if (materialIconValue) {
+    @let materialSymbolClassValue = materialSymbolClass();
+    @let materialIconClassValue = materialIconClass();
+    @let isMatSymbolClassValue = isMatSymbolClass();
+    @let counterBgColorValue = counterBgColor();
+    @let counterValue = counter();
+    @let counterColorValue = counterColor();
+    @let hasDotValue = hasDot();
+    <div class="icon-box material">
+      <span class="icon" [class]="isMatSymbolClassValue ? materialSymbolClassValue : materialIconClassValue" [class.fill]="isMatIconFillCurrent">
+        {{ materialIconValue }}
+      </span>
+      @if (counterValue > 0) {
+        <span class="counter" [style.background]="getColor(counterBgColorValue)" [style.color]="getColor(counterColorValue)">
+          {{ counterValue }}
+        </span>
+      }
+      @if (hasDotValue) {
+        <span class="counter-icon" [class]="materialSymbolClassValue" [style.color]="getColor(counterBgColorValue)">circle</span>
+      }
+    </div>
+  }
 
   <span class="text">
     <ng-content></ng-content>
   </span>
 
-  <span class="dev-text" [style.background]="getColor(color)" [style.color]="getColor(bg)" *ngIf="dev">DEMO</span>
+  @if (devValue) {
+    @let colorValue = color();
+    @let bgValue = bg();
+    <span class="dev-text" [style.background]="getColor(colorValue)" [style.color]="getColor(bgValue)">DEMO</span>
+  }
 </a>

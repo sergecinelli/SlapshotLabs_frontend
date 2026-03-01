@@ -1,0 +1,214 @@
+<div class="turnover-form-modal">
+  <h2 mat-dialog-title class="modal-title">
+    <span class="material-symbols-rounded title-icon">swap_horiz</span>
+    Turnover
+  </h2>
+
+  <mat-dialog-content class="modal-content">
+    <form [formGroup]="turnoverForm" class="turnover-form">
+      <!-- Turnover Information Section -->
+      <div class="form-section">
+        <div class="section-header">
+          <span class="section-title">Turnover Information</span>
+        </div>
+        <mat-divider class="section-divider"></mat-divider>
+
+        <div class="team-selection-container">
+          <div class="team-selection-label uppercase text-custom-secondary">
+            Team that turned the puck over
+          </div>
+          @if (isLoadingTeams) {
+            <div class="loading-message">Loading teams...</div>
+          }
+          @if (!isLoadingTeams) {
+            <div class="team-buttons">
+              @for (team of teamOptions; track team) {
+                <button
+                  type="button"
+                  class="team-button"
+                  [class.selected]="turnoverForm.get('team')?.value === team.value"
+                  (click)="selectTeam(team.value)"
+                  >
+                  <div class="team-avatar">
+                    @if (team.value) {
+                      <img
+                        [src]="getTeamLogoUrl(team.value)"
+                        [alt]="team.label"
+                        class="team-logo-img"
+                        />
+                    }
+                  </div>
+                  <div class="team-name">{{ team.label }}</div>
+                </button>
+              }
+            </div>
+          }
+          @if (turnoverForm.get('team')?.errors && turnoverForm.get('team')?.touched) {
+            <div
+              class="team-error"
+              >
+              {{ getErrorMessage('team') }}
+            </div>
+          }
+        </div>
+
+        <div class="player-selection-container">
+          <div class="player-selection-label uppercase text-custom-secondary">
+            Player that turned the puck over
+          </div>
+          @if (isLoadingPlayers) {
+            <div class="loading-message">Loading players...</div>
+          }
+          @if (!isLoadingPlayers) {
+            <div class="player-buttons">
+              @for (player of playerOptions; track player) {
+                <button
+                  type="button"
+                  class="player-button"
+                  [class.selected]="turnoverForm.get('player')?.value === player.value"
+                  (click)="selectPlayer(player.value)"
+                  >
+                  <div class="player-name">{{ player.label }}</div>
+                </button>
+              }
+            </div>
+          }
+          @if (turnoverForm.get('player')?.errors && turnoverForm.get('player')?.touched) {
+            <div
+              class="player-error"
+              >
+              {{ getErrorMessage('player') }}
+            </div>
+          }
+        </div>
+
+        <div class="period-selection-container">
+          <div class="period-selection-label uppercase text-custom-secondary">Period</div>
+          @if (isLoadingPeriods) {
+            <div class="loading-message">Loading periods...</div>
+          }
+          @if (!isLoadingPeriods) {
+            <div class="period-buttons">
+              @for (period of periodOptions; track period) {
+                <button
+                  type="button"
+                  class="period-button"
+                  [class.selected]="turnoverForm.get('period')?.value === period.value"
+                  (click)="selectPeriod(period.value)"
+                  >
+                  <div class="period-name">{{ period.label }}</div>
+                </button>
+              }
+            </div>
+          }
+          @if (turnoverForm.get('period')?.errors && turnoverForm.get('period')?.touched) {
+            <div
+              class="period-error"
+              >
+              {{ getErrorMessage('period') }}
+            </div>
+          }
+        </div>
+
+        <div class="form-row">
+          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+            <mat-label class="uppercase text-custom-secondary">Time</mat-label>
+            <input matInput formControlName="time" placeholder="mm:ss" maxlength="6" />
+            @if (turnoverForm.get('time')?.errors && turnoverForm.get('time')?.touched) {
+              <mat-error
+                >
+                {{ getErrorMessage('time') }}
+              </mat-error>
+            }
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- YouTube Link Section -->
+      <div class="form-section">
+        <div class="section-header">
+          <span class="section-title">Add YouTube Link</span>
+        </div>
+        <mat-divider class="section-divider"></mat-divider>
+
+        <div class="form-row">
+          <mat-form-field
+            [floatLabel]="'always'"
+            [hideRequiredMarker]="true"
+            class="form-field full-width"
+            >
+            <mat-label class="uppercase text-custom-secondary">YouTube Link</mat-label>
+            <input matInput formControlName="youtubeLink" placeholder="YouTube link" />
+            @if (
+              turnoverForm.get('youtubeLink')?.errors && turnoverForm.get('youtubeLink')?.touched
+              ) {
+              <mat-error
+                >
+                {{ getErrorMessage('youtubeLink') }}
+              </mat-error>
+            }
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Set Location Section -->
+      <div class="form-section">
+        <app-location-selector
+          formControlName="location"
+          [team1]="selectedTeamData"
+          [team2]="otherTeamData"
+          [initialLocation]="puckLocation"
+          (locationChange)="onLocationChange($event)"
+          >
+        </app-location-selector>
+
+        @if (
+          turnoverForm.get('location')?.errors?.['required'] &&
+          turnoverForm.get('location')?.touched
+          ) {
+          <div
+            class="location-error"
+            >
+            Please click on the rink to set the turnover location
+          </div>
+        }
+      </div>
+    </form>
+  </mat-dialog-content>
+
+  <mat-dialog-actions class="modal-actions">
+    <app-button
+      [bg]="'transparent'"
+      [bghover]="'button_background'"
+      [br]="'border'"
+      [color]="'text_primary'"
+      [colorhover]="'text_primary'"
+      [opacity]="1"
+      [opacityhover]="1"
+      [width]="'auto'"
+      [rounded]="false"
+      [haveContent]="true"
+      [isDisabled]="isSubmitting"
+      (clicked)="onCancel()"
+      >
+      Cancel
+    </app-button>
+    <app-button-loading
+      [isLoading]="isSubmitting"
+      [isDisabled]="turnoverForm.invalid || isSubmitting"
+      materialIcon="save"
+      [bg]="'primary'"
+      [bghover]="'primary_dark'"
+      [color]="'white'"
+      [colorhover]="'white'"
+      [opacity]="1"
+      [opacityhover]="1"
+      [width]="'auto'"
+      [rounded]="false"
+      [haveContent]="true"
+      (clicked)="onSubmit()"
+      >
+      {{ isEditMode ? 'Save Turnover' : 'Add Turnover' }}
+    </app-button-loading>
+  </mat-dialog-actions>
+</div>

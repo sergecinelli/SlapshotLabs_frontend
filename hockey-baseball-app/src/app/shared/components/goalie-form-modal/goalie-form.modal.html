@@ -1,0 +1,344 @@
+<div class="goalie-form-modal">
+  <h2 mat-dialog-title class="modal-title">
+    <span class="material-symbols-rounded title-icon">sports_hockey</span>
+    {{ isEditMode ? 'Edit Goalie' : 'Add Goalie' }}
+  </h2>
+
+  <mat-dialog-content class="modal-content">
+    @if (isLoading) {
+      <div class="loading-container">
+        <p>Loading form data...</p>
+      </div>
+    }
+    @if (!isLoading) {
+      <form [formGroup]="goalieForm" class="goalie-form">
+        <!-- Team Information Section -->
+        <div class="form-section">
+          <div class="section-header">
+            <span class="section-title">Team Information</span>
+          </div>
+          <mat-divider class="section-divider"></mat-divider>
+          <div class="form-row">
+            <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+              <mat-label class="uppercase text-custom-secondary">Team</mat-label>
+              <mat-select formControlName="team">
+                @for (team of teamOptions; track team) {
+                  <mat-option [value]="team.value">
+                    {{ team.label }}
+                  </mat-option>
+                }
+              </mat-select>
+              @if (goalieForm.get('team')?.errors && goalieForm.get('team')?.touched) {
+                <mat-error>
+                  {{ getErrorMessage('team') }}
+                </mat-error>
+              }
+            </mat-form-field>
+            <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+              <mat-label class="uppercase text-custom-secondary">Birth Year:</mat-label>
+              <input
+                matInput
+                type="number"
+                formControlName="birthYear"
+                placeholder="Enter birth year"
+                />
+                @if (goalieForm.get('birthYear')?.errors && goalieForm.get('birthYear')?.touched) {
+                  <mat-error
+                    >
+                    {{ getErrorMessage('birthYear') }}
+                  </mat-error>
+                }
+              </mat-form-field>
+            </div>
+          </div>
+          <!-- Personal Information Section -->
+          <div class="form-section">
+            <div class="section-header">
+              <span class="section-title">Personal Information</span>
+            </div>
+            <mat-divider class="section-divider"></mat-divider>
+            <div class="form-row">
+              <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+                <mat-label class="uppercase text-custom-secondary">Number:</mat-label>
+                <input
+                  matInput
+                  type="number"
+                  formControlName="jerseyNumber"
+                  placeholder="Enter jersey number"
+                  />
+                  @if (
+                    goalieForm.get('jerseyNumber')?.errors && goalieForm.get('jerseyNumber')?.touched
+                    ) {
+                    <mat-error
+                      >
+                      {{ getErrorMessage('jerseyNumber') }}
+                    </mat-error>
+                  }
+                </mat-form-field>
+                <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+                  <mat-label class="uppercase text-custom-secondary">First Name</mat-label>
+                  <input matInput formControlName="firstName" placeholder="Enter first name" />
+                  @if (goalieForm.get('firstName')?.errors && goalieForm.get('firstName')?.touched) {
+                    <mat-error
+                      >
+                      {{ getErrorMessage('firstName') }}
+                    </mat-error>
+                  }
+                </mat-form-field>
+                <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+                  <mat-label class="uppercase text-custom-secondary">Last Name:</mat-label>
+                  <input matInput formControlName="lastName" placeholder="Enter last name" />
+                  @if (goalieForm.get('lastName')?.errors && goalieForm.get('lastName')?.touched) {
+                    <mat-error
+                      >
+                      {{ getErrorMessage('lastName') }}
+                    </mat-error>
+                  }
+                </mat-form-field>
+              </div>
+            </div>
+            <!-- Physical Information Section -->
+            <div class="form-section">
+              <div class="section-header">
+                <span class="section-title">Physical Information</span>
+              </div>
+              <mat-divider class="section-divider"></mat-divider>
+              <div class="form-row">
+                <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+                  <mat-label class="uppercase text-custom-secondary">Height</mat-label>
+                  <input matInput formControlName="height" placeholder="e.g., 6'2&quot;" />
+                  @if (goalieForm.get('height')?.errors && goalieForm.get('height')?.touched) {
+                    <mat-error
+                      >
+                      {{ getErrorMessage('height') }}
+                    </mat-error>
+                  }
+                </mat-form-field>
+                <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+                  <mat-label class="uppercase text-custom-secondary">Weight</mat-label>
+                  <input
+                    matInput
+                    type="number"
+                    formControlName="weight"
+                    placeholder="Enter weight in lbs"
+                    />
+                    @if (goalieForm.get('weight')?.errors && goalieForm.get('weight')?.touched) {
+                      <mat-error
+                        >
+                        {{ getErrorMessage('weight') }}
+                      </mat-error>
+                    }
+                  </mat-form-field>
+                  <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+                    <mat-label class="uppercase text-custom-secondary">Birthplace:</mat-label>
+                    <input matInput formControlName="birthplace" placeholder="Country Born In" />
+                    @if (goalieForm.get('birthplace')?.errors && goalieForm.get('birthplace')?.touched) {
+                      <mat-error
+                        >
+                        {{ getErrorMessage('birthplace') }}
+                      </mat-error>
+                    }
+                  </mat-form-field>
+                </div>
+                <div class="form-row">
+                  <!-- Shoots Radio Buttons -->
+                  <div class="shoots-selection-container">
+                    <span class="shoots-selection-label uppercase text-custom-secondary">Shoots (R/L)</span>
+                    <div class="shoots-buttons">
+                      @for (option of shootsOptions; track option) {
+                        <div
+                          class="shoots-button"
+                          [class.selected]="goalieForm.get('shoots')?.value === option.value"
+                          (click)="goalieForm.patchValue({ shoots: option.value })"
+                          (keydown.enter)="goalieForm.patchValue({ shoots: option.value })"
+                          (keydown.space)="goalieForm.patchValue({ shoots: option.value })"
+                          tabindex="0"
+                          role="button"
+                          [attr.aria-pressed]="goalieForm.get('shoots')?.value === option.value"
+                          >
+                          <span class="shoots-name">{{ option.label }}</span>
+                        </div>
+                      }
+                    </div>
+                    @if (goalieForm.get('shoots')?.errors && goalieForm.get('shoots')?.touched) {
+                      <div
+                        class="shoots-error"
+                        >
+                        {{ getErrorMessage('shoots') }}
+                      </div>
+                    }
+                  </div>
+                </div>
+              </div>
+              <!-- Address Section -->
+              <div class="form-section">
+                <div class="section-header">
+                  <span class="section-title">Address</span>
+                </div>
+                <mat-divider class="section-divider"></mat-divider>
+                <div class="form-row">
+                  <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+                    <mat-label class="uppercase text-custom-secondary">Country</mat-label>
+                    <input matInput formControlName="addressCountry" placeholder="Enter country" />
+                    @if (
+                      goalieForm.get('addressCountry')?.errors &&
+                      goalieForm.get('addressCountry')?.touched
+                      ) {
+                      <mat-error
+                        >
+                        {{ getErrorMessage('addressCountry') }}
+                      </mat-error>
+                    }
+                  </mat-form-field>
+                  <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+                    <mat-label class="uppercase text-custom-secondary">State/Province</mat-label>
+                    <input matInput formControlName="addressRegion" placeholder="Enter state or province" />
+                    @if (
+                      goalieForm.get('addressRegion')?.errors && goalieForm.get('addressRegion')?.touched
+                      ) {
+                      <mat-error
+                        >
+                        {{ getErrorMessage('addressRegion') }}
+                      </mat-error>
+                    }
+                  </mat-form-field>
+                  <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+                    <mat-label class="uppercase text-custom-secondary">City</mat-label>
+                    <input matInput formControlName="addressCity" placeholder="Enter city" />
+                    @if (
+                      goalieForm.get('addressCity')?.errors && goalieForm.get('addressCity')?.touched
+                      ) {
+                      <mat-error
+                        >
+                        {{ getErrorMessage('addressCity') }}
+                      </mat-error>
+                    }
+                  </mat-form-field>
+                </div>
+                <div class="form-row">
+                  <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+                    <mat-label class="uppercase text-custom-secondary">Street Address</mat-label>
+                    <input matInput formControlName="addressStreet" placeholder="Enter street address" />
+                    @if (
+                      goalieForm.get('addressStreet')?.errors && goalieForm.get('addressStreet')?.touched
+                      ) {
+                      <mat-error
+                        >
+                        {{ getErrorMessage('addressStreet') }}
+                      </mat-error>
+                    }
+                  </mat-form-field>
+                  <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+                    <mat-label class="uppercase text-custom-secondary">Postal Code</mat-label>
+                    <input matInput formControlName="addressPostalCode" placeholder="Enter postal code" />
+                    @if (
+                      goalieForm.get('addressPostalCode')?.errors &&
+                      goalieForm.get('addressPostalCode')?.touched
+                      ) {
+                      <mat-error
+                        >
+                        {{ getErrorMessage('addressPostalCode') }}
+                      </mat-error>
+                    }
+                  </mat-form-field>
+                </div>
+              </div>
+              <!-- Player Biography Section -->
+              <div class="form-section">
+                <div class="section-header">
+                  <span class="section-title">Player Biography</span>
+                </div>
+                <mat-divider class="section-divider"></mat-divider>
+                <div class="form-row">
+                  <mat-form-field
+                    [floatLabel]="'always'"
+                    [hideRequiredMarker]="true"
+                    class="form-field full-width"
+                    >
+                    <mat-label class="uppercase text-custom-secondary">Player Biography</mat-label>
+                    <textarea
+                      matInput
+                      formControlName="playerBiography"
+                      rows="4"
+                      placeholder="Enter player biography and background information"
+                    ></textarea>
+                    @if (
+                      goalieForm.get('playerBiography')?.errors &&
+                      goalieForm.get('playerBiography')?.touched
+                      ) {
+                      <mat-error
+                        >
+                        {{ getErrorMessage('playerBiography') }}
+                      </mat-error>
+                    }
+                  </mat-form-field>
+                </div>
+              </div>
+              <!-- Analysis Section -->
+              <div class="form-section">
+                <div class="section-header">
+                  <span class="section-title">Analysis</span>
+                </div>
+                <mat-divider class="section-divider"></mat-divider>
+                <div class="form-row">
+                  <mat-form-field
+                    [floatLabel]="'always'"
+                    [hideRequiredMarker]="true"
+                    class="form-field full-width"
+                    >
+                    <mat-label class="uppercase text-custom-secondary">Analysis</mat-label>
+                    <textarea
+                      matInput
+                      formControlName="analysis"
+                      rows="3"
+                      placeholder="Enter analysis (optional)"
+                    ></textarea>
+                    @if (goalieForm.get('analysis')?.errors && goalieForm.get('analysis')?.touched) {
+                      <mat-error
+                        >
+                        {{ getErrorMessage('analysis') }}
+                      </mat-error>
+                    }
+                  </mat-form-field>
+                </div>
+              </div>
+            </form>
+          }
+        </mat-dialog-content>
+
+        <mat-dialog-actions class="modal-actions">
+          <app-button
+            [bg]="'transparent'"
+            [bghover]="'button_background'"
+            [br]="'border'"
+            [color]="'text_primary'"
+            [colorhover]="'text_primary'"
+            [opacity]="1"
+            [opacityhover]="1"
+            [width]="'auto'"
+            [rounded]="false"
+            [haveContent]="true"
+            [isDisabled]="isLoading"
+            (clicked)="onCancel()"
+            >
+            Cancel
+          </app-button>
+          <app-button-loading
+            [isLoading]="isLoading"
+            [isDisabled]="goalieForm.invalid"
+            materialIcon="save"
+            [bg]="isEditMode ? 'orange' : 'green'"
+            [bghover]="isEditMode ? 'orange' : 'green'"
+            [color]="'white'"
+            [colorhover]="'white'"
+            [opacity]="1"
+            [opacityhover]="1"
+            [width]="'auto'"
+            [rounded]="false"
+            [haveContent]="true"
+            (clicked)="onSubmit()"
+            >
+            {{ isEditMode ? 'Update Goalie' : 'Add Goalie' }}
+          </app-button-loading>
+        </mat-dialog-actions>
+      </div>

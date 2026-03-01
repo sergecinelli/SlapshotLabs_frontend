@@ -1,0 +1,31 @@
+@let rowsValue = rows();
+@let loadingValue = loading();
+
+<div class="page-content" [appVisibilityMap]="visibilityByRoleMap">
+
+  <!-- Create Highlight Reel Button -->
+  <div class="mb-4 flex justify-end">
+    <app-button
+      [bg]="'primary'"
+      [bghover]="'primary_dark'"
+      [color]="'white'"
+      [colorhover]="'white'"
+      [materialIcon]="'add'"
+      [haveContent]="true"
+      (clicked)="openCreateHighlightModal()"
+      role-visibility-name="create-highlight-button"
+    >
+      Create New Highlight Reel
+    </app-button>
+  </div>
+
+  <app-data-table
+    [columns]="tableColumns"
+    [data]="rowsValue"
+    [actions]="tableActions"
+    [loading]="loadingValue"
+    (actionClick)="onActionClick($event)"
+    (sort)="onSort($event)"
+    emptyMessage="No highlight reels found."
+  ></app-data-table>
+</div>

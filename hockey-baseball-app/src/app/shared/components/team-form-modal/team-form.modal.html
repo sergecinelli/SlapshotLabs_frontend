@@ -1,0 +1,220 @@
+<div class="team-form-modal">
+  <h2 mat-dialog-title class="modal-title">
+    <span class="material-symbols-rounded title-icon">groups</span>
+    {{ isEditMode ? 'Edit Team' : 'Add New Team' }}
+  </h2>
+
+  <mat-dialog-content class="modal-content">
+    @if (isLoading) {
+      <div class="loading-container">
+        <mat-spinner diameter="40"></mat-spinner>
+        <p>Loading options...</p>
+      </div>
+    }
+
+    @if (!isLoading) {
+      <form [formGroup]="teamForm" class="team-form">
+        <!-- Team Information -->
+        <div class="form-section">
+          <div class="section-header">
+            <span class="section-title">Team Information</span>
+          </div>
+          <mat-divider class="section-divider"></mat-divider>
+          <div class="form-row">
+            <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="false" class="form-field">
+              <mat-label class="uppercase text-custom-secondary">Team Name</mat-label>
+              <input matInput formControlName="name" placeholder="Enter team name" />
+              @if (teamForm.get('name')?.errors && teamForm.get('name')?.touched) {
+                <mat-error>
+                  {{ getErrorMessage('name') }}
+                </mat-error>
+              }
+            </mat-form-field>
+            <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="false" class="form-field">
+              <mat-label class="uppercase text-custom-secondary">Group</mat-label>
+              <input
+                matInput
+                formControlName="group"
+                placeholder="Enter or select group"
+                [matAutocomplete]="groupAuto"
+                />
+                <mat-autocomplete #groupAuto="matAutocomplete" [displayWith]="displayGroupFn">
+                  @for (option of filteredGroupOptions | async; track option) {
+                    <mat-option [value]="option.value">
+                      {{ option.label }}
+                    </mat-option>
+                  }
+                  <!-- Allow custom input - if user types something not in the list, it will be saved as-is -->
+                </mat-autocomplete>
+                @if (teamForm.get('group')?.errors && teamForm.get('group')?.touched) {
+                  <mat-error>
+                    {{ getErrorMessage('group') }}
+                  </mat-error>
+                }
+              </mat-form-field>
+            </div>
+            <div class="form-row">
+              <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="false" class="form-field">
+                <mat-label class="uppercase text-custom-secondary">Level</mat-label>
+                <mat-select formControlName="level">
+                  @for (option of levelOptions; track option) {
+                    <mat-option [value]="option.value">
+                      {{ option.label }}
+                    </mat-option>
+                  }
+                </mat-select>
+                @if (teamForm.get('level')?.errors && teamForm.get('level')?.touched) {
+                  <mat-error>
+                    {{ getErrorMessage('level') }}
+                  </mat-error>
+                }
+              </mat-form-field>
+              <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="false" class="form-field">
+                <mat-label class="uppercase text-custom-secondary">Division</mat-label>
+                <mat-select formControlName="division">
+                  @for (option of divisionOptions; track option) {
+                    <mat-option [value]="option.value">
+                      {{ option.label }}
+                    </mat-option>
+                  }
+                </mat-select>
+                @if (teamForm.get('division')?.errors && teamForm.get('division')?.touched) {
+                  <mat-error
+                    >
+                    {{ getErrorMessage('division') }}
+                  </mat-error>
+                }
+              </mat-form-field>
+            </div>
+            <div class="form-row">
+              <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+                <mat-label class="uppercase text-custom-secondary">City</mat-label>
+                <input matInput formControlName="city" placeholder="Enter city" />
+                @if (teamForm.get('city')?.errors && teamForm.get('city')?.touched) {
+                  <mat-error>
+                    {{ getErrorMessage('city') }}
+                  </mat-error>
+                }
+              </mat-form-field>
+              <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+                <mat-label class="uppercase text-custom-secondary">Abbreviation</mat-label>
+                <input matInput formControlName="abbreviation" placeholder="Enter abbreviation" />
+                @if (teamForm.get('abbreviation')?.errors && teamForm.get('abbreviation')?.touched) {
+                  <mat-error
+                    >
+                    {{ getErrorMessage('abbreviation') }}
+                  </mat-error>
+                }
+              </mat-form-field>
+            </div>
+            <div class="form-row">
+              <div class="form-field logo-picker-container">
+                <div class="uppercase text-custom-secondary logo-label">Team Logo</div>
+                <!-- Hidden file input -->
+                <input
+                  type="file"
+                  accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+                  (change)="onFileSelected($event)"
+                  style="display: none"
+                  #fileInput
+                  />
+                  <!-- Image preview or upload button -->
+                  <div
+                    class="logo-preview-area"
+                    (dragover)="onDragOver($event)"
+                    (dragleave)="onDragLeave($event)"
+                    (drop)="onDrop($event)"
+                    [class.dragging]="isDragging"
+                    >
+                    <!-- Upload placeholder -->
+                    @if (!imagePreview) {
+                      <button
+                        type="button"
+                        class="upload-placeholder"
+                        (click)="triggerFileInput()"
+                        >
+                        <span class="material-symbols-rounded upload-icon">cloud_upload</span>
+                        <span class="upload-text">{{
+                          isDragging ? 'Drop image here' : 'Click or drag to upload logo'
+                        }}</span>
+                        <span class="upload-hint">JPEG, PNG, GIF, WebP (max 5MB)</span>
+                      </button>
+                    }
+                    <!-- Image preview -->
+                    @if (imagePreview) {
+                      <div class="image-preview" [class.loading]="isImageLoading">
+                        <img
+                          [src]="imagePreview"
+                          alt="Team logo preview"
+                          class="preview-image"
+                          [style.opacity]="isImageLoading ? '0' : '1'"
+                          (load)="onImageLoad()"
+                          (error)="onImageError()"
+                          />
+                          @if (isImageLoading) {
+                            <div class="image-loading-overlay">
+                              <mat-spinner diameter="40"></mat-spinner>
+                            </div>
+                          }
+                          @if (!isImageLoading) {
+                            <button
+                              mat-icon-button
+                              class="remove-image-btn"
+                              (click)="removeImage()"
+                              type="button"
+                              >
+                              <span class="material-symbols-rounded">close</span>
+                            </button>
+                          }
+                        </div>
+                      }
+                    </div>
+                    <!-- Error message -->
+                    @if (imageError) {
+                      <div class="image-error">
+                        <span class="material-symbols-rounded error-icon">error</span>
+                        <span>{{ imageError }}</span>
+                      </div>
+                    }
+                  </div>
+                </div>
+              </div>
+            </form>
+          }
+        </mat-dialog-content>
+
+        <mat-dialog-actions class="modal-actions">
+          <app-button
+            [bg]="'transparent'"
+            [bghover]="'button_background'"
+            [br]="'border'"
+            [color]="'text_primary'"
+            [colorhover]="'text_primary'"
+            [opacity]="1"
+            [opacityhover]="1"
+            [width]="'auto'"
+            [rounded]="false"
+            [haveContent]="true"
+            (clicked)="onCancel()"
+            >
+            Cancel
+          </app-button>
+          <app-button-loading
+            [isLoading]="isLoading"
+            [isDisabled]="teamForm.invalid"
+            materialIcon="save"
+            [bg]="isEditMode ? 'orange' : 'green'"
+            [bghover]="isEditMode ? 'orange' : 'green'"
+            [color]="'white'"
+            [colorhover]="'white'"
+            [opacity]="1"
+            [opacityhover]="1"
+            [width]="'auto'"
+            [rounded]="false"
+            [haveContent]="true"
+            (clicked)="onSubmit()"
+            >
+            {{ isEditMode ? 'Update Team' : 'Add Team' }}
+          </app-button-loading>
+        </mat-dialog-actions>
+      </div>

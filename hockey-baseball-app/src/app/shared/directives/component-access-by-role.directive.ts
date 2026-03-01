@@ -1,4 +1,4 @@
-import { Directive, ElementRef, Input, AfterViewChecked, inject } from '@angular/core';
+import { Directive, ElementRef, AfterViewChecked, inject, input } from '@angular/core';
 import { Role } from '../../services/roles/role.interface';
 import { RoleService } from '../../services/roles/role.service';
 import { AuthService } from '../../services/auth.service';
@@ -8,25 +8,12 @@ export interface IAccessByRoleMap {
   disable?: Record<string, Role[]>;
 }
 
-/**
- * Directive for disable or enable an element based on the user's role.
- *
- * @example
- * ```html
- * <div [appAccessMap]="accessByRoleMap">
- *  <custom-component role-access-name="media-team-admin">This block will be disable or enable for media-team-admin role.</custom-component>
- * </div>
- * ```
- *
- * @param {IAccessByRoleMap} accessMap - The map with roles which the block will be disable or enable.
- */
 @Directive({
   selector: '[appAccessMap]',
-  standalone: true,
 })
 export class ComponentAccessByRoleDirective implements AfterViewChecked {
-  @Input() appAccessMap!: IAccessByRoleMap;
-  @Input() opacity = 0.7;
+  appAccessMap = input.required<IAccessByRoleMap>();
+  opacity = input(0.7);
 
   private elementRef = inject(ElementRef);
   private roleService = inject(RoleService);
@@ -37,11 +24,11 @@ export class ComponentAccessByRoleDirective implements AfterViewChecked {
   }
 
   init() {
-    const { enable, disable } = this.appAccessMap;
+    const { enable, disable } = this.appAccessMap();
     if (!enable && !disable) return;
 
     const role = this.roleService.current;
-    if (!this.appAccessMap) return;
+    if (!this.appAccessMap()) return;
 
     const nodeList = this.elementRef.nativeElement.querySelectorAll('[role-access-name]');
     if (!nodeList) return;
@@ -50,72 +37,66 @@ export class ComponentAccessByRoleDirective implements AfterViewChecked {
       const roleName = el.getAttribute('role-access-name');
       if (!roleName) return;
 
-      // Check show for Author role and author_id condition
       if (
-        this.appAccessMap.enable &&
-        this.appAccessMap.enable[roleName] &&
-        this.appAccessMap.enable[roleName].includes(Role.Author) &&
+        this.appAccessMap().enable &&
+        this.appAccessMap().enable![roleName] &&
+        this.appAccessMap().enable![roleName].includes(Role.Author) &&
         this.authorCondition(el)
       ) {
         return;
       }
 
-      // Check show for Coach role and team_id condition
       if (
-        this.appAccessMap.enable &&
-        this.appAccessMap.enable[roleName] &&
-        this.appAccessMap.enable[roleName].includes(Role.Coach) &&
+        this.appAccessMap().enable &&
+        this.appAccessMap().enable![roleName] &&
+        this.appAccessMap().enable![roleName].includes(Role.Coach) &&
         this.coachCondition(el)
       ) {
         return;
       }
 
-      // Check hide for Author role and author_id condition
       if (
-        this.appAccessMap.disable &&
-        this.appAccessMap.disable[roleName] &&
-        this.appAccessMap.disable[roleName].includes(Role.Author) &&
+        this.appAccessMap().disable &&
+        this.appAccessMap().disable![roleName] &&
+        this.appAccessMap().disable![roleName].includes(Role.Author) &&
         this.authorCondition(el)
       ) {
-        el.style.opacity = String(this.opacity);
+        el.style.opacity = String(this.opacity());
         el.style.userSelect = 'none';
         el.style.pointerEvents = 'none';
         return;
       }
 
-      // Check hide for Coach role and team_id condition
       if (
-        this.appAccessMap.disable &&
-        this.appAccessMap.disable[roleName] &&
-        this.appAccessMap.disable[roleName].includes(Role.Coach) &&
+        this.appAccessMap().disable &&
+        this.appAccessMap().disable![roleName] &&
+        this.appAccessMap().disable![roleName].includes(Role.Coach) &&
         this.coachCondition(el)
       ) {
-        el.style.opacity = String(this.opacity);
+        el.style.opacity = String(this.opacity());
         el.style.userSelect = 'none';
         el.style.pointerEvents = 'none';
         return;
       }
 
-      // Check hide for role
       if (
-        this.appAccessMap.disable &&
-        this.appAccessMap.disable[roleName] &&
-        this.appAccessMap.disable[roleName].includes(role)
+        this.appAccessMap().disable &&
+        this.appAccessMap().disable![roleName] &&
+        this.appAccessMap().disable![roleName].includes(role)
       ) {
-        el.style.opacity = String(this.opacity);
+        el.style.opacity = String(this.opacity());
         el.style.userSelect = 'none';
         el.style.pointerEvents = 'none';
 
         return;
       }
 
-      // Check show for role
       if (
-        this.appAccessMap.enable &&
-        this.appAccessMap.enable[roleName] &&
-        !this.appAccessMap.enable[roleName].includes(role)
+        this.appAccessMap().enable &&
+        this.appAccessMap().enable![roleName] &&
+        !this.appAccessMap().enable![roleName].includes(role)
       ) {
-        el.style.opacity = String(this.opacity);
+        el.style.opacity = String(this.opacity());
         el.style.userSelect = 'none';
         el.style.pointerEvents = 'none';
 
@@ -134,7 +115,6 @@ export class ComponentAccessByRoleDirective implements AfterViewChecked {
         return false;
       }
 
-      // Compare team_id from attribute with user's team_id
       const teamIdArray = teamIdAttr.split(',');
 
       return teamIdArray.includes(userTeamId);
@@ -153,7 +133,6 @@ export class ComponentAccessByRoleDirective implements AfterViewChecked {
         return false;
       }
 
-      // Compare author_id from attribute with user's author_id
       const authorIdArray = authorIdAttr.split(',');
 
       return authorIdArray.includes(userAuthorId);
@@ -162,4 +141,3 @@ export class ComponentAccessByRoleDirective implements AfterViewChecked {
     return false;
   }
 }
-

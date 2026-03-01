@@ -1,15 +1,13 @@
 import {
   ElementRef,
-  HostBinding,
-  Input,
-  OnChanges,
   OnInit,
-  SimpleChanges,
   AfterContentInit,
   Directive,
-  Output,
-  EventEmitter,
   inject,
+  input,
+  output,
+  effect,
+  signal,
 } from '@angular/core';
 import {
   ButtonMaterialIconsClass,
@@ -21,10 +19,10 @@ import { ThemeService } from '../../../services/theme.service';
 import { AppColor } from '../../constants/colors';
 import { TooltipPosition } from '@angular/material/tooltip';
 
-@Directive()
-export abstract class ButtonBaseClass
-  implements OnInit, OnChanges, AfterContentInit
-{
+@Directive({
+  host: { '[style.width]': 'width()' },
+})
+export abstract class ButtonBaseClass implements OnInit, AfterContentInit {
   protected static readonly BUTTON_TRANSITION =
     '0.1s cubic-bezier(0.175, 0.885, 0.32, 1.06)';
 
@@ -33,65 +31,71 @@ export abstract class ButtonBaseClass
   }
 
   get rippleColor() {
-    return this.themeService.getRippleColor(this.color, 0.1);
+    return this.themeService.getRippleColor(this.color(), 0.1);
   }
 
-  @Input() bg: AppColor = 'transparent';
-  @Input() bghover: AppColor = 'none';
-  @Input() bgselect: AppColor = 'none';
-  @Input() br: AppColor = 'transparent';
-  @Input() brhover: AppColor = 'none';
-  @Input() brselect: AppColor = 'none';
-  @Input() color: AppColor = 'background';
-  @Input() colorhover: AppColor = 'none';
-  @Input() colorselect: AppColor = 'none';
+  bg = input<AppColor>('transparent');
+  bghover = input<AppColor>('none');
+  bgselect = input<AppColor>('none');
+  br = input<AppColor>('transparent');
+  brhover = input<AppColor>('none');
+  brselect = input<AppColor>('none');
+  color = input<AppColor>('background');
+  colorhover = input<AppColor>('none');
+  colorselect = input<AppColor>('none');
 
-  @Input() opacity = 1;
-  @Input() opacityhover = 1;
-  @Input() width = 'auto';
-  @Input() rounded = false;
-  @Input() dev = false;
-  @Input() haveContent = false;
-  @Input() isActive = false;
+  opacity = input(1);
+  opacityhover = input(1);
+  width = input('auto');
+  rounded = input(false);
+  dev = input(false);
+  haveContent = input(false);
+  isActive = input(false);
 
-  @Input() tooltip: string | null = null;
-  @Input() tooltipPos: TooltipPosition = 'below';
-  @Input() tooltipDelay = 800;
+  tooltip = input<string | null>(null);
+  tooltipPos = input<TooltipPosition>('below');
+  tooltipDelay = input(800);
 
-  @Input() isDisabled = false;
+  isDisabled = input(false);
 
-  @Input() materialIcon = '';
-  @Input() materialIconClass: ButtonMaterialIconsClass = 'material-icons-round';
-  @Input() materialSymbolClass: ButtonMaterialSymbolsClass =
-    'material-symbols-rounded';
-  @Input() isMatSymbolClass = true;
+  materialIcon = input('');
+  materialIconClass = input<ButtonMaterialIconsClass>('material-icons-round');
+  materialSymbolClass = input<ButtonMaterialSymbolsClass>(
+    'material-symbols-rounded'
+  );
+  isMatSymbolClass = input(true);
 
-  @Input() counter = -1;
-  @Input() hasDot = false;
-  @Input() counterColor: AppColor = 'transparent';
-  @Input() counterBgColor: AppColor = 'transparent';
+  counter = input(-1);
+  hasDot = input(false);
+  counterColor = input<AppColor>('transparent');
+  counterBgColor = input<AppColor>('transparent');
+
+  isMatIconFill = input(false);
 
   protected _isMatIconFillOriginal = false;
   protected isMatIconFillCurrent = false;
-  @Input() set isMatIconFill(value: boolean) {
-    this._isMatIconFillOriginal = value;
-    this.isMatIconFillCurrent = value;
-  }
-  get isMatIconFill() {
-    return this._isMatIconFillOriginal;
-  }
 
-  @HostBinding('style.width')
-  get getWidth(): string {
-    return this.width;
-  }
+  clicked = output<MouseEvent>();
 
-  @Output() clicked = new EventEmitter<MouseEvent>();
+  protected hasContent = signal(false);
 
   styles: CustomButtomStyles = {};
 
   protected themeService = inject(ThemeService);
   protected elRef = inject(ElementRef);
+
+  private isMatIconFillEffect = effect(() => {
+    this._isMatIconFillOriginal = this.isMatIconFill();
+    this.isMatIconFillCurrent = this.isMatIconFill();
+  });
+
+  private isActiveEffect = effect(() => {
+    if (this.isActive()) {
+      this.applyActiveStyles();
+    } else {
+      this.applyDefaultStyles();
+    }
+  });
 
   ngOnInit() {
     this.updateStyles({
@@ -100,36 +104,28 @@ export abstract class ButtonBaseClass
       ...this.getDefaultStyles(),
     });
 
-    if (this.isActive) {
+    if (this.isActive()) {
       this.applyActiveStyles();
     }
   }
 
-  ngOnChanges(changes: SimpleChanges) {
-    if (changes['isActive']) {
-      if (this.isActive) {
-        this.applyActiveStyles();
-      } else {
-        this.applyDefaultStyles();
-      }
-    }
-  }
-
   ngAfterContentInit() {
-    this.haveContent =
-      !!this.elRef.nativeElement.querySelector('.text')?.childNodes.length;
+    this.hasContent.set(
+      !!this.elRef.nativeElement.querySelector('.text')?.childNodes.length ||
+        this.haveContent()
+    );
   }
 
   protected getStyleParams(): ButtonStyleParams {
     return {
-      color: this.color,
-      colorhover: this.colorhover,
-      bg: this.bg,
-      bghover: this.bghover,
-      br: this.br,
-      brhover: this.brhover,
-      opacity: this.opacity,
-      opacityhover: this.opacityhover,
+      color: this.color(),
+      colorhover: this.colorhover(),
+      bg: this.bg(),
+      bghover: this.bghover(),
+      br: this.br(),
+      brhover: this.brhover(),
+      opacity: this.opacity(),
+      opacityhover: this.opacityhover(),
     };
   }
 
@@ -177,57 +173,57 @@ export abstract class ButtonBaseClass
   }
 
   onMouseEnter() {
-    if (this.isActive) return;
+    if (this.isActive()) return;
     this.isMatIconFillCurrent = true;
     this.updateStyles(this.getHoverStyles());
   }
 
   onMouseLeave() {
-    if (this.isActive) return;
+    if (this.isActive()) return;
     this.applyDefaultStyles();
   }
 
   onMouseDown() {
-    if (this.colorselect !== 'none')
+    if (this.colorselect() !== 'none')
       this.updateStyles({
-        color: this.themeService.getCurrentThemeColor(this.colorselect),
+        color: this.themeService.getCurrentThemeColor(this.colorselect()),
       });
-    if (this.bgselect !== 'none')
+    if (this.bgselect() !== 'none')
       this.updateStyles({
-        backgroundColor: this.themeService.getCurrentThemeColor(this.bgselect),
+        backgroundColor: this.themeService.getCurrentThemeColor(this.bgselect()),
       });
-    if (this.brselect !== 'none')
+    if (this.brselect() !== 'none')
       this.updateStyles({
-        borderColor: this.themeService.getCurrentThemeColor(this.brselect),
+        borderColor: this.themeService.getCurrentThemeColor(this.brselect()),
       });
   }
 
   onMouseUp() {
-    if (this.colorhover !== 'none')
+    if (this.colorhover() !== 'none')
       this.updateStyles({
-        color: this.themeService.getCurrentThemeColor(this.colorhover),
+        color: this.themeService.getCurrentThemeColor(this.colorhover()),
       });
-    else if (this.colorselect !== 'none')
+    else if (this.colorselect() !== 'none')
       this.updateStyles({
-        color: this.themeService.getCurrentThemeColor(this.color),
-      });
-
-    if (this.bghover !== 'none')
-      this.updateStyles({
-        backgroundColor: this.themeService.getCurrentThemeColor(this.bghover),
-      });
-    else if (this.bgselect !== 'none')
-      this.updateStyles({
-        backgroundColor: this.themeService.getCurrentThemeColor(this.bg),
+        color: this.themeService.getCurrentThemeColor(this.color()),
       });
 
-    if (this.brhover !== 'none')
+    if (this.bghover() !== 'none')
       this.updateStyles({
-        borderColor: this.themeService.getCurrentThemeColor(this.brhover),
+        backgroundColor: this.themeService.getCurrentThemeColor(this.bghover()),
       });
-    else if (this.brselect !== 'none')
+    else if (this.bgselect() !== 'none')
       this.updateStyles({
-        borderColor: this.themeService.getCurrentThemeColor(this.br),
+        backgroundColor: this.themeService.getCurrentThemeColor(this.bg()),
+      });
+
+    if (this.brhover() !== 'none')
+      this.updateStyles({
+        borderColor: this.themeService.getCurrentThemeColor(this.brhover()),
+      });
+    else if (this.brselect() !== 'none')
+      this.updateStyles({
+        borderColor: this.themeService.getCurrentThemeColor(this.br()),
       });
   }
 
@@ -237,4 +233,3 @@ export abstract class ButtonBaseClass
     this.clicked.emit(event);
   }
 }
-

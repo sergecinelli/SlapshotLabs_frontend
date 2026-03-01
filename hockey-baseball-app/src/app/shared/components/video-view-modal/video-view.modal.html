@@ -1,0 +1,50 @@
+@let videoUrlValue = videoUrl();
+@let videoMessageValue = videoMessage();
+
+<div class="video-view-modal">
+  <h2 mat-dialog-title class="modal-title">
+    <span class="material-symbols-rounded title-icon">play_circle</span>
+    {{ data.video.name }}
+  </h2>
+
+  <mat-dialog-content class="modal-content">
+    <div class="video-container">
+      @if (videoUrlValue) {
+        <div class="video-wrapper">
+          <iframe
+            class="video-iframe"
+            [src]="videoUrlValue"
+            title="Video player"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowfullscreen
+            >
+          </iframe>
+        </div>
+      } @else {
+        <div class="no-video">
+          <span class="material-symbols-rounded">info</span>
+          <p>{{ videoMessageValue || 'Video not available' }}</p>
+        </div>
+      }
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions class="modal-actions">
+    <app-button
+      [bg]="'transparent'"
+      [bghover]="'button_background'"
+      [br]="'border'"
+      [color]="'text_primary'"
+      [colorhover]="'text_primary'"
+      [opacity]="1"
+      [opacityhover]="1"
+      [width]="'auto'"
+      [rounded]="false"
+      [haveContent]="true"
+      (clicked)="close()"
+      >
+      Close
+    </app-button>
+  </mat-dialog-actions>
+</div>

@@ -1,0 +1,30 @@
+@let videosValue = videos();
+@let loadingValue = loading();
+
+<div class="page-content" [appVisibilityMap]="visibilityByRoleMap">
+
+  <!-- Add Video Button -->
+  <div class="mb-4 flex justify-end" role-visibility-name="add-video-button">
+    <app-button
+      [bg]="'primary'"
+      [bghover]="'primary_dark'"
+      [color]="'white'"
+      [colorhover]="'white'"
+      [materialIcon]="'add'"
+      [haveContent]="true"
+      (clicked)="openAddVideoModal()"
+    >
+      Add a Video
+    </app-button>
+  </div>
+
+  <app-data-table
+    [columns]="tableColumns"
+    [data]="videosValue"
+    [actions]="tableActions"
+    [loading]="loadingValue"
+    (actionClick)="onActionClick($event)"
+    (sort)="onSort($event)"
+    emptyMessage="No videos found."
+  ></app-data-table>
+</div>

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { SprayChartEvent } from '../shared/interfaces/spray-chart.interface';
-import { ShotLocationData } from '../shared/components/shot-location-display/shot-location-display';
+import { ShotLocationData } from '../shared/components/shot-location-display/shot-location-display.component';
 import { GameEventName } from './game-event-name.service';
 import { ShotTypeResponse } from './game-metadata.service';
 

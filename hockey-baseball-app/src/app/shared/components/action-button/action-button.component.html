@@ -1,0 +1,14 @@
+@let disabledValue = disabled();
+@let roleVisibilityNameValue = roleVisibilityName();
+@let labelValue = label();
+
+<button
+  class="action-button"
+  [disabled]="disabledValue"
+  (click)="onClick()"
+  [attr.role-visibility-name]="roleVisibilityNameValue"
+>
+  <div class="button-content">
+    <span class="button-label">{{ labelValue }}</span>
+  </div>
+</button>

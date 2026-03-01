@@ -1,27 +1,26 @@
-import { Component, Input } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, ChangeDetectionStrategy, input } from '@angular/core';
+import { NgStyle } from '@angular/common';
 import { MatRippleModule } from '@angular/material/core';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ButtonBaseClass } from '../button-base.class';
 
 @Component({
   selector: 'app-button-image',
-  standalone: true,
-  imports: [CommonModule, MatRippleModule, MatTooltipModule],
+  imports: [NgStyle, MatRippleModule, MatTooltipModule],
   templateUrl: './button-image.component.html',
   styleUrl: '../button.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ButtonImageComponent extends ButtonBaseClass {
-  @Input() image = '';
-  @Input() type: 'button' | 'submit' = 'button';
-  @Input() isLoading = false;
+  image = input('');
+  type = input<'button' | 'submit'>('button');
+  isLoading = input(false);
 
   override click(event: MouseEvent) {
-    if (this.isLoading) return;
+    if (this.isLoading()) return;
 
     event.preventDefault();
     event.stopPropagation();
-    this.clicked.emit();
+    this.clicked.emit(event);
   }
 }
-

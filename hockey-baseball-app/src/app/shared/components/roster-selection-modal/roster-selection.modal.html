@@ -1,0 +1,169 @@
+@let isLoadingValue = isLoading();
+@let goaliesValue = goalies();
+@let playersValue = players();
+
+<div class="roster-selection-modal">
+  <h2 mat-dialog-title class="modal-title">
+    <span class="material-symbols-rounded title-icon">groups</span>
+    Select Roster for {{ data.teamName }}
+  </h2>
+
+  <mat-dialog-content class="modal-content">
+    @if (isLoadingValue) {
+      <div class="loading-container">
+        <p>Loading roster...</p>
+      </div>
+    }
+
+    @if (!isLoadingValue) {
+      <!-- Goalies Section -->
+      <div class="roster-section">
+        <h3 class="section-title">Goalies</h3>
+
+        @if (goaliesValue.length === 0) {
+          <p class="no-data">No goalies available for this team.</p>
+        } @else {
+          <table mat-table [dataSource]="goaliesValue" class="roster-table">
+            <!-- Checkbox Column -->
+            <ng-container matColumnDef="select">
+              <th mat-header-cell *matHeaderCellDef>
+                <mat-checkbox
+                  (change)="toggleAllGoalies()"
+                  [checked]="areAllGoaliesSelected()"
+                  [indeterminate]="goalieSelection.hasValue() && !areAllGoaliesSelected()"
+                >
+                </mat-checkbox>
+              </th>
+              <td mat-cell *matCellDef="let row">
+                <mat-checkbox
+                  (click)="$event.stopPropagation()"
+                  (change)="toggleGoalie(row.id)"
+                  [checked]="isGoalieSelected(row.id)"
+                >
+                </mat-checkbox>
+              </td>
+            </ng-container>
+
+            <!-- Jersey Number Column -->
+            <ng-container matColumnDef="jerseyNumber">
+              <th mat-header-cell *matHeaderCellDef>Jersey #</th>
+              <td mat-cell *matCellDef="let row">{{ row.jerseyNumber }}</td>
+            </ng-container>
+
+            <!-- First Name Column -->
+            <ng-container matColumnDef="firstName">
+              <th mat-header-cell *matHeaderCellDef>First Name</th>
+              <td mat-cell *matCellDef="let row">{{ row.firstName }}</td>
+            </ng-container>
+
+            <!-- Last Name Column -->
+            <ng-container matColumnDef="lastName">
+              <th mat-header-cell *matHeaderCellDef>Last Name</th>
+              <td mat-cell *matCellDef="let row">{{ row.lastName }}</td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr
+              mat-row
+              *matRowDef="let row; columns: displayedColumns"
+              (click)="toggleGoalie(row.id)"
+              class="roster-row"
+            ></tr>
+          </table>
+        }
+      </div>
+
+      <!-- Players Section -->
+      <div class="roster-section">
+        <h3 class="section-title">Players</h3>
+
+        @if (playersValue.length === 0) {
+          <p class="no-data">No players available for this team.</p>
+        } @else {
+          <table mat-table [dataSource]="playersValue" class="roster-table">
+            <!-- Checkbox Column -->
+            <ng-container matColumnDef="select">
+              <th mat-header-cell *matHeaderCellDef>
+                <mat-checkbox
+                  (change)="toggleAllPlayers()"
+                  [checked]="areAllPlayersSelected()"
+                  [indeterminate]="playerSelection.hasValue() && !areAllPlayersSelected()"
+                >
+                </mat-checkbox>
+              </th>
+              <td mat-cell *matCellDef="let row">
+                <mat-checkbox
+                  (click)="$event.stopPropagation()"
+                  (change)="togglePlayer(row.id)"
+                  [checked]="isPlayerSelected(row.id)"
+                >
+                </mat-checkbox>
+              </td>
+            </ng-container>
+
+            <!-- Jersey Number Column -->
+            <ng-container matColumnDef="jerseyNumber">
+              <th mat-header-cell *matHeaderCellDef>Jersey #</th>
+              <td mat-cell *matCellDef="let row">{{ row.jerseyNumber }}</td>
+            </ng-container>
+
+            <!-- First Name Column -->
+            <ng-container matColumnDef="firstName">
+              <th mat-header-cell *matHeaderCellDef>First Name</th>
+              <td mat-cell *matCellDef="let row">{{ row.firstName }}</td>
+            </ng-container>
+
+            <!-- Last Name Column -->
+            <ng-container matColumnDef="lastName">
+              <th mat-header-cell *matHeaderCellDef>Last Name</th>
+              <td mat-cell *matCellDef="let row">{{ row.lastName }}</td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr
+              mat-row
+              *matRowDef="let row; columns: displayedColumns"
+              (click)="togglePlayer(row.id)"
+              class="roster-row"
+            ></tr>
+          </table>
+        }
+      </div>
+    }
+  </mat-dialog-content>
+
+  <mat-dialog-actions class="modal-actions">
+    <app-button
+      [bg]="'transparent'"
+      [bghover]="'button_background'"
+      [br]="'border'"
+      [color]="'text_primary'"
+      [colorhover]="'text_primary'"
+      [opacity]="1"
+      [opacityhover]="1"
+      [width]="'auto'"
+      [rounded]="false"
+      [haveContent]="true"
+      (clicked)="onCancel()"
+    >
+      Cancel
+    </app-button>
+    <app-button-loading
+      [isLoading]="isLoadingValue"
+      [isDisabled]="isLoadingValue"
+      materialIcon="check"
+      [bg]="'primary'"
+      [bghover]="'primary_dark'"
+      [color]="'white'"
+      [colorhover]="'white'"
+      [opacity]="1"
+      [opacityhover]="1"
+      [width]="'auto'"
+      [rounded]="false"
+      [haveContent]="true"
+      (clicked)="onConfirm()"
+    >
+      Confirm Selection
+    </app-button-loading>
+  </mat-dialog-actions>
+</div>

@@ -1,8 +1,10 @@
+@let breadcrumbsValue = breadcrumbs();
+
 <nav class="breadcrumbs-container" aria-label="Breadcrumb">
   <div class="breadcrumbs-content">
-    @if (breadcrumbs().length > 0) {
+    @if (breadcrumbsValue.length > 0) {
       <ol class="breadcrumbs-list">
-        @for (item of breadcrumbs(); track item.path; let i = $index) {
+        @for (item of breadcrumbsValue; track item.path; let i = $index) {
           <li class="breadcrumbs-item">
             @if (isLast(i) && item.isLive) {
               <!-- Last item with live indicator (pulsing circle) -->

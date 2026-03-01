@@ -1,12 +1,12 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component , ChangeDetectionStrategy } from '@angular/core';
+import {  } from '@angular/common';
 
 @Component({
   selector: 'app-banner-skeleton',
-  standalone: true,
-  imports: [CommonModule],
-  templateUrl: './banner-skeleton.html',
-  styleUrl: './banner-skeleton.scss',
+  imports: [],
+  templateUrl: './banner-skeleton.component.html',
+  styleUrl: './banner-skeleton.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BannerSkeletonComponent {
   // Number of skeleton cards to show

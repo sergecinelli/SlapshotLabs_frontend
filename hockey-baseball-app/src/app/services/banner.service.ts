@@ -54,7 +54,8 @@ export class BannerService implements OnDestroy {
   constructor() {
     this.broadcastChannel = new BroadcastChannel('game_banner_channel');
     this.setupBroadcastListener();
-    
+    this.broadcastChannel.postMessage({ type: 'REQUEST_DATA' });
+
     // Subscribe to auth state
     this.authService.isAuthenticated$.subscribe(isAuth => {
       this.isAuthenticated = isAuth;
@@ -189,8 +190,11 @@ export class BannerService implements OnDestroy {
       if (event.data.type === 'BANNER_UPDATE') {
         // Update local state with data from leader
         this.updateState(event.data.data, false, null);
+      } else if (event.data.type === 'REQUEST_DATA') {
+        if (this.isLeader && this.bannerItemsSubject.value.length > 0) {
+          this.broadcastData(this.bannerItemsSubject.value);
+        }
       } else if (event.data.type === 'REQUEST_REFRESH') {
-        // If we are leader, someone requested a refresh
         if (this.isLeader && this.isAuthenticated) {
           this.fetchBanner(true);
         }

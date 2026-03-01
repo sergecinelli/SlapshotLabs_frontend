@@ -1,5 +1,4 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { MatRippleModule } from '@angular/material/core';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { RouterLink } from '@angular/router';
@@ -23,7 +22,6 @@ const buttons = [
 
 @NgModule({
   imports: [
-    CommonModule,
     MatRippleModule,
     RouterLink,
     MatTooltipModule,

@@ -1,0 +1,16 @@
+@let textValue = text();
+@let linkTextValue = linkText();
+
+<p>
+  {{ textValue }}
+  <a
+    (click)="onLinkClick()"
+    (keyup.enter)="onLinkClick()"
+    (keyup.space)="onLinkClick()"
+    tabindex="0"
+    role="button"
+    class="text-custom-primary hover:text-red-700 no-underline font-medium text-md cursor-pointer"
+  >
+    {{ linkTextValue }}
+  </a>
+</p>

@@ -1,0 +1,325 @@
+<div class="schedule-form-modal">
+  <h2 mat-dialog-title class="modal-title">
+    <span class="material-symbols-rounded title-icon">event</span>
+    {{ isEditMode ? 'Edit Game' : 'Add Game' }}
+  </h2>
+
+  <mat-dialog-content class="modal-content">
+    @if (isLoading) {
+      <div class="loading-container">
+        <p>Loading form data...</p>
+      </div>
+    }
+
+    @if (!isLoading) {
+      <form [formGroup]="scheduleForm" class="schedule-form">
+        <!-- Game Information -->
+        <div class="form-section">
+          <div class="section-header">
+            <span class="section-title">Game Information</span>
+          </div>
+          <mat-divider class="section-divider"></mat-divider>
+          <div class="form-row">
+            <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+              <mat-label class="uppercase text-custom-secondary">Away Team</mat-label>
+              <mat-select
+                formControlName="awayTeam"
+                (selectionChange)="onAwayTeamChange($event)"
+                >
+                @for (option of teamOptions; track option) {
+                  <mat-option [value]="option.value">
+                    {{ option.label }}
+                  </mat-option>
+                }
+              </mat-select>
+              @if (scheduleForm.get('awayTeam')?.errors && scheduleForm.get('awayTeam')?.touched) {
+                <mat-error
+                  >
+                  {{ getErrorMessage('awayTeam') }}
+                </mat-error>
+              }
+            </mat-form-field>
+            <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+              <mat-label class="uppercase text-custom-secondary">Away Goalie</mat-label>
+              <mat-select formControlName="awayTeamGoalie">
+                @for (option of awayGoalieOptions; track option) {
+                  <mat-option [value]="option.value">
+                    {{ option.label }}
+                  </mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div class="form-row">
+            <app-button
+              [bg]="'transparent'"
+              [bghover]="'button_background'"
+              [br]="'border'"
+              [color]="'primary'"
+              [colorhover]="'primary'"
+              [opacity]="1"
+              [opacityhover]="1"
+              [width]="'auto'"
+              [rounded]="false"
+              [materialIcon]="'groups'"
+              [haveContent]="true"
+              [isDisabled]="!scheduleForm.get('awayTeam')?.value"
+              (clicked)="openAwayRosterModal()"
+              >
+              Select Away Team Roster
+            </app-button>
+          </div>
+          <div class="form-row">
+            <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+              <mat-label class="uppercase text-custom-secondary">Home Team</mat-label>
+              <mat-select
+                formControlName="homeTeam"
+                (selectionChange)="onHomeTeamChange($event)"
+                >
+                @for (option of teamOptions; track option) {
+                  <mat-option [value]="option.value">
+                    {{ option.label }}
+                  </mat-option>
+                }
+              </mat-select>
+              @if (scheduleForm.get('homeTeam')?.errors && scheduleForm.get('homeTeam')?.touched) {
+                <mat-error
+                  >
+                  {{ getErrorMessage('homeTeam') }}
+                </mat-error>
+              }
+            </mat-form-field>
+            <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+              <mat-label class="uppercase text-custom-secondary">Home Goalie</mat-label>
+              <mat-select formControlName="homeTeamGoalie">
+                @for (option of homeGoalieOptions; track option) {
+                  <mat-option [value]="option.value">
+                    {{ option.label }}
+                  </mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div class="form-row">
+            <app-button
+              [bg]="'transparent'"
+              [bghover]="'button_background'"
+              [br]="'border'"
+              [color]="'primary'"
+              [colorhover]="'primary'"
+              [opacity]="1"
+              [opacityhover]="1"
+              [width]="'auto'"
+              [rounded]="false"
+              [materialIcon]="'groups'"
+              [haveContent]="true"
+              [isDisabled]="!scheduleForm.get('homeTeam')?.value"
+              (clicked)="openHomeRosterModal()"
+              >
+              Select Home Team Roster
+            </app-button>
+          </div>
+          <div class="form-row">
+            <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+              <mat-label class="uppercase text-custom-secondary">Date</mat-label>
+              <input matInput type="date" formControlName="date" />
+              @if (scheduleForm.get('date')?.errors && scheduleForm.get('date')?.touched) {
+                <mat-error
+                  >
+                  {{ getErrorMessage('date') }}
+                </mat-error>
+              }
+            </mat-form-field>
+            <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+              <mat-label class="uppercase text-custom-secondary">Time</mat-label>
+              <input matInput type="text" formControlName="time" placeholder="e.g., 7:00 PM" />
+              @if (scheduleForm.get('time')?.errors && scheduleForm.get('time')?.touched) {
+                <mat-error
+                  >
+                  {{ getErrorMessage('time') }}
+                </mat-error>
+              }
+            </mat-form-field>
+          </div>
+        </div>
+        <!-- Venue Information -->
+        <div class="form-section">
+          <div class="section-header">
+            <span class="section-title">Venue Information</span>
+          </div>
+          <mat-divider class="section-divider"></mat-divider>
+          <div class="form-row">
+            <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+              <mat-label class="uppercase text-custom-secondary">Arena</mat-label>
+              <mat-select formControlName="arena" (selectionChange)="onArenaChange($event)">
+                @for (option of arenaOptions; track option) {
+                  <mat-option [value]="option.value">
+                    {{ option.label }}
+                  </mat-option>
+                }
+              </mat-select>
+              @if (scheduleForm.get('arena')?.errors && scheduleForm.get('arena')?.touched) {
+                <mat-error
+                  >
+                  {{ getErrorMessage('arena') }}
+                </mat-error>
+              }
+            </mat-form-field>
+            <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+              <mat-label class="uppercase text-custom-secondary">Rink</mat-label>
+              <mat-select formControlName="rink">
+                @for (option of rinkOptions; track option) {
+                  <mat-option [value]="option.value">
+                    {{ option.label }}
+                  </mat-option>
+                }
+              </mat-select>
+              @if (scheduleForm.get('rink')?.errors && scheduleForm.get('rink')?.touched) {
+                <mat-error
+                  >
+                  {{ getErrorMessage('rink') }}
+                </mat-error>
+              }
+            </mat-form-field>
+          </div>
+        </div>
+        <!-- Game Details -->
+        <div class="form-section">
+          <div class="section-header">
+            <span class="section-title">Game Details</span>
+          </div>
+          <mat-divider class="section-divider"></mat-divider>
+          <div class="game-type-selection-container">
+            <div class="game-type-selection-label uppercase text-custom-secondary">Game Type</div>
+            @if (isLoading) {
+              <div class="loading-message">Loading game types...</div>
+            }
+            @if (!isLoading) {
+              <div class="game-type-buttons">
+                @for (option of gameTypeOptions; track option) {
+                  <button
+                    type="button"
+                    class="game-type-button"
+                    [class.selected]="scheduleForm.get('gameType')?.value === option.value"
+                    (click)="selectGameType(option.value)"
+                    >
+                    <div class="game-type-name">{{ option.label }}</div>
+                  </button>
+                }
+              </div>
+            }
+            @if (scheduleForm.get('gameType')?.errors && scheduleForm.get('gameType')?.touched) {
+              <div
+                class="game-type-error"
+                >
+                {{ getErrorMessage('gameType') }}
+              </div>
+            }
+          </div>
+          @if (gameTypeNameOptions.length > 0) {
+            <div class="form-row">
+              <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+                <mat-label class="uppercase text-custom-secondary"
+                  >{{ selectedGameType?.name ?? '' }} Name</mat-label
+                  >
+                  <mat-select formControlName="gameTypeName">
+                    @for (option of gameTypeNameOptions; track option) {
+                      <mat-option [value]="option.value">
+                        {{ option.label }}
+                      </mat-option>
+                    }
+                  </mat-select>
+                </mat-form-field>
+              </div>
+            }
+            <div class="status-selection-container">
+              <div class="status-selection-label uppercase text-custom-secondary">Status</div>
+              <div class="status-buttons">
+                @for (option of statusOptions; track option) {
+                  <button
+                    type="button"
+                    class="status-button"
+                    [class.selected]="scheduleForm.get('status')?.value === option.value"
+                    (click)="selectStatus(option.value)"
+                    >
+                    <div class="status-name">{{ option.label }}</div>
+                  </button>
+                }
+              </div>
+              @if (scheduleForm.get('status')?.errors && scheduleForm.get('status')?.touched) {
+                <div
+                  class="status-error"
+                  >
+                  {{ getErrorMessage('status') }}
+                </div>
+              }
+            </div>
+          </div>
+          <!-- Analysis Section -->
+          <div class="form-section">
+            <div class="section-header">
+              <span class="section-title">Analysis</span>
+            </div>
+            <mat-divider class="section-divider"></mat-divider>
+            <div class="form-row">
+              <mat-form-field
+                [floatLabel]="'always'"
+                [hideRequiredMarker]="true"
+                class="form-field full-width"
+                >
+                <mat-label class="uppercase text-custom-secondary">Analysis</mat-label>
+                <textarea
+                  matInput
+                  formControlName="analysis"
+                  rows="3"
+                  placeholder="Enter analysis (optional)"
+                ></textarea>
+                @if (scheduleForm.get('analysis')?.errors && scheduleForm.get('analysis')?.touched) {
+                  <mat-error
+                    >
+                    {{ getErrorMessage('analysis') }}
+                  </mat-error>
+                }
+              </mat-form-field>
+            </div>
+          </div>
+        </form>
+      }
+    </mat-dialog-content>
+
+    <mat-dialog-actions class="modal-actions">
+      <app-button
+        [bg]="'transparent'"
+        [bghover]="'button_background'"
+        [br]="'border'"
+        [color]="'text_primary'"
+        [colorhover]="'text_primary'"
+        [opacity]="1"
+        [opacityhover]="1"
+        [width]="'auto'"
+        [rounded]="false"
+        [haveContent]="true"
+        [isDisabled]="isSubmitting"
+        (clicked)="onCancel()"
+        >
+        Cancel
+      </app-button>
+      <app-button-loading
+        [isLoading]="isSubmitting"
+        [isDisabled]="scheduleForm.invalid || isSubmitting"
+        materialIcon="save"
+        [bg]="isEditMode ? 'orange' : 'green'"
+        [bghover]="isEditMode ? 'orange' : 'green'"
+        [color]="'white'"
+        [colorhover]="'white'"
+        [opacity]="1"
+        [opacityhover]="1"
+        [width]="'auto'"
+        [rounded]="false"
+        [haveContent]="true"
+        (clicked)="onSubmit()"
+        >
+        {{ isEditMode ? 'Update Game' : 'Add Game' }}
+      </app-button-loading>
+    </mat-dialog-actions>
+  </div>

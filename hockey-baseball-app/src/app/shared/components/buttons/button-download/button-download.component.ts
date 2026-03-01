@@ -1,25 +1,22 @@
-import { Component, HostBinding, Input } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, input, computed } from '@angular/core';
+import { NgStyle } from '@angular/common';
 import { MatRippleModule } from '@angular/material/core';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ButtonBaseClass } from '../button-base.class';
 
 @Component({
   selector: 'app-button-download',
-  standalone: true,
-  imports: [CommonModule, MatRippleModule, MatTooltipModule],
+  imports: [NgStyle, MatRippleModule, MatTooltipModule],
   templateUrl: './button-download.component.html',
   styleUrl: '../button.component.scss',
+  host: { '[style.max-width]': 'computedMaxWidth()' },
 })
 export class ButtonDownloadComponent extends ButtonBaseClass {
-  @Input() maxWidth: string | number = 'auto';
-  @Input() download = '';
+  maxWidth = input<string | number>('auto');
+  download = input('');
 
-  @HostBinding('style.max-width')
-  get getMaxWidth(): string {
-    return typeof this.maxWidth === 'number'
-      ? `${this.maxWidth}px`
-      : this.maxWidth;
-  }
+  computedMaxWidth = computed(() => {
+    const value = this.maxWidth();
+    return typeof value === 'number' ? `${value}px` : value;
+  });
 }
-

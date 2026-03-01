@@ -1,0 +1,67 @@
+@let team1Value = team1();
+@let team2Value = team2();
+@let showTitleValue = showTitle();
+@let showDividerValue = showDivider();
+@let titleValue = title();
+@let showTeamsValue = showTeams();
+@let maxWidthValue = maxWidth();
+@let imageUrlValue = imageUrl();
+@let showClearButtonValue = showClearButton();
+
+<div class="location-selector">
+  @if (showTitleValue) {
+    <div class="section-header">
+      <span class="section-title">{{ titleValue }}</span>
+    </div>
+  }
+  @if (showDividerValue) {
+    <mat-divider class="section-divider"></mat-divider>
+  }
+
+  <div class="rink-container">
+    @if (showTeamsValue && (team1Value || team2Value)) {
+      <div class="teams-header">
+        @if (team1Value) {
+          <div class="team team-left">
+            @if (team1Value.logo) {
+              <img [src]="team1Value.logo" [alt]="team1Value.name" class="team-logo" />
+            }
+            <span class="team-name">{{ team1Value.name }}</span>
+          </div>
+        }
+        @if (team2Value) {
+          <div class="team team-right">
+            <span class="team-name">{{ team2Value.name }}</span>
+            @if (team2Value.logo) {
+              <img [src]="team2Value.logo" [alt]="team2Value.name" class="team-logo" />
+            }
+          </div>
+        }
+      </div>
+    }
+    <button
+      type="button"
+      class="rink-wrapper"
+      [style.max-width]="maxWidthValue"
+      (click)="onRinkClick($event)"
+      >
+      <img [src]="imageUrlValue" alt="Location" class="hockey-rink-image" />
+      @if (puckLocation) {
+        <div
+          class="puck-marker"
+          [style.left.%]="puckLocation.x / 10"
+          [style.top.%]="puckLocation.y / 10"
+        ></div>
+      }
+    </button>
+    @if (showClearButtonValue && puckLocation) {
+      <button
+        type="button"
+        class="clear-location-btn"
+        (click)="onClearLocation()"
+        >
+        Clear
+      </button>
+    }
+  </div>
+</div>

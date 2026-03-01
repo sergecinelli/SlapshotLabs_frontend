@@ -1,0 +1,438 @@
+import { Component, OnInit, inject , ChangeDetectionStrategy } from '@angular/core';
+import { AsyncPipe } from '@angular/common';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatIconModule } from '@angular/material/icon';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { Team } from '../../interfaces/team.interface';
+import { TeamOptionsService } from '../../../services/team-options.service';
+import { ButtonComponent } from '../buttons/button/button.component';
+import { ButtonLoadingComponent } from '../buttons/button-loading/button-loading.component';
+import { forkJoin, Observable, of } from 'rxjs';
+import { map, startWith } from 'rxjs/operators';
+
+export interface TeamFormModalData {
+  team?: Team;
+  isEditMode: boolean;
+}
+
+@Component({
+  selector: 'app-team-form-modal',
+  imports: [
+    AsyncPipe,
+    ReactiveFormsModule,
+    MatDialogModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatAutocompleteModule,
+    MatIconModule,
+    MatDividerModule,
+    MatProgressSpinnerModule,
+    ButtonComponent,
+    ButtonLoadingComponent,
+  ],
+  templateUrl: './team-form.modal.html',
+  styleUrl: './team-form.modal.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class TeamFormModal implements OnInit {
+  private fb = inject(FormBuilder);
+  private dialogRef = inject<MatDialogRef<TeamFormModal>>(MatDialogRef);
+  private teamOptionsService = inject(TeamOptionsService);
+  data = inject<TeamFormModalData>(MAT_DIALOG_DATA);
+
+  teamForm: FormGroup;
+  isEditMode: boolean;
+  isLoading = true;
+
+  groupOptions: { value: string; label: string }[] = [];
+  levelOptions: { value: string; label: string }[] = [];
+  divisionOptions: { value: string; label: string }[] = [];
+  filteredGroupOptions: Observable<{ value: string; label: string }[]> = of([]);
+
+  // Image picker properties
+  selectedFile: File | null = null;
+  imagePreview: string | null = null;
+  imageError: string | null = null;
+  isDragging = false;
+  isImageLoading = false;
+  logoRemoved = false; // Track if user explicitly removed the logo
+  readonly MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+  readonly ALLOWED_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+
+  constructor() {
+    const data = this.data;
+
+    this.isEditMode = data.isEditMode;
+    this.teamForm = this.createForm();
+  }
+
+  ngOnInit(): void {
+    this.loadOptions();
+  }
+
+  private setupGroupFilter(): void {
+    this.filteredGroupOptions = this.teamForm.get('group')!.valueChanges.pipe(
+      startWith(''),
+      map((value: string) => {
+        if (!value || typeof value !== 'string') {
+          return this.groupOptions;
+        }
+        const filterValue = value.toLowerCase();
+        return this.groupOptions.filter((option) =>
+          option.label.toLowerCase().includes(filterValue) ||
+          option.value.toLowerCase().includes(filterValue)
+        );
+      })
+    );
+  }
+
+  protected displayGroupFn = (value: string): string => {
+    if (!value) return '';
+    const option = this.groupOptions.find((opt) => opt.value === value);
+    return option ? option.label : value;
+  };
+
+  private createForm(): FormGroup {
+    return this.fb.group({
+      name: ['', [Validators.required, Validators.minLength(2)]],
+      group: ['', [Validators.required]],
+      level: ['', [Validators.required]],
+      division: ['', [Validators.required]],
+      city: [''],
+      abbreviation: [''],
+      logo: [''],
+    });
+  }
+
+  /**
+   * Load dropdown options from API and local data
+   */
+  private loadOptions(): void {
+    this.isLoading = true;
+
+    // Fetch age groups, levels and divisions from API
+    forkJoin({
+      ageGroups: this.teamOptionsService.getTeamAgeGroups(),
+      levels: this.teamOptionsService.getTeamLevels(),
+      divisions: this.teamOptionsService.getDivisions(),
+    }).subscribe({
+      next: ({ ageGroups, levels, divisions }) => {
+        // Transform age groups to options
+        this.groupOptions = this.teamOptionsService.transformAgeGroupsToOptions(ageGroups);
+        
+        // Setup autocomplete filter after options are loaded
+        this.setupGroupFilter();
+
+        this.levelOptions = this.teamOptionsService.transformLevelsToOptions(levels);
+        this.divisionOptions = this.teamOptionsService.transformDivisionsToOptions(divisions);
+
+        // Set default values after options are loaded
+        this.setDefaultValues();
+
+        // If in edit mode, populate the form
+        if (this.isEditMode && this.data.team) {
+          this.populateForm(this.data.team);
+        }
+
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Failed to load options:', error);
+        // Fallback to hardcoded options if API fails
+        this.groupOptions = this.teamOptionsService.getGroupOptions();
+        this.setupGroupFilter();
+        this.setDefaultValues();
+
+        if (this.isEditMode && this.data.team) {
+          this.populateForm(this.data.team);
+        }
+
+        this.isLoading = false;
+      },
+    });
+  }
+
+  /**
+   * Set default values for form controls
+   */
+  private setDefaultValues(): void {
+    // Only set defaults if no values are already present (for new forms)
+    if (!this.isEditMode) {
+      this.teamForm.patchValue({
+        group: this.groupOptions[0]?.value || '1U',
+        level: this.levelOptions[0]?.value || 'NHL',
+        division: this.divisionOptions[0]?.value || 'Atlantic',
+      });
+    }
+
+    // Update validity after setting values
+    this.teamForm.updateValueAndValidity();
+  }
+
+  private populateForm(team: Team): void {
+    this.teamForm.patchValue({
+      name: team.name,
+      group: team.group,
+      level: team.levelId?.toString() || this.levelOptions[0]?.value || '',
+      division: team.divisionId?.toString() || this.divisionOptions[0]?.value || '',
+      city: team.city,
+      abbreviation: team.abbreviation || '',
+      logo: team.logo,
+    });
+
+    // Set existing logo as preview if available
+    if (team.logo && team.logo !== '/assets/icons/teams.svg' && !team.logo.includes('/assets/')) {
+      this.isImageLoading = true;
+      this.imagePreview = team.logo;
+    }
+  }
+
+  /**
+   * Handle image load success
+   */
+  onImageLoad(): void {
+    this.isImageLoading = false;
+  }
+
+  /**
+   * Handle image load error - fallback to upload placeholder
+   */
+  onImageError(): void {
+    console.warn('Failed to load team logo, using default upload view');
+    this.isImageLoading = false;
+    this.imagePreview = null;
+    this.teamForm.patchValue({ logo: '' });
+  }
+
+  /**
+   * Handle file selection from input
+   */
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) {
+      return;
+    }
+
+    const file = input.files[0];
+    this.validateAndProcessFile(file);
+  }
+
+  /**
+   * Validate file and convert to base64
+   */
+  private validateAndProcessFile(file: File): void {
+    this.imageError = null;
+    this.logoRemoved = false; // Reset removed flag when new file is selected
+
+    // Validate file type
+    if (!this.ALLOWED_TYPES.includes(file.type)) {
+      this.imageError = 'Invalid file type. Please upload a JPEG, PNG, GIF, or WebP image.';
+      this.selectedFile = null;
+      this.imagePreview = null;
+      return;
+    }
+
+    // Validate file size
+    if (file.size > this.MAX_FILE_SIZE) {
+      this.imageError = `File size exceeds ${this.MAX_FILE_SIZE / (1024 * 1024)}MB limit.`;
+      this.selectedFile = null;
+      this.imagePreview = null;
+      return;
+    }
+
+    // Store the file and create preview
+    this.selectedFile = file;
+    this.convertFileToBase64(file);
+  }
+
+  /**
+   * Convert file to base64 for preview and storage
+   */
+  private convertFileToBase64(file: File): void {
+    this.isImageLoading = true;
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.imagePreview = reader.result as string;
+      // Update form control with base64 data
+      this.teamForm.patchValue({ logo: reader.result as string });
+      this.isImageLoading = false;
+    };
+    reader.onerror = () => {
+      this.imageError = 'Failed to read file. Please try again.';
+      this.selectedFile = null;
+      this.imagePreview = null;
+      this.isImageLoading = false;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  /**
+   * Remove selected image
+   */
+  removeImage(): void {
+    this.selectedFile = null;
+    this.imagePreview = null;
+    this.imageError = null;
+    this.isImageLoading = false;
+    this.logoRemoved = true; // Mark that logo was explicitly removed
+    this.teamForm.patchValue({ logo: '' });
+
+    // Reset file input
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    if (fileInput) {
+      fileInput.value = '';
+    }
+  }
+
+  /**
+   * Trigger file input click
+   */
+  triggerFileInput(): void {
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    fileInput?.click();
+  }
+
+  /**
+   * Handle drag over event
+   */
+  onDragOver(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragging = true;
+  }
+
+  /**
+   * Handle drag leave event
+   */
+  onDragLeave(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragging = false;
+  }
+
+  /**
+   * Handle drop event
+   */
+  onDrop(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragging = false;
+
+    const files = event.dataTransfer?.files;
+    if (files && files.length > 0) {
+      const file = files[0];
+      this.validateAndProcessFile(file);
+    }
+  }
+
+  onSubmit(): void {
+    if (this.isLoading) {
+      return; // Prevent submission while loading
+    }
+
+    if (this.teamForm.valid) {
+      const formValue = this.teamForm.value;
+
+      // Find the selected level and division names for display
+      const selectedLevel = this.levelOptions.find((opt) => opt.value === formValue.level);
+      const selectedDivision = this.divisionOptions.find((opt) => opt.value === formValue.division);
+
+      const teamData: Partial<Team> & { logoFile?: File; logoRemoved?: boolean } = {
+        name: formValue.name,
+        group: formValue.group,
+        level: selectedLevel?.label || '',
+        levelId: parseInt(formValue.level, 10),
+        division: selectedDivision?.label || '',
+        divisionId: parseInt(formValue.division, 10),
+        city: formValue.city,
+        abbreviation: formValue.abbreviation || undefined,
+        logo: formValue.logo || '/assets/icons/teams.svg',
+      };
+
+      if (this.isEditMode && this.data.team) {
+        teamData.id = this.data.team.id;
+      }
+
+      // Include the file if one was selected
+      if (this.selectedFile) {
+        teamData.logoFile = this.selectedFile;
+      } else if (this.logoRemoved) {
+        // If logo was removed, create an empty blob to signal deletion
+        const emptyBlob = new Blob([], { type: 'application/octet-stream' });
+        teamData.logoFile = new File([emptyBlob], 'empty.dat');
+        teamData.logoRemoved = true;
+      }
+
+      this.dialogRef.close(teamData);
+    } else {
+      // Mark all fields as touched to show validation errors
+      Object.keys(this.teamForm.controls).forEach((key) => {
+        this.teamForm.get(key)?.markAsTouched();
+      });
+    }
+  }
+
+  onCancel(): void {
+    this.dialogRef.close();
+  }
+
+  /**
+   * Get form validity status for debugging
+   */
+  get isFormValid(): boolean {
+    return this.teamForm.valid;
+  }
+
+  /**
+   * Get form errors for debugging
+   */
+  get formErrors(): Record<string, unknown> {
+    const errors: Record<string, unknown> = {};
+    Object.keys(this.teamForm.controls).forEach((key) => {
+      const control = this.teamForm.get(key);
+      if (control && control.errors) {
+        errors[key] = control.errors;
+      }
+    });
+    return errors;
+  }
+
+  getErrorMessage(fieldName: string): string {
+    const control = this.teamForm.get(fieldName);
+    if (control?.errors && control.touched) {
+      if (control.errors['required']) {
+        return `${this.getFieldLabel(fieldName)} is required`;
+      }
+      if (control.errors['minlength']) {
+        return `${this.getFieldLabel(fieldName)} must be at least ${control.errors['minlength'].requiredLength} characters long`;
+      }
+      if (control.errors['min']) {
+        return `${this.getFieldLabel(fieldName)} must be at least ${control.errors['min'].min}`;
+      }
+      if (control.errors['max']) {
+        return `${this.getFieldLabel(fieldName)} must be no more than ${control.errors['max'].max}`;
+      }
+    }
+    return '';
+  }
+
+  private getFieldLabel(fieldName: string): string {
+    const labels: Record<string, string> = {
+      name: 'Team Name',
+      group: 'Group',
+      level: 'Level',
+      division: 'Division',
+      city: 'City',
+      abbreviation: 'Abbreviation',
+      logo: 'Team Logo',
+    };
+    return labels[fieldName] || fieldName;
+  }
+}

@@ -1,0 +1,106 @@
+<div class="video-form-modal">
+  <h2 mat-dialog-title class="modal-title">
+    <span class="material-symbols-rounded title-icon">video_library</span>
+    {{ isEditMode ? 'Edit Video' : 'Add Video' }}
+  </h2>
+
+  <mat-dialog-content class="modal-content">
+    <form [formGroup]="videoForm" class="video-form">
+      <!-- Video Information Section -->
+      <div class="form-section">
+        <div class="section-header">
+          <span class="section-title">Video Information</span>
+        </div>
+        <mat-divider class="section-divider"></mat-divider>
+
+        <div class="form-row">
+          <mat-form-field
+            [floatLabel]="'always'"
+            [hideRequiredMarker]="true"
+            class="form-field full-width"
+            >
+            <mat-label class="uppercase text-custom-secondary">Video Name</mat-label>
+            <input matInput formControlName="name" placeholder="Enter video name" />
+            @if (name?.invalid && name?.touched) {
+              <mat-error>
+                {{ getErrorMessage('name') }}
+              </mat-error>
+            }
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field
+            [floatLabel]="'always'"
+            [hideRequiredMarker]="true"
+            class="form-field full-width"
+            >
+            <mat-label class="uppercase text-custom-secondary">YouTube Link</mat-label>
+            <input matInput formControlName="youtube_link" placeholder="Enter YouTube link" />
+            @if (youtube_link?.invalid && youtube_link?.touched) {
+              <mat-error>
+                {{ getErrorMessage('youtube_link') }}
+              </mat-error>
+            }
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field
+            [floatLabel]="'always'"
+            [hideRequiredMarker]="true"
+            class="form-field full-width"
+            >
+            <mat-label class="uppercase text-custom-secondary">Description</mat-label>
+            <textarea
+              matInput
+              formControlName="description"
+              placeholder="Enter video description"
+              rows="4"
+            ></textarea>
+            @if (description?.invalid && description?.touched) {
+              <mat-error>
+                {{ getErrorMessage('description') }}
+              </mat-error>
+            }
+          </mat-form-field>
+        </div>
+      </div>
+    </form>
+  </mat-dialog-content>
+
+  <mat-dialog-actions class="modal-actions">
+    <app-button
+      [bg]="'transparent'"
+      [bghover]="'button_background'"
+      [br]="'border'"
+      [color]="'text_primary'"
+      [colorhover]="'text_primary'"
+      [opacity]="1"
+      [opacityhover]="1"
+      [width]="'auto'"
+      [rounded]="false"
+      [haveContent]="true"
+      (clicked)="onCancel()"
+      >
+      Cancel
+    </app-button>
+    <app-button-loading
+      [isLoading]="false"
+      [isDisabled]="videoForm.invalid"
+      materialIcon="save"
+      [bg]="'primary'"
+      [bghover]="'primary_dark'"
+      [color]="'white'"
+      [colorhover]="'white'"
+      [opacity]="1"
+      [opacityhover]="1"
+      [width]="'auto'"
+      [rounded]="false"
+      [haveContent]="true"
+      (clicked)="onSubmit()"
+      >
+      {{ isEditMode ? 'Update Video' : 'Add Video' }}
+    </app-button-loading>
+  </mat-dialog-actions>
+</div>

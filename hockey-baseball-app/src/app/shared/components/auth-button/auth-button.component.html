@@ -1,0 +1,26 @@
+@let loadingValue = loading();
+@let variantValue = variant();
+@let typeValue = type();
+@let disabledValue = disabled();
+@let textValue = text();
+@let loadingTextValue = loadingText();
+
+<button
+  [matButton]="variantValue"
+  [type]="typeValue"
+  [disabled]="disabledValue || loadingValue"
+  (click)="onClick()"
+  class="!px-6 !text-xs !h-8"
+  [class.loading-button]="loadingValue"
+  [style]="
+    variantValue === 'filled'
+      ? 'background-color: var(--color-primary)'
+      : 'border-color: var(--color-primary); color: var(--color-primary)'
+  "
+>
+  @if (!loadingValue) {
+    <span>{{ textValue }}</span>
+  } @else {
+    <span>{{ loadingTextValue }}</span>
+  }
+</button>

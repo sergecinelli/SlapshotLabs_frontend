@@ -1,5 +1,5 @@
-import { Component, Input } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, ChangeDetectionStrategy, input } from '@angular/core';
+import { NgStyle } from '@angular/common';
 import { MatRippleModule } from '@angular/material/core';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ButtonBaseClass } from '../button-base.class';
@@ -7,23 +7,22 @@ import { ComponentDisableToggleDirective } from '../../../directives/component-d
 
 @Component({
   selector: 'app-button',
-  standalone: true,
-  imports: [CommonModule, MatRippleModule, MatTooltipModule, ComponentDisableToggleDirective],
+  imports: [NgStyle, MatRippleModule, MatTooltipModule, ComponentDisableToggleDirective],
   templateUrl: './button.component.html',
   styleUrl: '../button.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ButtonComponent extends ButtonBaseClass {
-  @Input() type: 'button' | 'submit' = 'button';
+  type = input<'button' | 'submit'>('button');
 
   override click(event: MouseEvent) {
-    if (this.isDisabled) {
+    if (this.isDisabled()) {
       event.preventDefault();
       event.stopPropagation();
       return;
     }
     event.preventDefault();
     event.stopPropagation();
-    this.clicked.emit();
+    this.clicked.emit(event);
   }
 }
-

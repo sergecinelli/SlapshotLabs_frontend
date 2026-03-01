@@ -1,0 +1,73 @@
+@let loadingValue = loading();
+@let gamesValue = games();
+@let layoutModeValue = layoutMode();
+@let pageTitleValue = pageTitle();
+@let schedulesValue = schedules();
+
+<div class="page-content" [appVisibilityMap]="visibilityByRoleMap">
+
+  <!-- Header -->
+  <div class="schedules-header">
+    <div class="schedules-header-left">
+      <h2>{{ pageTitleValue }}</h2>
+    </div>
+    <div class="schedules-header-actions" style="display: flex; gap: 10px; align-items: center;">
+      <app-button
+        [materialIcon]="layoutModeValue === 'card' ? 'table_rows' : 'grid_view'"
+        [bg]="'white'"
+        [bghover]="'gray_tone3'"
+        [color]="'text_primary'"
+        [colorhover]="'primary'"
+        [width]="'auto'"
+        [rounded]="false"
+        [haveContent]="true"
+        (clicked)="toggleLayout()"
+      >
+        {{ layoutModeValue === 'card' ? 'Table View' : 'Card View' }}
+      </app-button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  @if (loadingValue) {
+    <div class="schedules-loading">
+      <div class="loading-text">Loading schedules...</div>
+    </div>
+  }
+
+  <!-- Empty State -->
+  @if (!loadingValue && gamesValue.length === 0) {
+    <div class="schedules-empty">
+      <div class="empty-text">No schedules found.</div>
+    </div>
+  }
+
+  <!-- Content -->
+  @if (!loadingValue && gamesValue.length > 0) {
+    @if (layoutModeValue === 'card') {
+      <!-- Card View -->
+      <div class="schedules-cards-container">
+        @for (schedule of schedulesValue; track schedule.id) {
+          <app-game-card
+            [game]="schedule"
+            [showActions]="false"
+            [showScore]="true"
+          />
+        }
+      </div>
+    } @else {
+      <!-- Table View -->
+      <div class="schedules-table-container">
+        <app-data-table
+          [columns]="tableColumns"
+          [data]="gamesValue"
+          [actions]="tableActions"
+          [loading]="loadingValue"
+          (actionClick)="onActionClick($event)"
+          (sort)="onSort($event)"
+          emptyMessage="No schedules found."
+        ></app-data-table>
+      </div>
+    }
+  }
+</div>

@@ -1,5 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { Schedule, GameStatus } from '../../interfaces/schedule.interface';
@@ -10,9 +9,7 @@ import { getGameStatusLabel, isOvertimeStatus } from '../../constants/game-statu
 
 @Component({
   selector: 'app-game-card',
-  standalone: true,
   imports: [
-    CommonModule,
     RouterLink,
     MatIconModule,
     ButtonComponent,
@@ -21,28 +18,29 @@ import { getGameStatusLabel, isOvertimeStatus } from '../../constants/game-statu
   ],
   templateUrl: './game-card.component.html',
   styleUrl: './game-card.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GameCardComponent {
-  @Input({ required: true }) game!: Schedule;
-  @Input() showActions = false;
-  @Input() showScore = true; // Show score or "at" separator for upcoming games
-  @Input() isDeleting = false; // Loading state for delete action
-  @Output() edit = new EventEmitter<Schedule>();
-  @Output() delete = new EventEmitter<Schedule>();
+  game = input.required<Schedule>();
+  showActions = input(false);
+  showScore = input(true);
+  isDeleting = input(false);
+  edit = output<Schedule>();
+  delete = output<Schedule>();
 
   protected readonly GameStatus = GameStatus;
   protected readonly getGameStatusLabel = getGameStatusLabel;
   protected readonly isOvertimeStatus = isOvertimeStatus;
 
   onEdit(): void {
-    this.edit.emit(this.game);
+    this.edit.emit(this.game());
   }
 
   onDelete(): void {
-    this.delete.emit(this.game);
+    this.delete.emit(this.game());
   }
 
-  formatTimeTo12Hour(time: string): string {
+  formatTimeTo12Hour(time: string | undefined): string {
     if (!time) return '';
 
     const parts = time.split(':');
@@ -61,47 +59,50 @@ export class GameCardComponent {
   }
 
   getVenueName(): string {
-    if (this.game.arenaRink) {
-      const parts = this.game.arenaRink.split(' – ');
-      return parts[0] || this.game.arenaRink;
+    const g = this.game();
+    if (g.arenaRink) {
+      const parts = g.arenaRink.split(' – ');
+      return parts[0] || g.arenaRink;
     }
-    return this.game.arenaName || '';
+    return g.arenaName || '';
   }
 
   getVenueLocation(): string {
-    if (this.game.arenaAddress) {
-      const parts = this.game.arenaAddress.split(',');
+    const g = this.game();
+    if (g.arenaAddress) {
+      const parts = g.arenaAddress.split(',');
       if (parts.length >= 2) {
         return parts.slice(-2).join(',').trim();
       }
-      return this.game.arenaAddress;
+      return g.arenaAddress;
     }
     return '';
   }
 
   getTeamLocation(isHome: boolean): string {
+    const g = this.game();
     if (isHome) {
-      if (this.game.homeTeamAgeGroup && this.game.homeTeamLevelName) {
-        return `${this.game.homeTeamAgeGroup} ${this.game.homeTeamLevelName}`;
+      if (g.homeTeamAgeGroup && g.homeTeamLevelName) {
+        return `${g.homeTeamAgeGroup} ${g.homeTeamLevelName}`;
       }
-      return this.game.homeTeamAgeGroup || this.game.homeTeamLevelName || '';
+      return g.homeTeamAgeGroup || g.homeTeamLevelName || '';
     } else {
-      if (this.game.awayTeamAgeGroup && this.game.awayTeamLevelName) {
-        return `${this.game.awayTeamAgeGroup} ${this.game.awayTeamLevelName}`;
+      if (g.awayTeamAgeGroup && g.awayTeamLevelName) {
+        return `${g.awayTeamAgeGroup} ${g.awayTeamLevelName}`;
       }
-      return this.game.awayTeamAgeGroup || this.game.awayTeamLevelName || '';
+      return g.awayTeamAgeGroup || g.awayTeamLevelName || '';
     }
   }
 
   isWinning(isHome: boolean): boolean {
-    if (this.game.status !== GameStatus.GameOver) {
+    const g = this.game();
+    if (g.status !== GameStatus.GameOver) {
       return false;
     }
     if (isHome) {
-      return this.game.homeGoals > this.game.awayGoals;
+      return g.homeGoals > g.awayGoals;
     } else {
-      return this.game.awayGoals > this.game.homeGoals;
+      return g.awayGoals > g.homeGoals;
     }
   }
 }
-

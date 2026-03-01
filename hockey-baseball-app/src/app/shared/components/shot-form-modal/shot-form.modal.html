@@ -1,0 +1,466 @@
+<div class="shot-form-modal">
+  <h2 mat-dialog-title class="modal-title">
+    <span class="material-symbols-rounded title-icon">sports_hockey</span>
+    Shot
+  </h2>
+
+  <mat-dialog-content class="modal-content">
+    <form [formGroup]="shotForm" class="shot-form">
+      <!-- Shot Type Section -->
+      <div class="form-section">
+        <div class="section-header">
+          <span class="section-title">Shot Information</span>
+        </div>
+        <mat-divider class="section-divider"></mat-divider>
+
+        <div class="shot-type-container">
+          <div class="shot-type-label uppercase text-custom-secondary">Type of Shot</div>
+          <div class="shot-type-buttons">
+            @for (type of shotTypeOptions; track type) {
+              <button
+                type="button"
+                class="shot-type-button"
+                [class.selected]="shotForm.get('shotType')?.value === type.value"
+                (click)="selectShotType(type.value)"
+                >
+                <div class="type-name">{{ type.label }}</div>
+              </button>
+            }
+          </div>
+          @if (shotForm.get('shotType')?.errors && shotForm.get('shotType')?.touched) {
+            <div
+              class="error-message"
+              >
+              {{ getErrorMessage('shotType') }}
+            </div>
+          }
+        </div>
+
+        <!-- Scoring Chance Checkbox -->
+        <div class="scoring-chance-container">
+          <mat-checkbox formControlName="isScoringChance" class="scoring-chance-checkbox">
+            Scoring Chance
+          </mat-checkbox>
+        </div>
+      </div>
+
+      <!-- Goal Section -->
+      @if (isGoal) {
+        <div class="form-section">
+          <div class="section-header">
+            <span class="section-title">Goal Details</span>
+          </div>
+          <mat-divider class="section-divider"></mat-divider>
+          <div class="team-selection-container">
+            <div class="team-selection-label uppercase text-custom-secondary">
+              Team that Scored a Goal
+            </div>
+            <div class="team-buttons">
+              @for (team of teamOptions; track team) {
+                <button
+                  type="button"
+                  class="team-button"
+                  [class.selected]="shotForm.get('scoringTeam')?.value === team.value"
+                  (click)="selectTeam(team.value, 'scoringTeam')"
+                  >
+                  <div class="team-avatar">
+                    @if (team.value) {
+                      <img
+                        [src]="getTeamLogoUrl(team.value)"
+                        [alt]="team.label"
+                        class="team-logo-img"
+                        />
+                    }
+                  </div>
+                  <div class="team-name">{{ team.label }}</div>
+                </button>
+              }
+            </div>
+            @if (shotForm.get('scoringTeam')?.errors && shotForm.get('scoringTeam')?.touched) {
+              <div
+                class="error-message"
+                >
+                {{ getErrorMessage('scoringTeam') }}
+              </div>
+            }
+          </div>
+          <div class="player-selection-container">
+            <div class="player-selection-label uppercase text-custom-secondary">
+              Player That scored a Goal
+            </div>
+            <div class="player-buttons">
+              @for (player of playerOptions; track player) {
+                <button
+                  type="button"
+                  class="player-button"
+                  [class.selected]="shotForm.get('scoringPlayer')?.value === player.value"
+                  (click)="selectPlayer(player.value, 'scoringPlayer')"
+                  >
+                  <div class="player-name">
+                    @if (player.number !== undefined && player.number !== null) {
+                      <span class="player-number">{{ player.number }}</span>
+                    }
+                    <span class="player-label">{{ player.label }}</span>
+                  </div>
+                </button>
+              }
+            </div>
+            @if (shotForm.get('scoringPlayer')?.errors && shotForm.get('scoringPlayer')?.touched) {
+              <div
+                class="error-message"
+                >
+                {{ getErrorMessage('scoringPlayer') }}
+              </div>
+            }
+          </div>
+          <div class="player-selection-container">
+            <div class="player-selection-label uppercase text-custom-secondary">
+              Player that got Assist
+            </div>
+            <div class="player-buttons">
+              @for (player of playerOptions; track player) {
+                <button
+                  type="button"
+                  class="player-button"
+                  [class.selected]="shotForm.get('assistPlayer')?.value === player.value"
+                  (click)="selectPlayer(player.value, 'assistPlayer')"
+                  >
+                  <div class="player-name">
+                    @if (player.number !== undefined && player.number !== null) {
+                      <span class="player-number">{{ player.number }}</span>
+                    }
+                    <span class="player-label">{{ player.label }}</span>
+                  </div>
+                </button>
+              }
+            </div>
+          </div>
+          <div class="goalie-selection-container">
+            <div class="goalie-selection-label uppercase text-custom-secondary">
+              Goalie that got Scored On
+            </div>
+            <div class="goalie-buttons">
+              @for (goalie of goalieOptions; track goalie) {
+                <button
+                  type="button"
+                  class="goalie-button"
+                  [class.selected]="shotForm.get('goalieScored')?.value === goalie.value"
+                  (click)="selectGoalie(goalie.value, 'goalieScored')"
+                  >
+                  <div class="goalie-name">
+                    @if (goalie.number) {
+                      <span class="player-number">{{ goalie.number }}</span>
+                    }
+                    <span class="player-label">{{ goalie.label }}</span>
+                  </div>
+                </button>
+              }
+            </div>
+            @if (shotForm.get('goalieScored')?.errors && shotForm.get('goalieScored')?.touched) {
+              <div
+                class="error-message"
+                >
+                {{ getErrorMessage('goalieScored') }}
+              </div>
+            }
+          </div>
+          <div class="goal-type-container">
+            <div class="goal-type-label uppercase text-custom-secondary">Goal Type</div>
+            <div class="goal-type-buttons">
+              <button
+                type="button"
+                class="goal-type-button"
+                [class.selected]="shotForm.get('goalType')?.value === 'Short Handed'"
+                (click)="selectGoalType('Short Handed')"
+                >
+                <div class="goal-type-name">Short Handed</div>
+              </button>
+              <button
+                type="button"
+                class="goal-type-button"
+                [class.selected]="shotForm.get('goalType')?.value === 'Even Strength'"
+                (click)="selectGoalType('Even Strength')"
+                >
+                <div class="goal-type-name">Even Strength</div>
+              </button>
+              <button
+                type="button"
+                class="goal-type-button"
+                [class.selected]="shotForm.get('goalType')?.value === 'Power Play'"
+                (click)="selectGoalType('Power Play')"
+                >
+                <div class="goal-type-name">Power Play</div>
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- Save/Missed/Blocked Section -->
+      @if (isNonGoal) {
+        <div class="form-section">
+          <div class="section-header">
+            <span class="section-title">Shot Details</span>
+          </div>
+          <mat-divider class="section-divider"></mat-divider>
+          <div class="team-selection-container">
+            <div class="team-selection-label uppercase text-custom-secondary">
+              Team that shot the puck
+            </div>
+            <div class="team-buttons">
+              @for (team of teamOptions; track team) {
+                <button
+                  type="button"
+                  class="team-button"
+                  [class.selected]="shotForm.get('shootingTeam')?.value === team.value"
+                  (click)="selectTeam(team.value, 'shootingTeam')"
+                  >
+                  <div class="team-avatar">
+                    @if (team.value) {
+                      <img
+                        [src]="getTeamLogoUrl(team.value)"
+                        [alt]="team.label"
+                        class="team-logo-img"
+                        />
+                    }
+                  </div>
+                  <div class="team-name">{{ team.label }}</div>
+                </button>
+              }
+            </div>
+            @if (shotForm.get('shootingTeam')?.errors && shotForm.get('shootingTeam')?.touched) {
+              <div
+                class="error-message"
+                >
+                {{ getErrorMessage('shootingTeam') }}
+              </div>
+            }
+          </div>
+          <div class="player-selection-container">
+            <div class="player-selection-label uppercase text-custom-secondary">
+              Player that shot the puck
+            </div>
+            <div class="player-buttons">
+              @for (player of playerOptions; track player) {
+                <button
+                  type="button"
+                  class="player-button"
+                  [class.selected]="shotForm.get('shootingPlayer')?.value === player.value"
+                  (click)="selectPlayer(player.value, 'shootingPlayer')"
+                  >
+                  <div class="player-name">
+                    @if (player.number !== undefined && player.number !== null) {
+                      <span class="player-number">{{ player.number }}</span>
+                    }
+                    <span class="player-label">{{ player.label }}</span>
+                  </div>
+                </button>
+              }
+            </div>
+            @if (
+              shotForm.get('shootingPlayer')?.errors && shotForm.get('shootingPlayer')?.touched
+              ) {
+              <div
+                class="error-message"
+                >
+                {{ getErrorMessage('shootingPlayer') }}
+              </div>
+            }
+          </div>
+          @if (isBlocked) {
+            <div class="player-selection-container">
+              <div class="player-selection-label uppercase text-custom-secondary">
+                Player that blocked the shot
+              </div>
+              <div class="player-buttons">
+                @for (player of blockingPlayerOptions; track player) {
+                  <button
+                    type="button"
+                    class="player-button"
+                    [class.selected]="shotForm.get('blockingPlayer')?.value === player.value"
+                    (click)="selectPlayer(player.value, 'blockingPlayer')"
+                    >
+                    <div class="player-name">
+                      @if (player.number) {
+                        <span class="player-number">{{ player.number }}</span>
+                      }
+                      <span class="player-label">{{ player.label }}</span>
+                    </div>
+                  </button>
+                }
+              </div>
+            </div>
+          }
+          <div class="goalie-selection-container">
+            <div class="goalie-selection-label uppercase text-custom-secondary">Goalie in Net</div>
+            <div class="goalie-buttons">
+              @for (goalie of goalieOptions; track goalie) {
+                <button
+                  type="button"
+                  class="goalie-button"
+                  [class.selected]="shotForm.get('goalieInNet')?.value === goalie.value"
+                  (click)="selectGoalie(goalie.value, 'goalieInNet')"
+                  >
+                  <div class="goalie-name">
+                    @if (goalie.number) {
+                      <span class="player-number">{{ goalie.number }}</span>
+                    }
+                    <span class="player-label">{{ goalie.label }}</span>
+                  </div>
+                </button>
+              }
+            </div>
+            @if (shotForm.get('goalieInNet')?.errors && shotForm.get('goalieInNet')?.touched) {
+              <div
+                class="error-message"
+                >
+                {{ getErrorMessage('goalieInNet') }}
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- Scoring Chance Note -->
+      @if (isScoringChance) {
+        <div class="form-section">
+          <div class="section-header">
+            <span class="section-title">Scoring Chance Details</span>
+          </div>
+          <mat-divider class="section-divider"></mat-divider>
+          <div class="form-row">
+            <mat-form-field
+              [floatLabel]="'always'"
+              [hideRequiredMarker]="true"
+              class="form-field full-width"
+              >
+              <mat-label class="uppercase text-custom-secondary">Note</mat-label>
+              <textarea
+                matInput
+                formControlName="scoringChanceNote"
+                placeholder="Description about the scoring chance"
+                rows="3"
+              ></textarea>
+              @if (
+                shotForm.get('scoringChanceNote')?.errors &&
+                shotForm.get('scoringChanceNote')?.touched
+                ) {
+                <mat-error
+                  >
+                  {{ getErrorMessage('scoringChanceNote') }}
+                </mat-error>
+              }
+            </mat-form-field>
+          </div>
+        </div>
+      }
+
+      <!-- Period and Time Section -->
+      <div class="form-section">
+        <div class="section-header">
+          <span class="section-title">Time Information</span>
+        </div>
+        <mat-divider class="section-divider"></mat-divider>
+
+        <div class="period-selection-container">
+          <div class="period-selection-label uppercase text-custom-secondary">Period</div>
+          <div class="period-buttons">
+            @for (period of periodOptions; track period) {
+              <button
+                type="button"
+                class="period-button"
+                [class.selected]="shotForm.get('period')?.value === period.value"
+                (click)="selectPeriod(period.value)"
+                >
+                <div class="period-name">{{ period.label }}</div>
+              </button>
+            }
+          </div>
+          @if (shotForm.get('period')?.errors && shotForm.get('period')?.touched) {
+            <div
+              class="period-error"
+              >
+              {{ getErrorMessage('period') }}
+            </div>
+          }
+        </div>
+
+        <div class="form-row">
+          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
+            <mat-label class="uppercase text-custom-secondary">Time</mat-label>
+            <input matInput formControlName="time" placeholder="mm:ss" maxlength="6" />
+            @if (shotForm.get('time')?.errors && shotForm.get('time')?.touched) {
+              <mat-error>
+                {{ getErrorMessage('time') }}
+              </mat-error>
+            }
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Shot Location Section -->
+      <div class="form-section">
+        <app-shot-location-selector
+          [team1]="team1Data"
+          [team2]="team2Data"
+          [initialLocation]="shotLocation"
+          (locationChange)="onShotLocationChange($event)"
+        ></app-shot-location-selector>
+      </div>
+
+      <!-- YouTube Link Section -->
+      <div class="form-section">
+        <div class="section-header">
+          <span class="section-title">Add YouTube Link</span>
+        </div>
+        <mat-divider class="section-divider"></mat-divider>
+
+        <div class="form-row">
+          <mat-form-field
+            [floatLabel]="'always'"
+            [hideRequiredMarker]="true"
+            class="form-field full-width"
+            >
+            <mat-label class="uppercase text-custom-secondary">YouTube Link</mat-label>
+            <input matInput formControlName="youtubeLink" placeholder="YouTube link" />
+          </mat-form-field>
+        </div>
+      </div>
+    </form>
+  </mat-dialog-content>
+
+  <mat-dialog-actions class="modal-actions">
+    <app-button
+      [bg]="'transparent'"
+      [bghover]="'button_background'"
+      [br]="'border'"
+      [color]="'text_primary'"
+      [colorhover]="'text_primary'"
+      [opacity]="1"
+      [opacityhover]="1"
+      [width]="'auto'"
+      [rounded]="false"
+      [haveContent]="true"
+      (clicked)="onCancel()"
+      >
+      Cancel
+    </app-button>
+    <app-button-loading
+      [isLoading]="isSubmitting"
+      [isDisabled]="shotForm.invalid || isSubmitting"
+      materialIcon="save"
+      [bg]="'primary'"
+      [bghover]="'primary_dark'"
+      [color]="'white'"
+      [colorhover]="'white'"
+      [opacity]="1"
+      [opacityhover]="1"
+      [width]="'auto'"
+      [rounded]="false"
+      [haveContent]="true"
+      (clicked)="onSubmit()"
+      >
+      {{ isEditMode ? 'Save Shot' : 'Add Shot' }}
+    </app-button-loading>
+  </mat-dialog-actions>
+</div>

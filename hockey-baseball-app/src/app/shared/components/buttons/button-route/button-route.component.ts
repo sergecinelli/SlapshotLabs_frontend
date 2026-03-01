@@ -1,5 +1,5 @@
-import { Component, Input } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, ChangeDetectionStrategy, input } from '@angular/core';
+import { NgStyle } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { MatRippleModule } from '@angular/material/core';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -7,14 +7,13 @@ import { ButtonBaseClass } from '../button-base.class';
 
 @Component({
   selector: 'app-button-route',
-  standalone: true,
-  imports: [CommonModule, RouterLink, MatRippleModule, MatTooltipModule],
+  imports: [NgStyle, RouterLink, MatRippleModule, MatTooltipModule],
   templateUrl: './button-route.component.html',
   styleUrl: '../button.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ButtonRouteComponent extends ButtonBaseClass {
-  @Input() route = '.';
-  @Input() queryParams: Record<string, string | number> | null = null;
-  @Input() target: '_self' | '_blank' | '_parent' | '_top' = '_self';
+  route = input('.');
+  queryParams = input<Record<string, string | number> | null>(null);
+  target = input<'_self' | '_blank' | '_parent' | '_top'>('_self');
 }
-

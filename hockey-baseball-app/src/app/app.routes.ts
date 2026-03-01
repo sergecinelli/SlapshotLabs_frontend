@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { LayoutComponent } from './components/layout/layout';
+import { LayoutComponent } from './components/layout/layout.component';
 import { AuthGuard } from './shared/guards/auth.guard';
 import { GuestGuard } from './shared/guards/guest.guard';
 import { RoleAccessGuard } from './shared/guards/role-access.guard';
@@ -29,24 +29,24 @@ export const routes: Routes = [
   // Authentication routes (lazy loaded)
   {
     path: 'sign-in',
-    loadComponent: () => import('./components/sign-in/sign-in').then((m) => m.SignInComponent),
+    loadComponent: () => import('./components/sign-in/sign-in.component').then((m) => m.SignInComponent),
     canActivate: [GuestGuard],
   },
   {
     path: 'sign-up',
-    loadComponent: () => import('./components/sign-up/sign-up').then((m) => m.SignUpComponent),
+    loadComponent: () => import('./components/sign-up/sign-up.component').then((m) => m.SignUpComponent),
     canActivate: [GuestGuard],
   },
   {
     path: 'forgot-password',
     loadComponent: () =>
-      import('./components/forgot-password/forgot-password').then((m) => m.ForgotPasswordComponent),
+      import('./components/forgot-password/forgot-password.component').then((m) => m.ForgotPasswordComponent),
     canActivate: [GuestGuard],
   },
   {
     path: 'reset-password',
     loadComponent: () =>
-      import('./components/reset-password/reset-password').then((m) => m.ResetPasswordComponent),
+      import('./components/reset-password/reset-password.component').then((m) => m.ResetPasswordComponent),
     canActivate: [GuestGuard],
   },
 
@@ -59,7 +59,7 @@ export const routes: Routes = [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       {
         path: 'dashboard',
-        loadComponent: () => import('./pages/dashboard/dashboard').then((m) => m.DashboardComponent),
+        loadComponent: () => import('./pages/dashboard/dashboard.page').then((m) => m.DashboardPage),
         canActivate: [RoleAccessGuard],
         data: {
           pageRolesAccessMap: dashboardPageRolesAccessMap,
@@ -72,7 +72,7 @@ export const routes: Routes = [
       {
         path: 'account/profile',
         loadComponent: () =>
-          import('./pages/account/profile/profile').then((m) => m.ProfileComponent),
+          import('./pages/account/profile/profile.page').then((m) => m.ProfilePage),
         data: {
           breadcrumbs: [
             { label: 'Account', path: '/account', icon: 'account_circle' },
@@ -83,8 +83,8 @@ export const routes: Routes = [
       {
         path: 'account/payment-method',
         loadComponent: () =>
-          import('./pages/account/payment-method/payment-method').then(
-            (m) => m.PaymentMethodComponent
+          import('./pages/account/payment-method/payment-method.page').then(
+            (m) => m.PaymentMethodPage
           ),
         data: {
           breadcrumbs: [
@@ -96,8 +96,8 @@ export const routes: Routes = [
       {
         path: 'account/payment-history',
         loadComponent: () =>
-          import('./pages/account/payment-history/payment-history').then(
-            (m) => m.PaymentHistoryComponent
+          import('./pages/account/payment-history/payment-history.page').then(
+            (m) => m.PaymentHistoryPage
           ),
         data: {
           breadcrumbs: [
@@ -111,7 +111,7 @@ export const routes: Routes = [
       { path: 'teams-and-rosters', redirectTo: 'teams-and-rosters/teams', pathMatch: 'full' },
       {
         path: 'teams',
-        loadComponent: () => import('./pages/teams/teams').then((m) => m.TeamsComponent),
+        loadComponent: () => import('./pages/teams/teams.page').then((m) => m.TeamsPage),
         canActivate: [RoleAccessGuard],
         data: {
           pageRolesAccessMap: teamsPageRolesAccessMap,
@@ -120,7 +120,7 @@ export const routes: Routes = [
       },
       {
         path: 'teams-and-rosters/teams',
-        loadComponent: () => import('./pages/teams/teams').then((m) => m.TeamsComponent),
+        loadComponent: () => import('./pages/teams/teams.page').then((m) => m.TeamsPage),
         canActivate: [RoleAccessGuard],
         data: {
           pageRolesAccessMap: teamsPageRolesAccessMap,
@@ -129,7 +129,7 @@ export const routes: Routes = [
       },
       {
         path: 'teams/players',
-        loadComponent: () => import('./pages/players/players').then((m) => m.PlayersComponent),
+        loadComponent: () => import('./pages/players/players.page').then((m) => m.PlayersPage),
         canActivate: [RoleAccessGuard],
         data: {
           pageRolesAccessMap: playersPageRolesAccessMap,
@@ -138,7 +138,7 @@ export const routes: Routes = [
       },
       {
         path: 'teams-and-rosters/players',
-        loadComponent: () => import('./pages/players/players').then((m) => m.PlayersComponent),
+        loadComponent: () => import('./pages/players/players.page').then((m) => m.PlayersPage),
         canActivate: [RoleAccessGuard],
         data: {
           pageRolesAccessMap: playersPageRolesAccessMap,
@@ -147,7 +147,7 @@ export const routes: Routes = [
       },
       {
         path: 'teams/goalies',
-        loadComponent: () => import('./pages/goalies/goalies').then((m) => m.GoaliesComponent),
+        loadComponent: () => import('./pages/goalies/goalies.page').then((m) => m.GoaliesPage),
         canActivate: [RoleAccessGuard],
         data: {
           pageRolesAccessMap: goaliesPageRolesAccessMap,
@@ -156,7 +156,7 @@ export const routes: Routes = [
       },
       {
         path: 'teams-and-rosters/goalies',
-        loadComponent: () => import('./pages/goalies/goalies').then((m) => m.GoaliesComponent),
+        loadComponent: () => import('./pages/goalies/goalies.page').then((m) => m.GoaliesPage),
         canActivate: [RoleAccessGuard],
         data: {
           pageRolesAccessMap: goaliesPageRolesAccessMap,
@@ -166,7 +166,7 @@ export const routes: Routes = [
       {
         path: 'teams-and-rosters/players/:id/profile',
         loadComponent: () =>
-          import('./pages/player-profile/player-profile').then((m) => m.PlayerProfileComponent),
+          import('./pages/player-profile/player-profile.page').then((m) => m.PlayerProfilePage),
         canActivate: [RoleAccessGuard],
         data: {
           pageRolesAccessMap: playerProfilePageRolesAccessMap,
@@ -176,7 +176,7 @@ export const routes: Routes = [
       {
         path: 'teams-and-rosters/goalies/:id/profile',
         loadComponent: () =>
-          import('./pages/goalie-profile/goalie-profile').then((m) => m.GoalieProfileComponent),
+          import('./pages/goalie-profile/goalie-profile.page').then((m) => m.GoalieProfilePage),
         canActivate: [RoleAccessGuard],
         data: {
           pageRolesAccessMap: goalieProfilePageRolesAccessMap,
@@ -186,7 +186,7 @@ export const routes: Routes = [
       {
         path: 'teams-and-rosters/teams/:id/profile',
         loadComponent: () =>
-          import('./pages/team-profile/team-profile').then((m) => m.TeamProfileComponent),
+          import('./pages/team-profile/team-profile.page').then((m) => m.TeamProfilePage),
         canActivate: [RoleAccessGuard],
         data: {
           pageRolesAccessMap: teamProfilePageRolesAccessMap,
@@ -196,7 +196,7 @@ export const routes: Routes = [
       {
         path: 'teams-and-rosters/players/:id/spray-chart',
         loadComponent: () =>
-          import('./pages/spray-chart/spray-chart').then((m) => m.SprayChartComponent),
+          import('./pages/spray-chart/spray-chart.page').then((m) => m.SprayChartPage),
         data: {
           breadcrumbs: [
             TEAMS_AND_ROSTERS,
@@ -209,7 +209,7 @@ export const routes: Routes = [
       {
         path: 'teams-and-rosters/goalies/:id/spray-chart',
         loadComponent: () =>
-          import('./pages/spray-chart/spray-chart').then((m) => m.SprayChartComponent),
+          import('./pages/spray-chart/spray-chart.page').then((m) => m.SprayChartPage),
         data: {
           breadcrumbs: [
             TEAMS_AND_ROSTERS,
@@ -221,7 +221,7 @@ export const routes: Routes = [
       },
       {
         path: 'teams-and-rosters/teams/:id/schedule',
-        loadComponent: () => import('./pages/schedules/schedules').then((m) => m.SchedulesComponent),
+        loadComponent: () => import('./pages/schedules/schedules.page').then((m) => m.SchedulesPage),
         canActivate: [RoleAccessGuard],
         data: {
           pageRolesAccessMap: schedulesPageRolesAccessMap,
@@ -237,7 +237,7 @@ export const routes: Routes = [
       // Schedule routes
       {
         path: 'schedule',
-        loadComponent: () => import('./pages/schedule/schedule').then((m) => m.ScheduleComponent),
+        loadComponent: () => import('./pages/schedule/schedule.page').then((m) => m.SchedulePage),
         canActivate: [RoleAccessGuard],
         data: {
           pageRolesAccessMap: schedulePageRolesAccessMap,
@@ -249,7 +249,7 @@ export const routes: Routes = [
       {
         path: 'analytics',
         loadComponent: () =>
-          import('./pages/analytics/analytics').then((m) => m.AnalyticsComponent),
+          import('./pages/analytics/analytics.page').then((m) => m.AnalyticsPage),
         canActivate: [RoleAccessGuard],
         data: {
           pageRolesAccessMap: analyticsPageRolesAccessMap,
@@ -261,7 +261,7 @@ export const routes: Routes = [
       {
         path: 'video-library',
         loadComponent: () =>
-          import('./pages/video-library/video-library').then((m) => m.VideoLibraryComponent),
+          import('./pages/video-library/video-library.page').then((m) => m.VideoLibraryPage),
         canActivate: [RoleAccessGuard],
         data: {
           pageRolesAccessMap: videoLibraryPageRolesAccessMap,
@@ -271,8 +271,8 @@ export const routes: Routes = [
       {
         path: 'highlights',
         loadComponent: () =>
-          import('./pages/video-highlights/video-highlights').then(
-            (m) => m.VideoHighlightsComponent
+          import('./pages/video-highlights/video-highlights.page').then(
+            (m) => m.VideoHighlightsPage
           ),
         canActivate: [RoleAccessGuard],
         data: {
@@ -285,7 +285,7 @@ export const routes: Routes = [
       {
         path: 'gamesheet',
         loadComponent: () =>
-          import('./pages/gamesheet/gamesheet').then((m) => m.GamesheetComponent),
+          import('./pages/gamesheet/gamesheet.page').then((m) => m.GamesheetPage),
         canActivate: [RoleAccessGuard],
         data: {
           pageRolesAccessMap: gamesheetPageRolesAccessMap,
@@ -297,7 +297,7 @@ export const routes: Routes = [
       {
         path: 'schedule/live/:gameId',
         loadComponent: () =>
-          import('./pages/live-dashboard/live-dashboard').then((m) => m.LiveDashboardComponent),
+          import('./pages/live-dashboard/live-dashboard.page').then((m) => m.LiveDashboardPage),
         canActivate: [RoleAccessGuard],
         data: {
           pageRolesAccessMap: liveDashboardPageRolesAccessMap,

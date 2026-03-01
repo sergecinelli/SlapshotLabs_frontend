@@ -1,0 +1,63 @@
+@let currentMonthStartValue = currentMonthStart();
+@let currentMonthEndValue = currentMonthEnd();
+@let loadingValue = loading();
+@let schedulesValue = schedules();
+
+<div class="page-content" [appVisibilityMap]="visibilityByRoleMap">
+
+  <!-- Header with Month Pagination and Add Button -->
+  <div class="schedule-header">
+    <div class="schedule-header-left"></div>
+    <app-week-pagination
+      [weekStart]="currentMonthStartValue"
+      [weekEnd]="currentMonthEndValue"
+      [isFirstWeek]="false"
+      [isLastWeek]="false"
+      (weekChange)="onMonthChange($event)"
+    />
+    <div class="add-schedule-button-wrapper" >
+      <app-button
+        role-visibility-name="add-schedule-button"
+        [bg]="'primary'"
+        [bghover]="'primary_dark'"
+        [color]="'white'"
+        [colorhover]="'white'"
+        [materialIcon]="'add'"
+        [haveContent]="true"
+        (clicked)="openAddScheduleModal()"
+      >
+        Add to Schedule
+      </app-button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  @if (loadingValue) {
+    <div class="schedule-loading">
+      <div class="loading-text">Loading games...</div>
+    </div>
+  }
+
+  <!-- Empty State -->
+  @if (!loadingValue && schedulesValue.length === 0) {
+    <div class="schedule-empty">
+      <div class="empty-text">No games scheduled.</div>
+    </div>
+  }
+
+  <!-- Game Cards -->
+  @if (!loadingValue && schedulesValue.length > 0) {
+    <div class="schedule-cards-container">
+      @for (schedule of schedulesValue; track schedule.id) {
+        <app-game-card
+          [game]="schedule"
+          [showActions]="true"
+          [showScore]="true"
+          [isDeleting]="deletingGameIds.has(schedule.id)"
+          (edit)="editSchedule($event)"
+          (delete)="deleteSchedule($event)"
+        />
+      }
+    </div>
+  }
+</div>

@@ -1,5 +1,5 @@
-import { Component, Input } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, ChangeDetectionStrategy, input } from '@angular/core';
+import { NgStyle } from '@angular/common';
 import { MatRippleModule } from '@angular/material/core';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ButtonBaseClass } from '../button-base.class';
@@ -7,27 +7,25 @@ import { ComponentDisableToggleDirective } from '../../../directives/component-d
 
 @Component({
   selector: 'app-button-loading',
-  standalone: true,
-  imports: [CommonModule, MatRippleModule, MatTooltipModule, ComponentDisableToggleDirective],
+  imports: [NgStyle, MatRippleModule, MatTooltipModule, ComponentDisableToggleDirective],
   templateUrl: './button-loading.component.html',
   styleUrl: '../button.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ButtonLoadingComponent extends ButtonBaseClass {
-  @Input() type: 'button' | 'submit' = 'button';
-  @Input() isLoading = false;
+  type = input<'button' | 'submit'>('button');
+  isLoading = input(false);
 
   override click(event: MouseEvent) {
-    if (this.isLoading || this.isDisabled) {
+    if (this.isLoading() || this.isDisabled()) {
       event.preventDefault();
       event.stopPropagation();
       return;
     }
-    // For submit buttons, don't prevent default to allow form submission
-    if (this.type !== 'submit') {
+    if (this.type() !== 'submit') {
       event.preventDefault();
       event.stopPropagation();
     }
-    this.clicked.emit();
+    this.clicked.emit(event);
   }
 }
-

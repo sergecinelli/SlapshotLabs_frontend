@@ -1,0 +1,210 @@
+@let statsValue = stats();
+@let selectedIndicesValue = selectedIndices();
+@let linesDataValue = linesData();
+@let hoveredLineValue = hoveredLine();
+@let showDirectionValue = showDirection();
+@let goalieIdValue = goalieId();
+@let teamIdValue = teamId();
+@let goalieNameValue = goalieName();
+@let teamNameValue = teamName();
+@let showGoalieNameValue = showGoalieName();
+@let teamLogoLoadedValue = teamLogoLoaded();
+@let rinkItemsValue = rinkItems();
+@let netItemsValue = netItems();
+
+<div class="shot-location-display-container">
+  <!-- Stats Labels -->
+  <div class="stats-labels">
+    @for (stat of statsValue; track stat.type) {
+      <div
+        class="stat-label"
+        [class.inactive]="!stat.isVisible"
+        aria-hidden="true"
+        (click)="toggleType(stat.type)"
+      >
+        <span class="stat-dot" [style.background-color]="stat.color"></span>
+        <span class="stat-text">{{ stat.label }}: {{ stat.count }}</span>
+      </div>
+    }
+    @if (selectedIndicesValue.size > 0) {
+      <div class="clear-lines-btn">
+        <app-button-small
+          materialIcon="close"
+          tooltip="Clear lines"
+          color="text_secondary"
+          colorhover="text_primary"
+          (clicked)="clearAllLines()"
+        >Clear</app-button-small>
+      </div>
+    }
+  </div>
+
+  <!-- Location Images Grid -->
+  <div class="location-images" #locationImages>
+    <!-- Connecting lines overlay -->
+    @if (linesDataValue.length > 0 || hoveredLineValue) {
+      <svg class="line-overlay" [attr.viewBox]="(linesDataValue[0] || hoveredLineValue)!.viewBox">
+        @for (line of linesDataValue; track $index) {
+          <line
+            [attr.x1]="line.x1"
+            [attr.y1]="line.y1"
+            [attr.x2]="line.x2"
+            [attr.y2]="line.y2"
+            [attr.stroke]="line.color"
+            stroke-width="2"
+          />
+        }
+        @if (hoveredLineValue; as hl) {
+          <line
+            [attr.x1]="hl.x1"
+            [attr.y1]="hl.y1"
+            [attr.x2]="hl.x2"
+            [attr.y2]="hl.y2"
+            [attr.stroke]="hl.color"
+            stroke-width="2"
+            opacity="0.5"
+          />
+        }
+      </svg>
+    }
+    <!-- Rink Image -->
+    <div class="location-container">
+      @if (showDirectionValue) {
+        <div class="direction-indicator">
+          <svg class="direction-arrow" viewBox="0 0 200 40" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <marker
+                id="arrowhead"
+                markerWidth="10"
+                markerHeight="10"
+                refX="9"
+                refY="3"
+                orient="auto"
+              >
+                <polygon points="0 0, 10 3, 0 6" fill="#ef4444" />
+              </marker>
+            </defs>
+            <line
+              x1="10"
+              y1="20"
+              x2="190"
+              y2="20"
+              stroke="#ef4444"
+              stroke-width="3"
+              marker-end="url(#arrowhead)"
+            />
+          </svg>
+        </div>
+      }
+      <div class="location-wrapper" #rinkWrapper>
+        <img src="/assets/images/hockey-rink.svg" alt="Hockey Rink" class="location-image" />
+        @for (item of rinkItemsValue; track $index) {
+          <div
+            class="location-marker"
+            [class.marker-large]="item.index >= 100"
+            [class.marker-medium]="item.index >= 10 && item.index < 100"
+            [class.selected]="selectedIndicesValue.has(item.index)"
+            [style.top.%]="item.iceTopOffset"
+            [style.left.%]="item.iceLeftOffset"
+            [style.background-color]="item.color"
+            [style.--marker-color]="item.color"
+            (click)="selectMarker(item, $event)"
+            (mouseenter)="onMarkerHover(item)"
+            (mouseleave)="onMarkerLeave()"
+          >
+            <span class="marker-dot"></span>
+            <span class="marker-badge">{{ item.index }}</span>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Net Image -->
+    <div class="location-container">
+      @if ((goalieIdValue || teamIdValue) && (goalieNameValue || teamNameValue) && showGoalieNameValue) {
+        <div class="goalie-info">
+          <div class="goalie-photo-container">
+            @if (teamLogoLoadedValue) {
+              <img
+                [src]="getTeamLogoUrl()"
+                [alt]="(teamNameValue || 'Team') + ' logo'"
+                class="goalie-logo"
+                (error)="onTeamLogoError()"
+                (load)="onTeamLogoLoad()"
+              />
+            } @else {
+              <div class="goalie-initials">{{ getTeamInitials() }}</div>
+            }
+          </div>
+          <div class="goalie-text">
+            <span class="goalie-label">Goalie</span>
+            <span class="goalie-name">{{ goalieNameValue || teamNameValue }}</span>
+          </div>
+        </div>
+      }
+      <div class="location-wrapper" #netWrapper>
+        <img src="/assets/images/net.svg" alt="Net" class="location-image" />
+        @for (item of netItemsValue; track $index) {
+          <div
+            class="location-marker"
+            [class.marker-large]="item.index >= 100"
+            [class.marker-medium]="item.index >= 10 && item.index < 100"
+            [class.selected]="selectedIndicesValue.has(item.index)"
+            [style.top.%]="item.netTopOffset"
+            [style.left.%]="item.netLeftOffset"
+            [style.background-color]="item.color"
+            [style.--marker-color]="item.color"
+            (click)="selectMarker(item, $event)"
+            (mouseenter)="onMarkerHover(item)"
+            (mouseleave)="onMarkerLeave()"
+          >
+            <span class="marker-dot"></span>
+            <span class="marker-badge">{{ item.index }}</span>
+          </div>
+        }
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Marker popover (fixed position, outside overflow containers) -->
+  @if (popoverItem(); as item) {
+    @let popoverAboveValue = popoverAbove();
+    @let popoverPositionValue = popoverPosition();
+    <div
+      class="marker-popover"
+      [class.above]="popoverAboveValue"
+      [style.top.px]="popoverPositionValue?.top"
+      [style.left.px]="popoverPositionValue?.left"
+    >
+      <div class="popover-header" [style.color]="item.color">
+        #{{ item.index }} — {{ item.eventTypeLabel || item.type }}
+      </div>
+      <div class="popover-body">
+        @if (item.playerName) {
+          <div class="popover-row"><strong>Player:</strong> {{ item.playerName }}</div>
+        }
+        @if (item.teamName) {
+          <div class="popover-row"><strong>Team:</strong> {{ item.teamName }}</div>
+        }
+        @if (item.periodLabel) {
+          <div class="popover-row"><strong>Period:</strong> {{ item.periodLabel }}</div>
+        }
+        @if (item.timeLabel) {
+          <div class="popover-row"><strong>Time:</strong> {{ item.timeLabel }}</div>
+        }
+        @if (item.description) {
+          <div class="popover-row">{{ item.description }}</div>
+        }
+      </div>
+      @if (item.youtubeLink) {
+        <div class="popover-footer">
+          <a class="popover-video-link" (click)="openVideo(item.youtubeLink)">
+            <mat-icon>play_circle</mat-icon>
+            VIDEO
+          </a>
+        </div>
+      }
+    </div>
+  }
+</div>
