@@ -48,7 +48,7 @@ export class BannerService implements OnDestroy {
   private isLeader = false;
   private pollingSubscription?: Subscription;
   private abortController = new AbortController();
-  
+
   private isAuthenticated = false;
 
   constructor() {
@@ -57,7 +57,7 @@ export class BannerService implements OnDestroy {
     this.broadcastChannel.postMessage({ type: 'REQUEST_DATA' });
 
     // Subscribe to auth state
-    this.authService.isAuthenticated$.subscribe(isAuth => {
+    this.authService.isAuthenticated$.subscribe((isAuth) => {
       this.isAuthenticated = isAuth;
       // If we are currently the leader, start/stop polling based on auth status
       if (this.isLeader) {
@@ -111,7 +111,7 @@ export class BannerService implements OnDestroy {
         // If we are here, we are the leader.
         console.log('BannerService: Acquired leader lock');
         this.isLeader = true;
-        
+
         // Start polling if authenticated
         if (this.isAuthenticated) {
           this.startPolling();

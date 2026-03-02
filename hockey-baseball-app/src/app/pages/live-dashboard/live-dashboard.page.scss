@@ -1,5 +1,5 @@
-@use "../../shared/styles/dashboard-card.scss" as *;
-@use "sass:map";
+@use '../../shared/styles/dashboard-card.scss' as *;
+@use 'sass:map';
 
 // Helper function to convert colors from colors.ts to rgba with opacity
 // Colors from colors.ts:
@@ -8,13 +8,13 @@
 // black: #0f0f0f = rgb(15, 15, 15)
 @function rgba-from-color($color-name, $opacity) {
   $colors: (
-    "primary": rgba(207, 20, 43, $opacity),
-    "live": rgba(207, 20, 43, $opacity),
-    "white": rgba(255, 255, 255, $opacity),
-    "black": rgba(15, 15, 15, $opacity),
-    "upcoming": rgba(34, 169, 242, $opacity),
-    "completed": rgba(61, 12, 198, $opacity),
-    "gray": rgba(135, 135, 135, $opacity)
+    'primary': rgba(207, 20, 43, $opacity),
+    'live': rgba(207, 20, 43, $opacity),
+    'white': rgba(255, 255, 255, $opacity),
+    'black': rgba(15, 15, 15, $opacity),
+    'upcoming': rgba(34, 169, 242, $opacity),
+    'completed': rgba(61, 12, 198, $opacity),
+    'gray': rgba(135, 135, 135, $opacity),
   );
   @return map.get($colors, $color-name);
 }
@@ -88,7 +88,7 @@
     }
 
     .team-score-wrapper {
-      background-color: rgba-from-color("primary", 0.15);
+      background-color: rgba-from-color('primary', 0.15);
     }
   }
 
@@ -239,8 +239,8 @@
 
   &.winning-home,
   &.winning-away {
-    background-color: rgba-from-color("primary", 0.1);
-    border: 2px solid rgba-from-color("primary", 0.3);
+    background-color: rgba-from-color('primary', 0.1);
+    border: 2px solid rgba-from-color('primary', 0.3);
   }
 }
 
@@ -303,6 +303,142 @@
 .live-dashboard-card-content {
   padding: 24px;
   flex: 1;
+}
+
+// Event Filters
+.live-dashboard-card-header-filters {
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.event-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.event-type-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 6px 10px;
+  background-color: var(--gray-tone3);
+  border-radius: 8px;
+}
+
+.event-filter-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  user-select: none;
+  transition: opacity 0.15s ease;
+
+  &.inactive {
+    opacity: 0.4;
+  }
+
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.04);
+  }
+}
+
+.event-filter-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+
+  &.dot-goal {
+    background-color: #22c55e;
+  }
+  &.dot-save {
+    background-color: #3b82f6;
+  }
+  &.dot-missed {
+    background-color: #64748b;
+  }
+  &.dot-blocked {
+    background-color: #06b6d4;
+  }
+  &.dot-faceoff {
+    background-color: #ec4899;
+  }
+  &.dot-turnover {
+    background-color: #8b5cf6;
+  }
+  &.dot-penalty {
+    background-color: #ef4444;
+  }
+  &.dot-goalieChange {
+    background-color: #f59e0b;
+  }
+}
+
+.event-filter-text {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.player-filter-field {
+  min-width: 150px;
+
+  .mat-mdc-text-field-wrapper {
+    padding: 0 12px;
+  }
+
+  .mat-mdc-form-field-infix {
+    min-height: 36px;
+    padding: 6px 0;
+  }
+}
+
+.player-filter-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.player-filter-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.player-filter-action-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  padding: 2px 4px;
+  border-radius: 4px;
+
+  &:hover {
+    color: var(--text-primary);
+    background-color: rgba(0, 0, 0, 0.04);
+  }
+}
+
+.player-filter-action-divider {
+  font-size: 12px;
+  color: var(--text-secondary);
+  opacity: 0.4;
+}
+
+.player-number-badge {
+  font-weight: 600;
+  color: var(--text-secondary);
+  font-size: 12px;
+  margin-right: 4px;
 }
 
 // Tournament Header - Modern Material Design
@@ -368,7 +504,7 @@
 .tournament-category {
   font-size: 13px;
   font-weight: 500;
-  color: rgba-from-color("white", 0.8);
+  color: rgba-from-color('white', 0.8);
   line-height: 1.4;
   white-space: nowrap;
 }
@@ -402,15 +538,15 @@
 
   // Darker style for arena info (second item)
   &:nth-child(2) {
-    color: rgba-from-color("white", 0.75);
+    color: rgba-from-color('white', 0.75);
 
     .tournament-info-icon {
-      color: rgba-from-color("white", 0.75);
+      color: rgba-from-color('white', 0.75);
       opacity: 1;
     }
 
     .tournament-info-text {
-      color: rgba-from-color("white", 0.75);
+      color: rgba-from-color('white', 0.75);
     }
   }
 }
@@ -544,7 +680,7 @@
   }
 
   &.live-dashboard-goal-row {
-    background-color: rgba-from-color("primary", 0.06);
+    background-color: rgba-from-color('primary', 0.06);
     border-left: 3px solid var(--primary);
 
     .live-dashboard-table-td {
@@ -553,7 +689,7 @@
     }
 
     &:hover {
-      background-color: rgba-from-color("primary", 0.1);
+      background-color: rgba-from-color('primary', 0.1);
     }
   }
 }
@@ -845,7 +981,7 @@
 
   mat-icon,
   .material-symbols-rounded {
-    color: rgba-from-color("black", 0.26) !important;
+    color: rgba-from-color('black', 0.26) !important;
   }
 }
 
@@ -876,6 +1012,23 @@
 
   .live-dashboard-team-name {
     font-size: 12px;
+  }
+
+  .event-filters {
+    width: 100%;
+  }
+
+  .event-type-filters {
+    width: 100%;
+  }
+
+  .player-filter-wrapper {
+    width: 100%;
+  }
+
+  .player-filter-field {
+    max-width: 100%;
+    width: 100%;
   }
 
   .live-dashboard-score-card {

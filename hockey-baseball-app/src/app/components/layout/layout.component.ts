@@ -95,28 +95,21 @@ export class LayoutComponent implements OnInit {
       return;
     }
 
-    // Toggle navigation menu on 't' key press
-    if (event.key === 't' || event.key === 'T') {
+    // Shift+T — toggle navigation menu
+    if (event.shiftKey && event.code === 'KeyT') {
       event.preventDefault();
       this.toggleCollapse();
       return;
     }
 
-    // Navigation shortcuts with number keys
-    const keyMap: Record<string, string> = {
-      '1': '/dashboard',
-      '2': '/account',
-      '3': '/teams-and-rosters',
-      '4': '/schedule',
-      '5': '/analytics',
-      '6': '/video-library',
-      '7': '/highlights',
-      '8': '/gamesheet',
-    };
+    // Shift+1..9 — navigate to Nth menu item
+    const digit = event.code?.replace('Digit', '');
+    const index = Number(digit) - 1;
+    const items = this.navigationItems();
 
-    if (keyMap[event.key]) {
+    if (event.shiftKey && index >= 0 && index < items.length) {
       event.preventDefault();
-      this.navigate(keyMap[event.key]);
+      this.navigate(items[index].path);
     }
   }
 

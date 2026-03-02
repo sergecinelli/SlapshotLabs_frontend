@@ -1,5 +1,5 @@
-@use "@angular/material" as mat;
-@use "./app/shared/styles/dashboard-card.scss";
+@use '@angular/material' as mat;
+@use './app/shared/styles/dashboard-card.scss';
 
 // Global CSS Variables
 // Note: All colors are defined in colors.ts and set via ThemeService
@@ -8,40 +8,40 @@
 
 // Inter Font Family
 @font-face {
-  font-family: "Inter";
-  src: url("assets/fonts/Inter/Inter-Thin.ttf") format("truetype");
+  font-family: 'Inter';
+  src: url('assets/fonts/Inter/Inter-Thin.ttf') format('truetype');
   font-weight: 100;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: "Inter";
-  src: url("assets/fonts/Inter/Inter-Light.ttf") format("truetype");
+  font-family: 'Inter';
+  src: url('assets/fonts/Inter/Inter-Light.ttf') format('truetype');
   font-weight: 300;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: "Inter";
-  src: url("assets/fonts/Inter/Inter-Regular.ttf") format("truetype");
+  font-family: 'Inter';
+  src: url('assets/fonts/Inter/Inter-Regular.ttf') format('truetype');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: "Inter";
-  src: url("assets/fonts/Inter/Inter-SemiBold.ttf") format("truetype");
+  font-family: 'Inter';
+  src: url('assets/fonts/Inter/Inter-SemiBold.ttf') format('truetype');
   font-weight: 500;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: "Inter";
-  src: url("assets/fonts/Inter/Inter-Bold.ttf") format("truetype");
+  font-family: 'Inter';
+  src: url('assets/fonts/Inter/Inter-Bold.ttf') format('truetype');
   font-weight: 700;
   font-style: normal;
   font-display: swap;
@@ -63,7 +63,7 @@ $custom-primary-palette: (
   95: #edacad,
   98: #f3c8c7,
   99: #f9e4e1,
-  100: #ffffff
+  100: #ffffff,
 );
 
 $custom-secondary-palette: (
@@ -82,7 +82,7 @@ $custom-secondary-palette: (
   95: #d7dbe8,
   98: #efeefb,
   99: #f7f6ff,
-  100: #ffffff
+  100: #ffffff,
 );
 
 @layer utilities {
@@ -99,7 +99,7 @@ $custom-secondary-palette: (
 }
 
 * {
-  font-family: "Inter";
+  font-family: 'Inter';
   box-sizing: border-box;
   text-decoration: none;
 }
@@ -110,10 +110,10 @@ html {
       color: (
         primary: $custom-primary-palette,
         secondary: $custom-secondary-palette,
-        tertiary: $custom-primary-palette
+        tertiary: $custom-primary-palette,
       ),
       typography: Inter,
-      density: 0
+      density: 0,
     )
   );
 }
@@ -165,7 +165,7 @@ body {
 }
 body {
   margin: 0;
-  font-family: "Inter", Roboto, "Helvetica Neue", sans-serif;
+  font-family: 'Inter', Roboto, 'Helvetica Neue', sans-serif;
   font-synthesis: none; // Отключаем синтетическое утолщение, чтобы использовать реальные файлы шрифтов
 }
 
@@ -333,6 +333,10 @@ mat-error {
     color: var(--color-dark) !important;
   }
 
+  .mat-mdc-select-arrow-wrapper {
+    transform: translateY(0) !important;
+  }
+
   .mat-mdc-select-arrow {
     color: var(--color-secondary) !important;
   }
@@ -365,6 +369,8 @@ mat-error {
     }
 
     .mat-mdc-select-trigger {
+      display: flex;
+      align-items: center;
       font-size: 14px !important;
     }
   }
@@ -400,7 +406,7 @@ mat-error {
   font-size: 14px !important;
 }
 
-.cdk-overlay-pane[aria-label*="select"] .mat-mdc-option,
+.cdk-overlay-pane[aria-label*='select'] .mat-mdc-option,
 .cdk-overlay-pane .mat-mdc-select-panel .mat-mdc-option {
   font-size: 14px !important;
 }
@@ -450,8 +456,8 @@ mat-error {
 // Spray chart tooltip styles - support line breaks
 // Material tooltip applies class to the overlay pane, not the surface
 // So we need to target the surface inside the pane with the class
-.cdk-overlay-pane[class*="spray-chart-tooltip"] .mdc-tooltip__surface,
-.cdk-overlay-container .cdk-overlay-pane[class*="spray-chart-tooltip"] .mdc-tooltip__surface {
+.cdk-overlay-pane[class*='spray-chart-tooltip'] .mdc-tooltip__surface,
+.cdk-overlay-container .cdk-overlay-pane[class*='spray-chart-tooltip'] .mdc-tooltip__surface {
   white-space: pre-line !important;
   max-width: 260px !important;
   line-height: 1.5 !important;
@@ -471,10 +477,64 @@ mat-error {
 
 // Universal fallback - apply to all tooltip surfaces in overlay
 .cdk-overlay-container .mdc-tooltip__surface {
-  &[class*="spray-chart"] {
+  &[class*='spray-chart'] {
     white-space: pre-line !important;
     max-width: 260px !important;
     line-height: 1.5 !important;
     text-align: left !important;
+  }
+}
+
+// Player filter dropdown panel (live dashboard)
+.player-filter-panel.mat-mdc-select-panel {
+  min-width: 280px !important;
+  max-height: 360px !important;
+  padding: 0 !important;
+
+  .mat-mdc-optgroup {
+    .mat-mdc-optgroup-label {
+      font-size: 11px !important;
+      font-weight: 700 !important;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-secondary, #6b7280) !important;
+      min-height: 32px !important;
+      line-height: 32px !important;
+      padding: 0 16px !important;
+      background-color: #f9fafb !important;
+      border-bottom: 1px solid #e5e7eb;
+
+      .mdc-list-item__primary-text {
+        font-size: 11px !important;
+        font-weight: 700 !important;
+        letter-spacing: 0.5px;
+        color: var(--text-secondary, #6b7280) !important;
+      }
+    }
+
+    + .mat-mdc-optgroup {
+      .mat-mdc-optgroup-label {
+        border-top: 1px solid #e5e7eb;
+      }
+    }
+  }
+
+  .mat-mdc-option {
+    min-height: 40px !important;
+    font-size: 13px !important;
+    padding: 0 16px 0 16px !important;
+  }
+
+  .mat-mdc-option.mdc-list-item--selected:not(.mdc-list-item--disabled) {
+    background-color: white !important;
+    color: var(--color-dark) !important;
+  }
+
+  .mat-mdc-option.mdc-list-item--selected:not(.mdc-list-item--disabled):hover {
+    background-color: #f3f4f6 !important;
+  }
+
+  .mat-pseudo-checkbox-minimal {
+    display: inline-block !important;
   }
 }

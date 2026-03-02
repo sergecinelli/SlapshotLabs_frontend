@@ -914,6 +914,8 @@ export class LiveDashboardPage implements OnInit, OnDestroy {
           })),
         ];
 
+        this.selectAllPlayers();
+
         // Start polling for live data after roster is loaded
         this.startLiveDataPolling();
       },
@@ -1011,6 +1013,129 @@ export class LiveDashboardPage implements OnInit, OnDestroy {
 
   // Game events (loaded from API)
   gameEvents = signal<GameEvent[]>([]);
+
+  // Event type filter definitions
+  readonly eventTypeFilters: { key: string; label: string }[] = [
+    { key: 'goal', label: 'Goals' },
+    { key: 'save', label: 'Saves' },
+    { key: 'missed', label: 'Missed' },
+    { key: 'blocked', label: 'Blocked' },
+    { key: 'faceoff', label: 'Faceoffs' },
+    { key: 'turnover', label: 'Turnovers' },
+    { key: 'penalty', label: 'Penalties' },
+    { key: 'goalieChange', label: 'Goalie Change' },
+  ];
+
+  activeEventTypeFilters = signal<Set<string>>(
+    new Set(['goal', 'save', 'missed', 'blocked', 'faceoff', 'turnover', 'penalty', 'goalieChange'])
+  );
+
+  selectedPlayerIds = signal<Set<number>>(new Set());
+
+  selectedPlayerIdsArray = computed(() => Array.from(this.selectedPlayerIds()));
+
+  filteredGameEvents = computed(() => {
+    const events = this.gameEvents();
+    const activeTypes = this.activeEventTypeFilters();
+    const selectedPlayers = this.selectedPlayerIds();
+    const allPlayersSelected = this.isAllPlayersSelected;
+
+    if (activeTypes.size === this.eventTypeFilters.length && allPlayersSelected) {
+      return events;
+    }
+
+    const hasPlayerFilter = !allPlayersSelected;
+
+    const filtered = events.filter((event) => {
+      if (event.period) return true;
+
+      const typeKey = this.getEventTypeKey(event);
+      if (!activeTypes.has(typeKey)) return false;
+
+      if (hasPlayerFilter) {
+        const playerId = event.rawEventData?.player_id;
+        if (!playerId || !selectedPlayers.has(playerId)) return false;
+      }
+
+      return true;
+    });
+
+    return this.removeLonelyPeriodHeaders(filtered);
+  });
+
+  get homePlayerFilterOptions() {
+    const map = new Map<number, { value: number; label: string; teamId: number; number?: number }>();
+    for (const p of this.playerOptions) {
+      if (p.teamId === this.homeTeamId) map.set(p.value, p);
+    }
+    for (const g of this.goalieOptions) {
+      if (g.teamId === this.homeTeamId && !map.has(g.value)) map.set(g.value, g);
+    }
+    return Array.from(map.values());
+  }
+
+  get awayPlayerFilterOptions() {
+    const map = new Map<number, { value: number; label: string; teamId: number; number?: number }>();
+    for (const p of this.playerOptions) {
+      if (p.teamId === this.awayTeamId) map.set(p.value, p);
+    }
+    for (const g of this.goalieOptions) {
+      if (g.teamId === this.awayTeamId && !map.has(g.value)) map.set(g.value, g);
+    }
+    return Array.from(map.values());
+  }
+
+  toggleEventTypeFilter(key: string): void {
+    const current = new Set(this.activeEventTypeFilters());
+    if (current.has(key)) {
+      current.delete(key);
+    } else {
+      current.add(key);
+    }
+    this.activeEventTypeFilters.set(current);
+  }
+
+  onPlayerSelectionChange(playerIds: number[]): void {
+    this.selectedPlayerIds.set(new Set(playerIds));
+  }
+
+  get isAllPlayersSelected(): boolean {
+    const allIds = new Set<number>();
+    for (const p of this.playerOptions) allIds.add(p.value);
+    for (const g of this.goalieOptions) allIds.add(g.value);
+    if (allIds.size === 0) return true;
+    return this.selectedPlayerIds().size >= allIds.size;
+  }
+
+  selectAllPlayers(): void {
+    const allIds = new Set<number>();
+    for (const p of this.playerOptions) allIds.add(p.value);
+    for (const g of this.goalieOptions) allIds.add(g.value);
+    this.selectedPlayerIds.set(allIds);
+  }
+
+  clearAllPlayers(): void {
+    this.selectedPlayerIds.set(new Set());
+  }
+
+  private getEventTypeKey(event: GameEvent): string {
+    if (event.eventNameId === this.shotOnGoalEventId) {
+      return event.shotType || 'save';
+    }
+    if (event.eventNameId === this.faceoffEventId) return 'faceoff';
+    if (event.eventNameId === this.turnoverEventId) return 'turnover';
+    if (event.eventNameId === this.penaltyEventId) return 'penalty';
+    if (event.eventNameId === this.goalieChangeEventId) return 'goalieChange';
+    return 'unknown';
+  }
+
+  private removeLonelyPeriodHeaders(events: GameEvent[]): GameEvent[] {
+    return events.filter((event, index) => {
+      if (!event.period) return true;
+      const next = events[index + 1];
+      return next && !next.period;
+    });
+  }
 
   // Helpers to map UI keys to API fields
   private mapDefensiveField(type: 'icing' | 'skate' | 'soWin' | 'soLose' | 'pass') {

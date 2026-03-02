@@ -1,17 +1,267 @@
-// Dark sidebar theme colors
-// Using global CSS variables from styles.scss
+// ============================================
+// Layout Component Styles
+// ============================================
+
+// --- Page Layout ---
+
+.page-content-wrapper {
+  background-color: var(--page-background);
+}
+
+// --- Sidebar Utilities ---
+
+.bg-sidebar-dark {
+  background-color: var(--sidebar) !important;
+}
+
+.bg-sidebar-hover {
+  background-color: var(--sidebar-hover) !important;
+}
+
+.border-sidebar-border {
+  border-color: var(--sidebar-border) !important;
+}
+
+// --- Logo ---
 
 .logo-header {
   height: 139px;
-  padding: 0 1rem; // px-4
+  padding: 0 1rem;
   border-bottom: 1px solid var(--sidebar-border);
   display: flex;
   align-items: center;
 }
 
-.page-content-wrapper {
-  background-color: var(--page-background);
+.logo-image {
+  background-color: white;
+  border-radius: 10px;
+  object-fit: contain;
+  flex-shrink: 0;
+  width: 70px;
+  height: 70px;
+  transition:
+    width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    height 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.2s ease-in-out;
+  will-change: width, height;
+
+  &.logo-collapsed {
+    width: 50px;
+    height: 50px;
+  }
 }
+
+.logo-container:hover .logo-image {
+  transform: scale(1.05);
+}
+
+.logo-text-container {
+  display: none;
+  overflow: hidden;
+}
+
+.logo-text-line {
+  opacity: 0;
+  transform: translateX(-20px);
+  white-space: nowrap;
+  font-size: 20px;
+  font-weight: 900;
+}
+
+.logo-text-primary {
+  color: var(--color-primary);
+}
+
+.logo-text-white {
+  color: white;
+}
+
+// --- Sidebar Expanded State (.w-64) ---
+
+.w-64 {
+  .logo-text-container {
+    display: flex;
+    animation: slideInText 0.6s ease-out 0.1s both;
+  }
+
+  .logo-text-line {
+    animation: fadeInSlide 0.6s ease-out 0.1s both;
+  }
+
+  nav .nav-item-text {
+    animation: fadeInSlideNav 0.2s ease-out 0.1s both;
+  }
+}
+
+// --- Collapse Button ---
+
+.collapse-button {
+  position: absolute;
+  top: 128px;
+  right: 28px;
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  min-height: 24px;
+  border-radius: 50%;
+  background-color: var(--sidebar);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  z-index: 10;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+  outline: none;
+  border: 1px solid var(--border-dark);
+
+  &:focus {
+    outline: none;
+  }
+
+  .material-symbols-rounded {
+    color: white;
+    font-size: 28px;
+    line-height: 1;
+  }
+
+  &:hover .material-symbols-rounded {
+    color: var(--color-primary);
+  }
+}
+
+// --- Navigation Icons ---
+
+.nav-icon,
+.submenu-icon {
+  transition: color 0.1s ease-in-out;
+  color: #ffffff;
+}
+
+// --- Navigation ---
+
+nav {
+  display: flex;
+  flex-direction: column;
+  background-color: transparent;
+  overflow-y: auto;
+  overflow-x: hidden;
+  flex: 1;
+  min-height: 0;
+  padding: 10px;
+  padding-top: 15px;
+
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--sidebar-border);
+    border-radius: 2px;
+
+    &:hover {
+      background-color: #3d4154;
+    }
+  }
+
+  .nav-item-text {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+
+  button,
+  a {
+    display: flex;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 12px;
+    white-space: nowrap;
+    color: #949494;
+    text-decoration: none;
+
+    svg {
+      color: white !important;
+      stroke: white !important;
+    }
+
+    &.gamesheet {
+      opacity: 1;
+    }
+
+    &:hover {
+      background-color: #222222;
+      color: white !important;
+
+      &.gamesheet {
+        opacity: 0.9;
+      }
+    }
+
+    &.active {
+      color: white !important;
+      background-color: var(--color-primary) !important;
+    }
+
+    .submenu-chevron {
+      position: static !important;
+      margin-left: auto !important;
+      margin-right: 6px;
+      border: 1px solid var(--border-dark);
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      min-width: 20px;
+      display: flex !important;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      flex-grow: 0;
+      z-index: 10;
+      pointer-events: auto;
+    }
+
+    > div:first-child {
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+  }
+
+  .submenu-item {
+    color: #878787;
+
+    &:hover {
+      color: #ffffff;
+    }
+
+    &.active {
+      color: white !important;
+      background-color: var(--color-primary) !important;
+    }
+  }
+}
+
+.navigation-item {
+  transition: all 0.2s ease-in-out;
+
+  &:hover {
+    transform: translateX(2px);
+  }
+}
+
+.submenu-enter {
+  animation: slideDown 0.3s ease-out;
+}
+
+// --- User Profile ---
 
 .user-profile-section {
   border-top: 1px solid var(--border-dark);
@@ -46,74 +296,53 @@
   }
 }
 
-.bg-sidebar-dark {
-  background-color: var(--sidebar) !important;
+// --- App Header ---
+
+.app-header {
+  padding: 10px 20px;
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  background-color: #f5f5f5;
 }
 
-.bg-sidebar-hover {
-  background-color: var(--sidebar-hover) !important;
+.app-header-container {
+  display: flex;
+  width: 100%;
+  height: 100%;
 }
 
-.border-sidebar-border {
-  border-color: var(--sidebar-border) !important;
-}
-
-// Right border for navigation menu
-// .bg-sidebar-dark {
-//   border-right: 1px solid var(--border) !important;
-// }
-
-// Collapse button styles
-.collapse-button {
-  position: absolute;
-  top: 128px;
-  right: 28px;
-  width: 24px;
-  height: 24px;
-  min-width: 24px;
-  min-height: 24px;
-  border-radius: 50%;
-  background-color: var(--sidebar);
+.live-banner-container {
+  flex: 1;
+  min-width: 0;
   display: flex;
   align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  padding: 0;
-  z-index: 10;
-  transition: all 0.2s ease;
-  box-sizing: border-box;
-  outline: none;
-  border: none;
-  border: 1px solid var(--border-dark);
+  overflow-x: auto;
 
-  &:focus {
-    outline: none;
-  }
-
-  .material-symbols-rounded {
-    color: white;
-    font-size: 28px;
-    line-height: 1;
-  }
-
-  &:hover {
-    .material-symbols-rounded {
-      color: var(--color-primary);
-    }
+  .live-banner {
+    width: 100%;
+    min-width: max-content;
   }
 }
 
-.navigation-item {
-  transition: all 0.2s ease-in-out;
-
-  &:hover {
-    transform: translateX(2px);
-  }
+.app-header-actions {
+  display: flex;
+  align-self: flex-start;
+  justify-content: flex-end;
+  min-width: 260px;
+  max-width: 270px;
+  flex: 0 0 270px;
 }
 
-.submenu-enter {
-  animation: slideDown 0.3s ease-out;
+.app-header-actions-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: auto;
+  margin-bottom: auto;
 }
+
+// --- Animations ---
 
 @keyframes slideDown {
   from {
@@ -124,57 +353,6 @@
     opacity: 1;
     transform: translateY(0);
   }
-}
-
-nav::-webkit-scrollbar {
-  width: 4px;
-}
-
-nav::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-nav::-webkit-scrollbar-thumb {
-  background-color: var(--sidebar-border);
-  border-radius: 2px;
-}
-
-nav::-webkit-scrollbar-thumb:hover {
-  background-color: #3d4154;
-}
-
-// Logo text animation - appears after menu expands
-// Hide text completely until menu is fully expanded (300ms transition + 50ms delay)
-.logo-text-container {
-  display: none;
-  overflow: hidden;
-}
-
-// Show text container only when menu is fully expanded (w-64)
-.w-64 .logo-text-container {
-  display: flex;
-  animation: slideInText 0.6s ease-out 0.1s both;
-}
-
-.logo-text-line {
-  opacity: 0;
-  transform: translateX(-20px);
-  white-space: nowrap;
-  font-size: 20px;
-  font-weight: 900;
-}
-
-.logo-text-primary {
-  color: var(--color-primary);
-}
-
-.logo-text-white {
-  color: white;
-}
-
-// Animate text lines when container is visible
-.w-64 .logo-text-line {
-  animation: fadeInSlide 0.6s ease-out 0.1s both;
 }
 
 @keyframes slideInText {
@@ -199,74 +377,6 @@ nav::-webkit-scrollbar-thumb:hover {
   }
 }
 
-.logo-image {
-  background-color: white;
-  border-radius: 10px;
-  object-fit: contain;
-  flex-shrink: 0;
-  width: 70px;
-  height: 70px;
-  transition:
-    width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-    height 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-    transform 0.2s ease-in-out;
-  will-change: width, height;
-
-  &.logo-collapsed {
-    width: 50px;
-    height: 50px;
-  }
-}
-
-.logo-container:hover .logo-image {
-  transform: scale(1.05);
-}
-
-.nav-icon {
-  transition: color 0.1s ease-in-out;
-  color: #ffffff; // White by default
-
-  &.active {
-    color: #ffffff; // Keep white for active items on red background
-  }
-}
-
-.submenu-icon {
-  transition: color 0.1s ease-in-out;
-  color: #878787; // Gray by default
-
-  &.active {
-    color: #ffffff; // White for active submenu items
-  }
-}
-
-nav {
-  display: flex;
-  flex-direction: column;
-  background-color: transparent;
-  overflow-y: auto;
-  overflow-x: hidden;
-  flex: 1;
-  min-height: 0;
-  padding: 10px;
-
-  // margin-top: 34px;
-  padding-top: 15px;
-  // padding-top: 15px;
-  // border-top: 1px solid var(--border-dark);
-
-  // Navigation items text animation - only when menu is expanded
-  .nav-item-text {
-    opacity: 0;
-    transform: translateX(-10px);
-  }
-}
-
-// Apply animation only when sidebar is expanded (w-64)
-.w-64 nav .nav-item-text {
-  animation: fadeInSlideNav 0.2s ease-out 0.1s both;
-}
-
 @keyframes fadeInSlideNav {
   from {
     opacity: 0;
@@ -277,189 +387,3 @@ nav {
     transform: translateX(0);
   }
 }
-
-nav {
-  button,
-  a {
-    display: flex;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 500;
-    padding: 12px;
-    white-space: nowrap;
-    color: #949494;
-    text-decoration: none;
-    flex-wrap: nowrap !important;
-    align-items: center !important;
-
-    // Ensure chevron arrow is visible
-    svg {
-      color: white !important;
-      stroke: white !important;
-    }
-
-    &.gamesheet {
-      opacity: 1;
-
-      .nav-icon {
-        color: #ffffff;
-
-        &.active {
-          color: #ffffff;
-        }
-      }
-    }
-
-    &:hover {
-      background-color: #222222;
-      color: white !important;
-
-      &.gamesheet {
-        background-color: #222222;
-        color: white;
-        opacity: 0.9;
-
-        .nav-icon:not(.active) {
-          color: #ffffff;
-        }
-
-        .submenu-icon:not(.active) {
-          color: #878787;
-        }
-      }
-
-      .nav-icon:not(.active) {
-        color: #ffffff;
-      }
-
-      .submenu-icon:not(.active) {
-        color: #878787;
-      }
-    }
-
-    &.active {
-      color: white !important;
-      background-color: var(--color-primary) !important; // Primary color background for active items
-
-      .nav-icon {
-        color: #ffffff !important; // White icons on primary background
-      }
-
-      .submenu-icon {
-        color: #ffffff !important; // White icons for active submenu items
-      }
-    }
-  }
-
-  // Submenu items
-  .submenu-item {
-    color: #878787;
-
-    &:hover {
-      color: #ffffff;
-
-      .submenu-icon {
-        color: #ffffff;
-      }
-    }
-
-    &.active {
-      color: white !important;
-      background-color: var(--color-primary) !important; // Primary color background for active submenu items
-
-      .submenu-icon {
-        color: #ffffff !important; // White icons for active submenu items
-      }
-    }
-  }
-
-  // Submenu chevron arrow positioning
-  button,
-  a {
-    // Ensure flex-direction is row for proper layout
-    flex-direction: row !important;
-    flex-wrap: nowrap !important;
-
-    .submenu-chevron {
-      position: static !important;
-      margin-left: auto !important;
-      margin-right: 6px;
-      border: 1px solid var(--border-dark);
-      border-radius: 50%;
-      width: 20px;
-      height: 20px;
-      min-width: 20px;
-      display: flex !important;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      flex-grow: 0;
-      z-index: 10;
-      pointer-events: auto;
-    }
-
-    // Ensure the content div doesn't push chevron down
-    > div:first-child {
-      flex: 1 1 auto;
-      min-width: 0;
-    }
-  }
-}
-
-// App header styles
-.app-header {
-  padding: 10px 20px;
-  // padding-bottom: 5px;
-  display: flex;
-  justify-content: space-between;
-  border-bottom: 1px solid var(--border);
-  background-color: #f5f5f5;
-  // height: 160px;
-}
-
-.app-header-container {
-  display: flex;
-  width: 100%;
-  height: 100%;
-}
-
-// Live banner container styles
-.live-banner-container {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  align-items: center;
-  overflow-x: auto;
-
-  .live-banner {
-    width: 100%;
-    min-width: max-content;
-  }
-}
-
-// Header actions (Support / Alerts / Logout)
-.app-header-actions {
-  display: flex;
-  align-self: flex-start;
-  justify-content: flex-end;
-  min-width: 260px;
-  max-width: 270px;
-  flex: 0 0 270px;
-}
-
-.app-header-actions-content {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: auto;
-  margin-bottom: auto;
-}
-
-// Global padding for all page content rendered through router-outlet
-// Use ::ng-deep to penetrate component encapsulation and target .page-content class
-// .page-content-wrapper {
-//   ::ng-deep .page-content {
-//     padding-left: 20px !important;
-//     padding-right: 20px !important;
-//   }
-// }

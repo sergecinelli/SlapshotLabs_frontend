@@ -13,7 +13,6 @@
 @let homeSprayChartDataValue = homeSprayChartData();
 
 <div class="page-content space-y-6" [appVisibilityMap]="visibilityByRoleMap">
-
   <!-- Loading Spinner -->
   @if (isLoadingGameData) {
     <div class="flex items-center justify-center min-h-[60vh]">
@@ -57,7 +56,7 @@
                 [(ngModel)]="currentPeriodId"
                 (selectionChange)="onPeriodChange($event.value)"
                 [panelClass]="'period-select-panel'"
-                >
+              >
                 @for (period of periodOptions; track period) {
                   <mat-option [value]="period.value">
                     {{ period.label }}
@@ -72,7 +71,10 @@
         <!-- Teams and Score Section -->
         <div class="game-teams-section">
           <!-- Away Team -->
-          <div class="team-section team-section-left" [class.winning]="awayTeamValue.score > homeTeamValue.score">
+          <div
+            class="team-section team-section-left"
+            [class.winning]="awayTeamValue.score > homeTeamValue.score"
+          >
             <div class="team-info team-info-left">
               <div class="team-name-group">
                 <div class="team-location">
@@ -88,19 +90,38 @@
           <!-- Score in Center -->
           <div class="score-center-container">
             <div class="score-wrapper">
-              <div class="team-score-wrapper" [class.winning-away]="awayTeamValue.score > homeTeamValue.score">
-                <div class="team-score" [class.winning-score]="awayTeamValue.score > homeTeamValue.score">{{ awayTeamValue.score }}</div>
+              <div
+                class="team-score-wrapper"
+                [class.winning-away]="awayTeamValue.score > homeTeamValue.score"
+              >
+                <div
+                  class="team-score"
+                  [class.winning-score]="awayTeamValue.score > homeTeamValue.score"
+                >
+                  {{ awayTeamValue.score }}
+                </div>
                 <div class="team-sog">SOG: {{ awayTeamValue.sog }}</div>
               </div>
               <div class="score-separator">-</div>
-              <div class="team-score-wrapper" [class.winning-home]="homeTeamValue.score > awayTeamValue.score">
-                <div class="team-score" [class.winning-score]="homeTeamValue.score > awayTeamValue.score">{{ homeTeamValue.score }}</div>
+              <div
+                class="team-score-wrapper"
+                [class.winning-home]="homeTeamValue.score > awayTeamValue.score"
+              >
+                <div
+                  class="team-score"
+                  [class.winning-score]="homeTeamValue.score > awayTeamValue.score"
+                >
+                  {{ homeTeamValue.score }}
+                </div>
                 <div class="team-sog">SOG: {{ homeTeamValue.sog }}</div>
               </div>
             </div>
           </div>
           <!-- Home Team -->
-          <div class="team-section team-section-right" [class.winning]="homeTeamValue.score > awayTeamValue.score">
+          <div
+            class="team-section team-section-right"
+            [class.winning]="homeTeamValue.score > awayTeamValue.score"
+          >
             <div class="team-info team-info-right">
               <img [src]="homeTeamValue.logo" [alt]="homeTeamValue.name" class="team-logo" />
               <div class="team-name-group">
@@ -117,7 +138,11 @@
       </div>
       <!-- Game Event Actions (Unified Section) -->
       @if (!isLoadingGameData) {
-        <div class="live-dashboard-actions-wrapper" role-visibility-name="add-event-button" [attr.role-visibility-team-id]="[homeTeamId, awayTeamId]">
+        <div
+          class="live-dashboard-actions-wrapper"
+          role-visibility-name="add-event-button"
+          [attr.role-visibility-team-id]="[homeTeamId, awayTeamId]"
+        >
           <div class="flex flex-wrap gap-3 justify-center">
             <app-button
               [bg]="'primary'"
@@ -127,7 +152,7 @@
               [materialIcon]="'sports_hockey'"
               [haveContent]="true"
               (clicked)="onShots()"
-              >
+            >
               Shots
             </app-button>
             <app-button
@@ -138,7 +163,7 @@
               [materialIcon]="'swap_horiz'"
               [haveContent]="true"
               (clicked)="onTurnover()"
-              >
+            >
               Turnover
             </app-button>
             <app-button
@@ -149,7 +174,7 @@
               [materialIcon]="'sports'"
               [haveContent]="true"
               (clicked)="onFaceoff()"
-              >
+            >
               Faceoff
             </app-button>
             <app-button
@@ -160,7 +185,7 @@
               [materialIcon]="'shield'"
               [haveContent]="true"
               (clicked)="onGoalieChange()"
-              >
+            >
               Goalie Change
             </app-button>
             <app-button
@@ -171,7 +196,7 @@
               [materialIcon]="'gavel'"
               [haveContent]="true"
               (clicked)="onPenalty()"
-              >
+            >
               Penalty
             </app-button>
           </div>
@@ -182,7 +207,11 @@
         <!-- Away Team Stats Box -->
         <div class="live-dashboard-stats-card">
           <div class="stats-card-title">
-            <img [src]="awayTeamValue.logo" [alt]="awayTeamValue.name" class="stats-card-team-logo" />
+            <img
+              [src]="awayTeamValue.logo"
+              [alt]="awayTeamValue.name"
+              class="stats-card-team-logo"
+            />
             <span>{{ awayTeamValue.name }}</span>
           </div>
           <div class="stats-card-content">
@@ -196,16 +225,14 @@
                 </div>
                 <!-- Defensive Zone Exit -->
                 <div class="stat-section">
-                  <div class="stat-section-title">
-                    Defensive Zone Exit
-                  </div>
+                  <div class="stat-section-title">Defensive Zone Exit</div>
                   <div class="grid grid-cols-5 gap-1 text-center">
                     <div>
                       <div class="text-[12px] mb-1">Icing</div>
                       <button
                         (click)="incrementDefensiveZoneExit('away', 'icing')"
                         class="stat-increment-btn"
-                        >
+                      >
                         <img src="assets/icons/up-button.svg" alt="Increment" />
                       </button>
                       <div class="text-sm font-semibold my-1">
@@ -214,7 +241,7 @@
                       <button
                         (click)="decrementDefensiveZoneExit('away', 'icing')"
                         class="stat-decrement-btn"
-                        >
+                      >
                         <img src="assets/icons/down-button.svg" alt="Decrement" />
                       </button>
                     </div>
@@ -223,7 +250,7 @@
                       <button
                         (click)="incrementDefensiveZoneExit('away', 'skate')"
                         class="stat-increment-btn"
-                        >
+                      >
                         <img src="assets/icons/up-button.svg" alt="Increment" />
                       </button>
                       <div class="text-sm font-semibold my-1">
@@ -232,7 +259,7 @@
                       <button
                         (click)="decrementDefensiveZoneExit('away', 'skate')"
                         class="stat-decrement-btn"
-                        >
+                      >
                         <img src="assets/icons/down-button.svg" alt="Decrement" />
                       </button>
                     </div>
@@ -241,7 +268,7 @@
                       <button
                         (click)="incrementDefensiveZoneExit('away', 'soWin')"
                         class="stat-increment-btn"
-                        >
+                      >
                         <img src="assets/icons/up-button.svg" alt="Increment" />
                       </button>
                       <div class="text-sm font-semibold my-1">
@@ -250,7 +277,7 @@
                       <button
                         (click)="decrementDefensiveZoneExit('away', 'soWin')"
                         class="stat-decrement-btn"
-                        >
+                      >
                         <img src="assets/icons/down-button.svg" alt="Decrement" />
                       </button>
                     </div>
@@ -259,7 +286,7 @@
                       <button
                         (click)="incrementDefensiveZoneExit('away', 'soLose')"
                         class="stat-increment-btn"
-                        >
+                      >
                         <img src="assets/icons/up-button.svg" alt="Increment" />
                       </button>
                       <div class="text-sm font-semibold my-1">
@@ -268,7 +295,7 @@
                       <button
                         (click)="decrementDefensiveZoneExit('away', 'soLose')"
                         class="stat-decrement-btn"
-                        >
+                      >
                         <img src="assets/icons/down-button.svg" alt="Decrement" />
                       </button>
                     </div>
@@ -277,7 +304,7 @@
                       <button
                         (click)="incrementDefensiveZoneExit('away', 'pass')"
                         class="stat-increment-btn"
-                        >
+                      >
                         <img src="assets/icons/up-button.svg" alt="Increment" />
                       </button>
                       <div class="text-sm font-semibold my-1">
@@ -286,7 +313,7 @@
                       <button
                         (click)="decrementDefensiveZoneExit('away', 'pass')"
                         class="stat-decrement-btn"
-                        >
+                      >
                         <img src="assets/icons/down-button.svg" alt="Decrement" />
                       </button>
                     </div>
@@ -295,16 +322,14 @@
               </div>
               <!-- Offensive Zone Entry -->
               <div class="stat-section">
-                <div class="stat-section-title">
-                  Offensive Zone Entry
-                </div>
+                <div class="stat-section-title">Offensive Zone Entry</div>
                 <div class="grid grid-cols-4 gap-1 text-center">
                   <div>
                     <div class="text-[12px] mb-1">Pass</div>
                     <button
                       (click)="incrementOffensiveZoneEntry('away', 'pass')"
                       class="stat-increment-btn"
-                      >
+                    >
                       <img src="assets/icons/up-button.svg" alt="Increment" />
                     </button>
                     <div class="text-sm font-semibold my-1">
@@ -313,7 +338,7 @@
                     <button
                       (click)="decrementOffensiveZoneEntry('away', 'pass')"
                       class="stat-decrement-btn"
-                      >
+                    >
                       <img src="assets/icons/down-button.svg" alt="Decrement" />
                     </button>
                   </div>
@@ -322,7 +347,7 @@
                     <button
                       (click)="incrementOffensiveZoneEntry('away', 'dump')"
                       class="stat-increment-btn"
-                      >
+                    >
                       <img src="assets/icons/up-button.svg" alt="Increment" />
                     </button>
                     <div class="text-sm font-semibold my-1">
@@ -331,7 +356,7 @@
                     <button
                       (click)="decrementOffensiveZoneEntry('away', 'dump')"
                       class="stat-decrement-btn"
-                      >
+                    >
                       <img src="assets/icons/down-button.svg" alt="Decrement" />
                     </button>
                   </div>
@@ -340,7 +365,7 @@
                     <button
                       (click)="incrementOffensiveZoneEntry('away', 'carry')"
                       class="stat-increment-btn"
-                      >
+                    >
                       <img src="assets/icons/up-button.svg" alt="Increment" />
                     </button>
                     <div class="text-sm font-semibold my-1">
@@ -349,7 +374,7 @@
                     <button
                       (click)="decrementOffensiveZoneEntry('away', 'carry')"
                       class="stat-decrement-btn"
-                      >
+                    >
                       <img src="assets/icons/down-button.svg" alt="Decrement" />
                     </button>
                   </div>
@@ -358,7 +383,7 @@
                     <button
                       (click)="incrementOffensiveZoneEntry('away', 'skated')"
                       class="stat-increment-btn"
-                      >
+                    >
                       <img src="assets/icons/up-button.svg" alt="Increment" />
                     </button>
                     <div class="text-sm font-semibold my-1">
@@ -367,7 +392,7 @@
                     <button
                       (click)="decrementOffensiveZoneEntry('away', 'skated')"
                       class="stat-decrement-btn"
-                      >
+                    >
                       <img src="assets/icons/down-button.svg" alt="Decrement" />
                     </button>
                   </div>
@@ -387,7 +412,9 @@
                   </div>
                   <div>
                     <div class="text-[12px]">Scoring Chances</div>
-                    <div class="text-sm font-semibold">{{ awayStatsValue.shots.scoringChances }}</div>
+                    <div class="text-sm font-semibold">
+                      {{ awayStatsValue.shots.scoringChances }}
+                    </div>
                   </div>
                   <div>
                     <div class="text-[12px]">Blocked</div>
@@ -405,7 +432,9 @@
                   </div>
                   <div>
                     <div class="text-[12px]">Neutral Zone</div>
-                    <div class="text-sm font-semibold">{{ awayStatsValue.turnovers.neutralZone }}</div>
+                    <div class="text-sm font-semibold">
+                      {{ awayStatsValue.turnovers.neutralZone }}
+                    </div>
                   </div>
                   <div>
                     <div class="text-[12px]">Def. Zone</div>
@@ -419,7 +448,11 @@
         <!-- Home Team Stats Box -->
         <div class="live-dashboard-stats-card">
           <div class="stats-card-title">
-            <img [src]="homeTeamValue.logo" [alt]="homeTeamValue.name" class="stats-card-team-logo" />
+            <img
+              [src]="homeTeamValue.logo"
+              [alt]="homeTeamValue.name"
+              class="stats-card-team-logo"
+            />
             <span>{{ homeTeamValue.name }}</span>
           </div>
           <div class="stats-card-content">
@@ -433,16 +466,14 @@
                 </div>
                 <!-- Defensive Zone Exit -->
                 <div class="stat-section">
-                  <div class="stat-section-title">
-                    Defensive Zone Exit
-                  </div>
+                  <div class="stat-section-title">Defensive Zone Exit</div>
                   <div class="grid grid-cols-5 gap-1 text-center">
                     <div>
                       <div class="text-[12px] mb-1">Icing</div>
                       <button
                         (click)="incrementDefensiveZoneExit('home', 'icing')"
                         class="stat-increment-btn"
-                        >
+                      >
                         <img src="assets/icons/up-button.svg" alt="Increment" />
                       </button>
                       <div class="text-sm font-semibold my-1">
@@ -451,7 +482,7 @@
                       <button
                         (click)="decrementDefensiveZoneExit('home', 'icing')"
                         class="stat-decrement-btn"
-                        >
+                      >
                         <img src="assets/icons/down-button.svg" alt="Decrement" />
                       </button>
                     </div>
@@ -460,7 +491,7 @@
                       <button
                         (click)="incrementDefensiveZoneExit('home', 'skate')"
                         class="stat-increment-btn"
-                        >
+                      >
                         <img src="assets/icons/up-button.svg" alt="Increment" />
                       </button>
                       <div class="text-sm font-semibold my-1">
@@ -469,7 +500,7 @@
                       <button
                         (click)="decrementDefensiveZoneExit('home', 'skate')"
                         class="stat-decrement-btn"
-                        >
+                      >
                         <img src="assets/icons/down-button.svg" alt="Decrement" />
                       </button>
                     </div>
@@ -478,7 +509,7 @@
                       <button
                         (click)="incrementDefensiveZoneExit('home', 'soWin')"
                         class="stat-increment-btn"
-                        >
+                      >
                         <img src="assets/icons/up-button.svg" alt="Increment" />
                       </button>
                       <div class="text-sm font-semibold my-1">
@@ -487,7 +518,7 @@
                       <button
                         (click)="decrementDefensiveZoneExit('home', 'soWin')"
                         class="stat-decrement-btn"
-                        >
+                      >
                         <img src="assets/icons/down-button.svg" alt="Decrement" />
                       </button>
                     </div>
@@ -496,7 +527,7 @@
                       <button
                         (click)="incrementDefensiveZoneExit('home', 'soLose')"
                         class="stat-increment-btn"
-                        >
+                      >
                         <img src="assets/icons/up-button.svg" alt="Increment" />
                       </button>
                       <div class="text-sm font-semibold my-1">
@@ -505,7 +536,7 @@
                       <button
                         (click)="decrementDefensiveZoneExit('home', 'soLose')"
                         class="stat-decrement-btn"
-                        >
+                      >
                         <img src="assets/icons/down-button.svg" alt="Decrement" />
                       </button>
                     </div>
@@ -514,7 +545,7 @@
                       <button
                         (click)="incrementDefensiveZoneExit('home', 'pass')"
                         class="stat-increment-btn"
-                        >
+                      >
                         <img src="assets/icons/up-button.svg" alt="Increment" />
                       </button>
                       <div class="text-sm font-semibold my-1">
@@ -523,7 +554,7 @@
                       <button
                         (click)="decrementDefensiveZoneExit('home', 'pass')"
                         class="stat-decrement-btn"
-                        >
+                      >
                         <img src="assets/icons/down-button.svg" alt="Decrement" />
                       </button>
                     </div>
@@ -532,16 +563,14 @@
               </div>
               <!-- Offensive Zone Entry -->
               <div class="stat-section">
-                <div class="stat-section-title">
-                  Offensive Zone Entry
-                </div>
+                <div class="stat-section-title">Offensive Zone Entry</div>
                 <div class="grid grid-cols-4 gap-1 text-center">
                   <div>
                     <div class="text-[12px] mb-1">Pass</div>
                     <button
                       (click)="incrementOffensiveZoneEntry('home', 'pass')"
                       class="stat-increment-btn"
-                      >
+                    >
                       <img src="assets/icons/up-button.svg" alt="Increment" />
                     </button>
                     <div class="text-sm font-semibold my-1">
@@ -550,7 +579,7 @@
                     <button
                       (click)="decrementOffensiveZoneEntry('home', 'pass')"
                       class="stat-decrement-btn"
-                      >
+                    >
                       <img src="assets/icons/down-button.svg" alt="Decrement" />
                     </button>
                   </div>
@@ -559,7 +588,7 @@
                     <button
                       (click)="incrementOffensiveZoneEntry('home', 'dump')"
                       class="stat-increment-btn"
-                      >
+                    >
                       <img src="assets/icons/up-button.svg" alt="Increment" />
                     </button>
                     <div class="text-sm font-semibold my-1">
@@ -568,7 +597,7 @@
                     <button
                       (click)="decrementOffensiveZoneEntry('home', 'dump')"
                       class="stat-decrement-btn"
-                      >
+                    >
                       <img src="assets/icons/down-button.svg" alt="Decrement" />
                     </button>
                   </div>
@@ -577,7 +606,7 @@
                     <button
                       (click)="incrementOffensiveZoneEntry('home', 'carry')"
                       class="stat-increment-btn"
-                      >
+                    >
                       <img src="assets/icons/up-button.svg" alt="Increment" />
                     </button>
                     <div class="text-sm font-semibold my-1">
@@ -586,7 +615,7 @@
                     <button
                       (click)="decrementOffensiveZoneEntry('home', 'carry')"
                       class="stat-decrement-btn"
-                      >
+                    >
                       <img src="assets/icons/down-button.svg" alt="Decrement" />
                     </button>
                   </div>
@@ -595,7 +624,7 @@
                     <button
                       (click)="incrementOffensiveZoneEntry('home', 'skated')"
                       class="stat-increment-btn"
-                      >
+                    >
                       <img src="assets/icons/up-button.svg" alt="Increment" />
                     </button>
                     <div class="text-sm font-semibold my-1">
@@ -604,7 +633,7 @@
                     <button
                       (click)="decrementOffensiveZoneEntry('home', 'skated')"
                       class="stat-decrement-btn"
-                      >
+                    >
                       <img src="assets/icons/down-button.svg" alt="Decrement" />
                     </button>
                   </div>
@@ -624,7 +653,9 @@
                   </div>
                   <div>
                     <div class="text-[12px]">Scoring Chances</div>
-                    <div class="text-sm font-semibold">{{ homeStatsValue.shots.scoringChances }}</div>
+                    <div class="text-sm font-semibold">
+                      {{ homeStatsValue.shots.scoringChances }}
+                    </div>
                   </div>
                   <div>
                     <div class="text-[12px]">Blocked</div>
@@ -642,7 +673,9 @@
                   </div>
                   <div>
                     <div class="text-[12px]">Neutral Zone</div>
-                    <div class="text-sm font-semibold">{{ homeStatsValue.turnovers.neutralZone }}</div>
+                    <div class="text-sm font-semibold">
+                      {{ homeStatsValue.turnovers.neutralZone }}
+                    </div>
                   </div>
                   <div>
                     <div class="text-[12px]">Def. Zone</div>
@@ -659,9 +692,83 @@
 
   <!-- Events Section (Full Width) -->
   @if (!isLoadingGameData) {
+    @let filteredGameEventsValue = filteredGameEvents();
+    @let activeEventTypeFiltersValue = activeEventTypeFilters();
+    @let selectedPlayerIdsArrayValue = selectedPlayerIdsArray();
+
     <div class="live-dashboard-card">
-      <div class="live-dashboard-card-header">
+      <div class="live-dashboard-card-header live-dashboard-card-header-filters">
         <h2 class="live-dashboard-card-title">Game Events</h2>
+        <div class="event-filters">
+          <div class="event-type-filters">
+            @for (filter of eventTypeFilters; track filter.key) {
+              <div
+                class="event-filter-label"
+                [class.inactive]="!activeEventTypeFiltersValue.has(filter.key)"
+                tabindex="0"
+                role="checkbox"
+                [attr.aria-checked]="activeEventTypeFiltersValue.has(filter.key)"
+                [attr.aria-label]="filter.label"
+                (click)="toggleEventTypeFilter(filter.key)"
+                (keydown.enter)="toggleEventTypeFilter(filter.key)"
+                (keydown.space)="toggleEventTypeFilter(filter.key); $event.preventDefault()"
+              >
+                <span class="event-filter-dot" [class]="'dot-' + filter.key"></span>
+                <span class="event-filter-text">{{ filter.label }}</span>
+              </div>
+            }
+          </div>
+          <div class="player-filter-wrapper">
+            <mat-form-field appearance="fill" subscriptSizing="dynamic" [floatLabel]="'always'">
+              <mat-label>Players</mat-label>
+              <mat-select
+                [value]="selectedPlayerIdsArrayValue"
+                (selectionChange)="onPlayerSelectionChange($event.value)"
+                multiple
+                panelClass="player-filter-panel"
+              >
+                <mat-select-trigger>
+                  @if (isAllPlayersSelected) {
+                    All players
+                  } @else if (selectedPlayerIdsArrayValue.length > 0) {
+                    {{ selectedPlayerIdsArrayValue.length }} selected
+                  } @else {
+                    None
+                  }
+                </mat-select-trigger>
+                <mat-optgroup [label]="homeTeamValue.name">
+                  @for (player of homePlayerFilterOptions; track player.value) {
+                    <mat-option [value]="player.value">
+                      @if (player.number) {
+                        <span class="player-number-badge">#{{ player.number }}</span>
+                      }
+                      {{ player.label }}
+                    </mat-option>
+                  }
+                </mat-optgroup>
+                <mat-optgroup [label]="awayTeamValue.name">
+                  @for (player of awayPlayerFilterOptions; track player.value) {
+                    <mat-option [value]="player.value">
+                      @if (player.number) {
+                        <span class="player-number-badge">#{{ player.number }}</span>
+                      }
+                      {{ player.label }}
+                    </mat-option>
+                  }
+                </mat-optgroup>
+              </mat-select>
+            </mat-form-field>
+            <div class="player-filter-actions">
+              <button type="button" class="player-filter-action-btn" (click)="selectAllPlayers()">
+                All
+              </button>
+              <span class="player-filter-action-divider">|</span>
+              <button type="button" class="player-filter-action-btn" (click)="clearAllPlayers()">
+                Clear
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
       <div class="live-dashboard-card-content">
         <!-- Events Table -->
@@ -679,18 +786,32 @@
               </tr>
             </thead>
             <tbody class="live-dashboard-table-body">
-              @if (gameEventsValue.length === 0) {
+              @if (filteredGameEventsValue.length === 0) {
                 <tr>
                   <td colspan="7" class="live-dashboard-table-empty">
                     <div class="live-dashboard-empty-content">
-                      <span class="material-symbols-rounded live-dashboard-empty-icon">event_note</span>
-                      <p class="live-dashboard-empty-title">No game events yet</p>
-                      <p class="live-dashboard-empty-text">Events will appear here as the game progresses</p>
+                      @if (gameEventsValue.length > 0) {
+                        <span class="material-symbols-rounded live-dashboard-empty-icon"
+                          >filter_list_off</span
+                        >
+                        <p class="live-dashboard-empty-title">No events match current filters</p>
+                        <p class="live-dashboard-empty-text">
+                          Try adjusting event type or player filters
+                        </p>
+                      } @else {
+                        <span class="material-symbols-rounded live-dashboard-empty-icon"
+                          >event_note</span
+                        >
+                        <p class="live-dashboard-empty-title">No game events yet</p>
+                        <p class="live-dashboard-empty-text">
+                          Events will appear here as the game progresses
+                        </p>
+                      }
                     </div>
                   </td>
                 </tr>
               } @else {
-                @for (event of gameEventsValue; track event.id) {
+                @for (event of filteredGameEventsValue; track event.id) {
                   @if (event.period) {
                     <tr class="live-dashboard-period-row">
                       <td class="live-dashboard-period-cell" colspan="7">
@@ -701,7 +822,7 @@
                     <tr
                       class="live-dashboard-table-row"
                       [class.live-dashboard-goal-row]="event.shotType === 'goal'"
-                      >
+                    >
                       <td class="live-dashboard-table-td text-center font-semibold">
                         {{ event.index ?? '—' }}
                       </td>
@@ -714,7 +835,7 @@
                                 [src]="getTeamLogoUrl(event.teamId)"
                                 [alt]="event.team"
                                 class="live-dashboard-team-logo"
-                                />
+                              />
                             }
                           </div>
                           <span class="live-dashboard-team-name">{{ event.team }}</span>
@@ -734,13 +855,13 @@
                             mat-icon-button
                             color="primary"
                             [disabled]="!isYouTubeLinkValid(event.rawEventData?.youtube_link)"
-                        [matTooltip]="
-                          isYouTubeLinkValid(event.rawEventData?.youtube_link)
-                            ? 'Video'
-                            : 'No valid video link'
-                        "
+                            [matTooltip]="
+                              isYouTubeLinkValid(event.rawEventData?.youtube_link)
+                                ? 'Video'
+                                : 'No valid video link'
+                            "
                             (click)="onViewEventVideo(event)"
-                            >
+                          >
                             <span class="material-symbols-rounded">videocam</span>
                           </button>
                           <button
@@ -750,7 +871,7 @@
                             (click)="onEditEvent(event)"
                             role-visibility-name="edit-event-button"
                             [attr.role-visibility-team-id]="[homeTeamId, awayTeamId]"
-                            >
+                          >
                             <span class="material-symbols-rounded">stylus</span>
                           </button>
                           <button
@@ -760,7 +881,7 @@
                             (click)="onDeleteEvent(event.id)"
                             role-visibility-name="delete-event-button"
                             [attr.role-visibility-team-id]="[homeTeamId, awayTeamId]"
-                            >
+                          >
                             <span class="material-symbols-rounded">delete</span>
                           </button>
                         </div>
@@ -778,9 +899,7 @@
 
   <!-- Spray Charts Section (Full Width) -->
   @if (!isLoadingGameData) {
-    <div
-      class="live-dashboard-card"
-      >
+    <div class="live-dashboard-card">
       <div class="live-dashboard-card-header">
         <h2 class="live-dashboard-card-title live-dashboard-card-title-center">Spray Charts</h2>
       </div>
@@ -800,7 +919,7 @@
                   [src]="getTeamLogoUrl(awayTeamId)"
                   [alt]="awayTeamValue.name"
                   class="live-dashboard-spray-chart-logo"
-                  />
+                />
                 <h3 class="live-dashboard-spray-chart-title">{{ awayTeamValue.name }}</h3>
               </div>
               @if (awaySprayChartDataValue.length > 0) {
@@ -815,7 +934,9 @@
                 ></app-shot-location-display>
               } @else {
                 <div class="live-dashboard-empty-chart">
-                  <span class="material-symbols-rounded live-dashboard-empty-chart-icon">sports_hockey</span>
+                  <span class="material-symbols-rounded live-dashboard-empty-chart-icon"
+                    >sports_hockey</span
+                  >
                   <p class="live-dashboard-empty-chart-text">No spray chart data available</p>
                 </div>
               }
@@ -827,7 +948,7 @@
                   [src]="getTeamLogoUrl(homeTeamId)"
                   [alt]="homeTeamValue.name"
                   class="live-dashboard-spray-chart-logo"
-                  />
+                />
                 <h3 class="live-dashboard-spray-chart-title">{{ homeTeamValue.name }}</h3>
               </div>
               @if (homeSprayChartDataValue.length > 0) {
@@ -842,7 +963,9 @@
                 ></app-shot-location-display>
               } @else {
                 <div class="live-dashboard-empty-chart">
-                  <span class="material-symbols-rounded live-dashboard-empty-chart-icon">sports_hockey</span>
+                  <span class="material-symbols-rounded live-dashboard-empty-chart-icon"
+                    >sports_hockey</span
+                  >
                   <p class="live-dashboard-empty-chart-text">No spray chart data available</p>
                 </div>
               }
