@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, input } from '@angular/core';
+import { Component, input } from '@angular/core';
 import { NgStyle } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { MatRippleModule } from '@angular/material/core';
@@ -10,7 +10,6 @@ import { ButtonBaseClass } from '../button-base.class';
   imports: [NgStyle, RouterLink, MatRippleModule, MatTooltipModule],
   templateUrl: './button-route.component.html',
   styleUrl: '../button.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ButtonRouteComponent extends ButtonBaseClass {
   route = input('.');

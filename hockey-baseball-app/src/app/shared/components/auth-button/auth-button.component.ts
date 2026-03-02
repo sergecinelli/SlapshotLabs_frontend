@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 
 @Component({
@@ -6,7 +6,6 @@ import { MatButtonModule } from '@angular/material/button';
   imports: [MatButtonModule],
   templateUrl: './auth-button.component.html',
   styleUrl: './auth-button.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AuthButtonComponent {
   text = input('');

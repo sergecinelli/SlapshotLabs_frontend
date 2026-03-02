@@ -1,4 +1,4 @@
-import { Component, input, output, ChangeDetectionStrategy, ViewChild } from '@angular/core';
+import { Component, input, output, ViewChild } from '@angular/core';
 import { MatDatepicker } from '@angular/material/datepicker';
 import {  } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
@@ -20,7 +20,6 @@ import { MatNativeDateModule } from '@angular/material/core';
   ],
   templateUrl: './week-pagination.component.html',
   styleUrl: './week-pagination.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class WeekPaginationComponent {
   @ViewChild('picker') picker!: MatDatepicker<Date>;

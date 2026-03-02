@@ -25,8 +25,7 @@ Angular and TypeScript best practices.
 - Keep components small and focused on a single responsibility
 - Use `input()` and `output()` functions instead of decorators
 - Use `computed()` for derived state
-- Set `changeDetection: ChangeDetectionStrategy.OnPush` in `@Component`
-  decorator
+- Do NOT set `changeDetection: ChangeDetectionStrategy.OnPush` — not all components use signals yet.
 - Prefer inline templates for small components
 - Prefer Reactive forms instead of Template-driven ones
 - Do NOT use `ngClass`, use `class` bindings instead

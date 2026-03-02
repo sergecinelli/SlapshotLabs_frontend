@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, inject , ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, signal, inject  } from '@angular/core';
 import {  } from '@angular/common';
 import { Router } from '@angular/router';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
@@ -43,7 +43,6 @@ import { convertGMTToLocalWithDateShift, formatDateForDisplay } from '../../shar
   ],
   templateUrl: './dashboard.page.html',
   styleUrl: './dashboard.page.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DashboardPage implements OnInit {
   // Role-based visibility map

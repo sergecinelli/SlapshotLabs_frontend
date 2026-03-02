@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit , ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, signal, OnInit } from '@angular/core';
 import { RouterOutlet, Router } from '@angular/router';
 import {  } from '@angular/common';
 import { MatRippleModule } from '@angular/material/core';

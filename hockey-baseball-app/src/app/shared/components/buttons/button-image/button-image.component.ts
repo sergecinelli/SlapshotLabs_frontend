@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, input } from '@angular/core';
+import { Component, input } from '@angular/core';
 import { NgStyle } from '@angular/common';
 import { MatRippleModule } from '@angular/material/core';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -9,7 +9,6 @@ import { ButtonBaseClass } from '../button-base.class';
   imports: [NgStyle, MatRippleModule, MatTooltipModule],
   templateUrl: './button-image.component.html',
   styleUrl: '../button.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ButtonImageComponent extends ButtonBaseClass {
   image = input('');

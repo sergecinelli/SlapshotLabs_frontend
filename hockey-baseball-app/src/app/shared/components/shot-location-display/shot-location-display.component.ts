@@ -1,4 +1,4 @@
-import { Component, input, computed, ChangeDetectionStrategy, signal, effect, inject, viewChild, ElementRef } from '@angular/core';
+import { Component, input, computed, signal, effect, inject, viewChild, ElementRef } from '@angular/core';
 import {  } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { ButtonSmallComponent } from '../buttons/button-small/button-small.component';
@@ -46,7 +46,6 @@ interface TypeStats {
   imports: [MatIconModule, ButtonSmallComponent],
   templateUrl: './shot-location-display.component.html',
   styleUrl: './shot-location-display.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'shot-location-display',
   },

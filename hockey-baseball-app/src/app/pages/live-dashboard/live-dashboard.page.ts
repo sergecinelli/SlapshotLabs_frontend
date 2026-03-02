@@ -1,4 +1,4 @@
-import { Component, signal, inject, OnInit, OnDestroy , ChangeDetectionStrategy } from '@angular/core';
+import { Component, signal, computed, inject, OnInit, OnDestroy } from '@angular/core';
 
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
@@ -125,7 +125,6 @@ interface GameEvent {
 ],
   templateUrl: './live-dashboard.page.html',
   styleUrl: './live-dashboard.page.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LiveDashboardPage implements OnInit, OnDestroy {
   // Role-based access map

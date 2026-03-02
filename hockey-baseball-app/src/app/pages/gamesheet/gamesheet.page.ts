@@ -1,4 +1,4 @@
-import { Component, inject , ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject  } from '@angular/core';
 import {  } from '@angular/common';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
@@ -7,7 +7,6 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
   imports: [],
   templateUrl: './gamesheet.page.html',
   styleUrl: './gamesheet.page.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GamesheetPage {
   private sanitizer = inject(DomSanitizer);

@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal, computed , ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, inject, signal, computed  } from '@angular/core';
 import {  } from '@angular/common';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { ButtonComponent } from '../buttons/button/button.component';
@@ -43,7 +43,6 @@ export interface RosterSelectionResult {
   ],
   templateUrl: './roster-selection.modal.html',
   styleUrl: './roster-selection.modal.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RosterSelectionModal implements OnInit {
   private dialogRef = inject<MatDialogRef<RosterSelectionModal>>(MatDialogRef);

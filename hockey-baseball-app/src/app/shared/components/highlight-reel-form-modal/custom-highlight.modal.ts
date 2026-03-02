@@ -1,4 +1,4 @@
-import { Component, inject , ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject  } from '@angular/core';
 
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
@@ -33,7 +33,6 @@ export interface CustomHighlightFormResult {
 ],
   templateUrl: './custom-highlight.modal.html',
   styleUrls: ['./custom-highlight.modal.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CustomHighlightModal {
   private dialogRef = inject<MatDialogRef<CustomHighlightModal>>(MatDialogRef);

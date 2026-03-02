@@ -1,4 +1,4 @@
-import { Component , ChangeDetectionStrategy } from '@angular/core';
+import { Component  } from '@angular/core';
 import { NgStyle } from '@angular/common';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ButtonBaseClass } from '../button-base.class';
@@ -8,7 +8,6 @@ import { ButtonBaseClass } from '../button-base.class';
   imports: [NgStyle, MatTooltipModule],
   templateUrl: './button-small.component.html',
   styleUrl: '../button.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ButtonSmallComponent extends ButtonBaseClass {
   handleKeyboard(event: KeyboardEvent) {

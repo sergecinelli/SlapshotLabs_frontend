@@ -1,6 +1,6 @@
 import {
   Component,
-  ChangeDetectionStrategy,
+  
   ElementRef,
   Renderer2,
   inject,
@@ -58,7 +58,6 @@ export interface TableAction {
   ],
   templateUrl: './data-table.component.html',
   styleUrl: './data-table.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DataTableComponent<T extends Record<string, unknown> = Record<string, unknown>> {
   private elementRef = inject(ElementRef);

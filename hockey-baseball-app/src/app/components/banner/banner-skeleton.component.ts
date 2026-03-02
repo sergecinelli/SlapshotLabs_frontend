@@ -1,4 +1,4 @@
-import { Component , ChangeDetectionStrategy } from '@angular/core';
+import { Component  } from '@angular/core';
 import {  } from '@angular/common';
 
 @Component({
@@ -6,7 +6,6 @@ import {  } from '@angular/common';
   imports: [],
   templateUrl: './banner-skeleton.component.html',
   styleUrl: './banner-skeleton.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BannerSkeletonComponent {
   // Number of skeleton cards to show

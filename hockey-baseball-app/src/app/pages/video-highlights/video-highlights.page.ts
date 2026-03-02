@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, inject , ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, signal, inject  } from '@angular/core';
 import {  } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { ButtonComponent } from '../../shared/components/buttons/button/button.component';
@@ -36,7 +36,6 @@ import { formatDateShortWithCommas } from '../../shared/utils/time-converter.uti
   ],
   templateUrl: './video-highlights.page.html',
   styleUrl: './video-highlights.page.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class VideoHighlightsPage implements OnInit {
   // Role-based access map

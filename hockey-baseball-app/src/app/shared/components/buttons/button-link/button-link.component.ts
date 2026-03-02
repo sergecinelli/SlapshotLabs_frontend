@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, input, inject } from '@angular/core';
+import { Component, input, inject } from '@angular/core';
 import { NgStyle } from '@angular/common';
 import { MatRippleModule } from '@angular/material/core';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -10,7 +10,6 @@ import { ButtonBaseClass } from '../button-base.class';
   imports: [NgStyle, MatRippleModule, MatTooltipModule],
   templateUrl: './button-link.component.html',
   styleUrl: '../button.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ButtonLinkComponent extends ButtonBaseClass {
   target = input<'_self' | '_blank' | '_parent' | '_top'>('_blank');

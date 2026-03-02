@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { Component, input } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatDivider } from '@angular/material/divider';
 
@@ -7,7 +7,6 @@ import { MatDivider } from '@angular/material/divider';
   imports: [MatCardModule, MatDivider],
   templateUrl: './auth-layout.component.html',
   styleUrl: './auth-layout.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AuthLayoutComponent {
   titleText = input('');

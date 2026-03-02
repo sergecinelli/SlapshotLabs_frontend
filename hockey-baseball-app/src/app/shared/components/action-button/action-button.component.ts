@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 
@@ -7,7 +7,6 @@ import { MatIconModule } from '@angular/material/icon';
   imports: [MatButtonModule, MatIconModule],
   templateUrl: './action-button.component.html',
   styleUrl: './action-button.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ActionButtonComponent {
   label = input.required<string>();

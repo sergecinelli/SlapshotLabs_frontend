@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@angular/core';
+import { Component, effect, inject, signal } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs';
@@ -24,7 +24,6 @@ export interface BreadcrumbRouteData {
   imports: [],
   templateUrl: './breadcrumbs.component.html',
   styleUrl: './breadcrumbs.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BreadcrumbsComponent {
   private router = inject(Router);

@@ -1,4 +1,4 @@
-import { Component, forwardRef, ChangeDetectionStrategy, input, output, effect } from '@angular/core';
+import { Component, forwardRef, input, output, effect } from '@angular/core';
 
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { MatDividerModule } from '@angular/material/divider';

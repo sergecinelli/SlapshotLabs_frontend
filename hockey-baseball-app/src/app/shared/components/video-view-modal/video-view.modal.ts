@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { ButtonComponent } from '../buttons/button/button.component';
@@ -15,7 +15,6 @@ export interface VideoViewModalData {
   imports: [MatDialogModule, ButtonComponent, MatIconModule],
   templateUrl: './video-view.modal.html',
   styleUrl: './video-view.modal.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class VideoViewModal implements OnInit {
   private dialogRef = inject<MatDialogRef<VideoViewModal>>(MatDialogRef);

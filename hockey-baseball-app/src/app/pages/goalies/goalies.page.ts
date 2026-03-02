@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, inject , ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, signal, inject  } from '@angular/core';
 import {  } from '@angular/common';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
@@ -32,7 +32,6 @@ import { LocalStorageService, StorageKey } from '../../services/local-storage.se
   ],
   templateUrl: './goalies.page.html',
   styleUrl: './goalies.page.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GoaliesPage implements OnInit {
   // Role-based visibility map

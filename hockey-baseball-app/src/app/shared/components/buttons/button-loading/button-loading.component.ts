@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, input } from '@angular/core';
+import { Component, input } from '@angular/core';
 import { NgStyle } from '@angular/common';
 import { MatRippleModule } from '@angular/material/core';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -10,7 +10,6 @@ import { ComponentDisableToggleDirective } from '../../../directives/component-d
   imports: [NgStyle, MatRippleModule, MatTooltipModule, ComponentDisableToggleDirective],
   templateUrl: './button-loading.component.html',
   styleUrl: '../button.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ButtonLoadingComponent extends ButtonBaseClass {
   type = input<'button' | 'submit'>('button');

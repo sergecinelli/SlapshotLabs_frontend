@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { Schedule, GameStatus } from '../../interfaces/schedule.interface';
@@ -18,7 +18,6 @@ import { getGameStatusLabel, isOvertimeStatus } from '../../constants/game-statu
   ],
   templateUrl: './game-card.component.html',
   styleUrl: './game-card.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GameCardComponent {
   game = input.required<Schedule>();

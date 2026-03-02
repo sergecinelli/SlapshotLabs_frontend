@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, input, output, effect } from '@angular/core';
+import { Component, input, output, effect } from '@angular/core';
 import { MatDividerModule } from '@angular/material/divider';
 import {
   LocationSelectorComponent,
@@ -21,7 +21,6 @@ export interface ShotLocation {
   imports: [MatDividerModule, LocationSelectorComponent],
   templateUrl: './shot-location-selector.component.html',
   styleUrl: './shot-location-selector.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ShotLocationSelectorComponent {
   team1 = input<Team>();

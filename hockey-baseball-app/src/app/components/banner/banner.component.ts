@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, OnDestroy, signal, ElementRef, AfterViewInit , ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy, signal, ElementRef, AfterViewInit  } from '@angular/core';
 import { trigger, transition, style, animate, query, stagger } from '@angular/animations';
 import { Router, RouterLink } from '@angular/router';
 import { environment } from '../../../environments/environment';
@@ -76,7 +76,6 @@ import { BannerSkeletonComponent } from './banner-skeleton.component';
       ])
     ])
   ],
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BannerComponent implements OnInit, OnDestroy, AfterViewInit {
   private router = inject(Router);

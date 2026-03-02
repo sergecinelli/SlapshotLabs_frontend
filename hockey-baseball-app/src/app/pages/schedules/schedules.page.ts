@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, signal, inject } from '@angular/core';
 import {  } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -42,7 +42,6 @@ interface GameDisplay {
 
 @Component({
   selector: 'app-schedules',
-  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     MatIconModule,
     ComponentVisibilityByRoleDirective,

@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, inject , ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, signal, inject  } from '@angular/core';
 import {  } from '@angular/common';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
@@ -29,7 +29,6 @@ import { LocalStorageService, StorageKey } from '../../services/local-storage.se
   ],
   templateUrl: './teams.page.html',
   styleUrl: './teams.page.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TeamsPage implements OnInit {
   // Role-based access map

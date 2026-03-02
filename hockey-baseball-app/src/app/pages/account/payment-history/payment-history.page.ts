@@ -1,4 +1,4 @@
-import { Component , ChangeDetectionStrategy } from '@angular/core';
+import { Component  } from '@angular/core';
 import {  } from '@angular/common';
 
 @Component({
@@ -6,6 +6,5 @@ import {  } from '@angular/common';
   imports: [],
   templateUrl: './payment-history.page.html',
   styleUrl: './payment-history.page.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PaymentHistoryPage {}

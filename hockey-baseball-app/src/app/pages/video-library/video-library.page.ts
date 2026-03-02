@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, signal, inject } from '@angular/core';
 import {  } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { ButtonComponent } from '../../shared/components/buttons/button/button.component';
@@ -25,7 +25,6 @@ import { visibilityByRoleMap } from './video-library.role-map';
   ],
   templateUrl: './video-library.page.html',
   styleUrl: './video-library.page.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class VideoLibraryPage implements OnInit {
   // Role-based access map
