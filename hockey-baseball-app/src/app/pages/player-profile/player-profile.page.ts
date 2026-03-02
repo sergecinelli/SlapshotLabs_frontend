@@ -1,4 +1,4 @@
-import { Component, OnInit, inject , ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
@@ -46,7 +46,6 @@ import { BreadcrumbDataService } from '../../services/breadcrumb-data.service';
   ],
   templateUrl: './player-profile.page.html',
   styleUrl: './player-profile.page.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PlayerProfilePage implements OnInit {
   // Role-based access map

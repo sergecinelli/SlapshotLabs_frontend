@@ -1,4 +1,4 @@
-import { Component, OnInit, inject , ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import {
   FormBuilder,
@@ -26,7 +26,6 @@ import { PasswordResetConfirm } from '../../shared/interfaces/auth.interfaces';
   ],
   templateUrl: './reset-password.component.html',
   styleUrl: './reset-password.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ResetPasswordComponent implements OnInit {
   private router = inject(Router);

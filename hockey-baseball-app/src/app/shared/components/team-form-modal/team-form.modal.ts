@@ -1,4 +1,4 @@
-import { Component, OnInit, inject , ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
@@ -39,7 +39,6 @@ export interface TeamFormModalData {
   ],
   templateUrl: './team-form.modal.html',
   styleUrl: './team-form.modal.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TeamFormModal implements OnInit {
   private fb = inject(FormBuilder);

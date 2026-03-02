@@ -1,4 +1,4 @@
-import { Component, OnInit, inject , ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
@@ -41,7 +41,6 @@ import { BreadcrumbDataService } from '../../services/breadcrumb-data.service';
   ],
   templateUrl: './goalie-profile.page.html',
   styleUrl: './goalie-profile.page.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GoalieProfilePage implements OnInit {
   protected StorageKey = StorageKey;

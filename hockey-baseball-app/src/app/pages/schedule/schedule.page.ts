@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, inject , ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, signal, inject } from '@angular/core';
 import {  } from '@angular/common';
 import { Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
@@ -46,7 +46,6 @@ import { convertGMTToLocal, formatDateForDisplay } from '../../shared/utils/time
   ],
   templateUrl: './schedule.page.html',
   styleUrl: './schedule.page.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SchedulePage implements OnInit {
   // Role-based visibility map

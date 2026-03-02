@@ -1,4 +1,4 @@
-import { Component, OnInit, inject , ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {  } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { forkJoin } from 'rxjs';
@@ -27,7 +27,6 @@ import { BreadcrumbDataService } from '../../services/breadcrumb-data.service';
   ],
   templateUrl: './spray-chart.page.html',
   styleUrl: './spray-chart.page.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SprayChartPage implements OnInit {
   private route = inject(ActivatedRoute);

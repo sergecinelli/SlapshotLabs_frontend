@@ -1,4 +1,4 @@
-import { Component, OnDestroy, inject , ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnDestroy, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
@@ -20,7 +20,6 @@ import { AuthLinkComponent } from '../../shared/components/auth-link/auth-link.c
   ],
   templateUrl: './forgot-password.component.html',
   styleUrls: ['./forgot-password.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ForgotPasswordComponent implements OnDestroy {
   private router = inject(Router);

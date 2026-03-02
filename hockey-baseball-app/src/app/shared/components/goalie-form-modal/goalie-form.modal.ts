@@ -1,4 +1,4 @@
-import { Component, OnInit, inject , ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
@@ -43,7 +43,6 @@ export interface TeamOption {
 ],
   templateUrl: './goalie-form.modal.html',
   styleUrl: './goalie-form.modal.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GoalieFormModal implements OnInit {
   private fb = inject(FormBuilder);

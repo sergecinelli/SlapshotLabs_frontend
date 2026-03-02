@@ -1,4 +1,4 @@
-import { Component, inject, OnInit , ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatDialogRef, MatDialogModule, MAT_DIALOG_DATA } from '@angular/material/dialog';
@@ -46,7 +46,6 @@ export interface TurnoverFormData {
 ],
   templateUrl: './turnover-form.modal.html',
   styleUrl: './turnover-form.modal.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TurnoverFormModal implements OnInit {
   private fb = inject(FormBuilder);

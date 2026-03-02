@@ -1,4 +1,4 @@
-import { Component, OnInit, inject , ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {  } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ButtonLoadingComponent } from '../../../shared/components/buttons/button-loading/button-loading.component';
@@ -16,7 +16,6 @@ import { UserProfile, UserEditRequest } from '../../../shared/interfaces/auth.in
   ],
   templateUrl: './profile.page.html',
   styleUrl: './profile.page.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProfilePage implements OnInit {
   private formBuilder = inject(FormBuilder);

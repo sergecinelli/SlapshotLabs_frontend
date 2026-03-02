@@ -1,4 +1,4 @@
-import { Component, inject , ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import {
   FormBuilder,
@@ -28,7 +28,6 @@ import { UserRegistrationForm } from '../../shared/interfaces/auth.interfaces';
   ],
   templateUrl: './sign-up.component.html',
   styleUrl: './sign-up.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SignUpComponent {
   private router = inject(Router);

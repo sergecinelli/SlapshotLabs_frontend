@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, inject , ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
@@ -66,7 +66,6 @@ export interface TeamPlayer {
   ],
   templateUrl: './team-profile.page.html',
   styleUrl: './team-profile.page.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TeamProfilePage implements OnInit, OnDestroy {
   // Role-based access map

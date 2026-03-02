@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal , ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import {
@@ -62,7 +62,6 @@ interface GameListItem {
 ],
   templateUrl: './highlight-reel-form.modal.html',
   styleUrl: './highlight-reel-form.modal.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HighlightReelFormModal implements OnInit {
   private fb = inject(FormBuilder);

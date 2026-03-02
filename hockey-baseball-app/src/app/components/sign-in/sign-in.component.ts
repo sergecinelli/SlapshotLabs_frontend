@@ -1,4 +1,4 @@
-import { Component, OnInit, inject , ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -24,7 +24,6 @@ import { UserSignInForm } from '../../shared/interfaces/auth.interfaces';
   ],
   templateUrl: './sign-in.component.html',
   styleUrl: './sign-in.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SignInComponent implements OnInit {
   private router = inject(Router);

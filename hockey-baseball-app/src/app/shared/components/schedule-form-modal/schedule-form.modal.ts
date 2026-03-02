@@ -1,4 +1,4 @@
-import { Component, OnInit, inject , ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import {
@@ -92,7 +92,6 @@ export interface ScheduleFormModalData {
 ],
   templateUrl: './schedule-form.modal.html',
   styleUrl: './schedule-form.modal.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ScheduleFormModal implements OnInit {
   private fb = inject(FormBuilder);
