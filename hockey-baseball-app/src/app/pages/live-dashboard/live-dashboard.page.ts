@@ -1031,6 +1031,7 @@ export class LiveDashboardPage implements OnInit, OnDestroy {
   );
 
   selectedPlayerIds = signal<Set<number>>(new Set());
+  playerSearchText = signal('');
 
   selectedPlayerIdsArray = computed(() => Array.from(this.selectedPlayerIds()));
 
@@ -1064,25 +1065,31 @@ export class LiveDashboardPage implements OnInit, OnDestroy {
   });
 
   get homePlayerFilterOptions() {
+    return this.getPlayerFilterOptions(this.homeTeamId);
+  }
+
+  get awayPlayerFilterOptions() {
+    return this.getPlayerFilterOptions(this.awayTeamId);
+  }
+
+  private getPlayerFilterOptions(teamId: number) {
     const map = new Map<number, { value: number; label: string; teamId: number; number?: number }>();
     for (const p of this.playerOptions) {
-      if (p.teamId === this.homeTeamId) map.set(p.value, p);
+      if (p.teamId === teamId) map.set(p.value, p);
     }
     for (const g of this.goalieOptions) {
-      if (g.teamId === this.homeTeamId && !map.has(g.value)) map.set(g.value, g);
+      if (g.teamId === teamId && !map.has(g.value)) map.set(g.value, g);
     }
     return Array.from(map.values());
   }
 
-  get awayPlayerFilterOptions() {
-    const map = new Map<number, { value: number; label: string; teamId: number; number?: number }>();
-    for (const p of this.playerOptions) {
-      if (p.teamId === this.awayTeamId) map.set(p.value, p);
-    }
-    for (const g of this.goalieOptions) {
-      if (g.teamId === this.awayTeamId && !map.has(g.value)) map.set(g.value, g);
-    }
-    return Array.from(map.values());
+  playerMatchesSearch(player: { label: string; number?: number }): boolean {
+    const search = this.playerSearchText().toLowerCase();
+    if (!search) return true;
+    return (
+      player.label.toLowerCase().includes(search) ||
+      (player.number != null && String(player.number).includes(search))
+    );
   }
 
   toggleEventTypeFilter(key: string): void {
@@ -1116,6 +1123,22 @@ export class LiveDashboardPage implements OnInit, OnDestroy {
 
   clearAllPlayers(): void {
     this.selectedPlayerIds.set(new Set());
+  }
+
+  onPlayerSearchInput(event: Event): void {
+    this.playerSearchText.set((event.target as HTMLInputElement).value);
+  }
+
+  onPlayerSelectOpenedChange(opened: boolean): void {
+    if (!opened) {
+      this.playerSearchText.set('');
+    }
+  }
+
+  clearPlayerSearch(input: HTMLInputElement): void {
+    this.playerSearchText.set('');
+    input.value = '';
+    input.focus();
   }
 
   private getEventTypeKey(event: GameEvent): string {

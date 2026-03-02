@@ -724,6 +724,7 @@
               <mat-select
                 [value]="selectedPlayerIdsArrayValue"
                 (selectionChange)="onPlayerSelectionChange($event.value)"
+                (openedChange)="onPlayerSelectOpenedChange($event)"
                 multiple
                 panelClass="player-filter-panel"
               >
@@ -736,9 +737,23 @@
                     None
                   }
                 </mat-select-trigger>
+                <div class="player-search-wrapper" (click)="$event.stopPropagation()">
+                  <mat-icon class="player-search-icon">search</mat-icon>
+                  <input
+                    #playerSearchInput
+                    class="player-search-input"
+                    placeholder="Search players..."
+                    [value]="playerSearchText()"
+                    (input)="onPlayerSearchInput($event)"
+                    (keydown)="$event.stopPropagation()"
+                  />
+                  @if (playerSearchText()) {
+                    <mat-icon class="player-search-clear" (click)="clearPlayerSearch(playerSearchInput)">close</mat-icon>
+                  }
+                </div>
                 <mat-optgroup [label]="homeTeamValue.name">
                   @for (player of homePlayerFilterOptions; track player.value) {
-                    <mat-option [value]="player.value">
+                    <mat-option [value]="player.value" [style.display]="playerMatchesSearch(player) ? '' : 'none'">
                       @if (player.number) {
                         <span class="player-number-badge">#{{ player.number }}</span>
                       }
@@ -748,7 +763,7 @@
                 </mat-optgroup>
                 <mat-optgroup [label]="awayTeamValue.name">
                   @for (player of awayPlayerFilterOptions; track player.value) {
-                    <mat-option [value]="player.value">
+                    <mat-option [value]="player.value" [style.display]="playerMatchesSearch(player) ? '' : 'none'">
                       @if (player.number) {
                         <span class="player-number-badge">#{{ player.number }}</span>
                       }
