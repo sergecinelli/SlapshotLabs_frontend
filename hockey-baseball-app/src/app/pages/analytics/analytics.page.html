@@ -1,7 +1,40 @@
-<div class="page-content">
-  <div class="flex items-center justify-center h-96">
-    <div class="text-center">
-      <p class="text-custom-secondary">This feature will be implemented in the future.</p>
+@let analysesValue = analyses();
+@let loadingValue = loading();
+@let showTabsValue = showTabs();
+@let activeTabIndexValue = activeTabIndex();
+@let buttonConfigValue = buttonConfig();
+
+<div class="page-content" [appVisibilityMap]="visibilityByRoleMap">
+  <div class="analytics-toolbar">
+    @if (showTabsValue) {
+      <app-tabs-slider
+        [items]="tabItems"
+        [activeTabIndex]="activeTabIndexValue"
+        (onSelect)="onTabChange($event)"
+      ></app-tabs-slider>
+    }
+
+    <div role-visibility-name="create-analysis-button" class="create-button-wrapper">
+      <app-button
+        [materialIcon]="buttonConfigValue.buttonIcon"
+        [bg]="'primary'"
+        [bghover]="'primary'"
+        [color]="'white'"
+        [colorhover]="'white'"
+        [haveContent]="true"
+        (clicked)="onCreateAnalysis()"
+      >
+        {{ buttonConfigValue.buttonLabel }}
+      </app-button>
     </div>
   </div>
+
+  <app-data-table
+    [columns]="tableColumns"
+    [data]="analysesValue"
+    [actions]="tableActions"
+    [loading]="loadingValue"
+    emptyMessage="No analyses found"
+    (actionClick)="onTableAction($event)"
+  ></app-data-table>
 </div>

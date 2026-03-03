@@ -396,8 +396,8 @@ export class TeamProfilePage implements OnInit, OnDestroy {
   }
 
   onRequestTeamAnalysis(): void {
-    console.log('Request team analysis clicked');
-    // TODO: Implement analysis request
+    if (!this.team) return;
+    this.router.navigate(['/analytics/teams', this.team.id]);
   }
 
   getCurrentSeason(): string {

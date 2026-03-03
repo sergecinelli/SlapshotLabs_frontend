@@ -154,20 +154,23 @@ export class LayoutComponent implements OnInit {
   }
 
   protected handleNavigationClick(event: MouseEvent, path: string, item?: NavigationItem): void {
-    // If item has children, toggle submenu and navigate to first child
-    if (item?.children && item.children.length > 0) {
-      event.preventDefault();
-      // Toggle submenu
-      this.toggleSubmenu(item);
-      // Navigate to first child
-      const firstChildPath = item.children[0].path;
-      this.navigate(firstChildPath);
+    // Middle click (button === 1) or Ctrl+Click or Cmd+Click: allow default behavior (opens in new tab)
+    if (event.button === 1 || event.ctrlKey || event.metaKey) {
       return;
     }
 
-    // Middle click (button === 1) or Ctrl+Click or Cmd+Click: allow default behavior (opens in new tab)
-    if (event.button === 1 || event.ctrlKey || event.metaKey) {
-      // Let the browser handle it - opens in new tab
+    // If item has children and its own route, navigate without toggling submenu
+    if (item?.children && item.children.length > 0 && item.navigable) {
+      event.preventDefault();
+      this.navigate(item.path);
+      return;
+    }
+
+    // If item has children but no own route, toggle submenu and navigate to first child
+    if (item?.children && item.children.length > 0) {
+      event.preventDefault();
+      this.toggleSubmenu(item);
+      this.navigate(item.children[0].path);
       return;
     }
 

@@ -191,57 +191,68 @@
             </div>
 
             <!-- Action Buttons -->
-            <div class="goalie-card-actions">
-              <app-button-route
-                [route]="'/teams-and-rosters/goalies/' + goalie.id + '/spray-chart'"
-                [bg]="'secondary'"
-                [bghover]="'secondary_dark'"
-                [color]="'white'"
-                [colorhover]="'white'"
-                [materialIcon]="'scatter_plot'"
-                [haveContent]="true"
-                class="action-button"
-              >
-                Spray Chart
-              </app-button-route>
-              <app-button-route
-                [route]="'/teams-and-rosters/goalies/' + goalie.id + '/profile'"
-                [bg]="'green'"
-                [bghover]="'green_dark'"
-                [color]="'white'"
-                [colorhover]="'white'"
-                [materialIcon]="'visibility'"
-                [haveContent]="true"
-                class="action-button"
-              >
-                Profile
-              </app-button-route>
-              <app-button
-                [bg]="'orange'"
-                [bghover]="'orange_dark'"
-                [color]="'white'"
-                [colorhover]="'white'"
-                materialIcon="stylus"
-                [haveContent]="true"
-                (clicked)="editGoalie(goalie)"
-                class="action-button"
-                role-visibility-name="edit-action"
-              >
-                Edit
-              </app-button>
-              <app-button
-                [bg]="'primary'"
-                [bghover]="'primary_dark'"
-                [color]="'white'"
-                [colorhover]="'white'"
-                [materialIcon]="'delete'"
-                [haveContent]="true"
-                (clicked)="deleteGoalie(goalie)"
-                class="action-button"
-                role-visibility-name="delete-action"
-              >
-                Delete
-              </app-button>
+            <div class="card-actions-container">
+              <div class="card-actions">
+                <app-button-route
+                  [route]="'/analytics/goalies/' + goalie.id"
+                  [bg]="'upcoming'"
+                  [bghover]="'upcoming'"
+                  [color]="'white'"
+                  [colorhover]="'white'"
+                  [materialIcon]="'analytics'"
+                  [haveContent]="true"
+                  class="action-button"
+                >
+                  Analysis
+                </app-button-route>
+                <app-button-route
+                  [route]="'/teams-and-rosters/goalies/' + goalie.id + '/spray-chart'"
+                  [bg]="'transparent'"
+                  [bghover]="'button_background'"
+                  [br]="'border'"
+                  [color]="'text_primary'"
+                  [colorhover]="'text_primary'"
+                  [materialIcon]="'scatter_plot'"
+                  [haveContent]="true"
+                  class="action-button"
+                >
+                  Spray Chart
+                </app-button-route>
+              </div>
+              <div class="card-actions">
+                <app-button-route
+                  [route]="'/teams-and-rosters/goalies/' + goalie.id + '/profile'"
+                  [color]="'green'"
+                  [colorhover]="'green_dark'"
+                  [bghover]="'gray_tone3'"
+                  [bgselect]="'gray_tone2'"
+                  [materialIcon]="'visibility'"
+                  [tooltip]="'Profile'"
+                  class="action-button"
+                />
+                <app-button
+                  [color]="'orange'"
+                  [colorhover]="'orange_dark'"
+                  [bghover]="'gray_tone3'"
+                  [bgselect]="'gray_tone2'"
+                  materialIcon="stylus"
+                  [tooltip]="'Edit'"
+                  (clicked)="editGoalie(goalie)"
+                  class="action-button"
+                  role-visibility-name="edit-action"
+                />
+                <app-button
+                  [color]="'primary'"
+                  [colorhover]="'primary_dark'"
+                  [bghover]="'gray_tone3'"
+                  [bgselect]="'gray_tone2'"
+                  [materialIcon]="'delete'"
+                  [tooltip]="'Delete'"
+                  (clicked)="deleteGoalie(goalie)"
+                  class="action-button"
+                  role-visibility-name="delete-action"
+                />
+              </div>
             </div>
           </div>
         }

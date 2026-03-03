@@ -58,12 +58,13 @@ export class TeamsPage implements OnInit {
   ];
 
   tableActions: TableAction[] = [
+    { label: 'Analysis', action: 'analysis', variant: 'secondary', icon: 'analytics' },
     { label: 'Schedule', action: 'schedules', variant: 'secondary', icon: 'scoreboard' },
     { label: 'Players', action: 'players', variant: 'secondary', icon: 'people' },
     { label: 'Goalies', action: 'goalies', variant: 'secondary', icon: 'shield' },
-    { label: 'View', action: 'view-profile', variant: 'primary', icon: 'visibility' },
-    { label: 'Edit', action: 'edit', variant: 'secondary', icon: 'stylus', roleVisibilityName: 'edit-action' },
-    { label: 'Delete', action: 'delete', variant: 'danger', icon: 'delete', roleVisibilityName: 'delete-action' },
+    { label: 'View', action: 'view-profile', variant: 'primary', icon: 'visibility', iconOnly: true },
+    { label: 'Edit', action: 'edit', variant: 'secondary', icon: 'stylus', iconOnly: true, roleVisibilityName: 'edit-action' },
+    { label: 'Delete', action: 'delete', variant: 'danger', icon: 'delete', iconOnly: true, roleVisibilityName: 'delete-action' },
   ];
 
   ngOnInit(): void {
@@ -134,6 +135,9 @@ export class TeamsPage implements OnInit {
         break;
       case 'schedules':
         this.viewTeamGames(item);
+        break;
+      case 'analysis':
+        this.viewTeamAnalysis(item);
         break;
       default:
         console.log(`Unknown action: ${action}`);
@@ -245,6 +249,10 @@ export class TeamsPage implements OnInit {
 
   viewTeamGames(team: Team): void {
     this.router.navigate(['/teams-and-rosters/teams', team.id, 'schedule']);
+  }
+
+  viewTeamAnalysis(team: Team): void {
+    this.router.navigate(['/analytics/teams', team.id]);
   }
 
   openAddTeamModal(): void {

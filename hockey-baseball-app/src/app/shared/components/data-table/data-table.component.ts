@@ -262,6 +262,9 @@ export class DataTableComponent<T extends Record<string, unknown> = Record<strin
       return 'green';
     }
     if (action === 'view-profile') {
+      return 'green';
+    }
+    if (action === 'analysis') {
       return 'upcoming';
     }
     if (action === 'edit') {
@@ -290,6 +293,9 @@ export class DataTableComponent<T extends Record<string, unknown> = Record<strin
       return 'green';
     }
     if (action === 'view-profile') {
+      return 'green';
+    }
+    if (action === 'analysis') {
       return 'upcoming';
     }
     if (action === 'edit') {

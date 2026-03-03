@@ -3,11 +3,10 @@
 @let layoutModeValue = layoutMode();
 
 <div class="page-content" [appVisibilityMap]="visibilityByRoleMap">
-
   <!-- Header with Add Button -->
   <div class="teams-header">
     <div class="teams-header-left"></div>
-    <div class="teams-header-actions" style="display: flex; gap: 10px; align-items: center;">
+    <div class="teams-header-actions" style="display: flex; gap: 10px; align-items: center">
       <!-- View Toggle Button -->
       <app-button
         [materialIcon]="layoutModeValue === 'card' ? 'table_rows' : 'grid_view'"
@@ -82,7 +81,9 @@
                       tabindex="0"
                       role="button"
                       [attr.aria-label]="'View ' + team.name + ' profile'"
-                    >{{ team.name }}</div>
+                    >
+                      {{ team.name }}
+                    </div>
                     @if (team.abbreviation) {
                       <div class="team-abbreviation">{{ team.abbreviation }}</div>
                     }
@@ -152,83 +153,96 @@
             </div>
 
             <!-- Action Buttons -->
-            <div class="team-card-actions">
-              <app-button-route
-                [route]="'/teams-and-rosters/teams/' + team.id + '/schedule'"
-                [bg]="'secondary'"
-                [bghover]="'secondary_dark'"
-                [color]="'white'"
-                [colorhover]="'white'"
-                [materialIcon]="'scoreboard'"
-                [haveContent]="true"
-                class="action-button"
-              >
-                Schedule
-              </app-button-route>
-              <app-button-route
-                [route]="'/teams-and-rosters/players'"
-                [queryParams]="getPlayersQueryParams(team)"
-                [bg]="'secondary'"
-                [bghover]="'secondary_dark'"
-                [color]="'white'"
-                [colorhover]="'white'"
-                [materialIcon]="'people'"
-                [haveContent]="true"
-                class="action-button"
-              >
-                Players
-              </app-button-route>
-              <app-button-route
-                [route]="'/teams-and-rosters/goalies'"
-                [queryParams]="getGoaliesQueryParams(team)"
-                [bg]="'secondary'"
-                [bghover]="'secondary_dark'"
-                [color]="'white'"
-                [colorhover]="'white'"
-                [materialIcon]="'shield'"
-                [haveContent]="true"
-                class="action-button"
-              >
-                Goalies
-              </app-button-route>
-              <app-button-route
-                [route]="'/teams-and-rosters/teams/' + team.id + '/profile'"
-                [bg]="'green'"
-                [bghover]="'green_dark'"
-                [color]="'white'"
-                [colorhover]="'white'"
-                [materialIcon]="'visibility'"
-                [haveContent]="true"
-                class="action-button"
-              >
-                View
-              </app-button-route>
-              <app-button
-                [bg]="'orange'"
-                [bghover]="'orange_dark'"
-                [color]="'white'"
-                [colorhover]="'white'"
-                materialIcon="stylus"
-                [haveContent]="true"
-                (clicked)="editTeam(team)"
-                class="action-button"
-                role-visibility-name="edit-action"
-              >
-                Edit
-              </app-button>
-              <app-button
-                [bg]="'primary'"
-                [bghover]="'primary_dark'"
-                [color]="'white'"
-                [colorhover]="'white'"
-                [materialIcon]="'delete'"
-                [haveContent]="true"
-                (clicked)="deleteTeam(team)"
-                class="action-button"
-                role-visibility-name="delete-action"
-              >
-                Delete
-              </app-button>
+            <div class="card-actions-container">
+              <div class="card-actions">
+                <app-button-route
+                  [route]="'/analytics/teams/' + team.id"
+                  [bg]="'upcoming'"
+                  [bghover]="'upcoming'"
+                  [color]="'white'"
+                  [colorhover]="'white'"
+                  [materialIcon]="'analytics'"
+                  [haveContent]="true"
+                  class="action-button"
+                >
+                  Analysis
+                </app-button-route>
+                <app-button-route
+                  [route]="'/teams-and-rosters/teams/' + team.id + '/schedule'"
+                  [bg]="'transparent'"
+                  [bghover]="'button_background'"
+                  [br]="'border'"
+                  [color]="'text_primary'"
+                  [colorhover]="'text_primary'"
+                  [materialIcon]="'scoreboard'"
+                  [haveContent]="true"
+                  class="action-button"
+                >
+                  Schedule
+                </app-button-route>
+                <app-button-route
+                  [route]="'/teams-and-rosters/players'"
+                  [queryParams]="getPlayersQueryParams(team)"
+                  [bg]="'transparent'"
+                  [bghover]="'button_background'"
+                  [br]="'border'"
+                  [color]="'text_primary'"
+                  [colorhover]="'text_primary'"
+                  [materialIcon]="'people'"
+                  [haveContent]="true"
+                  class="action-button"
+                >
+                  Players
+                </app-button-route>
+                <app-button-route
+                  [route]="'/teams-and-rosters/goalies'"
+                  [queryParams]="getGoaliesQueryParams(team)"
+                  [bg]="'transparent'"
+                  [bghover]="'button_background'"
+                  [br]="'border'"
+                  [color]="'text_primary'"
+                  [colorhover]="'text_primary'"
+                  [materialIcon]="'shield'"
+                  [haveContent]="true"
+                  class="action-button"
+                >
+                  Goalies
+                </app-button-route>
+              </div>
+              <div class="card-actions">
+                <app-button-route
+                  [route]="'/teams-and-rosters/teams/' + team.id + '/profile'"
+                  [color]="'green'"
+                  [colorhover]="'green_dark'"
+                  [bghover]="'gray_tone3'"
+                  [bgselect]="'gray_tone2'"
+                  [materialIcon]="'visibility'"
+                  [tooltip]="'View'"
+                  class="action-button"
+                />
+                <app-button
+                  [color]="'orange'"
+                  [colorhover]="'orange_dark'"
+                  [bghover]="'gray_tone3'"
+                  [bgselect]="'gray_tone2'"
+                  materialIcon="stylus"
+                  [tooltip]="'Edit'"
+                  (clicked)="editTeam(team)"
+                  class="action-button"
+                  role-visibility-name="edit-action"
+                />
+                <app-button
+                  [color]="'primary'"
+                  [colorhover]="'primary_dark'"
+                  [bghover]="'gray_tone3'"
+                  [bgselect]="'gray_tone2'"
+                  [materialIcon]="'delete'"
+                  [tooltip]="'Delete'"
+                  (clicked)="deleteTeam(team)"
+                  class="action-button"
+                  role-visibility-name="delete-action"
+                />
+              </div>
             </div>
           </div>
         }

@@ -1,4 +1,5 @@
 @use '../../../shared/styles/variables' as *;
+@use '../../../shared/styles/card-actions';
 
 // Game Card
 .game-card {
@@ -145,10 +146,10 @@
   }
 
   &.completed-badge {
-    background: linear-gradient(135deg, rgba(61, 12, 198, 0.1));
+    background: linear-gradient(135deg, rgba(34, 169, 242, 0.1));
     color: var(--completed);
-    border: 1px solid rgba(61, 12, 198, 0.2);
-    box-shadow: 0 1px 3px rgba(61, 12, 198, 0.1);
+    border: 1px solid rgba(34, 169, 242, 0.2);
+    box-shadow: 0 1px 3px rgba(34, 169, 242, 0.1);
   }
 
   .live-indicator {
@@ -512,17 +513,8 @@
   margin: 0 4px;
 }
 
-// Action Buttons
-.game-card-actions {
-  display: flex;
-  gap: 12px;
-  justify-content: flex-end;
-  flex-wrap: wrap;
+.card-actions-container {
   margin-top: auto;
-}
-
-.action-button {
-  flex-shrink: 0;
 }
 
 // Responsive Design
@@ -560,11 +552,4 @@
     display: none;
   }
 
-  .game-card-actions {
-    justify-content: stretch;
-
-    .action-button {
-      flex: 1;
-    }
-  }
 }

@@ -27,6 +27,7 @@ import {
 } from '../../services/spray-chart-utils.service';
 import { StorageKey } from '../../services/local-storage.service';
 import { BreadcrumbDataService } from '../../services/breadcrumb-data.service';
+import { ButtonComponent } from '../../shared/components/buttons/button/button.component';
 
 @Component({
   selector: 'app-goalie-profile',
@@ -38,6 +39,7 @@ import { BreadcrumbDataService } from '../../services/breadcrumb-data.service';
     MatDividerModule,
     MatTableModule,
     ShotLocationDisplayComponent,
+    ButtonComponent,
   ],
   templateUrl: './goalie-profile.page.html',
   styleUrl: './goalie-profile.page.scss',
@@ -224,5 +226,10 @@ export class GoalieProfilePage implements OnInit {
 
   getShotLocationData(): ShotLocationData[] {
     return this.shotLocationData;
+  }
+
+  onGoalieAnalysis(): void {
+    if (!this.goalie) return;
+    this.router.navigate(['/analytics/goalies', this.goalie.id]);
   }
 }

@@ -209,6 +209,10 @@ nav {
     &.active {
       color: white !important;
       background-color: var(--color-primary) !important;
+
+      .submenu-chevron {
+        border-color: var(--color-primary);
+      }
     }
 
     .submenu-chevron {

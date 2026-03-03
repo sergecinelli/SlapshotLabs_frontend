@@ -70,10 +70,11 @@ export class GoaliesPage implements OnInit {
   ];
 
   tableActions: TableAction[] = [
+    { label: 'Analysis', action: 'analysis', variant: 'secondary', icon: 'analytics' },
     { label: 'Spray Chart', action: 'shot-spray-chart', variant: 'secondary', icon: 'scatter_plot' },
-    { label: 'Profile', action: 'view-profile', variant: 'primary', icon: 'visibility' },
-    { label: 'Edit', action: 'edit', variant: 'secondary', icon: 'stylus', roleVisibilityName: 'edit-action' },
-    { label: 'Delete', action: 'delete', variant: 'danger', icon: 'delete', roleVisibilityName: 'delete-action' },
+    { label: 'Profile', action: 'view-profile', variant: 'primary', icon: 'visibility', iconOnly: true },
+    { label: 'Edit', action: 'edit', variant: 'secondary', icon: 'stylus', iconOnly: true, roleVisibilityName: 'edit-action' },
+    { label: 'Delete', action: 'delete', variant: 'danger', icon: 'delete', iconOnly: true, roleVisibilityName: 'delete-action' },
   ];
 
   ngOnInit(): void {
@@ -207,6 +208,9 @@ export class GoaliesPage implements OnInit {
       case 'shot-spray-chart':
         this.viewShotSprayChart(item);
         break;
+      case 'analysis':
+        this.viewGoalieAnalysis(item);
+        break;
       default:
         console.log(`Unknown action: ${action}`);
     }
@@ -296,6 +300,10 @@ export class GoaliesPage implements OnInit {
 
   viewShotSprayChart(goalie: Goalie): void {
     this.router.navigate(['/teams-and-rosters/goalies', goalie.id, 'spray-chart']);
+  }
+
+  viewGoalieAnalysis(goalie: Goalie): void {
+    this.router.navigate(['/analytics/goalies', goalie.id]);
   }
 
   openAddGoalieModal(): void {

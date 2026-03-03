@@ -65,53 +65,53 @@ export const appColors: IKeyValue<AppColor, string>[] = [
   // Primary colors
   { key: 'primary', value: '#CF142B' },
   { key: 'primary_dark', value: '#B0122A' },
-  
+
   // Secondary colors
   { key: 'secondary', value: '#778f9c' },
   { key: 'secondary_tone1', value: '#c6cddb' },
   { key: 'secondary_dark', value: '#5f7a88' },
   { key: 'upcoming', value: '#22a9f2' },
-  
+
   // Banner status colors (semantic aliases - same values as primary/gray)
   { key: 'live', value: '#CF142B' },
-  { key: 'completed', value: '#3d0cc6' },
-  
+  { key: 'completed', value: '#22A9F2' },
+
   // Dark colors
   { key: 'dark', value: '#090b0c' },
   { key: 'dark_tone2', value: '#2f2f2f' },
   { key: 'dark_hover', value: '#222222' },
-  
+
   // Gray colors
   { key: 'gray', value: '#878787' },
   { key: 'gray_tone1', value: '#2d2d2d' },
   { key: 'gray_tone2', value: '#e7e7e7' },
   { key: 'gray_tone3', value: '#F0F1F3' },
-  
+
   // Base colors
   { key: 'white', value: '#ffffff' },
   { key: 'black', value: '#0f0f0f' },
-  
+
   // Layout colors
   { key: 'sidebar', value: '#0f0f0f' },
   { key: 'sidebar_hover', value: '#252836' },
   { key: 'sidebar_border', value: '#2d3142' },
-  
+
   // Background colors
   { key: 'background', value: '#ffffff' },
   { key: 'background_invert', value: '#0F0F0F' },
   { key: 'button_background', value: '#F7F8FA' },
   { key: 'page_background', value: '#f5f5f5' },
-  
+
   // Border colors
   { key: 'border', value: '#e7e7e7' },
   { key: 'border_dark', value: '#2d2d2d' },
   { key: 'border_light', value: '#F0F1F3' },
-  
+
   // Text colors
   { key: 'text_primary', value: '#0F0F0F' },
   { key: 'text_secondary', value: '#878787' },
   { key: 'text_white', value: '#ffffff' },
-  
+
   // Action colors
   { key: 'orange', value: '#ff8509' },
   { key: 'orange_dark', value: '#EB7A08' },
@@ -120,7 +120,7 @@ export const appColors: IKeyValue<AppColor, string>[] = [
   { key: 'green_dark', value: '#0d9668' },
   { key: 'blue', value: '#3b82f6' },
   { key: 'blue_dark', value: '#2563eb' },
-  
+
   // Legacy CSS variable aliases (for backward compatibility)
   { key: 'color_primary', value: '#CF142B' },
   { key: 'color_dark', value: '#090b0c' },
@@ -129,7 +129,7 @@ export const appColors: IKeyValue<AppColor, string>[] = [
   { key: 'sidebar_dark', value: '#0f0f0f' },
   { key: 'bg_content', value: '#f3f4f6' },
   { key: 'bg_white', value: '#ffffff' },
-  
+
   // Special
   { key: 'transparent', value: 'transparent' },
   { key: 'none', value: 'transparent' },

@@ -4,13 +4,14 @@
 // Colors from colors.ts:
 // primary/live: #CF142B = rgb(207, 20, 43)
 // upcoming: #22a9f2 = rgb(34, 169, 242)
-// gray/completed: #878787 = rgb(135, 135, 135)
+// completed: #22A9F2 = rgb(34, 169, 242)
+// gray: #878787 = rgb(135, 135, 135)
 @function rgba-from-color($color-name, $opacity) {
   $colors: (
     "primary": rgba(207, 20, 43, $opacity),
     "live": rgba(207, 20, 43, $opacity),
     "upcoming": rgba(34, 169, 242, $opacity),
-    "completed": rgba(61, 12, 198, $opacity),
+    "completed": rgba(34, 169, 242, $opacity),
     "gray": rgba(135, 135, 135, $opacity)
   );
   @return map.get($colors, $color-name);

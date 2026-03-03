@@ -85,7 +85,6 @@ ng build --configuration development
 - **Never explicitly set `standalone: true`** in decorators (it's the default)
 - **Use `input()` and `output()` functions** instead of decorators
 - **Use signals for state** with `computed()` for derived state
-- **Do NOT set `changeDetection: ChangeDetectionStrategy.OnPush`** — not all components use signals yet
 - **Use native control flow**: `@if`, `@for`, `@switch` instead of structural
   directives
 - **Avoid `ngClass` and `ngStyle`** - use direct class/style bindings instead

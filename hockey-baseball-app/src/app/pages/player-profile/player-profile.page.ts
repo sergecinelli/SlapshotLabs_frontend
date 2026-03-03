@@ -257,8 +257,8 @@ export class PlayerProfilePage implements OnInit {
   }
 
   onRequestAnalysis(): void {
-    console.log('Request player analysis clicked');
-    // TODO: Implement analysis request
+    if (!this.player) return;
+    this.router.navigate(['/analytics/players', this.player.id]);
   }
 
   getSeasonStats(): PlayerSeasonStats[] {

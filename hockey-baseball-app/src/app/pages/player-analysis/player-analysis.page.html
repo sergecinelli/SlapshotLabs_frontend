@@ -1,0 +1,27 @@
+@let analysesValue = analyses();
+@let loadingValue = loading();
+
+<div class="page-content" [appVisibilityMap]="visibilityByRoleMap">
+  <div class="flex flex-wrap gap-4 justify-end mb-4" role-visibility-name="create-analysis-button">
+    <app-button
+      materialIcon="add"
+      [bg]="'primary'"
+      [bghover]="'primary'"
+      [color]="'white'"
+      [colorhover]="'white'"
+      [haveContent]="true"
+      (clicked)="onCreateAnalysis()"
+    >
+      Create Player Analysis
+    </app-button>
+  </div>
+
+  <app-data-table
+    [columns]="tableColumns"
+    [data]="analysesValue"
+    [actions]="tableActions"
+    [loading]="loadingValue"
+    emptyMessage="No analyses found for this player"
+    (actionClick)="onTableAction($event)"
+  ></app-data-table>
+</div>

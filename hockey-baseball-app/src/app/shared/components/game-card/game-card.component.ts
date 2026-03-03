@@ -26,6 +26,7 @@ export class GameCardComponent {
   isDeleting = input(false);
   edit = output<Schedule>();
   delete = output<Schedule>();
+  analysis = output<Schedule>();
 
   protected readonly GameStatus = GameStatus;
   protected readonly getGameStatusLabel = getGameStatusLabel;
@@ -37,6 +38,10 @@ export class GameCardComponent {
 
   onDelete(): void {
     this.delete.emit(this.game());
+  }
+
+  onAnalysis(): void {
+    this.analysis.emit(this.game());
   }
 
   formatTimeTo12Hour(time: string | undefined): string {

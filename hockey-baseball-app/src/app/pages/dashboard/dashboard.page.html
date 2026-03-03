@@ -48,6 +48,7 @@
                 [game]="game"
                 [showActions]="false"
                 [showScore]="false"
+                (analysis)="viewGameAnalysis($event)"
               />
             }
           }
@@ -72,6 +73,7 @@
                 [game]="game"
                 [showActions]="false"
                 [showScore]="true"
+                (analysis)="viewGameAnalysis($event)"
               />
             }
           }

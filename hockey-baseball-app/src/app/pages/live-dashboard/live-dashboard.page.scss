@@ -13,7 +13,7 @@
     'white': rgba(255, 255, 255, $opacity),
     'black': rgba(15, 15, 15, $opacity),
     'upcoming': rgba(34, 169, 242, $opacity),
-    'completed': rgba(61, 12, 198, $opacity),
+    'completed': rgba(34, 169, 242, $opacity),
     'gray': rgba(135, 135, 135, $opacity),
   );
   @return map.get($colors, $color-name);

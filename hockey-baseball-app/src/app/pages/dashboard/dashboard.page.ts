@@ -306,6 +306,10 @@ export class DashboardPage implements OnInit {
     });
   }
 
+  viewGameAnalysis(game: Schedule): void {
+    this.router.navigate(['/analytics/games', game.id]);
+  }
+
   createHighlightReel(): void {
     const dialogRef = this.dialog.open(HighlightReelFormModal, {
       width: '1400px',

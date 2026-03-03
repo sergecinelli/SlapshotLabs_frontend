@@ -1,4 +1,19 @@
 <div class="goalie-profile-page">
+  <!-- Action Buttons Row -->
+  <div class="flex flex-wrap gap-4 justify-end mb-4">
+    <app-button
+      materialIcon="analytics"
+      [bg]="'upcoming'"
+      [bghover]="'upcoming'"
+      [color]="'white'"
+      [colorhover]="'white'"
+      [haveContent]="true"
+      (clicked)="onGoalieAnalysis()"
+    >
+      Goalie Analysis
+    </app-button>
+  </div>
+
   <!-- Loading State -->
   @if (loading) {
     <div class="loading-container">
@@ -169,7 +184,7 @@
           </div>
         </div>
         <!-- Season Stats Table -->
-        <div class="dashboard-card info-card stats-table-card">
+        <div class="dashboard-card">
           <div class="dashboard-card-header">
             <h2 class="dashboard-card-title">
               <span class="material-symbols-rounded">table_chart</span>
@@ -187,18 +202,18 @@
                       {{ getSeasonName(element.seasonId) || element.season }}
                     </td>
                   </ng-container>
+
                   <!-- Team Column -->
                   <ng-container matColumnDef="team">
                     <th mat-header-cell *matHeaderCellDef class="header-cell">Team</th>
-                    <td mat-cell *matCellDef="let element" class="data-cell team-cell"
-                      style="display: flex !important; flex-direction: row !important; align-items: center; gap: 8px;">
+                    <td mat-cell *matCellDef="let element" class="data-cell team-cell">
                       @if (element.logo) {
-                        <img [src]="element.logo" [alt]="element.team + ' logo'" class="team-logo"
-                          style="width: 30px !important; height: 30px !important; max-width: 30px !important; max-height: 30px !important; object-fit: cover; border-radius: 5px; flex-shrink: 0; display: block;" />
+                        <img [src]="element.logo" [alt]="element.team + ' logo'" class="team-logo" />
                       }
                       <span class="team-name">{{ element.team }}</span>
                     </td>
                   </ng-container>
+
                   <!-- GP Column -->
                   <ng-container matColumnDef="gamesPlayed">
                     <th mat-header-cell *matHeaderCellDef class="header-cell center">GP</th>
@@ -206,6 +221,7 @@
                       {{ element.gamesPlayed }}
                     </td>
                   </ng-container>
+
                   <!-- W Column -->
                   <ng-container matColumnDef="wins">
                     <th mat-header-cell *matHeaderCellDef class="header-cell center">W</th>
@@ -213,6 +229,7 @@
                       {{ element.wins }}
                     </td>
                   </ng-container>
+
                   <!-- L Column -->
                   <ng-container matColumnDef="losses">
                     <th mat-header-cell *matHeaderCellDef class="header-cell center">L</th>
@@ -220,6 +237,7 @@
                       {{ element.losses }}
                     </td>
                   </ng-container>
+
                   <!-- T Column -->
                   <ng-container matColumnDef="ties">
                     <th mat-header-cell *matHeaderCellDef class="header-cell center">T</th>
@@ -227,6 +245,7 @@
                       {{ element.ties }}
                     </td>
                   </ng-container>
+
                   <!-- GA Column -->
                   <ng-container matColumnDef="goalsAgainst">
                     <th mat-header-cell *matHeaderCellDef class="header-cell center">GA</th>
@@ -234,6 +253,7 @@
                       {{ element.goalsAgainst }}
                     </td>
                   </ng-container>
+
                   <!-- SA Column -->
                   <ng-container matColumnDef="shotsAgainst">
                     <th mat-header-cell *matHeaderCellDef class="header-cell center">SA</th>
@@ -241,6 +261,7 @@
                       {{ element.shotsAgainst }}
                     </td>
                   </ng-container>
+
                   <!-- SV Column -->
                   <ng-container matColumnDef="saves">
                     <th mat-header-cell *matHeaderCellDef class="header-cell center">SV</th>
@@ -248,6 +269,7 @@
                       {{ element.saves }}
                     </td>
                   </ng-container>
+
                   <!-- SV % Column -->
                   <ng-container matColumnDef="savePercentage">
                     <th mat-header-cell *matHeaderCellDef class="header-cell center">SV %</th>
@@ -255,24 +277,22 @@
                       {{ (element.savePercentage * 100).toFixed(3) }}%
                     </td>
                   </ng-container>
+
                   <tr mat-header-row *matHeaderRowDef="seasonStatsColumns"></tr>
                   <tr mat-row *matRowDef="let row; columns: seasonStatsColumns"></tr>
                 </table>
               </div>
             } @else {
-              <div class="empty-state">
-                <span class="material-symbols-rounded empty-icon">table_chart</span>
-                <p class="empty-message">No season statistics available for this goalie. </p>
-              </div>
+              <div class="dashboard-empty">No season statistics available for this goalie.</div>
             }
           </div>
         </div>
         <!-- Recent Game Stats Table -->
-        <div class="dashboard-card info-card stats-table-card">
+        <div class="dashboard-card">
           <div class="dashboard-card-header">
             <h2 class="dashboard-card-title">
               <span class="material-symbols-rounded">history</span>
-              Recent Game Stats (show last 5 games)
+              Recent Game Stats
             </h2>
           </div>
           <div class="dashboard-card-content">
@@ -286,26 +306,28 @@
                       {{ element.season || '—' }}
                     </td>
                   </ng-container>
+
                   <!-- Date Column -->
                   <ng-container matColumnDef="date">
                     <th mat-header-cell *matHeaderCellDef class="header-cell">Date</th>
                     <td mat-cell *matCellDef="let element" class="data-cell">{{ element.date }}</td>
                   </ng-container>
+
                   <!-- vs Team Column -->
                   <ng-container matColumnDef="vsTeam">
                     <th mat-header-cell *matHeaderCellDef class="header-cell">vs Team</th>
-                    <td mat-cell *matCellDef="let element" class="data-cell team-cell"
-                      style="display: flex !important; flex-direction: row !important; align-items: center; gap: 8px;">
-                      <img [src]="element.vsTeamLogo" [alt]="element.vsTeamName + ' logo'" class="team-logo"
-                        style="width: 30px !important; height: 30px !important; max-width: 30px !important; max-height: 30px !important; object-fit: cover; border-radius: 5px; flex-shrink: 0; display: block;" />
+                    <td mat-cell *matCellDef="let element" class="data-cell team-cell">
+                      <img class="team-logo" [src]="element.vsTeamLogo" alt="vs team logo" />
                       <span class="team-name">{{ element.vsTeamName }}</span>
                     </td>
                   </ng-container>
+
                   <!-- Score Column -->
                   <ng-container matColumnDef="score">
                     <th mat-header-cell *matHeaderCellDef class="header-cell">Score</th>
                     <td mat-cell *matCellDef="let element" class="data-cell">{{ element.score }}</td>
                   </ng-container>
+
                   <!-- GA Column -->
                   <ng-container matColumnDef="goalsAgainst">
                     <th mat-header-cell *matHeaderCellDef class="header-cell center">GA</th>
@@ -313,6 +335,7 @@
                       {{ element.goalsAgainst }}
                     </td>
                   </ng-container>
+
                   <!-- SA Column -->
                   <ng-container matColumnDef="shotsAgainst">
                     <th mat-header-cell *matHeaderCellDef class="header-cell center">SA</th>
@@ -320,6 +343,7 @@
                       {{ element.shotsAgainst }}
                     </td>
                   </ng-container>
+
                   <!-- SV Column -->
                   <ng-container matColumnDef="saves">
                     <th mat-header-cell *matHeaderCellDef class="header-cell center">SV</th>
@@ -327,6 +351,7 @@
                       {{ element.saves }}
                     </td>
                   </ng-container>
+
                   <!-- SV % Column -->
                   <ng-container matColumnDef="savePercentage">
                     <th mat-header-cell *matHeaderCellDef class="header-cell center">SV %</th>
@@ -334,15 +359,13 @@
                       {{ (element.savePercentage * 100).toFixed(3) }}%
                     </td>
                   </ng-container>
+
                   <tr mat-header-row *matHeaderRowDef="recentGameStatsColumns"></tr>
                   <tr mat-row *matRowDef="let row; columns: recentGameStatsColumns"></tr>
                 </table>
               </div>
             } @else {
-              <div class="empty-state">
-                <span class="material-symbols-rounded empty-icon">history</span>
-                <p class="empty-message">No recent game statistics available for this goalie. </p>
-              </div>
+              <div class="dashboard-empty">No recent game statistics available for this goalie.</div>
             }
           </div>
         </div>

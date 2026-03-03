@@ -9,6 +9,7 @@ export interface NavigationItem {
   children?: NavigationItem[];
   expanded?: boolean;
   isHovered?: boolean;
+  navigable?: boolean;
 }
 
 @Injectable({
@@ -58,6 +59,14 @@ export class NavigationService {
         label: 'Analytics',
         path: '/analytics',
         icon: 'analytics',
+        expanded: false,
+        navigable: true,
+        children: [
+          { label: 'Teams', path: '/analytics/teams', icon: 'teams' },
+          { label: 'Players', path: '/analytics/players', icon: 'players' },
+          { label: 'Goalies', path: '/analytics/goalies', icon: 'goalies' },
+          { label: 'Games', path: '/analytics/games', icon: 'games' },
+        ],
       },
       {
         label: 'Video Library',
@@ -122,6 +131,8 @@ export class NavigationService {
 
   isParentActive(item: NavigationItem): boolean {
     if (!item.children) return false;
+    const currentPath = this._currentPath().split('?')[0];
+    if (currentPath === item.path) return true;
     return item.children.some((child) => this.isActive(child.path));
   }
 
@@ -130,7 +141,7 @@ export class NavigationService {
     if (path.includes('/spray-chart')) {
       return 'Spray Chart';
     }
-    
+
     const flatItems = this.getFlatNavigationItems();
     // First, try to find exact match or child items (longer paths first)
     // Sort by path length descending to prioritize more specific paths
@@ -144,42 +155,46 @@ export class NavigationService {
     if (path.includes('/spray-chart')) {
       return 'scatter_plot';
     }
-    
+
     const flatItems = this.getFlatNavigationItems();
     // First, try to find exact match or child items (longer paths first)
     // Sort by path length descending to prioritize more specific paths
     const sortedItems = [...flatItems].sort((a, b) => b.path.length - a.path.length);
     const activeItem = sortedItems.find((item) => path.startsWith(item.path));
     if (!activeItem?.icon) return null;
-    
+
     return this.getMaterialIcon(activeItem.icon);
   }
 
   getMaterialIcon(iconName: string): string | null {
     // Map navigation icons to material-symbols icons
     const iconMap: Record<string, string> = {
-      'dashboard': 'dashboard',
-      'account': 'account_circle',
-      'profile': 'person',
-      'payment': 'credit_card',
-      'history': 'history',
-      'teams': 'groups',
-      'players': 'sports_hockey',
-      'goalies': 'shield',
-      'schedule': 'event',
-      'analytics': 'analytics',
-      'video': 'video_library',
-      'highlights': 'movie',
-      'gamesheet': 'description',
+      dashboard: 'dashboard',
+      account: 'account_circle',
+      profile: 'person',
+      payment: 'credit_card',
+      history: 'history',
+      teams: 'groups',
+      players: 'sports_hockey',
+      goalies: 'shield',
+      schedule: 'event',
+      analytics: 'analytics',
+      video: 'video_library',
+      highlights: 'movie',
+      games: 'scoreboard',
+      gamesheet: 'description',
     };
-    
+
     return iconMap[iconName] || null;
   }
 
   private updateExpandedState(): void {
     const items = this._navigationItems();
+    const currentPath = this._currentPath().split('?')[0];
     const updatedItems = items.map((item) => {
-      if (item.children && this.isParentActive(item)) {
+      if (!item.children) return item;
+      if (item.navigable && currentPath === item.path) return item;
+      if (this.isParentActive(item)) {
         return { ...item, expanded: true };
       }
       return item;

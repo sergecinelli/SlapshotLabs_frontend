@@ -12,6 +12,10 @@ import { liveDashboardPageRolesAccessMap } from './pages/live-dashboard/live-das
 import { videoHighlightsPageRolesAccessMap } from './pages/video-highlights/video-highlights.role-map';
 import { videoLibraryPageRolesAccessMap } from './pages/video-library/video-library.role-map';
 import { analyticsPageRolesAccessMap } from './pages/analytics/analytics.role-map';
+import { playerAnalysisPageRolesAccessMap } from './pages/player-analysis/player-analysis.role-map';
+import { goalieAnalysisPageRolesAccessMap } from './pages/goalie-analysis/goalie-analysis.role-map';
+import { teamAnalysisPageRolesAccessMap } from './pages/team-analysis/team-analysis.role-map';
+import { gameAnalysisPageRolesAccessMap } from './pages/game-analysis/game-analysis.role-map';
 import { gamesheetPageRolesAccessMap } from './pages/gamesheet/gamesheet.role-map';
 import { playerProfilePageRolesAccessMap } from './pages/player-profile/player-profile.role-map';
 import { goalieProfilePageRolesAccessMap } from './pages/goalie-profile/goalie-profile.role-map';
@@ -20,33 +24,60 @@ import { schedulesPageRolesAccessMap } from './pages/schedules/schedules.role-ma
 import { BreadcrumbRouteData } from './shared/components/breadcrumbs/breadcrumbs.component';
 
 // Reusable breadcrumb fragments
-const TEAMS_AND_ROSTERS: BreadcrumbRouteData = { label: 'Teams & Rosters', path: '/teams-and-rosters', icon: 'groups' };
-const TEAMS: BreadcrumbRouteData = { label: 'Teams', path: '/teams-and-rosters/teams', icon: 'groups' };
-const PLAYERS: BreadcrumbRouteData = { label: 'Players', path: '/teams-and-rosters/players', icon: 'sports_hockey' };
-const GOALIES: BreadcrumbRouteData = { label: 'Goalies', path: '/teams-and-rosters/goalies', icon: 'shield' };
+const TEAMS_AND_ROSTERS: BreadcrumbRouteData = {
+  label: 'Teams & Rosters',
+  path: '/teams-and-rosters',
+  icon: 'groups',
+};
+const TEAMS: BreadcrumbRouteData = {
+  label: 'Teams',
+  path: '/teams-and-rosters/teams',
+  icon: 'groups',
+};
+const PLAYERS: BreadcrumbRouteData = {
+  label: 'Players',
+  path: '/teams-and-rosters/players',
+  icon: 'sports_hockey',
+};
+const GOALIES: BreadcrumbRouteData = {
+  label: 'Goalies',
+  path: '/teams-and-rosters/goalies',
+  icon: 'shield',
+};
+const ANALYTICS: BreadcrumbRouteData = {
+  label: 'Analytics',
+  path: '/analytics',
+  icon: 'analytics',
+};
 
 export const routes: Routes = [
   // Authentication routes (lazy loaded)
   {
     path: 'sign-in',
-    loadComponent: () => import('./components/sign-in/sign-in.component').then((m) => m.SignInComponent),
+    loadComponent: () =>
+      import('./components/sign-in/sign-in.component').then((m) => m.SignInComponent),
     canActivate: [GuestGuard],
   },
   {
     path: 'sign-up',
-    loadComponent: () => import('./components/sign-up/sign-up.component').then((m) => m.SignUpComponent),
+    loadComponent: () =>
+      import('./components/sign-up/sign-up.component').then((m) => m.SignUpComponent),
     canActivate: [GuestGuard],
   },
   {
     path: 'forgot-password',
     loadComponent: () =>
-      import('./components/forgot-password/forgot-password.component').then((m) => m.ForgotPasswordComponent),
+      import('./components/forgot-password/forgot-password.component').then(
+        (m) => m.ForgotPasswordComponent
+      ),
     canActivate: [GuestGuard],
   },
   {
     path: 'reset-password',
     loadComponent: () =>
-      import('./components/reset-password/reset-password.component').then((m) => m.ResetPasswordComponent),
+      import('./components/reset-password/reset-password.component').then(
+        (m) => m.ResetPasswordComponent
+      ),
     canActivate: [GuestGuard],
   },
 
@@ -59,7 +90,8 @@ export const routes: Routes = [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       {
         path: 'dashboard',
-        loadComponent: () => import('./pages/dashboard/dashboard.page').then((m) => m.DashboardPage),
+        loadComponent: () =>
+          import('./pages/dashboard/dashboard.page').then((m) => m.DashboardPage),
         canActivate: [RoleAccessGuard],
         data: {
           pageRolesAccessMap: dashboardPageRolesAccessMap,
@@ -201,7 +233,11 @@ export const routes: Routes = [
           breadcrumbs: [
             TEAMS_AND_ROSTERS,
             PLAYERS,
-            { label: ':entityName', path: '/teams-and-rosters/players/:id/profile', icon: 'person' },
+            {
+              label: ':entityName',
+              path: '/teams-and-rosters/players/:id/profile',
+              icon: 'person',
+            },
             { label: 'Spray Chart', icon: 'scatter_plot' },
           ],
         },
@@ -214,14 +250,19 @@ export const routes: Routes = [
           breadcrumbs: [
             TEAMS_AND_ROSTERS,
             GOALIES,
-            { label: ':entityName', path: '/teams-and-rosters/goalies/:id/profile', icon: 'person' },
+            {
+              label: ':entityName',
+              path: '/teams-and-rosters/goalies/:id/profile',
+              icon: 'person',
+            },
             { label: 'Spray Chart', icon: 'scatter_plot' },
           ],
         },
       },
       {
         path: 'teams-and-rosters/teams/:id/schedule',
-        loadComponent: () => import('./pages/schedules/schedules.page').then((m) => m.SchedulesPage),
+        loadComponent: () =>
+          import('./pages/schedules/schedules.page').then((m) => m.SchedulesPage),
         canActivate: [RoleAccessGuard],
         data: {
           pageRolesAccessMap: schedulesPageRolesAccessMap,
@@ -230,6 +271,64 @@ export const routes: Routes = [
             TEAMS,
             { label: ':entityName', path: '/teams-and-rosters/teams/:id/profile', icon: 'groups' },
             { label: 'Schedule', icon: 'scoreboard' },
+          ],
+        },
+      },
+
+      // Entity Analysis routes
+      {
+        path: 'analytics/teams/:id',
+        loadComponent: () =>
+          import('./pages/team-analysis/team-analysis.page').then((m) => m.TeamAnalysisPage),
+        canActivate: [RoleAccessGuard],
+        data: {
+          pageRolesAccessMap: teamAnalysisPageRolesAccessMap,
+          breadcrumbs: [
+            ANALYTICS,
+            { label: 'Teams', path: '/analytics/teams', icon: 'groups' },
+            { label: ':entityName', icon: 'groups' },
+          ],
+        },
+      },
+      {
+        path: 'analytics/players/:id',
+        loadComponent: () =>
+          import('./pages/player-analysis/player-analysis.page').then((m) => m.PlayerAnalysisPage),
+        canActivate: [RoleAccessGuard],
+        data: {
+          pageRolesAccessMap: playerAnalysisPageRolesAccessMap,
+          breadcrumbs: [
+            ANALYTICS,
+            { label: 'Players', path: '/analytics/players', icon: 'sports_hockey' },
+            { label: ':entityName', icon: 'person' },
+          ],
+        },
+      },
+      {
+        path: 'analytics/goalies/:id',
+        loadComponent: () =>
+          import('./pages/goalie-analysis/goalie-analysis.page').then((m) => m.GoalieAnalysisPage),
+        canActivate: [RoleAccessGuard],
+        data: {
+          pageRolesAccessMap: goalieAnalysisPageRolesAccessMap,
+          breadcrumbs: [
+            ANALYTICS,
+            { label: 'Goalies', path: '/analytics/goalies', icon: 'shield' },
+            { label: ':entityName', icon: 'person' },
+          ],
+        },
+      },
+      {
+        path: 'analytics/games/:id',
+        loadComponent: () =>
+          import('./pages/game-analysis/game-analysis.page').then((m) => m.GameAnalysisPage),
+        canActivate: [RoleAccessGuard],
+        data: {
+          pageRolesAccessMap: gameAnalysisPageRolesAccessMap,
+          breadcrumbs: [
+            ANALYTICS,
+            { label: 'Games', path: '/analytics/games', icon: 'sports_hockey' },
+            { label: ':entityName', icon: 'sports_hockey' },
           ],
         },
       },
@@ -253,6 +352,50 @@ export const routes: Routes = [
         canActivate: [RoleAccessGuard],
         data: {
           pageRolesAccessMap: analyticsPageRolesAccessMap,
+          breadcrumbs: [{ label: 'Analytics', icon: 'analytics' }],
+        },
+      },
+      {
+        path: 'analytics/players',
+        loadComponent: () =>
+          import('./pages/analytics/analytics.page').then((m) => m.AnalyticsPage),
+        canActivate: [RoleAccessGuard],
+        data: {
+          pageRolesAccessMap: analyticsPageRolesAccessMap,
+          defaultTab: 'player',
+          breadcrumbs: [{ label: 'Analytics', icon: 'analytics' }],
+        },
+      },
+      {
+        path: 'analytics/goalies',
+        loadComponent: () =>
+          import('./pages/analytics/analytics.page').then((m) => m.AnalyticsPage),
+        canActivate: [RoleAccessGuard],
+        data: {
+          pageRolesAccessMap: analyticsPageRolesAccessMap,
+          defaultTab: 'goalie',
+          breadcrumbs: [{ label: 'Analytics', icon: 'analytics' }],
+        },
+      },
+      {
+        path: 'analytics/teams',
+        loadComponent: () =>
+          import('./pages/analytics/analytics.page').then((m) => m.AnalyticsPage),
+        canActivate: [RoleAccessGuard],
+        data: {
+          pageRolesAccessMap: analyticsPageRolesAccessMap,
+          defaultTab: 'team',
+          breadcrumbs: [{ label: 'Analytics', icon: 'analytics' }],
+        },
+      },
+      {
+        path: 'analytics/games',
+        loadComponent: () =>
+          import('./pages/analytics/analytics.page').then((m) => m.AnalyticsPage),
+        canActivate: [RoleAccessGuard],
+        data: {
+          pageRolesAccessMap: analyticsPageRolesAccessMap,
+          defaultTab: 'game',
           breadcrumbs: [{ label: 'Analytics', icon: 'analytics' }],
         },
       },

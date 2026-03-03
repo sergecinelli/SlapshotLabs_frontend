@@ -1,0 +1,20 @@
+@let itemsList = items();
+
+@if (itemsList) {
+  <ul class="tabs" #tabsContainer>
+    @for (item of itemsList; track item.key; let i = $index) {
+      <li
+        matRipple
+        [matRippleColor]="rippleColor"
+        class="tab"
+        [class.active]="currentTabIndex === i"
+        (click)="selectTab(i)"
+      >
+        @if (item.icon) {
+          <span class="material-symbols-rounded tab-icon">{{ item.icon }}</span>
+        }
+        {{ item.label }}
+      </li>
+    }
+  </ul>
+}

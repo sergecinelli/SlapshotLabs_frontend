@@ -23,8 +23,7 @@ import { TooltipPosition } from '@angular/material/tooltip';
   host: { '[style.width]': 'width()' },
 })
 export abstract class ButtonBaseClass implements OnInit, AfterContentInit {
-  protected static readonly BUTTON_TRANSITION =
-    '0.1s cubic-bezier(0.175, 0.885, 0.32, 1.06)';
+  protected static readonly BUTTON_TRANSITION = '0.1s cubic-bezier(0.175, 0.885, 0.32, 1.06)';
 
   protected getColor(color: AppColor) {
     return this.themeService.getCurrentThemeColor(color);
@@ -54,15 +53,13 @@ export abstract class ButtonBaseClass implements OnInit, AfterContentInit {
 
   tooltip = input<string | null>(null);
   tooltipPos = input<TooltipPosition>('below');
-  tooltipDelay = input(800);
+  tooltipDelay = input(300);
 
   isDisabled = input(false);
 
   materialIcon = input('');
   materialIconClass = input<ButtonMaterialIconsClass>('material-icons-round');
-  materialSymbolClass = input<ButtonMaterialSymbolsClass>(
-    'material-symbols-rounded'
-  );
+  materialSymbolClass = input<ButtonMaterialSymbolsClass>('material-symbols-rounded');
   isMatSymbolClass = input(true);
 
   counter = input(-1);
@@ -111,8 +108,7 @@ export abstract class ButtonBaseClass implements OnInit, AfterContentInit {
 
   ngAfterContentInit() {
     this.hasContent.set(
-      !!this.elRef.nativeElement.querySelector('.text')?.childNodes.length ||
-        this.haveContent()
+      !!this.elRef.nativeElement.querySelector('.text')?.childNodes.length || this.haveContent()
     );
   }
 

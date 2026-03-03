@@ -69,10 +69,11 @@ export class PlayersPage implements OnInit {
   ];
 
   tableActions: TableAction[] = [
+    { label: 'Analysis', action: 'analysis', variant: 'secondary', icon: 'analytics' },
     { label: 'Spray Chart', action: 'shot-spray-chart', variant: 'secondary', icon: 'scatter_plot' },
-    { label: 'Profile', action: 'view-profile', variant: 'primary', icon: 'visibility' },
-    { label: 'Edit', action: 'edit', variant: 'secondary', icon: 'stylus', roleVisibilityName: 'edit-action' },
-    { label: 'Delete', action: 'delete', variant: 'danger', icon: 'delete', roleVisibilityName: 'delete-action' },
+    { label: 'Profile', action: 'view-profile', variant: 'primary', icon: 'visibility', iconOnly: true },
+    { label: 'Edit', action: 'edit', variant: 'secondary', icon: 'stylus', iconOnly: true, roleVisibilityName: 'edit-action' },
+    { label: 'Delete', action: 'delete', variant: 'danger', icon: 'delete', iconOnly: true, roleVisibilityName: 'delete-action' },
   ];
 
   ngOnInit(): void {
@@ -210,6 +211,9 @@ export class PlayersPage implements OnInit {
       case 'shot-spray-chart':
         this.viewShotSprayChart(item);
         break;
+      case 'analysis':
+        this.viewPlayerAnalysis(item);
+        break;
       default:
         console.log(`Unknown action: ${action}`);
     }
@@ -298,6 +302,10 @@ export class PlayersPage implements OnInit {
 
   viewShotSprayChart(player: Player): void {
     this.router.navigate(['/teams-and-rosters/players', player.id, 'spray-chart'], { queryParams: { type: 'player' } });
+  }
+
+  viewPlayerAnalysis(player: Player): void {
+    this.router.navigate(['/analytics/players', player.id]);
   }
 
   openAddPlayerModal(): void {

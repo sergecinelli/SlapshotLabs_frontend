@@ -3,7 +3,12 @@
 @let showScoreValue = showScore();
 @let isDeletingValue = isDeleting();
 
-<div class="game-card" [class.completed]="gameValue.status === GameStatus.GameOver" [class.in-progress]="gameValue.status === GameStatus.GameInProgress" [class.not-started]="gameValue.status === GameStatus.NotStarted">
+<div
+  class="game-card"
+  [class.completed]="gameValue.status === GameStatus.GameOver"
+  [class.in-progress]="gameValue.status === GameStatus.GameInProgress"
+  [class.not-started]="gameValue.status === GameStatus.NotStarted"
+>
   <!-- Card Header -->
   <div class="game-card-header">
     <div class="header-left">
@@ -27,7 +32,8 @@
         <div class="game-type-info">
           <div class="game-type-text">
             @if (gameValue.gameType && gameValue.gameTypeName) {
-              <span class="game-type-bold">{{ gameValue.gameType }}</span><span class="game-type-separator"> - </span>{{ gameValue.gameTypeName }}
+              <span class="game-type-bold">{{ gameValue.gameType }}</span
+              ><span class="game-type-separator"> - </span>{{ gameValue.gameTypeName }}
             } @else {
               <span class="game-type-bold">{{ gameValue.gameType || gameValue.gameTypeName }}</span>
             }
@@ -37,7 +43,12 @@
     </div>
     <div class="header-right">
       <div class="game-status-row">
-        <div class="status-badge" [class.live-badge]="gameValue.status === GameStatus.GameInProgress" [class.upcoming-badge]="gameValue.status === GameStatus.NotStarted" [class.completed-badge]="gameValue.status === GameStatus.GameOver">
+        <div
+          class="status-badge"
+          [class.live-badge]="gameValue.status === GameStatus.GameInProgress"
+          [class.upcoming-badge]="gameValue.status === GameStatus.NotStarted"
+          [class.completed-badge]="gameValue.status === GameStatus.GameOver"
+        >
           @if (gameValue.status === GameStatus.GameInProgress) {
             <span class="live-indicator"></span>
           }
@@ -75,7 +86,8 @@
               class="team-name team-link"
               [routerLink]="['/teams-and-rosters/teams/team-profile', gameValue.homeTeamId]"
               [attr.aria-label]="'View ' + gameValue.homeTeam + ' profile'"
-            >{{ gameValue.homeTeam }}</a>
+              >{{ gameValue.homeTeam }}</a
+            >
           } @else {
             <div class="team-name">{{ gameValue.homeTeam }}</div>
           }
@@ -83,7 +95,10 @@
           @if (gameValue.homeTeamGoalie && gameValue.homeTeamGoalieId) {
             <a
               class="team-goalie goalie-link"
-              [routerLink]="['/teams-and-rosters/goalies/goalie-profile', gameValue.homeTeamGoalieId]"
+              [routerLink]="[
+                '/teams-and-rosters/goalies/goalie-profile',
+                gameValue.homeTeamGoalieId,
+              ]"
               [attr.aria-label]="'View ' + gameValue.homeTeamGoalie + ' profile'"
             >
               <span class="goalie-name">{{ gameValue.homeTeamGoalie }}</span>
@@ -108,11 +123,15 @@
     <div class="score-center-container">
       @if (showScoreValue) {
         <div class="team-score-wrapper" [class.winning-home]="isWinning(true)">
-          <div class="team-score" [class.winning-score]="isWinning(true)">{{ gameValue.homeGoals }}</div>
+          <div class="team-score" [class.winning-score]="isWinning(true)">
+            {{ gameValue.homeGoals }}
+          </div>
         </div>
         <div class="score-separator">-</div>
         <div class="team-score-wrapper" [class.winning-away]="isWinning(false)">
-          <div class="team-score" [class.winning-score]="isWinning(false)">{{ gameValue.awayGoals }}</div>
+          <div class="team-score" [class.winning-score]="isWinning(false)">
+            {{ gameValue.awayGoals }}
+          </div>
         </div>
       } @else {
         <div class="score-separator">at</div>
@@ -133,7 +152,8 @@
               class="team-name team-link"
               [routerLink]="['/teams-and-rosters/teams/team-profile', gameValue.awayTeamId]"
               [attr.aria-label]="'View ' + gameValue.awayTeam + ' profile'"
-            >{{ gameValue.awayTeam }}</a>
+              >{{ gameValue.awayTeam }}</a
+            >
           } @else {
             <div class="team-name">{{ gameValue.awayTeam }}</div>
           }
@@ -141,7 +161,10 @@
           @if (gameValue.awayTeamGoalie && gameValue.awayTeamGoalieId) {
             <a
               class="team-goalie goalie-link"
-              [routerLink]="['/teams-and-rosters/goalies/goalie-profile', gameValue.awayTeamGoalieId]"
+              [routerLink]="[
+                '/teams-and-rosters/goalies/goalie-profile',
+                gameValue.awayTeamGoalieId,
+              ]"
               [attr.aria-label]="'View ' + gameValue.awayTeamGoalie + ' profile'"
             >
               <span class="material-symbols-rounded goalie-icon">shield</span>
@@ -159,15 +182,30 @@
   </div>
 
   <!-- Action Buttons -->
-  @if (gameValue.status === GameStatus.GameInProgress || gameValue.status === GameStatus.GameOver || showActionsValue) {
-    <div class="game-card-actions">
-      @if (gameValue.status === GameStatus.GameInProgress || gameValue.status === GameStatus.GameOver) {
+  <div class="card-actions-container">
+    <div class="card-actions">
+      <app-button
+        [bg]="'upcoming'"
+        [bghover]="'upcoming'"
+        [color]="'white'"
+        [colorhover]="'white'"
+        materialIcon="analytics"
+        [haveContent]="true"
+        (clicked)="onAnalysis()"
+        class="action-button"
+      >
+        Analysis
+      </app-button>
+      @if (
+        gameValue.status === GameStatus.GameInProgress || gameValue.status === GameStatus.GameOver
+      ) {
         <app-button-route
           [route]="'/schedule/live/' + gameValue.id"
-          [bg]="'green'"
-          [bghover]="'green'"
-          [color]="'white'"
-          [colorhover]="'white'"
+          [bg]="'transparent'"
+          [bghover]="'button_background'"
+          [br]="'border'"
+          [color]="'text_primary'"
+          [colorhover]="'text_primary'"
           [materialIcon]="'dashboard'"
           [haveContent]="true"
           class="action-button"
@@ -175,36 +213,34 @@
           Dashboard
         </app-button-route>
       }
-      @if (showActionsValue) {
+    </div>
+    @if (showActionsValue) {
+      <div class="card-actions">
         <app-button
-          [bg]="'orange'"
-          [bghover]="'orange'"
-          [color]="'white'"
-          [colorhover]="'white'"
+          [color]="'orange'"
+          [colorhover]="'orange_dark'"
+          [bghover]="'gray_tone3'"
+          [bgselect]="'gray_tone2'"
           materialIcon="stylus"
-          [haveContent]="true"
+          [tooltip]="'Edit'"
           (clicked)="onEdit()"
           class="action-button"
           role-visibility-name="edit-action"
-        >
-          Edit
-        </app-button>
+        />
         <app-button-loading
           [isLoading]="isDeletingValue"
           [isDisabled]="isDeletingValue"
-          [bg]="'primary'"
-          [bghover]="'primary_dark'"
-          [color]="'white'"
-          [colorhover]="'white'"
+          [color]="'primary'"
+          [colorhover]="'primary_dark'"
+          [bghover]="'gray_tone3'"
+          [bgselect]="'gray_tone2'"
           [materialIcon]="'delete'"
-          [haveContent]="true"
+          [tooltip]="'Delete'"
           (clicked)="onDelete()"
           class="action-button"
           role-visibility-name="delete-action"
-        >
-          Delete
-        </app-button-loading>
-      }
-    </div>
-  }
+        />
+      </div>
+    }
+  </div>
 </div>

@@ -1,6 +1,6 @@
 import { Component, OnInit, signal, inject } from '@angular/core';
 import {  } from '@angular/common';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
@@ -60,11 +60,12 @@ export class SchedulePage implements OnInit {
   private bannerService = inject(BannerService);
   private dialog = inject(MatDialog);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
 
   schedules = signal<Schedule[]>([]);
   deletingGameIds = new Set<string>();
   loading = signal(true);
-  currentMonthStart = signal<Date>(this.getMonthStart(new Date()));
+  currentMonthStart = signal<Date>(this.getInitialMonthStart());
   currentMonthEnd = signal<Date>(this.getMonthEnd(this.currentMonthStart()));
 
   // Cached data for form modals
@@ -87,14 +88,34 @@ export class SchedulePage implements OnInit {
   onMonthChange(event: { start: Date; end: Date }): void {
     this.currentMonthStart.set(event.start);
     this.currentMonthEnd.set(event.end);
+    this.updatePeriodQueryParam(event.start);
     this.loadSchedules();
   }
 
-  private getMonthStart(date: Date): Date {
-    const d = new Date(date);
+  private getInitialMonthStart(): Date {
+    const periodParam = inject(ActivatedRoute).snapshot.queryParamMap.get('period');
+    if (periodParam) {
+      const [year, month] = periodParam.split('-').map(Number);
+      if (year && month && month >= 1 && month <= 12) {
+        const d = new Date(year, month - 1, 1);
+        d.setHours(0, 0, 0, 0);
+        return d;
+      }
+    }
+    const d = new Date();
     d.setHours(0, 0, 0, 0);
     d.setDate(1);
     return d;
+  }
+
+  private updatePeriodQueryParam(date: Date): void {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { period: `${year}-${month}` },
+      replaceUrl: true,
+    });
   }
 
   private getMonthEnd(monthStart: Date): Date {
@@ -568,6 +589,10 @@ export class SchedulePage implements OnInit {
 
   openLiveDashboard(schedule: Schedule): void {
     this.router.navigate(['/schedule/live', schedule.id]);
+  }
+
+  viewGameAnalysis(schedule: Schedule): void {
+    this.router.navigate(['/analytics/games', schedule.id]);
   }
 
   openAddScheduleModal(): void {

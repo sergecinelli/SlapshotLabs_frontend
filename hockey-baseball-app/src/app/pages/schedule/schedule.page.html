@@ -56,6 +56,7 @@
           [isDeleting]="deletingGameIds.has(schedule.id)"
           (edit)="editSchedule($event)"
           (delete)="deleteSchedule($event)"
+          (analysis)="viewGameAnalysis($event)"
         />
       }
     </div>

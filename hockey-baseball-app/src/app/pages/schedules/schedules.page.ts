@@ -285,4 +285,8 @@ export class SchedulesPage implements OnInit {
       return timeStr;
     }
   }
+
+  viewGameAnalysis(schedule: Schedule): void {
+    this.router.navigate(['/analytics/games', schedule.id]);
+  }
 }

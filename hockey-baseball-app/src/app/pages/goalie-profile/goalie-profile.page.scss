@@ -1,19 +1,5 @@
 @use '../../shared/styles/dashboard-card.scss' as *;
 
-// Force team logo sizes globally
-.goalie-profile-page img.team-logo {
-  width: 30px !important;
-  height: 30px !important;
-  max-width: 30px !important;
-  max-height: 30px !important;
-  min-width: 30px !important;
-  min-height: 30px !important;
-  object-fit: cover !important;
-  border-radius: 5px;
-  display: block !important;
-  flex-shrink: 0 !important;
-}
-
 .goalie-profile-page {
   padding: 20px;
   margin: 0 auto;
@@ -394,207 +380,114 @@
       }
     }
 
-      mat-divider {
-        margin: 16px 0;
-        border-color: var(--color-primary) !important;
-        border-top-width: 2px !important;
+    mat-divider {
+      margin: 16px 0;
+      border-color: var(--color-primary) !important;
+      border-top-width: 2px !important;
+    }
+  }
+}
+
+// Table Container - matches player-profile structure
+.table-container {
+  background-color: var(--white);
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  overflow-x: auto;
+  overflow-y: hidden;
+  margin-top: 8px;
+
+  &::-webkit-scrollbar {
+    height: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background-color: #f1f5f9;
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: #cbd5e1;
+    border-radius: 4px;
+
+    &:hover {
+      background-color: #94a3b8;
+    }
+  }
+}
+
+// Stats Table
+.stats-table {
+  width: 100%;
+  min-width: 800px;
+  table-layout: fixed;
+
+  .mat-mdc-header-row {
+    .mat-mdc-header-cell {
+      background-color: #e5e7eb;
+      color: #4b5563;
+      font-weight: 500;
+      font-size: 14px !important;
+      padding: 8px 12px !important;
+      border: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+
+      &:first-child {
+        border-top-left-radius: 4px;
       }
 
-      // Stats Table Card Specific Styles (matching goalies table)
-      &.stats-table-card {
-      .table-container {
-        background-color: white;
-        border-radius: 0.5rem;
-        box-shadow:
-          0 1px 3px 0 rgb(0 0 0 / 0.1),
-          0 1px 2px -1px rgb(0 0 0 / 0.1);
-        overflow-x: auto;
-        overflow-y: hidden;
-        margin-top: 8px;
+      &:last-child {
+        border-top-right-radius: 4px;
+      }
 
-        &::-webkit-scrollbar {
-          height: 8px;
+      &.center {
+        text-align: center;
+      }
+    }
+  }
+
+  .mat-mdc-row {
+    .mat-mdc-cell {
+      font-size: 12px !important;
+      color: var(--text-primary) !important;
+      border-bottom: 1px solid var(--border-light) !important;
+      padding: 8px 12px !important;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+
+      &.center {
+        text-align: center !important;
+      }
+
+      &.team-cell {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        white-space: normal !important;
+        overflow: visible !important;
+        text-overflow: initial !important;
+
+        .team-logo {
+          width: 30px;
+          height: 30px;
+          border-radius: 5px;
+          object-fit: cover;
         }
 
-        &::-webkit-scrollbar-track {
-          background-color: #f1f5f9;
-          border-radius: 4px;
-        }
-
-        &::-webkit-scrollbar-thumb {
-          background-color: #cbd5e1;
-          border-radius: 4px;
-
-          &:hover {
-            background-color: #94a3b8;
-          }
-        }
-
-        .stats-table {
-          width: 100%;
-          min-width: 800px;
-          table-layout: fixed;
-
-          // Header styling to match goalies table
-          .mat-mdc-header-row {
-            .mat-mdc-header-cell {
-              background-color: #e5e7eb;
-              color: #4b5563;
-              font-weight: 500;
-              font-size: 14px !important; // text-sm equivalent
-              padding: 8px 16px !important;
-              border: 0;
-              white-space: nowrap;
-              overflow: hidden;
-              text-overflow: ellipsis;
-
-              &:first-child {
-                border-top-left-radius: 8px;
-              }
-
-              &:last-child {
-                border-top-right-radius: 8px;
-              }
-
-              &.center {
-                text-align: center;
-              }
-            }
-          }
-
-          // Row styling to match goalies table
-          .mat-mdc-row {
-            transition-property:
-              color, background-color, border-color, text-decoration-color, fill, stroke;
-            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-            transition-duration: 150ms;
-
-            &:hover {
-              .mat-mdc-cell {
-                background-color: #f9fafb !important;
-              }
-            }
-
-            .mat-mdc-cell {
-              font-size: 12px !important;
-              color: #111827 !important;
-              border-bottom: 1px solid #e5e7eb !important;
-              padding: 8px 16px !important;
-              white-space: nowrap;
-              overflow: hidden;
-              text-overflow: ellipsis;
-
-              &.center {
-                text-align: center !important;
-              }
-
-              .team-logo {
-                width: 30px !important;
-                height: 30px !important;
-                max-width: 30px !important;
-                max-height: 30px !important;
-                min-width: 30px !important;
-                min-height: 30px !important;
-                border-radius: 5px;
-                object-fit: cover;
-                flex-shrink: 0;
-                display: block;
-              }
-
-              .no-logo {
-                color: var(--color-secondary);
-                opacity: 0.5;
-              }
-
-              &.team-cell {
-                display: flex !important;
-                flex-direction: row !important;
-                align-items: center;
-                gap: 8px;
-                white-space: normal !important;
-                overflow: visible !important;
-                text-overflow: initial !important;
-
-                .team-logo {
-                  width: 30px !important;
-                  height: 30px !important;
-                  max-width: 30px !important;
-                  max-height: 30px !important;
-                  min-width: 30px !important;
-                  min-height: 30px !important;
-                  border-radius: 5px;
-                  object-fit: cover;
-                  flex-shrink: 0;
-                  order: 1;
-                }
-
-                .team-name {
-                  font-weight: 500;
-                  color: var(--text-primary);
-                  font-size: 12px;
-                  order: 2;
-                }
-              }
-
-              &.save-percentage {
-                font-weight: 600;
-                color: var(--color-primary);
-              }
-            }
-          }
-        }
-
-        // Specific styles for recent games table - keep same font sizes as main table
-        .recent-games-table {
-          // Headers should be the same size as season stats
-          .mat-mdc-header-row {
-            .mat-mdc-header-cell {
-              font-size: 14px !important; // Same as season stats
-            }
-          }
-
-          .mat-mdc-row {
-            .mat-mdc-cell {
-              font-size: 12px !important; // Same as season stats
-              padding: 8px 16px !important; // Same as season stats
-
-              &.team-cell {
-                display: flex !important;
-                flex-direction: row !important;
-                align-items: center;
-                gap: 8px;
-                white-space: normal !important;
-                overflow: visible !important;
-                text-overflow: initial !important;
-
-                .team-logo {
-                  width: 30px !important;
-                  height: 30px !important;
-                  max-width: 30px !important;
-                  max-height: 30px !important;
-                  min-width: 30px !important;
-                  min-height: 30px !important;
-                  border-radius: 5px;
-                  object-fit: cover;
-                  flex-shrink: 0;
-                  order: 1;
-                }
-
-                .team-name {
-                  font-size: 12px; // Same as season stats
-                  font-weight: 500;
-                  color: var(--text-primary);
-                  order: 2;
-                }
-              }
-            }
-          }
+        .team-name {
+          font-weight: 500;
+          color: var(--text-primary);
+          font-size: 12px;
         }
       }
     }
   }
 }
 
+// Responsive adjustments
 @media (max-width: 1024px) {
   .goalie-profile-page {
     padding: 16px;
@@ -620,225 +513,84 @@
           }
         }
       }
-
-      .info-card {
-        &.stats-table-card {
-          .table-container {
-            .stats-table {
-              .mat-mdc-header-row {
-                .mat-mdc-header-cell {
-                  padding: 6px 12px !important;
-                  font-size: 12px !important; // Slightly smaller for tablet
-                }
-              }
-
-              .mat-mdc-row {
-                .mat-mdc-cell {
-                  padding: 6px 12px !important;
-                  font-size: 11px !important; // Slightly smaller for tablet
-
-                  &.team-cell {
-                    gap: 6px;
-
-                    .team-logo {
-                      width: 30px !important;
-                      height: 30px !important;
-                      max-width: 30px !important;
-                      max-height: 30px !important;
-                      min-width: 30px !important;
-                      min-height: 30px !important;
-                      border-radius: 5px;
-                      object-fit: cover;
-                      flex-shrink: 0;
-                      display: block;
-                    }
-
-                    .team-name {
-                      font-size: 11px;
-                    }
-                  }
-                }
-              }
-            }
-
-            .recent-games-table {
-              .mat-mdc-header-row {
-                .mat-mdc-header-cell {
-                  font-size: 12px !important; // Same as season stats header
-                }
-              }
-
-              .mat-mdc-row {
-                .mat-mdc-cell {
-                  font-size: 11px !important; // Same as season stats cells
-                  padding: 6px 12px !important;
-
-                  &.team-cell {
-                    .team-logo {
-                      width: 30px !important;
-                      height: 30px !important;
-                      max-width: 30px !important;
-                      max-height: 30px !important;
-                      min-width: 30px !important;
-                      min-height: 30px !important;
-                      border-radius: 5px;
-                      object-fit: cover;
-                      flex-shrink: 0;
-                      display: block;
-                    }
-
-                    .team-name {
-                      font-size: 11px; // Same as cells
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
     }
   }
 
-  @media (max-width: 768px) {
-    .goalie-profile-page {
-      padding: 12px;
-
-      .profile-content {
-        .stats-row {
-          gap: 12px;
-
-          &.stats-row-3 {
-            grid-template-columns: repeat(2, 1fr);
-          }
-
-          &.stats-row-6 {
-            grid-template-columns: repeat(2, 1fr);
-          }
-
-          .stat-box {
-            padding: 16px 12px;
-
-            .stat-value {
-              font-size: 1.25rem;
-            }
-          }
-        }
-
-        .profile-header {
-          flex-direction: column;
-          gap: 20px;
-          text-align: center;
-          padding: 16px;
-
-          .player-info .player-name {
-            font-size: 1.625rem;
-          }
-
-          .player-details {
-            justify-content: center;
-            flex-wrap: wrap;
-          }
-        }
-
-        .info-card {
-          .info-grid {
-            flex-direction: column !important;
-            gap: 16px;
-          }
-
-          &.stats-table-card {
-            .table-container {
-              .stats-table {
-                min-width: 600px;
-
-                .mat-mdc-header-row {
-                  .mat-mdc-header-cell {
-                    padding: 4px 8px !important;
-                    font-size: 11px !important; // Smaller for mobile
-                  }
-                }
-
-                .mat-mdc-row {
-                  .mat-mdc-cell {
-                    padding: 4px 8px !important;
-                    font-size: 10px !important; // Smaller for mobile
-
-                    &.team-cell {
-                      gap: 4px;
-
-                      .team-logo {
-                        width: 30px !important;
-                        height: 30px !important;
-                        max-width: 30px !important;
-                        max-height: 30px !important;
-                        min-width: 30px !important;
-                        min-height: 30px !important;
-                        border-radius: 5px;
-                        object-fit: cover;
-                        flex-shrink: 0;
-                        display: block;
-                      }
-
-                      .team-name {
-                        font-size: 10px;
-                      }
-                    }
-                  }
-                }
-              }
-
-              .recent-games-table {
-                .mat-mdc-header-row {
-                  .mat-mdc-header-cell {
-                    font-size: 11px !important; // Same as season stats header
-                  }
-                }
-
-                .mat-mdc-row {
-                  .mat-mdc-cell {
-                    font-size: 10px !important; // Same as season stats cells
-                    padding: 4px 8px !important;
-
-                    &.team-cell {
-                      .team-logo {
-                        width: 30px !important;
-                        height: 30px !important;
-                        max-width: 30px !important;
-                        max-height: 30px !important;
-                        min-width: 30px !important;
-                        min-height: 30px !important;
-                        border-radius: 5px;
-                        object-fit: cover;
-                        flex-shrink: 0;
-                        display: block;
-                      }
-
-                      .team-name {
-                        font-size: 10px; // Same as cells
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
+  .stats-table {
+    min-width: 700px;
   }
 }
 
-::ng-deep .goalie-profile-page {
-  mat-divider {
-    border-top-color: var(--color-primary) !important;
-    border-color: var(--color-primary) !important;
-    border-top-width: 2px !important;
+@media (max-width: 768px) {
+  .goalie-profile-page {
+    padding: 12px;
+
+    .profile-content {
+      .dashboard-card {
+        .dashboard-card-header {
+          padding: 16px 20px;
+          min-height: 56px;
+        }
+
+        .dashboard-card-title {
+          font-size: 18px;
+          gap: 10px;
+
+          .material-symbols-rounded {
+            font-size: 20px;
+            width: 20px;
+            height: 20px;
+          }
+        }
+      }
+
+      .stats-row {
+        gap: 12px;
+
+        &.stats-row-3 {
+          grid-template-columns: repeat(2, 1fr);
+        }
+
+        &.stats-row-6 {
+          grid-template-columns: repeat(2, 1fr);
+        }
+
+        .stat-box {
+          padding: 16px 12px;
+
+          .stat-value {
+            font-size: 1.25rem;
+          }
+        }
+      }
+
+      .profile-header {
+        flex-direction: column;
+        gap: 20px;
+        text-align: center;
+        padding: 16px;
+
+        .player-info .player-name {
+          font-size: 1.625rem;
+        }
+
+        .player-details {
+          justify-content: center;
+          flex-wrap: wrap;
+        }
+      }
+
+      .info-card {
+        .info-grid {
+          flex-direction: column !important;
+          gap: 16px;
+        }
+      }
+    }
   }
 
-  .mat-divider {
-    border-top-color: var(--color-primary) !important;
-    border-color: var(--color-primary) !important;
-    border-top-width: 2px !important;
+  .penalty-stats-row {
+    grid-template-columns: 1fr;
+    gap: 12px;
   }
 }

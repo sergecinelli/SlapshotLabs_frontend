@@ -1,0 +1,99 @@
+<div class="analysis-modal">
+  <h2 mat-dialog-title class="modal-title">
+    <span class="material-symbols-rounded title-icon">analytics</span>
+    {{ isEditMode ? 'Edit Goalie Analysis' : 'Create Goalie Analysis' }}
+  </h2>
+
+  <mat-dialog-content class="modal-content">
+    @if (isLoading) {
+      <div class="loading-container">
+        <p>Loading form data...</p>
+      </div>
+    }
+    @if (!isLoading) {
+      <form [formGroup]="analysisForm" class="analysis-form">
+        <div class="form-section">
+          <div class="section-header">
+            <span class="section-title">Analysis Details</span>
+          </div>
+          <mat-divider class="section-divider"></mat-divider>
+
+          <div class="form-row">
+            <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field full-width">
+              <mat-label class="uppercase text-custom-secondary">Select Goalie</mat-label>
+              <input matInput formControlName="entityId" [matAutocomplete]="entityAuto" placeholder="Search goalie..." />
+              <mat-autocomplete #entityAuto="matAutocomplete" [displayWith]="displayEntityFn">
+                @for (option of filteredEntityOptions | async; track option.value) {
+                  <mat-option [value]="option.value">{{ option.label }}</mat-option>
+                }
+              </mat-autocomplete>
+              @if (analysisForm.get('entityId')?.errors && analysisForm.get('entityId')?.touched) {
+                <mat-error>{{ getErrorMessage('entityId') }}</mat-error>
+              }
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field full-width">
+              <mat-label class="uppercase text-custom-secondary">Analysis By</mat-label>
+              <input matInput formControlName="analysisBy" placeholder="Enter name" />
+              @if (analysisForm.get('analysisBy')?.errors && analysisForm.get('analysisBy')?.touched) {
+                <mat-error>{{ getErrorMessage('analysisBy') }}</mat-error>
+              }
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field full-width">
+              <mat-label class="uppercase text-custom-secondary">Input Analysis</mat-label>
+              <textarea
+                matInput
+                formControlName="analysisText"
+                rows="6"
+                placeholder="Enter analysis"
+              ></textarea>
+              @if (analysisForm.get('analysisText')?.errors && analysisForm.get('analysisText')?.touched) {
+                <mat-error>{{ getErrorMessage('analysisText') }}</mat-error>
+              }
+            </mat-form-field>
+          </div>
+        </div>
+      </form>
+    }
+  </mat-dialog-content>
+
+  <mat-dialog-actions class="modal-actions">
+    <app-button
+      [bg]="'transparent'"
+      [bghover]="'button_background'"
+      [br]="'border'"
+      [color]="'text_primary'"
+      [colorhover]="'text_primary'"
+      [opacity]="1"
+      [opacityhover]="1"
+      [width]="'auto'"
+      [rounded]="false"
+      [haveContent]="true"
+      (clicked)="onCancel()"
+    >
+      Cancel
+    </app-button>
+    <app-button-loading
+      [isLoading]="isSubmitting"
+      [isDisabled]="analysisForm.invalid"
+      materialIcon="save"
+      [bg]="isEditMode ? 'orange' : 'green'"
+      [bghover]="isEditMode ? 'orange' : 'green'"
+      [color]="'white'"
+      [colorhover]="'white'"
+      [opacity]="1"
+      [opacityhover]="1"
+      [width]="'auto'"
+      [rounded]="false"
+      [haveContent]="true"
+      (clicked)="onSubmit()"
+    >
+      {{ isEditMode ? 'Update Analysis' : 'Create Analysis' }}
+    </app-button-loading>
+  </mat-dialog-actions>
+</div>

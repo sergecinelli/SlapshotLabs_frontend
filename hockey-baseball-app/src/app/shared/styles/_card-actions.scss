@@ -1,0 +1,28 @@
+.card-actions-container {
+  display: flex;
+  gap: 15px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+.card-actions {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.action-button {
+  flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  .card-actions-container {
+    justify-content: stretch;
+  }
+
+  .card-actions {
+    .action-button {
+      flex: 1;
+    }
+  }
+}

@@ -5,13 +5,12 @@
 @let pageTitleValue = pageTitle();
 
 <div class="page-content" [appVisibilityMap]="visibilityByRoleMap">
-
   <!-- Header with Add Button -->
   <div class="players-header">
     <div class="players-header-left">
       <h2>{{ pageTitleValue }}</h2>
     </div>
-    <div class="players-header-actions" style="display: flex; gap: 10px; align-items: center;">
+    <div class="players-header-actions" style="display: flex; gap: 10px; align-items: center">
       <!-- View Toggle Button -->
       <app-button
         [materialIcon]="layoutModeValue === 'card' ? 'table_rows' : 'grid_view'"
@@ -27,7 +26,11 @@
         {{ layoutModeValue === 'card' ? 'Table View' : 'Card View' }}
       </app-button>
 
-      <div class="add-player-button-wrapper" role-visibility-name="add-player-button" [attr.role-visibility-team-id]="teamIdValue">
+      <div
+        class="add-player-button-wrapper"
+        role-visibility-name="add-player-button"
+        [attr.role-visibility-team-id]="teamIdValue"
+      >
         <app-button
           materialIcon="add"
           [bg]="'primary'"
@@ -83,8 +86,12 @@
                       (keyup.space)="viewPlayerProfile(player)"
                       tabindex="0"
                       role="button"
-                      [attr.aria-label]="'View ' + player.firstName + ' ' + player.lastName + ' profile'"
-                    >{{ player.firstName }} {{ player.lastName }}</div>
+                      [attr.aria-label]="
+                        'View ' + player.firstName + ' ' + player.lastName + ' profile'
+                      "
+                    >
+                      {{ player.firstName }} {{ player.lastName }}
+                    </div>
                     <div class="player-jersey-row">
                       @if (player.jerseyNumber) {
                         <div class="player-jersey">#{{ player.jerseyNumber }}</div>
@@ -126,7 +133,11 @@
                       <span class="player-info-label">Team:</span>
                       <div class="team-name-with-logo">
                         @if (player.teamLogo) {
-                          <img [src]="player.teamLogo" [alt]="player.team" class="team-logo-small" />
+                          <img
+                            [src]="player.teamLogo"
+                            [alt]="player.team"
+                            class="team-logo-small"
+                          />
                         }
                         @if (player.teamId) {
                           <span
@@ -137,7 +148,8 @@
                             tabindex="0"
                             role="button"
                             [attr.aria-label]="'View ' + player.team + ' profile'"
-                          >{{ player.team }}</span>
+                            >{{ player.team }}</span
+                          >
                         } @else {
                           <span class="player-info-value">{{ player.team }}</span>
                         }
@@ -187,58 +199,69 @@
             </div>
 
             <!-- Action Buttons -->
-            <div class="player-card-actions">
-              <app-button-route
-                [route]="'/teams-and-rosters/players/' + player.id + '/spray-chart'"
-                [queryParams]="{ type: 'player' }"
-                [bg]="'secondary'"
-                [bghover]="'secondary_dark'"
-                [color]="'white'"
-                [colorhover]="'white'"
-                [materialIcon]="'scatter_plot'"
-                [haveContent]="true"
-                class="action-button"
-              >
-                Spray Chart
-              </app-button-route>
-              <app-button-route
-                [route]="'/teams-and-rosters/players/' + player.id + '/profile'"
-                [bg]="'green'"
-                [bghover]="'green_dark'"
-                [color]="'white'"
-                [colorhover]="'white'"
-                [materialIcon]="'visibility'"
-                [haveContent]="true"
-                class="action-button"
-              >
-                Profile
-              </app-button-route>
-              <app-button
-                [bg]="'orange'"
-                [bghover]="'orange_dark'"
-                [color]="'white'"
-                [colorhover]="'white'"
-                materialIcon="stylus"
-                [haveContent]="true"
-                (clicked)="editPlayer(player)"
-                class="action-button"
-                role-visibility-name="edit-action"
-              >
-                Edit
-              </app-button>
-              <app-button
-                [bg]="'primary'"
-                [bghover]="'primary_dark'"
-                [color]="'white'"
-                [colorhover]="'white'"
-                [materialIcon]="'delete'"
-                [haveContent]="true"
-                (clicked)="deletePlayer(player)"
-                class="action-button"
-                role-visibility-name="delete-action"
-              >
-                Delete
-              </app-button>
+            <div class="card-actions-container">
+              <div class="card-actions">
+                <app-button-route
+                  [route]="'/analytics/players/' + player.id"
+                  [bg]="'upcoming'"
+                  [bghover]="'upcoming'"
+                  [color]="'white'"
+                  [colorhover]="'white'"
+                  [materialIcon]="'analytics'"
+                  [haveContent]="true"
+                  class="action-button"
+                >
+                  Analysis
+                </app-button-route>
+                <app-button-route
+                  [route]="'/teams-and-rosters/players/' + player.id + '/spray-chart'"
+                  [queryParams]="{ type: 'player' }"
+                  [bg]="'transparent'"
+                  [bghover]="'button_background'"
+                  [br]="'border'"
+                  [color]="'text_primary'"
+                  [colorhover]="'text_primary'"
+                  [materialIcon]="'scatter_plot'"
+                  [haveContent]="true"
+                  class="action-button"
+                >
+                  Spray Chart
+                </app-button-route>
+              </div>
+              <div class="card-actions">
+                <app-button-route
+                  [route]="'/teams-and-rosters/players/' + player.id + '/profile'"
+                  [color]="'green'"
+                  [colorhover]="'green_dark'"
+                  [bghover]="'gray_tone3'"
+                  [bgselect]="'gray_tone2'"
+                  [materialIcon]="'visibility'"
+                  [tooltip]="'Profile'"
+                  class="action-button"
+                />
+                <app-button
+                  [color]="'orange'"
+                  [colorhover]="'orange_dark'"
+                  [bghover]="'gray_tone3'"
+                  [bgselect]="'gray_tone2'"
+                  materialIcon="stylus"
+                  [tooltip]="'Edit'"
+                  (clicked)="editPlayer(player)"
+                  class="action-button"
+                  role-visibility-name="edit-action"
+                />
+                <app-button
+                  [color]="'primary'"
+                  [colorhover]="'primary_dark'"
+                  [bghover]="'gray_tone3'"
+                  [bgselect]="'gray_tone2'"
+                  [materialIcon]="'delete'"
+                  [tooltip]="'Delete'"
+                  (clicked)="deletePlayer(player)"
+                  class="action-button"
+                  role-visibility-name="delete-action"
+                />
+              </div>
             </div>
           </div>
         }
