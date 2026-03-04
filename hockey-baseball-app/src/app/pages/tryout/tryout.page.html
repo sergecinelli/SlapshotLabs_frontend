@@ -1,0 +1,36 @@
+@let entriesValue = entries();
+@let loadingValue = loading();
+@let activeTabIndexValue = activeTabIndex();
+
+<div class="page-content" [appVisibilityMap]="visibilityByRoleMap">
+  <div class="tryout-toolbar">
+    <app-tabs-slider
+      [items]="tabItems"
+      [activeTabIndex]="activeTabIndexValue"
+      (onSelect)="onTabChange($event)"
+    ></app-tabs-slider>
+
+    <div role-visibility-name="add-player-button" class="add-button-wrapper">
+      <app-button
+        materialIcon="add"
+        [bg]="'primary'"
+        [bghover]="'primary'"
+        [color]="'white'"
+        [colorhover]="'white'"
+        [haveContent]="true"
+        (clicked)="openAddModal()"
+      >
+        Add Player
+      </app-button>
+    </div>
+  </div>
+
+  <app-data-table
+    [columns]="tableColumns"
+    [data]="entriesValue"
+    [actions]="tableActions"
+    [loading]="loadingValue"
+    emptyMessage="No tryout entries found"
+    (actionClick)="onActionClick($event)"
+  ></app-data-table>
+</div>

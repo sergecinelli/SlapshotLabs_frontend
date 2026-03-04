@@ -1,0 +1,348 @@
+@use '../../styles/radio-button-selection';
+
+.tryout-add-modal {
+  width: 100%;
+  background-color: white;
+  border-radius: 12px;
+  overflow: hidden;
+  transform: translateZ(0);
+  will-change: transform;
+  backface-visibility: hidden;
+
+  ::ng-deep .mat-mdc-form-field {
+    font-size: 14px !important;
+
+    .mat-mdc-input-element {
+      font-size: 14px !important;
+    }
+
+    .mdc-text-field__input {
+      font-size: 14px !important;
+    }
+
+    .mdc-floating-label {
+      font-size: 12px !important;
+    }
+  }
+
+  ::ng-deep .mat-mdc-text-field-wrapper {
+    padding: 0 2px !important;
+  }
+
+  ::ng-deep mat-error {
+    font-size: 12px !important;
+  }
+
+  .modal-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--color-primary);
+    font-size: 1.375rem;
+    font-weight: 600;
+    margin: 0;
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--border);
+
+    .title-icon {
+      color: var(--color-primary);
+      font-size: 1.375rem;
+    }
+  }
+
+  .modal-content {
+    padding: 24px;
+    max-height: 600px;
+    overflow-y: auto;
+    transform: translateZ(0);
+    -webkit-overflow-scrolling: touch;
+    will-change: scroll-position;
+    backface-visibility: hidden;
+
+    .search-section {
+      margin-bottom: 16px;
+
+      .select-field-wrapper {
+        position: relative;
+
+        .clear-all-btn {
+          position: absolute;
+          top: 0;
+          right: 0;
+          z-index: 1;
+        }
+
+        .search-field {
+          width: 100%;
+
+          ::ng-deep .mat-mdc-select-placeholder {
+            color: var(--secondary) !important;
+            font-size: 14px !important;
+            opacity: 0.7;
+          }
+        }
+      }
+
+      .create-toggle {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-top: 8px;
+
+        .divider-text {
+          color: var(--gray);
+          font-size: 13px;
+        }
+      }
+    }
+
+    .player-form {
+      .form-section {
+        margin-bottom: 0px;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+
+        .section-header {
+          margin-bottom: 8px;
+
+          .section-title {
+            color: var(--color-dark);
+            font-size: 1rem;
+            font-weight: 500;
+            margin: 0;
+            padding: 0;
+          }
+        }
+
+        .section-divider {
+          margin-bottom: 16px;
+          border-top-color: var(--color-primary) !important;
+          border-top-width: 2px !important;
+          transform: translateZ(0);
+          will-change: transform;
+          backface-visibility: hidden;
+          -webkit-backface-visibility: hidden;
+        }
+
+        .form-row {
+          display: flex;
+          column-gap: 16px;
+          margin-bottom: 8px;
+          flex-wrap: wrap;
+
+          .form-field {
+            flex: 1;
+            min-width: 200px;
+
+            &.full-width {
+              flex: 2;
+              min-width: 300px;
+            }
+          }
+        }
+
+        @include radio-button-selection.shoots-selection-container;
+        @include radio-button-selection.position-selection-container;
+
+        .shoots-selection-container {
+          .shoots-buttons {
+            display: flex;
+            gap: 12px;
+            flex-wrap: nowrap;
+          }
+        }
+
+        .position-selection-container {
+          .position-buttons {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+          }
+        }
+      }
+    }
+  }
+
+  .modal-actions {
+    padding: 16px 24px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+  }
+}
+
+::ng-deep .tryout-add-modal-dialog {
+  .mat-mdc-dialog-container {
+    padding: 0 !important;
+    background-color: white !important;
+    border-radius: 12px !important;
+    overflow: hidden !important;
+
+    .mdc-dialog__surface {
+      background-color: white !important;
+      border-radius: 12px !important;
+      box-shadow:
+        0 8px 25px rgba(0, 0, 0, 0.15),
+        0 4px 10px rgba(0, 0, 0, 0.1);
+      overflow: hidden !important;
+    }
+  }
+}
+
+.trigger-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 2px 0;
+}
+
+.trigger-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background-color: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--color-dark);
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.trigger-chip-remove {
+  font-size: 14px !important;
+  cursor: pointer;
+  color: var(--gray);
+  flex-shrink: 0;
+
+  &:hover {
+    color: var(--danger);
+  }
+}
+
+::ng-deep .tryout-player-select-panel.mat-mdc-select-panel {
+  min-width: 320px !important;
+  max-height: 360px !important;
+  padding: 0 !important;
+
+  .mat-mdc-option {
+    min-height: 40px !important;
+    font-size: 13px !important;
+    padding: 0 16px !important;
+  }
+
+  .mat-mdc-option.mdc-list-item--selected:not(.mdc-list-item--disabled) {
+    background-color: white !important;
+    color: var(--color-dark) !important;
+  }
+
+  .mat-mdc-option.mdc-list-item--selected:not(.mdc-list-item--disabled):hover {
+    background-color: #f3f4f6 !important;
+  }
+
+  .mat-pseudo-checkbox-minimal {
+    display: inline-block !important;
+  }
+}
+
+.player-search-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-bottom: 1px solid #e5e7eb;
+  position: sticky;
+  top: 0;
+  background: white;
+  z-index: 1;
+
+  .search-icon {
+    font-size: 20px;
+    color: var(--gray);
+  }
+
+  .player-search-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 13px;
+    background: transparent;
+    color: var(--color-dark);
+
+    &::placeholder {
+      color: var(--gray);
+    }
+  }
+
+  .search-clear {
+    font-size: 18px;
+    cursor: pointer;
+    color: var(--gray);
+
+    &:hover {
+      color: var(--danger);
+    }
+  }
+}
+
+.player-option {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  width: 100%;
+
+  .player-number-badge {
+    color: var(--gray);
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  .player-team-info {
+    margin-left: auto;
+    font-size: 11px;
+    color: var(--gray);
+  }
+}
+
+@media (max-width: 768px) {
+  .tryout-add-modal {
+    max-width: 95vw;
+
+    .modal-content {
+      padding: 16px;
+      max-height: 70vh;
+
+      .player-form {
+        .form-section {
+          margin-bottom: 12px;
+
+          .form-row {
+            flex-direction: column;
+            gap: 12px;
+
+            .form-field {
+              min-width: unset;
+
+              &.full-width {
+                min-width: unset;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    .modal-actions {
+      padding: 12px 16px;
+      flex-direction: column-reverse;
+    }
+  }
+}

@@ -18,6 +18,8 @@ import { ButtonRouteComponent } from '../../shared/components/buttons/button-rou
 import { visibilityByRoleMap } from './goalies.role-map';
 import { DataTableComponent, TableColumn, TableAction } from '../../shared/components/data-table/data-table.component';
 import { LocalStorageService, StorageKey } from '../../services/local-storage.service';
+import { TryoutService } from '../../services/tryout.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-goalies',
@@ -43,6 +45,8 @@ export class GoaliesPage implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private storage = inject(LocalStorageService);
+  private tryoutService = inject(TryoutService);
+  private authService = inject(AuthService);
 
   goalies = signal<Goalie[]>([]);
   teams: Team[] = []; // Store teams to pass to modals
@@ -75,6 +79,7 @@ export class GoaliesPage implements OnInit {
     { label: 'Profile', action: 'view-profile', variant: 'primary', icon: 'visibility', iconOnly: true },
     { label: 'Edit', action: 'edit', variant: 'secondary', icon: 'stylus', iconOnly: true, roleVisibilityName: 'edit-action' },
     { label: 'Delete', action: 'delete', variant: 'danger', icon: 'delete', iconOnly: true, roleVisibilityName: 'delete-action' },
+    { label: 'Add To Tryout', action: 'add-to-tryout', variant: 'secondary', icon: 'person_add', iconOnly: true },
   ];
 
   ngOnInit(): void {
@@ -210,6 +215,9 @@ export class GoaliesPage implements OnInit {
         break;
       case 'analysis':
         this.viewGoalieAnalysis(item);
+        break;
+      case 'add-to-tryout':
+        this.addToTryout(item);
         break;
       default:
         console.log(`Unknown action: ${action}`);
@@ -366,6 +374,29 @@ export class GoaliesPage implements OnInit {
         this.updateGoalie(result);
       }
     });
+  }
+
+  addToTryout(goalie: Goalie): void {
+    const user = this.authService.getCurrentUserValue();
+    const teamId = user?.team_id;
+    if (!teamId) return;
+
+    this.tryoutService
+      .addToTryout(teamId, {
+        playerId: goalie.id,
+        firstName: goalie.firstName,
+        lastName: goalie.lastName,
+        position: goalie.position,
+        shoots: goalie.shoots,
+        jerseyNumber: goalie.jerseyNumber,
+        team: goalie.team,
+        teamId: goalie.teamId,
+        teamLevelName: goalie.level,
+        type: 'goalie',
+      })
+      .subscribe({
+        error: (error) => console.error('Failed to add to tryout:', error),
+      });
   }
 
   private updateGoalie(goalieData: Partial<Goalie>): void {

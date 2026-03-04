@@ -17,6 +17,7 @@ import { goalieAnalysisPageRolesAccessMap } from './pages/goalie-analysis/goalie
 import { teamAnalysisPageRolesAccessMap } from './pages/team-analysis/team-analysis.role-map';
 import { gameAnalysisPageRolesAccessMap } from './pages/game-analysis/game-analysis.role-map';
 import { gamesheetPageRolesAccessMap } from './pages/gamesheet/gamesheet.role-map';
+import { tryoutPageRolesAccessMap } from './pages/tryout/tryout.role-map';
 import { playerProfilePageRolesAccessMap } from './pages/player-profile/player-profile.role-map';
 import { goalieProfilePageRolesAccessMap } from './pages/goalie-profile/goalie-profile.role-map';
 import { teamProfilePageRolesAccessMap } from './pages/team-profile/team-profile.role-map';
@@ -421,6 +422,20 @@ export const routes: Routes = [
         data: {
           pageRolesAccessMap: videoHighlightsPageRolesAccessMap,
           breadcrumbs: [{ label: 'Video Highlights', icon: 'movie' }],
+        },
+      },
+
+      // Tryout routes
+      {
+        path: 'tryout',
+        loadComponent: () => import('./pages/tryout/tryout.page').then((m) => m.TryoutPage),
+        canActivate: [RoleAccessGuard],
+        data: {
+          pageRolesAccessMap: tryoutPageRolesAccessMap,
+          breadcrumbs: [
+            { label: 'Tryout', icon: 'person_add' },
+            { label: ':entityName' },
+          ],
         },
       },
 

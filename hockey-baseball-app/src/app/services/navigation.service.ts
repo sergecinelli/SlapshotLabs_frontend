@@ -79,6 +79,11 @@ export class NavigationService {
         icon: 'highlights',
       },
       {
+        label: 'Tryout',
+        path: '/tryout',
+        icon: 'tryout',
+      },
+      {
         label: 'GAMESHEET',
         path: '/gamesheet',
         icon: 'gamesheet',
@@ -182,6 +187,7 @@ export class NavigationService {
       video: 'video_library',
       highlights: 'movie',
       games: 'scoreboard',
+      tryout: 'person_add',
       gamesheet: 'description',
     };
 

@@ -252,6 +252,16 @@
                   class="action-button"
                   role-visibility-name="delete-action"
                 />
+                <app-button
+                  [color]="'upcoming'"
+                  [colorhover]="'upcoming'"
+                  [bghover]="'gray_tone3'"
+                  [bgselect]="'gray_tone2'"
+                  [materialIcon]="'person_add'"
+                  [tooltip]="'Add To Tryout List'"
+                  (clicked)="addToTryout(goalie)"
+                  class="action-button"
+                />
               </div>
             </div>
           </div>

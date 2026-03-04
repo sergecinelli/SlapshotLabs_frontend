@@ -18,6 +18,8 @@ import { ButtonRouteComponent } from '../../shared/components/buttons/button-rou
 import { visibilityByRoleMap } from './players.role-map';
 import { DataTableComponent, TableColumn, TableAction } from '../../shared/components/data-table/data-table.component';
 import { LocalStorageService, StorageKey } from '../../services/local-storage.service';
+import { TryoutService } from '../../services/tryout.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-players',
@@ -43,6 +45,8 @@ export class PlayersPage implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private storage = inject(LocalStorageService);
+  private tryoutService = inject(TryoutService);
+  private authService = inject(AuthService);
 
   players = signal<Player[]>([]);
   teams: Team[] = [];
@@ -74,6 +78,7 @@ export class PlayersPage implements OnInit {
     { label: 'Profile', action: 'view-profile', variant: 'primary', icon: 'visibility', iconOnly: true },
     { label: 'Edit', action: 'edit', variant: 'secondary', icon: 'stylus', iconOnly: true, roleVisibilityName: 'edit-action' },
     { label: 'Delete', action: 'delete', variant: 'danger', icon: 'delete', iconOnly: true, roleVisibilityName: 'delete-action' },
+    { label: 'Add To Tryout', action: 'add-to-tryout', variant: 'secondary', icon: 'person_add', iconOnly: true },
   ];
 
   ngOnInit(): void {
@@ -213,6 +218,9 @@ export class PlayersPage implements OnInit {
         break;
       case 'analysis':
         this.viewPlayerAnalysis(item);
+        break;
+      case 'add-to-tryout':
+        this.addToTryout(item);
         break;
       default:
         console.log(`Unknown action: ${action}`);
@@ -368,6 +376,31 @@ export class PlayersPage implements OnInit {
         this.updatePlayer(result);
       }
     });
+  }
+
+  addToTryout(player: Player): void {
+    const user = this.authService.getCurrentUserValue();
+    const teamId = user?.team_id;
+    if (!teamId) return;
+
+    this.tryoutService
+      .addToTryout(teamId, {
+        playerId: player.id,
+        firstName: player.firstName,
+        lastName: player.lastName,
+        position: player.position,
+        shoots: player.shoots,
+        jerseyNumber: player.jerseyNumber,
+        team: player.team,
+        teamId: player.teamId,
+        teamLogo: player.teamLogo,
+        teamAgeGroup: player.teamAgeGroup,
+        teamLevelName: player.teamLevelName || player.level,
+        type: 'player',
+      })
+      .subscribe({
+        error: (error) => console.error('Failed to add to tryout:', error),
+      });
   }
 
   private updatePlayer(playerData: Partial<Player>): void {
