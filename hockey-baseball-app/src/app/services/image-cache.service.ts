@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
 
 interface CacheEntry {
-  blob: Blob;
+  dataUrl: string;
   timestamp: number;
 }
 
@@ -10,11 +10,11 @@ interface CacheEntry {
 export class ImageCacheService {
   private readonly DB_NAME = 'slapshot-image-cache';
   private readonly STORE_NAME = 'images';
-  private readonly DB_VERSION = 1;
+  private readonly DB_VERSION = 2;
 
   private db: IDBDatabase | null = null;
   private memoryCache = new Map<string, string>();
-  private pendingFetches = new Map<string, Promise<Blob | null>>();
+  private pendingFetches = new Map<string, Promise<string | null>>();
   private updateSubjects = new Map<string, Subject<string>>();
 
   getImage(url: string): Observable<string> {
@@ -24,19 +24,23 @@ export class ImageCacheService {
         return;
       }
 
-      const memoryUrl = this.memoryCache.get(url);
-      if (memoryUrl) {
-        subscriber.next(memoryUrl);
+      const cached = this.memoryCache.get(url);
+      if (cached) {
+        subscriber.next(cached);
       }
 
       const updateSubject = this.getUpdateSubject(url);
-      const sub = updateSubject.subscribe((blobUrl) => subscriber.next(blobUrl));
+      const sub = updateSubject.subscribe((dataUrl) => subscriber.next(dataUrl));
 
-      if (!memoryUrl) {
+      if (!cached) {
         this.loadFromCache(url);
       }
 
-      this.fetchFresh(url);
+      this.fetchFresh(url).then((dataUrl) => {
+        if (!dataUrl && !this.memoryCache.has(url)) {
+          subscriber.next(url);
+        }
+      });
 
       return () => sub.unsubscribe();
     });
@@ -53,36 +57,30 @@ export class ImageCacheService {
     try {
       const entry = await this.getFromDb(url);
       if (entry && !this.memoryCache.has(url)) {
-        const blobUrl = URL.createObjectURL(entry.blob);
-        this.memoryCache.set(url, blobUrl);
-        this.getUpdateSubject(url).next(blobUrl);
+        this.memoryCache.set(url, entry.dataUrl);
+        this.getUpdateSubject(url).next(entry.dataUrl);
       }
     } catch {
       // IndexedDB unavailable, continue with network fetch
     }
   }
 
-  private async fetchFresh(url: string): Promise<void> {
+  private async fetchFresh(url: string): Promise<string | null> {
     try {
-      const blob = await this.deduplicatedFetch(url);
-      if (!blob) return;
+      const dataUrl = await this.deduplicatedFetch(url);
+      if (!dataUrl) return null;
 
-      await this.storeInDb(url, blob);
+      await this.storeInDb(url, dataUrl);
+      this.memoryCache.set(url, dataUrl);
+      this.getUpdateSubject(url).next(dataUrl);
 
-      const oldBlobUrl = this.memoryCache.get(url);
-      const newBlobUrl = URL.createObjectURL(blob);
-      this.memoryCache.set(url, newBlobUrl);
-      this.getUpdateSubject(url).next(newBlobUrl);
-
-      if (oldBlobUrl) {
-        URL.revokeObjectURL(oldBlobUrl);
-      }
+      return dataUrl;
     } catch {
-      // Network error, cached version (if any) remains
+      return null;
     }
   }
 
-  private deduplicatedFetch(url: string): Promise<Blob | null> {
+  private deduplicatedFetch(url: string): Promise<string | null> {
     if (this.pendingFetches.has(url)) {
       return this.pendingFetches.get(url)!;
     }
@@ -92,11 +90,24 @@ export class ImageCacheService {
         if (!response.ok) return null;
         return response.blob();
       })
+      .then((blob) => {
+        if (!blob) return null;
+        return this.blobToDataUrl(blob);
+      })
       .catch(() => null)
       .finally(() => this.pendingFetches.delete(url));
 
     this.pendingFetches.set(url, promise);
     return promise;
+  }
+
+  private blobToDataUrl(blob: Blob): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result as string);
+      reader.onerror = () => reject(reader.error);
+      reader.readAsDataURL(blob);
+    });
   }
 
   private async openDb(): Promise<IDBDatabase> {
@@ -107,9 +118,10 @@ export class ImageCacheService {
 
       request.onupgradeneeded = () => {
         const db = request.result;
-        if (!db.objectStoreNames.contains(this.STORE_NAME)) {
-          db.createObjectStore(this.STORE_NAME);
+        if (db.objectStoreNames.contains(this.STORE_NAME)) {
+          db.deleteObjectStore(this.STORE_NAME);
         }
+        db.createObjectStore(this.STORE_NAME);
       };
 
       request.onsuccess = () => {
@@ -132,12 +144,12 @@ export class ImageCacheService {
     });
   }
 
-  private async storeInDb(url: string, blob: Blob): Promise<void> {
+  private async storeInDb(url: string, dataUrl: string): Promise<void> {
     const db = await this.openDb();
     return new Promise((resolve) => {
       const tx = db.transaction(this.STORE_NAME, 'readwrite');
       const store = tx.objectStore(this.STORE_NAME);
-      const entry: CacheEntry = { blob, timestamp: Date.now() };
+      const entry: CacheEntry = { dataUrl, timestamp: Date.now() };
       store.put(entry, url);
       tx.oncomplete = () => resolve();
       tx.onerror = () => resolve();

@@ -22,9 +22,15 @@ export class CachedSrcDirective implements OnDestroy {
 
       this.renderer.addClass(this.elementRef.nativeElement, 'cached-img-loading');
 
-      this.subscription = this.imageCacheService.getImage(url).subscribe((blobUrl) => {
-        this.renderer.setProperty(this.elementRef.nativeElement, 'src', blobUrl);
-        this.renderer.removeClass(this.elementRef.nativeElement, 'cached-img-loading');
+      this.subscription = this.imageCacheService.getImage(url).subscribe({
+        next: (blobUrl) => {
+          this.renderer.setProperty(this.elementRef.nativeElement, 'src', blobUrl);
+          this.renderer.removeClass(this.elementRef.nativeElement, 'cached-img-loading');
+        },
+        error: () => {
+          this.renderer.setProperty(this.elementRef.nativeElement, 'src', url);
+          this.renderer.removeClass(this.elementRef.nativeElement, 'cached-img-loading');
+        },
       });
     });
   }
