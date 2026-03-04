@@ -115,9 +115,9 @@ export class GameAnalysisModal implements OnInit {
         return this.entityOptions.filter(
           (option) =>
             option.label.toLowerCase().includes(filterValue) ||
-            option.value.toLowerCase().includes(filterValue),
+            option.value.toLowerCase().includes(filterValue)
         );
-      }),
+      })
     );
   }
 
@@ -138,9 +138,10 @@ export class GameAnalysisModal implements OnInit {
       analysis_text: formValue.analysisText,
     };
 
-    const request$ = this.isEditMode && this.data.analysis
-      ? this.analysisService.updateAnalysis(this.data.analysis.id, apiData)
-      : this.analysisService.createAnalysis(apiData);
+    const request$ =
+      this.isEditMode && this.data.analysis
+        ? this.analysisService.updateAnalysis(this.data.analysis.id, apiData)
+        : this.analysisService.createAnalysis(apiData);
 
     request$.subscribe({
       next: () => {

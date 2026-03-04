@@ -432,10 +432,7 @@ export const routes: Routes = [
         canActivate: [RoleAccessGuard],
         data: {
           pageRolesAccessMap: tryoutPageRolesAccessMap,
-          breadcrumbs: [
-            { label: 'Tryout', icon: 'person_add' },
-            { label: ':entityName' },
-          ],
+          breadcrumbs: [{ label: 'Tryout', icon: 'person_add' }, { label: ':entityName' }],
         },
       },
 

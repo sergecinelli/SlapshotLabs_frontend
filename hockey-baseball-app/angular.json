@@ -50,7 +50,8 @@
               ],
               "outputHashing": "all",
               "sourceMap": false,
-              "namedChunks": false
+              "namedChunks": false,
+              "serviceWorker": "ngsw-config.json"
             },
             "staging": {
               "optimization": true,
@@ -69,6 +70,7 @@
               "outputHashing": "all",
               "sourceMap": false,
               "namedChunks": false,
+              "serviceWorker": "ngsw-config.json",
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",

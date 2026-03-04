@@ -27,7 +27,7 @@
   (mouseup)="onMouseUp()"
   (mouseenter)="onMouseEnter()"
   (mouseleave)="onMouseLeave()"
-  >
+>
   @if (materialIconValue) {
     @let materialSymbolClassValue = materialSymbolClass();
     @let materialIconClassValue = materialIconClass();
@@ -42,28 +42,28 @@
         [class]="isMatSymbolClassValue ? materialSymbolClassValue : materialIconClassValue"
         [class.fill]="isMatIconFillCurrent"
         >{{ materialIconValue }}</span
+      >
+      @if (counterValue > 0) {
+        <span
+          class="counter"
+          [style.background]="getColor(counterBgColorValue)"
+          [style.color]="getColor(counterColorValue)"
         >
-        @if (counterValue > 0) {
-          <span
-            class="counter"
-            [style.background]="getColor(counterBgColorValue)"
-            [style.color]="getColor(counterColorValue)"
-            >
-            {{ counterValue }}
-          </span>
-        }
-        @if (hasDotValue) {
-          <span
-            class="counter-icon"
-            [class]="materialSymbolClassValue"
-            [style.color]="getColor(counterBgColorValue)"
-            >circle</span
-            >
-          }
-        </div>
+          {{ counterValue }}
+        </span>
       }
-
-      <span class="text">
-        <ng-content></ng-content>
-      </span>
+      @if (hasDotValue) {
+        <span
+          class="counter-icon"
+          [class]="materialSymbolClassValue"
+          [style.color]="getColor(counterBgColorValue)"
+          >circle</span
+        >
+      }
     </div>
+  }
+
+  <span class="text">
+    <ng-content></ng-content>
+  </span>
+</div>

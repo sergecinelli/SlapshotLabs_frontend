@@ -43,7 +43,9 @@
           font-variation-settings: 'wght' 600;
 
           &.fill {
-            font-variation-settings: 'FILL' 1, 'wght' 600;
+            font-variation-settings:
+              'FILL' 1,
+              'wght' 600;
           }
         }
       }
@@ -110,7 +112,9 @@
       top: -2px;
       right: -2px;
       line-height: 1;
-      font-variation-settings: 'FILL' 1, 'wght' 600;
+      font-variation-settings:
+        'FILL' 1,
+        'wght' 600;
     }
   }
 
@@ -164,4 +168,3 @@
     cursor: not-allowed;
   }
 }
-

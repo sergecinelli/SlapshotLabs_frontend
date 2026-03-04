@@ -112,7 +112,11 @@
           }
         </div>
         @if (gameValue.homeTeamLogo) {
-          <img [src]="gameValue.homeTeamLogo" [alt]="gameValue.homeTeam" class="team-logo" />
+          <img
+            [appCachedSrc]="gameValue.homeTeamLogo"
+            [alt]="gameValue.homeTeam"
+            class="team-logo"
+          />
         } @else {
           <div class="team-logo-placeholder"></div>
         }
@@ -142,7 +146,11 @@
     <div class="team-section team-section-right" [class.winning]="isWinning(false)">
       <div class="team-info team-info-right">
         @if (gameValue.awayTeamLogo) {
-          <img [src]="gameValue.awayTeamLogo" [alt]="gameValue.awayTeam" class="team-logo" />
+          <img
+            [appCachedSrc]="gameValue.awayTeamLogo"
+            [alt]="gameValue.awayTeam"
+            class="team-logo"
+          />
         } @else {
           <div class="team-logo-placeholder"></div>
         }

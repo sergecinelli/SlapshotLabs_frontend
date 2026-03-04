@@ -4,9 +4,7 @@
     <!-- Spray Chart Card -->
     <div class="dashboard-card">
       <div class="dashboard-card-header">
-        <h2 class="dashboard-card-title">
-          Spray Chart for {{ displayName }}
-        </h2>
+        <h2 class="dashboard-card-title">Spray Chart for {{ displayName }}</h2>
       </div>
       <div class="dashboard-card-content">
         @if (loading) {
@@ -14,27 +12,31 @@
             <div class="dashboard-loading-text">Loading spray chart data...</div>
           </div>
         } @else if (!goalie && !player) {
-          <div class="dashboard-empty">{{ entityType === 'player' ? 'Player' : 'Goalie' }} not found.</div>
+          <div class="dashboard-empty">
+            {{ entityType === 'player' ? 'Player' : 'Goalie' }} not found.
+          </div>
           <div class="flex justify-center mt-4">
-            <app-button 
-              [bg]="'primary'" 
-              [bghover]="'primary_dark'" 
-              [color]="'white'" 
+            <app-button
+              [bg]="'primary'"
+              [bghover]="'primary_dark'"
+              [color]="'white'"
               [colorhover]="'white'"
               [materialIcon]="'arrow_back'"
               [haveContent]="true"
-              (clicked)="goBack()">
+              (clicked)="goBack()"
+            >
               Back to {{ entityType === 'player' ? 'Players' : 'Goalies' }}
             </app-button>
           </div>
         } @else if (shotLocationData.length > 0) {
-          <app-shot-location-display 
+          <app-shot-location-display
             [data]="shotLocationData"
             [teamId]="teamId"
             [teamName]="teamName"
             [goalieId]="goalieId"
             [goalieName]="goalieName"
-            [showGoalieName]="false">
+            [showGoalieName]="false"
+          >
           </app-shot-location-display>
         } @else {
           <div class="dashboard-empty">No shot data available for this {{ entityType }}.</div>

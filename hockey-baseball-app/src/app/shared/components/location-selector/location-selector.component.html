@@ -24,7 +24,7 @@
         @if (team1Value) {
           <div class="team team-left">
             @if (team1Value.logo) {
-              <img [src]="team1Value.logo" [alt]="team1Value.name" class="team-logo" />
+              <img [appCachedSrc]="team1Value.logo" [alt]="team1Value.name" class="team-logo" />
             }
             <span class="team-name">{{ team1Value.name }}</span>
           </div>
@@ -33,7 +33,7 @@
           <div class="team team-right">
             <span class="team-name">{{ team2Value.name }}</span>
             @if (team2Value.logo) {
-              <img [src]="team2Value.logo" [alt]="team2Value.name" class="team-logo" />
+              <img [appCachedSrc]="team2Value.logo" [alt]="team2Value.name" class="team-logo" />
             }
           </div>
         }
@@ -44,7 +44,7 @@
       class="rink-wrapper"
       [style.max-width]="maxWidthValue"
       (click)="onRinkClick($event)"
-      >
+    >
       <img [src]="imageUrlValue" alt="Location" class="hockey-rink-image" />
       @if (puckLocation) {
         <div
@@ -55,13 +55,7 @@
       }
     </button>
     @if (showClearButtonValue && puckLocation) {
-      <button
-        type="button"
-        class="clear-location-btn"
-        (click)="onClearLocation()"
-        >
-        Clear
-      </button>
+      <button type="button" class="clear-location-btn" (click)="onClearLocation()">Clear</button>
     }
   </div>
 </div>

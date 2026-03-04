@@ -88,8 +88,8 @@ export interface ScheduleFormModalData {
     MatDatepickerModule,
     MatNativeDateModule,
     ButtonComponent,
-    ButtonLoadingComponent
-],
+    ButtonLoadingComponent,
+  ],
   templateUrl: './schedule-form.modal.html',
   styleUrl: './schedule-form.modal.scss',
 })
@@ -417,8 +417,12 @@ export class ScheduleFormModal implements OnInit {
       // Fallback: extract from mapped strings (less reliable)
       const awayTeamId = this.extractIdFromString(schedule.awayTeam);
       const homeTeamId = this.extractIdFromString(schedule.homeTeam);
-      const awayGoalieId = schedule.awayTeamGoalie ? this.extractIdFromString(schedule.awayTeamGoalie) : '';
-      const homeGoalieId = schedule.homeTeamGoalie ? this.extractIdFromString(schedule.homeTeamGoalie) : '';
+      const awayGoalieId = schedule.awayTeamGoalie
+        ? this.extractIdFromString(schedule.awayTeamGoalie)
+        : '';
+      const homeGoalieId = schedule.homeTeamGoalie
+        ? this.extractIdFromString(schedule.homeTeamGoalie)
+        : '';
       const rinkId = this.extractIdFromString(schedule.rink);
 
       // Find the arena for this rink
@@ -623,18 +627,18 @@ export class ScheduleFormModal implements OnInit {
       const defaultGamePeriod =
         this.gamePeriods.length > 0
           ? this.gamePeriods.reduce((min, period) =>
-            (period.order ?? Infinity) < (min.order ?? Infinity) ? period : min
-          )
+              (period.order ?? Infinity) < (min.order ?? Infinity) ? period : min
+            )
           : null;
 
       const hasGameTypeName = !!formValue.gameTypeName;
-      
+
       // Convert local time to 24-hour format first
       const time24Hour = this.convertTo24Hour(formValue.time);
-      
+
       // Convert local date and time to GMT
       const gmtDateTime = convertLocalToGMT(formValue.date, time24Hour);
-      
+
       // Create API request body
       const gameData: Record<string, unknown> & { id?: number } = {
         home_team_id: homeTeamId,

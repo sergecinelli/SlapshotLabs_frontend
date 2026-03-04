@@ -39,8 +39,8 @@ export interface TeamOption {
     MatIconModule,
     MatDividerModule,
     ButtonComponent,
-    ButtonLoadingComponent
-],
+    ButtonLoadingComponent,
+  ],
   templateUrl: './player-form.modal.html',
   styleUrl: './player-form.modal.scss',
 })

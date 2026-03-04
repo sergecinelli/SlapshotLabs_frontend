@@ -19,6 +19,7 @@ import { PlayerService } from '../../../services/player.service';
 import { GameMetadataService } from '../../../services/game-metadata.service';
 import { GameEventService, TurnoverEventRequest } from '../../../services/game-event.service';
 import { environment } from '../../../../environments/environment';
+import { CachedSrcDirective } from '../../directives/cached-src.directive';
 
 export interface TurnoverFormData {
   teamLogo: string;
@@ -33,6 +34,7 @@ export interface TurnoverFormData {
 @Component({
   selector: 'app-turnover-form-modal',
   imports: [
+    CachedSrcDirective,
     ReactiveFormsModule,
     MatDialogModule,
     ButtonComponent,
@@ -42,8 +44,8 @@ export interface TurnoverFormData {
     MatSelectModule,
     MatIconModule,
     MatDividerModule,
-    LocationSelectorComponent
-],
+    LocationSelectorComponent,
+  ],
   templateUrl: './turnover-form.modal.html',
   styleUrl: './turnover-form.modal.scss',
 })
@@ -173,7 +175,10 @@ export class TurnoverFormModal implements OnInit {
       team: ['', Validators.required],
       player: ['', Validators.required],
       period: ['', Validators.required],
-      time: ['', [Validators.required, Validators.pattern(/^([0-9]{1,2}|1[0-9][0-9]|200):([0-5][0-9])$/)]],
+      time: [
+        '',
+        [Validators.required, Validators.pattern(/^([0-9]{1,2}|1[0-9][0-9]|200):([0-5][0-9])$/)],
+      ],
       location: ['', Validators.required],
       youtubeLink: [''],
     });

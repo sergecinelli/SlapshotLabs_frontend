@@ -6,10 +6,12 @@ import { ButtonComponent } from '../buttons/button/button.component';
 import { ButtonRouteComponent } from '../buttons/button-route/button-route.component';
 import { ButtonLoadingComponent } from '../buttons/button-loading/button-loading.component';
 import { getGameStatusLabel, isOvertimeStatus } from '../../constants/game-status.constants';
+import { CachedSrcDirective } from '../../directives/cached-src.directive';
 
 @Component({
   selector: 'app-game-card',
   imports: [
+    CachedSrcDirective,
     RouterLink,
     MatIconModule,
     ButtonComponent,

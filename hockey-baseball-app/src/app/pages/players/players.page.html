@@ -134,7 +134,7 @@
                       <div class="team-name-with-logo">
                         @if (player.teamLogo) {
                           <img
-                            [src]="player.teamLogo"
+                            [appCachedSrc]="player.teamLogo"
                             [alt]="player.team"
                             class="team-logo-small"
                           />

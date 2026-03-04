@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal, computed  } from '@angular/core';
+import { Component, inject, OnInit, signal, computed } from '@angular/core';
 
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { ButtonComponent } from '../buttons/button/button.component';
@@ -175,24 +175,24 @@ export class HighlightReelViewModal implements OnInit {
   // UI helpers
   formatDate(d?: string, time?: string): string {
     if (!d) return '-';
-    
+
     // If time is provided, convert GMT date and time to local (accounting for date shifts)
     let dateStr = d;
     if (time) {
       const localDateTime = convertGMTToLocalWithDateShift(d, this.extractTimeFromApiFormat(time));
       dateStr = localDateTime.date;
     }
-    
+
     // Format date as "Nov 12, 2025"
     return formatDateShort(dateStr);
   }
 
   formatPeriodTime(time?: string, date?: string): string {
     if (!time) return '-';
-    
+
     // Extract time in HH:mm:ss format from API format (HH:mm:ss.sssZ or HH:mm:ss)
     const timeStr = this.extractTimeFromApiFormat(time);
-    
+
     // If date is provided, convert GMT to local time (accounting for date shifts)
     if (date) {
       const localDateTime = convertGMTToLocalWithDateShift(date, timeStr);
@@ -206,7 +206,7 @@ export class HighlightReelViewModal implements OnInit {
       }
       return localTimeStr;
     }
-    
+
     // Fallback: Show MM:SS from HH:MM:SS(.sss) if possible
     const m = timeStr.match(/^(\d{2}):(\d{2}):(\d{2})/);
     if (!m) return time;
@@ -220,10 +220,10 @@ export class HighlightReelViewModal implements OnInit {
    */
   private extractTimeFromApiFormat(timeStr: string): string {
     if (!timeStr) return '00:00:00';
-    
+
     // Remove Z suffix and milliseconds if present
     const cleaned = timeStr.replace(/Z$/, '').split('.')[0];
-    
+
     // Ensure it's in HH:mm:ss format
     const parts = cleaned.split(':');
     if (parts.length === 2) {
@@ -232,7 +232,7 @@ export class HighlightReelViewModal implements OnInit {
     if (parts.length === 3) {
       return cleaned;
     }
-    
+
     return '00:00:00';
   }
 }

@@ -12,7 +12,7 @@
             [floatLabel]="'always'"
             [hideRequiredMarker]="true"
             class="form-field full-width"
-            >
+          >
             <mat-label class="uppercase text-custom-secondary">Name</mat-label>
             <input matInput formControlName="name" placeholder="Enter name" />
           </mat-form-field>
@@ -23,7 +23,7 @@
             [floatLabel]="'always'"
             [hideRequiredMarker]="true"
             class="form-field full-width"
-            >
+          >
             <mat-label class="uppercase text-custom-secondary">Description</mat-label>
             <textarea
               matInput
@@ -39,9 +39,7 @@
             <mat-label class="uppercase text-custom-secondary">Date</mat-label>
             <input matInput type="date" formControlName="date" />
             @if (form.get('date')?.errors && form.get('date')?.touched) {
-              <mat-error>
-                Date is required
-              </mat-error>
+              <mat-error> Date is required </mat-error>
             }
           </mat-form-field>
 
@@ -61,7 +59,7 @@
             [floatLabel]="'always'"
             [hideRequiredMarker]="true"
             class="form-field full-width"
-            >
+          >
             <mat-label class="uppercase text-custom-secondary">Video Link</mat-label>
             <input matInput formControlName="youtube_link" placeholder="Enter YouTube link" />
           </mat-form-field>
@@ -83,7 +81,7 @@
       [rounded]="false"
       [haveContent]="true"
       (clicked)="onCancel()"
-      >
+    >
       Cancel
     </app-button>
     <app-button-loading
@@ -100,7 +98,7 @@
       [rounded]="false"
       [haveContent]="true"
       (clicked)="onSave()"
-      >
+    >
       Save
     </app-button-loading>
   </mat-dialog-actions>

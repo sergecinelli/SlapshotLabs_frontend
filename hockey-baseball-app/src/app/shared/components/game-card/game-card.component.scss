@@ -327,7 +327,7 @@
   margin-top: 2px;
 
   &::after {
-    content: "";
+    content: '';
     width: 20px;
     height: 20px;
     background: var(--white);
@@ -551,5 +551,4 @@
   .score-separator {
     display: none;
   }
-
 }

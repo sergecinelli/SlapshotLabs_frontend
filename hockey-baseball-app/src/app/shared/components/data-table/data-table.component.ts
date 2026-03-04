@@ -1,6 +1,5 @@
 import {
   Component,
-  
   ElementRef,
   Renderer2,
   inject,
@@ -19,6 +18,7 @@ import { MatTooltipModule, MatTooltip } from '@angular/material/tooltip';
 import { IconService } from '../../../services/icon.service';
 import { ButtonSmallComponent } from '../buttons/button-small/button-small.component';
 import { AppColor } from '../../constants/colors';
+import { CachedSrcDirective } from '../../directives/cached-src.directive';
 
 export interface TableColumn {
   key: string;
@@ -46,6 +46,7 @@ export interface TableAction {
 @Component({
   selector: 'app-data-table',
   imports: [
+    CachedSrcDirective,
     DatePipe,
     DecimalPipe,
     RouterLink,
@@ -94,6 +95,10 @@ export class DataTableComponent<T extends Record<string, unknown> = Record<strin
 
   getCellValueByKey(item: T, key: string): unknown {
     return this.getNestedValue(item, key);
+  }
+
+  getCellStringByKey(item: T, key: string): string {
+    return String(this.getNestedValue(item, key) ?? '');
   }
 
   getDateValue(item: T, column: TableColumn): Date | null {

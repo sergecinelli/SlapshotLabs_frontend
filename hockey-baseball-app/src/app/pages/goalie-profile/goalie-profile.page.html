@@ -172,7 +172,10 @@
           </div>
           <div class="dashboard-card-content">
             @if (getShotLocationData().length > 0) {
-              <app-shot-location-display [data]="getShotLocationData()" [storageKey]="StorageKey.GoalieSprayChartFilters"></app-shot-location-display>
+              <app-shot-location-display
+                [data]="getShotLocationData()"
+                [storageKey]="StorageKey.GoalieSprayChartFilters"
+              ></app-shot-location-display>
             } @else {
               <div class="empty-state">
                 <span class="material-symbols-rounded empty-icon">sports_hockey</span>
@@ -208,7 +211,11 @@
                     <th mat-header-cell *matHeaderCellDef class="header-cell">Team</th>
                     <td mat-cell *matCellDef="let element" class="data-cell team-cell">
                       @if (element.logo) {
-                        <img [src]="element.logo" [alt]="element.team + ' logo'" class="team-logo" />
+                        <img
+                          [appCachedSrc]="element.logo"
+                          [alt]="element.team + ' logo'"
+                          class="team-logo"
+                        />
                       }
                       <span class="team-name">{{ element.team }}</span>
                     </td>
@@ -298,7 +305,11 @@
           <div class="dashboard-card-content">
             @if (getRecentGameStats().length > 0) {
               <div class="table-container">
-                <table mat-table [dataSource]="getRecentGameStats()" class="stats-table recent-games-table">
+                <table
+                  mat-table
+                  [dataSource]="getRecentGameStats()"
+                  class="stats-table recent-games-table"
+                >
                   <!-- Season Column -->
                   <ng-container matColumnDef="season">
                     <th mat-header-cell *matHeaderCellDef class="header-cell">Season</th>
@@ -317,7 +328,11 @@
                   <ng-container matColumnDef="vsTeam">
                     <th mat-header-cell *matHeaderCellDef class="header-cell">vs Team</th>
                     <td mat-cell *matCellDef="let element" class="data-cell team-cell">
-                      <img class="team-logo" [src]="element.vsTeamLogo" alt="vs team logo" />
+                      <img
+                        class="team-logo"
+                        [appCachedSrc]="element.vsTeamLogo"
+                        alt="vs team logo"
+                      />
                       <span class="team-name">{{ element.vsTeamName }}</span>
                     </td>
                   </ng-container>
@@ -325,7 +340,9 @@
                   <!-- Score Column -->
                   <ng-container matColumnDef="score">
                     <th mat-header-cell *matHeaderCellDef class="header-cell">Score</th>
-                    <td mat-cell *matCellDef="let element" class="data-cell">{{ element.score }}</td>
+                    <td mat-cell *matCellDef="let element" class="data-cell">
+                      {{ element.score }}
+                    </td>
                   </ng-container>
 
                   <!-- GA Column -->
@@ -365,7 +382,9 @@
                 </table>
               </div>
             } @else {
-              <div class="dashboard-empty">No recent game statistics available for this goalie.</div>
+              <div class="dashboard-empty">
+                No recent game statistics available for this goalie.
+              </div>
             }
           </div>
         </div>

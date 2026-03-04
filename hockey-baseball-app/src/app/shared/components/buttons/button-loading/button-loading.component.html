@@ -32,7 +32,7 @@
   (mouseup)="onMouseUp()"
   (mouseenter)="onMouseEnter()"
   (mouseleave)="onMouseLeave()"
-  >
+>
   @if (materialIconValue && !isLoadingValue) {
     @let materialIconClassValue = materialIconClass();
     @let isMatSymbolClassValue = isMatSymbolClass();
@@ -45,7 +45,7 @@
         class="icon"
         [class]="isMatSymbolClassValue ? materialSymbolClassValue : materialIconClassValue"
         [class.fill]="isMatIconFillCurrent"
-        >
+      >
         {{ materialIconValue }}
       </span>
       @if (counterValue > 0) {
@@ -53,7 +53,7 @@
           class="counter"
           [style.background]="getColor(counterBgColorValue)"
           [style.color]="getColor(counterColorValue)"
-          >
+        >
           {{ counterValue }}
         </span>
       }
@@ -63,31 +63,29 @@
           [class]="materialSymbolClassValue"
           [style.color]="getColor(counterBgColorValue)"
           >circle</span
-          >
-        }
-      </div>
-    }
-
-    @if (isLoadingValue) {
-      <div class="icon-box material">
-        <span [class]="materialSymbolClassValue" class="icon loading"
-          >progress_activity</span
-          >
-        </div>
+        >
       }
+    </div>
+  }
 
-      <span class="text">
-        <ng-content></ng-content>
-      </span>
+  @if (isLoadingValue) {
+    <div class="icon-box material">
+      <span [class]="materialSymbolClassValue" class="icon loading">progress_activity</span>
+    </div>
+  }
 
-      @if (devValue) {
-        @let colorValue = color();
-        @let bgValue = bg();
-        <span
-          class="dev-text"
-          [style.background]="getColor(colorValue)"
-          [style.color]="getColor(bgValue)"
-          >DEMO</span
-          >
-        }
-      </button>
+  <span class="text">
+    <ng-content></ng-content>
+  </span>
+
+  @if (devValue) {
+    @let colorValue = color();
+    @let bgValue = bg();
+    <span
+      class="dev-text"
+      [style.background]="getColor(colorValue)"
+      [style.color]="getColor(bgValue)"
+      >DEMO</span
+    >
+  }
+</button>

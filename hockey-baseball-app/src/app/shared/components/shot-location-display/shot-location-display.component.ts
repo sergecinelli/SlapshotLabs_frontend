@@ -1,5 +1,14 @@
-import { Component, input, computed, signal, effect, inject, viewChild, ElementRef } from '@angular/core';
-import {  } from '@angular/common';
+import {
+  Component,
+  input,
+  computed,
+  signal,
+  effect,
+  inject,
+  viewChild,
+  ElementRef,
+} from '@angular/core';
+import {} from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { ButtonSmallComponent } from '../buttons/button-small/button-small.component';
 import { environment } from '../../../../environments/environment';
@@ -7,6 +16,7 @@ import { LocalStorageService, StorageKey } from '../../../services/local-storage
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { fromEvent } from 'rxjs';
 import { debounceTime } from 'rxjs';
+import { CachedSrcDirective } from '../../directives/cached-src.directive';
 
 export interface ShotLocationData {
   iceTopOffset: number;
@@ -43,7 +53,7 @@ interface TypeStats {
 
 @Component({
   selector: 'app-shot-location-display',
-  imports: [MatIconModule, ButtonSmallComponent],
+  imports: [CachedSrcDirective, MatIconModule, ButtonSmallComponent],
   templateUrl: './shot-location-display.component.html',
   styleUrl: './shot-location-display.component.scss',
   host: {
@@ -67,8 +77,17 @@ export class ShotLocationDisplayComponent {
   goaliePhotoLoaded = signal(true); // Start as true, will be set to false on error
   teamLogoLoaded = signal(true); // Start as true, will be set to false on error
   selectedIndices = signal<Set<number>>(new Set());
-  linesData = signal<{ x1: number; y1: number; x2: number; y2: number; color: string; viewBox: string }[]>([]);
-  hoveredLine = signal<{ x1: number; y1: number; x2: number; y2: number; color: string; viewBox: string } | null>(null);
+  linesData = signal<
+    { x1: number; y1: number; x2: number; y2: number; color: string; viewBox: string }[]
+  >([]);
+  hoveredLine = signal<{
+    x1: number;
+    y1: number;
+    x2: number;
+    y2: number;
+    color: string;
+    viewBox: string;
+  } | null>(null);
   popoverItem = signal<(ShotLocationData & { color: string }) | null>(null);
   popoverPosition = signal<{ top: number; left: number } | null>(null);
   popoverAbove = signal(false);
@@ -302,9 +321,7 @@ export class ShotLocationDisplayComponent {
 
     this.popoverAbove.set(showAbove);
     this.popoverPosition.set({
-      top: showAbove
-        ? markerRect.top - 8
-        : markerRect.bottom + 8,
+      top: showAbove ? markerRect.top - 8 : markerRect.bottom + 8,
       left: markerRect.left + markerRect.width / 2,
     });
     this.popoverItem.set({ ...item, color: this.typeColors[item.type] });
@@ -359,7 +376,14 @@ export class ShotLocationDisplayComponent {
     const netRect = netImg.getBoundingClientRect();
     const viewBox = `0 0 ${containerRect.width} ${containerRect.height}`;
 
-    const lines: { x1: number; y1: number; x2: number; y2: number; color: string; viewBox: string }[] = [];
+    const lines: {
+      x1: number;
+      y1: number;
+      x2: number;
+      y2: number;
+      color: string;
+      viewBox: string;
+    }[] = [];
 
     for (const index of indices) {
       const item = this.data().find((d) => d.index === index);
@@ -466,30 +490,30 @@ export class ShotLocationDisplayComponent {
   getGoalieInitials(): string {
     const name = this.goalieName();
     if (!name) return 'G';
-    
+
     const parts = name.trim().split(' ');
     if (parts.length === 0) return 'G';
-    
+
     const first = parts[0]?.[0] || '';
     const last = parts[parts.length - 1]?.[0] || '';
-    
+
     return (first + last).toUpperCase() || 'G';
   }
 
   getTeamInitials(): string {
     const name = this.teamName();
     if (!name) return 'T';
-    
+
     const parts = name.trim().split(' ');
     if (parts.length === 0) return 'T';
-    
+
     if (parts.length === 1) {
       return parts[0].substring(0, 2).toUpperCase();
     }
-    
+
     const first = parts[0]?.[0] || '';
     const last = parts[parts.length - 1]?.[0] || '';
-    
+
     return (first + last).toUpperCase() || 'T';
   }
 }

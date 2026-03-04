@@ -1,5 +1,5 @@
-import { Component  } from '@angular/core';
-import {  } from '@angular/common';
+import { Component } from '@angular/core';
+import {} from '@angular/common';
 
 @Component({
   selector: 'app-banner-skeleton',
@@ -11,6 +11,3 @@ export class BannerSkeletonComponent {
   // Number of skeleton cards to show
   skeletonCount = 8;
 }
-
-
-

@@ -20,6 +20,7 @@ import { PlayerService } from '../../../services/player.service';
 import { GameMetadataService } from '../../../services/game-metadata.service';
 import { GameEventService, PenaltyEventRequest } from '../../../services/game-event.service';
 import { environment } from '../../../../environments/environment';
+import { CachedSrcDirective } from '../../directives/cached-src.directive';
 
 export interface PenaltyFormData {
   teamLogo: string;
@@ -35,6 +36,7 @@ export interface PenaltyFormData {
 @Component({
   selector: 'app-penalty-form-modal',
   imports: [
+    CachedSrcDirective,
     ReactiveFormsModule,
     MatDialogModule,
     ButtonComponent,
@@ -44,8 +46,8 @@ export interface PenaltyFormData {
     MatSelectModule,
     MatIconModule,
     MatDividerModule,
-    LocationSelectorComponent
-],
+    LocationSelectorComponent,
+  ],
   templateUrl: './penalty-form.modal.html',
   styleUrl: './penalty-form.modal.scss',
 })
@@ -187,7 +189,10 @@ export class PenaltyFormModal implements OnInit {
         [Validators.required, Validators.pattern(/^([0-9]{1,2}|1[0-9][0-9]|200):([0-5][0-9])$/)],
       ],
       period: ['', Validators.required],
-      time: ['', [Validators.required, Validators.pattern(/^([0-9]{1,2}|1[0-9][0-9]|200):([0-5][0-9])$/)]],
+      time: [
+        '',
+        [Validators.required, Validators.pattern(/^([0-9]{1,2}|1[0-9][0-9]|200):([0-5][0-9])$/)],
+      ],
       youtubeLink: [''],
       location: [''],
     });

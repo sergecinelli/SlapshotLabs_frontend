@@ -1,4 +1,4 @@
-import { Component, inject  } from '@angular/core';
+import { Component, inject } from '@angular/core';
 
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
@@ -29,8 +29,8 @@ export interface CustomHighlightFormResult {
     MatInputModule,
     ButtonComponent,
     ButtonLoadingComponent,
-    MatIconModule
-],
+    MatIconModule,
+  ],
   templateUrl: './custom-highlight.modal.html',
   styleUrls: ['./custom-highlight.modal.scss'],
 })
@@ -42,7 +42,13 @@ export class CustomHighlightModal {
     name: ['', [Validators.required, Validators.maxLength(200)]],
     description: ['', [Validators.maxLength(1000)]],
     date: [new Date().toISOString().slice(0, 10), [Validators.required]],
-    time: ['', [Validators.required, Validators.pattern(/^([0-1]?[0-9]|2[0-3]):([0-5][0-9])(:([0-5][0-9]))?$/)]],
+    time: [
+      '',
+      [
+        Validators.required,
+        Validators.pattern(/^([0-1]?[0-9]|2[0-3]):([0-5][0-9])(:([0-5][0-9]))?$/),
+      ],
+    ],
     youtube_link: ['', [Validators.maxLength(500)]],
   });
 
@@ -53,16 +59,16 @@ export class CustomHighlightModal {
   onSave(): void {
     if (this.form.invalid) return;
     const formValue = this.form.value;
-    
+
     // Ensure time is in HH:mm:ss format (add seconds if missing)
     let time24Hour = formValue.time;
     if (time24Hour && time24Hour.split(':').length === 2) {
       time24Hour = `${time24Hour}:00`;
     }
-    
+
     // Convert local date and time to GMT
     const gmtDateTime = convertLocalToGMT(formValue.date, time24Hour);
-    
+
     const value: CustomHighlightFormResult = {
       name: formValue.name,
       description: formValue.description,

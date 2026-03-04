@@ -35,7 +35,12 @@ function formatTimeString(hours: number, minutes: number, seconds: number): stri
  * @param seconds Seconds (0-59)
  * @returns UTC date-time string (e.g., "2025-12-18T23:30:00Z")
  */
-function createUTCDateTimeString(dateString: string, hours: number, minutes: number, seconds: number): string {
+function createUTCDateTimeString(
+  dateString: string,
+  hours: number,
+  minutes: number,
+  seconds: number
+): string {
   return `${dateString}T${formatTimeString(hours, minutes, seconds)}Z`;
 }
 
@@ -55,7 +60,10 @@ function parseDateSafe(date: string | Date): Date {
  * @param timeString Time string in format HH:mm:ss (24-hour format, user's local time)
  * @returns Object with date (preserved) and time in GMT format
  */
-export function convertLocalToGMT(dateString: string, timeString: string): { date: string; time: string } {
+export function convertLocalToGMT(
+  dateString: string,
+  timeString: string
+): { date: string; time: string } {
   if (!dateString || !timeString) {
     return { date: dateString, time: timeString };
   }
@@ -66,7 +74,7 @@ export function convertLocalToGMT(dateString: string, timeString: string): { dat
   // Create a date object from local date and time
   // Parse the date string to get year, month, day
   const [year, month, day] = dateString.split('-').map(Number);
-  
+
   // Create a date object using local time (this will be interpreted as local timezone)
   const localDate = new Date(year, month - 1, day, hours, minutes, seconds, 0);
 
@@ -92,7 +100,10 @@ export function convertLocalToGMT(dateString: string, timeString: string): { dat
  * @param timeString Time string in format HH:mm:ss (GMT time from backend)
  * @returns Object with date (preserved) and time in local timezone
  */
-export function convertGMTToLocal(dateString: string, timeString: string): { date: string; time: string } {
+export function convertGMTToLocal(
+  dateString: string,
+  timeString: string
+): { date: string; time: string } {
   if (!dateString || !timeString) {
     return { date: dateString, time: timeString };
   }
@@ -103,7 +114,7 @@ export function convertGMTToLocal(dateString: string, timeString: string): { dat
   // Create UTC date-time string using the original date
   // The date from backend is the original date the user selected
   const utcDateString = createUTCDateTimeString(dateString, hours, minutes, seconds);
-  
+
   // Create date object (will be interpreted as UTC)
   const utcDate = new Date(utcDateString);
 
@@ -128,7 +139,10 @@ export function convertGMTToLocal(dateString: string, timeString: string): { dat
  * @param timeString Time string in format HH:mm:ss (UTC time from backend)
  * @returns Object with date and time in local timezone (date may differ from input if time shift crosses midnight)
  */
-export function convertGMTToLocalWithDateShift(dateString: string, timeString: string): { date: string; time: string } {
+export function convertGMTToLocalWithDateShift(
+  dateString: string,
+  timeString: string
+): { date: string; time: string } {
   if (!dateString || !timeString) {
     return { date: dateString, time: timeString };
   }
@@ -138,7 +152,7 @@ export function convertGMTToLocalWithDateShift(dateString: string, timeString: s
 
   // Create UTC date-time string
   const utcDateString = createUTCDateTimeString(dateString, hours, minutes, seconds);
-  
+
   // Create date object (will be interpreted as UTC)
   const utcDate = new Date(utcDateString);
 
@@ -146,7 +160,7 @@ export function convertGMTToLocalWithDateShift(dateString: string, timeString: s
   const localYear = utcDate.getFullYear();
   const localMonth = utcDate.getMonth() + 1; // getMonth() returns 0-11
   const localDay = utcDate.getDate();
-  
+
   // Get local time components
   const localHours = utcDate.getHours();
   const localMinutes = utcDate.getMinutes();
@@ -197,7 +211,7 @@ export function formatDateShort(date: string | Date): string {
   if (!date) return '';
 
   const dateObj = parseDateSafe(date);
-  
+
   return dateObj.toLocaleDateString('en-US', {
     month: 'short',
     day: 'numeric',
@@ -217,7 +231,7 @@ export function formatDateShortWithCommas(date: string | Date): string {
   const month = dateObj.toLocaleString('en-US', { month: 'short' });
   const day = dateObj.getDate();
   const year = dateObj.toLocaleString('en-US', { year: '2-digit' });
-  
+
   return `${month}, ${day}, ${year}`;
 }
 
@@ -232,15 +246,18 @@ export function formatDateTimeFromGMT(dateString: string, timeString: string): s
   if (!dateString || !timeString) return '';
 
   // Convert GMT to local timezone (accounting for date shifts)
-  const { date: localDate, time: localTime } = convertGMTToLocalWithDateShift(dateString, timeString);
-  
+  const { date: localDate, time: localTime } = convertGMTToLocalWithDateShift(
+    dateString,
+    timeString
+  );
+
   // Parse local date and time
   const [year, month, day] = localDate.split('-').map(Number);
   const [hours, minutes] = localTime.split(':').map(Number);
-  
+
   // Create Date object in local timezone
   const dateObj = new Date(year, month - 1, day, hours, minutes);
-  
+
   // Format as "Nov 12, 2025, 7:30 PM"
   return dateObj.toLocaleString('en-US', {
     year: 'numeric',

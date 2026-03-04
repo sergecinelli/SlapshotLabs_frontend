@@ -1,5 +1,5 @@
-import { Component, OnInit, signal, inject  } from '@angular/core';
-import {  } from '@angular/common';
+import { Component, OnInit, signal, inject } from '@angular/core';
+import {} from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { ButtonComponent } from '../../shared/components/buttons/button/button.component';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
@@ -158,7 +158,6 @@ export class VideoHighlightsPage implements OnInit {
     if (column === 'dateCreatedFormatted') return row.dateCreated.getTime();
     return (row as Record<string, unknown>)[column];
   }
-
 
   openCreateHighlightModal(): void {
     const dialogRef = this.dialog.open(HighlightReelFormModal, {

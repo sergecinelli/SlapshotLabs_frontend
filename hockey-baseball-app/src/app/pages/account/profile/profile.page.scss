@@ -3,13 +3,13 @@
 // Center the card
 :host {
   display: block;
-  
+
   .page-content {
     display: flex;
     justify-content: center;
     padding: 20px;
   }
-  
+
   .dashboard-card {
     max-width: 900px;
     width: 100%;
@@ -57,35 +57,37 @@
   background-color: var(--white);
   border: 1px solid var(--border);
   border-radius: 4px;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
   outline: none;
-  
+
   &::placeholder {
     color: var(--text-secondary);
     opacity: 0.6;
   }
-  
+
   // Normal focus state - use dark color
   &:focus:not(.error) {
     border-color: var(--text-primary);
     box-shadow: 0 0 0 3px rgba(15, 15, 15, 0.1);
   }
-  
+
   &:hover:not(:focus) {
     border-color: var(--text-primary);
   }
-  
+
   // Show red border only when input has error and is NOT focused
   &.error:not(:focus) {
     border-color: var(--primary);
   }
-  
+
   // When input with error is focused, use dark color (not red)
   &.error:focus {
     border-color: var(--text-primary);
     box-shadow: 0 0 0 3px rgba(15, 15, 15, 0.1);
   }
-  
+
   &:disabled {
     background-color: var(--gray-tone3);
     cursor: not-allowed;

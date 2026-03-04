@@ -1,5 +1,5 @@
-import { Component  } from '@angular/core';
-import {  } from '@angular/common';
+import { Component } from '@angular/core';
+import {} from '@angular/common';
 
 @Component({
   selector: 'app-payment-history',

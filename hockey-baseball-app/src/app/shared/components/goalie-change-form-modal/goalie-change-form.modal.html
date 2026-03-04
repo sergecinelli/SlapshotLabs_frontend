@@ -21,14 +21,14 @@
                 class="team-button"
                 [class.selected]="goalieChangeForm.get('team')?.value === team.value"
                 (click)="selectTeam(team.value)"
-                >
+              >
                 <div class="team-avatar">
                   @if (team.value) {
                     <img
-                      [src]="getTeamLogoUrl(team.value)"
+                      [appCachedSrc]="getTeamLogoUrl(team.value)"
                       [alt]="team.label"
                       class="team-logo-img"
-                      />
+                    />
                   }
                 </div>
                 <div class="team-name">{{ team.label }}</div>
@@ -36,9 +36,7 @@
             }
           </div>
           @if (goalieChangeForm.get('team')?.errors && goalieChangeForm.get('team')?.touched) {
-            <div
-              class="team-error"
-              >
+            <div class="team-error">
               {{ getErrorMessage('team') }}
             </div>
           }
@@ -60,17 +58,13 @@
                 class="goalie-button"
                 [class.selected]="goalieChangeForm.get('goalie')?.value === goalie.value"
                 (click)="selectGoalie(goalie.value)"
-                >
+              >
                 <div class="goalie-name">{{ goalie.label }}</div>
               </button>
             }
           </div>
-          @if (
-            goalieChangeForm.get('goalie')?.errors && goalieChangeForm.get('goalie')?.touched
-            ) {
-            <div
-              class="goalie-error"
-              >
+          @if (goalieChangeForm.get('goalie')?.errors && goalieChangeForm.get('goalie')?.touched) {
+            <div class="goalie-error">
               {{ getErrorMessage('goalie') }}
             </div>
           }
@@ -97,18 +91,14 @@
                   class="period-button"
                   [class.selected]="goalieChangeForm.get('period')?.value === period.value"
                   (click)="selectPeriod(period.value)"
-                  >
+                >
                   <div class="period-name">{{ period.label }}</div>
                 </button>
               }
             </div>
           }
-          @if (
-            goalieChangeForm.get('period')?.errors && goalieChangeForm.get('period')?.touched
-            ) {
-            <div
-              class="period-error"
-              >
+          @if (goalieChangeForm.get('period')?.errors && goalieChangeForm.get('period')?.touched) {
+            <div class="period-error">
               {{ getErrorMessage('period') }}
             </div>
           }
@@ -119,8 +109,7 @@
             <mat-label class="uppercase text-custom-secondary">Time</mat-label>
             <input matInput formControlName="time" placeholder="mm:ss" maxlength="6" />
             @if (goalieChangeForm.get('time')?.errors && goalieChangeForm.get('time')?.touched) {
-              <mat-error
-                >
+              <mat-error>
                 {{ getErrorMessage('time') }}
               </mat-error>
             }
@@ -140,7 +129,7 @@
             [floatLabel]="'always'"
             [hideRequiredMarker]="true"
             class="form-field full-width"
-            >
+          >
             <mat-label class="uppercase text-custom-secondary">Note</mat-label>
             <textarea
               matInput
@@ -149,8 +138,7 @@
               rows="3"
             ></textarea>
             @if (goalieChangeForm.get('note')?.errors && goalieChangeForm.get('note')?.touched) {
-              <mat-error
-                >
+              <mat-error>
                 {{ getErrorMessage('note') }}
               </mat-error>
             }
@@ -173,7 +161,7 @@
       [rounded]="false"
       [haveContent]="true"
       (clicked)="onCancel()"
-      >
+    >
       Cancel
     </app-button>
     <app-button-loading
@@ -190,7 +178,7 @@
       [rounded]="false"
       [haveContent]="true"
       (clicked)="onSubmit()"
-      >
+    >
       {{ isEditMode ? 'Save Goalie Change' : 'Add Goalie Change' }}
     </app-button-loading>
   </mat-dialog-actions>

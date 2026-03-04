@@ -9,7 +9,7 @@ export interface Theme {
 }
 
 export enum ThemeStyle {
-  main, /* dark, light, etc... */
+  main /* dark, light, etc... */,
 }
 
 @Injectable({ providedIn: 'root' })
@@ -66,4 +66,3 @@ export class ThemeService {
     return this.themes[this.currentTheme];
   }
 }
-

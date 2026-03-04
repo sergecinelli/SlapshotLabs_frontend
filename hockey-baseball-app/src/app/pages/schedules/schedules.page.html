@@ -5,13 +5,12 @@
 @let schedulesValue = schedules();
 
 <div class="page-content" [appVisibilityMap]="visibilityByRoleMap">
-
   <!-- Header -->
   <div class="schedules-header">
     <div class="schedules-header-left">
       <h2>{{ pageTitleValue }}</h2>
     </div>
-    <div class="schedules-header-actions" style="display: flex; gap: 10px; align-items: center;">
+    <div class="schedules-header-actions" style="display: flex; gap: 10px; align-items: center">
       <app-button
         [materialIcon]="layoutModeValue === 'card' ? 'table_rows' : 'grid_view'"
         [bg]="'white'"

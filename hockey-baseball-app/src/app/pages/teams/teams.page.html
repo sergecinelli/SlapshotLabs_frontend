@@ -68,7 +68,7 @@
               <div class="header-left">
                 <div class="team-name-row">
                   @if (team.logo) {
-                    <img [src]="team.logo" [alt]="team.name" class="team-logo" />
+                    <img [appCachedSrc]="team.logo" [alt]="team.name" class="team-logo" />
                   } @else {
                     <div class="team-logo-placeholder"></div>
                   }

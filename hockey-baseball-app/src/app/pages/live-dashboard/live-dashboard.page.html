@@ -84,7 +84,11 @@
                 <div class="team-name">{{ awayTeamValue.name }}</div>
                 <div class="team-record">{{ awayTeamValue.record }}</div>
               </div>
-              <img [src]="awayTeamValue.logo" [alt]="awayTeamValue.name" class="team-logo" />
+              <img
+                [appCachedSrc]="awayTeamValue.logo"
+                [alt]="awayTeamValue.name"
+                class="team-logo"
+              />
             </div>
           </div>
           <!-- Score in Center -->
@@ -123,7 +127,11 @@
             [class.winning]="homeTeamValue.score > awayTeamValue.score"
           >
             <div class="team-info team-info-right">
-              <img [src]="homeTeamValue.logo" [alt]="homeTeamValue.name" class="team-logo" />
+              <img
+                [appCachedSrc]="homeTeamValue.logo"
+                [alt]="homeTeamValue.name"
+                class="team-logo"
+              />
               <div class="team-name-group">
                 <div class="team-location">
                   {{ homeTeamValue.teamLevel }}
@@ -208,7 +216,7 @@
         <div class="live-dashboard-stats-card">
           <div class="stats-card-title">
             <img
-              [src]="awayTeamValue.logo"
+              [appCachedSrc]="awayTeamValue.logo"
               [alt]="awayTeamValue.name"
               class="stats-card-team-logo"
             />
@@ -449,7 +457,7 @@
         <div class="live-dashboard-stats-card">
           <div class="stats-card-title">
             <img
-              [src]="homeTeamValue.logo"
+              [appCachedSrc]="homeTeamValue.logo"
               [alt]="homeTeamValue.name"
               class="stats-card-team-logo"
             />
@@ -748,12 +756,19 @@
                     (keydown)="$event.stopPropagation()"
                   />
                   @if (playerSearchText()) {
-                    <mat-icon class="player-search-clear" (click)="clearPlayerSearch(playerSearchInput)">close</mat-icon>
+                    <mat-icon
+                      class="player-search-clear"
+                      (click)="clearPlayerSearch(playerSearchInput)"
+                      >close</mat-icon
+                    >
                   }
                 </div>
                 <mat-optgroup [label]="homeTeamValue.name">
                   @for (player of homePlayerFilterOptions; track player.value) {
-                    <mat-option [value]="player.value" [style.display]="playerMatchesSearch(player) ? '' : 'none'">
+                    <mat-option
+                      [value]="player.value"
+                      [style.display]="playerMatchesSearch(player) ? '' : 'none'"
+                    >
                       @if (player.number) {
                         <span class="player-number-badge">#{{ player.number }}</span>
                       }
@@ -763,7 +778,10 @@
                 </mat-optgroup>
                 <mat-optgroup [label]="awayTeamValue.name">
                   @for (player of awayPlayerFilterOptions; track player.value) {
-                    <mat-option [value]="player.value" [style.display]="playerMatchesSearch(player) ? '' : 'none'">
+                    <mat-option
+                      [value]="player.value"
+                      [style.display]="playerMatchesSearch(player) ? '' : 'none'"
+                    >
                       @if (player.number) {
                         <span class="player-number-badge">#{{ player.number }}</span>
                       }
@@ -847,7 +865,7 @@
                           <div class="live-dashboard-team-logo-wrapper">
                             @if (event.teamId) {
                               <img
-                                [src]="getTeamLogoUrl(event.teamId)"
+                                [appCachedSrc]="getTeamLogoUrl(event.teamId)"
                                 [alt]="event.team"
                                 class="live-dashboard-team-logo"
                               />
@@ -931,7 +949,7 @@
             <div>
               <div class="live-dashboard-spray-chart-header">
                 <img
-                  [src]="getTeamLogoUrl(awayTeamId)"
+                  [appCachedSrc]="getTeamLogoUrl(awayTeamId)"
                   [alt]="awayTeamValue.name"
                   class="live-dashboard-spray-chart-logo"
                 />
@@ -960,7 +978,7 @@
             <div>
               <div class="live-dashboard-spray-chart-header">
                 <img
-                  [src]="getTeamLogoUrl(homeTeamId)"
+                  [appCachedSrc]="getTeamLogoUrl(homeTeamId)"
                   [alt]="homeTeamValue.name"
                   class="live-dashboard-spray-chart-logo"
                 />

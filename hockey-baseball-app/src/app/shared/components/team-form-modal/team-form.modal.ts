@@ -84,9 +84,10 @@ export class TeamFormModal implements OnInit {
           return this.groupOptions;
         }
         const filterValue = value.toLowerCase();
-        return this.groupOptions.filter((option) =>
-          option.label.toLowerCase().includes(filterValue) ||
-          option.value.toLowerCase().includes(filterValue)
+        return this.groupOptions.filter(
+          (option) =>
+            option.label.toLowerCase().includes(filterValue) ||
+            option.value.toLowerCase().includes(filterValue)
         );
       })
     );
@@ -125,7 +126,7 @@ export class TeamFormModal implements OnInit {
       next: ({ ageGroups, levels, divisions }) => {
         // Transform age groups to options
         this.groupOptions = this.teamOptionsService.transformAgeGroupsToOptions(ageGroups);
-        
+
         // Setup autocomplete filter after options are loaded
         this.setupGroupFilter();
 

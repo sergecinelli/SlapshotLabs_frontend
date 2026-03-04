@@ -22,7 +22,10 @@ import { ButtonComponent } from '../../shared/components/buttons/button/button.c
 import { visibilityByRoleMap } from './team-profile.role-map';
 import { forkJoin, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { convertGMTToLocalWithDateShift, formatDateShort } from '../../shared/utils/time-converter.util';
+import {
+  convertGMTToLocalWithDateShift,
+  formatDateShort,
+} from '../../shared/utils/time-converter.util';
 
 // Additional interfaces for team profile specific data
 export interface TeamGame {
@@ -52,7 +55,6 @@ export interface TeamPlayer {
   birthYear?: number;
   team?: string;
 }
-
 
 @Component({
   selector: 'app-team-profile',
@@ -111,16 +113,14 @@ export class TeamProfilePage implements OnInit, OnDestroy {
   ];
 
   ngOnInit(): void {
-    this.route.params
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((params) => {
-        const teamId = params['id'];
-        if (teamId) {
-          this.loadTeam(teamId);
-        } else {
-          this.router.navigate(['/teams-and-rosters/teams']);
-        }
-      });
+    this.route.params.pipe(takeUntil(this.destroy$)).subscribe((params) => {
+      const teamId = params['id'];
+      if (teamId) {
+        this.loadTeam(teamId);
+      } else {
+        this.router.navigate(['/teams-and-rosters/teams']);
+      }
+    });
   }
 
   ngOnDestroy(): void {
@@ -172,9 +172,7 @@ export class TeamProfilePage implements OnInit, OnDestroy {
             forkJoin(rinkRequests).subscribe({
               next: (rinksData) => {
                 // Create rinks map from fetched data
-                this.rinksMap = new Map(
-                  rinksData.map((rink) => [rink.id, rink])
-                );
+                this.rinksMap = new Map(rinksData.map((rink) => [rink.id, rink]));
                 // Load season stats
                 this.seasonStats = teamSeasons.map((s) => ({
                   season: s.season,
@@ -273,12 +271,14 @@ export class TeamProfilePage implements OnInit, OnDestroy {
       const awayTeamName = awayTeam?.name || `Team ${game.away_team_id}`;
 
       // Determine opponent
-      const opponent =
-        game.home_team_id === currentTeamId ? awayTeamName : homeTeamName;
+      const opponent = game.home_team_id === currentTeamId ? awayTeamName : homeTeamName;
 
       // Format date - convert from GMT to local timezone
       // The date and time from API are in UTC
-      const { date: localDate, time: localTime } = convertGMTToLocalWithDateShift(game.date, game.time);
+      const { date: localDate, time: localTime } = convertGMTToLocalWithDateShift(
+        game.date,
+        game.time
+      );
       const formattedDate = formatDateShort(localDate);
 
       // Format time from "HH:MM:SS" (local) to "H:MM AM/PM"

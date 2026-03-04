@@ -54,6 +54,7 @@ import { formatDateTimeFromGMT } from '../../shared/utils/time-converter.util';
 import { BannerService } from '../../services/banner.service';
 import { StorageKey } from '../../services/local-storage.service';
 import { BreadcrumbDataService } from '../../services/breadcrumb-data.service';
+import { CachedSrcDirective } from '../../shared/directives/cached-src.directive';
 
 interface TeamDisplay {
   name: string;
@@ -112,6 +113,7 @@ interface GameEvent {
 @Component({
   selector: 'app-live-dashboard',
   imports: [
+    CachedSrcDirective,
     FormsModule,
     ButtonComponent,
     MatIconModule,
@@ -121,8 +123,8 @@ interface GameEvent {
     MatSelectModule,
     MatFormFieldModule,
     MatProgressSpinnerModule,
-    ShotLocationDisplayComponent
-],
+    ShotLocationDisplayComponent,
+  ],
   templateUrl: './live-dashboard.page.html',
   styleUrl: './live-dashboard.page.scss',
 })
@@ -494,7 +496,9 @@ export class LiveDashboardPage implements OnInit, OnDestroy {
     this.tournamentName.set(gameExtra.game_type_name || '');
 
     // Set breadcrumb entity name
-    const breadcrumbLabel = (gameExtra.game_type_name ? `${gameExtra.game_type_name} | ` : '') + (gameType ? gameType.name : '');
+    const breadcrumbLabel =
+      (gameExtra.game_type_name ? `${gameExtra.game_type_name} | ` : '') +
+      (gameType ? gameType.name : '');
     if (breadcrumbLabel) {
       this.breadcrumbData.entityName.set(breadcrumbLabel);
     }
@@ -507,7 +511,7 @@ export class LiveDashboardPage implements OnInit, OnDestroy {
     // Update date and time - convert from GMT to local timezone and format
     const formattedDateTime = formatDateTimeFromGMT(gameExtra.date, gameExtra.time);
     this.tournamentDate.set(formattedDateTime);
-    
+
     // Store game start time as Date object (for any other uses)
     const gameDate = new Date(gameExtra.date + 'T' + gameExtra.time + 'Z'); // Add Z to indicate UTC
     this.gameStartTime = gameDate;
@@ -1073,7 +1077,10 @@ export class LiveDashboardPage implements OnInit, OnDestroy {
   }
 
   private getPlayerFilterOptions(teamId: number) {
-    const map = new Map<number, { value: number; label: string; teamId: number; number?: number }>();
+    const map = new Map<
+      number,
+      { value: number; label: string; teamId: number; number?: number }
+    >();
     for (const p of this.playerOptions) {
       if (p.teamId === teamId) map.set(p.value, p);
     }

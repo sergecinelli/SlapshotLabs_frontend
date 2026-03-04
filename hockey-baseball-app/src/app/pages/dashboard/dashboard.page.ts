@@ -1,5 +1,5 @@
-import { Component, OnInit, signal, inject  } from '@angular/core';
-import {  } from '@angular/common';
+import { Component, OnInit, signal, inject } from '@angular/core';
+import {} from '@angular/common';
 import { Router } from '@angular/router';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
@@ -15,11 +15,26 @@ import { Team } from '../../shared/interfaces/team.interface';
 import { Player } from '../../shared/interfaces/player.interface';
 import { Goalie } from '../../shared/interfaces/goalie.interface';
 import { Arena, Rink } from '../../shared/interfaces/arena.interface';
-import { PlayerFormModal, PlayerFormModalData } from '../../shared/components/player-form-modal/player-form.modal';
-import { TeamFormModal, TeamFormModalData } from '../../shared/components/team-form-modal/team-form.modal';
-import { GoalieFormModal, GoalieFormModalData } from '../../shared/components/goalie-form-modal/goalie-form.modal';
-import { ScheduleFormModal, ScheduleFormModalData } from '../../shared/components/schedule-form-modal/schedule-form.modal';
-import { HighlightReelFormModal, HighlightReelFormModalData } from '../../shared/components/highlight-reel-form-modal/highlight-reel-form.modal';
+import {
+  PlayerFormModal,
+  PlayerFormModalData,
+} from '../../shared/components/player-form-modal/player-form.modal';
+import {
+  TeamFormModal,
+  TeamFormModalData,
+} from '../../shared/components/team-form-modal/team-form.modal';
+import {
+  GoalieFormModal,
+  GoalieFormModalData,
+} from '../../shared/components/goalie-form-modal/goalie-form.modal';
+import {
+  ScheduleFormModal,
+  ScheduleFormModalData,
+} from '../../shared/components/schedule-form-modal/schedule-form.modal';
+import {
+  HighlightReelFormModal,
+  HighlightReelFormModalData,
+} from '../../shared/components/highlight-reel-form-modal/highlight-reel-form.modal';
 import { HighlightReelUpsertPayload } from '../../shared/interfaces/highlight-reel.interface';
 import { HighlightsService } from '../../services/highlights.service';
 import { BannerService } from '../../services/banner.service';
@@ -29,7 +44,10 @@ import { ComponentVisibilityByRoleDirective } from '../../shared/directives/comp
 import { GameCardComponent } from '../../shared/components/game-card/game-card.component';
 import { GameCardSkeletonComponent } from '../../shared/components/game-card/game-card-skeleton.component';
 import { getGameStatusLabel } from '../../shared/constants/game-status.constants';
-import { convertGMTToLocalWithDateShift, formatDateForDisplay } from '../../shared/utils/time-converter.util';
+import {
+  convertGMTToLocalWithDateShift,
+  formatDateForDisplay,
+} from '../../shared/utils/time-converter.util';
 
 @Component({
   selector: 'app-dashboard',
@@ -91,7 +109,9 @@ export class DashboardPage implements OnInit {
         // Create mappings for arenas and rinks
         const arenaNameMap = new Map(arenas.map((a) => [a.id, a.name || '']));
         const rinkNameMap = new Map(rinks.map((r) => [r.id, r.name || '']));
-        const arenaAddressMap = new Map(arenas.map((a) => [a.id, a.address || a.arena_address || '']));
+        const arenaAddressMap = new Map(
+          arenas.map((a) => [a.id, a.address || a.arena_address || ''])
+        );
         const rinkMap = new Map(
           rinks.map((r) => {
             const arena = arenas.find((a) => a.id === r.arena_id);
@@ -100,7 +120,6 @@ export class DashboardPage implements OnInit {
             return [r.id, arena ? `${arenaName} – ${rinkName}` : rinkName];
           })
         );
-
 
         // Helper function to get status name
         const getStatusName = (status: number): string => {
@@ -154,7 +173,9 @@ export class DashboardPage implements OnInit {
             homeTeamAgeGroup: homeTeam?.group || '',
             homeTeamLevelName: homeTeam?.level || '',
             homeGoals: game.home_goals,
-            homeTeamGoalie: game.home_start_goalie_name || (game.home_start_goalie_id ? `Goalie ${game.home_start_goalie_id}` : '—'),
+            homeTeamGoalie:
+              game.home_start_goalie_name ||
+              (game.home_start_goalie_id ? `Goalie ${game.home_start_goalie_id}` : '—'),
             homeTeamGoalieId: game.home_start_goalie_id || undefined,
             awayTeam: awayTeam?.name || `Team ${game.away_team_id}`,
             awayTeamId: game.away_team_id,
@@ -162,18 +183,20 @@ export class DashboardPage implements OnInit {
             awayTeamAgeGroup: awayTeam?.group || '',
             awayTeamLevelName: awayTeam?.level || '',
             awayGoals: game.away_goals,
-            awayTeamGoalie: game.away_start_goalie_name || (game.away_start_goalie_id ? `Goalie ${game.away_start_goalie_id}` : '—'),
+            awayTeamGoalie:
+              game.away_start_goalie_name ||
+              (game.away_start_goalie_id ? `Goalie ${game.away_start_goalie_id}` : '—'),
             awayTeamGoalieId: game.away_start_goalie_id || undefined,
-            gameType: game.game_type || '' as GameType,
+            gameType: game.game_type || ('' as GameType),
             gameTypeName: game.game_type_name || undefined,
             tournamentName: game.tournament_name || undefined,
             date: formatDateForDisplay(convertGMTToLocalWithDateShift(game.date, game.time).date),
             time: convertGMTToLocalWithDateShift(game.date, game.time).time,
-            rink: game.rink_id ? (rinkMap.get(game.rink_id) || `Rink ${game.rink_id}`) : '',
-            arenaRink: game.rink_id ? (rinkMap.get(game.rink_id) || `Rink ${game.rink_id}`) : '',
-            arenaName: game.arena_id ? (arenaNameMap.get(game.arena_id) || '') : '',
-            rinkName: game.rink_id ? (rinkNameMap.get(game.rink_id) || '') : '',
-            arenaAddress: game.arena_id ? (arenaAddressMap.get(game.arena_id) || '') : '',
+            rink: game.rink_id ? rinkMap.get(game.rink_id) || `Rink ${game.rink_id}` : '',
+            arenaRink: game.rink_id ? rinkMap.get(game.rink_id) || `Rink ${game.rink_id}` : '',
+            arenaName: game.arena_id ? arenaNameMap.get(game.arena_id) || '' : '',
+            rinkName: game.rink_id ? rinkNameMap.get(game.rink_id) || '' : '',
+            arenaAddress: game.arena_id ? arenaAddressMap.get(game.arena_id) || '' : '',
             status: statusValue,
             statusName: getStatusName(game.status),
             periodName: game.game_period_name || undefined,

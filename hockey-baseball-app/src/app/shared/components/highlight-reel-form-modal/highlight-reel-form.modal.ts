@@ -28,6 +28,7 @@ import { CustomHighlightModal, CustomHighlightFormResult } from './custom-highli
 import { environment } from '../../../../environments/environment';
 import { forkJoin } from 'rxjs';
 import { convertLocalToGMT, convertGMTToLocal } from '../../utils/time-converter.util';
+import { CachedSrcDirective } from '../../directives/cached-src.directive';
 
 export interface HighlightReelFormModalData {
   isEditMode: boolean;
@@ -49,6 +50,7 @@ interface GameListItem {
 @Component({
   selector: 'app-highlight-reel-form-modal',
   imports: [
+    CachedSrcDirective,
     ReactiveFormsModule,
     MatDialogModule,
     ButtonComponent,
@@ -58,8 +60,8 @@ interface GameListItem {
     MatExpansionModule,
     MatIconModule,
     MatProgressSpinnerModule,
-    DragDropModule
-],
+    DragDropModule,
+  ],
   templateUrl: './highlight-reel-form.modal.html',
   styleUrl: './highlight-reel-form.modal.scss',
 })
@@ -134,14 +136,14 @@ export class HighlightReelFormModal implements OnInit {
             // Convert GMT time from API to local time for display
             let localDate = highlight.date;
             let localTime = highlight.time;
-            
+
             if (highlight.is_custom && highlight.date && highlight.time) {
               // For custom highlights, convert GMT to local time
               const localDateTime = convertGMTToLocal(highlight.date, highlight.time);
               localDate = localDateTime.date;
               localTime = localDateTime.time;
             }
-            
+
             return {
               id: this.nextSelectedEventId++,
               gameEventId: highlight.game_event_id,
@@ -458,16 +460,15 @@ export class HighlightReelFormModal implements OnInit {
   }
 
   openAddCustomHighlightModal(): void {
-    const dialogRef = this.dialog.open<
+    const dialogRef = this.dialog.open<CustomHighlightModal, undefined, CustomHighlightFormResult>(
       CustomHighlightModal,
-      undefined,
-      CustomHighlightFormResult
-    >(CustomHighlightModal, {
-      width: '460px',
-      maxWidth: '95vw',
-      autoFocus: true,
-      disableClose: true,
-    });
+      {
+        width: '460px',
+        maxWidth: '95vw',
+        autoFocus: true,
+        disableClose: true,
+      }
+    );
 
     dialogRef.afterClosed().subscribe((result) => {
       if (!result) return;
@@ -506,7 +507,7 @@ export class HighlightReelFormModal implements OnInit {
         // If not available (old data), convert local time to GMT
         let gmtDate = selectedEvent.fullEvent.date;
         let gmtTime = selectedEvent.fullEvent.time;
-        
+
         if (!gmtDate || !gmtTime || !gmtTime.includes(':')) {
           // Fallback: convert local date/time to GMT
           let time24Hour = selectedEvent.customTime || '';
@@ -520,7 +521,7 @@ export class HighlightReelFormModal implements OnInit {
           // Ensure time is in HH:mm:ss.sssZ format
           gmtTime = this.formatTimeForApi(gmtTime);
         }
-        
+
         return {
           ...(this.isEditMode && selectedEvent.highlightId
             ? { id: selectedEvent.highlightId }

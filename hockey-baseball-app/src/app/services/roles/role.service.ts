@@ -18,12 +18,14 @@ export class RoleService {
    */
   mapRoleNameToRole(roleName: number): Role {
     switch (roleName) {
-      case 1: return Role.Admin;
-      case 2: return Role.Coach;
-      case 3: return Role.Player;
+      case 1:
+        return Role.Admin;
+      case 2:
+        return Role.Coach;
+      case 3:
+        return Role.Player;
     }
 
     return Role.Unknown;
   }
 }
-

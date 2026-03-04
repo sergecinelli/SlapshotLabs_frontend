@@ -37,7 +37,7 @@
       }
     }
 
-      table {
+    table {
       width: 100%;
       min-width: 1200px;
       table-layout: fixed;
@@ -89,7 +89,7 @@
         span.goals-value {
           font-weight: 500 !important;
         }
-        
+
         // Ensure bold for goals columns
         &:has(.goals-value) {
           span.goals-value {
@@ -194,7 +194,6 @@
               text-decoration: underline;
             }
           }
-
 
           .team-info {
             font-size: 11px;

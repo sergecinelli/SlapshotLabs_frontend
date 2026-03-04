@@ -15,6 +15,7 @@ import { GameEventService, GoalieChangeEventRequest } from '../../../services/ga
 import { ButtonComponent } from '../buttons/button/button.component';
 import { ButtonLoadingComponent } from '../buttons/button-loading/button-loading.component';
 import { environment } from '../../../../environments/environment';
+import { CachedSrcDirective } from '../../directives/cached-src.directive';
 
 export interface GoalieChangeFormData {
   teamLogo: string;
@@ -28,6 +29,7 @@ export interface GoalieChangeFormData {
 @Component({
   selector: 'app-goalie-change-form-modal',
   imports: [
+    CachedSrcDirective,
     ReactiveFormsModule,
     MatDialogModule,
     MatFormFieldModule,
@@ -36,8 +38,8 @@ export interface GoalieChangeFormData {
     MatIconModule,
     MatDividerModule,
     ButtonComponent,
-    ButtonLoadingComponent
-],
+    ButtonLoadingComponent,
+  ],
   templateUrl: './goalie-change-form.modal.html',
   styleUrl: './goalie-change-form.modal.scss',
 })
@@ -155,7 +157,10 @@ export class GoalieChangeFormModal implements OnInit {
       team: ['', Validators.required],
       goalie: ['', Validators.required],
       period: ['', Validators.required],
-      time: ['', [Validators.required, Validators.pattern(/^([0-9]{1,2}|1[0-9][0-9]|200):([0-5][0-9])$/)]],
+      time: [
+        '',
+        [Validators.required, Validators.pattern(/^([0-9]{1,2}|1[0-9][0-9]|200):([0-5][0-9])$/)],
+      ],
       note: [''],
     });
   }

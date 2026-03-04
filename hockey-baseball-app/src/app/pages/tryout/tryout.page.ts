@@ -19,7 +19,10 @@ import {
 } from '../../shared/components/tabs-slider/tabs-slider.component';
 import { ComponentVisibilityByRoleDirective } from '../../shared/directives/component-visibility-by-role.directive';
 import { visibilityByRoleMap } from './tryout.role-map';
-import { TryoutAddModal, TryoutAddModalData } from '../../shared/components/tryout-add-modal/tryout-add.modal';
+import {
+  TryoutAddModal,
+  TryoutAddModalData,
+} from '../../shared/components/tryout-add-modal/tryout-add.modal';
 
 const TRYOUT_TABS: TabItem[] = [
   { key: 'player', label: 'Players', icon: 'person' },
@@ -123,16 +126,13 @@ export class TryoutPage implements OnInit {
     const { action, item } = event;
     switch (action) {
       case 'analysis': {
-        const basePath =
-          item.type === 'goalie' ? '/analytics/goalies/' : '/analytics/players/';
+        const basePath = item.type === 'goalie' ? '/analytics/goalies/' : '/analytics/players/';
         this.router.navigate([basePath + item.playerId]);
         break;
       }
       case 'view-profile': {
         const basePath =
-          item.type === 'goalie'
-            ? '/teams-and-rosters/goalies/'
-            : '/teams-and-rosters/players/';
+          item.type === 'goalie' ? '/teams-and-rosters/goalies/' : '/teams-and-rosters/players/';
         this.router.navigate([basePath + item.playerId + '/profile']);
         break;
       }

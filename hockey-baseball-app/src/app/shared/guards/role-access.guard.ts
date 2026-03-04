@@ -30,10 +30,7 @@ export class RoleAccessGuard implements CanActivate {
       return from(this.router.navigate(['/dashboard']));
     }
 
-    if (
-      pageAccess.denied &&
-      pageAccess.denied.find((role) => role === this.roleService.current)
-    ) {
+    if (pageAccess.denied && pageAccess.denied.find((role) => role === this.roleService.current)) {
       // Redirect to dashboard if user role is denied
       return from(this.router.navigate(['/dashboard']));
     }
@@ -41,4 +38,3 @@ export class RoleAccessGuard implements CanActivate {
     return of(true);
   }
 }
-

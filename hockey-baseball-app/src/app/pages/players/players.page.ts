@@ -1,5 +1,5 @@
-import { Component, OnInit, signal, inject  } from '@angular/core';
-import {  } from '@angular/common';
+import { Component, OnInit, signal, inject } from '@angular/core';
+import {} from '@angular/common';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -16,14 +16,20 @@ import { ComponentVisibilityByRoleDirective } from '../../shared/directives/comp
 import { ButtonComponent } from '../../shared/components/buttons/button/button.component';
 import { ButtonRouteComponent } from '../../shared/components/buttons/button-route/button-route.component';
 import { visibilityByRoleMap } from './players.role-map';
-import { DataTableComponent, TableColumn, TableAction } from '../../shared/components/data-table/data-table.component';
+import {
+  DataTableComponent,
+  TableColumn,
+  TableAction,
+} from '../../shared/components/data-table/data-table.component';
 import { LocalStorageService, StorageKey } from '../../services/local-storage.service';
 import { TryoutService } from '../../services/tryout.service';
 import { AuthService } from '../../services/auth.service';
+import { CachedSrcDirective } from '../../shared/directives/cached-src.directive';
 
 @Component({
   selector: 'app-players',
   imports: [
+    CachedSrcDirective,
     MatDialogModule,
     MatIconModule,
     MatTooltipModule,
@@ -74,11 +80,42 @@ export class PlayersPage implements OnInit {
 
   tableActions: TableAction[] = [
     { label: 'Analysis', action: 'analysis', variant: 'secondary', icon: 'analytics' },
-    { label: 'Spray Chart', action: 'shot-spray-chart', variant: 'secondary', icon: 'scatter_plot' },
-    { label: 'Profile', action: 'view-profile', variant: 'primary', icon: 'visibility', iconOnly: true },
-    { label: 'Edit', action: 'edit', variant: 'secondary', icon: 'stylus', iconOnly: true, roleVisibilityName: 'edit-action' },
-    { label: 'Delete', action: 'delete', variant: 'danger', icon: 'delete', iconOnly: true, roleVisibilityName: 'delete-action' },
-    { label: 'Add To Tryout', action: 'add-to-tryout', variant: 'secondary', icon: 'person_add', iconOnly: true },
+    {
+      label: 'Spray Chart',
+      action: 'shot-spray-chart',
+      variant: 'secondary',
+      icon: 'scatter_plot',
+    },
+    {
+      label: 'Profile',
+      action: 'view-profile',
+      variant: 'primary',
+      icon: 'visibility',
+      iconOnly: true,
+    },
+    {
+      label: 'Edit',
+      action: 'edit',
+      variant: 'secondary',
+      icon: 'stylus',
+      iconOnly: true,
+      roleVisibilityName: 'edit-action',
+    },
+    {
+      label: 'Delete',
+      action: 'delete',
+      variant: 'danger',
+      icon: 'delete',
+      iconOnly: true,
+      roleVisibilityName: 'delete-action',
+    },
+    {
+      label: 'Add To Tryout',
+      action: 'add-to-tryout',
+      variant: 'secondary',
+      icon: 'person_add',
+      iconOnly: true,
+    },
   ];
 
   ngOnInit(): void {
@@ -309,7 +346,9 @@ export class PlayersPage implements OnInit {
   }
 
   viewShotSprayChart(player: Player): void {
-    this.router.navigate(['/teams-and-rosters/players', player.id, 'spray-chart'], { queryParams: { type: 'player' } });
+    this.router.navigate(['/teams-and-rosters/players', player.id, 'spray-chart'], {
+      queryParams: { type: 'player' },
+    });
   }
 
   viewPlayerAnalysis(player: Player): void {

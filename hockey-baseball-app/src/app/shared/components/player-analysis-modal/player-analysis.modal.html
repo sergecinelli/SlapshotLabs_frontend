@@ -19,9 +19,18 @@
           <mat-divider class="section-divider"></mat-divider>
 
           <div class="form-row">
-            <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field full-width">
+            <mat-form-field
+              [floatLabel]="'always'"
+              [hideRequiredMarker]="true"
+              class="form-field full-width"
+            >
               <mat-label class="uppercase text-custom-secondary">Select Player</mat-label>
-              <input matInput formControlName="entityId" [matAutocomplete]="entityAuto" placeholder="Search player..." />
+              <input
+                matInput
+                formControlName="entityId"
+                [matAutocomplete]="entityAuto"
+                placeholder="Search player..."
+              />
               <mat-autocomplete #entityAuto="matAutocomplete" [displayWith]="displayEntityFn">
                 @for (option of filteredEntityOptions | async; track option.value) {
                   <mat-option [value]="option.value">{{ option.label }}</mat-option>
@@ -34,17 +43,27 @@
           </div>
 
           <div class="form-row">
-            <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field full-width">
+            <mat-form-field
+              [floatLabel]="'always'"
+              [hideRequiredMarker]="true"
+              class="form-field full-width"
+            >
               <mat-label class="uppercase text-custom-secondary">Analysis By</mat-label>
               <input matInput formControlName="analysisBy" placeholder="Enter name" />
-              @if (analysisForm.get('analysisBy')?.errors && analysisForm.get('analysisBy')?.touched) {
+              @if (
+                analysisForm.get('analysisBy')?.errors && analysisForm.get('analysisBy')?.touched
+              ) {
                 <mat-error>{{ getErrorMessage('analysisBy') }}</mat-error>
               }
             </mat-form-field>
           </div>
 
           <div class="form-row">
-            <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field full-width">
+            <mat-form-field
+              [floatLabel]="'always'"
+              [hideRequiredMarker]="true"
+              class="form-field full-width"
+            >
               <mat-label class="uppercase text-custom-secondary">Input Analysis</mat-label>
               <textarea
                 matInput
@@ -52,7 +71,10 @@
                 rows="6"
                 placeholder="Enter analysis"
               ></textarea>
-              @if (analysisForm.get('analysisText')?.errors && analysisForm.get('analysisText')?.touched) {
+              @if (
+                analysisForm.get('analysisText')?.errors &&
+                analysisForm.get('analysisText')?.touched
+              ) {
                 <mat-error>{{ getErrorMessage('analysisText') }}</mat-error>
               }
             </mat-form-field>

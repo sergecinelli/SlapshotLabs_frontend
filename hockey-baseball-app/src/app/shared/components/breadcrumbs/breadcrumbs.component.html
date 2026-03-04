@@ -16,7 +16,7 @@
               </div>
             } @else if (item.isLive) {
               <!-- Live item with pulsing indicator and tournament name -->
-              <a 
+              <a
                 class="breadcrumbs-link"
                 (click)="navigateTo(item.path, $event)"
                 (keyup.enter)="navigateTo(item.path, $event)"
@@ -48,7 +48,7 @@
                 <h1 class="breadcrumbs-title">{{ item.label }}</h1>
               </div>
             } @else {
-              <a 
+              <a
                 class="breadcrumbs-link"
                 (click)="navigateTo(item.path, $event)"
                 (keyup.enter)="navigateTo(item.path, $event)"
@@ -70,4 +70,3 @@
     }
   </div>
 </nav>
-

@@ -11,7 +11,10 @@ import {
   TableAction,
 } from '../../shared/components/data-table/data-table.component';
 import { ButtonComponent } from '../../shared/components/buttons/button/button.component';
-import { TabsSliderComponent, TabItem } from '../../shared/components/tabs-slider/tabs-slider.component';
+import {
+  TabsSliderComponent,
+  TabItem,
+} from '../../shared/components/tabs-slider/tabs-slider.component';
 import { ComponentVisibilityByRoleDirective } from '../../shared/directives/component-visibility-by-role.directive';
 import { visibilityByRoleMap } from './analytics.role-map';
 import { PlayerAnalysisModal } from '../../shared/components/player-analysis-modal/player-analysis.modal';
@@ -21,7 +24,12 @@ import { GameAnalysisModal } from '../../shared/components/game-analysis-modal/g
 
 @Component({
   selector: 'app-analytics',
-  imports: [DataTableComponent, ButtonComponent, TabsSliderComponent, ComponentVisibilityByRoleDirective],
+  imports: [
+    DataTableComponent,
+    ButtonComponent,
+    TabsSliderComponent,
+    ComponentVisibilityByRoleDirective,
+  ],
   templateUrl: './analytics.page.html',
   styleUrl: './analytics.page.scss',
 })
@@ -76,7 +84,11 @@ export class AnalyticsPage implements OnInit {
     const defaultTab = this.route.snapshot.data['defaultTab'] as AnalysisType | undefined;
     const tabParam = this.route.snapshot.queryParams['tab'] as AnalysisType | undefined;
     const validTabs: AnalysisType[] = ['team', 'player', 'goalie', 'game'];
-    const tab = validTabs.includes(defaultTab!) ? defaultTab! : validTabs.includes(tabParam!) ? tabParam! : 'team';
+    const tab = validTabs.includes(defaultTab!)
+      ? defaultTab!
+      : validTabs.includes(tabParam!)
+        ? tabParam!
+        : 'team';
 
     this.showTabs.set(!defaultTab);
     this.activeTab.set(tab);

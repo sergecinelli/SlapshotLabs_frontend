@@ -8,10 +8,25 @@
 @let widthValue = width();
 @let downloadValue = download();
 
-<a matRipple [matRippleColor]="rippleColor" [matTooltip]="tooltipValue" [matTooltipShowDelay]="tooltipDelayValue" [matTooltipPosition]="tooltipPosValue"
-  download class="app-button" [class.have-content]="hasContentValue" [class.dev]="devValue" [class.rounded]="roundedValue" [class.fill]="widthValue !== 'auto'"
-  [ngStyle]="styles" [href]="downloadValue" (mousedown)="onMouseDown()" (mouseup)="onMouseUp()" (mouseenter)="onMouseEnter()"
-  (mouseleave)="onMouseLeave()">
+<a
+  matRipple
+  [matRippleColor]="rippleColor"
+  [matTooltip]="tooltipValue"
+  [matTooltipShowDelay]="tooltipDelayValue"
+  [matTooltipPosition]="tooltipPosValue"
+  download
+  class="app-button"
+  [class.have-content]="hasContentValue"
+  [class.dev]="devValue"
+  [class.rounded]="roundedValue"
+  [class.fill]="widthValue !== 'auto'"
+  [ngStyle]="styles"
+  [href]="downloadValue"
+  (mousedown)="onMouseDown()"
+  (mouseup)="onMouseUp()"
+  (mouseenter)="onMouseEnter()"
+  (mouseleave)="onMouseLeave()"
+>
   @if (materialIconValue) {
     @let materialSymbolClassValue = materialSymbolClass();
     @let materialIconClassValue = materialIconClass();
@@ -21,16 +36,29 @@
     @let counterColorValue = counterColor();
     @let hasDotValue = hasDot();
     <div class="icon-box material">
-      <span class="icon" [class]="isMatSymbolClassValue ? materialSymbolClassValue : materialIconClassValue" [class.fill]="isMatIconFillCurrent">
+      <span
+        class="icon"
+        [class]="isMatSymbolClassValue ? materialSymbolClassValue : materialIconClassValue"
+        [class.fill]="isMatIconFillCurrent"
+      >
         {{ materialIconValue }}
       </span>
       @if (counterValue > 0) {
-        <span class="counter" [style.background]="getColor(counterBgColorValue)" [style.color]="getColor(counterColorValue)">
+        <span
+          class="counter"
+          [style.background]="getColor(counterBgColorValue)"
+          [style.color]="getColor(counterColorValue)"
+        >
           {{ counterValue }}
         </span>
       }
       @if (hasDotValue) {
-        <span class="counter-icon" [class]="materialSymbolClassValue" [style.color]="getColor(counterBgColorValue)">circle</span>
+        <span
+          class="counter-icon"
+          [class]="materialSymbolClassValue"
+          [style.color]="getColor(counterBgColorValue)"
+          >circle</span
+        >
       }
     </div>
   }
@@ -42,6 +70,11 @@
   @if (devValue) {
     @let colorValue = color();
     @let bgValue = bg();
-    <span class="dev-text" [style.background]="getColor(colorValue)" [style.color]="getColor(bgValue)">DEMO</span>
+    <span
+      class="dev-text"
+      [style.background]="getColor(colorValue)"
+      [style.color]="getColor(bgValue)"
+      >DEMO</span
+    >
   }
 </a>

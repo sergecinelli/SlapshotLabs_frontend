@@ -34,7 +34,8 @@
           color="text_secondary"
           colorhover="text_primary"
           (clicked)="clearAllLines()"
-        >Clear</app-button-small>
+          >Clear</app-button-small
+        >
       </div>
     }
   </div>
@@ -121,12 +122,14 @@
 
     <!-- Net Image -->
     <div class="location-container">
-      @if ((goalieIdValue || teamIdValue) && (goalieNameValue || teamNameValue) && showGoalieNameValue) {
+      @if (
+        (goalieIdValue || teamIdValue) && (goalieNameValue || teamNameValue) && showGoalieNameValue
+      ) {
         <div class="goalie-info">
           <div class="goalie-photo-container">
             @if (teamLogoLoadedValue) {
               <img
-                [src]="getTeamLogoUrl()"
+                [appCachedSrc]="getTeamLogoUrl()"
                 [alt]="(teamNameValue || 'Team') + ' logo'"
                 class="goalie-logo"
                 (error)="onTeamLogoError()"
@@ -164,7 +167,6 @@
         }
       </div>
     </div>
-
   </div>
 
   <!-- Marker popover (fixed position, outside overflow containers) -->

@@ -359,11 +359,14 @@ export class GoalieService {
           const formattedDate = formatDateShort(game.date);
 
           // save_percents is already in percentage format (0-100), convert to decimal (0-1)
-          const savePercentage = game.save_percents !== null && game.save_percents !== undefined && !isNaN(game.save_percents)
-            ? game.save_percents / 100
-            : game.shots_against > 0
-              ? game.saves / game.shots_against
-              : 0;
+          const savePercentage =
+            game.save_percents !== null &&
+            game.save_percents !== undefined &&
+            !isNaN(game.save_percents)
+              ? game.save_percents / 100
+              : game.shots_against > 0
+                ? game.saves / game.shots_against
+                : 0;
 
           // Get base URL for logo endpoint
           const baseUrl = this.apiService.getBaseUrl();

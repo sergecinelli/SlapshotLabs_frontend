@@ -1,6 +1,6 @@
 import { Component, input, output, ViewChild } from '@angular/core';
 import { MatDatepicker } from '@angular/material/datepicker';
-import {  } from '@angular/common';
+import {} from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -80,4 +80,3 @@ export class WeekPaginationComponent {
     return end;
   }
 }
-

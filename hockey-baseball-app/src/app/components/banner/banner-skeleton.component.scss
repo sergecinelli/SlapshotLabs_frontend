@@ -29,7 +29,9 @@
   height: 119px;
   overflow: hidden;
   z-index: 10;
-  transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  transition:
+    opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+    visibility 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   opacity: 1;
   visibility: visible;
   pointer-events: auto;
@@ -38,7 +40,9 @@
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
-    transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    transition:
+      opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+      visibility 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
 
@@ -53,11 +57,11 @@
   padding: 0;
   margin: 0;
   box-sizing: border-box;
-  
+
   // Hide scrollbar
   scrollbar-width: none;
   -ms-overflow-style: none;
-  
+
   &::-webkit-scrollbar {
     display: none;
   }

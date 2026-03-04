@@ -42,12 +42,10 @@ export class BreadcrumbsComponent {
 
     this.updateBreadcrumbs();
 
-    this.router.events
-      .pipe(filter((event) => event instanceof NavigationEnd))
-      .subscribe(() => {
-        this.breadcrumbData.reset();
-        this.updateBreadcrumbs();
-      });
+    this.router.events.pipe(filter((event) => event instanceof NavigationEnd)).subscribe(() => {
+      this.breadcrumbData.reset();
+      this.updateBreadcrumbs();
+    });
   }
 
   private updateBreadcrumbs(): void {

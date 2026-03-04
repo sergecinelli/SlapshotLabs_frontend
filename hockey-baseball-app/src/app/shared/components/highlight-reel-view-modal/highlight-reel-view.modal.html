@@ -22,7 +22,7 @@
               frameborder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
               allowfullscreen
-              >
+            >
             </iframe>
           </div>
         } @else {
@@ -59,7 +59,7 @@
                     class="table-row cursor-pointer"
                     (click)="onRowClick(i)"
                     [class.selected-row]="i === selectedIndexValue"
-                    >
+                  >
                     <td class="table-cell">{{ h.event_name || '-' }}</td>
                     <td class="table-cell">{{ h.note || '-' }}</td>
                     <td class="table-cell">{{ formatDate(h.date, h.time) }}</td>
@@ -87,7 +87,7 @@
       [rounded]="false"
       [haveContent]="true"
       (clicked)="close()"
-      >
+    >
       Close
     </app-button>
   </mat-dialog-actions>

@@ -3,29 +3,68 @@
 @let gameResultsValue = gameResults();
 
 <div class="page-content" [appVisibilityMap]="visibilityByRoleMap">
-
   <!-- Content with padding -->
   <div>
     <!-- Quick Actions Row -->
     <div class="flex flex-wrap gap-4 justify-center dashboard-actions-row">
-      <app-button role-visibility-name="add-team-button" [bg]="'primary'" [bghover]="'primary_dark'" [color]="'white'" [colorhover]="'white'"
-        [materialIcon]="'group_add'" [haveContent]="true" (clicked)="openAddTeamModal()">
+      <app-button
+        role-visibility-name="add-team-button"
+        [bg]="'primary'"
+        [bghover]="'primary_dark'"
+        [color]="'white'"
+        [colorhover]="'white'"
+        [materialIcon]="'group_add'"
+        [haveContent]="true"
+        (clicked)="openAddTeamModal()"
+      >
         Add Team
       </app-button>
-      <app-button role-visibility-name="add-player-button" [bg]="'primary'" [bghover]="'primary_dark'" [color]="'white'" [colorhover]="'white'"
-        [materialIcon]="'person_add'" [haveContent]="true" (clicked)="openAddPlayerModal()">
+      <app-button
+        role-visibility-name="add-player-button"
+        [bg]="'primary'"
+        [bghover]="'primary_dark'"
+        [color]="'white'"
+        [colorhover]="'white'"
+        [materialIcon]="'person_add'"
+        [haveContent]="true"
+        (clicked)="openAddPlayerModal()"
+      >
         Add Player
       </app-button>
-      <app-button role-visibility-name="add-goalie-button" [bg]="'primary'" [bghover]="'primary_dark'" [color]="'white'" [colorhover]="'white'"
-        [materialIcon]="'shield'" [haveContent]="true" (clicked)="openAddGoalieModal()">
+      <app-button
+        role-visibility-name="add-goalie-button"
+        [bg]="'primary'"
+        [bghover]="'primary_dark'"
+        [color]="'white'"
+        [colorhover]="'white'"
+        [materialIcon]="'shield'"
+        [haveContent]="true"
+        (clicked)="openAddGoalieModal()"
+      >
         Add Goalie
       </app-button>
-      <app-button role-visibility-name="add-game-button" [bg]="'primary'" [bghover]="'primary_dark'" [color]="'white'" [colorhover]="'white'"
-        [materialIcon]="'sports_hockey'" [haveContent]="true" (clicked)="openAddGameModal()">
+      <app-button
+        role-visibility-name="add-game-button"
+        [bg]="'primary'"
+        [bghover]="'primary_dark'"
+        [color]="'white'"
+        [colorhover]="'white'"
+        [materialIcon]="'sports_hockey'"
+        [haveContent]="true"
+        (clicked)="openAddGameModal()"
+      >
         Add Game
       </app-button>
-      <app-button role-visibility-name="add-highlight-button" [bg]="'primary'" [bghover]="'primary_dark'" [color]="'white'" [colorhover]="'white'"
-        [materialIcon]="'video_library'" [haveContent]="true" (clicked)="createHighlightReel()">
+      <app-button
+        role-visibility-name="add-highlight-button"
+        [bg]="'primary'"
+        [bghover]="'primary_dark'"
+        [color]="'white'"
+        [colorhover]="'white'"
+        [materialIcon]="'video_library'"
+        [haveContent]="true"
+        (clicked)="createHighlightReel()"
+      >
         Create Highlight Reel
       </app-button>
     </div>

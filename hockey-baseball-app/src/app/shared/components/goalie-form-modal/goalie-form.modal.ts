@@ -39,8 +39,8 @@ export interface TeamOption {
     MatIconModule,
     MatDividerModule,
     ButtonComponent,
-    ButtonLoadingComponent
-],
+    ButtonLoadingComponent,
+  ],
   templateUrl: './goalie-form.modal.html',
   styleUrl: './goalie-form.modal.scss',
 })

@@ -38,7 +38,7 @@ export class AnalysisService {
       catchError((error) => {
         console.error('Failed to fetch analyses:', error);
         return throwError(() => error);
-      }),
+      })
     );
   }
 
@@ -49,7 +49,7 @@ export class AnalysisService {
       catchError((error) => {
         console.error('Failed to fetch analysis:', error);
         return throwError(() => error);
-      }),
+      })
     );
   }
 
@@ -58,23 +58,18 @@ export class AnalysisService {
       catchError((error) => {
         console.error('Failed to create analysis:', error);
         return throwError(() => error);
-      }),
+      })
     );
   }
 
-  updateAnalysis(
-    id: string,
-    data: Partial<AnalysisApiIn>,
-  ): Observable<{ success: boolean }> {
+  updateAnalysis(id: string, data: Partial<AnalysisApiIn>): Observable<{ success: boolean }> {
     const numericId = parseInt(id, 10);
-    return this.apiService
-      .patch<{ success: boolean }>(`/hockey/analysis/${numericId}`, data)
-      .pipe(
-        catchError((error) => {
-          console.error('Failed to update analysis:', error);
-          return throwError(() => error);
-        }),
-      );
+    return this.apiService.patch<{ success: boolean }>(`/hockey/analysis/${numericId}`, data).pipe(
+      catchError((error) => {
+        console.error('Failed to update analysis:', error);
+        return throwError(() => error);
+      })
+    );
   }
 
   deleteAnalysis(id: string): Observable<{ success: boolean }> {
@@ -83,7 +78,7 @@ export class AnalysisService {
       catchError((error) => {
         console.error('Failed to delete analysis:', error);
         return throwError(() => error);
-      }),
+      })
     );
   }
 

@@ -20,7 +20,11 @@ import {
 import { SeasonService } from '../../services/season.service';
 import { Season } from '../../shared/interfaces/season.interface';
 import { GameEventNameService, GameEventName } from '../../services/game-event-name.service';
-import { GameMetadataService, ShotTypeResponse, GamePeriodResponse } from '../../services/game-metadata.service';
+import {
+  GameMetadataService,
+  ShotTypeResponse,
+  GamePeriodResponse,
+} from '../../services/game-metadata.service';
 import {
   SprayChartTransformOptions,
   SprayChartUtilsService,
@@ -28,10 +32,12 @@ import {
 import { StorageKey } from '../../services/local-storage.service';
 import { BreadcrumbDataService } from '../../services/breadcrumb-data.service';
 import { ButtonComponent } from '../../shared/components/buttons/button/button.component';
+import { CachedSrcDirective } from '../../shared/directives/cached-src.directive';
 
 @Component({
   selector: 'app-goalie-profile',
   imports: [
+    CachedSrcDirective,
     DecimalPipe,
     MatButtonModule,
     MatIconModule,
@@ -159,7 +165,8 @@ export class GoalieProfilePage implements OnInit {
         });
 
         const transformOptions: SprayChartTransformOptions = {
-          defaultPlayerName: `${this.goalie?.firstName ?? ''} ${this.goalie?.lastName ?? ''}`.trim(),
+          defaultPlayerName:
+            `${this.goalie?.firstName ?? ''} ${this.goalie?.lastName ?? ''}`.trim(),
           defaultTeamName: this.goalie?.team,
           periodNames,
           formatTime: (time) => time,

@@ -1,5 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
-import {  } from '@angular/common';
+import {} from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { GoalieService } from '../../services/goalie.service';
@@ -21,10 +21,7 @@ import { BreadcrumbDataService } from '../../services/breadcrumb-data.service';
 
 @Component({
   selector: 'app-spray-chart',
-  imports: [
-    ShotLocationDisplayComponent,
-    ButtonComponent,
-  ],
+  imports: [ShotLocationDisplayComponent, ButtonComponent],
   templateUrl: './spray-chart.page.html',
   styleUrl: './spray-chart.page.scss',
 })

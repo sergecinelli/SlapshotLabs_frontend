@@ -2,6 +2,7 @@ import { Component, forwardRef, input, output, effect } from '@angular/core';
 
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { MatDividerModule } from '@angular/material/divider';
+import { CachedSrcDirective } from '../../directives/cached-src.directive';
 
 export interface PuckLocation {
   x: number; // 0-1000
@@ -16,7 +17,7 @@ export interface Team {
 
 @Component({
   selector: 'app-location-selector',
-  imports: [MatDividerModule],
+  imports: [CachedSrcDirective, MatDividerModule],
   templateUrl: './location-selector.component.html',
   styleUrl: './location-selector.component.scss',
   providers: [

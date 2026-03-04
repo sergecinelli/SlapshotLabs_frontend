@@ -66,7 +66,8 @@ export class SprayChartUtilsService {
         options?.defaultPlayerName;
       const description = event.note || event.goal_type || '';
       const periodLabel =
-        options?.periodNames?.get(event.period_id) ?? (event.period_id ? `Period ${event.period_id}` : undefined);
+        options?.periodNames?.get(event.period_id) ??
+        (event.period_id ? `Period ${event.period_id}` : undefined);
       const timeLabel = options?.formatTime ? options.formatTime(event.time) : event.time;
 
       results.push({
@@ -165,7 +166,8 @@ export class SprayChartUtilsService {
         options?.defaultPlayerName;
       const description = event.note || event.goal_type || '';
       const periodLabel =
-        options?.periodNames?.get(event.period_id) ?? (event.period_id ? `Period ${event.period_id}` : undefined);
+        options?.periodNames?.get(event.period_id) ??
+        (event.period_id ? `Period ${event.period_id}` : undefined);
       const timeLabel = options?.formatTime ? options.formatTime(event.time) : event.time;
 
       const iceLeftOffset = this.convertCoordinateToPercentage(event.ice_left_offset);
@@ -272,7 +274,8 @@ export class SprayChartUtilsService {
         options?.goalieNames?.get(event.goalie_id) ??
         options?.defaultPlayerName;
       const periodLabel =
-        options?.periodNames?.get(event.period_id) ?? (event.period_id ? `Period ${event.period_id}` : undefined);
+        options?.periodNames?.get(event.period_id) ??
+        (event.period_id ? `Period ${event.period_id}` : undefined);
       const timeLabel = options?.formatTime ? options.formatTime(event.time) : event.time;
 
       const iceLeftOffset = this.convertCoordinateToPercentage(event.ice_left_offset);

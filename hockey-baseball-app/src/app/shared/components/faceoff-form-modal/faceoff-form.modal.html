@@ -26,14 +26,14 @@
                   class="team-button"
                   [class.selected]="faceoffForm.get('winnerTeam')?.value === team.value"
                   (click)="selectWinnerTeam(team.value)"
-                  >
+                >
                   <div class="team-avatar">
                     @if (team.value) {
                       <img
-                        [src]="getTeamLogoUrl(team.value)"
+                        [appCachedSrc]="getTeamLogoUrl(team.value)"
                         [alt]="team.label"
                         class="team-logo-img"
-                        />
+                      />
                     }
                   </div>
                   <div class="team-name">{{ team.label }}</div>
@@ -42,9 +42,7 @@
             </div>
           }
           @if (faceoffForm.get('winnerTeam')?.errors && faceoffForm.get('winnerTeam')?.touched) {
-            <div
-              class="team-error"
-              >
+            <div class="team-error">
               {{ getErrorMessage('winnerTeam') }}
             </div>
           }
@@ -63,7 +61,7 @@
                   class="player-button"
                   [class.selected]="faceoffForm.get('winnerPlayer')?.value === player.value"
                   (click)="selectWinnerPlayer(player.value)"
-                  >
+                >
                   <div class="player-name">{{ player.label }}</div>
                 </button>
               }
@@ -71,10 +69,8 @@
           }
           @if (
             faceoffForm.get('winnerPlayer')?.errors && faceoffForm.get('winnerPlayer')?.touched
-            ) {
-            <div
-              class="player-error"
-              >
+          ) {
+            <div class="player-error">
               {{ getErrorMessage('winnerPlayer') }}
             </div>
           }
@@ -101,14 +97,14 @@
                   class="team-button"
                   [class.selected]="faceoffForm.get('loserTeam')?.value === team.value"
                   (click)="selectLoserTeam(team.value)"
-                  >
+                >
                   <div class="team-avatar">
                     @if (team.value) {
                       <img
-                        [src]="getTeamLogoUrl(team.value)"
+                        [appCachedSrc]="getTeamLogoUrl(team.value)"
                         [alt]="team.label"
                         class="team-logo-img"
-                        />
+                      />
                     }
                   </div>
                   <div class="team-name">{{ team.label }}</div>
@@ -117,9 +113,7 @@
             </div>
           }
           @if (faceoffForm.get('loserTeam')?.errors && faceoffForm.get('loserTeam')?.touched) {
-            <div
-              class="team-error"
-              >
+            <div class="team-error">
               {{ getErrorMessage('loserTeam') }}
             </div>
           }
@@ -138,18 +132,14 @@
                   class="player-button"
                   [class.selected]="faceoffForm.get('loserPlayer')?.value === player.value"
                   (click)="selectLoserPlayer(player.value)"
-                  >
+                >
                   <div class="player-name">{{ player.label }}</div>
                 </button>
               }
             </div>
           }
-          @if (
-            faceoffForm.get('loserPlayer')?.errors && faceoffForm.get('loserPlayer')?.touched
-            ) {
-            <div
-              class="player-error"
-              >
+          @if (faceoffForm.get('loserPlayer')?.errors && faceoffForm.get('loserPlayer')?.touched) {
+            <div class="player-error">
               {{ getErrorMessage('loserPlayer') }}
             </div>
           }
@@ -176,16 +166,14 @@
                   class="period-button"
                   [class.selected]="faceoffForm.get('period')?.value === period.value"
                   (click)="selectPeriod(period.value)"
-                  >
+                >
                   <div class="period-name">{{ period.label }}</div>
                 </button>
               }
             </div>
           }
           @if (faceoffForm.get('period')?.errors && faceoffForm.get('period')?.touched) {
-            <div
-              class="period-error"
-              >
+            <div class="period-error">
               {{ getErrorMessage('period') }}
             </div>
           }
@@ -216,14 +204,13 @@
             [floatLabel]="'always'"
             [hideRequiredMarker]="true"
             class="form-field full-width"
-            >
+          >
             <mat-label class="uppercase text-custom-secondary">YouTube Link</mat-label>
             <input matInput formControlName="youtubeLink" placeholder="YouTube link" />
             @if (
               faceoffForm.get('youtubeLink')?.errors && faceoffForm.get('youtubeLink')?.touched
-              ) {
-              <mat-error
-                >
+            ) {
+              <mat-error>
                 {{ getErrorMessage('youtubeLink') }}
               </mat-error>
             }
@@ -239,18 +226,13 @@
           [team2]="loserTeamData"
           [initialLocation]="puckLocation"
           (locationChange)="onLocationChange($event)"
-          >
+        >
         </app-location-selector>
 
         @if (
-          faceoffForm.get('location')?.errors?.['required'] &&
-          faceoffForm.get('location')?.touched
-          ) {
-          <div
-            class="location-error"
-            >
-            Please click on the rink to set the faceoff location
-          </div>
+          faceoffForm.get('location')?.errors?.['required'] && faceoffForm.get('location')?.touched
+        ) {
+          <div class="location-error">Please click on the rink to set the faceoff location</div>
         }
       </div>
     </form>
@@ -270,7 +252,7 @@
       [haveContent]="true"
       [isDisabled]="isSubmitting"
       (clicked)="onCancel()"
-      >
+    >
       Cancel
     </app-button>
     <app-button-loading
@@ -287,7 +269,7 @@
       [rounded]="false"
       [haveContent]="true"
       (clicked)="onSubmit()"
-      >
+    >
       {{ isEditMode ? 'Save Faceoff' : 'Add Faceoff' }}
     </app-button-loading>
   </mat-dialog-actions>

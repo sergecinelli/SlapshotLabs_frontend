@@ -20,6 +20,7 @@ import { PlayerService } from '../../../services/player.service';
 import { GameMetadataService } from '../../../services/game-metadata.service';
 import { GameEventService, FaceoffEventRequest } from '../../../services/game-event.service';
 import { environment } from '../../../../environments/environment';
+import { CachedSrcDirective } from '../../directives/cached-src.directive';
 
 export interface FaceoffFormData {
   winnerTeamLogo: string;
@@ -37,6 +38,7 @@ export interface FaceoffFormData {
 @Component({
   selector: 'app-faceoff-form-modal',
   imports: [
+    CachedSrcDirective,
     ReactiveFormsModule,
     MatDialogModule,
     ButtonComponent,
@@ -46,8 +48,8 @@ export interface FaceoffFormData {
     MatSelectModule,
     MatIconModule,
     MatDividerModule,
-    LocationSelectorComponent
-],
+    LocationSelectorComponent,
+  ],
   templateUrl: './faceoff-form.modal.html',
   styleUrl: './faceoff-form.modal.scss',
 })
@@ -200,7 +202,10 @@ export class FaceoffFormModal implements OnInit {
       loserTeam: ['', Validators.required],
       loserPlayer: ['', Validators.required],
       period: ['', Validators.required],
-      time: ['', [Validators.required, Validators.pattern(/^([0-9]{1,2}|1[0-9][0-9]|200):([0-5][0-9])$/)]],
+      time: [
+        '',
+        [Validators.required, Validators.pattern(/^([0-9]{1,2}|1[0-9][0-9]|200):([0-5][0-9])$/)],
+      ],
       location: [''],
       youtubeLink: [''],
     });

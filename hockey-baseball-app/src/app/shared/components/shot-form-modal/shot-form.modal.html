@@ -22,15 +22,13 @@
                 class="shot-type-button"
                 [class.selected]="shotForm.get('shotType')?.value === type.value"
                 (click)="selectShotType(type.value)"
-                >
+              >
                 <div class="type-name">{{ type.label }}</div>
               </button>
             }
           </div>
           @if (shotForm.get('shotType')?.errors && shotForm.get('shotType')?.touched) {
-            <div
-              class="error-message"
-              >
+            <div class="error-message">
               {{ getErrorMessage('shotType') }}
             </div>
           }
@@ -62,14 +60,14 @@
                   class="team-button"
                   [class.selected]="shotForm.get('scoringTeam')?.value === team.value"
                   (click)="selectTeam(team.value, 'scoringTeam')"
-                  >
+                >
                   <div class="team-avatar">
                     @if (team.value) {
                       <img
-                        [src]="getTeamLogoUrl(team.value)"
+                        [appCachedSrc]="getTeamLogoUrl(team.value)"
                         [alt]="team.label"
                         class="team-logo-img"
-                        />
+                      />
                     }
                   </div>
                   <div class="team-name">{{ team.label }}</div>
@@ -77,9 +75,7 @@
               }
             </div>
             @if (shotForm.get('scoringTeam')?.errors && shotForm.get('scoringTeam')?.touched) {
-              <div
-                class="error-message"
-                >
+              <div class="error-message">
                 {{ getErrorMessage('scoringTeam') }}
               </div>
             }
@@ -95,7 +91,7 @@
                   class="player-button"
                   [class.selected]="shotForm.get('scoringPlayer')?.value === player.value"
                   (click)="selectPlayer(player.value, 'scoringPlayer')"
-                  >
+                >
                   <div class="player-name">
                     @if (player.number !== undefined && player.number !== null) {
                       <span class="player-number">{{ player.number }}</span>
@@ -106,9 +102,7 @@
               }
             </div>
             @if (shotForm.get('scoringPlayer')?.errors && shotForm.get('scoringPlayer')?.touched) {
-              <div
-                class="error-message"
-                >
+              <div class="error-message">
                 {{ getErrorMessage('scoringPlayer') }}
               </div>
             }
@@ -124,7 +118,7 @@
                   class="player-button"
                   [class.selected]="shotForm.get('assistPlayer')?.value === player.value"
                   (click)="selectPlayer(player.value, 'assistPlayer')"
-                  >
+                >
                   <div class="player-name">
                     @if (player.number !== undefined && player.number !== null) {
                       <span class="player-number">{{ player.number }}</span>
@@ -146,7 +140,7 @@
                   class="goalie-button"
                   [class.selected]="shotForm.get('goalieScored')?.value === goalie.value"
                   (click)="selectGoalie(goalie.value, 'goalieScored')"
-                  >
+                >
                   <div class="goalie-name">
                     @if (goalie.number) {
                       <span class="player-number">{{ goalie.number }}</span>
@@ -157,9 +151,7 @@
               }
             </div>
             @if (shotForm.get('goalieScored')?.errors && shotForm.get('goalieScored')?.touched) {
-              <div
-                class="error-message"
-                >
+              <div class="error-message">
                 {{ getErrorMessage('goalieScored') }}
               </div>
             }
@@ -172,7 +164,7 @@
                 class="goal-type-button"
                 [class.selected]="shotForm.get('goalType')?.value === 'Short Handed'"
                 (click)="selectGoalType('Short Handed')"
-                >
+              >
                 <div class="goal-type-name">Short Handed</div>
               </button>
               <button
@@ -180,7 +172,7 @@
                 class="goal-type-button"
                 [class.selected]="shotForm.get('goalType')?.value === 'Even Strength'"
                 (click)="selectGoalType('Even Strength')"
-                >
+              >
                 <div class="goal-type-name">Even Strength</div>
               </button>
               <button
@@ -188,7 +180,7 @@
                 class="goal-type-button"
                 [class.selected]="shotForm.get('goalType')?.value === 'Power Play'"
                 (click)="selectGoalType('Power Play')"
-                >
+              >
                 <div class="goal-type-name">Power Play</div>
               </button>
             </div>
@@ -214,14 +206,14 @@
                   class="team-button"
                   [class.selected]="shotForm.get('shootingTeam')?.value === team.value"
                   (click)="selectTeam(team.value, 'shootingTeam')"
-                  >
+                >
                   <div class="team-avatar">
                     @if (team.value) {
                       <img
-                        [src]="getTeamLogoUrl(team.value)"
+                        [appCachedSrc]="getTeamLogoUrl(team.value)"
                         [alt]="team.label"
                         class="team-logo-img"
-                        />
+                      />
                     }
                   </div>
                   <div class="team-name">{{ team.label }}</div>
@@ -229,9 +221,7 @@
               }
             </div>
             @if (shotForm.get('shootingTeam')?.errors && shotForm.get('shootingTeam')?.touched) {
-              <div
-                class="error-message"
-                >
+              <div class="error-message">
                 {{ getErrorMessage('shootingTeam') }}
               </div>
             }
@@ -247,7 +237,7 @@
                   class="player-button"
                   [class.selected]="shotForm.get('shootingPlayer')?.value === player.value"
                   (click)="selectPlayer(player.value, 'shootingPlayer')"
-                  >
+                >
                   <div class="player-name">
                     @if (player.number !== undefined && player.number !== null) {
                       <span class="player-number">{{ player.number }}</span>
@@ -259,10 +249,8 @@
             </div>
             @if (
               shotForm.get('shootingPlayer')?.errors && shotForm.get('shootingPlayer')?.touched
-              ) {
-              <div
-                class="error-message"
-                >
+            ) {
+              <div class="error-message">
                 {{ getErrorMessage('shootingPlayer') }}
               </div>
             }
@@ -279,7 +267,7 @@
                     class="player-button"
                     [class.selected]="shotForm.get('blockingPlayer')?.value === player.value"
                     (click)="selectPlayer(player.value, 'blockingPlayer')"
-                    >
+                  >
                     <div class="player-name">
                       @if (player.number) {
                         <span class="player-number">{{ player.number }}</span>
@@ -300,7 +288,7 @@
                   class="goalie-button"
                   [class.selected]="shotForm.get('goalieInNet')?.value === goalie.value"
                   (click)="selectGoalie(goalie.value, 'goalieInNet')"
-                  >
+                >
                   <div class="goalie-name">
                     @if (goalie.number) {
                       <span class="player-number">{{ goalie.number }}</span>
@@ -311,9 +299,7 @@
               }
             </div>
             @if (shotForm.get('goalieInNet')?.errors && shotForm.get('goalieInNet')?.touched) {
-              <div
-                class="error-message"
-                >
+              <div class="error-message">
                 {{ getErrorMessage('goalieInNet') }}
               </div>
             }
@@ -333,7 +319,7 @@
               [floatLabel]="'always'"
               [hideRequiredMarker]="true"
               class="form-field full-width"
-              >
+            >
               <mat-label class="uppercase text-custom-secondary">Note</mat-label>
               <textarea
                 matInput
@@ -344,9 +330,8 @@
               @if (
                 shotForm.get('scoringChanceNote')?.errors &&
                 shotForm.get('scoringChanceNote')?.touched
-                ) {
-                <mat-error
-                  >
+              ) {
+                <mat-error>
                   {{ getErrorMessage('scoringChanceNote') }}
                 </mat-error>
               }
@@ -371,15 +356,13 @@
                 class="period-button"
                 [class.selected]="shotForm.get('period')?.value === period.value"
                 (click)="selectPeriod(period.value)"
-                >
+              >
                 <div class="period-name">{{ period.label }}</div>
               </button>
             }
           </div>
           @if (shotForm.get('period')?.errors && shotForm.get('period')?.touched) {
-            <div
-              class="period-error"
-              >
+            <div class="period-error">
               {{ getErrorMessage('period') }}
             </div>
           }
@@ -420,7 +403,7 @@
             [floatLabel]="'always'"
             [hideRequiredMarker]="true"
             class="form-field full-width"
-            >
+          >
             <mat-label class="uppercase text-custom-secondary">YouTube Link</mat-label>
             <input matInput formControlName="youtubeLink" placeholder="YouTube link" />
           </mat-form-field>
@@ -442,7 +425,7 @@
       [rounded]="false"
       [haveContent]="true"
       (clicked)="onCancel()"
-      >
+    >
       Cancel
     </app-button>
     <app-button-loading
@@ -459,7 +442,7 @@
       [rounded]="false"
       [haveContent]="true"
       (clicked)="onSubmit()"
-      >
+    >
       {{ isEditMode ? 'Save Shot' : 'Add Shot' }}
     </app-button-loading>
   </mat-dialog-actions>

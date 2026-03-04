@@ -1,7 +1,13 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable, throwError, forkJoin } from 'rxjs';
 import { map, catchError, switchMap, shareReplay } from 'rxjs/operators';
-import { Team, TeamTableData, TeamApiOut, TeamSeasonOut, TeamSeasonStat } from '../shared/interfaces/team.interface';
+import {
+  Team,
+  TeamTableData,
+  TeamApiOut,
+  TeamSeasonOut,
+  TeamSeasonStat,
+} from '../shared/interfaces/team.interface';
 import { ApiService } from './api.service';
 import { TeamDataMapperService } from './team-data-mapper.service';
 import { SeasonService } from './season.service';

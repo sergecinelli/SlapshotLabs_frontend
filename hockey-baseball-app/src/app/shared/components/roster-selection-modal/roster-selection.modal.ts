@@ -1,5 +1,5 @@
-import { Component, OnInit, inject, signal, computed  } from '@angular/core';
-import {  } from '@angular/common';
+import { Component, OnInit, inject, signal, computed } from '@angular/core';
+import {} from '@angular/common';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { ButtonComponent } from '../buttons/button/button.component';
 import { ButtonLoadingComponent } from '../buttons/button-loading/button-loading.component';

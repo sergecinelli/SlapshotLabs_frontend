@@ -18,7 +18,7 @@
             [floatLabel]="'always'"
             [hideRequiredMarker]="true"
             class="form-field full-width"
-            >
+          >
             <mat-label class="uppercase text-custom-secondary">Video Name</mat-label>
             <input matInput formControlName="name" placeholder="Enter video name" />
             @if (name?.invalid && name?.touched) {
@@ -34,7 +34,7 @@
             [floatLabel]="'always'"
             [hideRequiredMarker]="true"
             class="form-field full-width"
-            >
+          >
             <mat-label class="uppercase text-custom-secondary">YouTube Link</mat-label>
             <input matInput formControlName="youtube_link" placeholder="Enter YouTube link" />
             @if (youtube_link?.invalid && youtube_link?.touched) {
@@ -50,7 +50,7 @@
             [floatLabel]="'always'"
             [hideRequiredMarker]="true"
             class="form-field full-width"
-            >
+          >
             <mat-label class="uppercase text-custom-secondary">Description</mat-label>
             <textarea
               matInput
@@ -82,7 +82,7 @@
       [rounded]="false"
       [haveContent]="true"
       (clicked)="onCancel()"
-      >
+    >
       Cancel
     </app-button>
     <app-button-loading
@@ -99,7 +99,7 @@
       [rounded]="false"
       [haveContent]="true"
       (clicked)="onSubmit()"
-      >
+    >
       {{ isEditMode ? 'Update Video' : 'Add Video' }}
     </app-button-loading>
   </mat-dialog-actions>

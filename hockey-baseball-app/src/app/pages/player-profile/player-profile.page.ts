@@ -21,7 +21,11 @@ import {
 import { SeasonService } from '../../services/season.service';
 import { Season } from '../../shared/interfaces/season.interface';
 import { GameEventNameService, GameEventName } from '../../services/game-event-name.service';
-import { GameMetadataService, ShotTypeResponse, GamePeriodResponse } from '../../services/game-metadata.service';
+import {
+  GameMetadataService,
+  ShotTypeResponse,
+  GamePeriodResponse,
+} from '../../services/game-metadata.service';
 import {
   SprayChartTransformOptions,
   SprayChartUtilsService,
@@ -31,10 +35,12 @@ import { ButtonComponent } from '../../shared/components/buttons/button/button.c
 import { visibilityByRoleMap } from './player-profile.role-map';
 import { StorageKey } from '../../services/local-storage.service';
 import { BreadcrumbDataService } from '../../services/breadcrumb-data.service';
+import { CachedSrcDirective } from '../../shared/directives/cached-src.directive';
 
 @Component({
   selector: 'app-player-profile',
   imports: [
+    CachedSrcDirective,
     DecimalPipe,
     MatIconModule,
     MatCardModule,
@@ -169,7 +175,8 @@ export class PlayerProfilePage implements OnInit {
         });
 
         const transformOptions: SprayChartTransformOptions = {
-          defaultPlayerName: `${this.player?.firstName ?? ''} ${this.player?.lastName ?? ''}`.trim(),
+          defaultPlayerName:
+            `${this.player?.firstName ?? ''} ${this.player?.lastName ?? ''}`.trim(),
           defaultTeamName: this.player?.team,
           periodNames,
           formatTime: (time) => time,

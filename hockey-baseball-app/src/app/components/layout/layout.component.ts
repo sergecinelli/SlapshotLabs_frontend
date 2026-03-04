@@ -1,6 +1,6 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { RouterOutlet, Router } from '@angular/router';
-import {  } from '@angular/common';
+import {} from '@angular/common';
 import { MatRippleModule } from '@angular/material/core';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { NavigationService, NavigationItem } from '../../services/navigation.service';
@@ -17,7 +17,14 @@ import { BreadcrumbsComponent } from '../../shared/components/breadcrumbs/breadc
 
 @Component({
   selector: 'app-layout',
-  imports: [RouterOutlet, BannerComponent, ButtonLoadingComponent, MatRippleModule, MatTooltipModule, BreadcrumbsComponent],
+  imports: [
+    RouterOutlet,
+    BannerComponent,
+    ButtonLoadingComponent,
+    MatRippleModule,
+    MatTooltipModule,
+    BreadcrumbsComponent,
+  ],
   templateUrl: './layout.component.html',
   styleUrl: './layout.component.scss',
   host: { '(window:keydown)': 'handleKeyDown($event)' },
@@ -81,15 +88,14 @@ export class LayoutComponent implements OnInit {
   }
 
   protected toggleCollapse(): void {
-    this.isCollapsed.update(value => !value);
+    this.isCollapsed.update((value) => !value);
   }
 
   handleKeyDown(event: KeyboardEvent): void {
     const target = event.target as HTMLElement;
-    const isInputElement = target.tagName === 'INPUT' || 
-                           target.tagName === 'TEXTAREA' || 
-                           target.isContentEditable;
-    
+    const isInputElement =
+      target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable;
+
     // Skip keyboard shortcuts if typing in input/textarea
     if (isInputElement) {
       return;
@@ -189,7 +195,7 @@ export class LayoutComponent implements OnInit {
 
   protected isItemActive(item: NavigationItem): boolean {
     const currentPath = this.currentPath();
-    
+
     // If item has children, check if any child is active first (same logic as Account)
     if (item.children && item.children.length > 0) {
       // Check if any child path matches current path or current path starts with child path + '/'
@@ -200,11 +206,11 @@ export class LayoutComponent implements OnInit {
         if (currentPath.startsWith(child.path + '/')) return true;
         return false;
       });
-      
+
       // If any child is active, parent is NOT active
       if (hasActiveChild) return false;
     }
-    
+
     // Item is active only if path exactly matches and no child is active
     return currentPath === item.path;
   }

@@ -21,12 +21,7 @@ const buttons = [
 ];
 
 @NgModule({
-  imports: [
-    MatRippleModule,
-    RouterLink,
-    MatTooltipModule,
-    ...buttons,
-  ],
+  imports: [MatRippleModule, RouterLink, MatTooltipModule, ...buttons],
   exports: buttons,
 })
-export class ButtonsModule { }
+export class ButtonsModule {}

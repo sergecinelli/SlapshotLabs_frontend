@@ -486,6 +486,27 @@ mat-error {
 }
 
 // Player filter dropdown panel (live dashboard)
+@keyframes cached-img-shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+img.cached-img-loading {
+  background: linear-gradient(
+    90deg,
+    var(--border-light, #f0f1f3) 0%,
+    var(--gray-tone2, #e5e7eb) 50%,
+    var(--border-light, #f0f1f3) 100%
+  );
+  background-size: 2000px 100%;
+  animation: cached-img-shimmer 1.5s infinite;
+  color: transparent;
+}
+
 .player-filter-panel.mat-mdc-select-panel {
   min-width: 280px !important;
   max-height: 360px !important;

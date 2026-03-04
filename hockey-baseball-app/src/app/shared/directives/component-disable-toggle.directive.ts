@@ -24,7 +24,11 @@ export class ComponentDisableToggleDirective {
     }
 
     if (this.isDisabled) {
-      this.renderer.setStyle(this.elementRef.nativeElement, 'opacity', String(this.disableOpacity()));
+      this.renderer.setStyle(
+        this.elementRef.nativeElement,
+        'opacity',
+        String(this.disableOpacity())
+      );
       this.renderer.setStyle(this.elementRef.nativeElement, 'user-select', 'none');
       this.renderer.setStyle(this.elementRef.nativeElement, 'pointer-events', 'none');
       this.renderer.setStyle(this.elementRef.nativeElement, 'cursor', 'not-allowed');

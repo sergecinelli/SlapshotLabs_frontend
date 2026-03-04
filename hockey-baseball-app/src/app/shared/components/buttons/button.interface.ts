@@ -22,8 +22,7 @@ export interface ButtonStyleParams {
 
 export type ButtonMaterialIconsClass =
   | 'material-icons-sharp'
-  | 'material-icons-round' | 'material-icons-outlined'
+  | 'material-icons-round'
+  | 'material-icons-outlined'
   | 'material-icons';
-export type ButtonMaterialSymbolsClass =
-  | 'material-symbols-outlined'
-  | 'material-symbols-rounded';
+export type ButtonMaterialSymbolsClass = 'material-symbols-outlined' | 'material-symbols-rounded';

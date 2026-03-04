@@ -4,7 +4,6 @@
 @let schedulesValue = schedules();
 
 <div class="page-content" [appVisibilityMap]="visibilityByRoleMap">
-
   <!-- Header with Month Pagination and Add Button -->
   <div class="schedule-header">
     <div class="schedule-header-left"></div>
@@ -15,7 +14,7 @@
       [isLastWeek]="false"
       (weekChange)="onMonthChange($event)"
     />
-    <div class="add-schedule-button-wrapper" >
+    <div class="add-schedule-button-wrapper">
       <app-button
         role-visibility-name="add-schedule-button"
         [bg]="'primary'"

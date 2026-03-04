@@ -1,5 +1,5 @@
-import { Component  } from '@angular/core';
-import {  } from '@angular/common';
+import { Component } from '@angular/core';
+import {} from '@angular/common';
 
 @Component({
   selector: 'app-game-card-skeleton',
@@ -11,4 +11,3 @@ export class GameCardSkeletonComponent {
   skeletonCountUpcoming = 2;
   skeletonCountGameResults = 6;
 }
-

@@ -1,4 +1,4 @@
-import { Component  } from '@angular/core';
+import { Component } from '@angular/core';
 import { NgStyle } from '@angular/common';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ButtonBaseClass } from '../button-base.class';
@@ -21,4 +21,3 @@ export class ButtonSmallComponent extends ButtonBaseClass {
     }
   }
 }
-

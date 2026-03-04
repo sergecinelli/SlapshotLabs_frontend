@@ -17,6 +17,7 @@ import {
   ShotLocation,
 } from '../shot-location-selector/shot-location-selector.component';
 import { Team } from '../location-selector/location-selector.component';
+import { CachedSrcDirective } from '../../directives/cached-src.directive';
 
 export interface ShotFormData {
   shotType: 'save' | 'goal' | 'missed' | 'blocked';
@@ -41,6 +42,7 @@ export interface ShotFormData {
 @Component({
   selector: 'app-shot-form-modal',
   imports: [
+    CachedSrcDirective,
     ReactiveFormsModule,
     MatDialogModule,
     ButtonComponent,
@@ -51,8 +53,8 @@ export interface ShotFormData {
     MatIconModule,
     MatDividerModule,
     MatCheckboxModule,
-    ShotLocationSelectorComponent
-],
+    ShotLocationSelectorComponent,
+  ],
   templateUrl: './shot-form.modal.html',
   styleUrl: './shot-form.modal.scss',
 })
@@ -160,12 +162,12 @@ export class ShotFormModal implements OnInit {
           },
           netLocation:
             existing.netTopOffset !== undefined &&
-              existing.netLeftOffset !== undefined &&
-              !(existing.netTopOffset === 0 && existing.netLeftOffset === 0)
+            existing.netLeftOffset !== undefined &&
+            !(existing.netTopOffset === 0 && existing.netLeftOffset === 0)
               ? {
-                x: existing.netLeftOffset,
-                y: existing.netTopOffset,
-              }
+                  x: existing.netLeftOffset,
+                  y: existing.netTopOffset,
+                }
               : undefined,
         };
       }
@@ -219,7 +221,10 @@ export class ShotFormModal implements OnInit {
       shotType: [null as number | null, Validators.required],
       isScoringChance: [false],
       period: [null as number | null, Validators.required],
-      time: ['', [Validators.required, Validators.pattern(/^([0-9]{1,2}|1[0-9][0-9]|200):([0-5][0-9])$/)]],
+      time: [
+        '',
+        [Validators.required, Validators.pattern(/^([0-9]{1,2}|1[0-9][0-9]|200):([0-5][0-9])$/)],
+      ],
       youtubeLink: [''],
       // Goal fields
       scoringTeam: [null as number | null],
@@ -470,7 +475,11 @@ export class ShotFormModal implements OnInit {
         event_name_id: this.shotEventId,
         team_id: this.isGoal ? formValue.scoringTeam : formValue.shootingTeam,
         player_id: this.isGoal ? formValue.scoringPlayer : formValue.shootingPlayer,
-        player_2_id: this.isGoal ? formValue.assistPlayer : (this.isBlocked ? formValue.blockingPlayer : undefined),
+        player_2_id: this.isGoal
+          ? formValue.assistPlayer
+          : this.isBlocked
+            ? formValue.blockingPlayer
+            : undefined,
         shot_type_id: formValue.shotType,
         goalie_id: goalieId,
         period_id: formValue.period,

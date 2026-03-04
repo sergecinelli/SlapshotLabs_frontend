@@ -1,24 +1,33 @@
-import { Component, OnInit, signal, inject  } from '@angular/core';
-import {  } from '@angular/common';
+import { Component, OnInit, signal, inject } from '@angular/core';
+import {} from '@angular/common';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Router } from '@angular/router';
 import { TeamService } from '../../services/team.service';
 import { Team } from '../../shared/interfaces/team.interface';
-import { TeamFormModal, TeamFormModalData } from '../../shared/components/team-form-modal/team-form.modal';
+import {
+  TeamFormModal,
+  TeamFormModalData,
+} from '../../shared/components/team-form-modal/team-form.modal';
 import { TeamOptionsService } from '../../services/team-options.service';
 import { ComponentVisibilityByRoleDirective } from '../../shared/directives/component-visibility-by-role.directive';
 import { ButtonComponent } from '../../shared/components/buttons/button/button.component';
 import { ButtonRouteComponent } from '../../shared/components/buttons/button-route/button-route.component';
 import { visibilityByRoleMap } from './teams.role-map';
 import { forkJoin } from 'rxjs';
-import { DataTableComponent, TableColumn, TableAction } from '../../shared/components/data-table/data-table.component';
+import {
+  DataTableComponent,
+  TableColumn,
+  TableAction,
+} from '../../shared/components/data-table/data-table.component';
 import { LocalStorageService, StorageKey } from '../../services/local-storage.service';
+import { CachedSrcDirective } from '../../shared/directives/cached-src.directive';
 
 @Component({
   selector: 'app-teams',
   imports: [
+    CachedSrcDirective,
     MatDialogModule,
     MatIconModule,
     MatTooltipModule,
@@ -62,9 +71,29 @@ export class TeamsPage implements OnInit {
     { label: 'Schedule', action: 'schedules', variant: 'secondary', icon: 'scoreboard' },
     { label: 'Players', action: 'players', variant: 'secondary', icon: 'people' },
     { label: 'Goalies', action: 'goalies', variant: 'secondary', icon: 'shield' },
-    { label: 'View', action: 'view-profile', variant: 'primary', icon: 'visibility', iconOnly: true },
-    { label: 'Edit', action: 'edit', variant: 'secondary', icon: 'stylus', iconOnly: true, roleVisibilityName: 'edit-action' },
-    { label: 'Delete', action: 'delete', variant: 'danger', icon: 'delete', iconOnly: true, roleVisibilityName: 'delete-action' },
+    {
+      label: 'View',
+      action: 'view-profile',
+      variant: 'primary',
+      icon: 'visibility',
+      iconOnly: true,
+    },
+    {
+      label: 'Edit',
+      action: 'edit',
+      variant: 'secondary',
+      icon: 'stylus',
+      iconOnly: true,
+      roleVisibilityName: 'edit-action',
+    },
+    {
+      label: 'Delete',
+      action: 'delete',
+      variant: 'danger',
+      icon: 'delete',
+      iconOnly: true,
+      roleVisibilityName: 'delete-action',
+    },
   ];
 
   ngOnInit(): void {

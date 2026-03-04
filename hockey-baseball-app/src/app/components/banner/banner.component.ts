@@ -1,80 +1,109 @@
-import { Component, inject, OnInit, OnDestroy, signal, ElementRef, AfterViewInit  } from '@angular/core';
+import {
+  Component,
+  inject,
+  OnInit,
+  OnDestroy,
+  signal,
+  ElementRef,
+  AfterViewInit,
+} from '@angular/core';
 import { trigger, transition, style, animate, query, stagger } from '@angular/animations';
 import { Router, RouterLink } from '@angular/router';
 import { environment } from '../../../environments/environment';
 import { BannerService, GameBannerItem } from '../../services/banner.service';
 import { Subscription } from 'rxjs';
 import { BannerSkeletonComponent } from './banner-skeleton.component';
+import { CachedSrcDirective } from '../../shared/directives/cached-src.directive';
 
 @Component({
   selector: 'app-live-banner',
-  imports: [BannerSkeletonComponent, RouterLink],
+  imports: [CachedSrcDirective, BannerSkeletonComponent, RouterLink],
   templateUrl: './banner.component.html',
   styleUrl: './banner.component.scss',
   animations: [
     trigger('listAnimation', [
       transition('* <=> *', [
-        query(':enter', [
-          style({ 
-            opacity: 0, 
-            transform: 'translateY(-20px)', 
-            width: '0px', 
-            minWidth: '0px',
-            marginRight: '0px', 
-            marginLeft: '0px',
-            paddingLeft: '0px', 
-            paddingRight: '0px', 
-            borderLeftWidth: '0px',
-            borderRightWidth: '0px',
-            overflow: 'hidden'
-          }),
-          stagger(60, [
-            // Smooth expansion without inertia
-            animate('350ms cubic-bezier(0.4, 0, 0.2, 1)', style({ 
-              width: '*', 
+        query(
+          ':enter',
+          [
+            style({
+              opacity: 0,
+              transform: 'translateY(-20px)',
+              width: '0px',
+              minWidth: '0px',
+              marginRight: '0px',
+              marginLeft: '0px',
+              paddingLeft: '0px',
+              paddingRight: '0px',
+              borderLeftWidth: '0px',
+              borderRightWidth: '0px',
+              overflow: 'hidden',
+            }),
+            stagger(60, [
+              // Smooth expansion without inertia
+              animate(
+                '350ms cubic-bezier(0.4, 0, 0.2, 1)',
+                style({
+                  width: '*',
+                  minWidth: '*',
+                  marginRight: '*',
+                  marginLeft: '*',
+                  paddingLeft: '*',
+                  paddingRight: '*',
+                  borderLeftWidth: '*',
+                  borderRightWidth: '*',
+                })
+              ),
+              // Appearance from top to bottom strictly and smoothly
+              animate(
+                '300ms cubic-bezier(0.4, 0, 0.2, 1)',
+                style({
+                  opacity: 1,
+                  transform: 'translateY(0)',
+                })
+              ),
+            ]),
+          ],
+          { optional: true }
+        ),
+        query(
+          ':leave',
+          [
+            style({
+              opacity: 1,
+              transform: 'translateY(0)',
+              width: '*',
               minWidth: '*',
               marginRight: '*',
-              marginLeft: '*',
-              paddingLeft: '*',
-              paddingRight: '*',
-              borderLeftWidth: '*',
-              borderRightWidth: '*'
-            })),
-            // Appearance from top to bottom strictly and smoothly
-            animate('300ms cubic-bezier(0.4, 0, 0.2, 1)', style({ 
-              opacity: 1, 
-              transform: 'translateY(0)' 
-            }))
-          ])
-        ], { optional: true }),
-        query(':leave', [
-          style({ 
-            opacity: 1, 
-            transform: 'translateY(0)', 
-            width: '*', 
-            minWidth: '*', 
-            marginRight: '*',
-            overflow: 'hidden' 
-          }),
-          // Card slightly "jumps" before falling down
-          animate('300ms cubic-bezier(0.6, -0.28, 0.735, 0.045)', style({ 
-            opacity: 0, 
-            transform: 'translateY(40px)' 
-          })),
-          // Collapsing space with inertia effect
-          animate('400ms cubic-bezier(0.4, 0, 0.2, 1)', style({ 
-            width: '0px', 
-            minWidth: '0px',
-            marginRight: '0px', 
-            marginLeft: '0px',
-            paddingLeft: '0px', 
-            paddingRight: '0px', 
-            borderLeftWidth: '0px',
-            borderRightWidth: '0px'
-          }))
-        ], { optional: true })
-      ])
-    ])
+              overflow: 'hidden',
+            }),
+            // Card slightly "jumps" before falling down
+            animate(
+              '300ms cubic-bezier(0.6, -0.28, 0.735, 0.045)',
+              style({
+                opacity: 0,
+                transform: 'translateY(40px)',
+              })
+            ),
+            // Collapsing space with inertia effect
+            animate(
+              '400ms cubic-bezier(0.4, 0, 0.2, 1)',
+              style({
+                width: '0px',
+                minWidth: '0px',
+                marginRight: '0px',
+                marginLeft: '0px',
+                paddingLeft: '0px',
+                paddingRight: '0px',
+                borderLeftWidth: '0px',
+                borderRightWidth: '0px',
+              })
+            ),
+          ],
+          { optional: true }
+        ),
+      ]),
+    ]),
   ],
 })
 export class BannerComponent implements OnInit, OnDestroy, AfterViewInit {
@@ -87,7 +116,7 @@ export class BannerComponent implements OnInit, OnDestroy, AfterViewInit {
   error = signal<string | null>(null);
   isScrolled = signal<boolean>(false);
   showSkeleton = signal<boolean>(true);
-  
+
   private subscriptions = new Subscription();
   private scrollListener?: () => void;
   private scrollElement?: HTMLElement;
@@ -98,9 +127,16 @@ export class BannerComponent implements OnInit, OnDestroy, AfterViewInit {
       this.bannerService.bannerItems$.subscribe((items) => {
         const currentItems = this.bannerItems();
         // Only update if data actually changed to avoid unnecessary re-renders/animations
-        const isIdentical = currentItems.length === items.length && 
-                           currentItems.every((item, index) => item.id === items[index].id && item.status === items[index].status && item.home_goals === items[index].home_goals && item.away_goals === items[index].away_goals);
-        
+        const isIdentical =
+          currentItems.length === items.length &&
+          currentItems.every(
+            (item, index) =>
+              item.id === items[index].id &&
+              item.status === items[index].status &&
+              item.home_goals === items[index].home_goals &&
+              item.away_goals === items[index].away_goals
+          );
+
         if (!isIdentical) {
           this.bannerItems.set(items);
         }
@@ -110,7 +146,7 @@ export class BannerComponent implements OnInit, OnDestroy, AfterViewInit {
     this.subscriptions.add(
       this.bannerService.loading$.subscribe((isLoading) => {
         this.loading.set(isLoading);
-        
+
         if (!isLoading) {
           // Remove skeleton from DOM after fade-out animation completes (0.5s)
           if (this.showSkeleton()) {

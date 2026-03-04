@@ -1,5 +1,5 @@
 import { Component, OnInit, signal, inject } from '@angular/core';
-import {  } from '@angular/common';
+import {} from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -79,7 +79,6 @@ export class SchedulePage implements OnInit {
 
   // Store raw game data for edit mode
   rawGames = new Map<string, DashboardGame>();
-
 
   ngOnInit(): void {
     this.loadInitialData();
@@ -188,12 +187,8 @@ export class SchedulePage implements OnInit {
             return [r.id, arena ? `${arenaName} – ${rinkName}` : rinkName];
           })
         );
-        const arenaNameMap = new Map(
-          this.arenas.map((a) => [a.id, a.name || ''])
-        );
-        const rinkNameMap = new Map(
-          this.rinks.map((r) => [r.id, r.name || ''])
-        );
+        const arenaNameMap = new Map(this.arenas.map((a) => [a.id, a.name || '']));
+        const rinkNameMap = new Map(this.rinks.map((r) => [r.id, r.name || '']));
         const arenaAddressMap = new Map(
           this.arenas.map((a) => [a.id, a.address || a.arena_address || ''])
         );
@@ -246,11 +241,14 @@ export class SchedulePage implements OnInit {
 
           const homeTeamData = teamDataMap.get(game.home_team_id);
           const awayTeamData = teamDataMap.get(game.away_team_id);
-          const homeGoalieName = game.home_start_goalie_name || 
+          const homeGoalieName =
+            game.home_start_goalie_name ||
             (game.home_start_goalie_id ? goalieMap.get(game.home_start_goalie_id) : undefined);
-          const awayGoalieName = game.away_start_goalie_name || 
+          const awayGoalieName =
+            game.away_start_goalie_name ||
             (game.away_start_goalie_id ? goalieMap.get(game.away_start_goalie_id) : undefined);
-          const periodName = game.game_period_name || 
+          const periodName =
+            game.game_period_name ||
             (game.game_period_id ? gamePeriodMap.get(game.game_period_id) : undefined);
 
           // Convert GMT date and time to local timezone
@@ -258,7 +256,8 @@ export class SchedulePage implements OnInit {
 
           return {
             id: game.id.toString(),
-            homeTeam: homeTeamData?.name || teamMap.get(game.home_team_id) || `Team ${game.home_team_id}`,
+            homeTeam:
+              homeTeamData?.name || teamMap.get(game.home_team_id) || `Team ${game.home_team_id}`,
             homeTeamId: game.home_team_id,
             homeTeamLogo: homeTeamData?.logo,
             homeTeamAgeGroup: homeTeamData?.ageGroup || '',
@@ -266,7 +265,8 @@ export class SchedulePage implements OnInit {
             homeGoals: game.home_goals,
             homeTeamGoalie: homeGoalieName,
             homeTeamGoalieId: game.home_start_goalie_id || undefined,
-            awayTeam: awayTeamData?.name || teamMap.get(game.away_team_id) || `Team ${game.away_team_id}`,
+            awayTeam:
+              awayTeamData?.name || teamMap.get(game.away_team_id) || `Team ${game.away_team_id}`,
             awayTeamId: game.away_team_id,
             awayTeamLogo: awayTeamData?.logo,
             awayTeamAgeGroup: awayTeamData?.ageGroup || '',
@@ -278,13 +278,15 @@ export class SchedulePage implements OnInit {
             gameTypeName: game.game_type_name || '',
             tournamentName: game.tournament_name || undefined,
             date: formatDate(localDateTime.date),
-            dateTime: localDateTime.time ? `${formatDate(localDateTime.date)} ${localDateTime.time}` : formatDate(localDateTime.date),
+            dateTime: localDateTime.time
+              ? `${formatDate(localDateTime.date)} ${localDateTime.time}`
+              : formatDate(localDateTime.date),
             time: localDateTime.time,
-            rink: game.rink_id ? (rinkMap.get(game.rink_id) || `Rink ${game.rink_id}`) : '',
-            arenaRink: game.rink_id ? (rinkMap.get(game.rink_id) || `Rink ${game.rink_id}`) : '',
-            arenaName: game.arena_id ? (arenaNameMap.get(game.arena_id) || '') : '',
-            rinkName: game.rink_id ? (rinkNameMap.get(game.rink_id) || '') : '',
-            arenaAddress: game.arena_id ? (arenaAddressMap.get(game.arena_id) || '') : '',
+            rink: game.rink_id ? rinkMap.get(game.rink_id) || `Rink ${game.rink_id}` : '',
+            arenaRink: game.rink_id ? rinkMap.get(game.rink_id) || `Rink ${game.rink_id}` : '',
+            arenaName: game.arena_id ? arenaNameMap.get(game.arena_id) || '' : '',
+            rinkName: game.rink_id ? rinkNameMap.get(game.rink_id) || '' : '',
+            arenaAddress: game.arena_id ? arenaAddressMap.get(game.arena_id) || '' : '',
             status: statusValue,
             statusName: getStatusName(game.status, periodName),
             periodName: periodName || undefined,
@@ -337,12 +339,8 @@ export class SchedulePage implements OnInit {
             return [r.id, arena ? `${arenaName} – ${rinkName}` : rinkName];
           })
         );
-        const arenaNameMap = new Map(
-          this.arenas.map((a) => [a.id, a.name || ''])
-        );
-        const rinkNameMap = new Map(
-          this.rinks.map((r) => [r.id, r.name || ''])
-        );
+        const arenaNameMap = new Map(this.arenas.map((a) => [a.id, a.name || '']));
+        const rinkNameMap = new Map(this.rinks.map((r) => [r.id, r.name || '']));
         const arenaAddressMap = new Map(
           this.arenas.map((a) => [a.id, a.address || a.arena_address || ''])
         );
@@ -394,11 +392,14 @@ export class SchedulePage implements OnInit {
 
           const homeTeamData = teamDataMap.get(game.home_team_id);
           const awayTeamData = teamDataMap.get(game.away_team_id);
-          const homeGoalieName = game.home_start_goalie_name || 
+          const homeGoalieName =
+            game.home_start_goalie_name ||
             (game.home_start_goalie_id ? goalieMap.get(game.home_start_goalie_id) : undefined);
-          const awayGoalieName = game.away_start_goalie_name || 
+          const awayGoalieName =
+            game.away_start_goalie_name ||
             (game.away_start_goalie_id ? goalieMap.get(game.away_start_goalie_id) : undefined);
-          const periodName = game.game_period_name || 
+          const periodName =
+            game.game_period_name ||
             (game.game_period_id ? gamePeriodMap.get(game.game_period_id) : undefined);
 
           // Convert GMT date and time to local timezone
@@ -406,7 +407,8 @@ export class SchedulePage implements OnInit {
 
           return {
             id: game.id.toString(),
-            homeTeam: homeTeamData?.name || teamMap.get(game.home_team_id) || `Team ${game.home_team_id}`,
+            homeTeam:
+              homeTeamData?.name || teamMap.get(game.home_team_id) || `Team ${game.home_team_id}`,
             homeTeamId: game.home_team_id,
             homeTeamLogo: homeTeamData?.logo,
             homeTeamAgeGroup: homeTeamData?.ageGroup || '',
@@ -414,7 +416,8 @@ export class SchedulePage implements OnInit {
             homeGoals: game.home_goals,
             homeTeamGoalie: homeGoalieName,
             homeTeamGoalieId: game.home_start_goalie_id || undefined,
-            awayTeam: awayTeamData?.name || teamMap.get(game.away_team_id) || `Team ${game.away_team_id}`,
+            awayTeam:
+              awayTeamData?.name || teamMap.get(game.away_team_id) || `Team ${game.away_team_id}`,
             awayTeamId: game.away_team_id,
             awayTeamLogo: awayTeamData?.logo,
             awayTeamAgeGroup: awayTeamData?.ageGroup || '',
@@ -426,13 +429,15 @@ export class SchedulePage implements OnInit {
             gameTypeName: game.game_type_name || '',
             tournamentName: game.tournament_name || undefined,
             date: formatDate(localDateTime.date),
-            dateTime: localDateTime.time ? `${formatDate(localDateTime.date)} ${localDateTime.time}` : formatDate(localDateTime.date),
+            dateTime: localDateTime.time
+              ? `${formatDate(localDateTime.date)} ${localDateTime.time}`
+              : formatDate(localDateTime.date),
             time: localDateTime.time,
-            rink: game.rink_id ? (rinkMap.get(game.rink_id) || `Rink ${game.rink_id}`) : '',
-            arenaRink: game.rink_id ? (rinkMap.get(game.rink_id) || `Rink ${game.rink_id}`) : '',
-            arenaName: game.arena_id ? (arenaNameMap.get(game.arena_id) || '') : '',
-            rinkName: game.rink_id ? (rinkNameMap.get(game.rink_id) || '') : '',
-            arenaAddress: game.arena_id ? (arenaAddressMap.get(game.arena_id) || '') : '',
+            rink: game.rink_id ? rinkMap.get(game.rink_id) || `Rink ${game.rink_id}` : '',
+            arenaRink: game.rink_id ? rinkMap.get(game.rink_id) || `Rink ${game.rink_id}` : '',
+            arenaName: game.arena_id ? arenaNameMap.get(game.arena_id) || '' : '',
+            rinkName: game.rink_id ? rinkNameMap.get(game.rink_id) || '' : '',
+            arenaAddress: game.arena_id ? arenaAddressMap.get(game.arena_id) || '' : '',
             status: statusValue,
             statusName: getStatusName(game.status, periodName),
             periodName: periodName || undefined,
@@ -566,15 +571,15 @@ export class SchedulePage implements OnInit {
       this.scheduleService.deleteGame(numericGameId).subscribe({
         next: () => {
           this.deletingGameIds.delete(gameId);
-          
+
           // Remove the game from the list immediately without full reload
           const currentSchedules = this.schedules();
           const updatedSchedules = currentSchedules.filter((s) => s.id !== gameId);
           this.schedules.set(updatedSchedules);
-          
+
           // Also remove from rawGames map
           this.rawGames.delete(gameId);
-          
+
           // Refresh the banner
           this.bannerService.triggerRefresh();
         },

@@ -75,16 +75,26 @@
                   @if (column.key === 'playerName' || column.key === 'goalieName') {
                     @if (getCellValueByKey(element, 'id')) {
                       <a
-                        [routerLink]="column.key === 'playerName'
-                          ? ['/teams-and-rosters/players/player-profile', getCellValueByKey(element, 'id')]
-                          : ['/teams-and-rosters/goalies/goalie-profile', getCellValueByKey(element, 'id')]"
+                        [routerLink]="
+                          column.key === 'playerName'
+                            ? [
+                                '/teams-and-rosters/players/player-profile',
+                                getCellValueByKey(element, 'id'),
+                              ]
+                            : [
+                                '/teams-and-rosters/goalies/goalie-profile',
+                                getCellValueByKey(element, 'id'),
+                              ]
+                        "
                         class="player-name-link"
                       >
-                        {{ getCellValueByKey(element, 'firstName') }} {{ getCellValueByKey(element, 'lastName') }}
+                        {{ getCellValueByKey(element, 'firstName') }}
+                        {{ getCellValueByKey(element, 'lastName') }}
                       </a>
                     } @else {
                       <span>
-                        {{ getCellValueByKey(element, 'firstName') }} {{ getCellValueByKey(element, 'lastName') }}
+                        {{ getCellValueByKey(element, 'firstName') }}
+                        {{ getCellValueByKey(element, 'lastName') }}
                       </span>
                     }
                   } @else if (column.key === 'team') {
@@ -93,18 +103,21 @@
                         @if (getCellValueByKey(element, 'teamLogo')) {
                           @if (getCellValueByKey(element, 'teamId')) {
                             <a
-                              [routerLink]="['/teams-and-rosters/teams/team-profile', getCellValueByKey(element, 'teamId')]"
+                              [routerLink]="[
+                                '/teams-and-rosters/teams/team-profile',
+                                getCellValueByKey(element, 'teamId'),
+                              ]"
                               class="team-logo-link"
                             >
                               <img
-                                [src]="getCellValueByKey(element, 'teamLogo')"
+                                [appCachedSrc]="getCellStringByKey(element, 'teamLogo')"
                                 [alt]="getCellValue(element, column) || 'Team logo'"
                                 class="team-logo"
                               />
                             </a>
                           } @else {
                             <img
-                              [src]="getCellValueByKey(element, 'teamLogo')"
+                              [appCachedSrc]="getCellStringByKey(element, 'teamLogo')"
                               [alt]="getCellValue(element, column) || 'Team logo'"
                               class="team-logo"
                             />
@@ -114,7 +127,10 @@
                       <div class="team-content">
                         @if (getCellValueByKey(element, 'teamId')) {
                           <a
-                            [routerLink]="['/teams-and-rosters/teams/team-profile', getCellValueByKey(element, 'teamId')]"
+                            [routerLink]="[
+                              '/teams-and-rosters/teams/team-profile',
+                              getCellValueByKey(element, 'teamId'),
+                            ]"
                             class="team-name-link"
                           >
                             {{ getCellValue(element, column) || '-' }}
@@ -131,21 +147,37 @@
                   } @else if (column.key === 'homeTeam' || column.key === 'awayTeam') {
                     <div class="team-cell">
                       <div class="team-logo-container">
-                        @if (getCellValueByKey(element, column.key === 'homeTeam' ? 'homeTeamLogo' : 'awayTeamLogo')) {
-                          @if (getCellValueByKey(element, column.key === 'homeTeam' ? 'homeTeamId' : 'awayTeamId')) {
+                        @if (
+                          getCellValueByKey(
+                            element,
+                            column.key === 'homeTeam' ? 'homeTeamLogo' : 'awayTeamLogo'
+                          )
+                        ) {
+                          @if (
+                            getCellValueByKey(
+                              element,
+                              column.key === 'homeTeam' ? 'homeTeamId' : 'awayTeamId'
+                            )
+                          ) {
                             <a
-                              [routerLink]="['/teams-and-rosters/teams/team-profile', getCellValueByKey(element, column.key === 'homeTeam' ? 'homeTeamId' : 'awayTeamId')]"
+                              [routerLink]="[
+                                '/teams-and-rosters/teams/team-profile',
+                                getCellValueByKey(
+                                  element,
+                                  column.key === 'homeTeam' ? 'homeTeamId' : 'awayTeamId'
+                                ),
+                              ]"
                               class="team-logo-link"
                             >
                               <img
-                                [src]="getCellValueByKey(element, column.key === 'homeTeam' ? 'homeTeamLogo' : 'awayTeamLogo')"
+                                [appCachedSrc]="getCellStringByKey(element, column.key === 'homeTeam' ? 'homeTeamLogo' : 'awayTeamLogo')"
                                 [alt]="getCellValue(element, column) || 'Team logo'"
                                 class="team-logo"
                               />
                             </a>
                           } @else {
                             <img
-                              [src]="getCellValueByKey(element, column.key === 'homeTeam' ? 'homeTeamLogo' : 'awayTeamLogo')"
+                              [appCachedSrc]="getCellStringByKey(element, column.key === 'homeTeam' ? 'homeTeamLogo' : 'awayTeamLogo')"
                               [alt]="getCellValue(element, column) || 'Team logo'"
                               class="team-logo"
                             />
@@ -153,9 +185,20 @@
                         }
                       </div>
                       <div class="team-content">
-                        @if (getCellValueByKey(element, column.key === 'homeTeam' ? 'homeTeamId' : 'awayTeamId')) {
+                        @if (
+                          getCellValueByKey(
+                            element,
+                            column.key === 'homeTeam' ? 'homeTeamId' : 'awayTeamId'
+                          )
+                        ) {
                           <a
-                            [routerLink]="['/teams-and-rosters/teams/team-profile', getCellValueByKey(element, column.key === 'homeTeam' ? 'homeTeamId' : 'awayTeamId')]"
+                            [routerLink]="[
+                              '/teams-and-rosters/teams/team-profile',
+                              getCellValueByKey(
+                                element,
+                                column.key === 'homeTeam' ? 'homeTeamId' : 'awayTeamId'
+                              ),
+                            ]"
                             class="team-name-link"
                           >
                             {{ getCellValue(element, column) || '-' }}
@@ -164,20 +207,53 @@
                           <div class="team-name">{{ getCellValue(element, column) || '-' }}</div>
                         }
                         <div class="team-info">
-                          {{ getCellValueByKey(element, column.key === 'homeTeam' ? 'homeTeamAgeGroup' : 'awayTeamAgeGroup') }}
-                          {{ getCellValueByKey(element, column.key === 'homeTeam' ? 'homeTeamLevelName' : 'awayTeamLevelName') }}
+                          {{
+                            getCellValueByKey(
+                              element,
+                              column.key === 'homeTeam' ? 'homeTeamAgeGroup' : 'awayTeamAgeGroup'
+                            )
+                          }}
+                          {{
+                            getCellValueByKey(
+                              element,
+                              column.key === 'homeTeam' ? 'homeTeamLevelName' : 'awayTeamLevelName'
+                            )
+                          }}
                         </div>
                         <div class="team-goalie">
                           Goalie:
-                          @if (getCellValueByKey(element, column.key === 'homeTeam' ? 'homeTeamGoalieId' : 'awayTeamGoalieId')) {
+                          @if (
+                            getCellValueByKey(
+                              element,
+                              column.key === 'homeTeam' ? 'homeTeamGoalieId' : 'awayTeamGoalieId'
+                            )
+                          ) {
                             <a
-                              [routerLink]="['/teams-and-rosters/goalies/goalie-profile', getCellValueByKey(element, column.key === 'homeTeam' ? 'homeTeamGoalieId' : 'awayTeamGoalieId')]"
+                              [routerLink]="[
+                                '/teams-and-rosters/goalies/goalie-profile',
+                                getCellValueByKey(
+                                  element,
+                                  column.key === 'homeTeam'
+                                    ? 'homeTeamGoalieId'
+                                    : 'awayTeamGoalieId'
+                                ),
+                              ]"
                               class="goalie-name-link"
                             >
-                              {{ getCellValueByKey(element, column.key === 'homeTeam' ? 'homeTeamGoalie' : 'awayTeamGoalie') || '-' }}
+                              {{
+                                getCellValueByKey(
+                                  element,
+                                  column.key === 'homeTeam' ? 'homeTeamGoalie' : 'awayTeamGoalie'
+                                ) || '-'
+                              }}
                             </a>
                           } @else {
-                            <span>{{ getCellValueByKey(element, column.key === 'homeTeam' ? 'homeTeamGoalie' : 'awayTeamGoalie') || '-' }}</span>
+                            <span>{{
+                              getCellValueByKey(
+                                element,
+                                column.key === 'homeTeam' ? 'homeTeamGoalie' : 'awayTeamGoalie'
+                              ) || '-'
+                            }}</span>
                           }
                         </div>
                       </div>
@@ -191,7 +267,13 @@
 
                 <!-- Number -->
                 @case ('number') {
-                  <span [class]="column.key === 'homeGoals' || column.key === 'awayGoals' ? 'font-mono goals-value' : 'font-mono'">
+                  <span
+                    [class]="
+                      column.key === 'homeGoals' || column.key === 'awayGoals'
+                        ? 'font-mono goals-value'
+                        : 'font-mono'
+                    "
+                  >
                     @if (column.key === 'birthYear') {
                       {{ getCellValue(element, column) }}
                     } @else {
@@ -212,9 +294,21 @@
                   @if (column.key === 'shoots' || column.key === 'catches') {
                     <span>
                       @if (column.key === 'shoots') {
-                        {{ getCellValue(element, column) === 'Right Shot' ? 'R' : getCellValue(element, column) === 'Left Shot' ? 'L' : getCellValue(element, column) || '-' }}
+                        {{
+                          getCellValue(element, column) === 'Right Shot'
+                            ? 'R'
+                            : getCellValue(element, column) === 'Left Shot'
+                              ? 'L'
+                              : getCellValue(element, column) || '-'
+                        }}
                       } @else {
-                        {{ getCellValue(element, column) === 'Right' ? 'R' : getCellValue(element, column) === 'Left' ? 'L' : getCellValue(element, column) || '-' }}
+                        {{
+                          getCellValue(element, column) === 'Right'
+                            ? 'R'
+                            : getCellValue(element, column) === 'Left'
+                              ? 'L'
+                              : getCellValue(element, column) || '-'
+                        }}
                       }
                     </span>
                   } @else {
@@ -228,11 +322,16 @@
                 @case ('custom') {
                   @if (column.key === 'status') {
                     <span [class]="getStatusBadgeClass(getCellValue(element, column))">
-                      {{ getCellValueByKey(element, 'statusName') || getStatusLabel(getCellValue(element, column)) }}
+                      {{
+                        getCellValueByKey(element, 'statusName') ||
+                          getStatusLabel(getCellValue(element, column))
+                      }}
                     </span>
                   } @else if (column.key === 'gameType') {
                     <span [class]="getGameTypeBadgeClass(getCellValue(element, column))">
-                      {{ getCellValueByKey(element, 'gameTypeName') || getCellValue(element, column) }}
+                      {{
+                        getCellValueByKey(element, 'gameTypeName') || getCellValue(element, column)
+                      }}
                     </span>
                   } @else {
                     <span>
@@ -246,16 +345,26 @@
                   @if (column.key === 'playerName' || column.key === 'goalieName') {
                     @if (getCellValueByKey(element, 'id')) {
                       <a
-                        [routerLink]="column.key === 'playerName'
-                          ? ['/teams-and-rosters/players/player-profile', getCellValueByKey(element, 'id')]
-                          : ['/teams-and-rosters/goalies/goalie-profile', getCellValueByKey(element, 'id')]"
+                        [routerLink]="
+                          column.key === 'playerName'
+                            ? [
+                                '/teams-and-rosters/players/player-profile',
+                                getCellValueByKey(element, 'id'),
+                              ]
+                            : [
+                                '/teams-and-rosters/goalies/goalie-profile',
+                                getCellValueByKey(element, 'id'),
+                              ]
+                        "
                         class="player-name-link"
                       >
-                        {{ getCellValueByKey(element, 'firstName') }} {{ getCellValueByKey(element, 'lastName') }}
+                        {{ getCellValueByKey(element, 'firstName') }}
+                        {{ getCellValueByKey(element, 'lastName') }}
                       </a>
                     } @else {
                       <span>
-                        {{ getCellValueByKey(element, 'firstName') }} {{ getCellValueByKey(element, 'lastName') }}
+                        {{ getCellValueByKey(element, 'firstName') }}
+                        {{ getCellValueByKey(element, 'lastName') }}
                       </span>
                     }
                   } @else if (column.key === 'team') {
@@ -264,18 +373,21 @@
                         @if (getCellValueByKey(element, 'teamLogo')) {
                           @if (getCellValueByKey(element, 'teamId')) {
                             <a
-                              [routerLink]="['/teams-and-rosters/teams/team-profile', getCellValueByKey(element, 'teamId')]"
+                              [routerLink]="[
+                                '/teams-and-rosters/teams/team-profile',
+                                getCellValueByKey(element, 'teamId'),
+                              ]"
                               class="team-logo-link"
                             >
                               <img
-                                [src]="getCellValueByKey(element, 'teamLogo')"
+                                [appCachedSrc]="getCellStringByKey(element, 'teamLogo')"
                                 [alt]="getCellValue(element, column) || 'Team logo'"
                                 class="team-logo"
                               />
                             </a>
                           } @else {
                             <img
-                              [src]="getCellValueByKey(element, 'teamLogo')"
+                              [appCachedSrc]="getCellStringByKey(element, 'teamLogo')"
                               [alt]="getCellValue(element, column) || 'Team logo'"
                               class="team-logo"
                             />
@@ -285,7 +397,10 @@
                       <div class="team-content">
                         @if (getCellValueByKey(element, 'teamId')) {
                           <a
-                            [routerLink]="['/teams-and-rosters/teams/team-profile', getCellValueByKey(element, 'teamId')]"
+                            [routerLink]="[
+                              '/teams-and-rosters/teams/team-profile',
+                              getCellValueByKey(element, 'teamId'),
+                            ]"
                             class="team-name-link"
                           >
                             {{ getCellValue(element, column) || '-' }}
@@ -303,27 +418,45 @@
                     <div class="arena-rink-cell">
                       <div class="arena-rink-name">{{ getCellValue(element, column) || '-' }}</div>
                       @if (getCellValueByKey(element, 'arenaAddress')) {
-                        <div class="arena-address">{{ getCellValueByKey(element, 'arenaAddress') }}</div>
+                        <div class="arena-address">
+                          {{ getCellValueByKey(element, 'arenaAddress') }}
+                        </div>
                       }
                     </div>
                   } @else if (column.key === 'homeTeam' || column.key === 'awayTeam') {
                     <div class="team-cell">
                       <div class="team-logo-container">
-                        @if (getCellValueByKey(element, column.key === 'homeTeam' ? 'homeTeamLogo' : 'awayTeamLogo')) {
-                          @if (getCellValueByKey(element, column.key === 'homeTeam' ? 'homeTeamId' : 'awayTeamId')) {
+                        @if (
+                          getCellValueByKey(
+                            element,
+                            column.key === 'homeTeam' ? 'homeTeamLogo' : 'awayTeamLogo'
+                          )
+                        ) {
+                          @if (
+                            getCellValueByKey(
+                              element,
+                              column.key === 'homeTeam' ? 'homeTeamId' : 'awayTeamId'
+                            )
+                          ) {
                             <a
-                              [routerLink]="['/teams-and-rosters/teams/team-profile', getCellValueByKey(element, column.key === 'homeTeam' ? 'homeTeamId' : 'awayTeamId')]"
+                              [routerLink]="[
+                                '/teams-and-rosters/teams/team-profile',
+                                getCellValueByKey(
+                                  element,
+                                  column.key === 'homeTeam' ? 'homeTeamId' : 'awayTeamId'
+                                ),
+                              ]"
                               class="team-logo-link"
                             >
                               <img
-                                [src]="getCellValueByKey(element, column.key === 'homeTeam' ? 'homeTeamLogo' : 'awayTeamLogo')"
+                                [appCachedSrc]="getCellStringByKey(element, column.key === 'homeTeam' ? 'homeTeamLogo' : 'awayTeamLogo')"
                                 [alt]="getCellValue(element, column) || 'Team logo'"
                                 class="team-logo"
                               />
                             </a>
                           } @else {
                             <img
-                              [src]="getCellValueByKey(element, column.key === 'homeTeam' ? 'homeTeamLogo' : 'awayTeamLogo')"
+                              [appCachedSrc]="getCellStringByKey(element, column.key === 'homeTeam' ? 'homeTeamLogo' : 'awayTeamLogo')"
                               [alt]="getCellValue(element, column) || 'Team logo'"
                               class="team-logo"
                             />
@@ -331,9 +464,20 @@
                         }
                       </div>
                       <div class="team-content">
-                        @if (getCellValueByKey(element, column.key === 'homeTeam' ? 'homeTeamId' : 'awayTeamId')) {
+                        @if (
+                          getCellValueByKey(
+                            element,
+                            column.key === 'homeTeam' ? 'homeTeamId' : 'awayTeamId'
+                          )
+                        ) {
                           <a
-                            [routerLink]="['/teams-and-rosters/teams/team-profile', getCellValueByKey(element, column.key === 'homeTeam' ? 'homeTeamId' : 'awayTeamId')]"
+                            [routerLink]="[
+                              '/teams-and-rosters/teams/team-profile',
+                              getCellValueByKey(
+                                element,
+                                column.key === 'homeTeam' ? 'homeTeamId' : 'awayTeamId'
+                              ),
+                            ]"
                             class="team-name-link"
                           >
                             {{ getCellValue(element, column) || '-' }}
@@ -342,20 +486,53 @@
                           <div class="team-name">{{ getCellValue(element, column) || '-' }}</div>
                         }
                         <div class="team-info">
-                          {{ getCellValueByKey(element, column.key === 'homeTeam' ? 'homeTeamAgeGroup' : 'awayTeamAgeGroup') }}
-                          {{ getCellValueByKey(element, column.key === 'homeTeam' ? 'homeTeamLevelName' : 'awayTeamLevelName') }}
+                          {{
+                            getCellValueByKey(
+                              element,
+                              column.key === 'homeTeam' ? 'homeTeamAgeGroup' : 'awayTeamAgeGroup'
+                            )
+                          }}
+                          {{
+                            getCellValueByKey(
+                              element,
+                              column.key === 'homeTeam' ? 'homeTeamLevelName' : 'awayTeamLevelName'
+                            )
+                          }}
                         </div>
                         <div class="team-goalie">
                           Goalie:
-                          @if (getCellValueByKey(element, column.key === 'homeTeam' ? 'homeTeamGoalieId' : 'awayTeamGoalieId')) {
+                          @if (
+                            getCellValueByKey(
+                              element,
+                              column.key === 'homeTeam' ? 'homeTeamGoalieId' : 'awayTeamGoalieId'
+                            )
+                          ) {
                             <a
-                              [routerLink]="['/teams-and-rosters/goalies/goalie-profile', getCellValueByKey(element, column.key === 'homeTeam' ? 'homeTeamGoalieId' : 'awayTeamGoalieId')]"
+                              [routerLink]="[
+                                '/teams-and-rosters/goalies/goalie-profile',
+                                getCellValueByKey(
+                                  element,
+                                  column.key === 'homeTeam'
+                                    ? 'homeTeamGoalieId'
+                                    : 'awayTeamGoalieId'
+                                ),
+                              ]"
                               class="goalie-name-link"
                             >
-                              {{ getCellValueByKey(element, column.key === 'homeTeam' ? 'homeTeamGoalie' : 'awayTeamGoalie') || '-' }}
+                              {{
+                                getCellValueByKey(
+                                  element,
+                                  column.key === 'homeTeam' ? 'homeTeamGoalie' : 'awayTeamGoalie'
+                                ) || '-'
+                              }}
                             </a>
                           } @else {
-                            <span>{{ getCellValueByKey(element, column.key === 'homeTeam' ? 'homeTeamGoalie' : 'awayTeamGoalie') || '-' }}</span>
+                            <span>{{
+                              getCellValueByKey(
+                                element,
+                                column.key === 'homeTeam' ? 'homeTeamGoalie' : 'awayTeamGoalie'
+                              ) || '-'
+                            }}</span>
                           }
                         </div>
                       </div>
@@ -383,7 +560,7 @@
               class="text-center actions-cell"
               style="width: 300px"
             >
-              <div class="flex flex-wrap items-center justify-end" style="gap: 15px;">
+              <div class="flex flex-wrap items-center justify-end" style="gap: 15px">
                 @for (action of actionsValue; track action.action) {
                   @if (!action.condition || action.condition(element)) {
                     <app-button-small

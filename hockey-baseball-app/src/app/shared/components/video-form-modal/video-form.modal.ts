@@ -25,8 +25,8 @@ export interface VideoFormModalData {
     MatFormFieldModule,
     MatInputModule,
     MatIconModule,
-    MatDividerModule
-],
+    MatDividerModule,
+  ],
   templateUrl: './video-form.modal.html',
   styleUrl: './video-form.modal.scss',
 })

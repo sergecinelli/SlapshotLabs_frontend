@@ -1,5 +1,5 @@
-import { Component, inject  } from '@angular/core';
-import {  } from '@angular/common';
+import { Component, inject } from '@angular/core';
+import {} from '@angular/common';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 @Component({
@@ -18,4 +18,3 @@ export class GamesheetPage {
     this.gamesheetUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
   }
 }
-

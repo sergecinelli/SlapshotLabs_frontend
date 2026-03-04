@@ -1,5 +1,5 @@
 import { Component, OnInit, signal, inject } from '@angular/core';
-import {  } from '@angular/common';
+import {} from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ScheduleService, DashboardGame } from '../../services/schedule.service';
@@ -9,7 +9,11 @@ import { ComponentVisibilityByRoleDirective } from '../../shared/directives/comp
 import { ButtonComponent } from '../../shared/components/buttons/button/button.component';
 import { GameCardComponent } from '../../shared/components/game-card/game-card.component';
 import { visibilityByRoleMap } from './schedules.role-map';
-import { DataTableComponent, TableColumn, TableAction } from '../../shared/components/data-table/data-table.component';
+import {
+  DataTableComponent,
+  TableColumn,
+  TableAction,
+} from '../../shared/components/data-table/data-table.component';
 import { LocalStorageService, StorageKey } from '../../services/local-storage.service';
 import { Schedule, GameStatus } from '../../shared/interfaces/schedule.interface';
 import { ArenaService } from '../../services/arena.service';
@@ -187,7 +191,10 @@ export class SchedulesPage implements OnInit {
           }
           return schedule;
         });
-        schedules.sort((a, b) => (b.date || '').localeCompare(a.date || '') || (b.time || '').localeCompare(a.time || ''));
+        schedules.sort(
+          (a, b) =>
+            (b.date || '').localeCompare(a.date || '') || (b.time || '').localeCompare(a.time || '')
+        );
         this.schedules.set(schedules);
 
         this.loading.set(false);
@@ -202,8 +209,10 @@ export class SchedulesPage implements OnInit {
   private mapToSchedule(g: DashboardGame): Schedule {
     const localDateTime = convertGMTToLocal(g.date, g.time);
     const statusValue =
-      g.status === 1 ? GameStatus.NotStarted
-        : g.status === 2 ? GameStatus.GameInProgress
+      g.status === 1
+        ? GameStatus.NotStarted
+        : g.status === 2
+          ? GameStatus.GameInProgress
           : GameStatus.GameOver;
 
     return {
@@ -259,10 +268,14 @@ export class SchedulesPage implements OnInit {
 
   private getStatusLabel(status: number): string {
     switch (status) {
-      case 1: return 'Upcoming';
-      case 2: return 'Live';
-      case 3: return 'Completed';
-      default: return 'Unknown';
+      case 1:
+        return 'Upcoming';
+      case 2:
+        return 'Live';
+      case 3:
+        return 'Completed';
+      default:
+        return 'Unknown';
     }
   }
 

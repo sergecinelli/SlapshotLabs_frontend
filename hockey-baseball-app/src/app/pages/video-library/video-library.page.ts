@@ -1,5 +1,5 @@
 import { Component, OnInit, signal, inject } from '@angular/core';
-import {  } from '@angular/common';
+import {} from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { ButtonComponent } from '../../shared/components/buttons/button/button.component';
 import { MatDialog } from '@angular/material/dialog';
@@ -17,12 +17,7 @@ import { visibilityByRoleMap } from './video-library.role-map';
 
 @Component({
   selector: 'app-video-library',
-  imports: [
-    DataTableComponent,
-    MatIconModule,
-    ComponentVisibilityByRoleDirective,
-    ButtonComponent,
-  ],
+  imports: [DataTableComponent, MatIconModule, ComponentVisibilityByRoleDirective, ButtonComponent],
   templateUrl: './video-library.page.html',
   styleUrl: './video-library.page.scss',
 })
