@@ -17,6 +17,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule, MatTooltip } from '@angular/material/tooltip';
 import { IconService } from '../../../services/icon.service';
 import { ButtonSmallComponent } from '../buttons/button-small/button-small.component';
+import { ButtonRouteSmallComponent } from '../buttons/button-route-small/button-route-small.component';
 import { AppColor } from '../../constants/colors';
 import { CachedSrcDirective } from '../../directives/cached-src.directive';
 
@@ -41,6 +42,7 @@ export interface TableAction {
   roleVisibilityTeamId?: string | ((item: Record<string, unknown>) => string | undefined);
   roleVisibilityAuthorId?: string | ((item: Record<string, unknown>) => string | undefined);
   condition?: (item: Record<string, unknown>) => boolean;
+  route?: (item: Record<string, unknown>) => string;
 }
 
 @Component({
@@ -56,6 +58,7 @@ export interface TableAction {
     MatProgressSpinnerModule,
     MatTooltipModule,
     ButtonSmallComponent,
+    ButtonRouteSmallComponent,
   ],
   templateUrl: './data-table.component.html',
   styleUrl: './data-table.component.scss',

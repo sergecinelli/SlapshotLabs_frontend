@@ -23,6 +23,7 @@ import {
 } from '../../shared/components/data-table/data-table.component';
 import { LocalStorageService, StorageKey } from '../../services/local-storage.service';
 import { CachedSrcDirective } from '../../shared/directives/cached-src.directive';
+import { CardGridComponent } from '../../shared/components/card-grid/card-grid.component';
 
 @Component({
   selector: 'app-teams',
@@ -34,6 +35,7 @@ import { CachedSrcDirective } from '../../shared/directives/cached-src.directive
     ComponentVisibilityByRoleDirective,
     ButtonComponent,
     ButtonRouteComponent,
+    CardGridComponent,
     DataTableComponent,
   ],
   templateUrl: './teams.page.html',
@@ -77,6 +79,7 @@ export class TeamsPage implements OnInit {
       variant: 'primary',
       icon: 'visibility',
       iconOnly: true,
+      route: (item) => `/teams-and-rosters/teams/${item['id']}/profile`,
     },
     {
       label: 'Edit',

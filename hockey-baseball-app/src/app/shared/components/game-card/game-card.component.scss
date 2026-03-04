@@ -26,16 +26,44 @@
       0 2px 4px rgba(0, 0, 0, 0.08);
   }
 
-  &.completed {
-    border-left: 4px solid var(--completed);
+  &.completed .game-date,
+  &.completed .game-time,
+  &.completed .date-time-icon {
+    // color: var(--completed);
   }
 
-  &.in-progress {
-    border-left: 4px solid var(--live);
+  &.completed .game-card-header {
   }
 
-  &.not-started {
+  &.in-progress .game-date,
+  &.in-progress .game-time,
+  &.in-progress .date-time-icon {
+    color: var(--live);
+  }
+
+  &.in-progress .game-card-header {
+  }
+
+  &.not-started .game-date,
+  &.not-started .game-time,
+  &.not-started .date-time-icon {
+    color: var(--upcoming);
+  }
+
+  &.not-started .game-card-header {
     border-left: 4px solid var(--upcoming);
+  }
+
+  &.not-started .header-left:before {
+    background-color: var(--upcoming);
+  }
+
+  &.in-progress .header-left:before {
+    background-color: var(--live);
+  }
+
+  &.completed .header-left:before {
+    background-color: var(--completed);
   }
 }
 
@@ -52,6 +80,18 @@
   display: flex;
   flex-direction: column;
   gap: 5px;
+  position: relative;
+
+  &:before {
+    position: absolute;
+    content: '';
+    top: -5px;
+    left: -16px;
+    width: 4px;
+    height: calc(100% + 10px);
+    background-color: var(--color-primary);
+    border-radius: 0 5px 5px 0;
+  }
 }
 
 .game-date-time-row {

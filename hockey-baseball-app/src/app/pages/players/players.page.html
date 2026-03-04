@@ -6,11 +6,9 @@
 
 <div class="page-content" [appVisibilityMap]="visibilityByRoleMap">
   <!-- Header with Add Button -->
-  <div class="players-header">
-    <div class="players-header-left">
-      <h2>{{ pageTitleValue }}</h2>
-    </div>
-    <div class="players-header-actions" style="display: flex; gap: 10px; align-items: center">
+  <div class="entity-page-header">
+    <div class="entity-header-left"></div>
+    <div class="entity-header-actions" style="display: flex; gap: 10px; align-items: center">
       <!-- View Toggle Button -->
       <app-button
         [materialIcon]="layoutModeValue === 'card' ? 'table_rows' : 'grid_view'"
@@ -27,7 +25,7 @@
       </app-button>
 
       <div
-        class="add-player-button-wrapper"
+        class="entity-add-button-wrapper"
         role-visibility-name="add-player-button"
         [attr.role-visibility-team-id]="teamIdValue"
       >
@@ -52,14 +50,14 @@
 
   <!-- Loading State -->
   @if (loadingValue) {
-    <div class="players-loading">
+    <div class="entity-loading">
       <div class="loading-text">Loading players...</div>
     </div>
   }
 
   <!-- Empty State -->
   @if (!loadingValue && playersValue.length === 0) {
-    <div class="players-empty">
+    <div class="entity-empty">
       <div class="empty-text">No players found.</div>
     </div>
   }
@@ -68,20 +66,20 @@
   @if (!loadingValue && playersValue.length > 0) {
     @if (layoutModeValue === 'card') {
       <!-- Card View -->
-      <div class="players-cards-container">
+      <app-card-grid [columns]="2">
         @for (player of playersValue; track player.id) {
-          <div class="player-card">
+          <div class="entity-card">
             <!-- Card Header -->
-            <div class="player-card-header">
+            <div class="entity-card-header">
               <div class="card-header-actions">
-                <app-button
+                <app-button-route
+                  [route]="'/teams-and-rosters/players/' + player.id + '/profile'"
                   [bg]="'transparent'"
                   [bghover]="'gray_tone3'"
                   [color]="'text_secondary'"
                   [colorhover]="'green_dark'"
                   [materialIcon]="'visibility'"
                   [matTooltip]="'Profile'"
-                  (clicked)="viewPlayerProfile(player)"
                 />
                 <app-button
                   [bg]="'transparent'"
@@ -103,13 +101,13 @@
                 />
               </div>
               <div class="header-left">
-                <div class="player-name-row">
-                  <div class="player-avatar">
+                <div class="entity-name-row">
+                  <div class="entity-avatar">
                     {{ getPlayerInitials(player) }}
                   </div>
-                  <div class="player-name-group">
+                  <div class="entity-name-group">
                     <div
-                      class="player-name player-link"
+                      class="entity-name entity-link"
                       (click)="viewPlayerProfile(player)"
                       (keyup.enter)="viewPlayerProfile(player)"
                       (keyup.space)="viewPlayerProfile(player)"
@@ -121,45 +119,45 @@
                     >
                       {{ player.firstName }} {{ player.lastName }}
                     </div>
-                    <div class="player-jersey-row">
+                    <div class="entity-subtitle-row">
                       @if (player.jerseyNumber) {
-                        <div class="player-jersey">#{{ player.jerseyNumber }}</div>
+                        <div class="entity-subtitle">#{{ player.jerseyNumber }}</div>
                       }
                       @if (player.birthYear) {
-                        <div class="player-info-item">
-                          <span class="player-info-label">Birth Year:</span>
-                          <span class="player-info-value">{{ player.birthYear }}</span>
+                        <div class="entity-info-item">
+                          <span class="entity-info-label">Birth Year:</span>
+                          <span class="entity-info-value">{{ player.birthYear }}</span>
                         </div>
                       }
                     </div>
                   </div>
                 </div>
-                <div class="player-info-row">
-                  <div class="player-info-item">
-                    <span class="player-info-label">Position:</span>
-                    <span class="player-info-value">{{ player.position }}</span>
+                <div class="entity-info-row">
+                  <div class="entity-info-item">
+                    <span class="entity-info-label">Position:</span>
+                    <span class="entity-info-value">{{ player.position }}</span>
                   </div>
                   @if (player.height) {
-                    <div class="player-info-item">
-                      <span class="player-info-label">Height:</span>
-                      <span class="player-info-value">{{ player.height }}</span>
+                    <div class="entity-info-item">
+                      <span class="entity-info-label">Height:</span>
+                      <span class="entity-info-value">{{ player.height }}</span>
                     </div>
                   }
                   @if (player.weight) {
-                    <div class="player-info-item">
-                      <span class="player-info-label">Weight:</span>
-                      <span class="player-info-value">{{ player.weight }} lbs</span>
+                    <div class="entity-info-item">
+                      <span class="entity-info-label">Weight:</span>
+                      <span class="entity-info-value">{{ player.weight }} lbs</span>
                     </div>
                   }
                   @if (player.shoots) {
-                    <div class="player-info-item">
-                      <span class="player-info-label">Shoots:</span>
-                      <span class="player-info-value">{{ player.shoots }}</span>
+                    <div class="entity-info-item">
+                      <span class="entity-info-label">Shoots:</span>
+                      <span class="entity-info-value">{{ player.shoots }}</span>
                     </div>
                   }
                   @if (player.team) {
-                    <div class="player-info-item">
-                      <span class="player-info-label">Team:</span>
+                    <div class="entity-info-item">
+                      <span class="entity-info-label">Team:</span>
                       <div class="team-name-with-logo">
                         @if (player.teamLogo) {
                           <img
@@ -170,7 +168,7 @@
                         }
                         @if (player.teamId) {
                           <span
-                            class="player-info-value team-link"
+                            class="entity-info-value team-link"
                             (click)="goToTeamProfile(player.teamId)"
                             (keyup.enter)="goToTeamProfile(player.teamId)"
                             (keyup.space)="goToTeamProfile(player.teamId)"
@@ -180,7 +178,7 @@
                             >{{ player.team }}</span
                           >
                         } @else {
-                          <span class="player-info-value">{{ player.team }}</span>
+                          <span class="entity-info-value">{{ player.team }}</span>
                         }
                       </div>
                     </div>
@@ -190,8 +188,8 @@
             </div>
 
             <!-- Stats Section -->
-            <div class="player-stats-section">
-              <div class="stats-grid">
+            <div class="entity-stats-section">
+              <app-card-grid [columns]="8" [radius]="10">
                 <div class="stat-item">
                   <div class="stat-label">GP</div>
                   <div class="stat-value">{{ player.gamesPlayed || 0 }}</div>
@@ -224,7 +222,7 @@
                   <div class="stat-label">PD</div>
                   <div class="stat-value">{{ player.penaltiesDrawn || 0 }}</div>
                 </div>
-              </div>
+              </app-card-grid>
             </div>
 
             <!-- Action Buttons -->
@@ -271,10 +269,10 @@
             </div>
           </div>
         }
-      </div>
+      </app-card-grid>
     } @else {
       <!-- Table View -->
-      <div class="players-table-container">
+      <div class="entity-table-container">
         <app-data-table
           [columns]="tableColumns"
           [data]="playersValue"

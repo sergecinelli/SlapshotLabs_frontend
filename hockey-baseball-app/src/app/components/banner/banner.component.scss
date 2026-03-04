@@ -125,7 +125,7 @@
   flex-shrink: 0;
   padding: 10px;
   padding-bottom: 2px;
-  border-radius: 4px;
+  border-radius: var(--radius-medium);
   background: var(--white);
   border: 1px solid var(--border);
   transition:
@@ -162,7 +162,7 @@
   // Status-based left border accent
   &.live {
     border: 1px solid var(--live);
-    border-left: 4px solid var(--live);
+    // border-left: 4px solid var(--live);
     background-color: rgba-from-color('primary', 0.04);
     transition:
       box-shadow 0.28s cubic-bezier(0.4, 0, 0.2, 1),
@@ -180,7 +180,7 @@
 
   &.upcoming {
     border: 1px solid var(--upcoming);
-    border-left: 4px solid var(--upcoming);
+    // border-left: 4px solid var(--upcoming);
     background-color: rgba-from-color('upcoming', 0.04);
     transition:
       box-shadow 0.28s cubic-bezier(0.4, 0, 0.2, 1),
@@ -194,7 +194,7 @@
 
   &.completed {
     border: 1px solid var(--completed);
-    border-left: 4px solid var(--completed);
+    // border-left: 4px solid var(--completed);
     background-color: rgba-from-color('completed', 0.04);
     transition:
       box-shadow 0.28s cubic-bezier(0.4, 0, 0.2, 1),

@@ -41,6 +41,7 @@ import { BannerService } from '../../services/banner.service';
 import { forkJoin } from 'rxjs';
 import { visibilityByRoleMap } from './dashboard.role-map';
 import { ComponentVisibilityByRoleDirective } from '../../shared/directives/component-visibility-by-role.directive';
+import { CardGridComponent } from '../../shared/components/card-grid/card-grid.component';
 import { GameCardComponent } from '../../shared/components/game-card/game-card.component';
 import { GameCardSkeletonComponent } from '../../shared/components/game-card/game-card-skeleton.component';
 import { getGameStatusLabel } from '../../shared/constants/game-status.constants';
@@ -55,6 +56,7 @@ import {
     MatIconModule,
     ButtonComponent,
     MatDialogModule,
+    CardGridComponent,
     ComponentVisibilityByRoleDirective,
     GameCardComponent,
     GameCardSkeletonComponent,

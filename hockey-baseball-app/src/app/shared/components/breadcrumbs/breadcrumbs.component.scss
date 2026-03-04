@@ -1,5 +1,5 @@
 .breadcrumbs-container {
-  padding: 10px 20px;
+  padding: 10px;
   position: sticky;
   top: 0;
   z-index: 100;
@@ -8,8 +8,7 @@
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
-  background-color: var(--gray-tone3);
-  border-bottom: 1px solid var(--border);
+  background-color: var(--page-background);
 }
 
 .breadcrumbs-content {

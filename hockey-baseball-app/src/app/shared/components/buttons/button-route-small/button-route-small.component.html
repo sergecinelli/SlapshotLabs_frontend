@@ -1,0 +1,69 @@
+@let materialIconValue = materialIcon();
+@let devValue = dev();
+@let tooltipValue = tooltip() ?? '';
+@let tooltipDelayValue = tooltipDelay();
+@let tooltipPosValue = tooltipPos();
+@let hasContentValue = hasContent();
+@let roundedValue = rounded();
+@let widthValue = width();
+@let isActiveValue = isActive();
+@let routeValue = route();
+@let queryParamsValue = queryParams();
+
+<a
+  class="app-button small"
+  [matTooltip]="tooltipValue"
+  [matTooltipShowDelay]="tooltipDelayValue"
+  [matTooltipPosition]="tooltipPosValue"
+  [class.have-content]="hasContentValue"
+  [class.dev]="devValue"
+  [class.rounded]="roundedValue"
+  [class.fill]="widthValue !== 'auto'"
+  [class.active]="isActiveValue"
+  [ngStyle]="styles"
+  [routerLink]="routeValue"
+  [queryParams]="queryParamsValue"
+  (mousedown)="onMouseDown()"
+  (mouseup)="onMouseUp()"
+  (mouseenter)="onMouseEnter()"
+  (mouseleave)="onMouseLeave()"
+>
+  @if (materialIconValue) {
+    @let materialSymbolClassValue = materialSymbolClass();
+    @let materialIconClassValue = materialIconClass();
+    @let isMatSymbolClassValue = isMatSymbolClass();
+    @let counterBgColorValue = counterBgColor();
+    @let counterValue = counter();
+    @let counterColorValue = counterColor();
+    @let hasDotValue = hasDot();
+    <div class="icon-box material">
+      <span
+        class="icon"
+        [class]="isMatSymbolClassValue ? materialSymbolClassValue : materialIconClassValue"
+        [class.fill]="isMatIconFillCurrent"
+        >{{ materialIconValue }}</span
+      >
+      @if (counterValue > 0) {
+        <span
+          class="counter"
+          [style.background]="getColor(counterBgColorValue)"
+          [style.color]="getColor(counterColorValue)"
+        >
+          {{ counterValue }}
+        </span>
+      }
+      @if (hasDotValue) {
+        <span
+          class="counter-icon"
+          [class]="materialSymbolClassValue"
+          [style.color]="getColor(counterBgColorValue)"
+          >circle</span
+        >
+      }
+    </div>
+  }
+
+  <span class="text">
+    <ng-content></ng-content>
+  </span>
+</a>

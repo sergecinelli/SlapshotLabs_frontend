@@ -36,11 +36,12 @@
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   grid-auto-rows: auto;
-  gap: 20px;
+  gap: var(--radius-small);
   max-width: 100%;
+  margin-top: 5px;
 
   @media (max-width: 1100px) {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr;
   }
 
   @media (max-width: 768px) {
@@ -50,16 +51,40 @@
 
 .game-card-skeleton-card {
   background: var(--white);
-  border-radius: $card-border-radius;
+  border-radius: var(--radius-small);
   border: 1px solid var(--border-light);
   padding: 16px;
-  height: 217.5px;
+  height: 254px;
   box-sizing: border-box;
-  box-shadow:
-    0 1px 3px rgba(0, 0, 0, 0.08),
-    0 1px 2px rgba(0, 0, 0, 0.06);
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+
+  // Corner radius for 2-column grid
+  &:first-child:last-child {
+    border-radius: 20px;
+  }
+
+  &:first-child:not(:last-child) {
+    border-top-left-radius: 20px;
+  }
+
+  &:nth-child(2) {
+    border-top-right-radius: 20px;
+  }
+
+  &:nth-child(odd):nth-last-child(2) {
+    border-bottom-left-radius: 20px;
+  }
+
+  &:nth-child(even):last-child {
+    border-bottom-right-radius: 20px;
+  }
+
+  &:nth-child(odd):last-child:not(:first-child) {
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+  }
 }
 
 .game-card-header {
@@ -300,12 +325,42 @@
 }
 
 // Responsive adjustments
-@media (max-width: 768px) {
-  .game-card-skeleton-cards-container {
-    grid-template-columns: 1fr;
-    gap: 16px;
-  }
+@media (max-width: 1100px) {
+  .game-card-skeleton-card {
+    border-radius: var(--radius-small);
 
+    &:first-child:last-child {
+      border-radius: 20px;
+    }
+
+    &:first-child:not(:last-child) {
+      border-radius: var(--radius-small);
+      border-top-left-radius: 20px;
+      border-top-right-radius: 20px;
+    }
+
+    &:nth-child(2) {
+      border-top-right-radius: var(--radius-small);
+    }
+
+    &:last-child:not(:first-child) {
+      border-radius: var(--radius-small);
+      border-bottom-left-radius: 20px;
+      border-bottom-right-radius: 20px;
+    }
+
+    &:nth-child(odd):nth-last-child(2) {
+      border-bottom-left-radius: var(--radius-small);
+    }
+
+    &:nth-child(odd):last-child:not(:first-child) {
+      border-bottom-left-radius: 20px;
+      border-bottom-right-radius: 20px;
+    }
+  }
+}
+
+@media (max-width: 768px) {
   .game-teams-section {
     grid-template-columns: 1fr;
     gap: 12px;

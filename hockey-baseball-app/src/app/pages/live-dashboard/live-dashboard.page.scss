@@ -278,7 +278,7 @@
 }
 
 .live-dashboard-card-header {
-  padding: 20px 24px;
+  padding: 20px;
   border-bottom: 1px solid var(--border-light);
   background-color: var(--white);
   display: flex;
@@ -301,7 +301,7 @@
 }
 
 .live-dashboard-card-content {
-  padding: 24px;
+  padding: 20px;
   flex: 1;
 }
 
@@ -502,7 +502,7 @@
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
     gap: 16px;
-    padding: 20px 24px;
+    padding: 20px;
   }
 }
 

@@ -25,6 +25,7 @@ import { LocalStorageService, StorageKey } from '../../services/local-storage.se
 import { TryoutService } from '../../services/tryout.service';
 import { AuthService } from '../../services/auth.service';
 import { CachedSrcDirective } from '../../shared/directives/cached-src.directive';
+import { CardGridComponent } from '../../shared/components/card-grid/card-grid.component';
 
 @Component({
   selector: 'app-goalies',
@@ -36,6 +37,7 @@ import { CachedSrcDirective } from '../../shared/directives/cached-src.directive
     ComponentVisibilityByRoleDirective,
     ButtonComponent,
     ButtonRouteComponent,
+    CardGridComponent,
     DataTableComponent,
   ],
   templateUrl: './goalies.page.html',
@@ -100,6 +102,7 @@ export class GoaliesPage implements OnInit {
       variant: 'primary',
       icon: 'visibility',
       iconOnly: true,
+      route: (item) => `/teams-and-rosters/goalies/${item['id']}/profile`,
     },
     {
       label: 'Edit',

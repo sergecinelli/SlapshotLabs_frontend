@@ -15,7 +15,7 @@ export class ActionMenuComponent {
   private themeService = inject(ThemeService);
 
   items = input<ActionMenuItem[]>([]);
-  onClose = output<void>();
+  closed = output<void>();
 
   get rippleColor() {
     return this.themeService.getRippleColor('text_secondary', 0.05);
@@ -25,10 +25,10 @@ export class ActionMenuComponent {
     if (item.onClick) {
       item.onClick(event);
     }
-    this.onClose.emit();
+    this.closed.emit();
   }
 
   outsideClick() {
-    this.onClose.emit();
+    this.closed.emit();
   }
 }

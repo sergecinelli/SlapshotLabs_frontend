@@ -1,15 +1,7 @@
-<div
-  class="action-menu-dropdown"
-  role="menu"
-  appOutsideClick
-  (appOutsideClick)="outsideClick()"
->
+<div class="action-menu-dropdown" role="menu" appOutsideClick (appOutsideClick)="outsideClick()">
   @for (item of items(); track $index) {
     @if (item.isDivider) {
-      <div
-        class="dropdown-divider"
-        role="separator"
-      ></div>
+      <div class="dropdown-divider" role="separator"></div>
     } @else if (item.isHeader) {
       <div class="dropdown-header">
         {{ item.label }}

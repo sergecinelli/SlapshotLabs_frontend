@@ -27,6 +27,7 @@ import {
   ScheduleFormModalData,
 } from '../../shared/components/schedule-form-modal/schedule-form.modal';
 import { ComponentVisibilityByRoleDirective } from '../../shared/directives/component-visibility-by-role.directive';
+import { CardGridComponent } from '../../shared/components/card-grid/card-grid.component';
 import { GameCardComponent } from '../../shared/components/game-card/game-card.component';
 import { visibilityByRoleMap } from './schedule.role-map';
 import { getGameStatusLabel } from '../../shared/constants/game-status.constants';
@@ -42,6 +43,7 @@ import { convertGMTToLocal, formatDateForDisplay } from '../../shared/utils/time
     ComponentVisibilityByRoleDirective,
     ButtonComponent,
     WeekPaginationComponent,
+    CardGridComponent,
     GameCardComponent,
   ],
   templateUrl: './schedule.page.html',

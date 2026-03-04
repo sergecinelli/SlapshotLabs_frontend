@@ -6,7 +6,7 @@
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    padding: 20px 24px;
+    padding: 20px;
     border-bottom: 1px solid var(--border-light);
     background-color: var(--white);
     min-height: 60px;
@@ -253,7 +253,6 @@
   border: 1px solid var(--border);
   overflow-x: auto;
   overflow-y: hidden;
-  margin-top: 8px;
 
   &::-webkit-scrollbar {
     height: 8px;

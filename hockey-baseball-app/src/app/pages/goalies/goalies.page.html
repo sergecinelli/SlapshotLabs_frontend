@@ -6,11 +6,9 @@
 
 <div class="page-content" [appVisibilityMap]="visibilityByRoleMap">
   <!-- Header with Add Button -->
-  <div class="goalies-header">
-    <div class="goalies-header-left">
-      <h2>{{ pageTitleValue }}</h2>
-    </div>
-    <div class="goalies-header-actions" style="display: flex; gap: 10px; align-items: center">
+  <div class="entity-page-header">
+    <div class="entity-header-left"></div>
+    <div class="entity-header-actions" style="display: flex; gap: 10px; align-items: center">
       <!-- View Toggle Button -->
       <app-button
         [materialIcon]="layoutModeValue === 'card' ? 'table_rows' : 'grid_view'"
@@ -27,7 +25,7 @@
       </app-button>
 
       <div
-        class="add-goalie-button-wrapper"
+        class="entity-add-button-wrapper"
         role-visibility-name="add-goalie-button"
         [attr.role-visibility-team-id]="teamIdValue"
       >
@@ -52,14 +50,14 @@
 
   <!-- Loading State -->
   @if (loadingValue) {
-    <div class="goalies-loading">
+    <div class="entity-loading">
       <div class="loading-text">Loading goalies...</div>
     </div>
   }
 
   <!-- Empty State -->
   @if (!loadingValue && goaliesValue.length === 0) {
-    <div class="goalies-empty">
+    <div class="entity-empty">
       <div class="empty-text">No goalies found.</div>
     </div>
   }
@@ -68,20 +66,20 @@
   @if (!loadingValue && goaliesValue.length > 0) {
     @if (layoutModeValue === 'card') {
       <!-- Card View -->
-      <div class="goalies-cards-container">
+      <app-card-grid [columns]="2">
         @for (goalie of goaliesValue; track goalie.id) {
-          <div class="goalie-card">
+          <div class="entity-card">
             <!-- Card Header -->
-            <div class="goalie-card-header">
+            <div class="entity-card-header">
               <div class="card-header-actions">
-                <app-button
+                <app-button-route
+                  [route]="'/teams-and-rosters/goalies/' + goalie.id + '/profile'"
                   [bg]="'transparent'"
                   [bghover]="'gray_tone3'"
                   [color]="'text_secondary'"
                   [colorhover]="'green_dark'"
                   [materialIcon]="'visibility'"
                   [matTooltip]="'Profile'"
-                  (clicked)="viewGoalieProfile(goalie)"
                 />
                 <app-button
                   [bg]="'transparent'"
@@ -103,13 +101,13 @@
                 />
               </div>
               <div class="header-left">
-                <div class="goalie-name-row">
-                  <div class="goalie-avatar">
+                <div class="entity-name-row">
+                  <div class="entity-avatar">
                     {{ getGoalieInitials(goalie) }}
                   </div>
-                  <div class="goalie-name-group">
+                  <div class="entity-name-group">
                     <div
-                      class="goalie-name goalie-link"
+                      class="entity-name entity-link"
                       (click)="viewGoalieProfile(goalie)"
                       (keyup.enter)="viewGoalieProfile(goalie)"
                       (keyup.space)="viewGoalieProfile(goalie)"
@@ -121,45 +119,45 @@
                     >
                       {{ goalie.firstName }} {{ goalie.lastName }}
                     </div>
-                    <div class="goalie-jersey-row">
+                    <div class="entity-subtitle-row">
                       @if (goalie.jerseyNumber) {
-                        <div class="goalie-jersey">#{{ goalie.jerseyNumber }}</div>
+                        <div class="entity-subtitle">#{{ goalie.jerseyNumber }}</div>
                       }
                       @if (goalie.birthYear) {
-                        <div class="goalie-info-item">
-                          <span class="goalie-info-label">Birth Year:</span>
-                          <span class="goalie-info-value">{{ goalie.birthYear }}</span>
+                        <div class="entity-info-item">
+                          <span class="entity-info-label">Birth Year:</span>
+                          <span class="entity-info-value">{{ goalie.birthYear }}</span>
                         </div>
                       }
                     </div>
                   </div>
                 </div>
-                <div class="goalie-info-row">
-                  <div class="goalie-info-item">
-                    <span class="goalie-info-label">Position:</span>
-                    <span class="goalie-info-value">{{ goalie.position || 'Goalie' }}</span>
+                <div class="entity-info-row">
+                  <div class="entity-info-item">
+                    <span class="entity-info-label">Position:</span>
+                    <span class="entity-info-value">{{ goalie.position || 'Goalie' }}</span>
                   </div>
                   @if (goalie.height) {
-                    <div class="goalie-info-item">
-                      <span class="goalie-info-label">Height:</span>
-                      <span class="goalie-info-value">{{ goalie.height }}</span>
+                    <div class="entity-info-item">
+                      <span class="entity-info-label">Height:</span>
+                      <span class="entity-info-value">{{ goalie.height }}</span>
                     </div>
                   }
                   @if (goalie.weight) {
-                    <div class="goalie-info-item">
-                      <span class="goalie-info-label">Weight:</span>
-                      <span class="goalie-info-value">{{ goalie.weight }} lbs</span>
+                    <div class="entity-info-item">
+                      <span class="entity-info-label">Weight:</span>
+                      <span class="entity-info-value">{{ goalie.weight }} lbs</span>
                     </div>
                   }
                   @if (goalie.shoots) {
-                    <div class="goalie-info-item">
-                      <span class="goalie-info-label">Shoots:</span>
-                      <span class="goalie-info-value">{{ goalie.shoots }}</span>
+                    <div class="entity-info-item">
+                      <span class="entity-info-label">Shoots:</span>
+                      <span class="entity-info-value">{{ goalie.shoots }}</span>
                     </div>
                   }
                   @if (goalie.team) {
-                    <div class="goalie-info-item">
-                      <span class="goalie-info-label">Team:</span>
+                    <div class="entity-info-item">
+                      <span class="entity-info-label">Team:</span>
                       <div class="team-name-with-logo">
                         @if (goalie['teamLogo']) {
                           <img
@@ -170,7 +168,7 @@
                         }
                         @if (goalie.teamId) {
                           <span
-                            class="goalie-info-value team-link"
+                            class="entity-info-value team-link"
                             (click)="goToTeamProfile(goalie.teamId)"
                             (keyup.enter)="goToTeamProfile(goalie.teamId)"
                             (keyup.space)="goToTeamProfile(goalie.teamId)"
@@ -180,7 +178,7 @@
                             >{{ goalie.team }}</span
                           >
                         } @else {
-                          <span class="goalie-info-value">{{ goalie.team }}</span>
+                          <span class="entity-info-value">{{ goalie.team }}</span>
                         }
                       </div>
                     </div>
@@ -190,8 +188,8 @@
             </div>
 
             <!-- Stats Section -->
-            <div class="goalie-stats-section">
-              <div class="stats-grid">
+            <div class="entity-stats-section">
+              <app-card-grid [columns]="9" [radius]="10">
                 <div class="stat-item">
                   <div class="stat-label">GP</div>
                   <div class="stat-value">{{ goalie.gamesPlayed || 0 }}</div>
@@ -228,7 +226,7 @@
                   <div class="stat-label">PTS</div>
                   <div class="stat-value stat-value-highlight">{{ goalie.points || 0 }}</div>
                 </div>
-              </div>
+              </app-card-grid>
             </div>
 
             <!-- Action Buttons -->
@@ -274,10 +272,10 @@
             </div>
           </div>
         }
-      </div>
+      </app-card-grid>
     } @else {
       <!-- Table View -->
-      <div class="goalies-table-container">
+      <div class="entity-table-container">
         <app-data-table
           [columns]="tableColumns"
           [data]="goaliesValue"

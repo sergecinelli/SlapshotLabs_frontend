@@ -221,14 +221,12 @@
       >
         Analysis
       </app-button>
-    </div>
-    @if (showActionsValue) {
-      <div class="card-actions">
+      @if (showActionsValue) {
         <app-button
-          [color]="'orange'"
-          [colorhover]="'orange_dark'"
-          [bghover]="'gray_tone3'"
-          [bgselect]="'gray_tone2'"
+          [bg]="'orange'"
+          [bghover]="'orange_dark'"
+          [color]="'white'"
+          [colorhover]="'white'"
           materialIcon="stylus"
           [tooltip]="'Edit'"
           (clicked)="onEdit()"
@@ -236,19 +234,19 @@
           role-visibility-name="edit-action"
         />
         <app-button-loading
+          [bg]="'primary'"
+          [bghover]="'primary_dark'"
+          [color]="'white'"
+          [colorhover]="'white'"
           [isLoading]="isDeletingValue"
           [isDisabled]="isDeletingValue"
-          [color]="'primary'"
-          [colorhover]="'primary_dark'"
-          [bghover]="'gray_tone3'"
-          [bgselect]="'gray_tone2'"
           [materialIcon]="'delete'"
           [tooltip]="'Delete'"
           (clicked)="onDelete()"
           class="action-button"
           role-visibility-name="delete-action"
         />
-      </div>
-    }
+      }
+    </div>
   </div>
 </div>

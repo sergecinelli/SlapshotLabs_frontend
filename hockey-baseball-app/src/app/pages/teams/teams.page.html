@@ -4,9 +4,9 @@
 
 <div class="page-content" [appVisibilityMap]="visibilityByRoleMap">
   <!-- Header with Add Button -->
-  <div class="teams-header">
-    <div class="teams-header-left"></div>
-    <div class="teams-header-actions" style="display: flex; gap: 10px; align-items: center">
+  <div class="entity-page-header">
+    <div class="entity-header-left"></div>
+    <div class="entity-header-actions" style="display: flex; gap: 10px; align-items: center">
       <!-- View Toggle Button -->
       <app-button
         [materialIcon]="layoutModeValue === 'card' ? 'table_rows' : 'grid_view'"
@@ -22,7 +22,7 @@
         {{ layoutModeValue === 'card' ? 'Table View' : 'Card View' }}
       </app-button>
 
-      <div class="add-team-button-wrapper" role-visibility-name="add-team-button">
+      <div class="entity-add-button-wrapper" role-visibility-name="add-team-button">
         <app-button
           materialIcon="add"
           [bg]="'primary'"
@@ -44,14 +44,14 @@
 
   <!-- Loading State -->
   @if (loadingValue) {
-    <div class="teams-loading">
+    <div class="entity-loading">
       <div class="loading-text">Loading teams...</div>
     </div>
   }
 
   <!-- Empty State -->
   @if (!loadingValue && teamsValue.length === 0) {
-    <div class="teams-empty">
+    <div class="entity-empty">
       <div class="empty-text">No teams found.</div>
     </div>
   }
@@ -60,11 +60,11 @@
   @if (!loadingValue && teamsValue.length > 0) {
     @if (layoutModeValue === 'card') {
       <!-- Card View -->
-      <div class="teams-cards-container">
+      <app-card-grid [columns]="2">
         @for (team of teamsValue; track team.id) {
-          <div class="team-card">
+          <div class="entity-card">
             <!-- Card Header -->
-            <div class="team-card-header">
+            <div class="entity-card-header">
               <div class="card-header-actions">
                 <app-button-route
                   [route]="'/teams-and-rosters/teams/' + team.id + '/profile'"
@@ -97,15 +97,15 @@
                 />
               </div>
               <div class="header-left">
-                <div class="team-name-row">
+                <div class="entity-name-row">
                   @if (team.logo) {
                     <img [appCachedSrc]="team.logo" [alt]="team.name" class="team-logo" />
                   } @else {
                     <div class="team-logo-placeholder"></div>
                   }
-                  <div class="team-name-group">
+                  <div class="entity-name-group">
                     <div
-                      class="team-name team-link"
+                      class="entity-name entity-link"
                       (click)="viewTeamProfile(team)"
                       (keyup.enter)="viewTeamProfile(team)"
                       (keyup.space)="viewTeamProfile(team)"
@@ -116,29 +116,29 @@
                       {{ team.name }}
                     </div>
                     @if (team.abbreviation) {
-                      <div class="team-abbreviation">{{ team.abbreviation }}</div>
+                      <div class="entity-subtitle">{{ team.abbreviation }}</div>
                     }
                   </div>
                 </div>
-                <div class="team-info-row">
-                  <div class="team-info-item">
-                    <span class="team-info-label">Group:</span>
-                    <span class="team-info-value">{{ team.group }}</span>
+                <div class="entity-info-row">
+                  <div class="entity-info-item">
+                    <span class="entity-info-label">Group:</span>
+                    <span class="entity-info-value">{{ team.group }}</span>
                   </div>
-                  <div class="team-info-item">
-                    <span class="team-info-label">Level:</span>
-                    <span class="team-info-value">{{ team.level }}</span>
+                  <div class="entity-info-item">
+                    <span class="entity-info-label">Level:</span>
+                    <span class="entity-info-value">{{ team.level }}</span>
                   </div>
                   @if (team.division) {
-                    <div class="team-info-item">
-                      <span class="team-info-label">Division:</span>
-                      <span class="team-info-value">{{ team.division }}</span>
+                    <div class="entity-info-item">
+                      <span class="entity-info-label">Division:</span>
+                      <span class="entity-info-value">{{ team.division }}</span>
                     </div>
                   }
                   @if (team.city) {
-                    <div class="team-info-item">
-                      <span class="team-info-label">City:</span>
-                      <span class="team-info-value">{{ team.city }}</span>
+                    <div class="entity-info-item">
+                      <span class="entity-info-label">City:</span>
+                      <span class="entity-info-value">{{ team.city }}</span>
                     </div>
                   }
                 </div>
@@ -146,8 +146,8 @@
             </div>
 
             <!-- Stats Section -->
-            <div class="team-stats-section">
-              <div class="stats-grid">
+            <div class="entity-stats-section">
+              <app-card-grid [columns]="8" [radius]="10">
                 <div class="stat-item">
                   <div class="stat-label">GP</div>
                   <div class="stat-value">{{ team.gamesPlayed }}</div>
@@ -180,7 +180,7 @@
                   <div class="stat-label">GD</div>
                   <div class="stat-value">{{ team.goalsFor - team.goalsAgainst }}</div>
                 </div>
-              </div>
+              </app-card-grid>
             </div>
 
             <!-- Action Buttons -->
@@ -243,10 +243,10 @@
             </div>
           </div>
         }
-      </div>
+      </app-card-grid>
     } @else {
       <!-- Table View -->
-      <div class="teams-table-container">
+      <div class="entity-table-container">
         <app-data-table
           [columns]="tableColumns"
           [data]="teamsValue"

@@ -1,0 +1,118 @@
+app-card-grid {
+  // Base: all children get small radius
+  > * {
+    border-radius: var(--radius-small);
+    overflow: hidden;
+  }
+
+  // Game card component: stretch to fill grid cell and inherit border-radius
+  > app-game-card {
+    display: flex;
+    height: 100%;
+
+    > .game-card {
+      border-radius: inherit;
+      box-shadow: none;
+    }
+  }
+}
+
+// ── 1-column layout ──
+app-card-grid[data-columns='1'] {
+  > * {
+    // Single item
+    &:first-child:last-child {
+      border-radius: var(--grid-radius);
+    }
+
+    // Top card
+    &:first-child:not(:last-child) {
+      border-top-left-radius: var(--grid-radius);
+      border-top-right-radius: var(--grid-radius);
+    }
+
+    // Bottom card
+    &:last-child:not(:first-child) {
+      border-bottom-left-radius: var(--grid-radius);
+      border-bottom-right-radius: var(--grid-radius);
+    }
+  }
+}
+
+// ── 2-column layout ──
+app-card-grid[data-columns='2'] {
+  > * {
+    // Single item
+    &:first-child:last-child {
+      border-radius: var(--grid-radius);
+    }
+
+    // Top-left corner
+    &:first-child:not(:last-child) {
+      border-top-left-radius: var(--grid-radius);
+    }
+
+    // Top-right corner
+    &:nth-child(2) {
+      border-top-right-radius: var(--grid-radius);
+    }
+
+    // Bottom-left (even total count — odd item is second-to-last)
+    &:nth-child(odd):nth-last-child(2) {
+      border-bottom-left-radius: var(--grid-radius);
+    }
+
+    // Bottom-right (even item is last)
+    &:nth-child(even):last-child {
+      border-bottom-right-radius: var(--grid-radius);
+    }
+
+    // Last item alone in row (odd total, not single item)
+    &:nth-child(odd):last-child:not(:first-child) {
+      border-bottom-left-radius: var(--grid-radius);
+      border-bottom-right-radius: var(--grid-radius);
+    }
+  }
+
+  // Responsive: collapse to 1-column
+  @media (max-width: 1100px) {
+    grid-template-columns: 1fr !important;
+
+    > * {
+      border-radius: var(--radius-small);
+
+      &:first-child:last-child {
+        border-radius: var(--grid-radius);
+      }
+
+      &:first-child:not(:last-child) {
+        border-top-left-radius: var(--grid-radius);
+        border-top-right-radius: var(--grid-radius);
+      }
+
+      &:last-child:not(:first-child) {
+        border-bottom-left-radius: var(--grid-radius);
+        border-bottom-right-radius: var(--grid-radius);
+      }
+    }
+  }
+}
+
+// ── Single-row layout (3+ columns) ──
+app-card-grid:not([data-columns='1']):not([data-columns='2']) {
+  > * {
+    &:first-child:last-child {
+      border-radius: var(--grid-radius);
+    }
+
+    &:first-child:not(:last-child) {
+      border-top-left-radius: var(--grid-radius);
+      border-bottom-left-radius: var(--grid-radius);
+    }
+
+    &:last-child:not(:first-child) {
+      border-top-right-radius: var(--grid-radius);
+      border-bottom-right-radius: var(--grid-radius);
+    }
+  }
+}

@@ -38,22 +38,6 @@
 }
 
 // Cards Container
-.schedule-cards-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(700px, 100%), 1fr));
-  grid-auto-rows: auto;
-  gap: 20px;
-  margin-top: 20px;
-  align-items: stretch;
-  max-width: 100%;
-
-  // Limit to maximum 2 columns on very wide screens
-  @media (min-width: 1600px) {
-    grid-template-columns: repeat(2, minmax(700px, 1fr));
-  }
-
-  app-game-card {
-    display: flex;
-    height: 100%;
-  }
+app-card-grid {
+  margin-top: 10px;
 }

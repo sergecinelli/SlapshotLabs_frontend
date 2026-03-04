@@ -583,37 +583,71 @@
               <div class="flex flex-wrap items-center justify-end" style="gap: 15px">
                 @for (action of actionsValue; track action.action) {
                   @if (!action.condition || action.condition(element)) {
-                    <app-button-small
-                      [materialIcon]="action.icon || getActionIcon(action.action)"
-                      [bg]="'transparent'"
-                      [bghover]="'transparent'"
-                      [color]="getActionColor(action.variant, action.action)"
-                      [colorhover]="getActionColorHover(action.variant, action.action)"
-                      [tooltip]="action.iconOnly ? action.label : null"
-                      [haveContent]="!action.iconOnly"
-                      [rounded]="false"
-                      (clicked)="onActionClick(action.action, element)"
-                      [attr.role-access-name]="action.roleAccessName"
-                      [attr.role-visibility-name]="action.roleVisibilityName"
-                      [attr.role-visibility-author-id]="
-                        action.roleVisibilityAuthorId
-                          ? typeof action.roleVisibilityAuthorId === 'function'
-                            ? action.roleVisibilityAuthorId(element)
-                            : action.roleVisibilityAuthorId
-                          : null
-                      "
-                      [attr.role-visibility-team-id]="
-                        action.roleVisibilityTeamId
-                          ? typeof action.roleVisibilityTeamId === 'function'
-                            ? action.roleVisibilityTeamId(element)
-                            : action.roleVisibilityTeamId
-                          : null
-                      "
-                    >
-                      @if (!action.iconOnly) {
-                        {{ action.label }}
-                      }
-                    </app-button-small>
+                    @if (action.route) {
+                      <app-button-route-small
+                        [route]="action.route(element)"
+                        [materialIcon]="action.icon || getActionIcon(action.action)"
+                        [bg]="'transparent'"
+                        [bghover]="'transparent'"
+                        [color]="getActionColor(action.variant, action.action)"
+                        [colorhover]="getActionColorHover(action.variant, action.action)"
+                        [tooltip]="action.iconOnly ? action.label : null"
+                        [haveContent]="!action.iconOnly"
+                        [rounded]="false"
+                        [attr.role-access-name]="action.roleAccessName"
+                        [attr.role-visibility-name]="action.roleVisibilityName"
+                        [attr.role-visibility-author-id]="
+                          action.roleVisibilityAuthorId
+                            ? typeof action.roleVisibilityAuthorId === 'function'
+                              ? action.roleVisibilityAuthorId(element)
+                              : action.roleVisibilityAuthorId
+                            : null
+                        "
+                        [attr.role-visibility-team-id]="
+                          action.roleVisibilityTeamId
+                            ? typeof action.roleVisibilityTeamId === 'function'
+                              ? action.roleVisibilityTeamId(element)
+                              : action.roleVisibilityTeamId
+                            : null
+                        "
+                      >
+                        @if (!action.iconOnly) {
+                          {{ action.label }}
+                        }
+                      </app-button-route-small>
+                    } @else {
+                      <app-button-small
+                        [materialIcon]="action.icon || getActionIcon(action.action)"
+                        [bg]="'transparent'"
+                        [bghover]="'transparent'"
+                        [color]="getActionColor(action.variant, action.action)"
+                        [colorhover]="getActionColorHover(action.variant, action.action)"
+                        [tooltip]="action.iconOnly ? action.label : null"
+                        [haveContent]="!action.iconOnly"
+                        [rounded]="false"
+                        (clicked)="onActionClick(action.action, element)"
+                        [attr.role-access-name]="action.roleAccessName"
+                        [attr.role-visibility-name]="action.roleVisibilityName"
+                        [attr.role-visibility-author-id]="
+                          action.roleVisibilityAuthorId
+                            ? typeof action.roleVisibilityAuthorId === 'function'
+                              ? action.roleVisibilityAuthorId(element)
+                              : action.roleVisibilityAuthorId
+                            : null
+                        "
+                        [attr.role-visibility-team-id]="
+                          action.roleVisibilityTeamId
+                            ? typeof action.roleVisibilityTeamId === 'function'
+                              ? action.roleVisibilityTeamId(element)
+                              : action.roleVisibilityTeamId
+                            : null
+                        "
+                      >
+                        @if (!action.iconOnly) {
+                          {{ action.label }}
+                        }
+                      </app-button-small>
+                    }
                   }
                 }
               </div>

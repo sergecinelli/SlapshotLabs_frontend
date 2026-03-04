@@ -6,7 +6,7 @@
   <!-- Content with padding -->
   <div>
     <!-- Quick Actions Row -->
-    <div class="flex flex-wrap gap-4 justify-center dashboard-actions-row">
+    <div class="flex flex-wrap justify-center dashboard-actions-row">
       <app-button
         role-visibility-name="add-team-button"
         [bg]="'primary'"
@@ -80,7 +80,7 @@
           <div class="empty-text">No current or upcoming games scheduled.</div>
         </div>
       } @else {
-        <div class="dashboard-cards-container">
+        <app-card-grid [columns]="2">
           @for (game of upcomingGamesValue; track game.id; let i = $index) {
             @if (i < 5) {
               <app-game-card
@@ -91,7 +91,7 @@
               />
             }
           }
-        </div>
+        </app-card-grid>
       }
     </div>
 
@@ -105,7 +105,7 @@
           <div class="empty-text">No completed games found.</div>
         </div>
       } @else {
-        <div class="dashboard-cards-container">
+        <app-card-grid [columns]="2">
           @for (game of gameResultsValue; track game.id; let i = $index) {
             @if (i < 5) {
               <app-game-card
@@ -116,7 +116,7 @@
               />
             }
           }
-        </div>
+        </app-card-grid>
       }
     </div>
   </div>

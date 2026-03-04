@@ -124,7 +124,7 @@
         .team-avatar {
           width: 60px;
           height: 60px;
-          border-radius: 50%;
+          border-radius: var(--border);
           background-color: #f3f4f6;
           display: flex;
           align-items: center;

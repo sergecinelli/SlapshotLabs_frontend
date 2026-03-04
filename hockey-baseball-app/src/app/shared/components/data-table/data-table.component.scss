@@ -1,21 +1,17 @@
 .data-table-container {
   width: 100%;
   max-width: 100%;
+  border-radius: var(--radius);
+  overflow: hidden;
 
   .loading-state {
     background-color: white;
-    border-radius: 0.5rem;
-    box-shadow:
-      0 1px 3px 0 rgb(0 0 0 / 0.1),
-      0 1px 2px -1px rgb(0 0 0 / 0.1);
+    border-radius: var(--radius);
   }
 
   .table-wrapper {
     background-color: white;
-    border-radius: 0.5rem;
-    box-shadow:
-      0 1px 3px 0 rgb(0 0 0 / 0.1),
-      0 1px 2px -1px rgb(0 0 0 / 0.1);
+    border-radius: var(--radius);
     overflow-x: auto;
     overflow-y: hidden;
 
@@ -41,6 +37,7 @@
       width: 100%;
       min-width: 1200px;
       table-layout: fixed;
+      font-family: 'Inter', sans-serif;
 
       // Bold text for Goals columns only
       .mat-mdc-cell {
@@ -51,14 +48,24 @@
 
       .custom-header {
         .mat-mdc-header-cell {
-          @apply bg-gray-200 font-medium text-sm text-gray-600 border-0;
+          @apply bg-gray-200 border-0;
+          font-family: 'Inter', sans-serif !important;
+          font-size: 13px !important;
+          font-weight: 600 !important;
+          color: #374151 !important;
+          letter-spacing: -0.01em;
+
+          * {
+            font-family: inherit !important;
+            font-weight: inherit !important;
+          }
 
           &:first-child {
-            border-top-left-radius: 8px;
+            border-top-left-radius: var(--radius);
           }
 
           &:last-child {
-            border-top-right-radius: 8px;
+            border-top-right-radius: var(--radius);
           }
         }
       }
@@ -77,13 +84,20 @@
       }
 
       .mat-mdc-cell {
-        font-size: 12px !important;
-        color: #111827 !important;
+        font-family: 'Inter', sans-serif !important;
+        font-size: 13px !important;
+        line-height: 1.5 !important;
+        color: #1f2937 !important;
         border-bottom: 1px solid #e5e7eb !important;
-        padding: 8px 16px !important;
+        padding: 10px 16px !important;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+        letter-spacing: -0.01em;
+
+        * {
+          font-family: inherit !important;
+        }
 
         // Bold text for Goals columns only (same style as team-name)
         span.goals-value {
@@ -196,13 +210,13 @@
           }
 
           .team-info {
-            font-size: 11px;
+            font-size: 12px;
             color: #6b7280;
             margin-bottom: 2px;
           }
 
           .team-goalie {
-            font-size: 11px;
+            font-size: 12px;
             color: #6b7280;
 
             .goalie-name-link {
@@ -229,7 +243,7 @@
           }
 
           .arena-address {
-            font-size: 11px;
+            font-size: 12px;
             color: #6b7280;
             margin-bottom: 2px;
           }
@@ -252,7 +266,8 @@
       }
 
       .mat-mdc-header-cell {
-        padding: 8px 16px !important;
+        font-family: 'Inter', sans-serif !important;
+        padding: 10px 16px !important;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -327,10 +342,7 @@
 
   .empty-state {
     background-color: white;
-    border-radius: 0.5rem;
-    box-shadow:
-      0 1px 3px 0 rgb(0 0 0 / 0.1),
-      0 1px 2px -1px rgb(0 0 0 / 0.1);
+    border-radius: var(--radius);
   }
 
   // Badge styles for schedule table

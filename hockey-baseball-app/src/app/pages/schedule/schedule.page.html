@@ -46,7 +46,7 @@
 
   <!-- Game Cards -->
   @if (!loadingValue && schedulesValue.length > 0) {
-    <div class="schedule-cards-container">
+    <app-card-grid [columns]="2">
       @for (schedule of schedulesValue; track schedule.id) {
         <app-game-card
           [game]="schedule"
@@ -58,6 +58,6 @@
           (analysis)="viewGameAnalysis($event)"
         />
       }
-    </div>
+    </app-card-grid>
   }
 </div>

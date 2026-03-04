@@ -1,5 +1,12 @@
 @use '@angular/material' as mat;
 @use './app/shared/styles/dashboard-card.scss';
+@use './app/shared/styles/card-grid';
+
+:root {
+  --radius: 20px;
+  --radius-medium: 10px;
+  --radius-small: 5px;
+}
 
 // Global CSS Variables
 // Note: All colors are defined in colors.ts and set via ThemeService
@@ -257,7 +264,14 @@ mat-error {
 }
 
 .page-content {
-  padding: 20px;
+  padding: 10px;
+}
+
+.mat-mdc-table {
+  --mat-table-header-headline-font: 'Inter', sans-serif;
+  --mat-table-row-item-label-text-font: 'Inter', sans-serif;
+  --mat-table-footer-supporting-text-font: 'Inter', sans-serif;
+  --mat-sort-arrow-color: #6b7280;
 }
 
 .mat-mdc-tooltip {
@@ -505,6 +519,14 @@ img.cached-img-loading {
   background-size: 2000px 100%;
   animation: cached-img-shimmer 1.5s infinite;
   color: transparent;
+}
+
+.action-buttons-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 5px;
+  margin-bottom: 16px;
 }
 
 .player-filter-panel.mat-mdc-select-panel {
