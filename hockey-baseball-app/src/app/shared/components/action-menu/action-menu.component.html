@@ -1,0 +1,65 @@
+<div
+  class="action-menu-dropdown"
+  role="menu"
+  appOutsideClick
+  (appOutsideClick)="outsideClick()"
+>
+  @for (item of items(); track $index) {
+    @if (item.isDivider) {
+      <div
+        class="dropdown-divider"
+        role="separator"
+      ></div>
+    } @else if (item.isHeader) {
+      <div class="dropdown-header">
+        {{ item.label }}
+      </div>
+    } @else {
+      <div
+        class="dropdown-item"
+        role="menuitem"
+        [appDisableToggle]="item.isDisabled || false"
+        [class.danger-item]="item.isDanger"
+        [class.active-item]="item.isActive"
+        [class.has-description]="!!item.description"
+        tabindex="0"
+        matRipple
+        [matRippleColor]="rippleColor"
+        (click)="handleAction(item, $event)"
+        (keydown.enter)="handleAction(item)"
+      >
+        @if (item.icon) {
+          <span class="material-symbols-rounded icon">{{ item.icon }}</span>
+        }
+
+        <div class="item-content">
+          <span class="label">{{ item.label }}</span>
+          @if (item.description) {
+            <span class="description">{{ item.description }}</span>
+          }
+        </div>
+
+        @if (item.badgeText) {
+          <span class="badge-text">{{ item.badgeText }}</span>
+        } @else if (item.badgeDot) {
+          <span class="badge-dot"></span>
+        }
+
+        @if (item.suffixIcon) {
+          <span class="material-symbols-rounded suffix-icon">{{ item.suffixIcon }}</span>
+        }
+
+        @if (item.shortcut) {
+          <div class="item-keys">
+            @for (key of item.shortcut; track $index) {
+              <kbd>{{ key }}</kbd>
+              @if (!$last) {
+                <span class="plus">+</span>
+              }
+            }
+          </div>
+        }
+      </div>
+    }
+  }
+</div>

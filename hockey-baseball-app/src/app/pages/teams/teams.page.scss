@@ -105,6 +105,16 @@
   margin-bottom: 16px;
   padding-bottom: 12px;
   border-bottom: 1px solid var(--border-light);
+  position: relative;
+}
+
+.card-header-actions {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: flex;
+  gap: 2px;
+  z-index: 1;
 }
 
 .header-left {
@@ -172,6 +182,7 @@
 
   &.team-link {
     cursor: pointer;
+    width: fit-content;
     transition: text-decoration 0.2s ease;
 
     &:hover {

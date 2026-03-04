@@ -434,8 +434,9 @@
   &.goalie-link {
     text-decoration: none;
     color: var(--text-secondary);
-    cursor: pointer;
     transition: text-decoration 0.2s ease;
+    width: fit-content;
+    cursor: pointer;
 
     &:hover {
       text-decoration: underline;

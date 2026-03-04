@@ -61,7 +61,6 @@ export class GoaliesPage implements OnInit {
   teamName = signal<string>('Goalies');
   pageTitle = signal<string>('Goalies');
   layoutMode = signal<'card' | 'table'>('table'); // Default to table
-
   tableColumns: TableColumn[] = [
     { key: 'firstName', label: 'First Name', sortable: true, width: '120px' },
     { key: 'lastName', label: 'Last Name', sortable: true, width: '120px' },
@@ -86,6 +85,14 @@ export class GoaliesPage implements OnInit {
       action: 'shot-spray-chart',
       variant: 'secondary',
       icon: 'scatter_plot',
+      iconOnly: true,
+    },
+    {
+      label: 'Add To Tryout',
+      action: 'add-to-tryout',
+      variant: 'secondary',
+      icon: 'person_add',
+      iconOnly: true,
     },
     {
       label: 'Profile',
@@ -109,13 +116,6 @@ export class GoaliesPage implements OnInit {
       icon: 'delete',
       iconOnly: true,
       roleVisibilityName: 'delete-action',
-    },
-    {
-      label: 'Add To Tryout',
-      action: 'add-to-tryout',
-      variant: 'secondary',
-      icon: 'person_add',
-      iconOnly: true,
     },
   ];
 

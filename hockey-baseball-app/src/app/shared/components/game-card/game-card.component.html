@@ -192,18 +192,6 @@
   <!-- Action Buttons -->
   <div class="card-actions-container">
     <div class="card-actions">
-      <app-button
-        [bg]="'upcoming'"
-        [bghover]="'upcoming'"
-        [color]="'white'"
-        [colorhover]="'white'"
-        materialIcon="analytics"
-        [haveContent]="true"
-        (clicked)="onAnalysis()"
-        class="action-button"
-      >
-        Analysis
-      </app-button>
       @if (
         gameValue.status === GameStatus.GameInProgress || gameValue.status === GameStatus.GameOver
       ) {
@@ -221,6 +209,18 @@
           Dashboard
         </app-button-route>
       }
+      <app-button
+        [bg]="'upcoming'"
+        [bghover]="'upcoming'"
+        [color]="'white'"
+        [colorhover]="'white'"
+        materialIcon="analytics"
+        [haveContent]="true"
+        (clicked)="onAnalysis()"
+        class="action-button"
+      >
+        Analysis
+      </app-button>
     </div>
     @if (showActionsValue) {
       <div class="card-actions">

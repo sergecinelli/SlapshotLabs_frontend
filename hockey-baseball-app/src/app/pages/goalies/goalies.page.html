@@ -73,6 +73,35 @@
           <div class="goalie-card">
             <!-- Card Header -->
             <div class="goalie-card-header">
+              <div class="card-header-actions">
+                <app-button
+                  [bg]="'transparent'"
+                  [bghover]="'gray_tone3'"
+                  [color]="'text_secondary'"
+                  [colorhover]="'green_dark'"
+                  [materialIcon]="'visibility'"
+                  [matTooltip]="'Profile'"
+                  (clicked)="viewGoalieProfile(goalie)"
+                />
+                <app-button
+                  [bg]="'transparent'"
+                  [bghover]="'gray_tone3'"
+                  [color]="'text_secondary'"
+                  [colorhover]="'orange_dark'"
+                  [materialIcon]="'stylus'"
+                  [matTooltip]="'Edit'"
+                  (clicked)="editGoalie(goalie)"
+                />
+                <app-button
+                  [bg]="'transparent'"
+                  [bghover]="'gray_tone3'"
+                  [color]="'text_secondary'"
+                  [colorhover]="'primary_dark'"
+                  [materialIcon]="'delete'"
+                  [matTooltip]="'Delete'"
+                  (clicked)="deleteGoalie(goalie)"
+                />
+              </div>
               <div class="header-left">
                 <div class="goalie-name-row">
                   <div class="goalie-avatar">
@@ -206,18 +235,6 @@
             <div class="card-actions-container">
               <div class="card-actions">
                 <app-button-route
-                  [route]="'/analytics/goalies/' + goalie.id"
-                  [bg]="'upcoming'"
-                  [bghover]="'upcoming'"
-                  [color]="'white'"
-                  [colorhover]="'white'"
-                  [materialIcon]="'analytics'"
-                  [haveContent]="true"
-                  class="action-button"
-                >
-                  Analysis
-                </app-button-route>
-                <app-button-route
                   [route]="'/teams-and-rosters/goalies/' + goalie.id + '/spray-chart'"
                   [bg]="'transparent'"
                   [bghover]="'button_background'"
@@ -230,50 +247,29 @@
                 >
                   Spray Chart
                 </app-button-route>
-              </div>
-              <div class="card-actions">
-                <app-button-route
-                  [route]="'/teams-and-rosters/goalies/' + goalie.id + '/profile'"
-                  [color]="'green'"
-                  [colorhover]="'green_dark'"
-                  [bghover]="'gray_tone3'"
-                  [bgselect]="'gray_tone2'"
-                  [materialIcon]="'visibility'"
-                  [tooltip]="'Profile'"
-                  class="action-button"
-                />
                 <app-button
-                  [color]="'orange'"
-                  [colorhover]="'orange_dark'"
-                  [bghover]="'gray_tone3'"
-                  [bgselect]="'gray_tone2'"
-                  materialIcon="stylus"
-                  [tooltip]="'Edit'"
-                  (clicked)="editGoalie(goalie)"
-                  class="action-button"
-                  role-visibility-name="edit-action"
-                />
-                <app-button
-                  [color]="'primary'"
-                  [colorhover]="'primary_dark'"
-                  [bghover]="'gray_tone3'"
-                  [bgselect]="'gray_tone2'"
-                  [materialIcon]="'delete'"
-                  [tooltip]="'Delete'"
-                  (clicked)="deleteGoalie(goalie)"
-                  class="action-button"
-                  role-visibility-name="delete-action"
-                />
-                <app-button
-                  [color]="'upcoming'"
-                  [colorhover]="'upcoming'"
-                  [bghover]="'gray_tone3'"
-                  [bgselect]="'gray_tone2'"
+                  [bg]="'transparent'"
+                  [bghover]="'button_background'"
+                  [br]="'border'"
+                  [color]="'text_primary'"
+                  [colorhover]="'text_primary'"
                   [materialIcon]="'person_add'"
-                  [tooltip]="'Add To Tryout List'"
                   (clicked)="addToTryout(goalie)"
                   class="action-button"
-                />
+                  >Add to Tryout</app-button
+                >
+                <app-button-route
+                  [route]="'/analytics/goalies/' + goalie.id"
+                  [bg]="'upcoming'"
+                  [bghover]="'upcoming'"
+                  [color]="'white'"
+                  [colorhover]="'white'"
+                  [materialIcon]="'analytics'"
+                  [haveContent]="true"
+                  class="action-button"
+                >
+                  Analysis
+                </app-button-route>
               </div>
             </div>
           </div>

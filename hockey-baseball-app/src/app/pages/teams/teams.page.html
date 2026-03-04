@@ -65,6 +65,37 @@
           <div class="team-card">
             <!-- Card Header -->
             <div class="team-card-header">
+              <div class="card-header-actions">
+                <app-button-route
+                  [route]="'/teams-and-rosters/teams/' + team.id + '/profile'"
+                  [bg]="'transparent'"
+                  [bghover]="'gray_tone3'"
+                  [color]="'text_secondary'"
+                  [colorhover]="'green_dark'"
+                  [materialIcon]="'visibility'"
+                  [matTooltip]="'Profile'"
+                />
+                <app-button
+                  [bg]="'transparent'"
+                  [bghover]="'gray_tone3'"
+                  [color]="'text_secondary'"
+                  [colorhover]="'orange_dark'"
+                  [materialIcon]="'stylus'"
+                  [matTooltip]="'Edit'"
+                  (clicked)="editTeam(team)"
+                  role-visibility-name="edit-action"
+                />
+                <app-button
+                  [bg]="'transparent'"
+                  [bghover]="'gray_tone3'"
+                  [color]="'text_secondary'"
+                  [colorhover]="'primary_dark'"
+                  [materialIcon]="'delete'"
+                  [matTooltip]="'Delete'"
+                  (clicked)="deleteTeam(team)"
+                  role-visibility-name="delete-action"
+                />
+              </div>
               <div class="header-left">
                 <div class="team-name-row">
                   @if (team.logo) {
@@ -156,18 +187,6 @@
             <div class="card-actions-container">
               <div class="card-actions">
                 <app-button-route
-                  [route]="'/analytics/teams/' + team.id"
-                  [bg]="'upcoming'"
-                  [bghover]="'upcoming'"
-                  [color]="'white'"
-                  [colorhover]="'white'"
-                  [materialIcon]="'analytics'"
-                  [haveContent]="true"
-                  class="action-button"
-                >
-                  Analysis
-                </app-button-route>
-                <app-button-route
                   [route]="'/teams-and-rosters/teams/' + team.id + '/schedule'"
                   [bg]="'transparent'"
                   [bghover]="'button_background'"
@@ -208,40 +227,18 @@
                 >
                   Goalies
                 </app-button-route>
-              </div>
-              <div class="card-actions">
                 <app-button-route
-                  [route]="'/teams-and-rosters/teams/' + team.id + '/profile'"
-                  [color]="'green'"
-                  [colorhover]="'green_dark'"
-                  [bghover]="'gray_tone3'"
-                  [bgselect]="'gray_tone2'"
-                  [materialIcon]="'visibility'"
-                  [tooltip]="'View'"
+                  [route]="'/analytics/teams/' + team.id"
+                  [bg]="'upcoming'"
+                  [bghover]="'upcoming'"
+                  [color]="'white'"
+                  [colorhover]="'white'"
+                  [materialIcon]="'analytics'"
+                  [haveContent]="true"
                   class="action-button"
-                />
-                <app-button
-                  [color]="'orange'"
-                  [colorhover]="'orange_dark'"
-                  [bghover]="'gray_tone3'"
-                  [bgselect]="'gray_tone2'"
-                  materialIcon="stylus"
-                  [tooltip]="'Edit'"
-                  (clicked)="editTeam(team)"
-                  class="action-button"
-                  role-visibility-name="edit-action"
-                />
-                <app-button
-                  [color]="'primary'"
-                  [colorhover]="'primary_dark'"
-                  [bghover]="'gray_tone3'"
-                  [bgselect]="'gray_tone2'"
-                  [materialIcon]="'delete'"
-                  [tooltip]="'Delete'"
-                  (clicked)="deleteTeam(team)"
-                  class="action-button"
-                  role-visibility-name="delete-action"
-                />
+                >
+                  Analysis
+                </app-button-route>
               </div>
             </div>
           </div>
