@@ -247,6 +247,20 @@
     background-color: #f3f4f6 !important;
   }
 
+  .mat-mdc-optgroup-label {
+    min-height: 32px !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    text-transform: uppercase;
+    color: var(--color-primary) !important;
+    letter-spacing: 0.5px;
+    background-color: #f9fafb;
+    border-bottom: 1px solid #e5e7eb;
+    position: sticky;
+    top: 37px;
+    z-index: 1;
+  }
+
   .mat-pseudo-checkbox-minimal {
     display: inline-block !important;
   }

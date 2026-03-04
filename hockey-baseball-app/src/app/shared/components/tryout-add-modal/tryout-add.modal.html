@@ -25,60 +25,68 @@
           </app-button-small>
         }
         <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="search-field">
-          <mat-label class="uppercase text-custom-secondary">Select existing {{ isGoalie ? 'goalies' : 'players' }}</mat-label>
-        <mat-select
-          [value]="selectedIds()"
-          [placeholder]="'No ' + (isGoalie ? 'goalies' : 'players') + ' selected'"
-          (selectionChange)="onSelectionChange($event.value)"
-          (openedChange)="onSelectOpenedChange($event)"
-          multiple
-          panelClass="tryout-player-select-panel"
-        >
-          <mat-select-trigger>
-            <div class="trigger-chips">
-              @for (entry of selectedEntriesValue; track entry.id) {
-                <span class="trigger-chip">
-                  {{ entry.firstName }} {{ entry.lastName }}
-                  <span
-                    class="material-symbols-rounded trigger-chip-remove"
-                    (click)="removeEntry(entry); $event.stopPropagation()"
-                  >close</span>
-                </span>
+          <mat-label class="uppercase text-custom-secondary"
+            >Select existing {{ isGoalie ? 'goalies' : 'players' }}</mat-label
+          >
+          <mat-select
+            [value]="selectedIds()"
+            [placeholder]="'No ' + (isGoalie ? 'goalies' : 'players') + ' selected'"
+            (selectionChange)="onSelectionChange($event.value)"
+            (openedChange)="onSelectOpenedChange($event)"
+            multiple
+            panelClass="tryout-player-select-panel"
+          >
+            <mat-select-trigger>
+              <div class="trigger-chips">
+                @for (entry of selectedEntriesValue; track entry.id) {
+                  <span class="trigger-chip">
+                    {{ entry.firstName }} {{ entry.lastName }}
+                    <span
+                      class="material-symbols-rounded trigger-chip-remove"
+                      (click)="removeEntry(entry); $event.stopPropagation()"
+                      >close</span
+                    >
+                  </span>
+                }
+              </div>
+            </mat-select-trigger>
+
+            <div class="player-search-wrapper" (click)="$event.stopPropagation()">
+              <span class="material-symbols-rounded search-icon">search</span>
+              <input
+                #playerSearchInput
+                class="player-search-input"
+                placeholder="Search by name..."
+                [value]="searchText()"
+                (input)="onSearchInput($event)"
+                (keydown)="$event.stopPropagation()"
+              />
+              @if (searchText()) {
+                <span
+                  class="material-symbols-rounded search-clear"
+                  (click)="clearSearch(playerSearchInput)"
+                  >close</span
+                >
               }
             </div>
-          </mat-select-trigger>
 
-          <div class="player-search-wrapper" (click)="$event.stopPropagation()">
-            <span class="material-symbols-rounded search-icon">search</span>
-            <input
-              #playerSearchInput
-              class="player-search-input"
-              placeholder="Search by name..."
-              [value]="searchText()"
-              (input)="onSearchInput($event)"
-              (keydown)="$event.stopPropagation()"
-            />
-            @if (searchText()) {
-              <span
-                class="material-symbols-rounded search-clear"
-                (click)="clearSearch(playerSearchInput)"
-              >close</span>
+            @for (group of groupedEntries(); track group.teamName) {
+              <mat-optgroup [label]="group.teamName">
+                @for (entry of group.entries; track entry.id) {
+                  <mat-option
+                    [value]="entry.id"
+                    [style.display]="playerMatchesSearch(entry) ? '' : 'none'"
+                  >
+                    <span class="player-option">
+                      <span class="player-number-badge">#{{ entry.jerseyNumber }}</span>
+                      {{ entry.firstName }} {{ entry.lastName }}
+                      <span class="player-team-info">{{ entry.teamLevelName }}</span>
+                    </span>
+                  </mat-option>
+                }
+              </mat-optgroup>
             }
-          </div>
-
-          @for (entry of allEntries(); track entry.id) {
-            <mat-option
-              [value]="entry.id"
-              [style.display]="playerMatchesSearch(entry) ? '' : 'none'"
-            >
-              <span class="player-option">
-                <span class="player-number-badge">#{{ entry.jerseyNumber }}</span>
-                {{ entry.firstName }} {{ entry.lastName }}
-                <span class="player-team-info">{{ entry.team }} ({{ entry.teamLevelName }})</span>
-              </span>
-            </mat-option>
-          }
-        </mat-select>
+          </mat-select>
         </mat-form-field>
       </div>
 
@@ -109,8 +117,15 @@
           <div class="form-row">
             <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
               <mat-label class="uppercase text-custom-secondary">Number:</mat-label>
-              <input matInput type="number" formControlName="jerseyNumber" placeholder="Enter jersey number" />
-              @if (playerForm.get('jerseyNumber')?.errors && playerForm.get('jerseyNumber')?.touched) {
+              <input
+                matInput
+                type="number"
+                formControlName="jerseyNumber"
+                placeholder="Enter jersey number"
+              />
+              @if (
+                playerForm.get('jerseyNumber')?.errors && playerForm.get('jerseyNumber')?.touched
+              ) {
                 <mat-error>{{ getErrorMessage('jerseyNumber') }}</mat-error>
               }
             </mat-form-field>
@@ -130,14 +145,21 @@
             </mat-form-field>
             <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
               <mat-label class="uppercase text-custom-secondary">Birth Year:</mat-label>
-              <input matInput type="number" formControlName="birthYear" placeholder="Enter birth year" />
+              <input
+                matInput
+                type="number"
+                formControlName="birthYear"
+                placeholder="Enter birth year"
+              />
               @if (playerForm.get('birthYear')?.errors && playerForm.get('birthYear')?.touched) {
                 <mat-error>{{ getErrorMessage('birthYear') }}</mat-error>
               }
             </mat-form-field>
             @if (!isGoalie) {
               <div class="position-selection-container">
-                <span class="position-selection-label uppercase text-custom-secondary">Position:</span>
+                <span class="position-selection-label uppercase text-custom-secondary"
+                  >Position:</span
+                >
                 <div class="position-buttons">
                   @for (option of positionOptions; track option) {
                     <div
@@ -171,7 +193,12 @@
             </mat-form-field>
             <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
               <mat-label class="uppercase text-custom-secondary">Weight</mat-label>
-              <input matInput type="number" formControlName="weight" placeholder="Enter weight in lbs" />
+              <input
+                matInput
+                type="number"
+                formControlName="weight"
+                placeholder="Enter weight in lbs"
+              />
               @if (playerForm.get('weight')?.errors && playerForm.get('weight')?.touched) {
                 <mat-error>{{ getErrorMessage('weight') }}</mat-error>
               }
@@ -179,7 +206,9 @@
           </div>
           <div class="form-row">
             <div class="shoots-selection-container">
-              <span class="shoots-selection-label uppercase text-custom-secondary">Shoots (R/L)</span>
+              <span class="shoots-selection-label uppercase text-custom-secondary"
+                >Shoots (R/L)</span
+              >
               <div class="shoots-buttons">
                 @for (option of shootsOptions; track option) {
                   <div
@@ -234,7 +263,8 @@
         [haveContent]="true"
         (clicked)="onSubmitSelected()"
       >
-        Add {{ selectedEntriesValue.length }} {{ isGoalie ? 'Goalie' : 'Player' }}{{ selectedEntriesValue.length > 1 ? 's' : '' }}
+        Add {{ selectedEntriesValue.length }} {{ isGoalie ? 'Goalie' : 'Player'
+        }}{{ selectedEntriesValue.length > 1 ? 's' : '' }}
       </app-button-loading>
     }
     @if (showCreateFormValue) {

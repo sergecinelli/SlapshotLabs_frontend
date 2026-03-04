@@ -62,6 +62,19 @@ export class TryoutAddModal implements OnInit {
     return this.allEntries().filter((e) => ids.has(String(e.id)));
   });
 
+  groupedEntries = computed(() => {
+    const entries = this.allEntries();
+    const search = this.searchText().toLowerCase();
+    const groups = new Map<string, TryoutEntry[]>();
+    for (const entry of entries) {
+      if (search && !this.entryMatchesSearch(entry, search)) continue;
+      const key = entry.team || 'Unknown Team';
+      if (!groups.has(key)) groups.set(key, []);
+      groups.get(key)!.push(entry);
+    }
+    return Array.from(groups, ([teamName, entries]) => ({ teamName, entries }));
+  });
+
   shootsOptions = [
     { value: 'Left Shot', label: 'Left Shot' },
     { value: 'Right Shot', label: 'Right Shot' },
@@ -98,7 +111,10 @@ export class TryoutAddModal implements OnInit {
   }
 
   playerMatchesSearch(entry: TryoutEntry): boolean {
-    const search = this.searchText().toLowerCase();
+    return this.entryMatchesSearch(entry, this.searchText().toLowerCase());
+  }
+
+  private entryMatchesSearch(entry: TryoutEntry, search: string): boolean {
     if (!search) return true;
     return (
       entry.firstName.toLowerCase().includes(search) ||
