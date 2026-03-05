@@ -17,7 +17,12 @@ import { ToastService } from '../../services/toast.service';
 
 @Component({
   selector: 'app-video-library',
-  imports: [DataTableComponent, MatIconModule, ComponentVisibilityByRoleDirective, ButtonLoadingComponent],
+  imports: [
+    DataTableComponent,
+    MatIconModule,
+    ComponentVisibilityByRoleDirective,
+    ButtonLoadingComponent,
+  ],
   templateUrl: './video-library.page.html',
   styleUrl: './video-library.page.scss',
 })
@@ -41,9 +46,9 @@ export class VideoLibraryPage implements OnInit {
   ];
 
   tableActions: TableAction[] = [
-    { label: 'Delete', action: 'delete', variant: 'danger', roleVisibilityName: 'delete-action' },
-    { label: 'Edit', action: 'edit', variant: 'secondary', roleVisibilityName: 'edit-action' },
-    { label: 'View', action: 'view', variant: 'primary' },
+    { label: 'Delete', action: 'delete', variant: 'red', roleVisibilityName: 'delete-action' },
+    { label: 'Edit', action: 'edit', variant: 'orange', roleVisibilityName: 'edit-action' },
+    { label: 'View', action: 'view', variant: 'green' },
   ];
 
   ngOnInit(): void {

@@ -4,8 +4,8 @@ import { map, catchError } from 'rxjs/operators';
 import { ApiService } from './api.service';
 import {
   Analysis,
-  AnalysisApiIn,
-  AnalysisApiOut,
+  AnalyticsApiIn,
+  AnalyticsApiOut,
   AnalysisTableData,
   AnalysisType,
 } from '../shared/interfaces/analysis.interface';
@@ -16,36 +16,25 @@ import {
 export class AnalysisService {
   private apiService = inject(ApiService);
 
-  getAnalyses(type?: AnalysisType, entityId?: number): Observable<AnalysisTableData> {
-    let endpoint = '/hockey/analysis/list';
-    const params: string[] = [];
+  getAnalyses(type: AnalysisType, entityId?: number): Observable<AnalysisTableData> {
+    const endpoint = entityId
+      ? `/hockey/analytics/list/${type}/${entityId}`
+      : `/hockey/analytics/list/${type}`;
 
-    if (type) {
-      params.push(`type=${type}`);
-    }
-    if (entityId) {
-      params.push(`entity_id=${entityId}`);
-    }
-    if (params.length > 0) {
-      endpoint += `?${params.join('&')}`;
-    }
-
-    return this.apiService.get<AnalysisApiOut[]>(endpoint).pipe(
+    return this.apiService.get<AnalyticsApiOut[]>(endpoint).pipe(
       map((apiAnalyses) => {
-        const analyses = apiAnalyses.map((a) => this.mapApiToFrontend(a));
-        return { analyses, total: analyses.length };
+        const analytics = apiAnalyses.map((a) => this.mapApiToFrontend(a, type));
+        return { analytics, total: analytics.length };
       }),
       catchError((error) => {
-        console.error('Failed to fetch analyses:', error);
+        console.error('Failed to fetch analytics:', error);
         return throwError(() => error);
       })
     );
   }
 
-  getAnalysisById(id: string): Observable<Analysis> {
-    const numericId = parseInt(id, 10);
-    return this.apiService.get<AnalysisApiOut>(`/hockey/analysis/${numericId}`).pipe(
-      map((apiAnalysis) => this.mapApiToFrontend(apiAnalysis)),
+  getAnalysisById(id: number): Observable<AnalyticsApiOut> {
+    return this.apiService.get<AnalyticsApiOut>(`/hockey/analytics/${id}`).pipe(
       catchError((error) => {
         console.error('Failed to fetch analysis:', error);
         return throwError(() => error);
@@ -53,8 +42,8 @@ export class AnalysisService {
     );
   }
 
-  createAnalysis(data: AnalysisApiIn): Observable<{ id: number; success: boolean }> {
-    return this.apiService.post<{ id: number; success: boolean }>('/hockey/analysis', data).pipe(
+  createAnalysis(data: AnalyticsApiIn): Observable<{ id: number }> {
+    return this.apiService.post<{ id: number }>('/hockey/analytics', data).pipe(
       catchError((error) => {
         console.error('Failed to create analysis:', error);
         return throwError(() => error);
@@ -62,9 +51,8 @@ export class AnalysisService {
     );
   }
 
-  updateAnalysis(id: string, data: Partial<AnalysisApiIn>): Observable<{ success: boolean }> {
-    const numericId = parseInt(id, 10);
-    return this.apiService.patch<{ success: boolean }>(`/hockey/analysis/${numericId}`, data).pipe(
+  updateAnalysis(id: number, data: AnalyticsApiIn): Observable<void> {
+    return this.apiService.put<void>(`/hockey/analytics/${id}`, data).pipe(
       catchError((error) => {
         console.error('Failed to update analysis:', error);
         return throwError(() => error);
@@ -72,9 +60,8 @@ export class AnalysisService {
     );
   }
 
-  deleteAnalysis(id: string): Observable<{ success: boolean }> {
-    const numericId = parseInt(id, 10);
-    return this.apiService.delete<{ success: boolean }>(`/hockey/analysis/${numericId}`).pipe(
+  deleteAnalysis(id: number): Observable<void> {
+    return this.apiService.delete<void>(`/hockey/analytics/${id}`).pipe(
       catchError((error) => {
         console.error('Failed to delete analysis:', error);
         return throwError(() => error);
@@ -82,26 +69,62 @@ export class AnalysisService {
     );
   }
 
-  private mapApiToFrontend(apiOut: AnalysisApiOut): Analysis {
-    const createdAt = new Date(apiOut.created_at);
+  private mapApiToFrontend(apiOut: AnalyticsApiOut, type: AnalysisType): Analysis {
     return {
       id: String(apiOut.id),
-      type: apiOut.type,
-      entityId: apiOut.entity_id,
-      entityName: apiOut.entity_name,
-      analysisBy: apiOut.analysis_by,
-      analysisText: apiOut.analysis_text,
-      date: createdAt.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-      }),
-      time: createdAt.toLocaleTimeString('en-US', {
-        hour: 'numeric',
-        minute: '2-digit',
-        hour12: true,
-      }),
-      createdAt,
+      type,
+      entityId: this.resolveEntityId(apiOut, type),
+      entityName: this.resolveEntityName(apiOut, type),
+      author: apiOut.author,
+      title: apiOut.title,
+      analysis: apiOut.analysis,
+      date: apiOut.date,
+      time: apiOut.time?.split('.')[0] ?? '',
+      ...this.resolveEntityFields(apiOut, type),
     };
+  }
+
+  private resolveEntityFields(
+    apiOut: AnalyticsApiOut,
+    type: AnalysisType
+  ): Partial<Analysis> {
+    switch (type) {
+      case 'team':
+        return { city: apiOut.team?.city ?? '' };
+      case 'player':
+      case 'goalie':
+        return { number: apiOut.player?.number };
+      case 'game':
+        return {
+          score: apiOut.game
+            ? `${apiOut.game.away_goals} - ${apiOut.game.home_goals}`
+            : '',
+          gameDate: apiOut.game?.date ?? '',
+        };
+    }
+  }
+
+  private resolveEntityName(apiOut: AnalyticsApiOut, type: AnalysisType): string {
+    switch (type) {
+      case 'team':
+        return apiOut.team?.name ?? '';
+      case 'player':
+      case 'goalie':
+        return apiOut.player ? `${apiOut.player.first_name} ${apiOut.player.last_name}` : '';
+      case 'game':
+        return apiOut.game ? `${apiOut.game.away_team_name} at ${apiOut.game.home_team_name}` : '';
+    }
+  }
+
+  private resolveEntityId(apiOut: AnalyticsApiOut, type: AnalysisType): number {
+    switch (type) {
+      case 'team':
+        return apiOut.team?.id ?? 0;
+      case 'player':
+      case 'goalie':
+        return apiOut.player?.id ?? 0;
+      case 'game':
+        return apiOut.game?.id ?? 0;
+    }
   }
 }

@@ -73,14 +73,14 @@ export class TeamsPage implements OnInit {
   ];
 
   tableActions: TableAction[] = [
-    { label: 'Analysis', action: 'analysis', variant: 'secondary', icon: 'analytics' },
-    { label: 'Schedule', action: 'schedules', variant: 'secondary', icon: 'scoreboard' },
-    { label: 'Players', action: 'players', variant: 'secondary', icon: 'people' },
-    { label: 'Goalies', action: 'goalies', variant: 'secondary', icon: 'shield' },
+    { label: 'Analysis', action: 'analysis', variant: 'blue', icon: 'analytics' },
+    { label: 'Schedule', action: 'schedules', variant: 'gray', icon: 'scoreboard' },
+    { label: 'Players', action: 'players', variant: 'gray', icon: 'people' },
+    { label: 'Goalies', action: 'goalies', variant: 'gray', icon: 'shield' },
     {
       label: 'View',
       action: 'view-profile',
-      variant: 'primary',
+      variant: 'green',
       icon: 'visibility',
       iconOnly: true,
       route: (item) => `/teams-and-rosters/teams/${item['id']}/profile`,
@@ -88,7 +88,7 @@ export class TeamsPage implements OnInit {
     {
       label: 'Edit',
       action: 'edit',
-      variant: 'secondary',
+      variant: 'orange',
       icon: 'stylus',
       iconOnly: true,
       roleVisibilityName: 'edit-action',
@@ -96,7 +96,7 @@ export class TeamsPage implements OnInit {
     {
       label: 'Delete',
       action: 'delete',
-      variant: 'danger',
+      variant: 'red',
       icon: 'delete',
       iconOnly: true,
       roleVisibilityName: 'delete-action',
@@ -300,7 +300,6 @@ export class TeamsPage implements OnInit {
             levels,
             divisions,
           } as TeamFormModalData,
-          preventBackdropClose: true,
           onCloseWithDataProcessing: (result) => {
             const { logoFile, ...team } = result as Partial<Team> & {
               logoFile?: File;
@@ -349,7 +348,6 @@ export class TeamsPage implements OnInit {
             levels,
             divisions,
           } as TeamFormModalData,
-          preventBackdropClose: true,
           onCloseWithDataProcessing: (result) => {
             const { logoFile, logoRemoved, ...teamData } = result as Partial<Team> & {
               logoFile?: File;

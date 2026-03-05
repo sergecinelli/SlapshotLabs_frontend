@@ -35,7 +35,7 @@ export interface TableAction {
   label: string;
   icon?: string;
   action: string;
-  variant?: 'primary' | 'secondary' | 'danger';
+  variant?: 'red' | 'green' | 'blue' | 'orange' | 'purple' | 'gray';
   iconOnly?: boolean;
   roleAccessName?: string;
   roleVisibilityName?: string;
@@ -227,103 +227,29 @@ export class DataTableComponent<T extends Record<string, unknown> = Record<strin
     return iconMap[action] || 'more_vert';
   }
 
-  getActionBg(variant?: 'primary' | 'secondary' | 'danger', action?: string): AppColor {
-    if (action === 'delete') {
-      return 'primary';
-    }
-    if (action === 'view') {
-      return 'green';
-    }
+  private readonly colorMap: Record<string, AppColor> = {
+    red: 'primary',
+    green: 'green',
+    blue: 'blue',
+    orange: 'orange',
+    purple: 'purple',
+    gray: 'text_secondary',
+  };
 
-    switch (variant) {
-      case 'primary':
-        return 'primary';
-      case 'danger':
-        return 'primary';
-      case 'secondary':
-      default:
-        return 'button_background';
-    }
+  private readonly colorHoverMap: Record<string, AppColor> = {
+    red: 'primary_dark',
+    green: 'green_dark',
+    blue: 'blue_dark',
+    orange: 'orange_dark',
+    purple: 'purple_dark',
+    gray: 'text_primary',
+  };
+
+  getActionColor(variant?: string): AppColor {
+    return this.colorMap[variant ?? 'gray'] ?? 'text_secondary';
   }
 
-  getActionBgHover(variant?: 'primary' | 'secondary' | 'danger', action?: string): AppColor {
-    if (action === 'delete') {
-      return 'primary';
-    }
-    if (action === 'view') {
-      return 'green';
-    }
-
-    switch (variant) {
-      case 'primary':
-        return 'primary_dark';
-      case 'danger':
-        return 'primary';
-      case 'secondary':
-      default:
-        return 'gray_tone1';
-    }
-  }
-
-  getActionColor(variant?: 'primary' | 'secondary' | 'danger', action?: string): AppColor {
-    if (action === 'view') {
-      return 'green';
-    }
-    if (action === 'view-profile') {
-      return 'green';
-    }
-    if (action === 'analysis') {
-      return 'upcoming';
-    }
-    if (action === 'edit') {
-      return 'orange';
-    }
-    if (action === 'delete') {
-      return 'primary';
-    }
-    if (action === 'shot-spray-chart') {
-      return 'purple';
-    }
-
-    switch (variant) {
-      case 'primary':
-        return 'primary';
-      case 'danger':
-        return 'primary';
-      case 'secondary':
-      default:
-        return 'text_secondary';
-    }
-  }
-
-  getActionColorHover(variant?: 'primary' | 'secondary' | 'danger', action?: string): AppColor {
-    if (action === 'view') {
-      return 'green';
-    }
-    if (action === 'view-profile') {
-      return 'green';
-    }
-    if (action === 'analysis') {
-      return 'upcoming';
-    }
-    if (action === 'edit') {
-      return 'orange';
-    }
-    if (action === 'delete') {
-      return 'primary';
-    }
-    if (action === 'shot-spray-chart') {
-      return 'purple';
-    }
-
-    switch (variant) {
-      case 'primary':
-        return 'primary_dark';
-      case 'danger':
-        return 'primary';
-      case 'secondary':
-      default:
-        return 'text_primary';
-    }
+  getActionColorHover(variant?: string): AppColor {
+    return this.colorHoverMap[variant ?? 'gray'] ?? 'text_primary';
   }
 }

@@ -16,6 +16,8 @@ import { GameMetadataService } from '../../services/game-metadata.service';
 import { GameEventNameService } from '../../services/game-event-name.service';
 import { Schedule, GameStatus, GameType } from '../../shared/interfaces/schedule.interface';
 import { Team } from '../../shared/interfaces/team.interface';
+import { Player } from '../../shared/interfaces/player.interface';
+import { Goalie } from '../../shared/interfaces/goalie.interface';
 import { Arena, Rink } from '../../shared/interfaces/arena.interface';
 import {
   PlayerFormModal,
@@ -246,7 +248,6 @@ export class DashboardPage implements OnInit {
           icon: 'groups',
           width: '800px',
           maxWidth: '95vw',
-          preventBackdropClose: true,
           data: { isEditMode: false, ageGroups, levels, divisions } as TeamFormModalData,
           onCloseWithDataProcessing: (result) => {
             const { logoFile, ...team } = result as Partial<Team> & {
@@ -287,9 +288,8 @@ export class DashboardPage implements OnInit {
           icon: 'sports_hockey',
           width: '800px',
           maxWidth: '95vw',
-          preventBackdropClose: true,
           data: { isEditMode: false, teams: teams.teams, positions } as PlayerFormModalData,
-          onCloseWithDataProcessing: (result) => {
+          onCloseWithDataProcessing: (result: Partial<Player>) => {
             this.playerService.addPlayer(result).subscribe({
               next: () => {
                 this.toast.show('Player created successfully', 'success');
@@ -324,9 +324,8 @@ export class DashboardPage implements OnInit {
           icon: 'sports_hockey',
           width: '800px',
           maxWidth: '95vw',
-          preventBackdropClose: true,
           data: { isEditMode: false, teams: teams.teams, positions } as GoalieFormModalData,
-          onCloseWithDataProcessing: (result) => {
+          onCloseWithDataProcessing: (result: Partial<Goalie>) => {
             this.goalieService.addGoalie(result).subscribe({
               next: () => {
                 this.toast.show('Goalie created successfully', 'success');
@@ -366,7 +365,6 @@ export class DashboardPage implements OnInit {
           icon: 'event',
           width: '800px',
           maxWidth: '95vw',
-          preventBackdropClose: true,
           data: {
             isEditMode: false,
             teams: teams.teams,
@@ -377,7 +375,7 @@ export class DashboardPage implements OnInit {
             gameTypes,
             gamePeriods,
           } as ScheduleFormModalData,
-          onCloseWithDataProcessing: (result) => {
+          onCloseWithDataProcessing: (result: Record<string, unknown>) => {
             this.scheduleService.createGame(result).subscribe({
               next: () => {
                 this.toast.show('Game created successfully', 'success');
@@ -419,7 +417,6 @@ export class DashboardPage implements OnInit {
           icon: 'movie',
           width: '1400px',
           maxWidth: '95vw',
-          preventBackdropClose: true,
           data: {
             isEditMode: false,
             teams: teams.teams,

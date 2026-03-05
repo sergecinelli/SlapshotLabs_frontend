@@ -1,7 +1,7 @@
 import { Component, OnInit, computed, signal, inject, Type } from '@angular/core';
 import { Location } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
-import { Observable, map } from 'rxjs';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Observable, forkJoin, map } from 'rxjs';
 import { ModalService, ModalEvent } from '../../services/modal.service';
 import { ToastService } from '../../services/toast.service';
 import { AnalysisService } from '../../services/analysis.service';
@@ -9,7 +9,7 @@ import { PlayerService } from '../../services/player.service';
 import { GoalieService } from '../../services/goalie.service';
 import { TeamService } from '../../services/team.service';
 import { ScheduleService } from '../../services/schedule.service';
-import { Analysis, AnalysisApiIn, AnalysisType } from '../../shared/interfaces/analysis.interface';
+import { Analysis, AnalyticsApiIn, AnalysisType } from '../../shared/interfaces/analysis.interface';
 import { ANALYSIS_TABS, ANALYSIS_TYPE_CONFIG } from '../../shared/constants/analysis.constants';
 import {
   DataTableComponent,
@@ -26,7 +26,10 @@ import { visibilityByRoleMap } from './analytics.role-map';
 import { PlayerAnalysisModal } from '../../shared/components/player-analysis-modal/player-analysis.modal';
 import { GoalieAnalysisModal } from '../../shared/components/goalie-analysis-modal/goalie-analysis.modal';
 import { TeamAnalysisModal } from '../../shared/components/team-analysis-modal/team-analysis.modal';
-import { GameAnalysisModal } from '../../shared/components/game-analysis-modal/game-analysis.modal';
+import {
+  GameAnalysisModal,
+  GameOption,
+} from '../../shared/components/game-analysis-modal/game-analysis.modal';
 
 @Component({
   selector: 'app-analytics',
@@ -41,6 +44,7 @@ import { GameAnalysisModal } from '../../shared/components/game-analysis-modal/g
 })
 export class AnalyticsPage implements OnInit {
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
   private location = inject(Location);
   private modalService = inject(ModalService);
   private analysisService = inject(AnalysisService);
@@ -58,8 +62,16 @@ export class AnalyticsPage implements OnInit {
     icon: tab.icon,
   }));
 
+  private readonly analysisTypes: AnalysisType[] = ['team', 'player', 'goalie', 'game'];
+
   activeTab = signal<AnalysisType>('team');
-  analyses = signal<Analysis[]>([]);
+  private analyticsCache = signal<Record<AnalysisType, Analysis[]>>({
+    team: [],
+    player: [],
+    goalie: [],
+    game: [],
+  });
+  analytics = computed(() => this.analyticsCache()[this.activeTab()]);
   loading = signal(true);
   isCreateLoading = signal(false);
   showTabs = signal(true);
@@ -67,30 +79,90 @@ export class AnalyticsPage implements OnInit {
   activeTabIndex = computed(() => ANALYSIS_TABS.findIndex((tab) => tab.key === this.activeTab()));
   buttonConfig = computed(() => ANALYSIS_TYPE_CONFIG[this.activeTab()]);
 
-  tableColumns: TableColumn[] = [
-    { key: 'entityName', label: 'Name', sortable: true, width: '200px' },
-    { key: 'analysisBy', label: 'Analysis By', sortable: true, width: '150px' },
-    { key: 'analysisText', label: 'Analysis', sortable: false, width: '300px' },
+  private readonly commonColumns: TableColumn[] = [
+    { key: 'title', label: 'Title', sortable: true, width: '200px' },
+    { key: 'author', label: 'Author', sortable: true, width: '150px' },
     { key: 'date', label: 'Date', sortable: true, width: '120px' },
     { key: 'time', label: 'Time', sortable: false, width: '100px' },
+    { key: 'analysis', label: 'Analysis', sortable: false, width: '250px' },
   ];
 
-  tableActions: TableAction[] = [
+  private readonly columnsByType: Record<AnalysisType, TableColumn[]> = {
+    team: [
+      { key: 'entityName', label: 'Name', sortable: true, width: '180px' },
+      { key: 'city', label: 'City', sortable: true, width: '140px' },
+      ...this.commonColumns,
+    ],
+    player: [
+      { key: 'entityName', label: 'Name', sortable: true, width: '180px' },
+      { key: 'number', label: 'Number', sortable: true, width: '100px' },
+      ...this.commonColumns,
+    ],
+    goalie: [
+      { key: 'entityName', label: 'Name', sortable: true, width: '180px' },
+      { key: 'number', label: 'Number', sortable: true, width: '100px' },
+      ...this.commonColumns,
+    ],
+    game: [
+      { key: 'entityName', label: 'Game', sortable: true, width: '200px' },
+      { key: 'score', label: 'Score', sortable: false, width: '100px' },
+      { key: 'gameDate', label: 'Game Date', sortable: true, width: '120px' },
+      ...this.commonColumns,
+    ],
+  };
+
+  tableColumns = computed(() => this.columnsByType[this.activeTab()]);
+
+  private readonly baseActions: TableAction[] = [
     {
       label: 'Edit',
       action: 'edit',
-      variant: 'secondary',
+      variant: 'orange',
       icon: 'stylus',
       roleVisibilityName: 'edit-action',
     },
     {
       label: 'Delete',
       action: 'delete',
-      variant: 'danger',
+      variant: 'red',
       icon: 'delete',
       roleVisibilityName: 'delete-action',
     },
   ];
+
+  tableActions = computed(() => {
+    const tab = this.activeTab();
+
+    if (tab === 'game') {
+      return [
+        {
+          label: 'Dashboard',
+          action: 'dashboard',
+          variant: 'green' as const,
+          icon: 'dashboard',
+        },
+        ...this.baseActions,
+      ];
+    }
+
+    const routeSegment: Record<string, string> = {
+      team: 'teams',
+      player: 'players',
+      goalie: 'goalies',
+    };
+
+    return [
+      {
+        label: 'Profile',
+        action: 'view-profile',
+        variant: 'green' as const,
+        icon: 'visibility',
+        route: (item: Record<string, unknown>) =>
+          `/teams-and-rosters/${routeSegment[tab]}/${item['entityId']}/profile`,
+      },
+      ...this.baseActions,
+    ];
+  });
 
   ngOnInit(): void {
     const defaultTab = this.route.snapshot.data['defaultTab'] as AnalysisType | undefined;
@@ -104,7 +176,7 @@ export class AnalyticsPage implements OnInit {
 
     this.showTabs.set(!defaultTab);
     this.activeTab.set(tab);
-    this.loadAnalyses();
+    this.loadAllAnalytics();
   }
 
   onTabChange(key: string): void {
@@ -112,63 +184,17 @@ export class AnalyticsPage implements OnInit {
     if (tab === this.activeTab()) return;
     this.activeTab.set(tab);
     this.location.replaceState('/analytics', `tab=${tab}`);
-    this.loadAnalyses();
   }
 
   onCreateAnalysis(): void {
-    this.isCreateLoading.set(true);
-    const type = this.activeTab();
-
-    this.loadEntityOptions(type).subscribe({
-      next: (entityOptions) => {
-        this.isCreateLoading.set(false);
-        this.openAnalysisModal(type, { isEditMode: false, entityOptions });
-      },
-      error: () => {
-        this.isCreateLoading.set(false);
-        this.toast.show('Failed to load data', 'error');
-      },
-    });
-  }
-
-  private loadEntityOptions(
-    type: AnalysisType
-  ): Observable<{ value: string; label: string }[]> {
-    const loaderMap: Record<AnalysisType, Observable<{ value: string; label: string }[]>> = {
-      player: this.playerService
-        .getPlayers()
-        .pipe(
-          map((r) => r.players.map((p) => ({ value: p.id, label: `${p.firstName} ${p.lastName}` })))
-        ),
-      goalie: this.goalieService
-        .getGoalies()
-        .pipe(
-          map((r) =>
-            r.goalies.map((g) => ({ value: g.id, label: `${g.firstName} ${g.lastName}` }))
-          )
-        ),
-      team: this.teamService
-        .getTeams()
-        .pipe(
-          map((r) => r.teams.map((t) => ({ value: String(t.id), label: t.name })))
-        ),
-      game: this.scheduleService
-        .getGameList()
-        .pipe(
-          map((games) =>
-            games.map((g) => ({
-              value: String(g.id),
-              label: `${g.away_team_name} at ${g.home_team_name} - ${g.date ?? ''}`,
-            }))
-          )
-        ),
-    };
-
-    return loaderMap[type];
+    this.loadEntityOptionsAndOpenModal(this.activeTab(), { isEditMode: false });
   }
 
   onTableAction(event: { action: string; item: Analysis }): void {
     switch (event.action) {
+      case 'dashboard':
+        this.router.navigate(['/schedule/live', event.item.entityId]);
+        break;
       case 'edit':
         this.onEditAnalysis(event.item);
         break;
@@ -179,7 +205,44 @@ export class AnalyticsPage implements OnInit {
   }
 
   private onEditAnalysis(analysis: Analysis): void {
-    this.openAnalysisModal(analysis.type, { analysis, isEditMode: true });
+    this.loadEntityOptionsAndOpenModal(analysis.type, { analysis, isEditMode: true });
+  }
+
+  private loadEntityOptionsAndOpenModal(type: AnalysisType, data: Record<string, unknown>): void {
+    this.isCreateLoading.set(true);
+
+    const entityLoaders: Record<AnalysisType, Observable<Record<string, unknown>>> = {
+      player: this.playerService.getPlayers().pipe(map((r) => ({ players: r.players }))),
+      goalie: this.goalieService.getGoalies().pipe(map((r) => ({ goalies: r.goalies }))),
+      team: this.teamService.getTeams().pipe(map((r) => ({ teams: r.teams }))),
+      game: forkJoin({
+        games: this.scheduleService.getGameList(),
+        teams: this.teamService.getTeams(),
+      }).pipe(
+        map(({ games, teams }) => {
+          const teamMap = new Map(teams.teams.map((t) => [Number(t.id), t.name]));
+          return {
+            games: games.map(
+              (g): GameOption => ({
+                value: String(g.id),
+                label: `${teamMap.get(g.away_team_id) ?? 'Unknown'} at ${teamMap.get(g.home_team_id) ?? 'Unknown'} - ${g.date ?? ''}`,
+              })
+            ),
+          };
+        })
+      ),
+    };
+
+    entityLoaders[type].subscribe({
+      next: (entityData) => {
+        this.isCreateLoading.set(false);
+        this.openAnalysisModal(type, { ...data, ...entityData });
+      },
+      error: (error) => {
+        console.error('Failed to load entity options:', error);
+        this.isCreateLoading.set(false);
+      },
+    });
   }
 
   private openAnalysisModal(type: AnalysisType, data: Record<string, unknown>): void {
@@ -197,11 +260,11 @@ export class AnalyticsPage implements OnInit {
       data,
       onCloseWithDataProcessing: (result: {
         isEditMode: boolean;
-        analysisId?: number;
-        apiData: AnalysisApiIn;
+        analysisId?: string;
+        apiData: AnalyticsApiIn;
       }) => {
-        const apiCall = result.isEditMode
-          ? this.analysisService.updateAnalysis(String(result.analysisId!), result.apiData)
+        const apiCall: Observable<unknown> = result.isEditMode
+          ? this.analysisService.updateAnalysis(Number(result.analysisId!), result.apiData)
           : this.analysisService.createAnalysis(result.apiData);
         apiCall.subscribe({
           next: () => {
@@ -210,7 +273,7 @@ export class AnalyticsPage implements OnInit {
               'success'
             );
             this.modalService.closeModal();
-            this.loadAnalyses();
+            this.loadAllAnalytics();
           },
           error: () => {
             this.toast.show(
@@ -226,24 +289,32 @@ export class AnalyticsPage implements OnInit {
 
   private onDeleteAnalysis(analysis: Analysis): void {
     if (confirm('Are you sure you want to delete this analysis?')) {
-      this.analysisService.deleteAnalysis(analysis.id).subscribe({
-        next: () => this.loadAnalyses(),
+      this.analysisService.deleteAnalysis(Number(analysis.id)).subscribe({
+        next: () => this.loadAllAnalytics(),
         error: (error) => console.error('Failed to delete analysis:', error),
       });
     }
   }
 
-  private loadAnalyses(): void {
+  private loadAllAnalytics(): void {
     this.loading.set(true);
 
-    this.analysisService.getAnalyses(this.activeTab()).subscribe({
-      next: (result) => {
-        this.analyses.set(result.analyses);
+    const requests = this.analysisTypes.reduce(
+      (acc, type) => {
+        acc[type] = this.analysisService.getAnalyses(type).pipe(map((result) => result.analytics));
+        return acc;
+      },
+      {} as Record<AnalysisType, Observable<Analysis[]>>
+    );
+
+    forkJoin(requests).subscribe({
+      next: (cache) => {
+        this.analyticsCache.set(cache);
         this.loading.set(false);
       },
       error: (error) => {
-        console.error('Failed to load analyses:', error);
-        this.analyses.set([]);
+        console.error('Failed to load analytics:', error);
+        this.analyticsCache.set({ team: [], player: [], goalie: [], game: [] });
         this.loading.set(false);
       },
     });

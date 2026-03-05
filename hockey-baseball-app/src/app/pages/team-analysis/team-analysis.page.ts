@@ -2,11 +2,11 @@ import { Component, OnInit, signal, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ModalService, ModalEvent } from '../../services/modal.service';
 import { ToastService } from '../../services/toast.service';
-import { forkJoin } from 'rxjs';
+import { Observable, forkJoin } from 'rxjs';
 import { AnalysisService } from '../../services/analysis.service';
 import { TeamService } from '../../services/team.service';
 import { BreadcrumbDataService } from '../../services/breadcrumb-data.service';
-import { Analysis, AnalysisApiIn } from '../../shared/interfaces/analysis.interface';
+import { Analysis, AnalyticsApiIn } from '../../shared/interfaces/analysis.interface';
 import {
   DataTableComponent,
   TableColumn,
@@ -34,29 +34,30 @@ export class TeamAnalysisPage implements OnInit {
   protected visibilityByRoleMap = visibilityByRoleMap;
 
   teamId = '';
-  analyses = signal<Analysis[]>([]);
+  analytics = signal<Analysis[]>([]);
   loading = signal(true);
   isCreateLoading = signal(false);
 
   tableColumns: TableColumn[] = [
-    { key: 'analysisBy', label: 'Analysis By', sortable: true, width: '150px' },
-    { key: 'analysisText', label: 'Analysis', sortable: false, width: '400px' },
+    { key: 'title', label: 'Title', sortable: true, width: '200px' },
+    { key: 'author', label: 'Author', sortable: true, width: '150px' },
     { key: 'date', label: 'Date', sortable: true, width: '120px' },
     { key: 'time', label: 'Time', sortable: false, width: '100px' },
+    { key: 'analysis', label: 'Analysis', sortable: false, width: '250px' },
   ];
 
   tableActions: TableAction[] = [
     {
       label: 'Edit',
       action: 'edit',
-      variant: 'secondary',
+      variant: 'orange',
       icon: 'stylus',
       roleVisibilityName: 'edit-action',
     },
     {
       label: 'Delete',
       action: 'delete',
-      variant: 'danger',
+      variant: 'red',
       icon: 'delete',
       roleVisibilityName: 'delete-action',
     },
@@ -70,24 +71,9 @@ export class TeamAnalysisPage implements OnInit {
   }
 
   onCreateAnalysis(): void {
-    this.isCreateLoading.set(true);
-    this.teamService.getTeams().subscribe({
-      next: (result) => {
-        this.isCreateLoading.set(false);
-        const entityOptions = result.teams.map((t) => ({
-          value: String(t.id),
-          label: t.name,
-        }));
-        this.openAnalysisModal({
-          isEditMode: false,
-          preSelectedTeamId: this.teamId,
-          entityOptions,
-        });
-      },
-      error: () => {
-        this.isCreateLoading.set(false);
-        this.toast.show('Failed to load teams', 'error');
-      },
+    this.loadEntityOptionsAndOpenModal({
+      isEditMode: false,
+      preSelectedTeamId: this.teamId,
     });
   }
 
@@ -103,7 +89,21 @@ export class TeamAnalysisPage implements OnInit {
   }
 
   private onEditAnalysis(analysis: Analysis): void {
-    this.openAnalysisModal({ analysis, isEditMode: true });
+    this.loadEntityOptionsAndOpenModal({ analysis, isEditMode: true });
+  }
+
+  private loadEntityOptionsAndOpenModal(data: Record<string, unknown>): void {
+    this.isCreateLoading.set(true);
+    this.teamService.getTeams().subscribe({
+      next: (result) => {
+        this.isCreateLoading.set(false);
+        this.openAnalysisModal({ ...data, teams: result.teams });
+      },
+      error: (error) => {
+        console.error('Failed to load teams:', error);
+        this.isCreateLoading.set(false);
+      },
+    });
   }
 
   private openAnalysisModal(data: Record<string, unknown>): void {
@@ -114,11 +114,11 @@ export class TeamAnalysisPage implements OnInit {
       data,
       onCloseWithDataProcessing: (result: {
         isEditMode: boolean;
-        analysisId?: number;
-        apiData: AnalysisApiIn;
+        analysisId?: string;
+        apiData: AnalyticsApiIn;
       }) => {
-        const apiCall = result.isEditMode
-          ? this.analysisService.updateAnalysis(String(result.analysisId!), result.apiData)
+        const apiCall: Observable<unknown> = result.isEditMode
+          ? this.analysisService.updateAnalysis(Number(result.analysisId!), result.apiData)
           : this.analysisService.createAnalysis(result.apiData);
         apiCall.subscribe({
           next: () => {
@@ -127,7 +127,7 @@ export class TeamAnalysisPage implements OnInit {
               'success'
             );
             this.modalService.closeModal();
-            this.loadAnalyses();
+            this.loadAnalytics();
           },
           error: () => {
             this.toast.show(
@@ -143,8 +143,8 @@ export class TeamAnalysisPage implements OnInit {
 
   private onDeleteAnalysis(analysis: Analysis): void {
     if (confirm('Are you sure you want to delete this analysis?')) {
-      this.analysisService.deleteAnalysis(analysis.id).subscribe({
-        next: () => this.loadAnalyses(),
+      this.analysisService.deleteAnalysis(Number(analysis.id)).subscribe({
+        next: () => this.loadAnalytics(),
         error: (error) => console.error('Failed to delete analysis:', error),
       });
     }
@@ -156,35 +156,35 @@ export class TeamAnalysisPage implements OnInit {
 
     forkJoin({
       team: this.teamService.getTeamById(this.teamId),
-      analyses: this.analysisService.getAnalyses('team', numericId),
+      analytics: this.analysisService.getAnalyses('team', numericId),
     }).subscribe({
-      next: ({ team, analyses }) => {
+      next: ({ team, analytics }) => {
         if (team) {
           this.breadcrumbData.entityName.set(team.name);
         }
-        this.analyses.set(analyses.analyses);
+        this.analytics.set(analytics.analytics);
         this.loading.set(false);
       },
       error: (error) => {
         console.error('Failed to load data:', error);
-        this.analyses.set([]);
+        this.analytics.set([]);
         this.loading.set(false);
       },
     });
   }
 
-  private loadAnalyses(): void {
+  private loadAnalytics(): void {
     this.loading.set(true);
     const numericId = parseInt(this.teamId, 10);
 
     this.analysisService.getAnalyses('team', numericId).subscribe({
       next: (result) => {
-        this.analyses.set(result.analyses);
+        this.analytics.set(result.analytics);
         this.loading.set(false);
       },
       error: (error) => {
-        console.error('Failed to load analyses:', error);
-        this.analyses.set([]);
+        console.error('Failed to load analytics:', error);
+        this.analytics.set([]);
         this.loading.set(false);
       },
     });

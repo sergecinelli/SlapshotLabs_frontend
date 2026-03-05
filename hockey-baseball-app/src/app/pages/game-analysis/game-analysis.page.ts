@@ -1,11 +1,13 @@
 import { Component, OnInit, signal, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ModalService, ModalEvent } from '../../services/modal.service';
+import { Observable, forkJoin } from 'rxjs';
 import { AnalysisService } from '../../services/analysis.service';
 import { ToastService } from '../../services/toast.service';
-import { BreadcrumbDataService } from '../../services/breadcrumb-data.service';
+import { TeamService } from '../../services/team.service';
 import { ScheduleService } from '../../services/schedule.service';
-import { Analysis, AnalysisApiIn } from '../../shared/interfaces/analysis.interface';
+import { BreadcrumbDataService } from '../../services/breadcrumb-data.service';
+import { Analysis, AnalyticsApiIn } from '../../shared/interfaces/analysis.interface';
 import {
   DataTableComponent,
   TableColumn,
@@ -14,7 +16,10 @@ import {
 import { ButtonLoadingComponent } from '../../shared/components/buttons/button-loading/button-loading.component';
 import { ComponentVisibilityByRoleDirective } from '../../shared/directives/component-visibility-by-role.directive';
 import { visibilityByRoleMap } from './game-analysis.role-map';
-import { GameAnalysisModal } from '../../shared/components/game-analysis-modal/game-analysis.modal';
+import {
+  GameAnalysisModal,
+  GameOption,
+} from '../../shared/components/game-analysis-modal/game-analysis.modal';
 
 @Component({
   selector: 'app-game-analysis',
@@ -27,35 +32,37 @@ export class GameAnalysisPage implements OnInit {
   private modalService = inject(ModalService);
   private analysisService = inject(AnalysisService);
   private toast = inject(ToastService);
-  private breadcrumbData = inject(BreadcrumbDataService);
+  private teamService = inject(TeamService);
   private scheduleService = inject(ScheduleService);
+  private breadcrumbData = inject(BreadcrumbDataService);
 
   protected visibilityByRoleMap = visibilityByRoleMap;
 
   gameId = '';
-  analyses = signal<Analysis[]>([]);
+  analytics = signal<Analysis[]>([]);
   loading = signal(true);
   isCreateLoading = signal(false);
 
   tableColumns: TableColumn[] = [
-    { key: 'analysisBy', label: 'Analysis By', sortable: true, width: '150px' },
-    { key: 'analysisText', label: 'Analysis', sortable: false, width: '400px' },
+    { key: 'title', label: 'Title', sortable: true, width: '200px' },
+    { key: 'author', label: 'Author', sortable: true, width: '150px' },
     { key: 'date', label: 'Date', sortable: true, width: '120px' },
     { key: 'time', label: 'Time', sortable: false, width: '100px' },
+    { key: 'analysis', label: 'Analysis', sortable: false, width: '250px' },
   ];
 
   tableActions: TableAction[] = [
     {
       label: 'Edit',
       action: 'edit',
-      variant: 'secondary',
+      variant: 'orange',
       icon: 'stylus',
       roleVisibilityName: 'edit-action',
     },
     {
       label: 'Delete',
       action: 'delete',
-      variant: 'danger',
+      variant: 'red',
       icon: 'delete',
       roleVisibilityName: 'delete-action',
     },
@@ -64,30 +71,15 @@ export class GameAnalysisPage implements OnInit {
   ngOnInit(): void {
     this.gameId = this.route.snapshot.paramMap.get('id') ?? '';
     if (this.gameId) {
-      this.loadAnalyses();
+      this.loadAnalytics();
       this.breadcrumbData.entityName.set(`Game #${this.gameId}`);
     }
   }
 
   onCreateAnalysis(): void {
-    this.isCreateLoading.set(true);
-    this.scheduleService.getGameList().subscribe({
-      next: (games) => {
-        this.isCreateLoading.set(false);
-        const entityOptions = games.map((g) => ({
-          value: String(g.id),
-          label: `${g.away_team_name} at ${g.home_team_name} - ${g.date ?? ''}`,
-        }));
-        this.openAnalysisModal({
-          isEditMode: false,
-          preSelectedGameId: this.gameId,
-          entityOptions,
-        });
-      },
-      error: () => {
-        this.isCreateLoading.set(false);
-        this.toast.show('Failed to load games', 'error');
-      },
+    this.loadEntityOptionsAndOpenModal({
+      isEditMode: false,
+      preSelectedGameId: this.gameId,
     });
   }
 
@@ -103,7 +95,29 @@ export class GameAnalysisPage implements OnInit {
   }
 
   private onEditAnalysis(analysis: Analysis): void {
-    this.openAnalysisModal({ analysis, isEditMode: true });
+    this.loadEntityOptionsAndOpenModal({ analysis, isEditMode: true });
+  }
+
+  private loadEntityOptionsAndOpenModal(data: Record<string, unknown>): void {
+    this.isCreateLoading.set(true);
+    forkJoin({
+      games: this.scheduleService.getGameList(),
+      teams: this.teamService.getTeams(),
+    }).subscribe({
+      next: ({ games, teams }) => {
+        this.isCreateLoading.set(false);
+        const teamMap = new Map(teams.teams.map((t) => [Number(t.id), t.name]));
+        const gameOptions: GameOption[] = games.map((g) => ({
+          value: String(g.id),
+          label: `${teamMap.get(g.away_team_id) ?? 'Unknown'} at ${teamMap.get(g.home_team_id) ?? 'Unknown'} - ${g.date ?? ''}`,
+        }));
+        this.openAnalysisModal({ ...data, games: gameOptions });
+      },
+      error: (error) => {
+        console.error('Failed to load games:', error);
+        this.isCreateLoading.set(false);
+      },
+    });
   }
 
   private openAnalysisModal(data: Record<string, unknown>): void {
@@ -114,11 +128,11 @@ export class GameAnalysisPage implements OnInit {
       data,
       onCloseWithDataProcessing: (result: {
         isEditMode: boolean;
-        analysisId?: number;
-        apiData: AnalysisApiIn;
+        analysisId?: string;
+        apiData: AnalyticsApiIn;
       }) => {
-        const apiCall = result.isEditMode
-          ? this.analysisService.updateAnalysis(String(result.analysisId!), result.apiData)
+        const apiCall: Observable<unknown> = result.isEditMode
+          ? this.analysisService.updateAnalysis(Number(result.analysisId!), result.apiData)
           : this.analysisService.createAnalysis(result.apiData);
         apiCall.subscribe({
           next: () => {
@@ -127,7 +141,7 @@ export class GameAnalysisPage implements OnInit {
               'success'
             );
             this.modalService.closeModal();
-            this.loadAnalyses();
+            this.loadAnalytics();
           },
           error: () => {
             this.toast.show(
@@ -143,25 +157,25 @@ export class GameAnalysisPage implements OnInit {
 
   private onDeleteAnalysis(analysis: Analysis): void {
     if (confirm('Are you sure you want to delete this analysis?')) {
-      this.analysisService.deleteAnalysis(analysis.id).subscribe({
-        next: () => this.loadAnalyses(),
+      this.analysisService.deleteAnalysis(Number(analysis.id)).subscribe({
+        next: () => this.loadAnalytics(),
         error: (error) => console.error('Failed to delete analysis:', error),
       });
     }
   }
 
-  private loadAnalyses(): void {
+  private loadAnalytics(): void {
     this.loading.set(true);
     const numericId = parseInt(this.gameId, 10);
 
     this.analysisService.getAnalyses('game', numericId).subscribe({
       next: (result) => {
-        this.analyses.set(result.analyses);
+        this.analytics.set(result.analytics);
         this.loading.set(false);
       },
       error: (error) => {
-        console.error('Failed to load analyses:', error);
-        this.analyses.set([]);
+        console.error('Failed to load analytics:', error);
+        this.analytics.set([]);
         this.loading.set(false);
       },
     });

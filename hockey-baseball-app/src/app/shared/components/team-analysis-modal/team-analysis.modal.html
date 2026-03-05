@@ -1,12 +1,6 @@
 <div class="analysis-modal">
   <div class="modal-content">
-    @if (isLoading) {
-      <div class="loading-container">
-        <p>Loading form data...</p>
-      </div>
-    }
-    @if (!isLoading) {
-      <form [formGroup]="analysisForm" class="analysis-form">
+    <form [formGroup]="analysisForm" class="analysis-form">
         <div class="form-section">
           <div class="section-header">
             <span class="section-title">Analysis Details</span>
@@ -20,17 +14,41 @@
               class="form-field full-width"
             >
               <mat-label class="uppercase text-custom-secondary">Select Team</mat-label>
-              <input
-                matInput
+              <mat-select
                 formControlName="entityId"
-                [matAutocomplete]="entityAuto"
                 placeholder="Search team..."
-              />
-              <mat-autocomplete #entityAuto="matAutocomplete" [displayWith]="displayEntityFn">
-                @for (option of filteredEntityOptions | async; track option.value) {
-                  <mat-option [value]="option.value">{{ option.label }}</mat-option>
+                (openedChange)="onSelectOpenedChange($event)"
+                panelClass="analysis-entity-select-panel"
+              >
+                <mat-select-trigger>
+                  {{ selectedTeamLabel() }}
+                </mat-select-trigger>
+
+                <div class="entity-search-wrapper" (click)="$event.stopPropagation()">
+                  <span class="material-symbols-rounded search-icon">search</span>
+                  <input
+                    #searchInput
+                    class="entity-search-input"
+                    placeholder="Search by name..."
+                    [value]="searchText()"
+                    (input)="onSearchInput($event)"
+                    (keydown)="$event.stopPropagation()"
+                  />
+                  @if (searchText()) {
+                    <span
+                      class="material-symbols-rounded search-clear"
+                      (click)="clearSearch(searchInput)"
+                      >close</span
+                    >
+                  }
+                </div>
+
+                @for (team of filteredTeams(); track team.id) {
+                  <mat-option [value]="team.id">
+                    {{ team.name }}
+                  </mat-option>
                 }
-              </mat-autocomplete>
+              </mat-select>
               @if (analysisForm.get('entityId')?.errors && analysisForm.get('entityId')?.touched) {
                 <mat-error>{{ getErrorMessage('entityId') }}</mat-error>
               }
@@ -43,12 +61,10 @@
               [hideRequiredMarker]="true"
               class="form-field full-width"
             >
-              <mat-label class="uppercase text-custom-secondary">Analysis By</mat-label>
-              <input matInput formControlName="analysisBy" placeholder="Enter name" />
-              @if (
-                analysisForm.get('analysisBy')?.errors && analysisForm.get('analysisBy')?.touched
-              ) {
-                <mat-error>{{ getErrorMessage('analysisBy') }}</mat-error>
+              <mat-label class="uppercase text-custom-secondary">Title</mat-label>
+              <input matInput formControlName="title" placeholder="Enter title" />
+              @if (analysisForm.get('title')?.errors && analysisForm.get('title')?.touched) {
+                <mat-error>{{ getErrorMessage('title') }}</mat-error>
               }
             </mat-form-field>
           </div>
@@ -59,24 +75,34 @@
               [hideRequiredMarker]="true"
               class="form-field full-width"
             >
-              <mat-label class="uppercase text-custom-secondary">Input Analysis</mat-label>
+              <mat-label class="uppercase text-custom-secondary">Author</mat-label>
+              <input matInput formControlName="author" placeholder="Enter author name" />
+              @if (analysisForm.get('author')?.errors && analysisForm.get('author')?.touched) {
+                <mat-error>{{ getErrorMessage('author') }}</mat-error>
+              }
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field
+              [floatLabel]="'always'"
+              [hideRequiredMarker]="true"
+              class="form-field full-width"
+            >
+              <mat-label class="uppercase text-custom-secondary">Analysis</mat-label>
               <textarea
                 matInput
-                formControlName="analysisText"
+                formControlName="analysis"
                 rows="6"
                 placeholder="Enter analysis"
               ></textarea>
-              @if (
-                analysisForm.get('analysisText')?.errors &&
-                analysisForm.get('analysisText')?.touched
-              ) {
-                <mat-error>{{ getErrorMessage('analysisText') }}</mat-error>
+              @if (analysisForm.get('analysis')?.errors && analysisForm.get('analysis')?.touched) {
+                <mat-error>{{ getErrorMessage('analysis') }}</mat-error>
               }
             </mat-form-field>
           </div>
         </div>
-      </form>
-    }
+    </form>
   </div>
 
   <div class="modal-actions">

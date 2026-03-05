@@ -32,7 +32,12 @@ import { formatDateShortWithCommas } from '../../shared/utils/time-converter.uti
 
 @Component({
   selector: 'app-video-highlights',
-  imports: [DataTableComponent, MatIconModule, ComponentVisibilityByRoleDirective, ButtonLoadingComponent],
+  imports: [
+    DataTableComponent,
+    MatIconModule,
+    ComponentVisibilityByRoleDirective,
+    ButtonLoadingComponent,
+  ],
   templateUrl: './video-highlights.page.html',
   styleUrl: './video-highlights.page.scss',
 })
@@ -68,18 +73,18 @@ export class VideoHighlightsPage implements OnInit {
   ];
 
   tableActions: TableAction[] = [
-    { label: 'View', action: 'view', variant: 'primary' },
+    { label: 'View', action: 'view', variant: 'green' },
     {
       label: 'Edit',
       action: 'edit',
-      variant: 'secondary',
+      variant: 'orange',
       roleVisibilityName: 'edit-action',
       roleVisibilityAuthorId: (item: Record<string, unknown>) => item['userId']?.toString() ?? '',
     },
     {
       label: 'Delete',
       action: 'delete',
-      variant: 'danger',
+      variant: 'red',
       roleVisibilityName: 'delete-action',
       roleVisibilityAuthorId: (item: Record<string, unknown>) => item['userId']?.toString() ?? '',
     },
@@ -211,16 +216,18 @@ export class VideoHighlightsPage implements OnInit {
       icon: 'movie',
       width: '1400px',
       maxWidth: '95vw',
-      preventBackdropClose: true,
       data,
       onCloseWithDataProcessing: (result: HighlightReelUpsertPayload) => {
-        const apiCall = isEdit && data.reel
-          ? this.highlightsService.updateHighlightReel(data.reel.id, result)
-          : this.highlightsService.createHighlightReel(result);
+        const apiCall =
+          isEdit && data.reel
+            ? this.highlightsService.updateHighlightReel(data.reel.id, result)
+            : this.highlightsService.createHighlightReel(result);
         apiCall.subscribe({
           next: () => {
             this.toast.show(
-              isEdit ? 'Highlight reel updated successfully' : 'Highlight reel created successfully',
+              isEdit
+                ? 'Highlight reel updated successfully'
+                : 'Highlight reel created successfully',
               'success'
             );
             this.modalService.closeModal();

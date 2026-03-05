@@ -397,7 +397,6 @@ export class TeamProfilePage implements OnInit, OnDestroy {
         levels,
         divisions,
       },
-      preventBackdropClose: true,
       onCloseWithDataProcessing: (
         result: Partial<Team> & { logoFile?: File; logoRemoved?: boolean }
       ) => {

@@ -2,11 +2,11 @@ import { Component, OnInit, signal, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ModalService, ModalEvent } from '../../services/modal.service';
 import { ToastService } from '../../services/toast.service';
-import { forkJoin } from 'rxjs';
+import { Observable, forkJoin } from 'rxjs';
 import { AnalysisService } from '../../services/analysis.service';
 import { PlayerService } from '../../services/player.service';
 import { BreadcrumbDataService } from '../../services/breadcrumb-data.service';
-import { Analysis, AnalysisApiIn } from '../../shared/interfaces/analysis.interface';
+import { Analysis, AnalyticsApiIn } from '../../shared/interfaces/analysis.interface';
 import {
   DataTableComponent,
   TableColumn,
@@ -34,29 +34,30 @@ export class PlayerAnalysisPage implements OnInit {
   protected visibilityByRoleMap = visibilityByRoleMap;
 
   playerId = '';
-  analyses = signal<Analysis[]>([]);
+  analytics = signal<Analysis[]>([]);
   loading = signal(true);
   isCreateLoading = signal(false);
 
   tableColumns: TableColumn[] = [
-    { key: 'analysisBy', label: 'Analysis By', sortable: true, width: '150px' },
-    { key: 'analysisText', label: 'Analysis', sortable: false, width: '400px' },
+    { key: 'title', label: 'Title', sortable: true, width: '200px' },
+    { key: 'author', label: 'Author', sortable: true, width: '150px' },
     { key: 'date', label: 'Date', sortable: true, width: '120px' },
     { key: 'time', label: 'Time', sortable: false, width: '100px' },
+    { key: 'analysis', label: 'Analysis', sortable: false, width: '250px' },
   ];
 
   tableActions: TableAction[] = [
     {
       label: 'Edit',
       action: 'edit',
-      variant: 'secondary',
+      variant: 'orange',
       icon: 'stylus',
       roleVisibilityName: 'edit-action',
     },
     {
       label: 'Delete',
       action: 'delete',
-      variant: 'danger',
+      variant: 'red',
       icon: 'delete',
       roleVisibilityName: 'delete-action',
     },
@@ -70,19 +71,22 @@ export class PlayerAnalysisPage implements OnInit {
   }
 
   onCreateAnalysis(): void {
+    this.loadEntityOptionsAndOpenModal({
+      isEditMode: false,
+      preSelectedPlayerId: this.playerId,
+    });
+  }
+
+  private loadEntityOptionsAndOpenModal(data: Record<string, unknown>): void {
     this.isCreateLoading.set(true);
     this.playerService.getPlayers().subscribe({
       next: (result) => {
         this.isCreateLoading.set(false);
-        const entityOptions = result.players.map((p) => ({
-          value: p.id,
-          label: `${p.firstName} ${p.lastName}`,
-        }));
-        this.openAnalysisModal({ isEditMode: false, preSelectedPlayerId: this.playerId, entityOptions });
+        this.openAnalysisModal({ ...data, players: result.players });
       },
-      error: () => {
+      error: (error) => {
+        console.error('Failed to load players:', error);
         this.isCreateLoading.set(false);
-        this.toast.show('Failed to load players', 'error');
       },
     });
   }
@@ -95,11 +99,11 @@ export class PlayerAnalysisPage implements OnInit {
       data,
       onCloseWithDataProcessing: (result: {
         isEditMode: boolean;
-        analysisId?: number;
-        apiData: AnalysisApiIn;
+        analysisId?: string;
+        apiData: AnalyticsApiIn;
       }) => {
-        const apiCall = result.isEditMode
-          ? this.analysisService.updateAnalysis(String(result.analysisId!), result.apiData)
+        const apiCall: Observable<unknown> = result.isEditMode
+          ? this.analysisService.updateAnalysis(Number(result.analysisId!), result.apiData)
           : this.analysisService.createAnalysis(result.apiData);
         apiCall.subscribe({
           next: () => {
@@ -108,7 +112,7 @@ export class PlayerAnalysisPage implements OnInit {
               'success'
             );
             this.modalService.closeModal();
-            this.loadAnalyses();
+            this.loadAnalytics();
           },
           error: () => {
             this.toast.show(
@@ -134,13 +138,13 @@ export class PlayerAnalysisPage implements OnInit {
   }
 
   private onEditAnalysis(analysis: Analysis): void {
-    this.openAnalysisModal({ analysis, isEditMode: true });
+    this.loadEntityOptionsAndOpenModal({ analysis, isEditMode: true });
   }
 
   private onDeleteAnalysis(analysis: Analysis): void {
     if (confirm('Are you sure you want to delete this analysis?')) {
-      this.analysisService.deleteAnalysis(analysis.id).subscribe({
-        next: () => this.loadAnalyses(),
+      this.analysisService.deleteAnalysis(Number(analysis.id)).subscribe({
+        next: () => this.loadAnalytics(),
         error: (error) => console.error('Failed to delete analysis:', error),
       });
     }
@@ -152,35 +156,35 @@ export class PlayerAnalysisPage implements OnInit {
 
     forkJoin({
       player: this.playerService.getPlayerById(this.playerId),
-      analyses: this.analysisService.getAnalyses('player', numericId),
+      analytics: this.analysisService.getAnalyses('player', numericId),
     }).subscribe({
-      next: ({ player, analyses }) => {
+      next: ({ player, analytics }) => {
         if (player) {
           this.breadcrumbData.entityName.set(`${player.firstName} ${player.lastName}`);
         }
-        this.analyses.set(analyses.analyses);
+        this.analytics.set(analytics.analytics);
         this.loading.set(false);
       },
       error: (error) => {
         console.error('Failed to load data:', error);
-        this.analyses.set([]);
+        this.analytics.set([]);
         this.loading.set(false);
       },
     });
   }
 
-  private loadAnalyses(): void {
+  private loadAnalytics(): void {
     this.loading.set(true);
     const numericId = parseInt(this.playerId, 10);
 
     this.analysisService.getAnalyses('player', numericId).subscribe({
       next: (result) => {
-        this.analyses.set(result.analyses);
+        this.analytics.set(result.analytics);
         this.loading.set(false);
       },
       error: (error) => {
-        console.error('Failed to load analyses:', error);
-        this.analyses.set([]);
+        console.error('Failed to load analytics:', error);
+        this.analytics.set([]);
         this.loading.set(false);
       },
     });

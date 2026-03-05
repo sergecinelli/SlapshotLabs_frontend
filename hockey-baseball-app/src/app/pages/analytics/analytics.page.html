@@ -1,8 +1,10 @@
-@let analysesValue = analyses();
+@let analyticsValue = analytics();
 @let loadingValue = loading();
 @let showTabsValue = showTabs();
 @let activeTabIndexValue = activeTabIndex();
 @let buttonConfigValue = buttonConfig();
+@let tableColumnsValue = tableColumns();
+@let tableActionsValue = tableActions();
 
 <div class="page-content" [appVisibilityMap]="visibilityByRoleMap">
   <div class="analytics-toolbar">
@@ -31,11 +33,11 @@
   </div>
 
   <app-data-table
-    [columns]="tableColumns"
-    [data]="analysesValue"
-    [actions]="tableActions"
+    [columns]="tableColumnsValue"
+    [data]="analyticsValue"
+    [actions]="tableActionsValue"
     [loading]="loadingValue"
-    emptyMessage="No analyses found"
+    emptyMessage="No analytics found"
     (actionClick)="onTableAction($event)"
   ></app-data-table>
 </div>

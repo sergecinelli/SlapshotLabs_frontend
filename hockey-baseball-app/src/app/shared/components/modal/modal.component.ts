@@ -1,6 +1,7 @@
 import {
   Component,
   ViewEncapsulation,
+  Type,
   OnInit,
   OnDestroy,
   inject,
@@ -24,30 +25,30 @@ import { ButtonComponent } from '../buttons/button/button.component';
 export class ModalComponent implements OnInit, OnDestroy {
   private modalService = inject(ModalService);
 
-  content: any;
+  content: Type<unknown> | null = null;
   params?: IModalParams | null;
 
-  closed = output<any>();
-  closedWithData = output<any>();
-  closedWithDataProcessing = output<any>();
-  backdropClicked = output<any>();
+  closed = output<unknown>();
+  closedWithData = output<unknown>();
+  closedWithDataProcessing = output<unknown>();
+  backdropClicked = output<unknown>();
 
   protected isActiveModal = signal(true);
   protected isLoading = signal(false);
 
   private subscriptions = new Subscription();
 
-  close(data?: any): void {
+  close(data?: unknown): void {
     this.isActiveModal.set(false);
     setTimeout(() => this.closed.emit(data), 200);
   }
 
-  closeWithData(data?: any): void {
+  closeWithData(data?: unknown): void {
     this.isActiveModal.set(false);
     setTimeout(() => this.closedWithData.emit(data), 200);
   }
 
-  closeWithDataProcessing(data?: any): void {
+  closeWithDataProcessing(data?: unknown): void {
     setTimeout(() => this.closedWithDataProcessing.emit(data), 200);
   }
 

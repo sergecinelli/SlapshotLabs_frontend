@@ -1,6 +1,16 @@
-import { Component, input, computed, signal, effect, OnDestroy, output } from '@angular/core';
+import {
+  Component,
+  input,
+  computed,
+  signal,
+  effect,
+  OnDestroy,
+  output,
+  inject,
+} from '@angular/core';
 import { ToastType } from '../../../services/toast.service';
 import { ButtonComponent } from '../buttons/button/button.component';
+import { ThemeService } from '../../../services/theme.service';
 
 export interface ToastData {
   id: string;
@@ -16,6 +26,7 @@ export interface ToastData {
   styleUrl: './toast.component.scss',
 })
 export class ToastComponent implements OnDestroy {
+  theme = inject(ThemeService);
   toast = input.required<ToastData>();
   closed = output<string>();
 
@@ -39,15 +50,21 @@ export class ToastComponent implements OnDestroy {
   protected toastClass = computed(() => `toast toast-${this.toast().type}`);
 
   protected borderColor = computed(() => {
+    const currentTheme = this.theme.getCurrent();
+    const red = currentTheme.colors.find((x) => x.key === 'primary');
+    const green = currentTheme.colors.find((x) => x.key === 'green');
+    const orange = currentTheme.colors.find((x) => x.key === 'orange');
+    const blue = currentTheme.colors.find((x) => x.key === 'blue');
+
     switch (this.toast().type) {
       case 'success':
-        return '#4caf50';
+        return green?.value;
       case 'error':
-        return '#f44336';
+        return red?.value;
       case 'warning':
-        return '#ff9800';
+        return orange?.value;
       case 'info':
-        return '#2196f3';
+        return blue?.value;
     }
   });
 

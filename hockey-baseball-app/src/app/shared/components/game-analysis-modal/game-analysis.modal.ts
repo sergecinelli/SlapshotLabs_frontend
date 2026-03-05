@@ -1,29 +1,25 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, inject, signal, computed } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ModalEvent, ModalService } from '../../../services/modal.service';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatSelectModule } from '@angular/material/select';
 import { MatDividerModule } from '@angular/material/divider';
-import { AsyncPipe } from '@angular/common';
-import { Observable, of } from 'rxjs';
-import { startWith, map } from 'rxjs/operators';
-import { ScheduleService } from '../../../services/schedule.service';
-import { Analysis } from '../../interfaces/analysis.interface';
+import { Analysis, AnalyticsApiIn } from '../../interfaces/analysis.interface';
 import { ButtonComponent } from '../buttons/button/button.component';
 import { ButtonLoadingComponent } from '../buttons/button-loading/button-loading.component';
+
+export interface GameOption {
+  value: string;
+  label: string;
+}
 
 export interface GameAnalysisModalData {
   analysis?: Analysis;
   isEditMode: boolean;
   preSelectedGameId?: string;
-  entityOptions?: { value: string; label: string }[];
-}
-
-interface EntityOption {
-  value: string;
-  label: string;
+  games: GameOption[];
 }
 
 @Component({
@@ -32,109 +28,80 @@ interface EntityOption {
     ReactiveFormsModule,
     MatFormFieldModule,
     MatInputModule,
-    MatAutocompleteModule,
+    MatSelectModule,
     MatDividerModule,
-    AsyncPipe,
     ButtonComponent,
     ButtonLoadingComponent,
   ],
   templateUrl: './game-analysis.modal.html',
   styleUrl: './game-analysis.modal.scss',
 })
-export class GameAnalysisModal implements OnInit {
+export class GameAnalysisModal {
   private fb = inject(FormBuilder);
   private modalService = inject(ModalService);
-  private scheduleService = inject(ScheduleService);
   data = inject(ModalService).getModalData<GameAnalysisModalData>();
 
   analysisForm: FormGroup;
   isEditMode: boolean;
-  isLoading = true;
   isSubmitting = signal(false);
-  entityOptions: EntityOption[] = [];
-  filteredEntityOptions: Observable<EntityOption[]> = of([]);
+
+  allGames = signal<GameOption[]>([]);
+  searchText = signal('');
+  selectedEntityId = signal('');
+
+  filteredGames = computed(() => {
+    const games = this.allGames();
+    const search = this.searchText().toLowerCase();
+    if (!search) return games;
+    return games.filter((g) => g.label.toLowerCase().includes(search));
+  });
+
+  selectedGameLabel = computed(() => {
+    const entityId = this.selectedEntityId();
+    if (!entityId) return '';
+    const game = this.allGames().find((g) => g.value === entityId);
+    return game ? game.label : '';
+  });
 
   constructor() {
     this.isEditMode = this.data.isEditMode;
+    this.allGames.set(this.data.games);
+
     this.analysisForm = this.fb.group({
       entityId: ['', [Validators.required]],
-      analysisBy: ['', [Validators.required]],
-      analysisText: ['', [Validators.required]],
+      title: ['', [Validators.required]],
+      author: ['', [Validators.required]],
+      analysis: ['', [Validators.required]],
     });
+
+    this.analysisForm
+      .get('entityId')!
+      .valueChanges.pipe(takeUntilDestroyed())
+      .subscribe((value: string) => this.selectedEntityId.set(value));
 
     this.modalService.onEvent$.pipe(takeUntilDestroyed()).subscribe((event) => {
       if (event === ModalEvent.StopButtonLoading) {
         this.isSubmitting.set(false);
       }
     });
+
+    this.patchFormValues();
   }
 
-  ngOnInit(): void {
-    this.loadEntityOptions();
-  }
-
-  private loadEntityOptions(): void {
-    this.isLoading = true;
-
-    if (this.data.entityOptions) {
-      this.entityOptions = this.data.entityOptions;
-      this.isLoading = false;
-      this.setupEntityFilter();
-      this.patchFormValues();
-      return;
-    }
-
-    this.scheduleService.getGameList().subscribe({
-      next: (games) => {
-        this.entityOptions = games.map((g) => ({
-          value: String(g.id),
-          label: `${g.away_team_name} at ${g.home_team_name} - ${g.date ?? ''}`,
-        }));
-
-        this.isLoading = false;
-        this.setupEntityFilter();
-        this.patchFormValues();
-      },
-      error: (error) => {
-        console.error('Failed to load games:', error);
-        this.isLoading = false;
-      },
-    });
-  }
-
-  private patchFormValues(): void {
-    if (this.isEditMode && this.data.analysis) {
-      this.analysisForm.patchValue({
-        entityId: String(this.data.analysis.entityId),
-        analysisBy: this.data.analysis.analysisBy,
-        analysisText: this.data.analysis.analysisText,
-      });
-    } else if (this.data.preSelectedGameId) {
-      this.analysisForm.patchValue({ entityId: this.data.preSelectedGameId });
+  onSelectOpenedChange(opened: boolean): void {
+    if (!opened) {
+      this.searchText.set('');
     }
   }
 
-  protected displayEntityFn = (value: string): string => {
-    if (!value) return '';
-    const option = this.entityOptions.find((opt) => opt.value === value);
-    return option ? option.label : value;
-  };
+  onSearchInput(event: Event): void {
+    this.searchText.set((event.target as HTMLInputElement).value);
+  }
 
-  private setupEntityFilter(): void {
-    this.filteredEntityOptions = this.analysisForm.get('entityId')!.valueChanges.pipe(
-      startWith(''),
-      map((value: string) => {
-        if (!value || typeof value !== 'string') {
-          return this.entityOptions;
-        }
-        const filterValue = value.toLowerCase();
-        return this.entityOptions.filter(
-          (option) =>
-            option.label.toLowerCase().includes(filterValue) ||
-            option.value.toLowerCase().includes(filterValue)
-        );
-      })
-    );
+  clearSearch(input: HTMLInputElement): void {
+    this.searchText.set('');
+    input.value = '';
+    input.focus();
   }
 
   onSubmit(): void {
@@ -147,11 +114,11 @@ export class GameAnalysisModal implements OnInit {
 
     this.isSubmitting.set(true);
     const formValue = this.analysisForm.value;
-    const apiData = {
-      type: 'game' as const,
-      entity_id: parseInt(formValue.entityId, 10),
-      analysis_by: formValue.analysisBy,
-      analysis_text: formValue.analysisText,
+    const apiData: AnalyticsApiIn = {
+      author: formValue.author,
+      title: formValue.title,
+      analysis: formValue.analysis,
+      game_id: parseInt(formValue.entityId, 10),
     };
 
     this.modalService.closeWithDataProcessing({
@@ -171,12 +138,26 @@ export class GameAnalysisModal implements OnInit {
       if (control.errors['required']) {
         const labels: Record<string, string> = {
           entityId: 'Game',
-          analysisBy: 'Analysis By',
-          analysisText: 'Analysis',
+          title: 'Title',
+          author: 'Author',
+          analysis: 'Analysis',
         };
         return `${labels[fieldName] || fieldName} is required`;
       }
     }
     return '';
+  }
+
+  private patchFormValues(): void {
+    if (this.isEditMode && this.data.analysis) {
+      this.analysisForm.patchValue({
+        entityId: String(this.data.analysis.entityId),
+        title: this.data.analysis.title,
+        author: this.data.analysis.author,
+        analysis: this.data.analysis.analysis,
+      });
+    } else if (this.data.preSelectedGameId) {
+      this.analysisForm.patchValue({ entityId: this.data.preSelectedGameId });
+    }
   }
 }

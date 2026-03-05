@@ -1,16 +1,13 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, inject, signal, computed } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ModalEvent, ModalService } from '../../../services/modal.service';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatSelectModule } from '@angular/material/select';
 import { MatDividerModule } from '@angular/material/divider';
-import { AsyncPipe } from '@angular/common';
-import { Observable, of } from 'rxjs';
-import { startWith, map } from 'rxjs/operators';
-import { GoalieService } from '../../../services/goalie.service';
-import { Analysis } from '../../interfaces/analysis.interface';
+import { Goalie } from '../../interfaces/goalie.interface';
+import { Analysis, AnalyticsApiIn } from '../../interfaces/analysis.interface';
 import { ButtonComponent } from '../buttons/button/button.component';
 import { ButtonLoadingComponent } from '../buttons/button-loading/button-loading.component';
 
@@ -18,12 +15,7 @@ export interface GoalieAnalysisModalData {
   analysis?: Analysis;
   isEditMode: boolean;
   preSelectedGoalieId?: string;
-  entityOptions?: { value: string; label: string }[];
-}
-
-interface EntityOption {
-  value: string;
-  label: string;
+  goalies: Goalie[];
 }
 
 @Component({
@@ -32,109 +24,90 @@ interface EntityOption {
     ReactiveFormsModule,
     MatFormFieldModule,
     MatInputModule,
-    MatAutocompleteModule,
+    MatSelectModule,
     MatDividerModule,
-    AsyncPipe,
     ButtonComponent,
     ButtonLoadingComponent,
   ],
   templateUrl: './goalie-analysis.modal.html',
   styleUrl: './goalie-analysis.modal.scss',
 })
-export class GoalieAnalysisModal implements OnInit {
+export class GoalieAnalysisModal {
   private fb = inject(FormBuilder);
   private modalService = inject(ModalService);
-  private goalieService = inject(GoalieService);
   data = inject(ModalService).getModalData<GoalieAnalysisModalData>();
 
   analysisForm: FormGroup;
   isEditMode: boolean;
-  isLoading = true;
   isSubmitting = signal(false);
-  entityOptions: EntityOption[] = [];
-  filteredEntityOptions: Observable<EntityOption[]> = of([]);
+
+  allGoalies = signal<Goalie[]>([]);
+  searchText = signal('');
+  selectedEntityId = signal('');
+
+  groupedGoalies = computed(() => {
+    const goalies = this.allGoalies();
+    const search = this.searchText().toLowerCase();
+    const groups = new Map<string, Goalie[]>();
+    for (const goalie of goalies) {
+      if (search && !this.goalieMatchesSearch(goalie, search)) continue;
+      const key = goalie.team || 'Unknown Team';
+      if (!groups.has(key)) groups.set(key, []);
+      groups.get(key)!.push(goalie);
+    }
+    return Array.from(groups, ([teamName, entries]) => ({ teamName, entries }));
+  });
+
+  selectedGoalieLabel = computed(() => {
+    const entityId = this.selectedEntityId();
+    if (!entityId) return '';
+    const goalie = this.allGoalies().find((g) => g.id === entityId);
+    return goalie ? `${goalie.firstName} ${goalie.lastName}` : '';
+  });
 
   constructor() {
     this.isEditMode = this.data.isEditMode;
+    this.allGoalies.set(this.data.goalies);
+
     this.analysisForm = this.fb.group({
       entityId: ['', [Validators.required]],
-      analysisBy: ['', [Validators.required]],
-      analysisText: ['', [Validators.required]],
+      title: ['', [Validators.required]],
+      author: ['', [Validators.required]],
+      analysis: ['', [Validators.required]],
     });
+
+    this.analysisForm
+      .get('entityId')!
+      .valueChanges.pipe(takeUntilDestroyed())
+      .subscribe((value: string) => this.selectedEntityId.set(value));
 
     this.modalService.onEvent$.pipe(takeUntilDestroyed()).subscribe((event) => {
       if (event === ModalEvent.StopButtonLoading) {
         this.isSubmitting.set(false);
       }
     });
+
+    this.patchFormValues();
   }
 
-  ngOnInit(): void {
-    this.loadEntityOptions();
-  }
-
-  private loadEntityOptions(): void {
-    this.isLoading = true;
-
-    if (this.data.entityOptions) {
-      this.entityOptions = this.data.entityOptions;
-      this.isLoading = false;
-      this.setupEntityFilter();
-      this.patchFormValues();
-      return;
-    }
-
-    this.goalieService.getGoalies().subscribe({
-      next: (result) => {
-        this.entityOptions = result.goalies.map((g) => ({
-          value: g.id,
-          label: `${g.firstName} ${g.lastName}`,
-        }));
-
-        this.isLoading = false;
-        this.setupEntityFilter();
-        this.patchFormValues();
-      },
-      error: (error) => {
-        console.error('Failed to load goalies:', error);
-        this.isLoading = false;
-      },
-    });
-  }
-
-  private patchFormValues(): void {
-    if (this.isEditMode && this.data.analysis) {
-      this.analysisForm.patchValue({
-        entityId: String(this.data.analysis.entityId),
-        analysisBy: this.data.analysis.analysisBy,
-        analysisText: this.data.analysis.analysisText,
-      });
-    } else if (this.data.preSelectedGoalieId) {
-      this.analysisForm.patchValue({ entityId: this.data.preSelectedGoalieId });
+  onSelectOpenedChange(opened: boolean): void {
+    if (!opened) {
+      this.searchText.set('');
     }
   }
 
-  protected displayEntityFn = (value: string): string => {
-    if (!value) return '';
-    const option = this.entityOptions.find((opt) => opt.value === value);
-    return option ? option.label : value;
-  };
+  onSearchInput(event: Event): void {
+    this.searchText.set((event.target as HTMLInputElement).value);
+  }
 
-  private setupEntityFilter(): void {
-    this.filteredEntityOptions = this.analysisForm.get('entityId')!.valueChanges.pipe(
-      startWith(''),
-      map((value: string) => {
-        if (!value || typeof value !== 'string') {
-          return this.entityOptions;
-        }
-        const filterValue = value.toLowerCase();
-        return this.entityOptions.filter(
-          (option) =>
-            option.label.toLowerCase().includes(filterValue) ||
-            option.value.toLowerCase().includes(filterValue)
-        );
-      })
-    );
+  clearSearch(input: HTMLInputElement): void {
+    this.searchText.set('');
+    input.value = '';
+    input.focus();
+  }
+
+  isGoalieVisible(goalie: Goalie): boolean {
+    return this.goalieMatchesSearch(goalie, this.searchText().toLowerCase());
   }
 
   onSubmit(): void {
@@ -147,11 +120,11 @@ export class GoalieAnalysisModal implements OnInit {
 
     this.isSubmitting.set(true);
     const formValue = this.analysisForm.value;
-    const apiData = {
-      type: 'goalie' as const,
-      entity_id: parseInt(formValue.entityId, 10),
-      analysis_by: formValue.analysisBy,
-      analysis_text: formValue.analysisText,
+    const apiData: AnalyticsApiIn = {
+      author: formValue.author,
+      title: formValue.title,
+      analysis: formValue.analysis,
+      player_id: parseInt(formValue.entityId, 10),
     };
 
     this.modalService.closeWithDataProcessing({
@@ -171,12 +144,35 @@ export class GoalieAnalysisModal implements OnInit {
       if (control.errors['required']) {
         const labels: Record<string, string> = {
           entityId: 'Goalie',
-          analysisBy: 'Analysis By',
-          analysisText: 'Analysis',
+          title: 'Title',
+          author: 'Author',
+          analysis: 'Analysis',
         };
         return `${labels[fieldName] || fieldName} is required`;
       }
     }
     return '';
+  }
+
+  private patchFormValues(): void {
+    if (this.isEditMode && this.data.analysis) {
+      this.analysisForm.patchValue({
+        entityId: String(this.data.analysis.entityId),
+        title: this.data.analysis.title,
+        author: this.data.analysis.author,
+        analysis: this.data.analysis.analysis,
+      });
+    } else if (this.data.preSelectedGoalieId) {
+      this.analysisForm.patchValue({ entityId: this.data.preSelectedGoalieId });
+    }
+  }
+
+  private goalieMatchesSearch(goalie: Goalie, search: string): boolean {
+    if (!search) return true;
+    return (
+      goalie.firstName.toLowerCase().includes(search) ||
+      goalie.lastName.toLowerCase().includes(search) ||
+      String(goalie.jerseyNumber).includes(search)
+    );
   }
 }

@@ -86,25 +86,25 @@ export class PlayersPage implements OnInit {
   ];
 
   tableActions: TableAction[] = [
-    { label: 'Analysis', action: 'analysis', variant: 'secondary', icon: 'analytics' },
+    { label: 'Analysis', action: 'analysis', variant: 'blue', icon: 'analytics' },
     {
       label: 'Spray Chart',
       action: 'shot-spray-chart',
-      variant: 'secondary',
+      variant: 'purple',
       icon: 'scatter_plot',
       iconOnly: true,
     },
     {
       label: 'Add To Tryout',
       action: 'add-to-tryout',
-      variant: 'secondary',
+      variant: 'gray',
       icon: 'person_add',
       iconOnly: true,
     },
     {
       label: 'Profile',
       action: 'view-profile',
-      variant: 'primary',
+      variant: 'green',
       icon: 'visibility',
       iconOnly: true,
       route: (item) => `/teams-and-rosters/players/${item['id']}/profile`,
@@ -112,7 +112,7 @@ export class PlayersPage implements OnInit {
     {
       label: 'Edit',
       action: 'edit',
-      variant: 'secondary',
+      variant: 'orange',
       icon: 'stylus',
       iconOnly: true,
       roleVisibilityName: 'edit-action',
@@ -120,7 +120,7 @@ export class PlayersPage implements OnInit {
     {
       label: 'Delete',
       action: 'delete',
-      variant: 'danger',
+      variant: 'red',
       icon: 'delete',
       iconOnly: true,
       roleVisibilityName: 'delete-action',
@@ -370,8 +370,7 @@ export class PlayersPage implements OnInit {
             teamId: this.teamId(),
             teamName: this.teamName(),
           } as PlayerFormModalData,
-          preventBackdropClose: true,
-          onCloseWithDataProcessing: (result) => {
+          onCloseWithDataProcessing: (result: Partial<Player>) => {
             this.playerService.addPlayer(result).subscribe({
               next: (newPlayer) => {
                 this.toast.show('Player created successfully', 'success');
@@ -414,8 +413,7 @@ export class PlayersPage implements OnInit {
             teamId: this.teamId(),
             teamName: this.teamName(),
           } as PlayerFormModalData,
-          preventBackdropClose: true,
-          onCloseWithDataProcessing: (result) => {
+          onCloseWithDataProcessing: (result: Partial<Player>) => {
             this.playerService.updatePlayer(result.id!, result).subscribe({
               next: (updatedPlayer) => {
                 this.toast.show('Player updated successfully', 'success');

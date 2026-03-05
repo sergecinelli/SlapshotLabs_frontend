@@ -75,18 +75,18 @@ export class TryoutPage implements OnInit {
   ];
 
   tableActions: TableAction[] = [
-    { label: 'Analysis', action: 'analysis', variant: 'secondary', icon: 'analytics' },
+    { label: 'Analysis', action: 'analysis', variant: 'blue', icon: 'analytics' },
     {
       label: 'Profile',
       action: 'view-profile',
-      variant: 'primary',
+      variant: 'green',
       icon: 'visibility',
       iconOnly: true,
     },
     {
       label: 'Delete',
       action: 'delete',
-      variant: 'danger',
+      variant: 'red',
       icon: 'delete',
       iconOnly: true,
       roleVisibilityName: 'delete-action',
@@ -158,7 +158,6 @@ export class TryoutPage implements OnInit {
         activeTab: this.activeTab(),
         teamId,
       } as TryoutAddModalData,
-      preventBackdropClose: true,
       onCloseWithDataProcessing: (result: { entries: Partial<TryoutEntry>[] }) => {
         const requests = result.entries.map((entry) =>
           this.tryoutService.addToTryout(teamId, entry)

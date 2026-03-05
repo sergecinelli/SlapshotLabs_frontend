@@ -542,7 +542,6 @@ export class SchedulePage implements OnInit {
       icon: 'event',
       width: '800px',
       maxWidth: '95vw',
-      preventBackdropClose: true,
       data: {
         schedule: schedule,
         gameData: rawGameData,
@@ -684,7 +683,6 @@ export class SchedulePage implements OnInit {
       icon: 'event',
       width: '800px',
       maxWidth: '95vw',
-      preventBackdropClose: true,
       data: {
         isEditMode: false,
         teams: this.teams,

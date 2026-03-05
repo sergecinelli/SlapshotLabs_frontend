@@ -466,7 +466,6 @@ export class HighlightReelFormModal implements OnInit {
       icon: 'movie',
       width: '460px',
       maxWidth: '95vw',
-      preventBackdropClose: true,
       onCloseWithData: (result: CustomHighlightFormResult) => {
         if (!result) return;
         const newSelection = {

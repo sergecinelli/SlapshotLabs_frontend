@@ -20,16 +20,16 @@ export interface IModalParams {
   loading?: boolean;
   preventBackdropClose?: boolean;
   showClose?: boolean;
-  data?: any;
+  data?: unknown;
   width?: string;
   minWidth?: string;
   maxWidth?: string;
   padding?: string;
 
-  onClose?: (data?: any) => void;
-  onBackdropClick?: (data?: any) => void;
-  onCloseWithData?: (data: any) => void;
-  onCloseWithDataProcessing?: (data: any) => void;
+  onClose?(data?: unknown): void;
+  onBackdropClick?(data?: unknown): void;
+  onCloseWithData?(data: unknown): void;
+  onCloseWithDataProcessing?(data: unknown): void;
 }
 
 export enum ModalEvent {
@@ -75,7 +75,7 @@ export class ModalService implements OnDestroy {
     this.setupGlobalEscapeHandler();
   }
 
-  async openModal(component: Type<any>, params?: IModalParams): Promise<string> {
+  async openModal(component: Type<unknown>, params?: IModalParams): Promise<string> {
     if (this.isClosing || this.isClosingAll) await this.waitForClose();
 
     const id = params?.id ?? this.generateId(params?.name ?? 'modal');
@@ -89,7 +89,7 @@ export class ModalService implements OnDestroy {
 
     this.appRef.attachView(ref.hostView);
 
-    document.body.appendChild((ref.hostView as EmbeddedViewRef<any>).rootNodes[0]);
+    document.body.appendChild((ref.hostView as EmbeddedViewRef<unknown>).rootNodes[0]);
 
     this.applyWindowStyles(ref, params);
 
@@ -134,7 +134,7 @@ export class ModalService implements OnDestroy {
     }
   }
 
-  async closeModal(data?: any, id?: string): Promise<void> {
+  async closeModal(data?: unknown, id?: string): Promise<void> {
     if (this.isClosing || this.isClosingAll) {
       await this.waitForClose();
       return;
@@ -192,17 +192,17 @@ export class ModalService implements OnDestroy {
     this._closeAllResolver?.();
   }
 
-  closeWithData(data?: any, id?: string): void {
+  closeWithData(data?: unknown, id?: string): void {
     const targets = this.findTarget(id);
     if (targets.length) this.destroyModals(targets, 'onCloseWithData', data);
   }
 
-  closeWithDataProcessing(data?: any, id?: string): void {
+  closeWithDataProcessing(data?: unknown, id?: string): void {
     const targets = this.findTarget(id);
     targets.forEach((t) => t?.params.onCloseWithDataProcessing?.(data));
   }
 
-  clickBackdrop(data?: any, id?: string): void {
+  clickBackdrop(data?: unknown, id?: string): void {
     const targets = id ? this.modals.filter((m) => m.params?.id === id) : this.modals.slice(-1);
     if (!targets.length) return;
 
@@ -258,7 +258,7 @@ export class ModalService implements OnDestroy {
   private destroyModals(
     instances: ModalInstance | ModalInstance[],
     event: keyof IModalParams,
-    data?: any
+    data?: unknown
   ): void {
     const arr = Array.isArray(instances) ? instances : [instances];
 
@@ -279,7 +279,7 @@ export class ModalService implements OnDestroy {
   }
 
   private applyWindowStyles(ref: ComponentRef<ModalComponent>, params?: IModalParams): void {
-    const host = (ref.hostView as EmbeddedViewRef<any>).rootNodes[0] as HTMLElement;
+    const host = (ref.hostView as EmbeddedViewRef<unknown>).rootNodes[0] as HTMLElement;
     const el = host.querySelector('#modal-window') as HTMLElement | null;
     if (!el || !params) return;
 
@@ -289,7 +289,7 @@ export class ModalService implements OnDestroy {
     if (params.padding !== undefined) el.style.padding = params.padding;
   }
 
-  private invokeCallback(instance: ModalInstance, fn: keyof IModalParams, data?: any): void {
+  private invokeCallback(instance: ModalInstance, fn: keyof IModalParams, data?: unknown): void {
     const cb = instance.params?.[fn];
     if (typeof cb === 'function') cb(data);
   }

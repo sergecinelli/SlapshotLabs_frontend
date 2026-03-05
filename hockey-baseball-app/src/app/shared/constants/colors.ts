@@ -45,6 +45,7 @@ export type AppColor =
   | 'orange'
   | 'orange_dark'
   | 'purple'
+  | 'purple_dark'
   | 'green'
   | 'green_dark'
   | 'blue'
@@ -116,6 +117,7 @@ export const appColors: IKeyValue<AppColor, string>[] = [
   { key: 'orange', value: '#ff8509' },
   { key: 'orange_dark', value: '#EB7A08' },
   { key: 'purple', value: '#9C27B0' },
+  { key: 'purple_dark', value: '#7B1FA2' },
   { key: 'green', value: '#10b981' },
   { key: 'green_dark', value: '#0d9668' },
   { key: 'blue', value: '#3b82f6' },

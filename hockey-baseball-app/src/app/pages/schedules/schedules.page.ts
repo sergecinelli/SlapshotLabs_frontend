@@ -87,7 +87,7 @@ export class SchedulesPage implements OnInit {
   ];
 
   tableActions: TableAction[] = [
-    { label: 'Dashboard', action: 'dashboard', variant: 'primary', icon: 'visibility' },
+    { label: 'Dashboard', action: 'dashboard', variant: 'green', icon: 'dashboard' },
   ];
 
   ngOnInit(): void {

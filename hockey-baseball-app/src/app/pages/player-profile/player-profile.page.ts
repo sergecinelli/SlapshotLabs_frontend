@@ -267,8 +267,7 @@ export class PlayerProfilePage implements OnInit {
         teams,
         positions,
       },
-      preventBackdropClose: true,
-      onCloseWithDataProcessing: (result) => {
+      onCloseWithDataProcessing: (result: Partial<Player>) => {
         if (!this.player?.id) return;
 
         this.playerService.updatePlayer(this.player.id, result).subscribe({

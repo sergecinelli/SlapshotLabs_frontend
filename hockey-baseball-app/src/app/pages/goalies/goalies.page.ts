@@ -87,25 +87,25 @@ export class GoaliesPage implements OnInit {
   ];
 
   tableActions: TableAction[] = [
-    { label: 'Analysis', action: 'analysis', variant: 'secondary', icon: 'analytics' },
+    { label: 'Analysis', action: 'analysis', variant: 'blue', icon: 'analytics' },
     {
       label: 'Spray Chart',
       action: 'shot-spray-chart',
-      variant: 'secondary',
+      variant: 'purple',
       icon: 'scatter_plot',
       iconOnly: true,
     },
     {
       label: 'Add To Tryout',
       action: 'add-to-tryout',
-      variant: 'secondary',
+      variant: 'gray',
       icon: 'person_add',
       iconOnly: true,
     },
     {
       label: 'Profile',
       action: 'view-profile',
-      variant: 'primary',
+      variant: 'green',
       icon: 'visibility',
       iconOnly: true,
       route: (item) => `/teams-and-rosters/goalies/${item['id']}/profile`,
@@ -113,7 +113,7 @@ export class GoaliesPage implements OnInit {
     {
       label: 'Edit',
       action: 'edit',
-      variant: 'secondary',
+      variant: 'orange',
       icon: 'stylus',
       iconOnly: true,
       roleVisibilityName: 'edit-action',
@@ -121,7 +121,7 @@ export class GoaliesPage implements OnInit {
     {
       label: 'Delete',
       action: 'delete',
-      variant: 'danger',
+      variant: 'red',
       icon: 'delete',
       iconOnly: true,
       roleVisibilityName: 'delete-action',
@@ -365,8 +365,7 @@ export class GoaliesPage implements OnInit {
             teamId: this.teamId(),
             teamName: this.teamName(),
           } as GoalieFormModalData,
-          preventBackdropClose: true,
-          onCloseWithDataProcessing: (result) => {
+          onCloseWithDataProcessing: (result: Partial<Goalie>) => {
             this.goalieService.addGoalie(result).subscribe({
               next: (newGoalie) => {
                 this.toast.show('Goalie created successfully', 'success');
@@ -409,8 +408,7 @@ export class GoaliesPage implements OnInit {
             teamId: this.teamId(),
             teamName: this.teamName(),
           } as GoalieFormModalData,
-          preventBackdropClose: true,
-          onCloseWithDataProcessing: (result) => {
+          onCloseWithDataProcessing: (result: Partial<Goalie>) => {
             this.goalieService.updateGoalie(result.id!, result).subscribe({
               next: (updatedGoalie) => {
                 this.toast.show('Goalie updated successfully', 'success');
