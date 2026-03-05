@@ -144,6 +144,12 @@ export class AnalyticsPage implements OnInit {
           variant: 'green' as const,
           icon: 'dashboard',
         },
+        {
+          label: 'View',
+          action: 'view',
+          variant: 'green' as const,
+          icon: 'visibility',
+        },
         ...this.baseActions,
       ];
     }

@@ -16,6 +16,7 @@ import { ButtonLoadingComponent } from '../../shared/components/buttons/button-l
 import { ComponentVisibilityByRoleDirective } from '../../shared/directives/component-visibility-by-role.directive';
 import { visibilityByRoleMap } from './goalie-analysis.role-map';
 import { GoalieAnalysisModal } from '../../shared/components/goalie-analysis-modal/goalie-analysis.modal';
+import { AnalysisViewModal } from '../../shared/components/analysis-view-modal/analysis-view.modal';
 
 @Component({
   selector: 'app-goalie-analysis',
@@ -37,6 +38,7 @@ export class GoalieAnalysisPage implements OnInit {
   analytics = signal<Analysis[]>([]);
   loading = signal(true);
   isCreateLoading = signal(false);
+  editingItemId = signal<string | null>(null);
 
   tableColumns: TableColumn[] = [
     { key: 'title', label: 'Title', sortable: true, width: '200px' },
@@ -48,11 +50,18 @@ export class GoalieAnalysisPage implements OnInit {
 
   tableActions: TableAction[] = [
     {
+      label: 'View',
+      action: 'view',
+      variant: 'green',
+      icon: 'visibility',
+    },
+    {
       label: 'Edit',
       action: 'edit',
       variant: 'orange',
       icon: 'stylus',
       roleVisibilityName: 'edit-action',
+      isLoading: (item) => this.editingItemId() === String(item['id']),
     },
     {
       label: 'Delete',
@@ -79,6 +88,9 @@ export class GoalieAnalysisPage implements OnInit {
 
   onTableAction(event: { action: string; item: Analysis }): void {
     switch (event.action) {
+      case 'view':
+        this.onViewAnalysis(event.item);
+        break;
       case 'edit':
         this.onEditAnalysis(event.item);
         break;
@@ -88,20 +100,36 @@ export class GoalieAnalysisPage implements OnInit {
     }
   }
 
+  private onViewAnalysis(analysis: Analysis): void {
+    this.modalService.openModal(AnalysisViewModal, {
+      name: analysis.title,
+      icon: 'visibility',
+      width: '100%',
+      maxWidth: '900px',
+      data: analysis,
+    });
+  }
+
   private onEditAnalysis(analysis: Analysis): void {
+    this.editingItemId.set(String(analysis.id));
     this.loadEntityOptionsAndOpenModal({ analysis, isEditMode: true });
   }
 
   private loadEntityOptionsAndOpenModal(data: Record<string, unknown>): void {
-    this.isCreateLoading.set(true);
+    const isEdit = !!data['isEditMode'];
+    if (!isEdit) {
+      this.isCreateLoading.set(true);
+    }
     this.goalieService.getGoalies().subscribe({
       next: (result) => {
         this.isCreateLoading.set(false);
+        this.editingItemId.set(null);
         this.openAnalysisModal({ ...data, goalies: result.goalies });
       },
       error: (error) => {
         console.error('Failed to load goalies:', error);
         this.isCreateLoading.set(false);
+        this.editingItemId.set(null);
       },
     });
   }
