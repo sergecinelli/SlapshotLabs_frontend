@@ -65,7 +65,7 @@ export class TeamsPage implements OnInit {
   layoutMode = signal<'card' | 'table'>('table'); // Default to table
 
   tableColumns: TableColumn[] = [
-    { key: 'name', label: 'Team Name', sortable: true, width: '150px' },
+    { key: 'name', label: 'Team Name', sortable: true, width: '200px' },
     { key: 'group', label: 'Group', sortable: true, width: '100px' },
     { key: 'level', label: 'Level', sortable: true, type: 'dropdown', width: '100px' },
     { key: 'division', label: 'Division', sortable: true, type: 'dropdown', width: '100px' },
@@ -103,6 +103,7 @@ export class TeamsPage implements OnInit {
       icon: 'stylus',
       iconOnly: true,
       roleVisibilityName: 'edit-action',
+      isLoading: (item) => this.editingTeamId() === item['id'],
     },
     {
       label: 'Delete',

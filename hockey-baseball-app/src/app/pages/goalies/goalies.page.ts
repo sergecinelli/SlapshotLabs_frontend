@@ -129,6 +129,7 @@ export class GoaliesPage implements OnInit {
       icon: 'stylus',
       iconOnly: true,
       roleVisibilityName: 'edit-action',
+      isLoading: (item) => this.editingGoalieId() === item['id'],
     },
     {
       label: 'Delete',

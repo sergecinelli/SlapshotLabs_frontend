@@ -128,6 +128,7 @@ export class PlayersPage implements OnInit {
       icon: 'stylus',
       iconOnly: true,
       roleVisibilityName: 'edit-action',
+      isLoading: (item) => this.editingPlayerId() === item['id'],
     },
     {
       label: 'Delete',

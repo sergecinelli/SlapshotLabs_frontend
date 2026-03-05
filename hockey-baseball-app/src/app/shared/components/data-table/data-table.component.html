@@ -268,6 +268,31 @@
                         </div>
                       </div>
                     </div>
+                  } @else if (column.key === 'entityName' && getCellValueByKey(element, 'entityId')) {
+                    <div class="entity-name-cell">
+                      @if (getCellValueByKey(element, 'entityLogo')) {
+                        <a
+                          [routerLink]="[
+                            '/teams-and-rosters/teams',
+                            getCellValueByKey(element, 'entityId'),
+                            'profile',
+                          ]"
+                          class="entity-logo-link"
+                        >
+                          <img
+                            [appCachedSrc]="getCellStringByKey(element, 'entityLogo')"
+                            [alt]="getCellValue(element, column) || 'Logo'"
+                            class="entity-logo"
+                          />
+                        </a>
+                      }
+                      <a
+                        [routerLink]="getEntityProfileRoute(element)"
+                        class="entity-name-link"
+                      >
+                        {{ getCellValue(element, column) || '-' }}
+                      </a>
+                    </div>
                   } @else {
                     <span>
                       {{ getCellValue(element, column) || '-' }}
@@ -424,6 +449,35 @@
                         </div>
                       </div>
                     </div>
+                  } @else if (column.key === 'name' && getCellValueByKey(element, 'logo') !== undefined) {
+                    <div class="team-cell-compact">
+                      @if (getCellValueByKey(element, 'logo')) {
+                        <a
+                          [routerLink]="[
+                            '/teams-and-rosters/teams',
+                            getCellValueByKey(element, 'id'),
+                            'profile',
+                          ]"
+                          class="team-logo-link"
+                        >
+                          <img
+                            [appCachedSrc]="getCellStringByKey(element, 'logo')"
+                            [alt]="getCellValue(element, column) || 'Team logo'"
+                            class="team-logo"
+                          />
+                        </a>
+                      }
+                      <a
+                        [routerLink]="[
+                          '/teams-and-rosters/teams',
+                          getCellValueByKey(element, 'id'),
+                          'profile',
+                        ]"
+                        class="team-name-link"
+                      >
+                        {{ getCellValue(element, column) || '-' }}
+                      </a>
+                    </div>
                   } @else if (column.key === 'arenaRink') {
                     <div class="arena-rink-cell">
                       <div class="arena-rink-name">{{ getCellValue(element, column) || '-' }}</div>
@@ -556,6 +610,31 @@
                           }
                         </div>
                       </div>
+                    </div>
+                  } @else if (column.key === 'entityName' && getCellValueByKey(element, 'entityId')) {
+                    <div class="entity-name-cell">
+                      @if (getCellValueByKey(element, 'entityLogo')) {
+                        <a
+                          [routerLink]="[
+                            '/teams-and-rosters/teams',
+                            getCellValueByKey(element, 'entityId'),
+                            'profile',
+                          ]"
+                          class="entity-logo-link"
+                        >
+                          <img
+                            [appCachedSrc]="getCellStringByKey(element, 'entityLogo')"
+                            [alt]="getCellValue(element, column) || 'Logo'"
+                            class="entity-logo"
+                          />
+                        </a>
+                      }
+                      <a
+                        [routerLink]="getEntityProfileRoute(element)"
+                        class="entity-name-link"
+                      >
+                        {{ getCellValue(element, column) || '-' }}
+                      </a>
                     </div>
                   } @else {
                     <span>

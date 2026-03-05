@@ -9,6 +9,7 @@ export type AppColor =
   | 'secondary_tone1'
   | 'secondary_dark'
   | 'upcoming'
+  | 'upcoming_dark'
   // Banner status colors (semantic aliases)
   | 'live'
   | 'completed'
@@ -72,6 +73,7 @@ export const appColors: IKeyValue<AppColor, string>[] = [
   { key: 'secondary_tone1', value: '#c6cddb' },
   { key: 'secondary_dark', value: '#5f7a88' },
   { key: 'upcoming', value: '#22a9f2' },
+  { key: 'upcoming_dark', value: '#209FE4' },
 
   // Banner status colors (semantic aliases - same values as primary/gray)
   { key: 'live', value: '#CF142B' },

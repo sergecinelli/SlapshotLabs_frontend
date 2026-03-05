@@ -214,6 +214,23 @@ export class DataTableComponent<T extends Record<string, unknown> = Record<strin
     return typeMap[typeStr] || 'game-type-badge';
   }
 
+  getEntityProfileRoute(item: T): string[] {
+    const type = String(this.getCellValueByKey(item, 'type') ?? '');
+    const entityId = String(this.getCellValueByKey(item, 'entityId') ?? '');
+    switch (type) {
+      case 'player':
+        return ['/teams-and-rosters/players', entityId, 'profile'];
+      case 'goalie':
+        return ['/teams-and-rosters/goalies', entityId, 'profile'];
+      case 'team':
+        return ['/teams-and-rosters/teams', entityId, 'profile'];
+      case 'game':
+        return ['/schedule/live', entityId];
+      default:
+        return ['/'];
+    }
+  }
+
   getActionIcon(action: string): string {
     const iconMap: Record<string, string> = {
       dashboard: 'dashboard',
@@ -231,7 +248,7 @@ export class DataTableComponent<T extends Record<string, unknown> = Record<strin
   private readonly colorMap: Record<string, AppColor> = {
     red: 'primary',
     green: 'green',
-    blue: 'blue',
+    blue: 'upcoming',
     orange: 'orange',
     purple: 'purple',
     gray: 'text_secondary',
@@ -240,7 +257,7 @@ export class DataTableComponent<T extends Record<string, unknown> = Record<strin
   private readonly colorHoverMap: Record<string, AppColor> = {
     red: 'primary_dark',
     green: 'green_dark',
-    blue: 'blue_dark',
+    blue: 'upcoming_dark',
     orange: 'orange_dark',
     purple: 'purple_dark',
     gray: 'text_primary',

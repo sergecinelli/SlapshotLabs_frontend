@@ -52,6 +52,7 @@ export interface Analysis extends Record<string, unknown> {
   type: AnalysisType;
   entityId: number;
   entityName: string;
+  entityLogo?: string;
   author: string;
   title: string;
   analysis: string;

@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 import { ApiService } from './api.service';
+import { environment } from '../../environments/environment';
 import {
   Analysis,
   AnalyticsApiIn,
@@ -87,7 +88,12 @@ export class AnalysisService {
   private resolveEntityFields(apiOut: AnalyticsApiOut, type: AnalysisType): Partial<Analysis> {
     switch (type) {
       case 'team':
-        return { city: apiOut.team?.city ?? '' };
+        return {
+          city: apiOut.team?.city ?? '',
+          entityLogo: apiOut.team?.id
+            ? `${environment.apiUrl}/hockey/team/${apiOut.team.id}/logo`
+            : undefined,
+        };
       case 'player':
       case 'goalie':
         return { number: apiOut.player?.number };
