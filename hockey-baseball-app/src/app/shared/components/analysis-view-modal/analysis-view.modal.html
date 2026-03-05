@@ -1,0 +1,76 @@
+<div class="analysis-modal">
+  <div class="modal-content">
+    <div class="analysis-form">
+      <div class="form-section">
+        <div class="section-header">
+          <span class="section-title">Analysis Details</span>
+        </div>
+        <mat-divider class="section-divider"></mat-divider>
+
+        <div class="form-row">
+          <div class="field full-width">
+            <span class="field-label">Subject</span>
+            <div class="subject-row">
+              @if (profileRoute()) {
+                <a class="field-value subject-link" (click)="goToProfile()">
+                  {{ data.entityName }}
+                </a>
+                <app-button-small
+                  materialIcon="visibility"
+                  [bg]="'transparent'"
+                  [bghover]="'button_background'"
+                  [color]="'text_secondary'"
+                  [colorhover]="'green_dark'"
+                  tooltip="View Profile"
+                  (clicked)="goToProfile()"
+                />
+              } @else {
+                <p class="field-value">{{ data.entityName }}</p>
+              }
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="field full-width">
+            <span class="field-label">Title</span>
+            <p class="field-value">{{ data.title }}</p>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="field full-width">
+            <span class="field-label">Author</span>
+            <p class="field-value">{{ data.author }}</p>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="field full-width">
+            <span class="field-label">Analysis</span>
+            <p class="field-value analysis-text">{{ data.analysis }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-actions">
+    <app-button
+      materialIcon="cancel"
+      [bg]="'transparent'"
+      [bghover]="'button_background'"
+      [br]="'border'"
+      [color]="'text_primary'"
+      [colorhover]="'text_primary'"
+      [opacity]="1"
+      [opacityhover]="1"
+      [width]="'auto'"
+      [rounded]="false"
+      [haveContent]="true"
+      (clicked)="onClose()"
+    >
+      Close
+    </app-button>
+  </div>
+</div>

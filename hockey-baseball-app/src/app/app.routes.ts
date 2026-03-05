@@ -48,7 +48,7 @@ const GOALIES: BreadcrumbRouteData = {
 const ANALYTICS: BreadcrumbRouteData = {
   label: 'Analytics',
   path: '/analytics',
-  icon: 'analytics',
+  icon: 'bar_chart',
 };
 
 export const routes: Routes = [
@@ -353,7 +353,7 @@ export const routes: Routes = [
         canActivate: [RoleAccessGuard],
         data: {
           pageRolesAccessMap: analyticsPageRolesAccessMap,
-          breadcrumbs: [{ label: 'Analytics', icon: 'analytics' }],
+          breadcrumbs: [{ label: 'Analytics', icon: 'bar_chart' }],
         },
       },
       {
@@ -364,7 +364,7 @@ export const routes: Routes = [
         data: {
           pageRolesAccessMap: analyticsPageRolesAccessMap,
           defaultTab: 'player',
-          breadcrumbs: [{ label: 'Analytics', icon: 'analytics' }],
+          breadcrumbs: [{ label: 'Analytics', icon: 'bar_chart' }],
         },
       },
       {
@@ -375,7 +375,7 @@ export const routes: Routes = [
         data: {
           pageRolesAccessMap: analyticsPageRolesAccessMap,
           defaultTab: 'goalie',
-          breadcrumbs: [{ label: 'Analytics', icon: 'analytics' }],
+          breadcrumbs: [{ label: 'Analytics', icon: 'bar_chart' }],
         },
       },
       {
@@ -386,7 +386,7 @@ export const routes: Routes = [
         data: {
           pageRolesAccessMap: analyticsPageRolesAccessMap,
           defaultTab: 'team',
-          breadcrumbs: [{ label: 'Analytics', icon: 'analytics' }],
+          breadcrumbs: [{ label: 'Analytics', icon: 'bar_chart' }],
         },
       },
       {
@@ -397,7 +397,7 @@ export const routes: Routes = [
         data: {
           pageRolesAccessMap: analyticsPageRolesAccessMap,
           defaultTab: 'game',
-          breadcrumbs: [{ label: 'Analytics', icon: 'analytics' }],
+          breadcrumbs: [{ label: 'Analytics', icon: 'bar_chart' }],
         },
       },
 

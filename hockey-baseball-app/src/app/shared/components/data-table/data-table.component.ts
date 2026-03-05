@@ -43,6 +43,7 @@ export interface TableAction {
   roleVisibilityAuthorId?: string | ((item: Record<string, unknown>) => string | undefined);
   condition?: (item: Record<string, unknown>) => boolean;
   route?: (item: Record<string, unknown>) => string;
+  isLoading?: (item: Record<string, unknown>) => boolean;
 }
 
 @Component({

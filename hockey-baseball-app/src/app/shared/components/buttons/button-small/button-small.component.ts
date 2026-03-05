@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, input } from '@angular/core';
 import { NgStyle } from '@angular/common';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ButtonBaseClass } from '../button-base.class';
@@ -10,6 +10,8 @@ import { ButtonBaseClass } from '../button-base.class';
   styleUrl: '../button.component.scss',
 })
 export class ButtonSmallComponent extends ButtonBaseClass {
+  isLoading = input(false);
+
   handleKeyboard(event: KeyboardEvent) {
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
@@ -19,5 +21,16 @@ export class ButtonSmallComponent extends ButtonBaseClass {
       });
       this.click(mouseEvent);
     }
+  }
+
+  override click(event: MouseEvent) {
+    if (this.isLoading() || this.isDisabled()) {
+      event.preventDefault();
+      event.stopPropagation();
+      return;
+    }
+    event.preventDefault();
+    event.stopPropagation();
+    this.clicked.emit(event);
   }
 }

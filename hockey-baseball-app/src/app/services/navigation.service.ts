@@ -58,7 +58,7 @@ export class NavigationService {
       {
         label: 'Analytics',
         path: '/analytics',
-        icon: 'analytics',
+        icon: 'bar_chart',
         expanded: false,
         navigable: true,
         children: [
@@ -183,7 +183,7 @@ export class NavigationService {
       players: 'sports_hockey',
       goalies: 'shield',
       schedule: 'event',
-      analytics: 'analytics',
+      analytics: 'bar_chart',
       video: 'video_library',
       highlights: 'movie',
       games: 'scoreboard',

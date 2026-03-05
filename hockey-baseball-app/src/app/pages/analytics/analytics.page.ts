@@ -30,6 +30,7 @@ import {
   GameAnalysisModal,
   GameOption,
 } from '../../shared/components/game-analysis-modal/game-analysis.modal';
+import { AnalysisViewModal } from '../../shared/components/analysis-view-modal/analysis-view.modal';
 
 @Component({
   selector: 'app-analytics',
@@ -74,6 +75,7 @@ export class AnalyticsPage implements OnInit {
   analytics = computed(() => this.analyticsCache()[this.activeTab()]);
   loading = signal(true);
   isCreateLoading = signal(false);
+  editingItemId = signal<string | null>(null);
   showTabs = signal(true);
 
   activeTabIndex = computed(() => ANALYSIS_TABS.findIndex((tab) => tab.key === this.activeTab()));
@@ -120,6 +122,7 @@ export class AnalyticsPage implements OnInit {
       variant: 'orange',
       icon: 'stylus',
       roleVisibilityName: 'edit-action',
+      isLoading: (item: Record<string, unknown>) => this.editingItemId() === String(item['id']),
     },
     {
       label: 'Delete',
@@ -145,20 +148,12 @@ export class AnalyticsPage implements OnInit {
       ];
     }
 
-    const routeSegment: Record<string, string> = {
-      team: 'teams',
-      player: 'players',
-      goalie: 'goalies',
-    };
-
     return [
       {
-        label: 'Profile',
-        action: 'view-profile',
+        label: 'View',
+        action: 'view',
         variant: 'green' as const,
         icon: 'visibility',
-        route: (item: Record<string, unknown>) =>
-          `/teams-and-rosters/${routeSegment[tab]}/${item['entityId']}/profile`,
       },
       ...this.baseActions,
     ];
@@ -192,6 +187,9 @@ export class AnalyticsPage implements OnInit {
 
   onTableAction(event: { action: string; item: Analysis }): void {
     switch (event.action) {
+      case 'view':
+        this.onViewAnalysis(event.item);
+        break;
       case 'dashboard':
         this.router.navigate(['/schedule/live', event.item.entityId]);
         break;
@@ -204,12 +202,24 @@ export class AnalyticsPage implements OnInit {
     }
   }
 
+  private onViewAnalysis(analysis: Analysis): void {
+    this.modalService.openModal(AnalysisViewModal, {
+      name: analysis.title,
+      icon: 'visibility',
+      width: '100%',
+      maxWidth: '900px',
+      data: analysis,
+    });
+  }
+
   private onEditAnalysis(analysis: Analysis): void {
+    this.editingItemId.set(analysis.id);
     this.loadEntityOptionsAndOpenModal(analysis.type, { analysis, isEditMode: true });
   }
 
   private loadEntityOptionsAndOpenModal(type: AnalysisType, data: Record<string, unknown>): void {
-    this.isCreateLoading.set(true);
+    const isCreate = !data['isEditMode'];
+    if (isCreate) this.isCreateLoading.set(true);
 
     const entityLoaders: Record<AnalysisType, Observable<Record<string, unknown>>> = {
       player: this.playerService.getPlayers().pipe(map((r) => ({ players: r.players }))),
@@ -235,12 +245,14 @@ export class AnalyticsPage implements OnInit {
 
     entityLoaders[type].subscribe({
       next: (entityData) => {
-        this.isCreateLoading.set(false);
+        if (isCreate) this.isCreateLoading.set(false);
+        this.editingItemId.set(null);
         this.openAnalysisModal(type, { ...data, ...entityData });
       },
       error: (error) => {
         console.error('Failed to load entity options:', error);
-        this.isCreateLoading.set(false);
+        if (isCreate) this.isCreateLoading.set(false);
+        this.editingItemId.set(null);
       },
     });
   }
@@ -254,9 +266,10 @@ export class AnalyticsPage implements OnInit {
     };
 
     this.modalService.openModal(componentMap[type], {
-      name: 'Create Analysis',
-      icon: 'analytics',
-      width: '600px',
+      name: data['isEditMode'] ? 'Edit Analysis' : 'Create Analysis',
+      icon: 'bar_chart',
+      width: '900px',
+      maxWidth: '95vw',
       data,
       onCloseWithDataProcessing: (result: {
         isEditMode: boolean;

@@ -7,6 +7,7 @@ import { NavigationService, NavigationItem } from '../../services/navigation.ser
 import { IconService } from '../../services/icon.service';
 import { AuthService } from '../../services/auth.service';
 import { TeamService } from '../../services/team.service';
+import { ModalService } from '../../services/modal.service';
 import { BannerComponent } from '../banner/banner.component';
 import { UserProfile } from '../../shared/interfaces/auth.interfaces';
 import { ButtonLoadingComponent } from '../../shared/components/buttons/button-loading/button-loading.component';
@@ -15,6 +16,7 @@ import { Role } from '../../services/roles/role.interface';
 import { RoleService } from '../../services/roles/role.service';
 import { BreadcrumbsComponent } from '../../shared/components/breadcrumbs/breadcrumbs.component';
 import { ToastContainerComponent } from '../../shared/components/toast/toast-container.component';
+import { LogoutConfirmationModal } from '../../shared/components/logout-confirmation-modal/logout-confirmation.modal';
 
 @Component({
   selector: 'app-layout',
@@ -37,12 +39,12 @@ export class LayoutComponent implements OnInit {
   private authService = inject(AuthService);
   private teamService = inject(TeamService);
   private roleService = inject(RoleService);
+  private modalService = inject(ModalService);
   private router = inject(Router);
   protected themeService = inject(ThemeService);
 
   protected isCollapsed = signal(false);
   protected currentUser = signal<UserProfile | null>(null);
-  protected isLoggingOut = signal(false);
   protected teamName = signal<string | null>(null);
 
   protected getRippleColor(): string {
@@ -218,18 +220,9 @@ export class LayoutComponent implements OnInit {
   }
 
   protected logout(): void {
-    this.isLoggingOut.set(true);
-    this.authService.signOut().subscribe({
-      next: () => {
-        this.isLoggingOut.set(false);
-        this.navigationService.navigate('/sign-in');
-      },
-      error: (error) => {
-        console.error('Error during sign out:', error);
-        this.isLoggingOut.set(false);
-        // Navigate to sign-in anyway as the local state is cleared
-        this.navigationService.navigate('/sign-in');
-      },
+    this.modalService.openModal(LogoutConfirmationModal, {
+      name: 'Log Out',
+      icon: 'logout',
     });
   }
 

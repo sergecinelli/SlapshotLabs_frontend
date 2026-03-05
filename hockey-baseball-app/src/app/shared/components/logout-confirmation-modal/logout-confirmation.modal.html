@@ -1,0 +1,32 @@
+@let isLoggingOutValue = isLoggingOut();
+
+<div class="logout-confirmation">
+  <p class="message">Are you sure you want to log out?</p>
+
+  <div class="actions">
+    <app-button-loading
+      [isLoading]="isLoggingOutValue"
+      [isDisabled]="isLoggingOutValue"
+      materialIcon="logout"
+      [bg]="'primary'"
+      [bghover]="'primary_dark'"
+      [color]="'text_white'"
+      [width]="'100%'"
+      (clicked)="logout()"
+    >
+      Log Out
+    </app-button-loading>
+
+    <app-button
+      materialIcon="cancel"
+      [bg]="'dark_tone2'"
+      [bghover]="'dark_hover'"
+      [color]="'text_white'"
+      [width]="'100%'"
+      [isDisabled]="isLoggingOutValue"
+      (clicked)="close()"
+    >
+      Cancel
+    </app-button>
+  </div>
+</div>

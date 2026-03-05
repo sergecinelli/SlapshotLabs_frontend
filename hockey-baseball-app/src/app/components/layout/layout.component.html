@@ -1,6 +1,5 @@
 @let isCollapsedValue = isCollapsed();
 @let currentUserValue = currentUser();
-@let isLoggingOutValue = isLoggingOut();
 @let navigationItemsValue = navigationItems();
 
 <div class="flex h-screen">
@@ -205,8 +204,6 @@
           </div>
           <div class="flex-shrink-0">
             <app-button-loading
-              [isLoading]="isLoggingOutValue"
-              [isDisabled]="isLoggingOutValue"
               materialIcon="logout"
               [bg]="'transparent'"
               [color]="'text_white'"

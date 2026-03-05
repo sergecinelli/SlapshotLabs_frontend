@@ -625,6 +625,7 @@
                         [tooltip]="action.iconOnly ? action.label : null"
                         [haveContent]="!action.iconOnly"
                         [rounded]="false"
+                        [isLoading]="action.isLoading ? action.isLoading(element) : false"
                         (clicked)="onActionClick(action.action, element)"
                         [attr.role-access-name]="action.roleAccessName"
                         [attr.role-visibility-name]="action.roleVisibilityName"

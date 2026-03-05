@@ -73,7 +73,7 @@ export class TeamsPage implements OnInit {
   ];
 
   tableActions: TableAction[] = [
-    { label: 'Analysis', action: 'analysis', variant: 'blue', icon: 'analytics' },
+    { label: 'Analysis', action: 'analysis', variant: 'blue', icon: 'bar_chart' },
     { label: 'Schedule', action: 'schedules', variant: 'gray', icon: 'scoreboard' },
     { label: 'Players', action: 'players', variant: 'gray', icon: 'people' },
     { label: 'Goalies', action: 'goalies', variant: 'gray', icon: 'shield' },

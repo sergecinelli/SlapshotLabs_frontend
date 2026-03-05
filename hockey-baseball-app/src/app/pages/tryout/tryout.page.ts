@@ -75,7 +75,7 @@ export class TryoutPage implements OnInit {
   ];
 
   tableActions: TableAction[] = [
-    { label: 'Analysis', action: 'analysis', variant: 'blue', icon: 'analytics' },
+    { label: 'Analysis', action: 'analysis', variant: 'blue', icon: 'bar_chart' },
     {
       label: 'Profile',
       action: 'view-profile',

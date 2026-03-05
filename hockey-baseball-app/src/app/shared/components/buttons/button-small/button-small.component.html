@@ -1,4 +1,5 @@
 @let materialIconValue = materialIcon();
+@let isLoadingValue = isLoading();
 @let devValue = dev();
 @let tooltipValue = tooltip() ?? '';
 @let tooltipDelayValue = tooltipDelay();
@@ -28,7 +29,7 @@
   (mouseenter)="onMouseEnter()"
   (mouseleave)="onMouseLeave()"
 >
-  @if (materialIconValue) {
+  @if (materialIconValue && !isLoadingValue) {
     @let materialSymbolClassValue = materialSymbolClass();
     @let materialIconClassValue = materialIconClass();
     @let isMatSymbolClassValue = isMatSymbolClass();
@@ -60,6 +61,13 @@
           >circle</span
         >
       }
+    </div>
+  }
+
+  @if (isLoadingValue) {
+    @let materialSymbolClassValue = materialSymbolClass();
+    <div class="icon-box material">
+      <span [class]="materialSymbolClassValue" class="icon loading">progress_activity</span>
     </div>
   }
 

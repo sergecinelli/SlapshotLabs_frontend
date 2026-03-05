@@ -84,10 +84,7 @@ export class AnalysisService {
     };
   }
 
-  private resolveEntityFields(
-    apiOut: AnalyticsApiOut,
-    type: AnalysisType
-  ): Partial<Analysis> {
+  private resolveEntityFields(apiOut: AnalyticsApiOut, type: AnalysisType): Partial<Analysis> {
     switch (type) {
       case 'team':
         return { city: apiOut.team?.city ?? '' };
@@ -96,9 +93,7 @@ export class AnalysisService {
         return { number: apiOut.player?.number };
       case 'game':
         return {
-          score: apiOut.game
-            ? `${apiOut.game.away_goals} - ${apiOut.game.home_goals}`
-            : '',
+          score: apiOut.game ? `${apiOut.game.away_goals} - ${apiOut.game.home_goals}` : '',
           gameDate: apiOut.game?.date ?? '',
         };
     }
