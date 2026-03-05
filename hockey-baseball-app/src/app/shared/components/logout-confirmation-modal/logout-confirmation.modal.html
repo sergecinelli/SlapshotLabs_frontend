@@ -2,31 +2,35 @@
 
 <div class="logout-confirmation">
   <p class="message">Are you sure you want to log out?</p>
+</div>
 
-  <div class="actions">
-    <app-button-loading
-      [isLoading]="isLoggingOutValue"
-      [isDisabled]="isLoggingOutValue"
-      materialIcon="logout"
-      [bg]="'primary'"
-      [bghover]="'primary_dark'"
-      [color]="'text_white'"
-      [width]="'100%'"
-      (clicked)="logout()"
-    >
-      Log Out
-    </app-button-loading>
+<div class="modal-actions">
+  <app-button-loading
+    [isLoading]="isLoggingOutValue"
+    [isDisabled]="isLoggingOutValue"
+    materialIcon="logout"
+    [bg]="'primary'"
+    [bghover]="'primary_dark'"
+    [color]="'text_white'"
+    (clicked)="logout()"
+  >
+    Log Out
+  </app-button-loading>
 
-    <app-button
-      materialIcon="cancel"
-      [bg]="'dark_tone2'"
-      [bghover]="'dark_hover'"
-      [color]="'text_white'"
-      [width]="'100%'"
-      [isDisabled]="isLoggingOutValue"
-      (clicked)="close()"
-    >
-      Cancel
-    </app-button>
-  </div>
+  <app-button
+    materialIcon="cancel"
+    [bg]="'transparent'"
+    [bghover]="'button_background'"
+    [br]="'border'"
+    [color]="'text_primary'"
+    [colorhover]="'text_primary'"
+    [opacity]="1"
+    [opacityhover]="1"
+    [rounded]="false"
+    [haveContent]="true"
+    [isDisabled]="isLoggingOutValue"
+    (clicked)="close()"
+  >
+    Cancel
+  </app-button>
 </div>

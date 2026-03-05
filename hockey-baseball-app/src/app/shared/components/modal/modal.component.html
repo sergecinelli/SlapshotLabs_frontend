@@ -51,12 +51,22 @@
             }
             <h1>{{ params?.name }}</h1>
           </div>
-          <app-button materialIcon="cancel" (clicked)="close()" />
+          <app-button
+            materialIcon="cancel"
+            [color]="'text_primary'"
+            [colorhover]="'text_primary'"
+            (clicked)="close()"
+          />
         </div>
       }
       @if (params?.showClose && !(params?.name || params?.icon)) {
         <div class="close-only">
-          <app-button materialIcon="cancel" (clicked)="close()" />
+          <app-button
+            materialIcon="cancel"
+            [color]="'text_primary'"
+            [colorhover]="'text_primary'"
+            (clicked)="close()"
+          />
         </div>
       }
       <div class="content">

@@ -60,12 +60,13 @@ export class BannerService implements OnDestroy {
     this.authService.isAuthenticated$.subscribe((isAuth) => {
       this.isAuthenticated = isAuth;
       // If we are currently the leader, start/stop polling based on auth status
-      if (this.isLeader) {
-        if (isAuth) {
+      if (isAuth) {
+        if (this.isLeader) {
           this.startPolling();
-        } else {
-          this.stopPolling();
         }
+      } else {
+        this.stopPolling();
+        this.updateState([], false, null);
       }
     });
 

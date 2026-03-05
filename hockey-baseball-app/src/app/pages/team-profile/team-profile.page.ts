@@ -449,10 +449,7 @@ export class TeamProfilePage implements OnInit, OnDestroy {
         preSelectedTeamId: this.team!.id.toString(),
         teams,
       },
-      onCloseWithDataProcessing: (result: {
-        isEditMode: boolean;
-        apiData: AnalyticsApiIn;
-      }) => {
+      onCloseWithDataProcessing: (result: { isEditMode: boolean; apiData: AnalyticsApiIn }) => {
         const apiCall: Observable<unknown> = this.analysisService.createAnalysis(result.apiData);
         apiCall.subscribe({
           next: () => {

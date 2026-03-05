@@ -315,10 +315,7 @@ export class PlayerProfilePage implements OnInit {
         preSelectedPlayerId: this.player!.id.toString(),
         players,
       },
-      onCloseWithDataProcessing: (result: {
-        isEditMode: boolean;
-        apiData: AnalyticsApiIn;
-      }) => {
+      onCloseWithDataProcessing: (result: { isEditMode: boolean; apiData: AnalyticsApiIn }) => {
         const apiCall: Observable<unknown> = this.analysisService.createAnalysis(result.apiData);
         apiCall.subscribe({
           next: () => {

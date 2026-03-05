@@ -268,7 +268,9 @@
                         </div>
                       </div>
                     </div>
-                  } @else if (column.key === 'entityName' && getCellValueByKey(element, 'entityId')) {
+                  } @else if (
+                    column.key === 'entityName' && getCellValueByKey(element, 'entityId')
+                  ) {
                     <div class="entity-name-cell">
                       @if (getCellValueByKey(element, 'entityLogo')) {
                         <a
@@ -286,10 +288,7 @@
                           />
                         </a>
                       }
-                      <a
-                        [routerLink]="getEntityProfileRoute(element)"
-                        class="entity-name-link"
-                      >
+                      <a [routerLink]="getEntityProfileRoute(element)" class="entity-name-link">
                         {{ getCellValue(element, column) || '-' }}
                       </a>
                     </div>
@@ -449,7 +448,9 @@
                         </div>
                       </div>
                     </div>
-                  } @else if (column.key === 'name' && getCellValueByKey(element, 'logo') !== undefined) {
+                  } @else if (
+                    column.key === 'name' && getCellValueByKey(element, 'logo') !== undefined
+                  ) {
                     <div class="team-cell-compact">
                       @if (getCellValueByKey(element, 'logo')) {
                         <a
@@ -611,7 +612,9 @@
                         </div>
                       </div>
                     </div>
-                  } @else if (column.key === 'entityName' && getCellValueByKey(element, 'entityId')) {
+                  } @else if (
+                    column.key === 'entityName' && getCellValueByKey(element, 'entityId')
+                  ) {
                     <div class="entity-name-cell">
                       @if (getCellValueByKey(element, 'entityLogo')) {
                         <a
@@ -629,10 +632,7 @@
                           />
                         </a>
                       }
-                      <a
-                        [routerLink]="getEntityProfileRoute(element)"
-                        class="entity-name-link"
-                      >
+                      <a [routerLink]="getEntityProfileRoute(element)" class="entity-name-link">
                         {{ getCellValue(element, column) || '-' }}
                       </a>
                     </div>

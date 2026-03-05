@@ -130,6 +130,7 @@ export class AnalyticsPage implements OnInit {
       variant: 'red',
       icon: 'delete',
       roleVisibilityName: 'delete-action',
+      roleVisibilityAuthorId: (item: Record<string, unknown>) => item['userId']?.toString() ?? '',
     },
   ];
 

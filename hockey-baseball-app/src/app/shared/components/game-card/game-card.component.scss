@@ -511,7 +511,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 20px;
   flex-shrink: 0;
   min-width: fit-content;
 }
@@ -520,8 +520,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 50px;
-  height: 50px;
+  width: 60px;
+  height: 60px;
   padding: 0;
   border-radius: 10px;
   background-color: var(--gray-tone3);
@@ -534,7 +534,7 @@
 }
 
 .team-score {
-  font-size: 22px;
+  font-size: 30px;
   font-weight: 600;
   color: var(--text-primary);
   text-align: center;
@@ -552,6 +552,13 @@
   flex-shrink: 0;
   padding: 0 4px;
   margin: 0 4px;
+}
+
+.versus-icon {
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+  flex-shrink: 0;
 }
 
 .card-actions-container {

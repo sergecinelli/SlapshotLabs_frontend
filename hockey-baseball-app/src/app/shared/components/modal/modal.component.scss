@@ -40,14 +40,12 @@
       align-items: center;
       justify-content: space-between;
       gap: 20px;
-      padding-bottom: 5px;
       padding-left: 10px;
 
       .header-wrapper {
         display: flex;
-        gap: 15px;
+        gap: 10px;
         align-items: center;
-        border-radius: 8px;
 
         .icon {
           display: none;
@@ -149,10 +147,9 @@
       .modal-actions {
         padding: 10px;
         padding-bottom: 0;
-        border-top: 1px solid var(--border);
         display: flex;
         justify-content: flex-end;
-        gap: 10px;
+        gap: 5px;
       }
     }
   }

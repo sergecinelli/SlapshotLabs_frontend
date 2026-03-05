@@ -69,6 +69,7 @@ export class GoalieAnalysisPage implements OnInit {
       variant: 'red',
       icon: 'delete',
       roleVisibilityName: 'delete-action',
+      roleVisibilityAuthorId: (item) => item['userId']?.toString() ?? '',
     },
   ];
 

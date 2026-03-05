@@ -270,10 +270,7 @@ export class GoalieProfilePage implements OnInit {
         preSelectedGoalieId: this.goalie!.id.toString(),
         goalies,
       },
-      onCloseWithDataProcessing: (result: {
-        isEditMode: boolean;
-        apiData: AnalyticsApiIn;
-      }) => {
+      onCloseWithDataProcessing: (result: { isEditMode: boolean; apiData: AnalyticsApiIn }) => {
         const apiCall: Observable<unknown> = this.analysisService.createAnalysis(result.apiData);
         apiCall.subscribe({
           next: () => {

@@ -343,10 +343,7 @@ export class SchedulesPage implements OnInit {
         preSelectedGameId,
         games,
       },
-      onCloseWithDataProcessing: (result: {
-        isEditMode: boolean;
-        apiData: AnalyticsApiIn;
-      }) => {
+      onCloseWithDataProcessing: (result: { isEditMode: boolean; apiData: AnalyticsApiIn }) => {
         const apiCall: Observable<unknown> = this.analysisService.createAnalysis(result.apiData);
         apiCall.subscribe({
           next: () => {

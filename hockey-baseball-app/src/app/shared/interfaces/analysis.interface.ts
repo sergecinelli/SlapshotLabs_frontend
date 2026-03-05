@@ -29,6 +29,7 @@ export interface AnalyticsGameOut {
 export interface AnalyticsApiOut {
   id: number;
   author: string;
+  user_id?: string;
   title: string;
   analysis: string;
   date: string;
@@ -54,6 +55,7 @@ export interface Analysis extends Record<string, unknown> {
   entityName: string;
   entityLogo?: string;
   author: string;
+  userId?: string;
   title: string;
   analysis: string;
   date: string;

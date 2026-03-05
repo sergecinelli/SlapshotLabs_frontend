@@ -77,6 +77,7 @@ export class AnalysisService {
       entityId: this.resolveEntityId(apiOut, type),
       entityName: this.resolveEntityName(apiOut, type),
       author: apiOut.author,
+      userId: apiOut.user_id,
       title: apiOut.title,
       analysis: apiOut.analysis,
       date: apiOut.date,

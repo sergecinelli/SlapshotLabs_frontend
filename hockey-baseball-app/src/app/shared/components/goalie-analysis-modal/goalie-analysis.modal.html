@@ -10,7 +10,9 @@
         <div class="form-row">
           @if (isEntityLocked()) {
             <div class="locked-entity-field">
-              <span class="locked-entity-label uppercase text-custom-secondary">Selected Goalie</span>
+              <span class="locked-entity-label uppercase text-custom-secondary"
+                >Selected Goalie</span
+              >
               <p class="locked-entity-value">{{ selectedGoalieLabel() }}</p>
             </div>
           } @else {
