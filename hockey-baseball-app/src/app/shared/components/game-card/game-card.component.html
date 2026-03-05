@@ -222,13 +222,14 @@
         Analysis
       </app-button>
       @if (showActionsValue) {
-        <app-button
+        <app-button-loading
           [bg]="'orange'"
           [bghover]="'orange_dark'"
           [color]="'white'"
           [colorhover]="'white'"
           materialIcon="stylus"
           [tooltip]="'Edit'"
+          [isLoading]="isEditLoading()"
           (clicked)="onEdit()"
           class="action-button"
           role-visibility-name="edit-action"

@@ -10,22 +10,23 @@
       <app-tabs-slider
         [items]="tabItems"
         [activeTabIndex]="activeTabIndexValue"
-        (onSelect)="onTabChange($event)"
+        (selected)="onTabChange($event)"
       ></app-tabs-slider>
     }
 
     <div role-visibility-name="create-analysis-button" class="create-button-wrapper">
-      <app-button
+      <app-button-loading
         [materialIcon]="buttonConfigValue.buttonIcon"
         [bg]="'primary'"
         [bghover]="'primary'"
         [color]="'white'"
         [colorhover]="'white'"
         [haveContent]="true"
+        [isLoading]="isCreateLoading()"
         (clicked)="onCreateAnalysis()"
       >
         {{ buttonConfigValue.buttonLabel }}
-      </app-button>
+      </app-button-loading>
     </div>
   </div>
 

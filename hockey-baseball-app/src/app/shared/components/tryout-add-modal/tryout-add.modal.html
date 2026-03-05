@@ -2,12 +2,7 @@
 @let selectedEntriesValue = selectedEntries();
 
 <div class="tryout-add-modal">
-  <h2 mat-dialog-title class="modal-title">
-    <span class="material-symbols-rounded title-icon">person_add</span>
-    Add {{ isGoalie ? 'Goalie' : 'Player' }} to Tryout
-  </h2>
-
-  <mat-dialog-content class="modal-content">
+  <div class="modal-content">
     <div class="search-section">
       <div class="select-field-wrapper">
         @if (selectedEntriesValue.length > 0) {
@@ -230,9 +225,9 @@
         </div>
       </form>
     }
-  </mat-dialog-content>
+  </div>
 
-  <mat-dialog-actions class="modal-actions">
+  <div class="modal-actions">
     <app-button
       [bg]="'transparent'"
       [bghover]="'button_background'"
@@ -250,7 +245,7 @@
     </app-button>
     @if (selectedEntriesValue.length > 0) {
       <app-button-loading
-        [isLoading]="isLoading"
+        [isLoading]="isSubmitting()"
         materialIcon="group_add"
         [bg]="'green'"
         [bghover]="'green'"
@@ -269,7 +264,7 @@
     }
     @if (showCreateFormValue) {
       <app-button-loading
-        [isLoading]="isLoading"
+        [isLoading]="isSubmitting()"
         [isDisabled]="playerForm.invalid"
         materialIcon="save"
         [bg]="'green'"
@@ -286,5 +281,5 @@
         Create {{ isGoalie ? 'Goalie' : 'Player' }}
       </app-button-loading>
     }
-  </mat-dialog-actions>
+  </div>
 </div>

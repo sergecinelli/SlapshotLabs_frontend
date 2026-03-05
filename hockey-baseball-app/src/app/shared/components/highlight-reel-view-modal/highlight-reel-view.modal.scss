@@ -1,21 +1,8 @@
-.highlight-reel-view-modal {
-  width: 100%;
-  max-width: 1400px;
-  background-color: white;
-  border-radius: 12px;
-  overflow: hidden;
-}
+@use '../../styles/modal-form';
 
-.modal-title {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: var(--color-primary);
-  font-size: 1.375rem;
-  font-weight: 600;
-  margin: 0;
-  padding: 16px 24px;
-  border-bottom: 1px solid #e5e7eb;
+.highlight-reel-view-modal {
+  @include modal-form.modal-wrapper;
+  max-width: 1400px;
 }
 
 .modal-content {
@@ -36,7 +23,7 @@
 .video-wrapper {
   position: relative;
   width: 100%;
-  padding-top: 56.25%; /* 16:9 */
+  padding-top: 56.25%;
   border-radius: 8px;
   overflow: hidden;
   background: #000;
@@ -61,7 +48,6 @@
   gap: 8px;
 }
 
-/* Reuse table styling concepts from form modal */
 .selected-events-table {
   background-color: white;
   border-radius: 8px;
@@ -114,13 +100,6 @@
 
 .selected-row .table-cell {
   background-color: #dbeafe !important;
-}
-
-.modal-actions {
-  padding: 16px 24px;
-  border-top: 1px solid #e5e7eb;
-  display: flex;
-  justify-content: flex-end;
 }
 
 @media (max-width: 1200px) {

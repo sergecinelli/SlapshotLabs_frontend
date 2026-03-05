@@ -1,0 +1,67 @@
+@let isActiveModalValue = isActiveModal();
+@let isLoadingValue = isLoading();
+
+<div
+  appSetFocus
+  id="modal-backdrop"
+  class="modal-backdrop"
+  appAnimate
+  [animateToggle]="isActiveModalValue"
+  (click)="backdropClick($event)"
+>
+  <div
+    id="modal-window"
+    class="modal"
+    appAnimate
+    [animationHideTransitionMS]="300"
+    [animationShowTransitionMS]="200"
+    [animateToggle]="isActiveModalValue"
+  >
+    <div class="scroll">
+      @if (params?.name || params?.icon) {
+        <div
+          class="header"
+          [class.header-only-close]="params?.showClose && !(params?.name || params?.icon)"
+        >
+          <div class="header-wrapper">
+            @if (params?.icon || isLoadingValue) {
+              <span
+                appAnimate
+                [delayShowAnimation]="100"
+                [animationShowTransitionMS]="200"
+                [animationHideTransitionMS]="100"
+                [animateToggle]="isLoadingValue"
+                class="material-symbols-rounded icon loading-icon spinning"
+              >
+                progress_activity
+              </span>
+            }
+            @if (params?.icon) {
+              <span
+                appAnimate
+                [animateInit]="false"
+                [delayShowAnimation]="50"
+                [animationShowTransitionMS]="200"
+                [animationHideTransitionMS]="100"
+                [animateToggle]="!isLoadingValue"
+                class="material-symbols-rounded icon"
+              >
+                {{ params?.icon }}
+              </span>
+            }
+            <h1>{{ params?.name }}</h1>
+          </div>
+          <app-button materialIcon="cancel" (clicked)="close()" />
+        </div>
+      }
+      @if (params?.showClose && !(params?.name || params?.icon)) {
+        <div class="close-only">
+          <app-button materialIcon="cancel" (clicked)="close()" />
+        </div>
+      }
+      <div class="content">
+        <ng-container *ngComponentOutlet="content"></ng-container>
+      </div>
+    </div>
+  </div>
+</div>

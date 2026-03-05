@@ -1,8 +1,8 @@
-import { Component, OnInit, inject } from '@angular/core';
-
+import { Component, OnInit, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { ModalService, ModalEvent } from '../../../services/modal.service';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
@@ -18,9 +18,10 @@ import { ButtonLoadingComponent } from '../buttons/button-loading/button-loading
 export interface GoalieFormModalData {
   goalie?: Goalie;
   isEditMode: boolean;
-  teams?: Team[]; // Optional: pass teams to avoid redundant API calls
-  teamId?: string; // Team ID to assign new goalies to
-  teamName?: string; // Team name for display
+  teams?: Team[];
+  positions?: PositionOption[];
+  teamId?: string;
+  teamName?: string;
 }
 
 export interface TeamOption {
@@ -32,7 +33,6 @@ export interface TeamOption {
   selector: 'app-goalie-form-modal',
   imports: [
     ReactiveFormsModule,
-    MatDialogModule,
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
@@ -46,14 +46,15 @@ export interface TeamOption {
 })
 export class GoalieFormModal implements OnInit {
   private fb = inject(FormBuilder);
-  private dialogRef = inject<MatDialogRef<GoalieFormModal>>(MatDialogRef);
+  private modalService = inject(ModalService);
   private teamService = inject(TeamService);
   private positionService = inject(PositionService);
-  data = inject<GoalieFormModalData>(MAT_DIALOG_DATA);
+  data = inject(ModalService).getModalData<GoalieFormModalData>();
 
   goalieForm: FormGroup;
   isEditMode: boolean;
   isLoading = true;
+  isSubmitting = signal(false);
 
   shootsOptions = [
     { value: 'Right Shot', label: 'Right Shot' },
@@ -68,6 +69,12 @@ export class GoalieFormModal implements OnInit {
 
     this.isEditMode = data.isEditMode;
     this.goalieForm = this.createForm();
+
+    this.modalService.onEvent$.pipe(takeUntilDestroyed()).subscribe((event) => {
+      if (event === ModalEvent.StopButtonLoading) {
+        this.isSubmitting.set(false);
+      }
+    });
   }
 
   ngOnInit(): void {
@@ -77,15 +84,17 @@ export class GoalieFormModal implements OnInit {
   private loadFormData(): void {
     this.isLoading = true;
 
-    // Use provided teams or fetch from API
     const teamsObservable = this.data.teams
       ? of({ teams: this.data.teams, total: this.data.teams.length })
       : this.teamService.getTeams();
 
-    // Fetch teams and positions concurrently
+    const positionsObservable = this.data.positions
+      ? of(this.data.positions)
+      : this.positionService.getPositions();
+
     forkJoin({
       teams: teamsObservable,
-      positions: this.positionService.getPositions(),
+      positions: positionsObservable,
     }).subscribe({
       next: ({ teams, positions }) => {
         // Transform teams to options format
@@ -260,7 +269,8 @@ export class GoalieFormModal implements OnInit {
         goalieData.id = this.data.goalie.id;
       }
 
-      this.dialogRef.close(goalieData);
+      this.isSubmitting.set(true);
+      this.modalService.closeWithDataProcessing(goalieData);
     } else {
       // Mark all fields as touched to show validation errors
       Object.keys(this.goalieForm.controls).forEach((key) => {
@@ -270,7 +280,7 @@ export class GoalieFormModal implements OnInit {
   }
 
   onCancel(): void {
-    this.dialogRef.close();
+    this.modalService.closeModal();
   }
 
   getErrorMessage(fieldName: string): string {

@@ -1,7 +1,7 @@
-import { Component, OnInit, inject } from '@angular/core';
-
+import { Component, OnInit, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
+import { ModalService, ModalEvent } from '../../../services/modal.service';
 import { ButtonComponent } from '../buttons/button/button.component';
 import { ButtonLoadingComponent } from '../buttons/button-loading/button-loading.component';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -19,7 +19,6 @@ export interface VideoFormModalData {
   selector: 'app-video-form-modal',
   imports: [
     ReactiveFormsModule,
-    MatDialogModule,
     ButtonComponent,
     ButtonLoadingComponent,
     MatFormFieldModule,
@@ -32,15 +31,22 @@ export interface VideoFormModalData {
 })
 export class VideoFormModal implements OnInit {
   private fb = inject(FormBuilder);
-  private dialogRef = inject<MatDialogRef<VideoFormModal>>(MatDialogRef);
-  data = inject<VideoFormModalData>(MAT_DIALOG_DATA);
+  private modalService = inject(ModalService);
+  data = inject(ModalService).getModalData<VideoFormModalData>();
 
   videoForm: FormGroup;
   isEditMode: boolean;
+  isSubmitting = signal(false);
 
   constructor() {
     this.isEditMode = this.data.isEditMode;
     this.videoForm = this.createForm();
+
+    this.modalService.onEvent$.pipe(takeUntilDestroyed()).subscribe((event) => {
+      if (event === ModalEvent.StopButtonLoading) {
+        this.isSubmitting.set(false);
+      }
+    });
   }
 
   ngOnInit(): void {
@@ -81,7 +87,8 @@ export class VideoFormModal implements OnInit {
   onSubmit(): void {
     if (this.videoForm.valid) {
       const formValue = this.videoForm.value;
-      this.dialogRef.close({
+      this.isSubmitting.set(true);
+      this.modalService.closeWithDataProcessing({
         name: formValue.name,
         description: formValue.description,
         youtube_link: formValue.youtube_link,
@@ -90,7 +97,7 @@ export class VideoFormModal implements OnInit {
   }
 
   onCancel(): void {
-    this.dialogRef.close();
+    this.modalService.closeModal();
   }
 
   get name() {

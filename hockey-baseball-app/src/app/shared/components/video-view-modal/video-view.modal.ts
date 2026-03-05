@@ -1,10 +1,9 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 
-import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { ButtonComponent } from '../buttons/button/button.component';
-import { MatIconModule } from '@angular/material/icon';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { Video } from '../../interfaces/video.interface';
+import { ModalService } from '../../../services/modal.service';
 
 export interface VideoViewModalData {
   video: Video;
@@ -12,14 +11,14 @@ export interface VideoViewModalData {
 
 @Component({
   selector: 'app-video-view-modal',
-  imports: [MatDialogModule, ButtonComponent, MatIconModule],
+  imports: [ButtonComponent],
   templateUrl: './video-view.modal.html',
   styleUrl: './video-view.modal.scss',
 })
 export class VideoViewModal implements OnInit {
-  private dialogRef = inject<MatDialogRef<VideoViewModal>>(MatDialogRef);
+  private modalService = inject(ModalService);
   private sanitizer = inject(DomSanitizer);
-  data = inject<VideoViewModalData>(MAT_DIALOG_DATA);
+  data = this.modalService.getModalData<VideoViewModalData>();
 
   videoUrl = signal<SafeResourceUrl | null>(null);
   videoMessage = signal<string | null>(null);
@@ -29,7 +28,7 @@ export class VideoViewModal implements OnInit {
   }
 
   close(): void {
-    this.dialogRef.close();
+    this.modalService.closeModal();
   }
 
   private loadVideo(): void {

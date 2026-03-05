@@ -7,9 +7,9 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatDialog } from '@angular/material/dialog';
 import { VideoViewModal } from '../../shared/components/video-view-modal/video-view.modal';
 import { Video } from '../../shared/interfaces/video.interface';
+import { ModalEvent, ModalService } from '../../services/modal.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ButtonComponent } from '../../shared/components/buttons/button/button.component';
 import { TurnoverFormModal } from '../../shared/components/turnover-form-modal/turnover-form.modal';
@@ -34,7 +34,14 @@ import { ArenaService } from '../../services/arena.service';
 import { Arena, Rink } from '../../shared/interfaces/arena.interface';
 import { Team } from '../../shared/interfaces/team.interface';
 import { TeamOptionsService } from '../../services/team-options.service';
-import { GameEventService } from '../../services/game-event.service';
+import {
+  GameEventService,
+  ShotEventRequest,
+  TurnoverEventRequest,
+  FaceoffEventRequest,
+  GoalieChangeEventRequest,
+  PenaltyEventRequest,
+} from '../../services/game-event.service';
 import { GameEventNameService } from '../../services/game-event-name.service';
 import { ScheduleService } from '../../services/schedule.service';
 import {
@@ -52,6 +59,7 @@ import { forkJoin, interval, Subscription } from 'rxjs';
 import { switchMap, startWith } from 'rxjs/operators';
 import { formatDateTimeFromGMT } from '../../shared/utils/time-converter.util';
 import { BannerService } from '../../services/banner.service';
+import { ToastService } from '../../services/toast.service';
 import { StorageKey } from '../../services/local-storage.service';
 import { BreadcrumbDataService } from '../../services/breadcrumb-data.service';
 import { CachedSrcDirective } from '../../shared/directives/cached-src.directive';
@@ -133,7 +141,7 @@ export class LiveDashboardPage implements OnInit, OnDestroy {
   protected visibilityByRoleMap = visibilityByRoleMap;
   protected StorageKey = StorageKey;
 
-  private dialog = inject(MatDialog);
+  private modalService = inject(ModalService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private gameMetadataService = inject(GameMetadataService);
@@ -150,6 +158,7 @@ export class LiveDashboardPage implements OnInit, OnDestroy {
   private sprayChartUtils = inject(SprayChartUtilsService);
   private bannerService = inject(BannerService);
   private breadcrumbData = inject(BreadcrumbDataService);
+  private toast = inject(ToastService);
 
   // Polling subscription for live data
   private liveDataPollingSubscription?: Subscription;
@@ -1407,11 +1416,10 @@ export class LiveDashboardPage implements OnInit, OnDestroy {
     if (this.isLoadingGameData) {
       return;
     }
-    const dialogRef = this.dialog.open(ShotFormModal, {
+    this.modalService.openModal(ShotFormModal, {
+      name: 'Shot',
+      icon: 'sports_hockey',
       width: '800px',
-      panelClass: 'shot-form-modal-dialog',
-      disableClose: false,
-      autoFocus: true,
       data: {
         gameId: this.gameId,
         shotEventId: this.shotOnGoalEventId,
@@ -1426,13 +1434,27 @@ export class LiveDashboardPage implements OnInit, OnDestroy {
         homeStartGoalieId: this.homeStartGoalieId,
         awayStartGoalieId: this.awayStartGoalieId,
       },
-    });
-
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
-        this.refreshLiveData();
-        this.bannerService.triggerRefresh();
-      }
+      onCloseWithDataProcessing: (result: {
+        isEditMode: boolean;
+        eventId?: number;
+        requestData: ShotEventRequest;
+      }) => {
+        const apiCall = result.isEditMode
+          ? this.gameEventService.updateGameEvent(result.eventId!, result.requestData)
+          : this.gameEventService.createShotEvent(result.requestData);
+        apiCall.subscribe({
+          next: () => {
+            this.toast.show('Event recorded successfully', 'success');
+            this.modalService.closeModal();
+            this.refreshLiveData();
+            this.bannerService.triggerRefresh();
+          },
+          error: () => {
+            this.toast.show('Failed to record event', 'error');
+            this.modalService.broadcastEvent(ModalEvent.StopButtonLoading);
+          },
+        });
+      },
     });
   }
 
@@ -1440,11 +1462,10 @@ export class LiveDashboardPage implements OnInit, OnDestroy {
     if (this.isLoadingGameData) {
       return;
     }
-    const dialogRef = this.dialog.open(TurnoverFormModal, {
+    this.modalService.openModal(TurnoverFormModal, {
+      name: 'Turnover',
+      icon: 'swap_horiz',
       width: '800px',
-      panelClass: 'turnover-form-modal-dialog',
-      disableClose: false,
-      autoFocus: true,
       data: {
         gameId: this.gameId,
         turnoverEventId: this.turnoverEventId,
@@ -1452,12 +1473,26 @@ export class LiveDashboardPage implements OnInit, OnDestroy {
         teamOptions: this.teamOptions,
         playerOptions: this.playerOptions,
       },
-    });
-
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
-        this.refreshLiveData();
-      }
+      onCloseWithDataProcessing: (result: {
+        isEditMode: boolean;
+        eventId?: number;
+        requestData: TurnoverEventRequest;
+      }) => {
+        const apiCall = result.isEditMode
+          ? this.gameEventService.updateGameEvent(result.eventId!, result.requestData)
+          : this.gameEventService.createTurnoverEvent(result.requestData);
+        apiCall.subscribe({
+          next: () => {
+            this.toast.show('Event recorded successfully', 'success');
+            this.modalService.closeModal();
+            this.refreshLiveData();
+          },
+          error: () => {
+            this.toast.show('Failed to record event', 'error');
+            this.modalService.broadcastEvent(ModalEvent.StopButtonLoading);
+          },
+        });
+      },
     });
   }
 
@@ -1465,11 +1500,10 @@ export class LiveDashboardPage implements OnInit, OnDestroy {
     if (this.isLoadingGameData) {
       return;
     }
-    const dialogRef = this.dialog.open(FaceoffFormModal, {
+    this.modalService.openModal(FaceoffFormModal, {
+      name: 'Faceoff',
+      icon: 'sports_hockey',
       width: '800px',
-      panelClass: 'faceoff-form-modal-dialog',
-      disableClose: false,
-      autoFocus: true,
       data: {
         gameId: this.gameId,
         faceoffEventId: this.faceoffEventId,
@@ -1477,12 +1511,26 @@ export class LiveDashboardPage implements OnInit, OnDestroy {
         teamOptions: this.teamOptions,
         playerOptions: this.playerOptions,
       },
-    });
-
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
-        this.refreshLiveData();
-      }
+      onCloseWithDataProcessing: (result: {
+        isEditMode: boolean;
+        eventId?: number;
+        requestData: FaceoffEventRequest;
+      }) => {
+        const apiCall = result.isEditMode
+          ? this.gameEventService.updateGameEvent(result.eventId!, result.requestData)
+          : this.gameEventService.createFaceoffEvent(result.requestData);
+        apiCall.subscribe({
+          next: () => {
+            this.toast.show('Event recorded successfully', 'success');
+            this.modalService.closeModal();
+            this.refreshLiveData();
+          },
+          error: () => {
+            this.toast.show('Failed to record event', 'error');
+            this.modalService.broadcastEvent(ModalEvent.StopButtonLoading);
+          },
+        });
+      },
     });
   }
 
@@ -1490,11 +1538,10 @@ export class LiveDashboardPage implements OnInit, OnDestroy {
     if (this.isLoadingGameData) {
       return;
     }
-    const dialogRef = this.dialog.open(GoalieChangeFormModal, {
+    this.modalService.openModal(GoalieChangeFormModal, {
+      name: 'Goalie Change',
+      icon: 'sports',
       width: '800px',
-      panelClass: 'goalie-change-form-modal-dialog',
-      disableClose: false,
-      autoFocus: true,
       data: {
         gameId: this.gameId,
         goalieChangeEventId: this.goalieChangeEventId,
@@ -1506,12 +1553,26 @@ export class LiveDashboardPage implements OnInit, OnDestroy {
         homeStartGoalieId: this.homeStartGoalieId,
         awayStartGoalieId: this.awayStartGoalieId,
       },
-    });
-
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
-        this.refreshLiveData();
-      }
+      onCloseWithDataProcessing: (result: {
+        isEditMode: boolean;
+        eventId?: number;
+        requestData: GoalieChangeEventRequest;
+      }) => {
+        const apiCall = result.isEditMode
+          ? this.gameEventService.updateGameEvent(result.eventId!, result.requestData)
+          : this.gameEventService.createGoalieChangeEvent(result.requestData);
+        apiCall.subscribe({
+          next: () => {
+            this.toast.show('Event recorded successfully', 'success');
+            this.modalService.closeModal();
+            this.refreshLiveData();
+          },
+          error: () => {
+            this.toast.show('Failed to record event', 'error');
+            this.modalService.broadcastEvent(ModalEvent.StopButtonLoading);
+          },
+        });
+      },
     });
   }
 
@@ -1570,11 +1631,10 @@ export class LiveDashboardPage implements OnInit, OnDestroy {
     if (this.isLoadingGameData) {
       return;
     }
-    const dialogRef = this.dialog.open(PenaltyFormModal, {
+    this.modalService.openModal(PenaltyFormModal, {
+      name: 'Penalty',
+      icon: 'warning',
       width: '800px',
-      panelClass: 'penalty-form-modal-dialog',
-      disableClose: false,
-      autoFocus: true,
       data: {
         gameId: this.gameId,
         penaltyEventId: this.penaltyEventId,
@@ -1582,12 +1642,26 @@ export class LiveDashboardPage implements OnInit, OnDestroy {
         teamOptions: this.teamOptions,
         playerOptions: this.playerOptions,
       },
-    });
-
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
-        this.refreshLiveData();
-      }
+      onCloseWithDataProcessing: (result: {
+        isEditMode: boolean;
+        eventId?: number;
+        requestData: PenaltyEventRequest;
+      }) => {
+        const apiCall = result.isEditMode
+          ? this.gameEventService.updateGameEvent(result.eventId!, result.requestData)
+          : this.gameEventService.createPenaltyEvent(result.requestData);
+        apiCall.subscribe({
+          next: () => {
+            this.toast.show('Event recorded successfully', 'success');
+            this.modalService.closeModal();
+            this.refreshLiveData();
+          },
+          error: () => {
+            this.toast.show('Failed to record event', 'error');
+            this.modalService.broadcastEvent(ModalEvent.StopButtonLoading);
+          },
+        });
+      },
     });
   }
 
@@ -1624,11 +1698,10 @@ export class LiveDashboardPage implements OnInit, OnDestroy {
     const eventTime = this.parseEventTime(rawEvent.time);
     const timeString = this.formatElapsedTime(eventTime);
 
-    const dialogRef = this.dialog.open(ShotFormModal, {
+    this.modalService.openModal(ShotFormModal, {
+      name: 'Shot',
+      icon: 'sports_hockey',
       width: '800px',
-      panelClass: 'shot-form-modal-dialog',
-      disableClose: false,
-      autoFocus: true,
       data: {
         gameId: this.gameId,
         shotEventId: this.shotOnGoalEventId,
@@ -1642,7 +1715,6 @@ export class LiveDashboardPage implements OnInit, OnDestroy {
         awayTeamId: this.awayTeamId,
         homeStartGoalieId: this.homeStartGoalieId,
         awayStartGoalieId: this.awayStartGoalieId,
-        // Edit mode data
         isEditMode: true,
         eventId: rawEvent.id,
         existingData: {
@@ -1663,14 +1735,27 @@ export class LiveDashboardPage implements OnInit, OnDestroy {
           goalType: rawEvent.goal_type,
         },
       },
-    });
-
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
-        this.refreshLiveData();
-        // Trigger banner refresh if score might have changed (for shots)
-        this.bannerService.triggerRefresh();
-      }
+      onCloseWithDataProcessing: (result: {
+        isEditMode: boolean;
+        eventId?: number;
+        requestData: ShotEventRequest;
+      }) => {
+        const apiCall = result.isEditMode
+          ? this.gameEventService.updateGameEvent(result.eventId!, result.requestData)
+          : this.gameEventService.createShotEvent(result.requestData);
+        apiCall.subscribe({
+          next: () => {
+            this.toast.show('Event recorded successfully', 'success');
+            this.modalService.closeModal();
+            this.refreshLiveData();
+            this.bannerService.triggerRefresh();
+          },
+          error: () => {
+            this.toast.show('Failed to record event', 'error');
+            this.modalService.broadcastEvent(ModalEvent.StopButtonLoading);
+          },
+        });
+      },
     });
   }
 
@@ -1681,18 +1766,16 @@ export class LiveDashboardPage implements OnInit, OnDestroy {
     const eventTime = this.parseEventTime(rawEvent.time);
     const timeString = this.formatElapsedTime(eventTime);
 
-    const dialogRef = this.dialog.open(TurnoverFormModal, {
+    this.modalService.openModal(TurnoverFormModal, {
+      name: 'Turnover',
+      icon: 'swap_horiz',
       width: '800px',
-      panelClass: 'turnover-form-modal-dialog',
-      disableClose: false,
-      autoFocus: true,
       data: {
         gameId: this.gameId,
         turnoverEventId: this.turnoverEventId,
         periodOptions: this.periodOptions,
         teamOptions: this.teamOptions,
         playerOptions: this.playerOptions,
-        // Edit mode data
         isEditMode: true,
         eventId: rawEvent.id,
         existingData: {
@@ -1706,12 +1789,26 @@ export class LiveDashboardPage implements OnInit, OnDestroy {
           iceLeftOffset: rawEvent.ice_left_offset,
         },
       },
-    });
-
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
-        this.refreshLiveData();
-      }
+      onCloseWithDataProcessing: (result: {
+        isEditMode: boolean;
+        eventId?: number;
+        requestData: TurnoverEventRequest;
+      }) => {
+        const apiCall = result.isEditMode
+          ? this.gameEventService.updateGameEvent(result.eventId!, result.requestData)
+          : this.gameEventService.createTurnoverEvent(result.requestData);
+        apiCall.subscribe({
+          next: () => {
+            this.toast.show('Event recorded successfully', 'success');
+            this.modalService.closeModal();
+            this.refreshLiveData();
+          },
+          error: () => {
+            this.toast.show('Failed to record event', 'error');
+            this.modalService.broadcastEvent(ModalEvent.StopButtonLoading);
+          },
+        });
+      },
     });
   }
 
@@ -1722,18 +1819,16 @@ export class LiveDashboardPage implements OnInit, OnDestroy {
     const eventTime = this.parseEventTime(rawEvent.time);
     const timeString = this.formatElapsedTime(eventTime);
 
-    const dialogRef = this.dialog.open(FaceoffFormModal, {
+    this.modalService.openModal(FaceoffFormModal, {
+      name: 'Faceoff',
+      icon: 'sports_hockey',
       width: '800px',
-      panelClass: 'faceoff-form-modal-dialog',
-      disableClose: false,
-      autoFocus: true,
       data: {
         gameId: this.gameId,
         faceoffEventId: this.faceoffEventId,
         periodOptions: this.periodOptions,
         teamOptions: this.teamOptions,
         playerOptions: this.playerOptions,
-        // Edit mode data
         isEditMode: true,
         eventId: rawEvent.id,
         existingData: {
@@ -1748,12 +1843,26 @@ export class LiveDashboardPage implements OnInit, OnDestroy {
           iceLeftOffset: rawEvent.ice_left_offset,
         },
       },
-    });
-
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
-        this.refreshLiveData();
-      }
+      onCloseWithDataProcessing: (result: {
+        isEditMode: boolean;
+        eventId?: number;
+        requestData: FaceoffEventRequest;
+      }) => {
+        const apiCall = result.isEditMode
+          ? this.gameEventService.updateGameEvent(result.eventId!, result.requestData)
+          : this.gameEventService.createFaceoffEvent(result.requestData);
+        apiCall.subscribe({
+          next: () => {
+            this.toast.show('Event recorded successfully', 'success');
+            this.modalService.closeModal();
+            this.refreshLiveData();
+          },
+          error: () => {
+            this.toast.show('Failed to record event', 'error');
+            this.modalService.broadcastEvent(ModalEvent.StopButtonLoading);
+          },
+        });
+      },
     });
   }
 
@@ -1764,11 +1873,10 @@ export class LiveDashboardPage implements OnInit, OnDestroy {
     const eventTime = this.parseEventTime(rawEvent.time);
     const timeString = this.formatElapsedTime(eventTime);
 
-    const dialogRef = this.dialog.open(GoalieChangeFormModal, {
+    this.modalService.openModal(GoalieChangeFormModal, {
+      name: 'Goalie Change',
+      icon: 'sports',
       width: '800px',
-      panelClass: 'goalie-change-form-modal-dialog',
-      disableClose: false,
-      autoFocus: true,
       data: {
         gameId: this.gameId,
         goalieChangeEventId: this.goalieChangeEventId,
@@ -1779,7 +1887,6 @@ export class LiveDashboardPage implements OnInit, OnDestroy {
         awayTeamId: this.awayTeamId,
         homeStartGoalieId: this.homeStartGoalieId,
         awayStartGoalieId: this.awayStartGoalieId,
-        // Edit mode data
         isEditMode: true,
         eventId: rawEvent.id,
         existingData: {
@@ -1790,12 +1897,26 @@ export class LiveDashboardPage implements OnInit, OnDestroy {
           note: rawEvent.note,
         },
       },
-    });
-
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
-        this.refreshLiveData();
-      }
+      onCloseWithDataProcessing: (result: {
+        isEditMode: boolean;
+        eventId?: number;
+        requestData: GoalieChangeEventRequest;
+      }) => {
+        const apiCall = result.isEditMode
+          ? this.gameEventService.updateGameEvent(result.eventId!, result.requestData)
+          : this.gameEventService.createGoalieChangeEvent(result.requestData);
+        apiCall.subscribe({
+          next: () => {
+            this.toast.show('Event recorded successfully', 'success');
+            this.modalService.closeModal();
+            this.refreshLiveData();
+          },
+          error: () => {
+            this.toast.show('Failed to record event', 'error');
+            this.modalService.broadcastEvent(ModalEvent.StopButtonLoading);
+          },
+        });
+      },
     });
   }
 
@@ -1845,18 +1966,16 @@ export class LiveDashboardPage implements OnInit, OnDestroy {
       }
     }
 
-    const dialogRef = this.dialog.open(PenaltyFormModal, {
+    this.modalService.openModal(PenaltyFormModal, {
+      name: 'Penalty',
+      icon: 'warning',
       width: '800px',
-      panelClass: 'penalty-form-modal-dialog',
-      disableClose: false,
-      autoFocus: true,
       data: {
         gameId: this.gameId,
         penaltyEventId: this.penaltyEventId,
         periodOptions: this.periodOptions,
         teamOptions: this.teamOptions,
         playerOptions: this.playerOptions,
-        // Edit mode data
         isEditMode: true,
         eventId: rawEvent.id,
         existingData: {
@@ -1872,12 +1991,26 @@ export class LiveDashboardPage implements OnInit, OnDestroy {
           iceLeftOffset: rawEvent.ice_left_offset,
         },
       },
-    });
-
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
-        this.refreshLiveData();
-      }
+      onCloseWithDataProcessing: (result: {
+        isEditMode: boolean;
+        eventId?: number;
+        requestData: PenaltyEventRequest;
+      }) => {
+        const apiCall = result.isEditMode
+          ? this.gameEventService.updateGameEvent(result.eventId!, result.requestData)
+          : this.gameEventService.createPenaltyEvent(result.requestData);
+        apiCall.subscribe({
+          next: () => {
+            this.toast.show('Event recorded successfully', 'success');
+            this.modalService.closeModal();
+            this.refreshLiveData();
+          },
+          error: () => {
+            this.toast.show('Failed to record event', 'error');
+            this.modalService.broadcastEvent(ModalEvent.StopButtonLoading);
+          },
+        });
+      },
     });
   }
 
@@ -1898,10 +2031,11 @@ export class LiveDashboardPage implements OnInit, OnDestroy {
       date: raw?.date || '',
     };
 
-    this.dialog.open(VideoViewModal, {
+    this.modalService.openModal(VideoViewModal, {
+      name: modalVideo.name,
+      icon: 'play_circle',
       width: '900px',
       maxWidth: '95vw',
-      panelClass: 'video-view-modal-dialog',
       data: { video: modalVideo },
     });
   }
@@ -1948,10 +2082,11 @@ export class LiveDashboardPage implements OnInit, OnDestroy {
           this.refreshLiveData();
           // Trigger banner refresh in case a goal was deleted
           this.bannerService.triggerRefresh();
+          this.toast.show('Event deleted successfully', 'success');
         },
         error: (error) => {
           console.error('Failed to delete event:', error);
-          alert('Failed to delete event. Please try again.');
+          this.toast.show('Failed to delete event', 'error');
         },
       });
     }

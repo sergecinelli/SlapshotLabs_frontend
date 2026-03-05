@@ -23,7 +23,7 @@
       </app-button>
 
       <div class="entity-add-button-wrapper" role-visibility-name="add-team-button">
-        <app-button
+        <app-button-loading
           materialIcon="add"
           [bg]="'primary'"
           [bghover]="'primary_dark'"
@@ -34,10 +34,11 @@
           [width]="'auto'"
           [rounded]="false"
           [haveContent]="true"
+          [isLoading]="isAddLoading()"
           (clicked)="openAddTeamModal()"
         >
           Add a Team
-        </app-button>
+        </app-button-loading>
       </div>
     </div>
   </div>
@@ -75,13 +76,14 @@
                   [materialIcon]="'visibility'"
                   [matTooltip]="'Profile'"
                 />
-                <app-button
+                <app-button-loading
                   [bg]="'transparent'"
                   [bghover]="'gray_tone3'"
                   [color]="'text_secondary'"
                   [colorhover]="'orange_dark'"
                   [materialIcon]="'stylus'"
-                  [matTooltip]="'Edit'"
+                  [tooltip]="'Edit'"
+                  [isLoading]="editingTeamId() === team.id"
                   (clicked)="editTeam(team)"
                   role-visibility-name="edit-action"
                 />

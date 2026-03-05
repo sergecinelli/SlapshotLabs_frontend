@@ -1,6 +1,6 @@
 import { Component, inject, OnInit, signal, computed } from '@angular/core';
 
-import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { ModalService } from '../../../services/modal.service';
 import { ButtonComponent } from '../buttons/button/button.component';
 import { MatIconModule } from '@angular/material/icon';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
@@ -17,14 +17,14 @@ export interface HighlightReelViewModalData {
 
 @Component({
   selector: 'app-highlight-reel-view-modal',
-  imports: [MatDialogModule, ButtonComponent, MatIconModule],
+  imports: [ButtonComponent, MatIconModule],
   templateUrl: './highlight-reel-view.modal.html',
   styleUrl: './highlight-reel-view.modal.scss',
 })
 export class HighlightReelViewModal implements OnInit {
-  private dialogRef = inject<MatDialogRef<HighlightReelViewModal>>(MatDialogRef);
+  private modalService = inject(ModalService);
   private sanitizer = inject(DomSanitizer);
-  data = inject<HighlightReelViewModalData>(MAT_DIALOG_DATA);
+  data = inject(ModalService).getModalData<HighlightReelViewModalData>();
 
   highlights = signal<HighlightApi[]>([]);
   selectedIndex = signal<number>(0);
@@ -51,7 +51,7 @@ export class HighlightReelViewModal implements OnInit {
   }
 
   close(): void {
-    this.dialogRef.close();
+    this.modalService.closeModal();
   }
 
   onRowClick(index: number): void {

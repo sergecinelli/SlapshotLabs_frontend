@@ -3,12 +3,7 @@
 @let playersValue = players();
 
 <div class="roster-selection-modal">
-  <h2 mat-dialog-title class="modal-title">
-    <span class="material-symbols-rounded title-icon">groups</span>
-    Select Roster for {{ data.teamName }}
-  </h2>
-
-  <mat-dialog-content class="modal-content">
+  <div class="modal-content">
     @if (isLoadingValue) {
       <div class="loading-container">
         <p>Loading roster...</p>
@@ -130,9 +125,9 @@
         }
       </div>
     }
-  </mat-dialog-content>
+  </div>
 
-  <mat-dialog-actions class="modal-actions">
+  <div class="modal-actions">
     <app-button
       [bg]="'transparent'"
       [bghover]="'button_background'"
@@ -165,5 +160,5 @@
     >
       Confirm Selection
     </app-button-loading>
-  </mat-dialog-actions>
+  </div>
 </div>

@@ -1,7 +1,8 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { MatDialogRef, MatDialogModule, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { ModalEvent, ModalService } from '../../../services/modal.service';
 import { ButtonComponent } from '../buttons/button/button.component';
 import { ButtonLoadingComponent } from '../buttons/button-loading/button-loading.component';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -10,7 +11,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { GameEventService, ShotEventRequest } from '../../../services/game-event.service';
+import { ShotEventRequest } from '../../../services/game-event.service';
 import { environment } from '../../../../environments/environment';
 import {
   ShotLocationSelectorComponent,
@@ -44,7 +45,6 @@ export interface ShotFormData {
   imports: [
     CachedSrcDirective,
     ReactiveFormsModule,
-    MatDialogModule,
     ButtonComponent,
     ButtonLoadingComponent,
     MatFormFieldModule,
@@ -60,9 +60,8 @@ export interface ShotFormData {
 })
 export class ShotFormModal implements OnInit {
   private fb = inject(FormBuilder);
-  private dialogRef = inject<MatDialogRef<ShotFormModal>>(MatDialogRef);
-  private gameEventService = inject(GameEventService);
-  private dialogData = inject<{
+  private modalService = inject(ModalService);
+  private dialogData = inject(ModalService).getModalData<{
     gameId: number;
     shotEventId: number;
     periodOptions?: { value: number; label: string }[];
@@ -96,7 +95,7 @@ export class ShotFormModal implements OnInit {
       zone?: string;
       goalType?: string;
     };
-  }>(MAT_DIALOG_DATA);
+  }>();
 
   gameId: number;
   shotEventId: number;
@@ -116,7 +115,7 @@ export class ShotFormModal implements OnInit {
   goalieOptions: { value: number; label: string; number?: number }[] = [];
 
   // Loading states
-  isSubmitting = false;
+  isSubmitting = signal(false);
 
   // Shot location
   shotLocation: ShotLocation | null = null;
@@ -128,6 +127,12 @@ export class ShotFormModal implements OnInit {
     this.isEditMode = this.dialogData.isEditMode || false;
     this.eventId = this.dialogData.eventId;
     this.setupConditionalValidation();
+
+    this.modalService.onEvent$.pipe(takeUntilDestroyed()).subscribe((event) => {
+      if (event === ModalEvent.StopButtonLoading) {
+        this.isSubmitting.set(false);
+      }
+    });
   }
 
   ngOnInit(): void {
@@ -455,8 +460,8 @@ export class ShotFormModal implements OnInit {
   }
 
   onSubmit(): void {
-    if (this.shotForm.valid && !this.isSubmitting) {
-      this.isSubmitting = true;
+    if (this.shotForm.valid && !this.isSubmitting()) {
+      this.isSubmitting.set(true);
       const formValue = this.shotForm.value;
 
       // Build absolute event time-of-day string in format HH:mm:ss.SSSZ
@@ -470,7 +475,7 @@ export class ShotFormModal implements OnInit {
       const goalieId: number | undefined =
         (this.isGoal ? formValue.goalieScored : formValue.goalieInNet) ?? undefined;
 
-      const shotRequest: ShotEventRequest = {
+      const requestData: ShotEventRequest = {
         game_id: this.gameId,
         event_name_id: this.shotEventId,
         team_id: this.isGoal ? formValue.scoringTeam : formValue.shootingTeam,
@@ -494,32 +499,11 @@ export class ShotFormModal implements OnInit {
         goal_type: this.isGoal ? formValue.goalType : undefined,
       };
 
-      // Edit or create based on mode
-      if (this.isEditMode && this.eventId) {
-        this.gameEventService.updateGameEvent(this.eventId, shotRequest).subscribe({
-          next: () => {
-            this.isSubmitting = false;
-            // Ensure caller always receives a truthy value to trigger refresh
-            this.dialogRef.close(true);
-          },
-          error: (error) => {
-            console.error('Failed to update shot event:', error);
-            this.isSubmitting = false;
-            alert('Failed to update shot event. Please try again.');
-          },
-        });
-      } else {
-        this.gameEventService.createShotEvent(shotRequest).subscribe({
-          next: (response) => {
-            this.isSubmitting = false;
-            this.dialogRef.close(response);
-          },
-          error: (error) => {
-            console.error('Failed to create shot event:', error);
-            this.isSubmitting = false;
-          },
-        });
-      }
+      this.modalService.closeWithDataProcessing({
+        isEditMode: this.isEditMode,
+        eventId: this.eventId,
+        requestData,
+      });
     } else if (!this.shotForm.valid) {
       Object.keys(this.shotForm.controls).forEach((key) => {
         this.shotForm.get(key)?.markAsTouched();
@@ -528,7 +512,7 @@ export class ShotFormModal implements OnInit {
   }
 
   onCancel(): void {
-    this.dialogRef.close();
+    this.modalService.closeModal();
   }
 
   getErrorMessage(fieldName: string): string {

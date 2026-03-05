@@ -1,7 +1,8 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { MatDialogRef, MatDialogModule, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { ModalEvent, ModalService } from '../../../services/modal.service';
 import { ButtonComponent } from '../buttons/button/button.component';
 import { ButtonLoadingComponent } from '../buttons/button-loading/button-loading.component';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -18,7 +19,7 @@ import {
 import { TeamService } from '../../../services/team.service';
 import { PlayerService } from '../../../services/player.service';
 import { GameMetadataService } from '../../../services/game-metadata.service';
-import { GameEventService, FaceoffEventRequest } from '../../../services/game-event.service';
+import { FaceoffEventRequest } from '../../../services/game-event.service';
 import { environment } from '../../../../environments/environment';
 import { CachedSrcDirective } from '../../directives/cached-src.directive';
 
@@ -40,7 +41,7 @@ export interface FaceoffFormData {
   imports: [
     CachedSrcDirective,
     ReactiveFormsModule,
-    MatDialogModule,
+
     ButtonComponent,
     ButtonLoadingComponent,
     MatFormFieldModule,
@@ -55,12 +56,11 @@ export interface FaceoffFormData {
 })
 export class FaceoffFormModal implements OnInit {
   private fb = inject(FormBuilder);
-  private dialogRef = inject<MatDialogRef<FaceoffFormModal>>(MatDialogRef);
+  private modalService = inject(ModalService);
   private teamService = inject(TeamService);
   private playerService = inject(PlayerService);
   private gameMetadataService = inject(GameMetadataService);
-  private gameEventService = inject(GameEventService);
-  private dialogData = inject<{
+  private dialogData = inject(ModalService).getModalData<{
     gameId: number;
     faceoffEventId: number;
     periodOptions?: { value: number; label: string }[];
@@ -81,7 +81,7 @@ export class FaceoffFormModal implements OnInit {
       iceLeftOffset?: number;
       isFaceoffWon?: boolean;
     };
-  }>(MAT_DIALOG_DATA);
+  }>();
 
   gameId: number;
   faceoffEventId: number;
@@ -102,7 +102,7 @@ export class FaceoffFormModal implements OnInit {
   isLoadingWinnerPlayers = false;
   isLoadingLoserPlayers = false;
   isLoadingPeriods = false;
-  isSubmitting = false;
+  isSubmitting = signal(false);
 
   constructor() {
     this.faceoffForm = this.createForm();
@@ -111,6 +111,12 @@ export class FaceoffFormModal implements OnInit {
     this.isEditMode = this.dialogData.isEditMode || false;
     this.eventId = this.dialogData.eventId;
     this.setupTeamChangeListeners();
+
+    this.modalService.onEvent$.pipe(takeUntilDestroyed()).subscribe((event) => {
+      if (event === ModalEvent.StopButtonLoading) {
+        this.isSubmitting.set(false);
+      }
+    });
   }
 
   ngOnInit(): void {
@@ -430,8 +436,8 @@ export class FaceoffFormModal implements OnInit {
   }
 
   onSubmit(): void {
-    if (this.faceoffForm.valid && !this.isSubmitting) {
-      this.isSubmitting = true;
+    if (this.faceoffForm.valid && !this.isSubmitting()) {
+      this.isSubmitting.set(true);
       const formValue = this.faceoffForm.value;
 
       // Convert mm:ss to time-of-day like shots (HH:mm:ss.SSSZ with 00 hours)
@@ -440,7 +446,7 @@ export class FaceoffFormModal implements OnInit {
       const iso = tmp.toISOString();
       const timeOfDay = iso.substring(iso.indexOf('T') + 1);
 
-      const faceoffRequest: FaceoffEventRequest = {
+      const requestData: FaceoffEventRequest = {
         game_id: this.gameId,
         event_name_id: this.faceoffEventId,
         team_id: formValue.winnerTeam,
@@ -454,55 +460,11 @@ export class FaceoffFormModal implements OnInit {
         zone: this.puckLocation?.zone,
       };
 
-      // Edit or create based on mode
-      if (this.isEditMode && this.eventId) {
-        this.gameEventService.updateGameEvent(this.eventId, faceoffRequest).subscribe({
-          next: () => {
-            this.isSubmitting = false;
-            // Ensure caller always receives a truthy value to trigger refresh
-            this.dialogRef.close(true);
-          },
-          error: (error) => {
-            console.error('Failed to update faceoff event:', error);
-            this.isSubmitting = false;
-            alert('Failed to update faceoff event. Please try again.');
-          },
-        });
-      } else {
-        this.gameEventService.createFaceoffEvent(faceoffRequest).subscribe({
-          next: () => {
-            // Find selected teams and players for display
-            const winnerTeam = this.teamOptions.find((t) => t.value === formValue.winnerTeam);
-            const loserTeam = this.teamOptions.find((t) => t.value === formValue.loserTeam);
-            const winnerPlayer = this.winnerPlayerOptions.find(
-              (p) => p.value === formValue.winnerPlayer
-            );
-            const loserPlayer = this.loserPlayerOptions.find(
-              (p) => p.value === formValue.loserPlayer
-            );
-
-            const faceoffData: FaceoffFormData = {
-              winnerTeamLogo: winnerTeam?.logo || '',
-              winnerTeamName: winnerTeam?.label || '',
-              winnerPlayerName: winnerPlayer?.label || '',
-              loserTeamLogo: loserTeam?.logo || '',
-              loserTeamName: loserTeam?.label || '',
-              loserPlayerName: loserPlayer?.label || '',
-              period: formValue.period.toString(),
-              time: formValue.time,
-              location: this.puckLocation || undefined,
-              youtubeLink: formValue.youtubeLink,
-            };
-
-            this.isSubmitting = false;
-            this.dialogRef.close(faceoffData);
-          },
-          error: (error) => {
-            console.error('Failed to create faceoff event:', error);
-            this.isSubmitting = false;
-          },
-        });
-      }
+      this.modalService.closeWithDataProcessing({
+        isEditMode: this.isEditMode,
+        eventId: this.eventId,
+        requestData,
+      });
     } else if (!this.faceoffForm.valid) {
       // Mark all fields as touched to show validation errors
       Object.keys(this.faceoffForm.controls).forEach((key) => {
@@ -512,7 +474,7 @@ export class FaceoffFormModal implements OnInit {
   }
 
   onCancel(): void {
-    this.dialogRef.close();
+    this.modalService.closeModal();
   }
 
   getErrorMessage(fieldName: string): string {

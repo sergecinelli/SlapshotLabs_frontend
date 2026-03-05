@@ -20,7 +20,7 @@ export class TabsSliderComponent {
   items = input<TabItem[]>([]);
   activeTabIndex = input<number | null>(null);
 
-  onSelect = output<string>();
+  selected = output<string>();
 
   private canSelect = true;
 
@@ -39,6 +39,6 @@ export class TabsSliderComponent {
     setTimeout(() => (this.canSelect = true), 300);
 
     this.currentTabIndex = index;
-    this.onSelect.emit(this.items()[index].key);
+    this.selected.emit(this.items()[index].key);
   }
 }

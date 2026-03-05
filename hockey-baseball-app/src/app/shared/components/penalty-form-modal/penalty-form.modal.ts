@@ -1,7 +1,8 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { MatDialogRef, MatDialogModule, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { ModalEvent, ModalService } from '../../../services/modal.service';
 import { ButtonComponent } from '../buttons/button/button.component';
 import { ButtonLoadingComponent } from '../buttons/button-loading/button-loading.component';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -18,7 +19,7 @@ import {
 import { TeamService } from '../../../services/team.service';
 import { PlayerService } from '../../../services/player.service';
 import { GameMetadataService } from '../../../services/game-metadata.service';
-import { GameEventService, PenaltyEventRequest } from '../../../services/game-event.service';
+import { PenaltyEventRequest } from '../../../services/game-event.service';
 import { environment } from '../../../../environments/environment';
 import { CachedSrcDirective } from '../../directives/cached-src.directive';
 
@@ -38,7 +39,7 @@ export interface PenaltyFormData {
   imports: [
     CachedSrcDirective,
     ReactiveFormsModule,
-    MatDialogModule,
+
     ButtonComponent,
     ButtonLoadingComponent,
     MatFormFieldModule,
@@ -53,12 +54,11 @@ export interface PenaltyFormData {
 })
 export class PenaltyFormModal implements OnInit {
   private fb = inject(FormBuilder);
-  private dialogRef = inject<MatDialogRef<PenaltyFormModal>>(MatDialogRef);
+  private modalService = inject(ModalService);
   private teamService = inject(TeamService);
   private playerService = inject(PlayerService);
   private gameMetadataService = inject(GameMetadataService);
-  private gameEventService = inject(GameEventService);
-  private dialogData = inject<{
+  private dialogData = inject(ModalService).getModalData<{
     gameId: number;
     penaltyEventId: number;
     periodOptions?: { value: number; label: string }[];
@@ -79,7 +79,7 @@ export class PenaltyFormModal implements OnInit {
       iceTopOffset?: number;
       iceLeftOffset?: number;
     };
-  }>(MAT_DIALOG_DATA);
+  }>();
 
   gameId: number;
   penaltyEventId: number;
@@ -99,7 +99,7 @@ export class PenaltyFormModal implements OnInit {
   isLoadingTeams = false;
   isLoadingPlayers = false;
   isLoadingPeriods = false;
-  isSubmitting = false;
+  isSubmitting = signal(false);
 
   constructor() {
     this.penaltyForm = this.createForm();
@@ -108,6 +108,12 @@ export class PenaltyFormModal implements OnInit {
     this.isEditMode = this.dialogData.isEditMode || false;
     this.eventId = this.dialogData.eventId;
     this.setupTeamChangeListener();
+
+    this.modalService.onEvent$.pipe(takeUntilDestroyed()).subscribe((event) => {
+      if (event === ModalEvent.StopButtonLoading) {
+        this.isSubmitting.set(false);
+      }
+    });
   }
 
   ngOnInit(): void {
@@ -416,8 +422,8 @@ export class PenaltyFormModal implements OnInit {
   }
 
   onSubmit(): void {
-    if (this.penaltyForm.valid && !this.isSubmitting) {
-      this.isSubmitting = true;
+    if (this.penaltyForm.valid && !this.isSubmitting()) {
+      this.isSubmitting.set(true);
       const formValue = this.penaltyForm.value;
 
       // Convert mm:ss to time-of-day like shots (HH:mm:ss.SSSZ with 00 hours)
@@ -434,7 +440,7 @@ export class PenaltyFormModal implements OnInit {
       const ss = isNaN(penaltySeconds) ? 0 : penaltySeconds;
       const timeLengthDuration = `PT${mm > 0 ? mm + 'M' : ''}${ss > 0 ? ss + 'S' : '0S'}`;
 
-      const penaltyRequest: PenaltyEventRequest = {
+      const requestData: PenaltyEventRequest = {
         game_id: this.gameId,
         event_name_id: this.penaltyEventId,
         team_id: formValue.team,
@@ -449,47 +455,11 @@ export class PenaltyFormModal implements OnInit {
         zone: this.puckLocation?.zone,
       };
 
-      // Edit or create based on mode
-      if (this.isEditMode && this.eventId) {
-        this.gameEventService.updateGameEvent(this.eventId, penaltyRequest).subscribe({
-          next: () => {
-            this.isSubmitting = false;
-            // Ensure caller always receives a truthy value to trigger refresh
-            this.dialogRef.close(true);
-          },
-          error: (error) => {
-            console.error('Failed to update penalty event:', error);
-            this.isSubmitting = false;
-            alert('Failed to update penalty event. Please try again.');
-          },
-        });
-      } else {
-        this.gameEventService.createPenaltyEvent(penaltyRequest).subscribe({
-          next: () => {
-            // Find selected team and player for display
-            const selectedTeam = this.teamOptions.find((t) => t.value === formValue.team);
-            const selectedPlayer = this.playerOptions.find((p) => p.value === formValue.player);
-
-            const penaltyData: PenaltyFormData = {
-              teamLogo: selectedTeam?.logo || '',
-              teamName: selectedTeam?.label || '',
-              playerName: selectedPlayer?.label || '',
-              penaltyLength: formValue.penaltyLength,
-              period: formValue.period.toString(),
-              time: formValue.time,
-              youtubeLink: formValue.youtubeLink,
-              location: this.puckLocation || undefined,
-            };
-
-            this.isSubmitting = false;
-            this.dialogRef.close(penaltyData);
-          },
-          error: (error) => {
-            console.error('Failed to create penalty event:', error);
-            this.isSubmitting = false;
-          },
-        });
-      }
+      this.modalService.closeWithDataProcessing({
+        isEditMode: this.isEditMode,
+        eventId: this.eventId,
+        requestData,
+      });
     } else if (!this.penaltyForm.valid) {
       // Mark all fields as touched to show validation errors
       Object.keys(this.penaltyForm.controls).forEach((key) => {
@@ -499,7 +469,7 @@ export class PenaltyFormModal implements OnInit {
   }
 
   onCancel(): void {
-    this.dialogRef.close();
+    this.modalService.closeModal();
   }
 
   getErrorMessage(fieldName: string): string {

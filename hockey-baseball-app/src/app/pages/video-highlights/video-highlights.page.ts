@@ -1,8 +1,8 @@
 import { Component, OnInit, signal, inject } from '@angular/core';
-import {} from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
-import { ButtonComponent } from '../../shared/components/buttons/button/button.component';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { ButtonLoadingComponent } from '../../shared/components/buttons/button-loading/button-loading.component';
+import { ModalEvent, ModalService } from '../../services/modal.service';
+import { ToastService } from '../../services/toast.service';
 import {
   DataTableComponent,
   TableAction,
@@ -23,17 +23,16 @@ import { ComponentVisibilityByRoleDirective } from '../../shared/directives/comp
 import { visibilityByRoleMap } from './video-highlights.role-map';
 import { AuthService } from '../../services/auth.service';
 import { RoleService } from '../../services/roles/role.service';
+import { TeamService } from '../../services/team.service';
+import { GameEventNameService } from '../../services/game-event-name.service';
+import { GameMetadataService } from '../../services/game-metadata.service';
+import { ScheduleService } from '../../services/schedule.service';
+import { forkJoin } from 'rxjs';
 import { formatDateShortWithCommas } from '../../shared/utils/time-converter.util';
 
 @Component({
   selector: 'app-video-highlights',
-  imports: [
-    DataTableComponent,
-    MatIconModule,
-    MatDialogModule,
-    ComponentVisibilityByRoleDirective,
-    ButtonComponent,
-  ],
+  imports: [DataTableComponent, MatIconModule, ComponentVisibilityByRoleDirective, ButtonLoadingComponent],
   templateUrl: './video-highlights.page.html',
   styleUrl: './video-highlights.page.scss',
 })
@@ -42,11 +41,17 @@ export class VideoHighlightsPage implements OnInit {
   protected visibilityByRoleMap = visibilityByRoleMap;
 
   private highlightsService = inject(HighlightsService);
-  private dialog = inject(MatDialog);
+  private modalService = inject(ModalService);
   private authService = inject(AuthService);
   private roleService = inject(RoleService);
+  private toast = inject(ToastService);
+  private teamService = inject(TeamService);
+  private gameEventNameService = inject(GameEventNameService);
+  private gameMetadataService = inject(GameMetadataService);
+  private scheduleService = inject(ScheduleService);
 
   rows = signal<HighlightReelRow[]>([]);
+  isAddLoading = signal(false);
   loading = signal(true);
 
   tableColumns: TableColumn[] = [
@@ -124,15 +129,15 @@ export class VideoHighlightsPage implements OnInit {
           this.loading.set(true);
           this.highlightsService.deleteHighlightReel(item.id).subscribe({
             next: () => {
-              // Optimistically remove from current list
               const updated = this.rows().filter((r) => r.id !== item.id);
               this.rows.set(updated);
               this.loading.set(false);
+              this.toast.show('Highlight reel deleted successfully', 'success');
             },
             error: (error) => {
               console.error('Error deleting highlight reel:', error);
               this.loading.set(false);
-              alert('Failed to delete highlight reel.');
+              this.toast.show('Failed to delete highlight reel', 'error');
             },
           });
         }
@@ -160,80 +165,92 @@ export class VideoHighlightsPage implements OnInit {
   }
 
   openCreateHighlightModal(): void {
-    const dialogRef = this.dialog.open(HighlightReelFormModal, {
-      width: '1400px',
-      maxWidth: '95vw',
-      disableClose: true,
-      autoFocus: false,
-      data: {
-        isEditMode: false,
-      } as HighlightReelFormModalData,
-      panelClass: 'schedule-form-modal-dialog',
-    });
-
-    dialogRef.afterClosed().subscribe((result?: HighlightReelUpsertPayload) => {
-      if (result) {
-        this.loading.set(true);
-        this.highlightsService.createHighlightReel(result).subscribe({
-          next: () => {
-            this.loadHighlights();
-          },
-          error: (error) => {
-            console.error('Error creating highlight reel:', error);
-            this.loading.set(false);
-          },
+    this.isAddLoading.set(true);
+    this.loadHighlightFormData().subscribe({
+      next: ({ teams, eventNames, gamePeriods, games }) => {
+        this.isAddLoading.set(false);
+        this.openHighlightModal({
+          isEditMode: false,
+          teams: teams.teams,
+          eventNames,
+          gamePeriods,
+          games,
         });
-      }
+      },
+      error: () => {
+        this.isAddLoading.set(false);
+        this.toast.show('Failed to load form data', 'error');
+      },
     });
   }
 
   openEditHighlightModal(item: HighlightReelRow): void {
-    const dialogRef = this.dialog.open(HighlightReelFormModal, {
+    this.openHighlightModal({
+      isEditMode: true,
+      reel: {
+        id: item.id,
+        name: item.name,
+        description: item.description,
+      },
+    });
+  }
+
+  private loadHighlightFormData() {
+    return forkJoin({
+      teams: this.teamService.getTeams(),
+      eventNames: this.gameEventNameService.getGameEventNames(),
+      gamePeriods: this.gameMetadataService.getGamePeriods(),
+      games: this.scheduleService.getGameList(),
+    });
+  }
+
+  private openHighlightModal(data: HighlightReelFormModalData): void {
+    const isEdit = data.isEditMode;
+    this.modalService.openModal(HighlightReelFormModal, {
+      name: isEdit ? 'Edit Highlight Reel' : 'Create Highlight Reel',
+      icon: 'movie',
       width: '1400px',
       maxWidth: '95vw',
-      disableClose: true,
-      autoFocus: false,
-      data: {
-        isEditMode: true,
-        reel: {
-          id: item.id,
-          name: item.name,
-          description: item.description,
-        },
-      } as HighlightReelFormModalData,
-      panelClass: 'schedule-form-modal-dialog',
-    });
-
-    dialogRef.afterClosed().subscribe((result?: HighlightReelUpsertPayload) => {
-      if (result) {
-        this.loading.set(true);
-        this.highlightsService.updateHighlightReel(item.id, result).subscribe({
+      preventBackdropClose: true,
+      data,
+      onCloseWithDataProcessing: (result: HighlightReelUpsertPayload) => {
+        const apiCall = isEdit && data.reel
+          ? this.highlightsService.updateHighlightReel(data.reel.id, result)
+          : this.highlightsService.createHighlightReel(result);
+        apiCall.subscribe({
           next: () => {
+            this.toast.show(
+              isEdit ? 'Highlight reel updated successfully' : 'Highlight reel created successfully',
+              'success'
+            );
+            this.modalService.closeModal();
             this.loadHighlights();
           },
-          error: (error) => {
-            console.error('Error updating highlight reel:', error);
-            this.loading.set(false);
+          error: () => {
+            this.toast.show(
+              isEdit ? 'Failed to update highlight reel' : 'Failed to create highlight reel',
+              'error'
+            );
+            this.modalService.broadcastEvent(ModalEvent.StopButtonLoading);
           },
         });
-      }
+      },
     });
   }
 
   openViewHighlightModal(item: HighlightReelRow): void {
-    // Fetch highlights for the reel, then open the view modal with the list
     this.highlightsService.getHighlights(item.id).subscribe({
       next: (highlights) => {
-        this.dialog.open(HighlightReelViewModal, {
+        this.modalService.openModal(HighlightReelViewModal, {
+          name: item.name,
+          icon: 'play_circle',
           width: '1400px',
           maxWidth: '95vw',
-          autoFocus: false,
           data: {
             reelName: item.name,
             highlights,
             initialIndex: 0,
           },
-          panelClass: 'highlight-reel-view-dialog',
         });
       },
       error: (error) => {

@@ -1,12 +1,8 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import {
-  MatDialogRef,
-  MAT_DIALOG_DATA,
-  MatDialogModule,
-  MatDialog,
-} from '@angular/material/dialog';
+import { ModalService, ModalEvent } from '../../../services/modal.service';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule, MatSelectChange } from '@angular/material/select';
@@ -38,7 +34,6 @@ import {
 } from '../roster-selection-modal/roster-selection.modal';
 import { forkJoin } from 'rxjs';
 import { convertLocalToGMT, convertGMTToLocal } from '../../utils/time-converter.util';
-import { ScheduleService } from '../../../services/schedule.service';
 
 export interface GameData {
   id: number;
@@ -79,7 +74,6 @@ export interface ScheduleFormModalData {
   selector: 'app-schedule-form-modal',
   imports: [
     ReactiveFormsModule,
-    MatDialogModule,
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
@@ -95,21 +89,19 @@ export interface ScheduleFormModalData {
 })
 export class ScheduleFormModal implements OnInit {
   private fb = inject(FormBuilder);
-  private dialogRef = inject<MatDialogRef<ScheduleFormModal>>(MatDialogRef);
-  private dialog = inject(MatDialog);
+  private modalService = inject(ModalService);
   private teamService = inject(TeamService);
   private arenaService = inject(ArenaService);
   private gameMetadataService = inject(GameMetadataService);
   private goalieService = inject(GoalieService);
   private playerService = inject(PlayerService);
   private gamePlayerService = inject(GamePlayerService);
-  private scheduleService = inject(ScheduleService);
-  data = inject<ScheduleFormModalData>(MAT_DIALOG_DATA);
+  data = inject(ModalService).getModalData<ScheduleFormModalData>();
 
   scheduleForm: FormGroup;
   isEditMode: boolean;
   isLoading = true;
-  isSubmitting = false;
+  isSubmitting = signal(false);
 
   teams: Team[] = [];
   arenas: Arena[] = [];
@@ -145,6 +137,12 @@ export class ScheduleFormModal implements OnInit {
     const data = this.data;
     this.isEditMode = data.isEditMode;
     this.scheduleForm = this.createForm();
+
+    this.modalService.onEvent$.pipe(takeUntilDestroyed()).subscribe((event) => {
+      if (event === ModalEvent.StopButtonLoading) {
+        this.isSubmitting.set(false);
+      }
+    });
   }
 
   ngOnInit(): void {
@@ -537,24 +535,21 @@ export class ScheduleFormModal implements OnInit {
     const homeTeam = this.teams.find((t) => parseInt(t.id) === homeTeamId);
     const teamName = homeTeam ? homeTeam.name : 'Home Team';
 
-    const dialogRef = this.dialog.open(RosterSelectionModal, {
+    this.modalService.openModal(RosterSelectionModal, {
+      name: 'Select Roster',
+      icon: 'groups',
       width: '700px',
       maxWidth: '95vw',
-      maxHeight: '90vh',
-      panelClass: 'roster-selection-dialog',
       data: {
         teamId: homeTeamId,
         teamName: teamName,
         selectedGoalieIds: this.homeGoalieIds,
         selectedPlayerIds: this.homePlayerIds,
       } as RosterSelectionModalData,
-    });
-
-    dialogRef.afterClosed().subscribe((result: RosterSelectionResult | undefined) => {
-      if (result) {
+      onCloseWithData: (result: RosterSelectionResult) => {
         this.homeGoalieIds = result.goalieIds;
         this.homePlayerIds = result.playerIds;
-      }
+      },
     });
   }
 
@@ -575,34 +570,30 @@ export class ScheduleFormModal implements OnInit {
     const awayTeam = this.teams.find((t) => parseInt(t.id) === awayTeamId);
     const teamName = awayTeam ? awayTeam.name : 'Away Team';
 
-    const dialogRef = this.dialog.open(RosterSelectionModal, {
+    this.modalService.openModal(RosterSelectionModal, {
+      name: 'Select Roster',
+      icon: 'groups',
       width: '700px',
       maxWidth: '95vw',
-      maxHeight: '90vh',
-      panelClass: 'roster-selection-dialog',
       data: {
         teamId: awayTeamId,
         teamName: teamName,
         selectedGoalieIds: this.awayGoalieIds,
         selectedPlayerIds: this.awayPlayerIds,
       } as RosterSelectionModalData,
-    });
-
-    dialogRef.afterClosed().subscribe((result: RosterSelectionResult | undefined) => {
-      if (result) {
+      onCloseWithData: (result: RosterSelectionResult) => {
         this.awayGoalieIds = result.goalieIds;
         this.awayPlayerIds = result.playerIds;
-      }
+      },
     });
   }
 
   onSubmit(): void {
-    if (this.isLoading || this.isSubmitting) {
+    if (this.isLoading || this.isSubmitting()) {
       return;
     }
 
     if (this.scheduleForm.valid) {
-      this.isSubmitting = true;
       const formValue = this.scheduleForm.value;
 
       const homeTeamId = parseInt(formValue.homeTeam);
@@ -664,33 +655,12 @@ export class ScheduleFormModal implements OnInit {
         gameData.id = parseInt(this.data.schedule.id);
       }
 
-      // Make API call directly from modal
-      if (this.isEditMode && this.data.schedule) {
-        const gameId = parseInt(this.data.schedule.id);
-        this.scheduleService.updateGame(gameId, gameData).subscribe({
-          next: () => {
-            this.isSubmitting = false;
-            this.dialogRef.close({ success: true, gameData });
-          },
-          error: (error) => {
-            this.isSubmitting = false;
-            console.error('Error updating game:', error);
-            alert('Error updating game. Please try again.');
-          },
-        });
-      } else {
-        this.scheduleService.createGame(gameData).subscribe({
-          next: () => {
-            this.isSubmitting = false;
-            this.dialogRef.close({ success: true, gameData });
-          },
-          error: (error) => {
-            this.isSubmitting = false;
-            console.error('Error adding game:', error);
-            alert('Error adding game. Please try again.');
-          },
-        });
-      }
+      this.isSubmitting.set(true);
+      this.modalService.closeWithDataProcessing({
+        isEditMode: this.isEditMode,
+        gameId: this.data.schedule?.id,
+        gameData,
+      });
     } else {
       // Mark all fields as touched to show validation errors
       Object.keys(this.scheduleForm.controls).forEach((key) => {
@@ -700,8 +670,8 @@ export class ScheduleFormModal implements OnInit {
   }
 
   onCancel(): void {
-    if (!this.isSubmitting) {
-      this.dialogRef.close();
+    if (!this.isSubmitting()) {
+      this.modalService.closeModal();
     }
   }
 

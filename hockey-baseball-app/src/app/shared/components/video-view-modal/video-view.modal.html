@@ -2,12 +2,7 @@
 @let videoMessageValue = videoMessage();
 
 <div class="video-view-modal">
-  <h2 mat-dialog-title class="modal-title">
-    <span class="material-symbols-rounded title-icon">play_circle</span>
-    {{ data.video.name }}
-  </h2>
-
-  <mat-dialog-content class="modal-content">
+  <div class="modal-content">
     <div class="video-container">
       @if (videoUrlValue) {
         <div class="video-wrapper">
@@ -28,9 +23,9 @@
         </div>
       }
     </div>
-  </mat-dialog-content>
+  </div>
 
-  <mat-dialog-actions class="modal-actions">
+  <div class="modal-actions">
     <app-button
       [bg]="'transparent'"
       [bghover]="'button_background'"
@@ -46,5 +41,5 @@
     >
       Close
     </app-button>
-  </mat-dialog-actions>
+  </div>
 </div>

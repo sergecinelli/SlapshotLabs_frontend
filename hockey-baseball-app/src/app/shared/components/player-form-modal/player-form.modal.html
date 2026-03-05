@@ -1,10 +1,5 @@
 <div class="player-form-modal">
-  <h2 mat-dialog-title class="modal-title">
-    <span class="material-symbols-rounded title-icon">sports_hockey</span>
-    {{ isEditMode ? 'Edit Player' : 'Add Player' }}
-  </h2>
-
-  <mat-dialog-content class="modal-content">
+  <div class="modal-content">
     @if (isLoading) {
       <div class="loading-container">
         <p>Loading form data...</p>
@@ -302,9 +297,9 @@
         </div>
       </form>
     }
-  </mat-dialog-content>
+  </div>
 
-  <mat-dialog-actions class="modal-actions">
+  <div class="modal-actions">
     <app-button
       [bg]="'transparent'"
       [bghover]="'button_background'"
@@ -321,8 +316,8 @@
       Cancel
     </app-button>
     <app-button-loading
-      [isLoading]="isLoading"
-      [isDisabled]="playerForm.invalid"
+      [isLoading]="isSubmitting()"
+      [isDisabled]="isLoading || playerForm.invalid"
       materialIcon="save"
       [bg]="isEditMode ? 'orange' : 'green'"
       [bghover]="isEditMode ? 'orange' : 'green'"
@@ -337,5 +332,5 @@
     >
       {{ isEditMode ? 'Update Player' : 'Add Player' }}
     </app-button-loading>
-  </mat-dialog-actions>
+  </div>
 </div>

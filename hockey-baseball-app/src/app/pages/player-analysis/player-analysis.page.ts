@@ -1,31 +1,33 @@
 import { Component, OnInit, signal, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { MatDialog } from '@angular/material/dialog';
+import { ModalService, ModalEvent } from '../../services/modal.service';
+import { ToastService } from '../../services/toast.service';
 import { forkJoin } from 'rxjs';
 import { AnalysisService } from '../../services/analysis.service';
 import { PlayerService } from '../../services/player.service';
 import { BreadcrumbDataService } from '../../services/breadcrumb-data.service';
-import { Analysis } from '../../shared/interfaces/analysis.interface';
+import { Analysis, AnalysisApiIn } from '../../shared/interfaces/analysis.interface';
 import {
   DataTableComponent,
   TableColumn,
   TableAction,
 } from '../../shared/components/data-table/data-table.component';
-import { ButtonComponent } from '../../shared/components/buttons/button/button.component';
+import { ButtonLoadingComponent } from '../../shared/components/buttons/button-loading/button-loading.component';
 import { ComponentVisibilityByRoleDirective } from '../../shared/directives/component-visibility-by-role.directive';
 import { visibilityByRoleMap } from './player-analysis.role-map';
 import { PlayerAnalysisModal } from '../../shared/components/player-analysis-modal/player-analysis.modal';
 
 @Component({
   selector: 'app-player-analysis',
-  imports: [DataTableComponent, ButtonComponent, ComponentVisibilityByRoleDirective],
+  imports: [DataTableComponent, ButtonLoadingComponent, ComponentVisibilityByRoleDirective],
   templateUrl: './player-analysis.page.html',
   styleUrl: './player-analysis.page.scss',
 })
 export class PlayerAnalysisPage implements OnInit {
   private route = inject(ActivatedRoute);
-  private dialog = inject(MatDialog);
+  private modalService = inject(ModalService);
   private analysisService = inject(AnalysisService);
+  private toast = inject(ToastService);
   private playerService = inject(PlayerService);
   private breadcrumbData = inject(BreadcrumbDataService);
 
@@ -34,6 +36,7 @@ export class PlayerAnalysisPage implements OnInit {
   playerId = '';
   analyses = signal<Analysis[]>([]);
   loading = signal(true);
+  isCreateLoading = signal(false);
 
   tableColumns: TableColumn[] = [
     { key: 'analysisBy', label: 'Analysis By', sortable: true, width: '150px' },
@@ -67,15 +70,55 @@ export class PlayerAnalysisPage implements OnInit {
   }
 
   onCreateAnalysis(): void {
-    const dialogRef = this.dialog.open(PlayerAnalysisModal, {
-      width: '600px',
-      data: { isEditMode: false, preSelectedPlayerId: this.playerId },
+    this.isCreateLoading.set(true);
+    this.playerService.getPlayers().subscribe({
+      next: (result) => {
+        this.isCreateLoading.set(false);
+        const entityOptions = result.players.map((p) => ({
+          value: p.id,
+          label: `${p.firstName} ${p.lastName}`,
+        }));
+        this.openAnalysisModal({ isEditMode: false, preSelectedPlayerId: this.playerId, entityOptions });
+      },
+      error: () => {
+        this.isCreateLoading.set(false);
+        this.toast.show('Failed to load players', 'error');
+      },
     });
+  }
 
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
-        this.loadAnalyses();
-      }
+  private openAnalysisModal(data: Record<string, unknown>): void {
+    this.modalService.openModal(PlayerAnalysisModal, {
+      name: data['isEditMode'] ? 'Edit Analysis' : 'Create Analysis',
+      icon: 'analytics',
+      width: '600px',
+      data,
+      onCloseWithDataProcessing: (result: {
+        isEditMode: boolean;
+        analysisId?: number;
+        apiData: AnalysisApiIn;
+      }) => {
+        const apiCall = result.isEditMode
+          ? this.analysisService.updateAnalysis(String(result.analysisId!), result.apiData)
+          : this.analysisService.createAnalysis(result.apiData);
+        apiCall.subscribe({
+          next: () => {
+            this.toast.show(
+              result.isEditMode ? 'Analysis updated successfully' : 'Analysis created successfully',
+              'success'
+            );
+            this.modalService.closeModal();
+            this.loadAnalyses();
+          },
+          error: () => {
+            this.toast.show(
+              result.isEditMode ? 'Failed to update analysis' : 'Failed to create analysis',
+              'error'
+            );
+            this.modalService.broadcastEvent(ModalEvent.StopButtonLoading);
+          },
+        });
+      },
     });
   }
 
@@ -91,16 +134,7 @@ export class PlayerAnalysisPage implements OnInit {
   }
 
   private onEditAnalysis(analysis: Analysis): void {
-    const dialogRef = this.dialog.open(PlayerAnalysisModal, {
-      width: '600px',
-      data: { analysis, isEditMode: true },
-    });
-
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
-        this.loadAnalyses();
-      }
-    });
+    this.openAnalysisModal({ analysis, isEditMode: true });
   }
 
   private onDeleteAnalysis(analysis: Analysis): void {

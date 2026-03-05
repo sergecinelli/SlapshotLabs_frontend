@@ -1,10 +1,5 @@
 <div class="turnover-form-modal">
-  <h2 mat-dialog-title class="modal-title">
-    <span class="material-symbols-rounded title-icon">swap_horiz</span>
-    Turnover
-  </h2>
-
-  <mat-dialog-content class="modal-content">
+  <div class="modal-content">
     <form [formGroup]="turnoverForm" class="turnover-form">
       <!-- Turnover Information Section -->
       <div class="form-section">
@@ -162,9 +157,9 @@
         }
       </div>
     </form>
-  </mat-dialog-content>
+  </div>
 
-  <mat-dialog-actions class="modal-actions">
+  <div class="modal-actions">
     <app-button
       [bg]="'transparent'"
       [bghover]="'button_background'"
@@ -176,14 +171,14 @@
       [width]="'auto'"
       [rounded]="false"
       [haveContent]="true"
-      [isDisabled]="isSubmitting"
+      [isDisabled]="isSubmitting()"
       (clicked)="onCancel()"
     >
       Cancel
     </app-button>
     <app-button-loading
-      [isLoading]="isSubmitting"
-      [isDisabled]="turnoverForm.invalid || isSubmitting"
+      [isLoading]="isSubmitting()"
+      [isDisabled]="turnoverForm.invalid || isSubmitting()"
       materialIcon="save"
       [bg]="'primary'"
       [bghover]="'primary_dark'"
@@ -198,5 +193,5 @@
     >
       {{ isEditMode ? 'Save Turnover' : 'Add Turnover' }}
     </app-button-loading>
-  </mat-dialog-actions>
+  </div>
 </div>

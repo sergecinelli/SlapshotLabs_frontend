@@ -1,8 +1,6 @@
 import { Component, OnInit, signal, inject } from '@angular/core';
-import {} from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
-import { ButtonComponent } from '../../shared/components/buttons/button/button.component';
-import { MatDialog } from '@angular/material/dialog';
+import { ButtonLoadingComponent } from '../../shared/components/buttons/button-loading/button-loading.component';
 import {
   DataTableComponent,
   TableColumn,
@@ -14,10 +12,12 @@ import { VideoFormModal } from '../../shared/components/video-form-modal/video-f
 import { VideoViewModal } from '../../shared/components/video-view-modal/video-view.modal';
 import { ComponentVisibilityByRoleDirective } from '../../shared/directives/component-visibility-by-role.directive';
 import { visibilityByRoleMap } from './video-library.role-map';
+import { ModalEvent, ModalService } from '../../services/modal.service';
+import { ToastService } from '../../services/toast.service';
 
 @Component({
   selector: 'app-video-library',
-  imports: [DataTableComponent, MatIconModule, ComponentVisibilityByRoleDirective, ButtonComponent],
+  imports: [DataTableComponent, MatIconModule, ComponentVisibilityByRoleDirective, ButtonLoadingComponent],
   templateUrl: './video-library.page.html',
   styleUrl: './video-library.page.scss',
 })
@@ -26,7 +26,8 @@ export class VideoLibraryPage implements OnInit {
   protected visibilityByRoleMap = visibilityByRoleMap;
 
   private videoService = inject(VideoService);
-  private dialog = inject(MatDialog);
+  private modalService = inject(ModalService);
+  private toast = inject(ToastService);
 
   videos = signal<Video[]>([]);
   loading = signal(true);
@@ -102,74 +103,72 @@ export class VideoLibraryPage implements OnInit {
         next: () => {
           const updatedVideos = this.videos().filter((v) => v.id !== video.id);
           this.videos.set(updatedVideos);
+          this.toast.show('Video deleted successfully', 'success');
         },
         error: (error) => {
           console.error('Error deleting video:', error);
-          alert('Failed to delete video. Please try again.');
+          this.toast.show('Failed to delete video', 'error');
         },
       });
     }
   }
 
   private editVideo(video: Video): void {
-    const dialogRef = this.dialog.open(VideoFormModal, {
+    this.modalService.openModal(VideoFormModal, {
+      name: 'Edit Video',
+      icon: 'video_library',
       width: '600px',
-      panelClass: 'video-form-modal-dialog',
       data: {
         video: video,
         isEditMode: true,
       },
-    });
-
-    dialogRef.afterClosed().subscribe((result: VideoApiRequest) => {
-      if (result) {
+      onCloseWithDataProcessing: (result: VideoApiRequest) => {
         this.videoService.updateVideo(video.id, result).subscribe({
           next: () => {
-            // Refresh the entire table after updating
+            this.toast.show('Video updated successfully', 'success');
+            this.modalService.closeModal();
             this.loadVideos();
           },
-          error: (error) => {
-            console.error('Error updating video:', error);
-            alert('Failed to update video. Please try again.');
+          error: () => {
+            this.toast.show('Failed to update video', 'error');
+            this.modalService.broadcastEvent(ModalEvent.StopButtonLoading);
           },
         });
-      }
+      },
     });
   }
 
   private viewVideo(video: Video): void {
-    this.dialog.open(VideoViewModal, {
+    this.modalService.openModal(VideoViewModal, {
+      name: video.name,
+      icon: 'play_circle',
       width: '900px',
       maxWidth: '95vw',
-      panelClass: 'video-view-modal-dialog',
-      data: {
-        video: video,
-      },
+      data: { video },
     });
   }
 
   openAddVideoModal(): void {
-    const dialogRef = this.dialog.open(VideoFormModal, {
+    this.modalService.openModal(VideoFormModal, {
+      name: 'Add Video',
+      icon: 'video_library',
       width: '600px',
-      panelClass: 'video-form-modal-dialog',
       data: {
         isEditMode: false,
       },
-    });
-
-    dialogRef.afterClosed().subscribe((result: VideoApiRequest) => {
-      if (result) {
+      onCloseWithDataProcessing: (result: VideoApiRequest) => {
         this.videoService.addVideo(result).subscribe({
           next: () => {
-            // Refresh the entire table after adding
+            this.toast.show('Video created successfully', 'success');
+            this.modalService.closeModal();
             this.loadVideos();
           },
-          error: (error) => {
-            console.error('Error adding video:', error);
-            alert('Failed to add video. Please try again.');
+          error: () => {
+            this.toast.show('Failed to create video', 'error');
+            this.modalService.broadcastEvent(ModalEvent.StopButtonLoading);
           },
         });
-      }
+      },
     });
   }
 }

@@ -1,19 +1,21 @@
 import { Component, OnInit, signal, inject } from '@angular/core';
-import {} from '@angular/common';
 import { Router } from '@angular/router';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { ModalService, ModalEvent } from '../../services/modal.service';
+import { ToastService } from '../../services/toast.service';
 import { MatIconModule } from '@angular/material/icon';
-import { ButtonComponent } from '../../shared/components/buttons/button/button.component';
+import { ButtonLoadingComponent } from '../../shared/components/buttons/button-loading/button-loading.component';
 import { ScheduleService } from '../../services/schedule.service';
 import { TeamService } from '../../services/team.service';
 import { PlayerService } from '../../services/player.service';
 import { GoalieService } from '../../services/goalie.service';
 import { ArenaService } from '../../services/arena.service';
 import { ApiService } from '../../services/api.service';
+import { TeamOptionsService } from '../../services/team-options.service';
+import { PositionService } from '../../services/position.service';
+import { GameMetadataService } from '../../services/game-metadata.service';
+import { GameEventNameService } from '../../services/game-event-name.service';
 import { Schedule, GameStatus, GameType } from '../../shared/interfaces/schedule.interface';
 import { Team } from '../../shared/interfaces/team.interface';
-import { Player } from '../../shared/interfaces/player.interface';
-import { Goalie } from '../../shared/interfaces/goalie.interface';
 import { Arena, Rink } from '../../shared/interfaces/arena.interface';
 import {
   PlayerFormModal,
@@ -54,8 +56,7 @@ import {
   selector: 'app-dashboard',
   imports: [
     MatIconModule,
-    ButtonComponent,
-    MatDialogModule,
+    ButtonLoadingComponent,
     CardGridComponent,
     ComponentVisibilityByRoleDirective,
     GameCardComponent,
@@ -74,9 +75,14 @@ export class DashboardPage implements OnInit {
   private goalieService = inject(GoalieService);
   private arenaService = inject(ArenaService);
   private apiService = inject(ApiService);
+  private teamOptionsService = inject(TeamOptionsService);
+  private positionService = inject(PositionService);
+  private gameMetadataService = inject(GameMetadataService);
+  private gameEventNameService = inject(GameEventNameService);
   private highlightsService = inject(HighlightsService);
   private bannerService = inject(BannerService);
-  private dialog = inject(MatDialog);
+  private modalService = inject(ModalService);
+  private toast = inject(ToastService);
   private router = inject(Router);
 
   upcomingGames = signal<Schedule[]>([]);
@@ -86,6 +92,12 @@ export class DashboardPage implements OnInit {
   teamsMap = new Map<number, Team>();
   arenas: Arena[] = [];
   rinks: Rink[] = [];
+
+  addTeamLoading = signal(false);
+  addPlayerLoading = signal(false);
+  addGoalieLoading = signal(false);
+  addGameLoading = signal(false);
+  createHighlightLoading = signal(false);
 
   ngOnInit(): void {
     this.loadData();
@@ -220,113 +232,170 @@ export class DashboardPage implements OnInit {
     });
   }
 
-  // Action button handlers
   openAddTeamModal(): void {
-    const dialogRef = this.dialog.open(TeamFormModal, {
-      width: '800px',
-      maxWidth: '95vw',
-      data: { isEditMode: false } as TeamFormModalData,
-      panelClass: 'team-form-modal-dialog',
-      disableClose: true,
-    });
-
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
-        this.addTeam(result);
-      }
-    });
-  }
-
-  private addTeam(teamData: Partial<Team> & { logoFile?: File; logoRemoved?: boolean }): void {
-    const { logoFile, ...team } = teamData;
-    this.teamService.addTeam(team, logoFile).subscribe({
-      next: () => {
-        this.router.navigate(['/teams-and-rosters/teams']);
+    this.addTeamLoading.set(true);
+    forkJoin({
+      ageGroups: this.teamOptionsService.getTeamAgeGroups(),
+      levels: this.teamOptionsService.getTeamLevels(),
+      divisions: this.teamOptionsService.getDivisions(),
+    }).subscribe({
+      next: ({ ageGroups, levels, divisions }) => {
+        this.addTeamLoading.set(false);
+        this.modalService.openModal(TeamFormModal, {
+          name: 'Add Team',
+          icon: 'groups',
+          width: '800px',
+          maxWidth: '95vw',
+          preventBackdropClose: true,
+          data: { isEditMode: false, ageGroups, levels, divisions } as TeamFormModalData,
+          onCloseWithDataProcessing: (result) => {
+            const { logoFile, ...team } = result as Partial<Team> & {
+              logoFile?: File;
+              logoRemoved?: boolean;
+            };
+            this.teamService.addTeam(team, logoFile).subscribe({
+              next: () => {
+                this.toast.show('Team created successfully', 'success');
+                this.modalService.closeModal();
+                this.router.navigate(['/teams-and-rosters/teams']);
+              },
+              error: () => {
+                this.toast.show('Failed to create team', 'error');
+                this.modalService.broadcastEvent(ModalEvent.StopButtonLoading);
+              },
+            });
+          },
+        });
       },
       error: (error) => {
-        console.error('Error adding team:', error);
+        console.error('Error loading team options:', error);
+        this.addTeamLoading.set(false);
       },
     });
   }
 
   openAddPlayerModal(): void {
-    const dialogRef = this.dialog.open(PlayerFormModal, {
-      width: '800px',
-      maxWidth: '95vw',
-      data: { isEditMode: false } as PlayerFormModalData,
-      panelClass: 'player-form-modal-dialog',
-      disableClose: true,
-    });
-
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
-        this.addPlayer(result);
-      }
-    });
-  }
-
-  private addPlayer(playerData: Partial<Player>): void {
-    this.playerService.addPlayer(playerData).subscribe({
-      next: () => {
-        this.router.navigate(['/teams-and-rosters/players']);
+    this.addPlayerLoading.set(true);
+    forkJoin({
+      teams: this.teamService.getTeams(),
+      positions: this.positionService.getPositions(),
+    }).subscribe({
+      next: ({ teams, positions }) => {
+        this.addPlayerLoading.set(false);
+        this.modalService.openModal(PlayerFormModal, {
+          name: 'Add Player',
+          icon: 'sports_hockey',
+          width: '800px',
+          maxWidth: '95vw',
+          preventBackdropClose: true,
+          data: { isEditMode: false, teams: teams.teams, positions } as PlayerFormModalData,
+          onCloseWithDataProcessing: (result) => {
+            this.playerService.addPlayer(result).subscribe({
+              next: () => {
+                this.toast.show('Player created successfully', 'success');
+                this.modalService.closeModal();
+                this.router.navigate(['/teams-and-rosters/players']);
+              },
+              error: () => {
+                this.toast.show('Failed to create player', 'error');
+                this.modalService.broadcastEvent(ModalEvent.StopButtonLoading);
+              },
+            });
+          },
+        });
       },
       error: (error) => {
-        console.error('Error adding player:', error);
+        console.error('Error loading player form data:', error);
+        this.addPlayerLoading.set(false);
       },
     });
   }
 
   openAddGoalieModal(): void {
-    const dialogRef = this.dialog.open(GoalieFormModal, {
-      width: '800px',
-      maxWidth: '95vw',
-      data: { isEditMode: false } as GoalieFormModalData,
-      panelClass: 'goalie-form-modal-dialog',
-      disableClose: true,
-    });
-
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
-        this.addGoalie(result);
-      }
-    });
-  }
-
-  private addGoalie(goalieData: Partial<Goalie>): void {
-    this.goalieService.addGoalie(goalieData).subscribe({
-      next: () => {
-        this.router.navigate(['/teams-and-rosters/goalies']);
+    this.addGoalieLoading.set(true);
+    forkJoin({
+      teams: this.teamService.getTeams(),
+      positions: this.positionService.getPositions(),
+    }).subscribe({
+      next: ({ teams, positions }) => {
+        this.addGoalieLoading.set(false);
+        this.modalService.openModal(GoalieFormModal, {
+          name: 'Add Goalie',
+          icon: 'sports_hockey',
+          width: '800px',
+          maxWidth: '95vw',
+          preventBackdropClose: true,
+          data: { isEditMode: false, teams: teams.teams, positions } as GoalieFormModalData,
+          onCloseWithDataProcessing: (result) => {
+            this.goalieService.addGoalie(result).subscribe({
+              next: () => {
+                this.toast.show('Goalie created successfully', 'success');
+                this.modalService.closeModal();
+                this.router.navigate(['/teams-and-rosters/goalies']);
+              },
+              error: () => {
+                this.toast.show('Failed to create goalie', 'error');
+                this.modalService.broadcastEvent(ModalEvent.StopButtonLoading);
+              },
+            });
+          },
+        });
       },
       error: (error) => {
-        console.error('Error adding goalie:', error);
+        console.error('Error loading goalie form data:', error);
+        this.addGoalieLoading.set(false);
       },
     });
   }
 
   openAddGameModal(): void {
-    const dialogRef = this.dialog.open(ScheduleFormModal, {
-      width: '800px',
-      maxWidth: '95vw',
-      data: { isEditMode: false } as ScheduleFormModalData,
-      panelClass: 'schedule-form-modal-dialog',
-      disableClose: true,
-    });
-
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
-        this.addGame(result);
-      }
-    });
-  }
-
-  private addGame(gameData: Record<string, unknown>): void {
-    this.scheduleService.createGame(gameData).subscribe({
-      next: () => {
-        this.bannerService.triggerRefresh(); // Refresh the banner
-        this.router.navigate(['/schedule']);
+    this.addGameLoading.set(true);
+    forkJoin({
+      teams: this.teamService.getTeams(),
+      arenas: this.arenaService.getArenas(),
+      rinks: this.arenaService.getAllRinks(),
+      goalies: this.goalieService.getGoalies(),
+      players: this.playerService.getPlayers(),
+      gameTypes: this.gameMetadataService.getGameTypes(),
+      gamePeriods: this.gameMetadataService.getGamePeriods(),
+    }).subscribe({
+      next: ({ teams, arenas, rinks, goalies, players, gameTypes, gamePeriods }) => {
+        this.addGameLoading.set(false);
+        this.modalService.openModal(ScheduleFormModal, {
+          name: 'Add Game',
+          icon: 'event',
+          width: '800px',
+          maxWidth: '95vw',
+          preventBackdropClose: true,
+          data: {
+            isEditMode: false,
+            teams: teams.teams,
+            arenas,
+            rinks,
+            goalies: goalies.goalies,
+            players: players.players,
+            gameTypes,
+            gamePeriods,
+          } as ScheduleFormModalData,
+          onCloseWithDataProcessing: (result) => {
+            this.scheduleService.createGame(result).subscribe({
+              next: () => {
+                this.toast.show('Game created successfully', 'success');
+                this.modalService.closeModal();
+                this.bannerService.triggerRefresh();
+                this.router.navigate(['/schedule']);
+              },
+              error: () => {
+                this.toast.show('Failed to create game', 'error');
+                this.modalService.broadcastEvent(ModalEvent.StopButtonLoading);
+              },
+            });
+          },
+        });
       },
       error: (error) => {
-        console.error('Error adding game:', error);
+        console.error('Error loading game form data:', error);
+        this.addGameLoading.set(false);
       },
     });
   }
@@ -336,26 +405,47 @@ export class DashboardPage implements OnInit {
   }
 
   createHighlightReel(): void {
-    const dialogRef = this.dialog.open(HighlightReelFormModal, {
-      width: '1400px',
-      maxWidth: '95vw',
-      data: { isEditMode: false } as HighlightReelFormModalData,
-      panelClass: 'schedule-form-modal-dialog',
-      disableClose: true,
-      autoFocus: false,
-    });
-
-    dialogRef.afterClosed().subscribe((result?: HighlightReelUpsertPayload) => {
-      if (result) {
-        this.highlightsService.createHighlightReel(result).subscribe({
-          next: () => {
-            this.router.navigate(['/highlights']);
-          },
-          error: (error) => {
-            console.error('Error creating highlight reel:', error);
+    this.createHighlightLoading.set(true);
+    forkJoin({
+      teams: this.teamService.getTeams(),
+      eventNames: this.gameEventNameService.getGameEventNames(),
+      gamePeriods: this.gameMetadataService.getGamePeriods(),
+      games: this.scheduleService.getGameList(),
+    }).subscribe({
+      next: ({ teams, eventNames, gamePeriods, games }) => {
+        this.createHighlightLoading.set(false);
+        this.modalService.openModal(HighlightReelFormModal, {
+          name: 'Create Highlight Reel',
+          icon: 'movie',
+          width: '1400px',
+          maxWidth: '95vw',
+          preventBackdropClose: true,
+          data: {
+            isEditMode: false,
+            teams: teams.teams,
+            eventNames,
+            gamePeriods,
+            games,
+          } as HighlightReelFormModalData,
+          onCloseWithDataProcessing: (result: HighlightReelUpsertPayload) => {
+            this.highlightsService.createHighlightReel(result).subscribe({
+              next: () => {
+                this.toast.show('Highlight reel created successfully', 'success');
+                this.modalService.closeModal();
+                this.router.navigate(['/highlights']);
+              },
+              error: () => {
+                this.toast.show('Failed to create highlight reel', 'error');
+                this.modalService.broadcastEvent(ModalEvent.StopButtonLoading);
+              },
+            });
           },
         });
-      }
+      },
+      error: (error) => {
+        console.error('Error loading highlight reel data:', error);
+        this.createHighlightLoading.set(false);
+      },
     });
   }
 }

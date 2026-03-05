@@ -3,18 +3,19 @@
   <div>
     <!-- Action Buttons Row -->
     <div class="action-buttons-row">
-      <app-button
+      <app-button-loading
         materialIcon="stylus"
         [bg]="'orange'"
         [bghover]="'orange'"
         [color]="'white'"
         [colorhover]="'white'"
         [haveContent]="true"
+        [isLoading]="isEditLoading()"
         (clicked)="onEditProfile()"
         role-visibility-name="edit-player-button"
       >
         Edit Player Profile
-      </app-button>
+      </app-button-loading>
       <app-button
         materialIcon="analytics"
         [bg]="'upcoming'"

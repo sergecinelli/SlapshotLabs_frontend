@@ -362,42 +362,6 @@ mat-error {
   }
 }
 
-::ng-deep .goalie-form-modal-dialog {
-  .mat-mdc-form-field {
-    font-size: 14px !important;
-
-    .mat-mdc-input-element {
-      font-size: 14px !important;
-    }
-
-    .mdc-floating-label {
-      font-size: 12px !important;
-    }
-
-    .mat-mdc-form-field-subscript-wrapper {
-      font-size: 12px !important;
-    }
-
-    .mat-mdc-select-value {
-      font-size: 14px !important;
-    }
-
-    .mat-mdc-select-trigger {
-      display: flex;
-      align-items: center;
-      font-size: 14px !important;
-    }
-  }
-
-  .mat-mdc-option {
-    font-size: 14px !important;
-  }
-
-  mat-error {
-    font-size: 12px !important;
-  }
-}
-
 .cdk-overlay-container .cdk-overlay-pane .mat-mdc-select-panel .mat-mdc-option {
   font-size: 14px !important;
 

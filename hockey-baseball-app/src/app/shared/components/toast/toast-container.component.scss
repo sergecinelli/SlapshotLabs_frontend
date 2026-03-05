@@ -1,0 +1,26 @@
+.toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  pointer-events: none;
+}
+
+@media (max-width: 768px) {
+  .toast-container {
+    right: 10px;
+    left: 10px;
+    align-items: stretch;
+
+    ::ng-deep app-toast {
+      .toast {
+        min-width: auto;
+        max-width: 100%;
+        width: 100%;
+      }
+    }
+  }
+}

@@ -4,18 +4,19 @@
 <div class="page-content" [appVisibilityMap]="visibilityByRoleMap">
   <!-- Create Highlight Reel Button -->
   <div class="mb-4 flex justify-end">
-    <app-button
+    <app-button-loading
       [bg]="'primary'"
       [bghover]="'primary_dark'"
       [color]="'white'"
       [colorhover]="'white'"
       [materialIcon]="'add'"
       [haveContent]="true"
+      [isLoading]="isAddLoading()"
       (clicked)="openCreateHighlightModal()"
       role-visibility-name="create-highlight-button"
     >
       Create New Highlight Reel
-    </app-button>
+    </app-button-loading>
   </div>
 
   <app-data-table

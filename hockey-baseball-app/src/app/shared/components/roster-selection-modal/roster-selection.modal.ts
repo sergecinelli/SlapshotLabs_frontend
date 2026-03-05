@@ -1,6 +1,6 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import {} from '@angular/common';
-import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
+import { ModalService } from '../../../services/modal.service';
 import { ButtonComponent } from '../buttons/button/button.component';
 import { ButtonLoadingComponent } from '../buttons/button-loading/button-loading.component';
 import { MatTableModule } from '@angular/material/table';
@@ -34,7 +34,6 @@ export interface RosterSelectionResult {
 @Component({
   selector: 'app-roster-selection-modal',
   imports: [
-    MatDialogModule,
     ButtonComponent,
     ButtonLoadingComponent,
     MatTableModule,
@@ -45,10 +44,10 @@ export interface RosterSelectionResult {
   styleUrl: './roster-selection.modal.scss',
 })
 export class RosterSelectionModal implements OnInit {
-  private dialogRef = inject<MatDialogRef<RosterSelectionModal>>(MatDialogRef);
+  private modalService = inject(ModalService);
   private goalieService = inject(GoalieService);
   private playerService = inject(PlayerService);
-  data = inject<RosterSelectionModalData>(MAT_DIALOG_DATA);
+  data = inject(ModalService).getModalData<RosterSelectionModalData>();
 
   isLoading = signal(true);
   goalies = signal<RosterPlayer[]>([]);
@@ -164,7 +163,7 @@ export class RosterSelectionModal implements OnInit {
   }
 
   onCancel(): void {
-    this.dialogRef.close();
+    this.modalService.closeModal();
   }
 
   onConfirm(): void {
@@ -172,6 +171,6 @@ export class RosterSelectionModal implements OnInit {
       goalieIds: this.goalieSelection.selected,
       playerIds: this.playerSelection.selected,
     };
-    this.dialogRef.close(result);
+    this.modalService.closeWithData(result);
   }
 }

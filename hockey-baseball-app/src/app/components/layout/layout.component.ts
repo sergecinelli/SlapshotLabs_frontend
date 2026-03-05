@@ -14,6 +14,7 @@ import { ThemeService } from '../../services/theme.service';
 import { Role } from '../../services/roles/role.interface';
 import { RoleService } from '../../services/roles/role.service';
 import { BreadcrumbsComponent } from '../../shared/components/breadcrumbs/breadcrumbs.component';
+import { ToastContainerComponent } from '../../shared/components/toast/toast-container.component';
 
 @Component({
   selector: 'app-layout',
@@ -24,6 +25,7 @@ import { BreadcrumbsComponent } from '../../shared/components/breadcrumbs/breadc
     MatRippleModule,
     MatTooltipModule,
     BreadcrumbsComponent,
+    ToastContainerComponent,
   ],
   templateUrl: './layout.component.html',
   styleUrl: './layout.component.scss',

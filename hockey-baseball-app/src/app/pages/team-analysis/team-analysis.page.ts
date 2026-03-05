@@ -1,31 +1,33 @@
 import { Component, OnInit, signal, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { MatDialog } from '@angular/material/dialog';
+import { ModalService, ModalEvent } from '../../services/modal.service';
+import { ToastService } from '../../services/toast.service';
 import { forkJoin } from 'rxjs';
 import { AnalysisService } from '../../services/analysis.service';
 import { TeamService } from '../../services/team.service';
 import { BreadcrumbDataService } from '../../services/breadcrumb-data.service';
-import { Analysis } from '../../shared/interfaces/analysis.interface';
+import { Analysis, AnalysisApiIn } from '../../shared/interfaces/analysis.interface';
 import {
   DataTableComponent,
   TableColumn,
   TableAction,
 } from '../../shared/components/data-table/data-table.component';
-import { ButtonComponent } from '../../shared/components/buttons/button/button.component';
+import { ButtonLoadingComponent } from '../../shared/components/buttons/button-loading/button-loading.component';
 import { ComponentVisibilityByRoleDirective } from '../../shared/directives/component-visibility-by-role.directive';
 import { visibilityByRoleMap } from './team-analysis.role-map';
 import { TeamAnalysisModal } from '../../shared/components/team-analysis-modal/team-analysis.modal';
 
 @Component({
   selector: 'app-team-analysis',
-  imports: [DataTableComponent, ButtonComponent, ComponentVisibilityByRoleDirective],
+  imports: [DataTableComponent, ButtonLoadingComponent, ComponentVisibilityByRoleDirective],
   templateUrl: './team-analysis.page.html',
   styleUrl: './team-analysis.page.scss',
 })
 export class TeamAnalysisPage implements OnInit {
   private route = inject(ActivatedRoute);
-  private dialog = inject(MatDialog);
+  private modalService = inject(ModalService);
   private analysisService = inject(AnalysisService);
+  private toast = inject(ToastService);
   private teamService = inject(TeamService);
   private breadcrumbData = inject(BreadcrumbDataService);
 
@@ -34,6 +36,7 @@ export class TeamAnalysisPage implements OnInit {
   teamId = '';
   analyses = signal<Analysis[]>([]);
   loading = signal(true);
+  isCreateLoading = signal(false);
 
   tableColumns: TableColumn[] = [
     { key: 'analysisBy', label: 'Analysis By', sortable: true, width: '150px' },
@@ -67,15 +70,24 @@ export class TeamAnalysisPage implements OnInit {
   }
 
   onCreateAnalysis(): void {
-    const dialogRef = this.dialog.open(TeamAnalysisModal, {
-      width: '600px',
-      data: { isEditMode: false, preSelectedTeamId: this.teamId },
-    });
-
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
-        this.loadAnalyses();
-      }
+    this.isCreateLoading.set(true);
+    this.teamService.getTeams().subscribe({
+      next: (result) => {
+        this.isCreateLoading.set(false);
+        const entityOptions = result.teams.map((t) => ({
+          value: String(t.id),
+          label: t.name,
+        }));
+        this.openAnalysisModal({
+          isEditMode: false,
+          preSelectedTeamId: this.teamId,
+          entityOptions,
+        });
+      },
+      error: () => {
+        this.isCreateLoading.set(false);
+        this.toast.show('Failed to load teams', 'error');
+      },
     });
   }
 
@@ -91,15 +103,41 @@ export class TeamAnalysisPage implements OnInit {
   }
 
   private onEditAnalysis(analysis: Analysis): void {
-    const dialogRef = this.dialog.open(TeamAnalysisModal, {
-      width: '600px',
-      data: { analysis, isEditMode: true },
-    });
+    this.openAnalysisModal({ analysis, isEditMode: true });
+  }
 
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
-        this.loadAnalyses();
-      }
+  private openAnalysisModal(data: Record<string, unknown>): void {
+    this.modalService.openModal(TeamAnalysisModal, {
+      name: data['isEditMode'] ? 'Edit Analysis' : 'Create Analysis',
+      icon: 'analytics',
+      width: '600px',
+      data,
+      onCloseWithDataProcessing: (result: {
+        isEditMode: boolean;
+        analysisId?: number;
+        apiData: AnalysisApiIn;
+      }) => {
+        const apiCall = result.isEditMode
+          ? this.analysisService.updateAnalysis(String(result.analysisId!), result.apiData)
+          : this.analysisService.createAnalysis(result.apiData);
+        apiCall.subscribe({
+          next: () => {
+            this.toast.show(
+              result.isEditMode ? 'Analysis updated successfully' : 'Analysis created successfully',
+              'success'
+            );
+            this.modalService.closeModal();
+            this.loadAnalyses();
+          },
+          error: () => {
+            this.toast.show(
+              result.isEditMode ? 'Failed to update analysis' : 'Failed to create analysis',
+              'error'
+            );
+            this.modalService.broadcastEvent(ModalEvent.StopButtonLoading);
+          },
+        });
+      },
     });
   }
 

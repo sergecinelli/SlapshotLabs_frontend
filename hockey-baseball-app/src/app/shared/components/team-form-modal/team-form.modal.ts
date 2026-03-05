@@ -1,8 +1,9 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AsyncPipe } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { ModalService, ModalEvent } from '../../../services/modal.service';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
@@ -10,6 +11,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Team } from '../../interfaces/team.interface';
+import { TeamLevel, Division } from '../../interfaces/team-level.interface';
 import { TeamOptionsService } from '../../../services/team-options.service';
 import { ButtonComponent } from '../buttons/button/button.component';
 import { ButtonLoadingComponent } from '../buttons/button-loading/button-loading.component';
@@ -19,6 +21,9 @@ import { map, startWith } from 'rxjs/operators';
 export interface TeamFormModalData {
   team?: Team;
   isEditMode: boolean;
+  ageGroups?: string[];
+  levels?: TeamLevel[];
+  divisions?: Division[];
 }
 
 @Component({
@@ -26,7 +31,6 @@ export interface TeamFormModalData {
   imports: [
     AsyncPipe,
     ReactiveFormsModule,
-    MatDialogModule,
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
@@ -42,9 +46,9 @@ export interface TeamFormModalData {
 })
 export class TeamFormModal implements OnInit {
   private fb = inject(FormBuilder);
-  private dialogRef = inject<MatDialogRef<TeamFormModal>>(MatDialogRef);
+  private modalService = inject(ModalService);
   private teamOptionsService = inject(TeamOptionsService);
-  data = inject<TeamFormModalData>(MAT_DIALOG_DATA);
+  data = inject(ModalService).getModalData<TeamFormModalData>();
 
   teamForm: FormGroup;
   isEditMode: boolean;
@@ -56,6 +60,8 @@ export class TeamFormModal implements OnInit {
   filteredGroupOptions: Observable<{ value: string; label: string }[]> = of([]);
 
   // Image picker properties
+  isSubmitting = signal(false);
+
   selectedFile: File | null = null;
   imagePreview: string | null = null;
   imageError: string | null = null;
@@ -70,6 +76,12 @@ export class TeamFormModal implements OnInit {
 
     this.isEditMode = data.isEditMode;
     this.teamForm = this.createForm();
+
+    this.modalService.onEvent$.pipe(takeUntilDestroyed()).subscribe((event) => {
+      if (event === ModalEvent.StopButtonLoading) {
+        this.isSubmitting.set(false);
+      }
+    });
   }
 
   ngOnInit(): void {
@@ -117,35 +129,21 @@ export class TeamFormModal implements OnInit {
   private loadOptions(): void {
     this.isLoading = true;
 
-    // Fetch age groups, levels and divisions from API
+    if (this.data.ageGroups && this.data.levels && this.data.divisions) {
+      this.applyOptions(this.data.ageGroups, this.data.levels, this.data.divisions);
+      return;
+    }
+
     forkJoin({
       ageGroups: this.teamOptionsService.getTeamAgeGroups(),
       levels: this.teamOptionsService.getTeamLevels(),
       divisions: this.teamOptionsService.getDivisions(),
     }).subscribe({
       next: ({ ageGroups, levels, divisions }) => {
-        // Transform age groups to options
-        this.groupOptions = this.teamOptionsService.transformAgeGroupsToOptions(ageGroups);
-
-        // Setup autocomplete filter after options are loaded
-        this.setupGroupFilter();
-
-        this.levelOptions = this.teamOptionsService.transformLevelsToOptions(levels);
-        this.divisionOptions = this.teamOptionsService.transformDivisionsToOptions(divisions);
-
-        // Set default values after options are loaded
-        this.setDefaultValues();
-
-        // If in edit mode, populate the form
-        if (this.isEditMode && this.data.team) {
-          this.populateForm(this.data.team);
-        }
-
-        this.isLoading = false;
+        this.applyOptions(ageGroups, levels, divisions);
       },
       error: (error) => {
         console.error('Failed to load options:', error);
-        // Fallback to hardcoded options if API fails
         this.groupOptions = this.teamOptionsService.getGroupOptions();
         this.setupGroupFilter();
         this.setDefaultValues();
@@ -157,6 +155,20 @@ export class TeamFormModal implements OnInit {
         this.isLoading = false;
       },
     });
+  }
+
+  private applyOptions(ageGroups: string[], levels: TeamLevel[], divisions: Division[]): void {
+    this.groupOptions = this.teamOptionsService.transformAgeGroupsToOptions(ageGroups);
+    this.setupGroupFilter();
+    this.levelOptions = this.teamOptionsService.transformLevelsToOptions(levels);
+    this.divisionOptions = this.teamOptionsService.transformDivisionsToOptions(divisions);
+    this.setDefaultValues();
+
+    if (this.isEditMode && this.data.team) {
+      this.populateForm(this.data.team);
+    }
+
+    this.isLoading = false;
   }
 
   /**
@@ -370,7 +382,8 @@ export class TeamFormModal implements OnInit {
         teamData.logoRemoved = true;
       }
 
-      this.dialogRef.close(teamData);
+      this.isSubmitting.set(true);
+      this.modalService.closeWithDataProcessing(teamData);
     } else {
       // Mark all fields as touched to show validation errors
       Object.keys(this.teamForm.controls).forEach((key) => {
@@ -380,7 +393,7 @@ export class TeamFormModal implements OnInit {
   }
 
   onCancel(): void {
-    this.dialogRef.close();
+    this.modalService.closeModal();
   }
 
   /**

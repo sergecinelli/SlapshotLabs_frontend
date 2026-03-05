@@ -1,6 +1,6 @@
 import { Component, OnInit, signal, inject } from '@angular/core';
-import {} from '@angular/common';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { ModalEvent, ModalService } from '../../services/modal.service';
+import { ToastService } from '../../services/toast.service';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Router } from '@angular/router';
@@ -13,6 +13,7 @@ import {
 import { TeamOptionsService } from '../../services/team-options.service';
 import { ComponentVisibilityByRoleDirective } from '../../shared/directives/component-visibility-by-role.directive';
 import { ButtonComponent } from '../../shared/components/buttons/button/button.component';
+import { ButtonLoadingComponent } from '../../shared/components/buttons/button-loading/button-loading.component';
 import { ButtonRouteComponent } from '../../shared/components/buttons/button-route/button-route.component';
 import { visibilityByRoleMap } from './teams.role-map';
 import { forkJoin } from 'rxjs';
@@ -29,11 +30,11 @@ import { CardGridComponent } from '../../shared/components/card-grid/card-grid.c
   selector: 'app-teams',
   imports: [
     CachedSrcDirective,
-    MatDialogModule,
     MatIconModule,
     MatTooltipModule,
     ComponentVisibilityByRoleDirective,
     ButtonComponent,
+    ButtonLoadingComponent,
     ButtonRouteComponent,
     CardGridComponent,
     DataTableComponent,
@@ -46,12 +47,15 @@ export class TeamsPage implements OnInit {
   protected visibilityByRoleMap = visibilityByRoleMap;
 
   private teamService = inject(TeamService);
-  private dialog = inject(MatDialog);
+  private modalService = inject(ModalService);
+  private toast = inject(ToastService);
   private teamOptionsService = inject(TeamOptionsService);
   private router = inject(Router);
   private storage = inject(LocalStorageService);
 
   teams = signal<Team[]>([]);
+  editingTeamId = signal<string | null>(null);
+  isAddLoading = signal(false);
   loading = signal(true);
   layoutMode = signal<'card' | 'table'>('table'); // Default to table
 
@@ -218,26 +222,14 @@ export class TeamsPage implements OnInit {
           if (success) {
             const updatedTeams = this.teams().filter((t) => t.id !== team.id);
             this.teams.set(updatedTeams);
-            // this.snackBar.open(
-            //   `Team ${team.name} deleted successfully`,
-            //   'Close',
-            //   { duration: 3000, panelClass: ['custom-snackbar', 'success-snackbar'] }
-            // );
+            this.toast.show('Team deleted successfully', 'success');
           } else {
-            // this.snackBar.open(
-            //   'Failed to delete team. Please try again.',
-            //   'Close',
-            //   { duration: 3000, panelClass: ['custom-snackbar', 'error-snackbar'] }
-            // );
+            this.toast.show('Failed to delete team', 'error');
           }
         },
         error: (error) => {
           console.error('Error deleting team:', error);
-          // this.snackBar.open(
-          //   'Error deleting team. Please try again.',
-          //   'Close',
-          //   { duration: 3000, panelClass: ['custom-snackbar', 'error-snackbar'] }
-          // );
+          this.toast.show('Failed to delete team', 'error');
         },
       });
     }
@@ -288,79 +280,104 @@ export class TeamsPage implements OnInit {
   }
 
   openAddTeamModal(): void {
-    const dialogRef = this.dialog.open(TeamFormModal, {
-      width: '800px',
-      maxWidth: '95vw',
-      data: {
-        isEditMode: false,
-      } as TeamFormModalData,
-      panelClass: 'team-form-modal-dialog',
-      disableClose: true,
-    });
+    this.isAddLoading.set(true);
 
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
-        this.addTeam(result);
-      }
+    forkJoin({
+      ageGroups: this.teamOptionsService.getTeamAgeGroups(),
+      levels: this.teamOptionsService.getTeamLevels(),
+      divisions: this.teamOptionsService.getDivisions(),
+    }).subscribe({
+      next: ({ ageGroups, levels, divisions }) => {
+        this.isAddLoading.set(false);
+        this.modalService.openModal(TeamFormModal, {
+          name: 'Add Team',
+          icon: 'groups',
+          width: '800px',
+          maxWidth: '95vw',
+          data: {
+            isEditMode: false,
+            ageGroups,
+            levels,
+            divisions,
+          } as TeamFormModalData,
+          preventBackdropClose: true,
+          onCloseWithDataProcessing: (result) => {
+            const { logoFile, ...team } = result as Partial<Team> & {
+              logoFile?: File;
+              logoRemoved?: boolean;
+            };
+            this.teamService.addTeam(team, logoFile).subscribe({
+              next: () => {
+                this.toast.show('Team created successfully', 'success');
+                this.modalService.closeModal();
+                this.loadTeams();
+              },
+              error: () => {
+                this.toast.show('Failed to create team', 'error');
+                this.modalService.broadcastEvent(ModalEvent.StopButtonLoading);
+              },
+            });
+          },
+        });
+      },
+      error: () => {
+        this.isAddLoading.set(false);
+        this.toast.show('Failed to load team options', 'error');
+      },
     });
   }
 
   editTeam(team: Team): void {
-    const dialogRef = this.dialog.open(TeamFormModal, {
-      width: '800px',
-      maxWidth: '95vw',
-      data: {
-        team: team,
-        isEditMode: true,
-      } as TeamFormModalData,
-      panelClass: 'team-form-modal-dialog',
-      disableClose: true,
-    });
+    this.editingTeamId.set(team.id);
 
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
-        this.updateTeam(result);
-      }
-    });
-  }
-
-  private addTeam(teamData: Partial<Team> & { logoFile?: File; logoRemoved?: boolean }): void {
-    const { logoFile, ...team } = teamData;
-    this.teamService.addTeam(team, logoFile).subscribe({
-      next: () => {
-        // Refresh the entire list to ensure data consistency
-        this.loadTeams();
-        // this.snackBar.open(
-        //   `Team ${newTeam.name} added successfully`,
-        //   'Close',
-        //   { duration: 3000, panelClass: ['custom-snackbar', 'success-snackbar'] }
-        // );
+    forkJoin({
+      ageGroups: this.teamOptionsService.getTeamAgeGroups(),
+      levels: this.teamOptionsService.getTeamLevels(),
+      divisions: this.teamOptionsService.getDivisions(),
+    }).subscribe({
+      next: ({ ageGroups, levels, divisions }) => {
+        this.editingTeamId.set(null);
+        this.modalService.openModal(TeamFormModal, {
+          name: 'Edit Team',
+          icon: 'groups',
+          width: '800px',
+          maxWidth: '95vw',
+          data: {
+            team: team,
+            isEditMode: true,
+            ageGroups,
+            levels,
+            divisions,
+          } as TeamFormModalData,
+          preventBackdropClose: true,
+          onCloseWithDataProcessing: (result) => {
+            const { logoFile, logoRemoved, ...teamData } = result as Partial<Team> & {
+              logoFile?: File;
+              logoRemoved?: boolean;
+            };
+            this.teamService.updateTeam(teamData.id!, teamData, logoFile, logoRemoved).subscribe({
+              next: (updatedTeam) => {
+                this.toast.show('Team updated successfully', 'success');
+                this.modalService.closeModal();
+                const currentTeams = this.teams();
+                const index = currentTeams.findIndex((t) => t.id === updatedTeam.id);
+                if (index !== -1) {
+                  const newTeams = [...currentTeams];
+                  newTeams[index] = updatedTeam;
+                  this.teams.set(newTeams);
+                }
+              },
+              error: () => {
+                this.toast.show('Failed to update team', 'error');
+                this.modalService.broadcastEvent(ModalEvent.StopButtonLoading);
+              },
+            });
+          },
+        });
       },
-      error: (error) => {
-        console.error('Error adding team:', error);
-      },
-    });
-  }
-
-  private updateTeam(teamData: Partial<Team> & { logoFile?: File; logoRemoved?: boolean }): void {
-    const { logoFile, logoRemoved, ...team } = teamData;
-    this.teamService.updateTeam(team.id!, team, logoFile, logoRemoved).subscribe({
-      next: (updatedTeam) => {
-        const currentTeams = this.teams();
-        const index = currentTeams.findIndex((t) => t.id === updatedTeam.id);
-        if (index !== -1) {
-          const newTeams = [...currentTeams];
-          newTeams[index] = updatedTeam;
-          this.teams.set(newTeams);
-          // this.snackBar.open(
-          //   `Team ${updatedTeam.name} updated successfully`,
-          //   'Close',
-          //   { duration: 3000, panelClass: ['custom-snackbar', 'success-snackbar'] }
-          // );
-        }
-      },
-      error: (error) => {
-        console.error('Error updating team:', error);
+      error: () => {
+        this.editingTeamId.set(null);
+        this.toast.show('Failed to load team options', 'error');
       },
     });
   }

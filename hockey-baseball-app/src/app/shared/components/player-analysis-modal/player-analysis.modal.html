@@ -1,10 +1,5 @@
 <div class="analysis-modal">
-  <h2 mat-dialog-title class="modal-title">
-    <span class="material-symbols-rounded title-icon">analytics</span>
-    {{ isEditMode ? 'Edit Player Analysis' : 'Create Player Analysis' }}
-  </h2>
-
-  <mat-dialog-content class="modal-content">
+  <div class="modal-content">
     @if (isLoading) {
       <div class="loading-container">
         <p>Loading form data...</p>
@@ -82,9 +77,9 @@
         </div>
       </form>
     }
-  </mat-dialog-content>
+  </div>
 
-  <mat-dialog-actions class="modal-actions">
+  <div class="modal-actions">
     <app-button
       [bg]="'transparent'"
       [bghover]="'button_background'"
@@ -101,7 +96,7 @@
       Cancel
     </app-button>
     <app-button-loading
-      [isLoading]="isSubmitting"
+      [isLoading]="isSubmitting()"
       [isDisabled]="analysisForm.invalid"
       materialIcon="save"
       [bg]="isEditMode ? 'orange' : 'green'"
@@ -117,5 +112,5 @@
     >
       {{ isEditMode ? 'Update Analysis' : 'Create Analysis' }}
     </app-button-loading>
-  </mat-dialog-actions>
+  </div>
 </div>

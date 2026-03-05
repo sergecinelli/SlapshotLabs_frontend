@@ -1,7 +1,8 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { MatDialogRef, MatDialogModule, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { ModalEvent, ModalService } from '../../../services/modal.service';
 import { ButtonComponent } from '../buttons/button/button.component';
 import { ButtonLoadingComponent } from '../buttons/button-loading/button-loading.component';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -17,7 +18,7 @@ import {
 import { TeamService } from '../../../services/team.service';
 import { PlayerService } from '../../../services/player.service';
 import { GameMetadataService } from '../../../services/game-metadata.service';
-import { GameEventService, TurnoverEventRequest } from '../../../services/game-event.service';
+import { TurnoverEventRequest } from '../../../services/game-event.service';
 import { environment } from '../../../../environments/environment';
 import { CachedSrcDirective } from '../../directives/cached-src.directive';
 
@@ -36,7 +37,6 @@ export interface TurnoverFormData {
   imports: [
     CachedSrcDirective,
     ReactiveFormsModule,
-    MatDialogModule,
     ButtonComponent,
     ButtonLoadingComponent,
     MatFormFieldModule,
@@ -51,12 +51,11 @@ export interface TurnoverFormData {
 })
 export class TurnoverFormModal implements OnInit {
   private fb = inject(FormBuilder);
-  private dialogRef = inject<MatDialogRef<TurnoverFormModal>>(MatDialogRef);
+  private modalService = inject(ModalService);
   private teamService = inject(TeamService);
   private playerService = inject(PlayerService);
   private gameMetadataService = inject(GameMetadataService);
-  private gameEventService = inject(GameEventService);
-  private dialogData = inject<{
+  private dialogData = inject(ModalService).getModalData<{
     gameId: number;
     turnoverEventId: number;
     periodOptions?: { value: number; label: string }[];
@@ -75,7 +74,7 @@ export class TurnoverFormModal implements OnInit {
       iceTopOffset?: number;
       iceLeftOffset?: number;
     };
-  }>(MAT_DIALOG_DATA);
+  }>();
 
   gameId: number;
   turnoverEventId: number;
@@ -93,7 +92,7 @@ export class TurnoverFormModal implements OnInit {
   isLoadingTeams = false;
   isLoadingPlayers = false;
   isLoadingPeriods = false;
-  isSubmitting = false;
+  isSubmitting = signal(false);
 
   constructor() {
     this.turnoverForm = this.createForm();
@@ -101,6 +100,12 @@ export class TurnoverFormModal implements OnInit {
     this.turnoverEventId = this.dialogData.turnoverEventId;
     this.isEditMode = this.dialogData.isEditMode || false;
     this.eventId = this.dialogData.eventId;
+
+    this.modalService.onEvent$.pipe(takeUntilDestroyed()).subscribe((event) => {
+      if (event === ModalEvent.StopButtonLoading) {
+        this.isSubmitting.set(false);
+      }
+    });
   }
 
   ngOnInit(): void {
@@ -294,8 +299,8 @@ export class TurnoverFormModal implements OnInit {
   }
 
   onSubmit(): void {
-    if (this.turnoverForm.valid && !this.isSubmitting) {
-      this.isSubmitting = true;
+    if (this.turnoverForm.valid && !this.isSubmitting()) {
+      this.isSubmitting.set(true);
       const formValue = this.turnoverForm.value;
 
       // Convert time from mm:ss to time-of-day format HH:mm:ss.SSSZ
@@ -306,7 +311,7 @@ export class TurnoverFormModal implements OnInit {
       const iso = tmp.toISOString();
       const timeOfDay = iso.substring(iso.indexOf('T') + 1); // HH:mm:ss.SSSZ
 
-      const turnoverRequest: TurnoverEventRequest = {
+      const requestData: TurnoverEventRequest = {
         game_id: this.gameId,
         event_name_id: this.turnoverEventId,
         team_id: formValue.team,
@@ -319,46 +324,11 @@ export class TurnoverFormModal implements OnInit {
         zone: this.puckLocation?.zone,
       };
 
-      // Edit or create based on mode
-      if (this.isEditMode && this.eventId) {
-        this.gameEventService.updateGameEvent(this.eventId, turnoverRequest).subscribe({
-          next: () => {
-            this.isSubmitting = false;
-            // Ensure caller always receives a truthy value to trigger refresh
-            this.dialogRef.close(true);
-          },
-          error: (error) => {
-            console.error('Failed to update turnover event:', error);
-            this.isSubmitting = false;
-            alert('Failed to update turnover event. Please try again.');
-          },
-        });
-      } else {
-        this.gameEventService.createTurnoverEvent(turnoverRequest).subscribe({
-          next: () => {
-            // Find selected team and player for display
-            const selectedTeam = this.teamOptions.find((t) => t.value === formValue.team);
-            const selectedPlayer = this.playerOptions.find((p) => p.value === formValue.player);
-
-            const turnoverData: TurnoverFormData = {
-              teamLogo: selectedTeam?.logo || '',
-              teamName: selectedTeam?.label || '',
-              playerNames: [selectedPlayer?.label || ''],
-              period: formValue.period.toString(),
-              time: formValue.time,
-              location: this.puckLocation || undefined,
-              youtubeLink: formValue.youtubeLink,
-            };
-
-            this.isSubmitting = false;
-            this.dialogRef.close(turnoverData);
-          },
-          error: (error) => {
-            console.error('Failed to create turnover event:', error);
-            this.isSubmitting = false;
-          },
-        });
-      }
+      this.modalService.closeWithDataProcessing({
+        isEditMode: this.isEditMode,
+        eventId: this.eventId,
+        requestData,
+      });
     } else if (!this.turnoverForm.valid) {
       // Mark all fields as touched to show validation errors
       Object.keys(this.turnoverForm.controls).forEach((key) => {
@@ -368,7 +338,7 @@ export class TurnoverFormModal implements OnInit {
   }
 
   onCancel(): void {
-    this.dialogRef.close();
+    this.modalService.closeModal();
   }
 
   getErrorMessage(fieldName: string): string {

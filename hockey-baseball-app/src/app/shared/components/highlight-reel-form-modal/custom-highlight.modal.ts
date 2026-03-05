@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { ModalService } from '../../../services/modal.service';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { ButtonComponent } from '../buttons/button/button.component';
@@ -24,7 +24,6 @@ export interface CustomHighlightFormResult {
   selector: 'app-custom-highlight-modal',
   imports: [
     ReactiveFormsModule,
-    MatDialogModule,
     MatFormFieldModule,
     MatInputModule,
     ButtonComponent,
@@ -35,7 +34,7 @@ export interface CustomHighlightFormResult {
   styleUrls: ['./custom-highlight.modal.scss'],
 })
 export class CustomHighlightModal {
-  private dialogRef = inject<MatDialogRef<CustomHighlightModal>>(MatDialogRef);
+  private modalService = inject(ModalService);
   private fb = inject(FormBuilder);
 
   form: FormGroup = this.fb.group({
@@ -53,7 +52,7 @@ export class CustomHighlightModal {
   });
 
   onCancel(): void {
-    this.dialogRef.close();
+    this.modalService.closeModal();
   }
 
   onSave(): void {
@@ -78,7 +77,7 @@ export class CustomHighlightModal {
       gmtDate: gmtDateTime.date,
       gmtTime: gmtDateTime.time,
     };
-    this.dialogRef.close(value);
+    this.modalService.closeWithData(value);
   }
 
   getErrorMessage(fieldName: string): string {

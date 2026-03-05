@@ -1,12 +1,7 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
-
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import {
-  MAT_DIALOG_DATA,
-  MatDialog,
-  MatDialogModule,
-  MatDialogRef,
-} from '@angular/material/dialog';
+import { ModalService, ModalEvent } from '../../../services/modal.service';
 import { ButtonComponent } from '../buttons/button/button.component';
 import { ButtonLoadingComponent } from '../buttons/button-loading/button-loading.component';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -15,13 +10,14 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
-import { ScheduleService } from '../../../services/schedule.service';
+import { ScheduleService, DashboardGame } from '../../../services/schedule.service';
 import { TeamService } from '../../../services/team.service';
+import { Team } from '../../interfaces/team.interface';
 import { PlayerService } from '../../../services/player.service';
 import { GoalieService } from '../../../services/goalie.service';
 import { LiveGameService, GameEvent as LiveGameEvent } from '../../../services/live-game.service';
-import { GameEventNameService } from '../../../services/game-event-name.service';
-import { GameMetadataService } from '../../../services/game-metadata.service';
+import { GameEventNameService, GameEventName } from '../../../services/game-event-name.service';
+import { GameMetadataService, GamePeriodResponse } from '../../../services/game-metadata.service';
 import { HighlightsService } from '../../../services/highlights.service';
 import { HighlightReelUpsertPayload } from '../../interfaces/highlight-reel.interface';
 import { CustomHighlightModal, CustomHighlightFormResult } from './custom-highlight.modal';
@@ -33,6 +29,10 @@ import { CachedSrcDirective } from '../../directives/cached-src.directive';
 export interface HighlightReelFormModalData {
   isEditMode: boolean;
   reel?: { id: number; name: string; description: string };
+  teams?: Team[];
+  eventNames?: GameEventName[];
+  gamePeriods?: GamePeriodResponse[];
+  games?: DashboardGame[];
 }
 
 interface GameListItem {
@@ -52,7 +52,6 @@ interface GameListItem {
   imports: [
     CachedSrcDirective,
     ReactiveFormsModule,
-    MatDialogModule,
     ButtonComponent,
     ButtonLoadingComponent,
     MatFormFieldModule,
@@ -67,8 +66,7 @@ interface GameListItem {
 })
 export class HighlightReelFormModal implements OnInit {
   private fb = inject(FormBuilder);
-  private dialogRef = inject<MatDialogRef<HighlightReelFormModal>>(MatDialogRef);
-  private dialog = inject(MatDialog);
+  private modalService = inject(ModalService);
   private scheduleService = inject(ScheduleService);
   private teamService = inject(TeamService);
   private playerService = inject(PlayerService);
@@ -77,7 +75,7 @@ export class HighlightReelFormModal implements OnInit {
   private gameEventNameService = inject(GameEventNameService);
   private gameMetadataService = inject(GameMetadataService);
   private highlightsService = inject(HighlightsService);
-  data = inject<HighlightReelFormModalData>(MAT_DIALOG_DATA);
+  data = inject(ModalService).getModalData<HighlightReelFormModalData>();
 
   form: FormGroup;
   isEditMode: boolean;
@@ -106,12 +104,19 @@ export class HighlightReelFormModal implements OnInit {
   private periodNameMap = new Map<number, string>();
   private periodOrderMap = new Map<number, number>();
   private nextSelectedEventId = 1;
+  isSubmitting = signal(false);
 
   constructor() {
     this.isEditMode = this.data.isEditMode;
     this.form = this.fb.group({
       name: [this.data.reel?.name || '', [Validators.required, Validators.maxLength(200)]],
       description: [this.data.reel?.description || '', [Validators.maxLength(1000)]],
+    });
+
+    this.modalService.onEvent$.pipe(takeUntilDestroyed()).subscribe((event) => {
+      if (event === ModalEvent.StopButtonLoading) {
+        this.isSubmitting.set(false);
+      }
     });
   }
 
@@ -176,62 +181,58 @@ export class HighlightReelFormModal implements OnInit {
   }
 
   private loadStaticData(): void {
-    // Load teams, event names, and game periods
     this.isLoading = true;
-    this.teamService.getTeams().subscribe({
-      next: (teamsResp) => {
-        (teamsResp.teams || []).forEach((t) => this.teamNameMap.set(parseInt(t.id), t.name));
-        this.gameEventNameService.getGameEventNames().subscribe({
-          next: (names) => {
-            names.forEach((n) => this.eventNameMap.set(n.id, n.name));
-            this.loadGamePeriods();
-          },
-          error: () => {
-            this.loadGamePeriods();
-          },
-        });
-      },
-      error: () => {
-        this.loadGamePeriods();
-      },
-    });
-  }
 
-  private loadGamePeriods(): void {
-    this.gameMetadataService.getGamePeriods().subscribe({
-      next: (periods) => {
-        periods.forEach((p) => {
-          this.periodNameMap.set(p.id, p.name);
-          this.periodOrderMap.set(p.id, p.order ?? p.id);
-        });
-        this.loadGames();
-      },
-      error: () => {
-        this.loadGames();
-      },
-    });
-  }
+    if (this.data.teams && this.data.eventNames && this.data.gamePeriods && this.data.games) {
+      this.applyStaticData(
+        this.data.teams,
+        this.data.eventNames,
+        this.data.gamePeriods,
+        this.data.games
+      );
+      return;
+    }
 
-  private loadGames(): void {
-    this.scheduleService.getGameList().subscribe({
-      next: (games) => {
-        const items: GameListItem[] = games.map((g) => ({
-          id: g.id,
-          label: `${this.teamNameMap.get(g.away_team_id) || 'Away'} vs. ${this.teamNameMap.get(g.home_team_id) || 'Home'}`,
-          homeTeamId: g.home_team_id,
-          awayTeamId: g.away_team_id,
-          loaded: false,
-          loading: false,
-          events: [],
-        }));
-        this.games.set(items);
-        this.isLoading = false;
+    forkJoin({
+      teams: this.teamService.getTeams(),
+      eventNames: this.gameEventNameService.getGameEventNames(),
+      gamePeriods: this.gameMetadataService.getGamePeriods(),
+      games: this.scheduleService.getGameList(),
+    }).subscribe({
+      next: ({ teams, eventNames, gamePeriods, games }) => {
+        this.applyStaticData(teams.teams, eventNames, gamePeriods, games);
       },
       error: () => {
         this.games.set([]);
         this.isLoading = false;
       },
     });
+  }
+
+  private applyStaticData(
+    teams: Team[],
+    eventNames: GameEventName[],
+    gamePeriods: GamePeriodResponse[],
+    games: DashboardGame[]
+  ): void {
+    teams.forEach((t) => this.teamNameMap.set(parseInt(t.id), t.name));
+    eventNames.forEach((n) => this.eventNameMap.set(n.id, n.name));
+    gamePeriods.forEach((p) => {
+      this.periodNameMap.set(p.id, p.name);
+      this.periodOrderMap.set(p.id, p.order ?? p.id);
+    });
+
+    const items: GameListItem[] = games.map((g) => ({
+      id: g.id,
+      label: `${this.teamNameMap.get(g.away_team_id) || 'Away'} vs. ${this.teamNameMap.get(g.home_team_id) || 'Home'}`,
+      homeTeamId: g.home_team_id,
+      awayTeamId: g.away_team_id,
+      loaded: false,
+      loading: false,
+      events: [],
+    }));
+    this.games.set(items);
+    this.isLoading = false;
   }
 
   onPanelOpened(game: GameListItem): void {
@@ -456,43 +457,40 @@ export class HighlightReelFormModal implements OnInit {
     return out;
   }
   onCancel(): void {
-    this.dialogRef.close();
+    this.modalService.closeModal();
   }
 
   openAddCustomHighlightModal(): void {
-    const dialogRef = this.dialog.open<CustomHighlightModal, undefined, CustomHighlightFormResult>(
-      CustomHighlightModal,
-      {
-        width: '460px',
-        maxWidth: '95vw',
-        autoFocus: true,
-        disableClose: true,
-      }
-    );
-
-    dialogRef.afterClosed().subscribe((result) => {
-      if (!result) return;
-      const newSelection = {
-        id: this.nextSelectedEventId++,
-        gameEventId: 0,
-        is_custom: true,
-        eventName: result.name,
-        description: result.description,
-        date: result.date, // Local date for display
-        periodTime: result.time, // Local time for display
-        gameLabel: 'Custom',
-        youtubeLink: result.youtube_link,
-        customTime: result.time, // Local time for editing
-        fullEvent: {
-          id: 0,
-          event_name_id: 0,
-          note: result.description,
-          youtube_link: result.youtube_link,
-          time: result.gmtTime, // Store GMT time for API
-          date: result.gmtDate, // Store GMT date for API
-        } as LiveGameEvent,
-      };
-      this.selectedEvents.set([...this.selectedEvents(), newSelection]);
+    this.modalService.openModal(CustomHighlightModal, {
+      name: 'Custom Highlight',
+      icon: 'movie',
+      width: '460px',
+      maxWidth: '95vw',
+      preventBackdropClose: true,
+      onCloseWithData: (result: CustomHighlightFormResult) => {
+        if (!result) return;
+        const newSelection = {
+          id: this.nextSelectedEventId++,
+          gameEventId: 0,
+          is_custom: true,
+          eventName: result.name,
+          description: result.description,
+          date: result.date,
+          periodTime: result.time,
+          gameLabel: 'Custom',
+          youtubeLink: result.youtube_link,
+          customTime: result.time,
+          fullEvent: {
+            id: 0,
+            event_name_id: 0,
+            note: result.description,
+            youtube_link: result.youtube_link,
+            time: result.gmtTime,
+            date: result.gmtDate,
+          } as LiveGameEvent,
+        };
+        this.selectedEvents.set([...this.selectedEvents(), newSelection]);
+      },
     });
   }
 
@@ -550,6 +548,7 @@ export class HighlightReelFormModal implements OnInit {
       description: this.form.value.description || '',
       highlights: highlights,
     };
-    this.dialogRef.close(payload);
+    this.isSubmitting.set(true);
+    this.modalService.closeWithDataProcessing(payload);
   }
 }

@@ -1,10 +1,5 @@
 <div class="team-form-modal">
-  <h2 mat-dialog-title class="modal-title">
-    <span class="material-symbols-rounded title-icon">groups</span>
-    {{ isEditMode ? 'Edit Team' : 'Add New Team' }}
-  </h2>
-
-  <mat-dialog-content class="modal-content">
+  <div class="modal-content">
     @if (isLoading) {
       <div class="loading-container">
         <mat-spinner diameter="40"></mat-spinner>
@@ -175,9 +170,9 @@
         </div>
       </form>
     }
-  </mat-dialog-content>
+  </div>
 
-  <mat-dialog-actions class="modal-actions">
+  <div class="modal-actions">
     <app-button
       [bg]="'transparent'"
       [bghover]="'button_background'"
@@ -194,8 +189,8 @@
       Cancel
     </app-button>
     <app-button-loading
-      [isLoading]="isLoading"
-      [isDisabled]="teamForm.invalid"
+      [isLoading]="isSubmitting()"
+      [isDisabled]="isLoading || teamForm.invalid"
       materialIcon="save"
       [bg]="isEditMode ? 'orange' : 'green'"
       [bghover]="isEditMode ? 'orange' : 'green'"
@@ -210,5 +205,5 @@
     >
       {{ isEditMode ? 'Update Team' : 'Add Team' }}
     </app-button-loading>
-  </mat-dialog-actions>
+  </div>
 </div>

@@ -1,6 +1,6 @@
 import { Component, OnInit, signal, inject } from '@angular/core';
-import {} from '@angular/common';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { ModalEvent, ModalService } from '../../services/modal.service';
+import { ToastService } from '../../services/toast.service';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -14,7 +14,9 @@ import {
 } from '../../shared/components/goalie-form-modal/goalie-form.modal';
 import { ComponentVisibilityByRoleDirective } from '../../shared/directives/component-visibility-by-role.directive';
 import { ButtonComponent } from '../../shared/components/buttons/button/button.component';
+import { ButtonLoadingComponent } from '../../shared/components/buttons/button-loading/button-loading.component';
 import { ButtonRouteComponent } from '../../shared/components/buttons/button-route/button-route.component';
+import { PositionService } from '../../services/position.service';
 import { visibilityByRoleMap } from './goalies.role-map';
 import {
   DataTableComponent,
@@ -31,11 +33,11 @@ import { CardGridComponent } from '../../shared/components/card-grid/card-grid.c
   selector: 'app-goalies',
   imports: [
     CachedSrcDirective,
-    MatDialogModule,
     MatIconModule,
     MatTooltipModule,
     ComponentVisibilityByRoleDirective,
     ButtonComponent,
+    ButtonLoadingComponent,
     ButtonRouteComponent,
     CardGridComponent,
     DataTableComponent,
@@ -49,15 +51,19 @@ export class GoaliesPage implements OnInit {
 
   private goalieService = inject(GoalieService);
   private teamService = inject(TeamService);
-  private dialog = inject(MatDialog);
+  private modalService = inject(ModalService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private storage = inject(LocalStorageService);
   private tryoutService = inject(TryoutService);
   private authService = inject(AuthService);
+  private toast = inject(ToastService);
+  private positionService = inject(PositionService);
 
   goalies = signal<Goalie[]>([]);
   teams: Team[] = []; // Store teams to pass to modals
+  editingGoalieId = signal<string | null>(null);
+  isAddLoading = signal(false);
   loading = signal(true);
   teamId = signal<string | null>(null);
   teamName = signal<string>('Goalies');
@@ -312,26 +318,14 @@ export class GoaliesPage implements OnInit {
           if (success) {
             const updatedGoalies = this.goalies().filter((g) => g.id !== goalie.id);
             this.goalies.set(updatedGoalies);
-            // this.snackBar.open(
-            //   `Goalie ${goalie.firstName} ${goalie.lastName} deleted successfully`,
-            //   'Close',
-            //   { duration: 3000, panelClass: ['custom-snackbar', 'success-snackbar'] }
-            // );
+            this.toast.show('Goalie deleted successfully', 'success');
           } else {
-            // this.snackBar.open(
-            //   'Failed to delete goalie. Please try again.',
-            //   'Close',
-            //   { duration: 3000, panelClass: ['custom-snackbar', 'error-snackbar'] }
-            // );
+            this.toast.show('Failed to delete goalie', 'error');
           }
         },
         error: (error) => {
           console.error('Error deleting goalie:', error);
-          // this.snackBar.open(
-          //   'Error deleting goalie. Please try again.',
-          //   'Close',
-          //   { duration: 3000, panelClass: ['custom-snackbar', 'error-snackbar'] }
-          // );
+          this.toast.show('Failed to delete goalie', 'error');
         },
       });
     }
@@ -354,64 +348,93 @@ export class GoaliesPage implements OnInit {
   }
 
   openAddGoalieModal(): void {
-    const dialogRef = this.dialog.open(GoalieFormModal, {
-      width: '800px',
-      maxWidth: '95vw',
-      data: {
-        isEditMode: false,
-        teams: this.teams,
-        teamId: this.teamId(),
-        teamName: this.teamName(),
-      } as GoalieFormModalData,
-      panelClass: 'goalie-form-modal-dialog',
-      disableClose: true,
-    });
+    this.isAddLoading.set(true);
 
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
-        this.addGoalie(result);
-      }
-    });
-  }
-
-  private addGoalie(goalieData: Partial<Goalie>): void {
-    this.goalieService.addGoalie(goalieData).subscribe({
-      next: (newGoalie) => {
-        const currentGoalies = this.goalies();
-        // Add new goalie at the beginning (newest first)
-        const updatedGoalies = [newGoalie, ...currentGoalies];
-        this.goalies.set(updatedGoalies);
-        // this.snackBar.open(
-        //   `Goalie ${newGoalie.firstName} ${newGoalie.lastName} added successfully`,
-        //   'Close',
-        //   { duration: 3000, panelClass: ['custom-snackbar', 'success-snackbar'] }
-        // );
+    this.positionService.getPositions().subscribe({
+      next: (positions) => {
+        this.isAddLoading.set(false);
+        this.modalService.openModal(GoalieFormModal, {
+          name: 'Add Goalie',
+          icon: 'sports_hockey',
+          width: '800px',
+          maxWidth: '95vw',
+          data: {
+            isEditMode: false,
+            teams: this.teams,
+            positions: positions,
+            teamId: this.teamId(),
+            teamName: this.teamName(),
+          } as GoalieFormModalData,
+          preventBackdropClose: true,
+          onCloseWithDataProcessing: (result) => {
+            this.goalieService.addGoalie(result).subscribe({
+              next: (newGoalie) => {
+                this.toast.show('Goalie created successfully', 'success');
+                this.modalService.closeModal();
+                const currentGoalies = this.goalies();
+                const updatedGoalies = [newGoalie, ...currentGoalies];
+                this.goalies.set(updatedGoalies);
+              },
+              error: () => {
+                this.toast.show('Failed to create goalie', 'error');
+                this.modalService.broadcastEvent(ModalEvent.StopButtonLoading);
+              },
+            });
+          },
+        });
       },
-      error: (error) => {
-        console.error('Error adding goalie:', error);
+      error: () => {
+        this.isAddLoading.set(false);
+        this.toast.show('Failed to load positions', 'error');
       },
     });
   }
 
   editGoalie(goalie: Goalie): void {
-    const dialogRef = this.dialog.open(GoalieFormModal, {
-      width: '800px',
-      maxWidth: '95vw',
-      data: {
-        goalie: goalie,
-        isEditMode: true,
-        teams: this.teams,
-        teamId: this.teamId(),
-        teamName: this.teamName(),
-      } as GoalieFormModalData,
-      panelClass: 'goalie-form-modal-dialog',
-      disableClose: true,
-    });
+    this.editingGoalieId.set(goalie.id);
 
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
-        this.updateGoalie(result);
-      }
+    this.positionService.getPositions().subscribe({
+      next: (positions) => {
+        this.editingGoalieId.set(null);
+        this.modalService.openModal(GoalieFormModal, {
+          name: 'Edit Goalie',
+          icon: 'sports_hockey',
+          width: '800px',
+          maxWidth: '95vw',
+          data: {
+            goalie: goalie,
+            isEditMode: true,
+            teams: this.teams,
+            positions: positions,
+            teamId: this.teamId(),
+            teamName: this.teamName(),
+          } as GoalieFormModalData,
+          preventBackdropClose: true,
+          onCloseWithDataProcessing: (result) => {
+            this.goalieService.updateGoalie(result.id!, result).subscribe({
+              next: (updatedGoalie) => {
+                this.toast.show('Goalie updated successfully', 'success');
+                this.modalService.closeModal();
+                const currentGoalies = this.goalies();
+                const index = currentGoalies.findIndex((g) => g.id === updatedGoalie.id);
+                if (index !== -1) {
+                  const newGoalies = [...currentGoalies];
+                  newGoalies[index] = updatedGoalie;
+                  this.goalies.set(newGoalies);
+                }
+              },
+              error: () => {
+                this.toast.show('Failed to update goalie', 'error');
+                this.modalService.broadcastEvent(ModalEvent.StopButtonLoading);
+              },
+            });
+          },
+        });
+      },
+      error: () => {
+        this.editingGoalieId.set(null);
+        this.toast.show('Failed to load positions', 'error');
+      },
     });
   }
 
@@ -436,27 +459,5 @@ export class GoaliesPage implements OnInit {
       .subscribe({
         error: (error) => console.error('Failed to add to tryout:', error),
       });
-  }
-
-  private updateGoalie(goalieData: Partial<Goalie>): void {
-    this.goalieService.updateGoalie(goalieData.id!, goalieData).subscribe({
-      next: (updatedGoalie) => {
-        const currentGoalies = this.goalies();
-        const index = currentGoalies.findIndex((g) => g.id === updatedGoalie.id);
-        if (index !== -1) {
-          const newGoalies = [...currentGoalies];
-          newGoalies[index] = updatedGoalie;
-          this.goalies.set(newGoalies);
-          // this.snackBar.open(
-          //   `Goalie ${updatedGoalie.firstName} ${updatedGoalie.lastName} updated successfully`,
-          //   'Close',
-          //   { duration: 3000, panelClass: ['custom-snackbar', 'success-snackbar'] }
-          // );
-        }
-      },
-      error: (error) => {
-        console.error('Error updating goalie:', error);
-      },
-    });
   }
 }

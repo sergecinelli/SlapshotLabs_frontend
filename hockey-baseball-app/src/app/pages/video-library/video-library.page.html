@@ -4,7 +4,7 @@
 <div class="page-content" [appVisibilityMap]="visibilityByRoleMap">
   <!-- Add Video Button -->
   <div class="mb-4 flex justify-end" role-visibility-name="add-video-button">
-    <app-button
+    <app-button-loading
       [bg]="'primary'"
       [bghover]="'primary_dark'"
       [color]="'white'"
@@ -14,7 +14,7 @@
       (clicked)="openAddVideoModal()"
     >
       Add a Video
-    </app-button>
+    </app-button-loading>
   </div>
 
   <app-data-table

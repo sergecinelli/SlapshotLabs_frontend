@@ -7,7 +7,7 @@
   <div>
     <!-- Quick Actions Row -->
     <div class="flex flex-wrap justify-center dashboard-actions-row">
-      <app-button
+      <app-button-loading
         role-visibility-name="add-team-button"
         [bg]="'primary'"
         [bghover]="'primary_dark'"
@@ -15,11 +15,12 @@
         [colorhover]="'white'"
         [materialIcon]="'group_add'"
         [haveContent]="true"
+        [isLoading]="addTeamLoading()"
         (clicked)="openAddTeamModal()"
       >
         Add Team
-      </app-button>
-      <app-button
+      </app-button-loading>
+      <app-button-loading
         role-visibility-name="add-player-button"
         [bg]="'primary'"
         [bghover]="'primary_dark'"
@@ -27,11 +28,12 @@
         [colorhover]="'white'"
         [materialIcon]="'person_add'"
         [haveContent]="true"
+        [isLoading]="addPlayerLoading()"
         (clicked)="openAddPlayerModal()"
       >
         Add Player
-      </app-button>
-      <app-button
+      </app-button-loading>
+      <app-button-loading
         role-visibility-name="add-goalie-button"
         [bg]="'primary'"
         [bghover]="'primary_dark'"
@@ -39,11 +41,12 @@
         [colorhover]="'white'"
         [materialIcon]="'shield'"
         [haveContent]="true"
+        [isLoading]="addGoalieLoading()"
         (clicked)="openAddGoalieModal()"
       >
         Add Goalie
-      </app-button>
-      <app-button
+      </app-button-loading>
+      <app-button-loading
         role-visibility-name="add-game-button"
         [bg]="'primary'"
         [bghover]="'primary_dark'"
@@ -51,11 +54,12 @@
         [colorhover]="'white'"
         [materialIcon]="'sports_hockey'"
         [haveContent]="true"
+        [isLoading]="addGameLoading()"
         (clicked)="openAddGameModal()"
       >
         Add Game
-      </app-button>
-      <app-button
+      </app-button-loading>
+      <app-button-loading
         role-visibility-name="add-highlight-button"
         [bg]="'primary'"
         [bghover]="'primary_dark'"
@@ -63,10 +67,11 @@
         [colorhover]="'white'"
         [materialIcon]="'video_library'"
         [haveContent]="true"
+        [isLoading]="createHighlightLoading()"
         (clicked)="createHighlightReel()"
       >
         Create Highlight Reel
-      </app-button>
+      </app-button-loading>
     </div>
 
     <!-- Main Content -->

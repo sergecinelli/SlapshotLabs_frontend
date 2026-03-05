@@ -1,7 +1,6 @@
-import { Component, OnInit, inject } from '@angular/core';
-
+import { Component, OnInit, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
@@ -14,13 +13,15 @@ import { TeamService } from '../../../services/team.service';
 import { PositionService, PositionOption } from '../../../services/position.service';
 import { ButtonComponent } from '../buttons/button/button.component';
 import { ButtonLoadingComponent } from '../buttons/button-loading/button-loading.component';
+import { ModalService, ModalEvent } from '../../../services/modal.service';
 
 export interface PlayerFormModalData {
   player?: Player;
   isEditMode: boolean;
-  teams?: Team[]; // Optional: pass teams to avoid redundant API calls
-  teamId?: string; // Team ID to assign new players to
-  teamName?: string; // Team name for display
+  teams?: Team[];
+  positions?: PositionOption[];
+  teamId?: string;
+  teamName?: string;
 }
 
 export interface TeamOption {
@@ -32,7 +33,6 @@ export interface TeamOption {
   selector: 'app-player-form-modal',
   imports: [
     ReactiveFormsModule,
-    MatDialogModule,
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
@@ -46,14 +46,15 @@ export interface TeamOption {
 })
 export class PlayerFormModal implements OnInit {
   private fb = inject(FormBuilder);
-  private dialogRef = inject<MatDialogRef<PlayerFormModal>>(MatDialogRef);
+  private modalService = inject(ModalService);
   private teamService = inject(TeamService);
   private positionService = inject(PositionService);
-  data = inject<PlayerFormModalData>(MAT_DIALOG_DATA);
+  data = inject(ModalService).getModalData<PlayerFormModalData>();
 
   playerForm: FormGroup;
   isEditMode: boolean;
   isLoading = true;
+  isSubmitting = signal(false);
 
   shootsOptions = [
     { value: 'Right Shot', label: 'Right Shot' },
@@ -68,6 +69,12 @@ export class PlayerFormModal implements OnInit {
 
     this.isEditMode = data.isEditMode;
     this.playerForm = this.createForm();
+
+    this.modalService.onEvent$.pipe(takeUntilDestroyed()).subscribe((event) => {
+      if (event === ModalEvent.StopButtonLoading) {
+        this.isSubmitting.set(false);
+      }
+    });
   }
 
   ngOnInit(): void {
@@ -77,15 +84,17 @@ export class PlayerFormModal implements OnInit {
   private loadFormData(): void {
     this.isLoading = true;
 
-    // Use provided teams or fetch from API
     const teamsObservable = this.data.teams
       ? of({ teams: this.data.teams, total: this.data.teams.length })
       : this.teamService.getTeams();
 
-    // Fetch teams and positions concurrently
+    const positionsObservable = this.data.positions
+      ? of(this.data.positions)
+      : this.positionService.getPositions();
+
     forkJoin({
       teams: teamsObservable,
-      positions: this.positionService.getPositions(),
+      positions: positionsObservable,
     }).subscribe({
       next: ({ teams, positions }) => {
         // Transform teams to options format
@@ -239,7 +248,8 @@ export class PlayerFormModal implements OnInit {
         playerData.id = this.data.player.id;
       }
 
-      this.dialogRef.close(playerData);
+      this.isSubmitting.set(true);
+      this.modalService.closeWithDataProcessing(playerData);
     } else {
       // Mark all fields as touched to show validation errors
       Object.keys(this.playerForm.controls).forEach((key) => {
@@ -249,7 +259,7 @@ export class PlayerFormModal implements OnInit {
   }
 
   onCancel(): void {
-    this.dialogRef.close();
+    this.modalService.closeModal();
   }
 
   getErrorMessage(fieldName: string): string {

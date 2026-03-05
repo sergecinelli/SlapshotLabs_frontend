@@ -1,6 +1,6 @@
 import { Component, OnInit, signal, inject } from '@angular/core';
-import {} from '@angular/common';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { ModalEvent, ModalService } from '../../services/modal.service';
+import { ToastService } from '../../services/toast.service';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -14,7 +14,9 @@ import {
 } from '../../shared/components/player-form-modal/player-form.modal';
 import { ComponentVisibilityByRoleDirective } from '../../shared/directives/component-visibility-by-role.directive';
 import { ButtonComponent } from '../../shared/components/buttons/button/button.component';
+import { ButtonLoadingComponent } from '../../shared/components/buttons/button-loading/button-loading.component';
 import { ButtonRouteComponent } from '../../shared/components/buttons/button-route/button-route.component';
+import { PositionService } from '../../services/position.service';
 import { visibilityByRoleMap } from './players.role-map';
 import {
   DataTableComponent,
@@ -31,11 +33,11 @@ import { CardGridComponent } from '../../shared/components/card-grid/card-grid.c
   selector: 'app-players',
   imports: [
     CachedSrcDirective,
-    MatDialogModule,
     MatIconModule,
     MatTooltipModule,
     ComponentVisibilityByRoleDirective,
     ButtonComponent,
+    ButtonLoadingComponent,
     ButtonRouteComponent,
     CardGridComponent,
     DataTableComponent,
@@ -49,15 +51,19 @@ export class PlayersPage implements OnInit {
 
   private playerService = inject(PlayerService);
   private teamService = inject(TeamService);
-  private dialog = inject(MatDialog);
+  private modalService = inject(ModalService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private storage = inject(LocalStorageService);
   private tryoutService = inject(TryoutService);
   private authService = inject(AuthService);
+  private toast = inject(ToastService);
+  private positionService = inject(PositionService);
 
   players = signal<Player[]>([]);
   teams: Team[] = [];
+  editingPlayerId = signal<string | null>(null);
+  isAddLoading = signal(false);
   loading = signal(true);
   teamId = signal<string | null>(null);
   teamName = signal<string>('Players');
@@ -315,26 +321,14 @@ export class PlayersPage implements OnInit {
           if (success) {
             const updatedPlayers = this.players().filter((p) => p.id !== player.id);
             this.players.set(updatedPlayers);
-            // this.snackBar.open(
-            //   `Player ${player.firstName} ${player.lastName} deleted successfully`,
-            //   'Close',
-            //   { duration: 3000, panelClass: ['custom-snackbar', 'success-snackbar'] }
-            // );
+            this.toast.show('Player deleted successfully', 'success');
           } else {
-            // this.snackBar.open(
-            //   'Failed to delete player. Please try again.',
-            //   'Close',
-            //   { duration: 3000, panelClass: ['custom-snackbar', 'error-snackbar'] }
-            // );
+            this.toast.show('Failed to delete player', 'error');
           }
         },
         error: (error) => {
           console.error('Error deleting player:', error);
-          // this.snackBar.open(
-          //   'Error deleting player. Please try again.',
-          //   'Close',
-          //   { duration: 3000, panelClass: ['custom-snackbar', 'error-snackbar'] }
-          // );
+          this.toast.show('Failed to delete player', 'error');
         },
       });
     }
@@ -359,64 +353,93 @@ export class PlayersPage implements OnInit {
   }
 
   openAddPlayerModal(): void {
-    const dialogRef = this.dialog.open(PlayerFormModal, {
-      width: '800px',
-      maxWidth: '95vw',
-      data: {
-        isEditMode: false,
-        teams: this.teams,
-        teamId: this.teamId(),
-        teamName: this.teamName(),
-      } as PlayerFormModalData,
-      panelClass: 'player-form-modal-dialog',
-      disableClose: true,
-    });
+    this.isAddLoading.set(true);
 
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
-        this.addPlayer(result);
-      }
-    });
-  }
-
-  private addPlayer(playerData: Partial<Player>): void {
-    this.playerService.addPlayer(playerData).subscribe({
-      next: (newPlayer) => {
-        const currentPlayers = this.players();
-        // Add new player at the beginning (newest first)
-        const updatedPlayers = [newPlayer, ...currentPlayers];
-        this.players.set(updatedPlayers);
-        // this.snackBar.open(
-        //   `Player ${newPlayer.firstName} ${newPlayer.lastName} added successfully`,
-        //   'Close',
-        //   { duration: 3000, panelClass: ['custom-snackbar', 'success-snackbar'] }
-        // );
+    this.positionService.getPositions().subscribe({
+      next: (positions) => {
+        this.isAddLoading.set(false);
+        this.modalService.openModal(PlayerFormModal, {
+          name: 'Add Player',
+          icon: 'sports_hockey',
+          width: '800px',
+          maxWidth: '95vw',
+          data: {
+            isEditMode: false,
+            teams: this.teams,
+            positions: positions,
+            teamId: this.teamId(),
+            teamName: this.teamName(),
+          } as PlayerFormModalData,
+          preventBackdropClose: true,
+          onCloseWithDataProcessing: (result) => {
+            this.playerService.addPlayer(result).subscribe({
+              next: (newPlayer) => {
+                this.toast.show('Player created successfully', 'success');
+                this.modalService.closeModal();
+                const currentPlayers = this.players();
+                const updatedPlayers = [newPlayer, ...currentPlayers];
+                this.players.set(updatedPlayers);
+              },
+              error: () => {
+                this.toast.show('Failed to create player', 'error');
+                this.modalService.broadcastEvent(ModalEvent.StopButtonLoading);
+              },
+            });
+          },
+        });
       },
-      error: (error) => {
-        console.error('Error adding player:', error);
+      error: () => {
+        this.isAddLoading.set(false);
+        this.toast.show('Failed to load positions', 'error');
       },
     });
   }
 
   editPlayer(player: Player): void {
-    const dialogRef = this.dialog.open(PlayerFormModal, {
-      width: '800px',
-      maxWidth: '95vw',
-      data: {
-        player: player,
-        isEditMode: true,
-        teams: this.teams,
-        teamId: this.teamId(),
-        teamName: this.teamName(),
-      } as PlayerFormModalData,
-      panelClass: 'player-form-modal-dialog',
-      disableClose: true,
-    });
+    this.editingPlayerId.set(player.id);
 
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
-        this.updatePlayer(result);
-      }
+    this.positionService.getPositions().subscribe({
+      next: (positions) => {
+        this.editingPlayerId.set(null);
+        this.modalService.openModal(PlayerFormModal, {
+          name: 'Edit Player',
+          icon: 'sports_hockey',
+          width: '800px',
+          maxWidth: '95vw',
+          data: {
+            player: player,
+            isEditMode: true,
+            teams: this.teams,
+            positions: positions,
+            teamId: this.teamId(),
+            teamName: this.teamName(),
+          } as PlayerFormModalData,
+          preventBackdropClose: true,
+          onCloseWithDataProcessing: (result) => {
+            this.playerService.updatePlayer(result.id!, result).subscribe({
+              next: (updatedPlayer) => {
+                this.toast.show('Player updated successfully', 'success');
+                this.modalService.closeModal();
+                const currentPlayers = this.players();
+                const index = currentPlayers.findIndex((p) => p.id === updatedPlayer.id);
+                if (index !== -1) {
+                  const newPlayers = [...currentPlayers];
+                  newPlayers[index] = updatedPlayer;
+                  this.players.set(newPlayers);
+                }
+              },
+              error: () => {
+                this.toast.show('Failed to update player', 'error');
+                this.modalService.broadcastEvent(ModalEvent.StopButtonLoading);
+              },
+            });
+          },
+        });
+      },
+      error: () => {
+        this.editingPlayerId.set(null);
+        this.toast.show('Failed to load positions', 'error');
+      },
     });
   }
 
@@ -443,27 +466,5 @@ export class PlayersPage implements OnInit {
       .subscribe({
         error: (error) => console.error('Failed to add to tryout:', error),
       });
-  }
-
-  private updatePlayer(playerData: Partial<Player>): void {
-    this.playerService.updatePlayer(playerData.id!, playerData).subscribe({
-      next: (updatedPlayer) => {
-        const currentPlayers = this.players();
-        const index = currentPlayers.findIndex((p) => p.id === updatedPlayer.id);
-        if (index !== -1) {
-          const newPlayers = [...currentPlayers];
-          newPlayers[index] = updatedPlayer;
-          this.players.set(newPlayers);
-          // this.snackBar.open(
-          //   `Player ${updatedPlayer.firstName} ${updatedPlayer.lastName} updated successfully`,
-          //   'Close',
-          //   { duration: 3000, panelClass: ['custom-snackbar', 'success-snackbar'] }
-          // );
-        }
-      },
-      error: (error) => {
-        console.error('Error updating player:', error);
-      },
-    });
   }
 }

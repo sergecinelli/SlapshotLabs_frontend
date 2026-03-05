@@ -26,6 +26,7 @@ export class GameCardComponent {
   showActions = input(false);
   showScore = input(true);
   isDeleting = input(false);
+  isEditLoading = input(false);
   edit = output<Schedule>();
   delete = output<Schedule>();
   analysis = output<Schedule>();

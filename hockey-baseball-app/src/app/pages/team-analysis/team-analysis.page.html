@@ -3,17 +3,18 @@
 
 <div class="page-content" [appVisibilityMap]="visibilityByRoleMap">
   <div class="action-buttons-row" role-visibility-name="create-analysis-button">
-    <app-button
+    <app-button-loading
       materialIcon="add"
       [bg]="'primary'"
       [bghover]="'primary'"
       [color]="'white'"
       [colorhover]="'white'"
       [haveContent]="true"
+      [isLoading]="isCreateLoading()"
       (clicked)="onCreateAnalysis()"
     >
       Create Team Analysis
-    </app-button>
+    </app-button-loading>
   </div>
 
   <app-data-table

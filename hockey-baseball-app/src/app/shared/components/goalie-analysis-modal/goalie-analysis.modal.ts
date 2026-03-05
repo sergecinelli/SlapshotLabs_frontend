@@ -1,6 +1,7 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ModalEvent, ModalService } from '../../../services/modal.service';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
@@ -9,7 +10,6 @@ import { AsyncPipe } from '@angular/common';
 import { Observable, of } from 'rxjs';
 import { startWith, map } from 'rxjs/operators';
 import { GoalieService } from '../../../services/goalie.service';
-import { AnalysisService } from '../../../services/analysis.service';
 import { Analysis } from '../../interfaces/analysis.interface';
 import { ButtonComponent } from '../buttons/button/button.component';
 import { ButtonLoadingComponent } from '../buttons/button-loading/button-loading.component';
@@ -18,6 +18,7 @@ export interface GoalieAnalysisModalData {
   analysis?: Analysis;
   isEditMode: boolean;
   preSelectedGoalieId?: string;
+  entityOptions?: { value: string; label: string }[];
 }
 
 interface EntityOption {
@@ -29,7 +30,6 @@ interface EntityOption {
   selector: 'app-goalie-analysis-modal',
   imports: [
     ReactiveFormsModule,
-    MatDialogModule,
     MatFormFieldModule,
     MatInputModule,
     MatAutocompleteModule,
@@ -43,15 +43,14 @@ interface EntityOption {
 })
 export class GoalieAnalysisModal implements OnInit {
   private fb = inject(FormBuilder);
-  private dialogRef = inject<MatDialogRef<GoalieAnalysisModal>>(MatDialogRef);
+  private modalService = inject(ModalService);
   private goalieService = inject(GoalieService);
-  private analysisService = inject(AnalysisService);
-  data = inject<GoalieAnalysisModalData>(MAT_DIALOG_DATA);
+  data = inject(ModalService).getModalData<GoalieAnalysisModalData>();
 
   analysisForm: FormGroup;
   isEditMode: boolean;
   isLoading = true;
-  isSubmitting = false;
+  isSubmitting = signal(false);
   entityOptions: EntityOption[] = [];
   filteredEntityOptions: Observable<EntityOption[]> = of([]);
 
@@ -62,6 +61,12 @@ export class GoalieAnalysisModal implements OnInit {
       analysisBy: ['', [Validators.required]],
       analysisText: ['', [Validators.required]],
     });
+
+    this.modalService.onEvent$.pipe(takeUntilDestroyed()).subscribe((event) => {
+      if (event === ModalEvent.StopButtonLoading) {
+        this.isSubmitting.set(false);
+      }
+    });
   }
 
   ngOnInit(): void {
@@ -70,6 +75,14 @@ export class GoalieAnalysisModal implements OnInit {
 
   private loadEntityOptions(): void {
     this.isLoading = true;
+
+    if (this.data.entityOptions) {
+      this.entityOptions = this.data.entityOptions;
+      this.isLoading = false;
+      this.setupEntityFilter();
+      this.patchFormValues();
+      return;
+    }
 
     this.goalieService.getGoalies().subscribe({
       next: (result) => {
@@ -80,22 +93,25 @@ export class GoalieAnalysisModal implements OnInit {
 
         this.isLoading = false;
         this.setupEntityFilter();
-
-        if (this.isEditMode && this.data.analysis) {
-          this.analysisForm.patchValue({
-            entityId: String(this.data.analysis.entityId),
-            analysisBy: this.data.analysis.analysisBy,
-            analysisText: this.data.analysis.analysisText,
-          });
-        } else if (this.data.preSelectedGoalieId) {
-          this.analysisForm.patchValue({ entityId: this.data.preSelectedGoalieId });
-        }
+        this.patchFormValues();
       },
       error: (error) => {
         console.error('Failed to load goalies:', error);
         this.isLoading = false;
       },
     });
+  }
+
+  private patchFormValues(): void {
+    if (this.isEditMode && this.data.analysis) {
+      this.analysisForm.patchValue({
+        entityId: String(this.data.analysis.entityId),
+        analysisBy: this.data.analysis.analysisBy,
+        analysisText: this.data.analysis.analysisText,
+      });
+    } else if (this.data.preSelectedGoalieId) {
+      this.analysisForm.patchValue({ entityId: this.data.preSelectedGoalieId });
+    }
   }
 
   protected displayEntityFn = (value: string): string => {
@@ -129,7 +145,7 @@ export class GoalieAnalysisModal implements OnInit {
       return;
     }
 
-    this.isSubmitting = true;
+    this.isSubmitting.set(true);
     const formValue = this.analysisForm.value;
     const apiData = {
       type: 'goalie' as const,
@@ -138,25 +154,15 @@ export class GoalieAnalysisModal implements OnInit {
       analysis_text: formValue.analysisText,
     };
 
-    const request$ =
-      this.isEditMode && this.data.analysis
-        ? this.analysisService.updateAnalysis(this.data.analysis.id, apiData)
-        : this.analysisService.createAnalysis(apiData);
-
-    request$.subscribe({
-      next: () => {
-        this.isSubmitting = false;
-        this.dialogRef.close(true);
-      },
-      error: (error) => {
-        console.error('Failed to save analysis:', error);
-        this.isSubmitting = false;
-      },
+    this.modalService.closeWithDataProcessing({
+      isEditMode: this.isEditMode,
+      analysisId: this.data.analysis?.id,
+      apiData,
     });
   }
 
   onCancel(): void {
-    this.dialogRef.close();
+    this.modalService.closeModal();
   }
 
   getErrorMessage(fieldName: string): string {

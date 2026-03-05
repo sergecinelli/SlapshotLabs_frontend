@@ -3,8 +3,9 @@ import {} from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { ButtonComponent } from '../../shared/components/buttons/button/button.component';
+import { ModalService, ModalEvent } from '../../services/modal.service';
+import { ToastService } from '../../services/toast.service';
+import { ButtonLoadingComponent } from '../../shared/components/buttons/button-loading/button-loading.component';
 import { WeekPaginationComponent } from '../../shared/components/week-pagination/week-pagination.component';
 import { ScheduleService, DashboardGame } from '../../services/schedule.service';
 import { TeamService } from '../../services/team.service';
@@ -32,6 +33,7 @@ import { GameCardComponent } from '../../shared/components/game-card/game-card.c
 import { visibilityByRoleMap } from './schedule.role-map';
 import { getGameStatusLabel } from '../../shared/constants/game-status.constants';
 import { forkJoin } from 'rxjs';
+import { tap } from 'rxjs/operators';
 import { convertGMTToLocal, formatDateForDisplay } from '../../shared/utils/time-converter.util';
 
 @Component({
@@ -39,9 +41,8 @@ import { convertGMTToLocal, formatDateForDisplay } from '../../shared/utils/time
   imports: [
     MatIconModule,
     MatTooltipModule,
-    MatDialogModule,
     ComponentVisibilityByRoleDirective,
-    ButtonComponent,
+    ButtonLoadingComponent,
     WeekPaginationComponent,
     CardGridComponent,
     GameCardComponent,
@@ -60,7 +61,8 @@ export class SchedulePage implements OnInit {
   private playerService = inject(PlayerService);
   private gameMetadataService = inject(GameMetadataService);
   private bannerService = inject(BannerService);
-  private dialog = inject(MatDialog);
+  private modalService = inject(ModalService);
+  private toast = inject(ToastService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 
@@ -81,6 +83,8 @@ export class SchedulePage implements OnInit {
 
   // Store raw game data for edit mode
   rawGames = new Map<string, DashboardGame>();
+  editingGameId = signal<string | null>(null);
+  isAddLoading = signal(false);
 
   ngOnInit(): void {
     this.loadInitialData();
@@ -533,13 +537,15 @@ export class SchedulePage implements OnInit {
   editSchedule(schedule: Schedule): void {
     const rawGameData = this.rawGames.get(schedule.id);
 
-    const dialogRef = this.dialog.open(ScheduleFormModal, {
+    this.modalService.openModal(ScheduleFormModal, {
+      name: 'Edit Game',
+      icon: 'event',
       width: '800px',
       maxWidth: '95vw',
-      disableClose: true,
+      preventBackdropClose: true,
       data: {
         schedule: schedule,
-        gameData: rawGameData, // Pass raw API data
+        gameData: rawGameData,
         isEditMode: true,
         teams: this.teams,
         arenas: this.arenas,
@@ -549,15 +555,33 @@ export class SchedulePage implements OnInit {
         gameTypes: this.gameTypes,
         gamePeriods: this.gamePeriods,
       } as ScheduleFormModalData,
-      panelClass: 'schedule-form-modal-dialog',
-    });
-
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result && result.success) {
-        // Reload the list without showing loading indicator
-        this.loadSchedules(false);
-        this.bannerService.triggerRefresh(); // Refresh the banner
-      }
+      onCloseWithDataProcessing: (result: {
+        isEditMode: boolean;
+        gameId?: number;
+        gameData: Record<string, unknown>;
+      }) => {
+        const apiCall = result.isEditMode
+          ? this.scheduleService.updateGame(result.gameId!, result.gameData)
+          : this.scheduleService.createGame(result.gameData);
+        apiCall.subscribe({
+          next: () => {
+            this.toast.show(
+              result.isEditMode ? 'Game updated successfully' : 'Game created successfully',
+              'success'
+            );
+            this.modalService.closeModal();
+            this.loadSchedules(false);
+            this.bannerService.triggerRefresh();
+          },
+          error: () => {
+            this.toast.show(
+              result.isEditMode ? 'Failed to update game' : 'Failed to create game',
+              'error'
+            );
+            this.modalService.broadcastEvent(ModalEvent.StopButtonLoading);
+          },
+        });
+      },
     });
   }
 
@@ -584,11 +608,12 @@ export class SchedulePage implements OnInit {
 
           // Refresh the banner
           this.bannerService.triggerRefresh();
+          this.toast.show('Game deleted successfully', 'success');
         },
         error: (error) => {
           this.deletingGameIds.delete(gameId);
           console.error('Error deleting game:', error);
-          alert('Error deleting game. Please try again.');
+          this.toast.show('Failed to delete game', 'error');
         },
       });
     }
@@ -603,10 +628,63 @@ export class SchedulePage implements OnInit {
   }
 
   openAddScheduleModal(): void {
-    const dialogRef = this.dialog.open(ScheduleFormModal, {
+    if (this.isMetadataLoaded()) {
+      this.openScheduleFormModal();
+      return;
+    }
+
+    this.isAddLoading.set(true);
+    this.loadMetadata().subscribe({
+      next: () => {
+        this.isAddLoading.set(false);
+        this.openScheduleFormModal();
+      },
+      error: () => {
+        this.isAddLoading.set(false);
+        this.toast.show('Failed to load form data', 'error');
+      },
+    });
+  }
+
+  private isMetadataLoaded(): boolean {
+    return (
+      this.teams.length > 0 &&
+      this.arenas.length > 0 &&
+      this.rinks.length > 0 &&
+      this.gameTypes.length > 0 &&
+      this.gamePeriods.length > 0
+    );
+  }
+
+  private loadMetadata() {
+    return forkJoin({
+      teams: this.teamService.getTeams(),
+      arenas: this.arenaService.getArenas(),
+      rinks: this.arenaService.getAllRinks(),
+      goalies: this.goalieService.getGoalies(),
+      players: this.playerService.getPlayers(),
+      gameTypes: this.gameMetadataService.getGameTypes(),
+      gamePeriods: this.gameMetadataService.getGamePeriods(),
+    }).pipe(
+      tap(({ teams, arenas, rinks, goalies, players, gameTypes, gamePeriods }) => {
+        this.teams = teams.teams;
+        this.arenas = arenas;
+        this.rinks = rinks;
+        this.goalies = goalies.goalies;
+        this.players = players.players;
+        this.gameTypes = gameTypes;
+        this.gamePeriods = gamePeriods;
+      })
+    );
+  }
+
+  private openScheduleFormModal(): void {
+    this.modalService.openModal(ScheduleFormModal, {
+      name: 'Add Game',
+      icon: 'event',
       width: '800px',
       maxWidth: '95vw',
-      disableClose: true,
+      preventBackdropClose: true,
       data: {
         isEditMode: false,
         teams: this.teams,
@@ -617,15 +695,33 @@ export class SchedulePage implements OnInit {
         gameTypes: this.gameTypes,
         gamePeriods: this.gamePeriods,
       } as ScheduleFormModalData,
-      panelClass: 'schedule-form-modal-dialog',
-    });
-
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result && result.success) {
-        // Reload the list without showing loading indicator
-        this.loadSchedules(false);
-        this.bannerService.triggerRefresh(); // Refresh the banner
-      }
+      onCloseWithDataProcessing: (result: {
+        isEditMode: boolean;
+        gameId?: number;
+        gameData: Record<string, unknown>;
+      }) => {
+        const apiCall = result.isEditMode
+          ? this.scheduleService.updateGame(result.gameId!, result.gameData)
+          : this.scheduleService.createGame(result.gameData);
+        apiCall.subscribe({
+          next: () => {
+            this.toast.show(
+              result.isEditMode ? 'Game updated successfully' : 'Game created successfully',
+              'success'
+            );
+            this.modalService.closeModal();
+            this.loadSchedules(false);
+            this.bannerService.triggerRefresh();
+          },
+          error: () => {
+            this.toast.show(
+              result.isEditMode ? 'Failed to update game' : 'Failed to create game',
+              'error'
+            );
+            this.modalService.broadcastEvent(ModalEvent.StopButtonLoading);
+          },
+        });
+      },
     });
   }
 

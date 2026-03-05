@@ -1,16 +1,22 @@
-import { Component, OnInit, computed, signal, inject } from '@angular/core';
+import { Component, OnInit, computed, signal, inject, Type } from '@angular/core';
 import { Location } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
-import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { Observable, map } from 'rxjs';
+import { ModalService, ModalEvent } from '../../services/modal.service';
+import { ToastService } from '../../services/toast.service';
 import { AnalysisService } from '../../services/analysis.service';
-import { Analysis, AnalysisType } from '../../shared/interfaces/analysis.interface';
+import { PlayerService } from '../../services/player.service';
+import { GoalieService } from '../../services/goalie.service';
+import { TeamService } from '../../services/team.service';
+import { ScheduleService } from '../../services/schedule.service';
+import { Analysis, AnalysisApiIn, AnalysisType } from '../../shared/interfaces/analysis.interface';
 import { ANALYSIS_TABS, ANALYSIS_TYPE_CONFIG } from '../../shared/constants/analysis.constants';
 import {
   DataTableComponent,
   TableColumn,
   TableAction,
 } from '../../shared/components/data-table/data-table.component';
-import { ButtonComponent } from '../../shared/components/buttons/button/button.component';
+import { ButtonLoadingComponent } from '../../shared/components/buttons/button-loading/button-loading.component';
 import {
   TabsSliderComponent,
   TabItem,
@@ -26,7 +32,7 @@ import { GameAnalysisModal } from '../../shared/components/game-analysis-modal/g
   selector: 'app-analytics',
   imports: [
     DataTableComponent,
-    ButtonComponent,
+    ButtonLoadingComponent,
     TabsSliderComponent,
     ComponentVisibilityByRoleDirective,
   ],
@@ -36,8 +42,13 @@ import { GameAnalysisModal } from '../../shared/components/game-analysis-modal/g
 export class AnalyticsPage implements OnInit {
   private route = inject(ActivatedRoute);
   private location = inject(Location);
-  private dialog = inject(MatDialog);
+  private modalService = inject(ModalService);
   private analysisService = inject(AnalysisService);
+  private toast = inject(ToastService);
+  private playerService = inject(PlayerService);
+  private goalieService = inject(GoalieService);
+  private teamService = inject(TeamService);
+  private scheduleService = inject(ScheduleService);
 
   protected visibilityByRoleMap = visibilityByRoleMap;
 
@@ -50,6 +61,7 @@ export class AnalyticsPage implements OnInit {
   activeTab = signal<AnalysisType>('team');
   analyses = signal<Analysis[]>([]);
   loading = signal(true);
+  isCreateLoading = signal(false);
   showTabs = signal(true);
 
   activeTabIndex = computed(() => ANALYSIS_TABS.findIndex((tab) => tab.key === this.activeTab()));
@@ -104,13 +116,55 @@ export class AnalyticsPage implements OnInit {
   }
 
   onCreateAnalysis(): void {
-    const dialogRef = this.openModal(this.activeTab(), { isEditMode: false });
+    this.isCreateLoading.set(true);
+    const type = this.activeTab();
 
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
-        this.loadAnalyses();
-      }
+    this.loadEntityOptions(type).subscribe({
+      next: (entityOptions) => {
+        this.isCreateLoading.set(false);
+        this.openAnalysisModal(type, { isEditMode: false, entityOptions });
+      },
+      error: () => {
+        this.isCreateLoading.set(false);
+        this.toast.show('Failed to load data', 'error');
+      },
     });
+  }
+
+  private loadEntityOptions(
+    type: AnalysisType
+  ): Observable<{ value: string; label: string }[]> {
+    const loaderMap: Record<AnalysisType, Observable<{ value: string; label: string }[]>> = {
+      player: this.playerService
+        .getPlayers()
+        .pipe(
+          map((r) => r.players.map((p) => ({ value: p.id, label: `${p.firstName} ${p.lastName}` })))
+        ),
+      goalie: this.goalieService
+        .getGoalies()
+        .pipe(
+          map((r) =>
+            r.goalies.map((g) => ({ value: g.id, label: `${g.firstName} ${g.lastName}` }))
+          )
+        ),
+      team: this.teamService
+        .getTeams()
+        .pipe(
+          map((r) => r.teams.map((t) => ({ value: String(t.id), label: t.name })))
+        ),
+      game: this.scheduleService
+        .getGameList()
+        .pipe(
+          map((games) =>
+            games.map((g) => ({
+              value: String(g.id),
+              label: `${g.away_team_name} at ${g.home_team_name} - ${g.date ?? ''}`,
+            }))
+          )
+        ),
+    };
+
+    return loaderMap[type];
   }
 
   onTableAction(event: { action: string; item: Analysis }): void {
@@ -125,27 +179,49 @@ export class AnalyticsPage implements OnInit {
   }
 
   private onEditAnalysis(analysis: Analysis): void {
-    const dialogRef = this.openModal(analysis.type, { analysis, isEditMode: true });
-
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
-        this.loadAnalyses();
-      }
-    });
+    this.openAnalysisModal(analysis.type, { analysis, isEditMode: true });
   }
 
-  private openModal(type: AnalysisType, data: Record<string, unknown>): MatDialogRef<unknown> {
-    const config = { width: '600px', data };
-    switch (type) {
-      case 'player':
-        return this.dialog.open(PlayerAnalysisModal, config);
-      case 'goalie':
-        return this.dialog.open(GoalieAnalysisModal, config);
-      case 'team':
-        return this.dialog.open(TeamAnalysisModal, config);
-      case 'game':
-        return this.dialog.open(GameAnalysisModal, config);
-    }
+  private openAnalysisModal(type: AnalysisType, data: Record<string, unknown>): void {
+    const componentMap: Record<AnalysisType, Type<unknown>> = {
+      player: PlayerAnalysisModal,
+      goalie: GoalieAnalysisModal,
+      team: TeamAnalysisModal,
+      game: GameAnalysisModal,
+    };
+
+    this.modalService.openModal(componentMap[type], {
+      name: 'Create Analysis',
+      icon: 'analytics',
+      width: '600px',
+      data,
+      onCloseWithDataProcessing: (result: {
+        isEditMode: boolean;
+        analysisId?: number;
+        apiData: AnalysisApiIn;
+      }) => {
+        const apiCall = result.isEditMode
+          ? this.analysisService.updateAnalysis(String(result.analysisId!), result.apiData)
+          : this.analysisService.createAnalysis(result.apiData);
+        apiCall.subscribe({
+          next: () => {
+            this.toast.show(
+              result.isEditMode ? 'Analysis updated successfully' : 'Analysis created successfully',
+              'success'
+            );
+            this.modalService.closeModal();
+            this.loadAnalyses();
+          },
+          error: () => {
+            this.toast.show(
+              result.isEditMode ? 'Failed to update analysis' : 'Failed to create analysis',
+              'error'
+            );
+            this.modalService.broadcastEvent(ModalEvent.StopButtonLoading);
+          },
+        });
+      },
+    });
   }
 
   private onDeleteAnalysis(analysis: Analysis): void {

@@ -7,11 +7,11 @@
     <app-tabs-slider
       [items]="tabItems"
       [activeTabIndex]="activeTabIndexValue"
-      (onSelect)="onTabChange($event)"
+      (selected)="onTabChange($event)"
     ></app-tabs-slider>
 
     <div role-visibility-name="add-player-button" class="add-button-wrapper">
-      <app-button
+      <app-button-loading
         materialIcon="add"
         [bg]="'primary'"
         [bghover]="'primary'"
@@ -21,7 +21,7 @@
         (clicked)="openAddModal()"
       >
         Add Player
-      </app-button>
+      </app-button-loading>
     </div>
   </div>
 

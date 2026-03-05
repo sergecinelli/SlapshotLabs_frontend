@@ -1,18 +1,20 @@
 import { Component, OnInit, computed, signal, inject } from '@angular/core';
 import { Location } from '@angular/common';
 import { Router } from '@angular/router';
-import { MatDialog } from '@angular/material/dialog';
+import { ModalService, ModalEvent } from '../../services/modal.service';
+import { ToastService } from '../../services/toast.service';
 import { AuthService } from '../../services/auth.service';
 import { BreadcrumbDataService } from '../../services/breadcrumb-data.service';
 import { TeamService } from '../../services/team.service';
 import { TryoutService } from '../../services/tryout.service';
 import { TryoutEntry, TryoutTabType } from '../../shared/interfaces/tryout.interface';
+import { forkJoin } from 'rxjs';
 import {
   DataTableComponent,
   TableColumn,
   TableAction,
 } from '../../shared/components/data-table/data-table.component';
-import { ButtonComponent } from '../../shared/components/buttons/button/button.component';
+import { ButtonLoadingComponent } from '../../shared/components/buttons/button-loading/button-loading.component';
 import {
   TabsSliderComponent,
   TabItem,
@@ -33,7 +35,7 @@ const TRYOUT_TABS: TabItem[] = [
   selector: 'app-tryout',
   imports: [
     DataTableComponent,
-    ButtonComponent,
+    ButtonLoadingComponent,
     TabsSliderComponent,
     ComponentVisibilityByRoleDirective,
   ],
@@ -43,11 +45,12 @@ const TRYOUT_TABS: TabItem[] = [
 export class TryoutPage implements OnInit {
   private location = inject(Location);
   private router = inject(Router);
-  private dialog = inject(MatDialog);
+  private modalService = inject(ModalService);
   private authService = inject(AuthService);
   private breadcrumbData = inject(BreadcrumbDataService);
   private teamService = inject(TeamService);
   private tryoutService = inject(TryoutService);
+  private toast = inject(ToastService);
 
   protected visibilityByRoleMap = visibilityByRoleMap;
 
@@ -146,21 +149,32 @@ export class TryoutPage implements OnInit {
     const teamId = this.teamId();
     if (!teamId) return;
 
-    const dialogRef = this.dialog.open(TryoutAddModal, {
+    this.modalService.openModal(TryoutAddModal, {
+      name: 'Add Player to Tryout',
+      icon: 'person_add',
       width: '800px',
       maxWidth: '95vw',
       data: {
         activeTab: this.activeTab(),
         teamId,
       } as TryoutAddModalData,
-      panelClass: 'tryout-add-modal-dialog',
-      disableClose: true,
-    });
-
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
-        this.loadEntries();
-      }
+      preventBackdropClose: true,
+      onCloseWithDataProcessing: (result: { entries: Partial<TryoutEntry>[] }) => {
+        const requests = result.entries.map((entry) =>
+          this.tryoutService.addToTryout(teamId, entry)
+        );
+        forkJoin(requests).subscribe({
+          next: () => {
+            this.toast.show('Player(s) added to tryout successfully', 'success');
+            this.modalService.closeModal();
+            this.loadEntries();
+          },
+          error: () => {
+            this.toast.show('Failed to add player(s) to tryout', 'error');
+            this.modalService.broadcastEvent(ModalEvent.StopButtonLoading);
+          },
+        });
+      },
     });
   }
 

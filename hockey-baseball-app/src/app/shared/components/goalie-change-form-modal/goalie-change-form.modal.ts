@@ -1,7 +1,8 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { MatDialogRef, MatDialogModule, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { ModalEvent, ModalService } from '../../../services/modal.service';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
@@ -11,7 +12,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { TeamService } from '../../../services/team.service';
 import { GoalieService } from '../../../services/goalie.service';
 import { GameMetadataService } from '../../../services/game-metadata.service';
-import { GameEventService, GoalieChangeEventRequest } from '../../../services/game-event.service';
+import { GoalieChangeEventRequest } from '../../../services/game-event.service';
 import { ButtonComponent } from '../buttons/button/button.component';
 import { ButtonLoadingComponent } from '../buttons/button-loading/button-loading.component';
 import { environment } from '../../../../environments/environment';
@@ -31,7 +32,7 @@ export interface GoalieChangeFormData {
   imports: [
     CachedSrcDirective,
     ReactiveFormsModule,
-    MatDialogModule,
+
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
@@ -45,12 +46,11 @@ export interface GoalieChangeFormData {
 })
 export class GoalieChangeFormModal implements OnInit {
   private fb = inject(FormBuilder);
-  private dialogRef = inject<MatDialogRef<GoalieChangeFormModal>>(MatDialogRef);
+  private modalService = inject(ModalService);
   private teamService = inject(TeamService);
   private goalieService = inject(GoalieService);
   private gameMetadataService = inject(GameMetadataService);
-  private gameEventService = inject(GameEventService);
-  private dialogData = inject<{
+  private dialogData = inject(ModalService).getModalData<{
     gameId: number;
     goalieChangeEventId: number;
     periodOptions?: { value: number; label: string }[];
@@ -70,7 +70,7 @@ export class GoalieChangeFormModal implements OnInit {
       goalieId?: number;
       note?: string;
     };
-  }>(MAT_DIALOG_DATA);
+  }>();
 
   gameId: number;
   goalieChangeEventId: number;
@@ -88,7 +88,7 @@ export class GoalieChangeFormModal implements OnInit {
   isLoadingTeams = false;
   isLoadingGoalies = false;
   isLoadingPeriods = false;
-  isSubmitting = false;
+  isSubmitting = signal(false);
 
   constructor() {
     this.goalieChangeForm = this.createForm();
@@ -97,6 +97,12 @@ export class GoalieChangeFormModal implements OnInit {
     this.isEditMode = this.dialogData.isEditMode || false;
     this.eventId = this.dialogData.eventId;
     this.setupTeamChangeListener();
+
+    this.modalService.onEvent$.pipe(takeUntilDestroyed()).subscribe((event) => {
+      if (event === ModalEvent.StopButtonLoading) {
+        this.isSubmitting.set(false);
+      }
+    });
   }
 
   ngOnInit(): void {
@@ -331,8 +337,8 @@ export class GoalieChangeFormModal implements OnInit {
   }
 
   onSubmit(): void {
-    if (this.goalieChangeForm.valid && !this.isSubmitting) {
-      this.isSubmitting = true;
+    if (this.goalieChangeForm.valid && !this.isSubmitting()) {
+      this.isSubmitting.set(true);
       const formValue = this.goalieChangeForm.value;
 
       // Convert mm:ss to time-of-day like shots (HH:mm:ss.SSSZ with 00 hours)
@@ -346,7 +352,7 @@ export class GoalieChangeFormModal implements OnInit {
           ? formValue.goalie
           : undefined;
 
-      const goalieChangeRequest: GoalieChangeEventRequest = {
+      const requestData: GoalieChangeEventRequest = {
         game_id: this.gameId,
         event_name_id: this.goalieChangeEventId,
         team_id: formValue.team,
@@ -356,45 +362,11 @@ export class GoalieChangeFormModal implements OnInit {
         note: formValue.note || undefined,
       };
 
-      // Edit or create based on mode
-      if (this.isEditMode && this.eventId) {
-        this.gameEventService.updateGameEvent(this.eventId, goalieChangeRequest).subscribe({
-          next: () => {
-            this.isSubmitting = false;
-            // Ensure caller always receives a truthy value to trigger refresh
-            this.dialogRef.close(true);
-          },
-          error: (error) => {
-            console.error('Failed to update goalie change event:', error);
-            this.isSubmitting = false;
-            alert('Failed to update goalie change event. Please try again.');
-          },
-        });
-      } else {
-        this.gameEventService.createGoalieChangeEvent(goalieChangeRequest).subscribe({
-          next: () => {
-            // Find selected team and goalie for display
-            const selectedTeam = this.teamOptions.find((t) => t.value === formValue.team);
-            const selectedGoalie = this.goalieOptions.find((g) => g.value === formValue.goalie);
-
-            const goalieChangeData: GoalieChangeFormData = {
-              teamLogo: selectedTeam?.logo || '',
-              teamName: selectedTeam?.label || '',
-              goalieName: selectedGoalie?.label || '',
-              period: formValue.period.toString(),
-              time: formValue.time,
-              note: formValue.note,
-            };
-
-            this.isSubmitting = false;
-            this.dialogRef.close(goalieChangeData);
-          },
-          error: (error) => {
-            console.error('Failed to create goalie change event:', error);
-            this.isSubmitting = false;
-          },
-        });
-      }
+      this.modalService.closeWithDataProcessing({
+        isEditMode: this.isEditMode,
+        eventId: this.eventId,
+        requestData,
+      });
     } else if (!this.goalieChangeForm.valid) {
       // Mark all fields as touched to show validation errors
       Object.keys(this.goalieChangeForm.controls).forEach((key) => {
@@ -404,7 +376,7 @@ export class GoalieChangeFormModal implements OnInit {
   }
 
   onCancel(): void {
-    this.dialogRef.close();
+    this.modalService.closeModal();
   }
 
   getErrorMessage(fieldName: string): string {

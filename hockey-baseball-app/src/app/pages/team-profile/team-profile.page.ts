@@ -1,16 +1,19 @@
-import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatTableModule } from '@angular/material/table';
-import { MatDialog } from '@angular/material/dialog';
+import { ModalService, ModalEvent } from '../../services/modal.service';
+import { ToastService } from '../../services/toast.service';
 import { TeamService } from '../../services/team.service';
 import { PlayerService } from '../../services/player.service';
 import { GoalieService } from '../../services/goalie.service';
 import { ScheduleService } from '../../services/schedule.service';
 import { GameMetadataService } from '../../services/game-metadata.service';
 import { ArenaService } from '../../services/arena.service';
+import { TeamOptionsService } from '../../services/team-options.service';
+import { TeamLevel, Division } from '../../shared/interfaces/team-level.interface';
 import { Team, TeamSeasonStat } from '../../shared/interfaces/team.interface';
 import { Rink } from '../../shared/interfaces/arena.interface';
 import { Player } from '../../shared/interfaces/player.interface';
@@ -19,6 +22,7 @@ import { TeamFormModal } from '../../shared/components/team-form-modal/team-form
 import { BreadcrumbDataService } from '../../services/breadcrumb-data.service';
 import { ComponentVisibilityByRoleDirective } from '../../shared/directives/component-visibility-by-role.directive';
 import { ButtonComponent } from '../../shared/components/buttons/button/button.component';
+import { ButtonLoadingComponent } from '../../shared/components/buttons/button-loading/button-loading.component';
 import { visibilityByRoleMap } from './team-profile.role-map';
 import { forkJoin, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -65,6 +69,7 @@ export interface TeamPlayer {
     MatTableModule,
     ComponentVisibilityByRoleDirective,
     ButtonComponent,
+    ButtonLoadingComponent,
   ],
   templateUrl: './team-profile.page.html',
   styleUrl: './team-profile.page.scss',
@@ -81,12 +86,15 @@ export class TeamProfilePage implements OnInit, OnDestroy {
   private scheduleService = inject(ScheduleService);
   private gameMetadataService = inject(GameMetadataService);
   private arenaService = inject(ArenaService);
-  private dialog = inject(MatDialog);
+  private modalService = inject(ModalService);
   private breadcrumbData = inject(BreadcrumbDataService);
+  private toast = inject(ToastService);
+  private teamOptionsService = inject(TeamOptionsService);
 
   private destroy$ = new Subject<void>();
 
   team: Team | null = null;
+  isEditLoading = signal(false);
   roster: (Player | Goalie)[] = [];
   loading = true;
   loadingRoster = false;
@@ -359,38 +367,55 @@ export class TeamProfilePage implements OnInit, OnDestroy {
   onEditTeamProfile(): void {
     if (!this.team) return;
 
-    const dialogRef = this.dialog.open(TeamFormModal, {
+    this.isEditLoading.set(true);
+    forkJoin({
+      ageGroups: this.teamOptionsService.getTeamAgeGroups(),
+      levels: this.teamOptionsService.getTeamLevels(),
+      divisions: this.teamOptionsService.getDivisions(),
+    }).subscribe({
+      next: ({ ageGroups, levels, divisions }) => {
+        this.isEditLoading.set(false);
+        this.openEditModal(ageGroups, levels, divisions);
+      },
+      error: () => {
+        this.isEditLoading.set(false);
+        this.toast.show('Failed to load form data', 'error');
+      },
+    });
+  }
+
+  private openEditModal(ageGroups: string[], levels: TeamLevel[], divisions: Division[]): void {
+    this.modalService.openModal(TeamFormModal, {
+      name: 'Edit Team',
+      icon: 'groups',
       width: '800px',
       maxWidth: '95vw',
       data: {
         team: this.team,
         isEditMode: true,
+        ageGroups,
+        levels,
+        divisions,
       },
-      panelClass: 'team-form-modal-dialog',
-      disableClose: true,
-    });
+      preventBackdropClose: true,
+      onCloseWithDataProcessing: (
+        result: Partial<Team> & { logoFile?: File; logoRemoved?: boolean }
+      ) => {
+        if (!this.team?.id) return;
 
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
-        this.updateTeam(result);
-      }
-    });
-  }
+        const { logoFile, logoRemoved, ...team } = result;
 
-  private updateTeam(teamData: Partial<Team> & { logoFile?: File; logoRemoved?: boolean }): void {
-    if (!this.team?.id) return;
-
-    this.loading = true;
-    const { logoFile, logoRemoved, ...team } = teamData;
-
-    this.teamService.updateTeam(this.team.id, team, logoFile, logoRemoved).subscribe({
-      next: (updatedTeam) => {
-        this.team = updatedTeam;
-        this.loading = false;
-      },
-      error: (error) => {
-        console.error('Error updating team:', error);
-        this.loading = false;
+        this.teamService.updateTeam(this.team.id, team, logoFile, logoRemoved).subscribe({
+          next: (updatedTeam) => {
+            this.toast.show('Team updated successfully', 'success');
+            this.modalService.closeModal();
+            this.team = updatedTeam;
+          },
+          error: () => {
+            this.toast.show('Failed to update team', 'error');
+            this.modalService.broadcastEvent(ModalEvent.StopButtonLoading);
+          },
+        });
       },
     });
   }

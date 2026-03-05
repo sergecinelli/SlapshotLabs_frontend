@@ -1,15 +1,14 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
+import { ModalService, ModalEvent } from '../../../services/modal.service';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
-import { forkJoin } from 'rxjs';
 import { PlayerService } from '../../../services/player.service';
 import { GoalieService } from '../../../services/goalie.service';
-import { TryoutService } from '../../../services/tryout.service';
 import { TryoutEntry, TryoutTabType } from '../../interfaces/tryout.interface';
 import { Player } from '../../interfaces/player.interface';
 import { Goalie } from '../../interfaces/goalie.interface';
@@ -27,7 +26,6 @@ export interface TryoutAddModalData {
   selector: 'app-tryout-add-modal',
   imports: [
     ReactiveFormsModule,
-    MatDialogModule,
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
@@ -42,19 +40,18 @@ export interface TryoutAddModalData {
 })
 export class TryoutAddModal implements OnInit {
   private fb = inject(FormBuilder);
-  private dialogRef = inject<MatDialogRef<TryoutAddModal>>(MatDialogRef);
+  private modalService = inject(ModalService);
   private playerService = inject(PlayerService);
   private goalieService = inject(GoalieService);
-  private tryoutService = inject(TryoutService);
   private positionService = inject(PositionService);
-  data = inject<TryoutAddModalData>(MAT_DIALOG_DATA);
+  data = inject(ModalService).getModalData<TryoutAddModalData>();
 
   playerForm!: FormGroup;
   allEntries = signal<TryoutEntry[]>([]);
   selectedIds = signal<(string | number)[]>([]);
   searchText = signal('');
   showCreateForm = signal(false);
-  isLoading = false;
+  isSubmitting = signal(false);
   positionOptions: PositionOption[] = [];
 
   selectedEntries = computed(() => {
@@ -82,6 +79,14 @@ export class TryoutAddModal implements OnInit {
 
   get isGoalie(): boolean {
     return this.data.activeTab === 'goalie';
+  }
+
+  constructor() {
+    this.modalService.onEvent$.pipe(takeUntilDestroyed()).subscribe((event) => {
+      if (event === ModalEvent.StopButtonLoading) {
+        this.isSubmitting.set(false);
+      }
+    });
   }
 
   ngOnInit(): void {
@@ -138,17 +143,8 @@ export class TryoutAddModal implements OnInit {
     const entries = this.selectedEntries();
     if (!entries.length) return;
 
-    this.isLoading = true;
-    const requests = entries.map((entry) =>
-      this.tryoutService.addToTryout(this.data.teamId, entry)
-    );
-    forkJoin(requests).subscribe({
-      next: () => this.dialogRef.close(true),
-      error: (error) => {
-        console.error('Failed to add to tryout:', error);
-        this.isLoading = false;
-      },
-    });
+    this.isSubmitting.set(true);
+    this.modalService.closeWithDataProcessing({ entries });
   }
 
   onSubmitNew(): void {
@@ -163,14 +159,8 @@ export class TryoutAddModal implements OnInit {
         type: this.data.activeTab,
       };
 
-      this.isLoading = true;
-      this.tryoutService.addToTryout(this.data.teamId, entry).subscribe({
-        next: () => this.dialogRef.close(true),
-        error: (error) => {
-          console.error('Failed to add to tryout:', error);
-          this.isLoading = false;
-        },
-      });
+      this.isSubmitting.set(true);
+      this.modalService.closeWithDataProcessing({ entries: [entry] });
     } else {
       Object.keys(this.playerForm.controls).forEach((key) => {
         this.playerForm.get(key)?.markAsTouched();
@@ -179,7 +169,7 @@ export class TryoutAddModal implements OnInit {
   }
 
   onCancel(): void {
-    this.dialogRef.close();
+    this.modalService.closeModal();
   }
 
   getErrorMessage(fieldName: string): string {

@@ -4,12 +4,7 @@
 @let selectedIndexValue = selectedIndex();
 
 <div class="highlight-reel-view-modal">
-  <h2 mat-dialog-title class="modal-title">
-    <span class="material-symbols-rounded title-icon">play_circle</span>
-    View Highlight Reel — {{ data.reelName }}
-  </h2>
-
-  <mat-dialog-content class="modal-content">
+  <div class="modal-content">
     <div class="two-column-layout">
       <!-- LEFT: YouTube Player -->
       <div class="column left">
@@ -72,9 +67,9 @@
         }
       </div>
     </div>
-  </mat-dialog-content>
+  </div>
 
-  <mat-dialog-actions class="modal-actions">
+  <div class="modal-actions">
     <app-button
       [bg]="'transparent'"
       [bghover]="'button_background'"
@@ -90,5 +85,5 @@
     >
       Close
     </app-button>
-  </mat-dialog-actions>
+  </div>
 </div>

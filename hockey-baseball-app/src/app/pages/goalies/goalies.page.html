@@ -2,7 +2,6 @@
 @let goaliesValue = goalies();
 @let layoutModeValue = layoutMode();
 @let teamIdValue = teamId();
-@let pageTitleValue = pageTitle();
 
 <div class="page-content" [appVisibilityMap]="visibilityByRoleMap">
   <!-- Header with Add Button -->
@@ -29,7 +28,7 @@
         role-visibility-name="add-goalie-button"
         [attr.role-visibility-team-id]="teamIdValue"
       >
-        <app-button
+        <app-button-loading
           materialIcon="add"
           [bg]="'primary'"
           [bghover]="'primary_dark'"
@@ -40,10 +39,11 @@
           [width]="'auto'"
           [rounded]="false"
           [haveContent]="true"
+          [isLoading]="isAddLoading()"
           (clicked)="openAddGoalieModal()"
         >
           Add a Goalie
-        </app-button>
+        </app-button-loading>
       </div>
     </div>
   </div>
@@ -81,13 +81,14 @@
                   [materialIcon]="'visibility'"
                   [matTooltip]="'Profile'"
                 />
-                <app-button
+                <app-button-loading
                   [bg]="'transparent'"
                   [bghover]="'gray_tone3'"
                   [color]="'text_secondary'"
                   [colorhover]="'orange_dark'"
                   [materialIcon]="'stylus'"
-                  [matTooltip]="'Edit'"
+                  [tooltip]="'Edit'"
+                  [isLoading]="editingGoalieId() === goalie.id"
                   (clicked)="editGoalie(goalie)"
                 />
                 <app-button

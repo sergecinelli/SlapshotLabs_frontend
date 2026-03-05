@@ -1,13 +1,17 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatTableModule } from '@angular/material/table';
-import { MatDialog } from '@angular/material/dialog';
+import { ModalService, ModalEvent } from '../../services/modal.service';
+import { ToastService } from '../../services/toast.service';
 import { MatIconModule } from '@angular/material/icon';
 import { forkJoin } from 'rxjs';
 import { PlayerService } from '../../services/player.service';
+import { TeamService } from '../../services/team.service';
+import { PositionService, PositionOption } from '../../services/position.service';
+import { Team } from '../../shared/interfaces/team.interface';
 import {
   Player,
   PlayerSeasonStats,
@@ -32,6 +36,7 @@ import {
 } from '../../services/spray-chart-utils.service';
 import { ComponentVisibilityByRoleDirective } from '../../shared/directives/component-visibility-by-role.directive';
 import { ButtonComponent } from '../../shared/components/buttons/button/button.component';
+import { ButtonLoadingComponent } from '../../shared/components/buttons/button-loading/button-loading.component';
 import { visibilityByRoleMap } from './player-profile.role-map';
 import { StorageKey } from '../../services/local-storage.service';
 import { BreadcrumbDataService } from '../../services/breadcrumb-data.service';
@@ -49,6 +54,7 @@ import { CachedSrcDirective } from '../../shared/directives/cached-src.directive
     ShotLocationDisplayComponent,
     ComponentVisibilityByRoleDirective,
     ButtonComponent,
+    ButtonLoadingComponent,
   ],
   templateUrl: './player-profile.page.html',
   styleUrl: './player-profile.page.scss',
@@ -61,14 +67,18 @@ export class PlayerProfilePage implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private playerService = inject(PlayerService);
-  private dialog = inject(MatDialog);
+  private modalService = inject(ModalService);
   private seasonService = inject(SeasonService);
   private gameEventNameService = inject(GameEventNameService);
   private gameMetadataService = inject(GameMetadataService);
   private sprayChartUtils = inject(SprayChartUtilsService);
   private breadcrumbData = inject(BreadcrumbDataService);
+  private toast = inject(ToastService);
+  private teamService = inject(TeamService);
+  private positionService = inject(PositionService);
 
   player: Player | null = null;
+  isEditLoading = signal(false);
   loading = true;
   shotLocationData: ShotLocationData[] = [];
   seasonStats: PlayerSeasonStats[] = [];
@@ -229,36 +239,49 @@ export class PlayerProfilePage implements OnInit {
   onEditProfile(): void {
     if (!this.player) return;
 
-    const dialogRef = this.dialog.open(PlayerFormModal, {
+    this.isEditLoading.set(true);
+    forkJoin({
+      teams: this.teamService.getTeams(),
+      positions: this.positionService.getPositions(),
+    }).subscribe({
+      next: ({ teams, positions }) => {
+        this.isEditLoading.set(false);
+        this.openEditModal(teams.teams, positions);
+      },
+      error: () => {
+        this.isEditLoading.set(false);
+        this.toast.show('Failed to load form data', 'error');
+      },
+    });
+  }
+
+  private openEditModal(teams: Team[], positions: PositionOption[]): void {
+    this.modalService.openModal(PlayerFormModal, {
+      name: 'Edit Player',
+      icon: 'sports_hockey',
       width: '800px',
       maxWidth: '95vw',
       data: {
         player: this.player,
         isEditMode: true,
+        teams,
+        positions,
       },
-      panelClass: 'player-form-modal-dialog',
-      disableClose: true,
-    });
+      preventBackdropClose: true,
+      onCloseWithDataProcessing: (result) => {
+        if (!this.player?.id) return;
 
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
-        this.updatePlayer(result);
-      }
-    });
-  }
-
-  private updatePlayer(playerData: Partial<Player>): void {
-    if (!this.player?.id) return;
-
-    this.loading = true;
-    this.playerService.updatePlayer(this.player.id, playerData).subscribe({
-      next: (updatedPlayer) => {
-        this.player = updatedPlayer;
-        this.loading = false;
-      },
-      error: (error) => {
-        console.error('Error updating player:', error);
-        this.loading = false;
+        this.playerService.updatePlayer(this.player.id, result).subscribe({
+          next: (updatedPlayer) => {
+            this.toast.show('Player updated successfully', 'success');
+            this.modalService.closeModal();
+            this.player = updatedPlayer;
+          },
+          error: () => {
+            this.toast.show('Failed to update player', 'error');
+            this.modalService.broadcastEvent(ModalEvent.StopButtonLoading);
+          },
+        });
       },
     });
   }

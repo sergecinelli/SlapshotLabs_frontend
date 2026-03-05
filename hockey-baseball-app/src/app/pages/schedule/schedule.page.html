@@ -15,7 +15,7 @@
       (weekChange)="onMonthChange($event)"
     />
     <div class="add-schedule-button-wrapper">
-      <app-button
+      <app-button-loading
         role-visibility-name="add-schedule-button"
         [bg]="'primary'"
         [bghover]="'primary_dark'"
@@ -23,10 +23,11 @@
         [colorhover]="'white'"
         [materialIcon]="'add'"
         [haveContent]="true"
+        [isLoading]="isAddLoading()"
         (clicked)="openAddScheduleModal()"
       >
         Add to Schedule
-      </app-button>
+      </app-button-loading>
     </div>
   </div>
 
@@ -53,6 +54,7 @@
           [showActions]="true"
           [showScore]="true"
           [isDeleting]="deletingGameIds.has(schedule.id)"
+          [isEditLoading]="editingGameId() === schedule.id"
           (edit)="editSchedule($event)"
           (delete)="deleteSchedule($event)"
           (analysis)="viewGameAnalysis($event)"

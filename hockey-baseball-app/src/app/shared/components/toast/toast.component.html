@@ -1,0 +1,37 @@
+@let toastData = toast();
+@let visibleValue = isVisible();
+@let removingValue = isRemoving();
+@let borderCol = borderColor();
+@let iconName = icon();
+@let toastClassValue = toastClass();
+
+<div class="toast-wrapper" [class.visible]="visibleValue" [class.removing]="removingValue">
+  <div [class]="toastClassValue">
+    <div class="toast-content">
+      <span class="material-symbols-rounded icon" [style.color]="borderCol">
+        {{ iconName }}
+      </span>
+
+      <div class="toast-message">
+        {{ toastData.content }}
+      </div>
+
+      <div class="toast-actions">
+        <app-button
+          [materialIcon]="'close'"
+          [bg]="'transparent'"
+          [color]="'text_primary'"
+          (clicked)="close()"
+        />
+      </div>
+    </div>
+
+    <div class="toast-progress">
+      <div
+        class="toast-progress-bar"
+        [style.background-color]="borderCol"
+        [style.animation-duration]="toastData.showSeconds + 'ms'"
+      ></div>
+    </div>
+  </div>
+</div>
