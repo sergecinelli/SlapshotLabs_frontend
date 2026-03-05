@@ -271,8 +271,17 @@ export class AnalyticsPage implements OnInit {
       game: GameAnalysisModal,
     };
 
+    const labelMap: Record<AnalysisType, string> = {
+      player: 'Player',
+      goalie: 'Goalie',
+      team: 'Team',
+      game: 'Game',
+    };
+
+    const label = labelMap[type];
+
     this.modalService.openModal(componentMap[type], {
-      name: data['isEditMode'] ? 'Edit Analysis' : 'Create Analysis',
+      name: data['isEditMode'] ? `Edit ${label} Analysis` : `Create ${label} Analysis`,
       icon: 'bar_chart',
       width: '900px',
       maxWidth: '95vw',

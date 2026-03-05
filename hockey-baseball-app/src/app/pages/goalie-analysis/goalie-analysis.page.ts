@@ -136,7 +136,7 @@ export class GoalieAnalysisPage implements OnInit {
 
   private openAnalysisModal(data: Record<string, unknown>): void {
     this.modalService.openModal(GoalieAnalysisModal, {
-      name: data['isEditMode'] ? 'Edit Analysis' : 'Create Analysis',
+      name: data['isEditMode'] ? 'Edit Goalie Analysis' : 'Create Goalie Analysis',
       icon: 'bar_chart',
       width: '600px',
       data,

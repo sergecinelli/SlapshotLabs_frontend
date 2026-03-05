@@ -441,7 +441,7 @@ export class TeamProfilePage implements OnInit, OnDestroy {
 
   private openAnalysisModal(teams: Team[]): void {
     this.modalService.openModal(TeamAnalysisModal, {
-      name: 'Create Analysis',
+      name: 'Create Team Analysis',
       icon: 'bar_chart',
       width: '600px',
       data: {
@@ -458,7 +458,7 @@ export class TeamProfilePage implements OnInit, OnDestroy {
           next: () => {
             this.toast.show('Analysis created successfully', 'success');
             this.modalService.closeModal();
-            this.router.navigate(['/analytics/teams', this.team!.id]);
+            this.router.navigate(['/analytics/teams']);
           },
           error: () => {
             this.toast.show('Failed to create analysis', 'error');

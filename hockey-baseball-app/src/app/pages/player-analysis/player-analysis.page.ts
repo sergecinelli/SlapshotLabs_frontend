@@ -107,7 +107,7 @@ export class PlayerAnalysisPage implements OnInit {
 
   private openAnalysisModal(data: Record<string, unknown>): void {
     this.modalService.openModal(PlayerAnalysisModal, {
-      name: data['isEditMode'] ? 'Edit Analysis' : 'Create Analysis',
+      name: data['isEditMode'] ? 'Edit Player Analysis' : 'Create Player Analysis',
       icon: 'bar_chart',
       width: '600px',
       data,

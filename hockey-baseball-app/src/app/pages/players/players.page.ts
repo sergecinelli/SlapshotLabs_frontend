@@ -366,7 +366,7 @@ export class PlayersPage implements OnInit {
       next: (result) => {
         this.analysisLoadingId.set(null);
         this.modalService.openModal(PlayerAnalysisModal, {
-          name: 'Create Analysis',
+          name: 'Create Player Analysis',
           icon: 'bar_chart',
           width: '600px',
           data: {
@@ -385,7 +385,7 @@ export class PlayersPage implements OnInit {
               next: () => {
                 this.toast.show('Analysis created successfully', 'success');
                 this.modalService.closeModal();
-                this.router.navigate(['/analytics/players', player.id]);
+                this.router.navigate(['/analytics/players']);
               },
               error: () => {
                 this.toast.show('Failed to create analysis', 'error');

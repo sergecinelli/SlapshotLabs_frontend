@@ -335,7 +335,7 @@ export class SchedulesPage implements OnInit {
 
   private openGameAnalysisModal(games: GameOption[], preSelectedGameId: string): void {
     this.modalService.openModal(GameAnalysisModal, {
-      name: 'Create Analysis',
+      name: 'Create Game Analysis',
       icon: 'bar_chart',
       width: '600px',
       data: {
@@ -352,7 +352,7 @@ export class SchedulesPage implements OnInit {
           next: () => {
             this.toast.show('Analysis created successfully', 'success');
             this.modalService.closeModal();
-            this.router.navigate(['/analytics/games', preSelectedGameId]);
+            this.router.navigate(['/analytics/games']);
           },
           error: () => {
             this.toast.show('Failed to create analysis', 'error');

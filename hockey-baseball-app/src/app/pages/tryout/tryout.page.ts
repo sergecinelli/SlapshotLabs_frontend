@@ -129,8 +129,8 @@ export class TryoutPage implements OnInit {
     const { action, item } = event;
     switch (action) {
       case 'analysis': {
-        const basePath = item.type === 'goalie' ? '/analytics/goalies/' : '/analytics/players/';
-        this.router.navigate([basePath + item.playerId]);
+        const path = item.type === 'goalie' ? '/analytics/goalies' : '/analytics/players';
+        this.router.navigate([path]);
         break;
       }
       case 'view-profile': {

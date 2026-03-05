@@ -150,7 +150,7 @@ export class GameAnalysisPage implements OnInit {
 
   private openAnalysisModal(data: Record<string, unknown>): void {
     this.modalService.openModal(GameAnalysisModal, {
-      name: data['isEditMode'] ? 'Edit Analysis' : 'Create Analysis',
+      name: data['isEditMode'] ? 'Edit Game Analysis' : 'Create Game Analysis',
       icon: 'bar_chart',
       width: '600px',
       data,

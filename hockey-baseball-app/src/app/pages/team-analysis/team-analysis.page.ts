@@ -136,7 +136,7 @@ export class TeamAnalysisPage implements OnInit {
 
   private openAnalysisModal(data: Record<string, unknown>): void {
     this.modalService.openModal(TeamAnalysisModal, {
-      name: data['isEditMode'] ? 'Edit Analysis' : 'Create Analysis',
+      name: data['isEditMode'] ? 'Edit Team Analysis' : 'Create Team Analysis',
       icon: 'bar_chart',
       width: '600px',
       data,

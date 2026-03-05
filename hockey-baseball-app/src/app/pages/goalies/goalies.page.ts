@@ -361,7 +361,7 @@ export class GoaliesPage implements OnInit {
       next: (result) => {
         this.analysisLoadingId.set(null);
         this.modalService.openModal(GoalieAnalysisModal, {
-          name: 'Create Analysis',
+          name: 'Create Goalie Analysis',
           icon: 'bar_chart',
           width: '600px',
           data: {
@@ -380,7 +380,7 @@ export class GoaliesPage implements OnInit {
               next: () => {
                 this.toast.show('Analysis created successfully', 'success');
                 this.modalService.closeModal();
-                this.router.navigate(['/analytics/goalies', goalie.id]);
+                this.router.navigate(['/analytics/goalies']);
               },
               error: () => {
                 this.toast.show('Failed to create analysis', 'error');
