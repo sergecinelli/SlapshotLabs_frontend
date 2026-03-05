@@ -2,7 +2,6 @@ import { Component, input, output } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { Schedule, GameStatus } from '../../interfaces/schedule.interface';
-import { ButtonComponent } from '../buttons/button/button.component';
 import { ButtonRouteComponent } from '../buttons/button-route/button-route.component';
 import { ButtonLoadingComponent } from '../buttons/button-loading/button-loading.component';
 import { getGameStatusLabel, isOvertimeStatus } from '../../constants/game-status.constants';
@@ -14,7 +13,6 @@ import { CachedSrcDirective } from '../../directives/cached-src.directive';
     CachedSrcDirective,
     RouterLink,
     MatIconModule,
-    ButtonComponent,
     ButtonRouteComponent,
     ButtonLoadingComponent,
   ],
@@ -27,6 +25,7 @@ export class GameCardComponent {
   showScore = input(true);
   isDeleting = input(false);
   isEditLoading = input(false);
+  isAnalysisLoading = input(false);
   edit = output<Schedule>();
   delete = output<Schedule>();
   analysis = output<Schedule>();

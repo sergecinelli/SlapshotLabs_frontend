@@ -209,18 +209,19 @@
           Dashboard
         </app-button-route>
       }
-      <app-button
+      <app-button-loading
         [bg]="'upcoming'"
         [bghover]="'upcoming'"
         [color]="'white'"
         [colorhover]="'white'"
         materialIcon="bar_chart"
         [haveContent]="true"
+        [isLoading]="isAnalysisLoading()"
         (clicked)="onAnalysis()"
         class="action-button"
       >
-        Analysis
-      </app-button>
+        Enter Analysis
+      </app-button-loading>
       @if (showActionsValue) {
         <app-button-loading
           [bg]="'orange'"

@@ -42,7 +42,13 @@ import {
 import { HighlightReelUpsertPayload } from '../../shared/interfaces/highlight-reel.interface';
 import { HighlightsService } from '../../services/highlights.service';
 import { BannerService } from '../../services/banner.service';
-import { forkJoin } from 'rxjs';
+import { Observable, forkJoin } from 'rxjs';
+import { AnalysisService } from '../../services/analysis.service';
+import { AnalyticsApiIn } from '../../shared/interfaces/analysis.interface';
+import {
+  GameAnalysisModal,
+  GameOption,
+} from '../../shared/components/game-analysis-modal/game-analysis.modal';
 import { visibilityByRoleMap } from './dashboard.role-map';
 import { ComponentVisibilityByRoleDirective } from '../../shared/directives/component-visibility-by-role.directive';
 import { CardGridComponent } from '../../shared/components/card-grid/card-grid.component';
@@ -86,6 +92,7 @@ export class DashboardPage implements OnInit {
   private modalService = inject(ModalService);
   private toast = inject(ToastService);
   private router = inject(Router);
+  private analysisService = inject(AnalysisService);
 
   upcomingGames = signal<Schedule[]>([]);
   gameResults = signal<Schedule[]>([]);
@@ -100,6 +107,7 @@ export class DashboardPage implements OnInit {
   addGoalieLoading = signal(false);
   addGameLoading = signal(false);
   createHighlightLoading = signal(false);
+  analysisLoadingId = signal<string | null>(null);
 
   ngOnInit(): void {
     this.loadData();
@@ -399,7 +407,55 @@ export class DashboardPage implements OnInit {
   }
 
   viewGameAnalysis(game: Schedule): void {
-    this.router.navigate(['/analytics/games', game.id]);
+    this.analysisLoadingId.set(game.id);
+    forkJoin({
+      games: this.scheduleService.getGameList(),
+      teams: this.teamService.getTeams(),
+    }).subscribe({
+      next: ({ games, teams }) => {
+        const teamMap = new Map(teams.teams.map((t) => [Number(t.id), t.name]));
+        const gameOptions: GameOption[] = games.map((g) => ({
+          value: String(g.id),
+          label: `${teamMap.get(g.away_team_id) ?? 'Unknown'} at ${teamMap.get(g.home_team_id) ?? 'Unknown'} - ${g.date ?? ''}`,
+        }));
+        this.analysisLoadingId.set(null);
+        this.openGameAnalysisModal(gameOptions, String(game.id));
+      },
+      error: () => {
+        this.analysisLoadingId.set(null);
+        this.toast.show('Failed to load game data', 'error');
+      },
+    });
+  }
+
+  private openGameAnalysisModal(games: GameOption[], preSelectedGameId: string): void {
+    this.modalService.openModal(GameAnalysisModal, {
+      name: 'Create Analysis',
+      icon: 'bar_chart',
+      width: '600px',
+      data: {
+        isEditMode: false,
+        preSelectedGameId,
+        games,
+      },
+      onCloseWithDataProcessing: (result: {
+        isEditMode: boolean;
+        apiData: AnalyticsApiIn;
+      }) => {
+        const apiCall: Observable<unknown> = this.analysisService.createAnalysis(result.apiData);
+        apiCall.subscribe({
+          next: () => {
+            this.toast.show('Analysis created successfully', 'success');
+            this.modalService.closeModal();
+            this.router.navigate(['/analytics/games', preSelectedGameId]);
+          },
+          error: () => {
+            this.toast.show('Failed to create analysis', 'error');
+            this.modalService.broadcastEvent(ModalEvent.StopButtonLoading);
+          },
+        });
+      },
+    });
   }
 
   createHighlightReel(): void {

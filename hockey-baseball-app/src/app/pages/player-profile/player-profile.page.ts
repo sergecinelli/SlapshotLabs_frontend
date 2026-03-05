@@ -4,7 +4,11 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatTableModule } from '@angular/material/table';
+import { Observable } from 'rxjs';
 import { ModalService, ModalEvent } from '../../services/modal.service';
+import { AnalysisService } from '../../services/analysis.service';
+import { AnalyticsApiIn } from '../../shared/interfaces/analysis.interface';
+import { PlayerAnalysisModal } from '../../shared/components/player-analysis-modal/player-analysis.modal';
 import { ToastService } from '../../services/toast.service';
 import { MatIconModule } from '@angular/material/icon';
 import { forkJoin } from 'rxjs';
@@ -35,7 +39,6 @@ import {
   SprayChartUtilsService,
 } from '../../services/spray-chart-utils.service';
 import { ComponentVisibilityByRoleDirective } from '../../shared/directives/component-visibility-by-role.directive';
-import { ButtonComponent } from '../../shared/components/buttons/button/button.component';
 import { ButtonLoadingComponent } from '../../shared/components/buttons/button-loading/button-loading.component';
 import { visibilityByRoleMap } from './player-profile.role-map';
 import { StorageKey } from '../../services/local-storage.service';
@@ -53,7 +56,6 @@ import { CachedSrcDirective } from '../../shared/directives/cached-src.directive
     MatTableModule,
     ShotLocationDisplayComponent,
     ComponentVisibilityByRoleDirective,
-    ButtonComponent,
     ButtonLoadingComponent,
   ],
   templateUrl: './player-profile.page.html',
@@ -76,9 +78,11 @@ export class PlayerProfilePage implements OnInit {
   private toast = inject(ToastService);
   private teamService = inject(TeamService);
   private positionService = inject(PositionService);
+  private analysisService = inject(AnalysisService);
 
   player: Player | null = null;
   isEditLoading = signal(false);
+  isAnalysisLoading = signal(false);
   loading = true;
   shotLocationData: ShotLocationData[] = [];
   seasonStats: PlayerSeasonStats[] = [];
@@ -287,7 +291,48 @@ export class PlayerProfilePage implements OnInit {
 
   onRequestAnalysis(): void {
     if (!this.player) return;
-    this.router.navigate(['/analytics/players', this.player.id]);
+
+    this.isAnalysisLoading.set(true);
+    this.playerService.getPlayers().subscribe({
+      next: (result) => {
+        this.isAnalysisLoading.set(false);
+        this.openAnalysisModal(result.players);
+      },
+      error: () => {
+        this.isAnalysisLoading.set(false);
+        this.toast.show('Failed to load players', 'error');
+      },
+    });
+  }
+
+  private openAnalysisModal(players: Player[]): void {
+    this.modalService.openModal(PlayerAnalysisModal, {
+      name: 'Create Analysis',
+      icon: 'bar_chart',
+      width: '600px',
+      data: {
+        isEditMode: false,
+        preSelectedPlayerId: this.player!.id.toString(),
+        players,
+      },
+      onCloseWithDataProcessing: (result: {
+        isEditMode: boolean;
+        apiData: AnalyticsApiIn;
+      }) => {
+        const apiCall: Observable<unknown> = this.analysisService.createAnalysis(result.apiData);
+        apiCall.subscribe({
+          next: () => {
+            this.toast.show('Analysis created successfully', 'success');
+            this.modalService.closeModal();
+            this.router.navigate(['/analytics/players', this.player!.id]);
+          },
+          error: () => {
+            this.toast.show('Failed to create analysis', 'error');
+            this.modalService.broadcastEvent(ModalEvent.StopButtonLoading);
+          },
+        });
+      },
+    });
   }
 
   getSeasonStats(): PlayerSeasonStats[] {

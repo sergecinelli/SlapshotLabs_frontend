@@ -52,6 +52,8 @@ export class TeamAnalysisModal {
     return teams.filter((t) => t.name.toLowerCase().includes(search));
   });
 
+  isEntityLocked = computed(() => !!this.data.preSelectedTeamId || this.isEditMode);
+
   selectedTeamLabel = computed(() => {
     const entityId = this.selectedEntityId();
     if (!entityId) return '';

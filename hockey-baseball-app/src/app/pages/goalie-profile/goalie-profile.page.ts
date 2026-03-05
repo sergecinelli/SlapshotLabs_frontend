@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
@@ -6,7 +6,12 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatTableModule } from '@angular/material/table';
-import { forkJoin } from 'rxjs';
+import { Observable, forkJoin } from 'rxjs';
+import { ModalService, ModalEvent } from '../../services/modal.service';
+import { ToastService } from '../../services/toast.service';
+import { AnalysisService } from '../../services/analysis.service';
+import { AnalyticsApiIn } from '../../shared/interfaces/analysis.interface';
+import { GoalieAnalysisModal } from '../../shared/components/goalie-analysis-modal/goalie-analysis.modal';
 import { GoalieService } from '../../services/goalie.service';
 import {
   Goalie,
@@ -31,7 +36,7 @@ import {
 } from '../../services/spray-chart-utils.service';
 import { StorageKey } from '../../services/local-storage.service';
 import { BreadcrumbDataService } from '../../services/breadcrumb-data.service';
-import { ButtonComponent } from '../../shared/components/buttons/button/button.component';
+import { ButtonLoadingComponent } from '../../shared/components/buttons/button-loading/button-loading.component';
 import { CachedSrcDirective } from '../../shared/directives/cached-src.directive';
 
 @Component({
@@ -45,7 +50,7 @@ import { CachedSrcDirective } from '../../shared/directives/cached-src.directive
     MatDividerModule,
     MatTableModule,
     ShotLocationDisplayComponent,
-    ButtonComponent,
+    ButtonLoadingComponent,
   ],
   templateUrl: './goalie-profile.page.html',
   styleUrl: './goalie-profile.page.scss',
@@ -61,8 +66,12 @@ export class GoalieProfilePage implements OnInit {
   private gameMetadataService = inject(GameMetadataService);
   private sprayChartUtils = inject(SprayChartUtilsService);
   private breadcrumbData = inject(BreadcrumbDataService);
+  private modalService = inject(ModalService);
+  private toast = inject(ToastService);
+  private analysisService = inject(AnalysisService);
 
   goalie: Goalie | null = null;
+  isAnalysisLoading = signal(false);
   loading = true;
   shotLocationData: ShotLocationData[] = [];
   seasonStats: GoalieSeasonStats[] = [];
@@ -237,6 +246,47 @@ export class GoalieProfilePage implements OnInit {
 
   onGoalieAnalysis(): void {
     if (!this.goalie) return;
-    this.router.navigate(['/analytics/goalies', this.goalie.id]);
+
+    this.isAnalysisLoading.set(true);
+    this.goalieService.getGoalies().subscribe({
+      next: (result) => {
+        this.isAnalysisLoading.set(false);
+        this.openAnalysisModal(result.goalies);
+      },
+      error: () => {
+        this.isAnalysisLoading.set(false);
+        this.toast.show('Failed to load goalies', 'error');
+      },
+    });
+  }
+
+  private openAnalysisModal(goalies: Goalie[]): void {
+    this.modalService.openModal(GoalieAnalysisModal, {
+      name: 'Create Analysis',
+      icon: 'bar_chart',
+      width: '600px',
+      data: {
+        isEditMode: false,
+        preSelectedGoalieId: this.goalie!.id.toString(),
+        goalies,
+      },
+      onCloseWithDataProcessing: (result: {
+        isEditMode: boolean;
+        apiData: AnalyticsApiIn;
+      }) => {
+        const apiCall: Observable<unknown> = this.analysisService.createAnalysis(result.apiData);
+        apiCall.subscribe({
+          next: () => {
+            this.toast.show('Analysis created successfully', 'success');
+            this.modalService.closeModal();
+            this.router.navigate(['/analytics/goalies', this.goalie!.id]);
+          },
+          error: () => {
+            this.toast.show('Failed to create analysis', 'error');
+            this.modalService.broadcastEvent(ModalEvent.StopButtonLoading);
+          },
+        });
+      },
+    });
   }
 }

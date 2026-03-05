@@ -96,6 +96,25 @@
   }
 }
 
+.locked-entity-field {
+  width: 100%;
+  padding: 0 2px;
+
+  .locked-entity-label {
+    display: block;
+    font-size: 10px;
+    font-weight: 400;
+    margin-bottom: 4px;
+  }
+
+  .locked-entity-value {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-dark);
+  }
+}
+
 .analysis-modal {
   @include modal-form.modal-wrapper;
   max-width: none;

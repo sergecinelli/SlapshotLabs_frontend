@@ -55,6 +55,7 @@
           [showScore]="true"
           [isDeleting]="deletingGameIds.has(schedule.id)"
           [isEditLoading]="editingGameId() === schedule.id"
+          [isAnalysisLoading]="analysisLoadingId() === schedule.id"
           (edit)="editSchedule($event)"
           (delete)="deleteSchedule($event)"
           (analysis)="viewGameAnalysis($event)"

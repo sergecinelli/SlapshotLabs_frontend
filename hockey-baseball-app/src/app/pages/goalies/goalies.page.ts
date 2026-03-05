@@ -26,6 +26,10 @@ import {
 import { LocalStorageService, StorageKey } from '../../services/local-storage.service';
 import { TryoutService } from '../../services/tryout.service';
 import { AuthService } from '../../services/auth.service';
+import { Observable } from 'rxjs';
+import { AnalysisService } from '../../services/analysis.service';
+import { AnalyticsApiIn } from '../../shared/interfaces/analysis.interface';
+import { GoalieAnalysisModal } from '../../shared/components/goalie-analysis-modal/goalie-analysis.modal';
 import { CachedSrcDirective } from '../../shared/directives/cached-src.directive';
 import { CardGridComponent } from '../../shared/components/card-grid/card-grid.component';
 
@@ -59,10 +63,12 @@ export class GoaliesPage implements OnInit {
   private authService = inject(AuthService);
   private toast = inject(ToastService);
   private positionService = inject(PositionService);
+  private analysisService = inject(AnalysisService);
 
   goalies = signal<Goalie[]>([]);
   teams: Team[] = []; // Store teams to pass to modals
   editingGoalieId = signal<string | null>(null);
+  analysisLoadingId = signal<string | null>(null);
   isAddLoading = signal(false);
   loading = signal(true);
   teamId = signal<string | null>(null);
@@ -87,7 +93,13 @@ export class GoaliesPage implements OnInit {
   ];
 
   tableActions: TableAction[] = [
-    { label: 'Analysis', action: 'analysis', variant: 'blue', icon: 'bar_chart' },
+    {
+      label: 'Enter Analysis',
+      action: 'analysis',
+      variant: 'blue',
+      icon: 'bar_chart',
+      isLoading: (item) => this.analysisLoadingId() === item['id'],
+    },
     {
       label: 'Spray Chart',
       action: 'shot-spray-chart',
@@ -344,7 +356,45 @@ export class GoaliesPage implements OnInit {
   }
 
   viewGoalieAnalysis(goalie: Goalie): void {
-    this.router.navigate(['/analytics/goalies', goalie.id]);
+    this.analysisLoadingId.set(goalie.id);
+    this.goalieService.getGoalies().subscribe({
+      next: (result) => {
+        this.analysisLoadingId.set(null);
+        this.modalService.openModal(GoalieAnalysisModal, {
+          name: 'Create Analysis',
+          icon: 'bar_chart',
+          width: '600px',
+          data: {
+            isEditMode: false,
+            preSelectedGoalieId: goalie.id.toString(),
+            goalies: result.goalies,
+          },
+          onCloseWithDataProcessing: (modalResult: {
+            isEditMode: boolean;
+            apiData: AnalyticsApiIn;
+          }) => {
+            const apiCall: Observable<unknown> = this.analysisService.createAnalysis(
+              modalResult.apiData
+            );
+            apiCall.subscribe({
+              next: () => {
+                this.toast.show('Analysis created successfully', 'success');
+                this.modalService.closeModal();
+                this.router.navigate(['/analytics/goalies', goalie.id]);
+              },
+              error: () => {
+                this.toast.show('Failed to create analysis', 'error');
+                this.modalService.broadcastEvent(ModalEvent.StopButtonLoading);
+              },
+            });
+          },
+        });
+      },
+      error: () => {
+        this.analysisLoadingId.set(null);
+        this.toast.show('Failed to load goalies', 'error');
+      },
+    });
   }
 
   openAddGoalieModal(): void {

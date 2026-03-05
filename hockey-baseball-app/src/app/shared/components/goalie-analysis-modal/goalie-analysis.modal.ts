@@ -58,6 +58,8 @@ export class GoalieAnalysisModal {
     return Array.from(groups, ([teamName, entries]) => ({ teamName, entries }));
   });
 
+  isEntityLocked = computed(() => !!this.data.preSelectedGoalieId || this.isEditMode);
+
   selectedGoalieLabel = computed(() => {
     const entityId = this.selectedEntityId();
     if (!entityId) return '';

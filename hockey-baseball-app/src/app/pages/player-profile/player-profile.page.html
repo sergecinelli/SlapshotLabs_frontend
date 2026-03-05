@@ -16,17 +16,18 @@
       >
         Edit Player Profile
       </app-button-loading>
-      <app-button
+      <app-button-loading
         materialIcon="bar_chart"
         [bg]="'upcoming'"
         [bghover]="'upcoming'"
         [color]="'white'"
         [colorhover]="'white'"
         [haveContent]="true"
+        [isLoading]="isAnalysisLoading()"
         (clicked)="onRequestAnalysis()"
       >
-        Player Analysis
-      </app-button>
+        Enter Analysis
+      </app-button-loading>
     </div>
 
     <!-- Loading State -->

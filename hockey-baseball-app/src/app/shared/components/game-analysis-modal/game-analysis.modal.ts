@@ -56,6 +56,8 @@ export class GameAnalysisModal {
     return games.filter((g) => g.label.toLowerCase().includes(search));
   });
 
+  isEntityLocked = computed(() => !!this.data.preSelectedGameId || this.isEditMode);
+
   selectedGameLabel = computed(() => {
     const entityId = this.selectedEntityId();
     if (!entityId) return '';

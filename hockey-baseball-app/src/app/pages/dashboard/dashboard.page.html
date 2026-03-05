@@ -92,6 +92,7 @@
                 [game]="game"
                 [showActions]="false"
                 [showScore]="false"
+                [isAnalysisLoading]="analysisLoadingId() === game.id"
                 (analysis)="viewGameAnalysis($event)"
               />
             }
@@ -117,6 +118,7 @@
                 [game]="game"
                 [showActions]="false"
                 [showScore]="true"
+                [isAnalysisLoading]="analysisLoadingId() === game.id"
                 (analysis)="viewGameAnalysis($event)"
               />
             }

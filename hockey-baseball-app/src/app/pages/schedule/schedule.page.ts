@@ -32,7 +32,13 @@ import { CardGridComponent } from '../../shared/components/card-grid/card-grid.c
 import { GameCardComponent } from '../../shared/components/game-card/game-card.component';
 import { visibilityByRoleMap } from './schedule.role-map';
 import { getGameStatusLabel } from '../../shared/constants/game-status.constants';
-import { forkJoin } from 'rxjs';
+import { Observable, forkJoin } from 'rxjs';
+import { AnalysisService } from '../../services/analysis.service';
+import { AnalyticsApiIn } from '../../shared/interfaces/analysis.interface';
+import {
+  GameAnalysisModal,
+  GameOption,
+} from '../../shared/components/game-analysis-modal/game-analysis.modal';
 import { tap } from 'rxjs/operators';
 import { convertGMTToLocal, formatDateForDisplay } from '../../shared/utils/time-converter.util';
 
@@ -65,6 +71,7 @@ export class SchedulePage implements OnInit {
   private toast = inject(ToastService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+  private analysisService = inject(AnalysisService);
 
   schedules = signal<Schedule[]>([]);
   deletingGameIds = new Set<string>();
@@ -85,6 +92,7 @@ export class SchedulePage implements OnInit {
   rawGames = new Map<string, DashboardGame>();
   editingGameId = signal<string | null>(null);
   isAddLoading = signal(false);
+  analysisLoadingId = signal<string | null>(null);
 
   ngOnInit(): void {
     this.loadInitialData();
@@ -623,7 +631,55 @@ export class SchedulePage implements OnInit {
   }
 
   viewGameAnalysis(schedule: Schedule): void {
-    this.router.navigate(['/analytics/games', schedule.id]);
+    this.analysisLoadingId.set(schedule.id);
+    forkJoin({
+      games: this.scheduleService.getGameList(),
+      teams: this.teamService.getTeams(),
+    }).subscribe({
+      next: ({ games, teams }) => {
+        this.analysisLoadingId.set(null);
+        const teamMap = new Map(teams.teams.map((t) => [Number(t.id), t.name]));
+        const gameOptions: GameOption[] = games.map((g) => ({
+          value: String(g.id),
+          label: `${teamMap.get(g.away_team_id) ?? 'Unknown'} at ${teamMap.get(g.home_team_id) ?? 'Unknown'} - ${g.date ?? ''}`,
+        }));
+        this.openGameAnalysisModal(gameOptions, String(schedule.id));
+      },
+      error: () => {
+        this.analysisLoadingId.set(null);
+        this.toast.show('Failed to load game data', 'error');
+      },
+    });
+  }
+
+  private openGameAnalysisModal(games: GameOption[], preSelectedGameId: string): void {
+    this.modalService.openModal(GameAnalysisModal, {
+      name: 'Create Analysis',
+      icon: 'bar_chart',
+      width: '600px',
+      data: {
+        isEditMode: false,
+        preSelectedGameId,
+        games,
+      },
+      onCloseWithDataProcessing: (result: {
+        isEditMode: boolean;
+        apiData: AnalyticsApiIn;
+      }) => {
+        const apiCall: Observable<unknown> = this.analysisService.createAnalysis(result.apiData);
+        apiCall.subscribe({
+          next: () => {
+            this.toast.show('Analysis created successfully', 'success');
+            this.modalService.closeModal();
+            this.router.navigate(['/analytics/games', preSelectedGameId]);
+          },
+          error: () => {
+            this.toast.show('Failed to create analysis', 'error');
+            this.modalService.broadcastEvent(ModalEvent.StopButtonLoading);
+          },
+        });
+      },
+    });
   }
 
   openAddScheduleModal(): void {

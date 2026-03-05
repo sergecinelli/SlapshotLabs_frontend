@@ -229,18 +229,19 @@
                 >
                   Goalies
                 </app-button-route>
-                <app-button-route
-                  [route]="'/analytics/teams/' + team.id"
+                <app-button-loading
                   [bg]="'upcoming'"
                   [bghover]="'upcoming'"
                   [color]="'white'"
                   [colorhover]="'white'"
                   [materialIcon]="'bar_chart'"
                   [haveContent]="true"
+                  [isLoading]="analysisLoadingId() === team.id"
+                  (clicked)="viewTeamAnalysis(team)"
                   class="action-button"
                 >
-                  Analysis
-                </app-button-route>
+                  Enter Analysis
+                </app-button-loading>
               </div>
             </div>
           </div>

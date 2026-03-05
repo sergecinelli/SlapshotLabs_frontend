@@ -16,7 +16,10 @@ import { ButtonComponent } from '../../shared/components/buttons/button/button.c
 import { ButtonLoadingComponent } from '../../shared/components/buttons/button-loading/button-loading.component';
 import { ButtonRouteComponent } from '../../shared/components/buttons/button-route/button-route.component';
 import { visibilityByRoleMap } from './teams.role-map';
-import { forkJoin } from 'rxjs';
+import { Observable, forkJoin } from 'rxjs';
+import { AnalysisService } from '../../services/analysis.service';
+import { AnalyticsApiIn } from '../../shared/interfaces/analysis.interface';
+import { TeamAnalysisModal } from '../../shared/components/team-analysis-modal/team-analysis.modal';
 import {
   DataTableComponent,
   TableColumn,
@@ -52,9 +55,11 @@ export class TeamsPage implements OnInit {
   private teamOptionsService = inject(TeamOptionsService);
   private router = inject(Router);
   private storage = inject(LocalStorageService);
+  private analysisService = inject(AnalysisService);
 
   teams = signal<Team[]>([]);
   editingTeamId = signal<string | null>(null);
+  analysisLoadingId = signal<string | null>(null);
   isAddLoading = signal(false);
   loading = signal(true);
   layoutMode = signal<'card' | 'table'>('table'); // Default to table
@@ -73,7 +78,13 @@ export class TeamsPage implements OnInit {
   ];
 
   tableActions: TableAction[] = [
-    { label: 'Analysis', action: 'analysis', variant: 'blue', icon: 'bar_chart' },
+    {
+      label: 'Enter Analysis',
+      action: 'analysis',
+      variant: 'blue',
+      icon: 'bar_chart',
+      isLoading: (item) => this.analysisLoadingId() === item['id'],
+    },
     { label: 'Schedule', action: 'schedules', variant: 'gray', icon: 'scoreboard' },
     { label: 'Players', action: 'players', variant: 'gray', icon: 'people' },
     { label: 'Goalies', action: 'goalies', variant: 'gray', icon: 'shield' },
@@ -276,7 +287,45 @@ export class TeamsPage implements OnInit {
   }
 
   viewTeamAnalysis(team: Team): void {
-    this.router.navigate(['/analytics/teams', team.id]);
+    this.analysisLoadingId.set(team.id);
+    this.teamService.getTeams().subscribe({
+      next: (result) => {
+        this.analysisLoadingId.set(null);
+        this.modalService.openModal(TeamAnalysisModal, {
+          name: 'Create Analysis',
+          icon: 'bar_chart',
+          width: '600px',
+          data: {
+            isEditMode: false,
+            preSelectedTeamId: team.id.toString(),
+            teams: result.teams,
+          },
+          onCloseWithDataProcessing: (modalResult: {
+            isEditMode: boolean;
+            apiData: AnalyticsApiIn;
+          }) => {
+            const apiCall: Observable<unknown> = this.analysisService.createAnalysis(
+              modalResult.apiData
+            );
+            apiCall.subscribe({
+              next: () => {
+                this.toast.show('Analysis created successfully', 'success');
+                this.modalService.closeModal();
+                this.router.navigate(['/analytics/teams', team.id]);
+              },
+              error: () => {
+                this.toast.show('Failed to create analysis', 'error');
+                this.modalService.broadcastEvent(ModalEvent.StopButtonLoading);
+              },
+            });
+          },
+        });
+      },
+      error: () => {
+        this.analysisLoadingId.set(null);
+        this.toast.show('Failed to load teams', 'error');
+      },
+    });
   }
 
   openAddTeamModal(): void {

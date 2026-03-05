@@ -8,51 +8,58 @@
         <mat-divider class="section-divider"></mat-divider>
 
         <div class="form-row">
-          <mat-form-field
-            [floatLabel]="'always'"
-            [hideRequiredMarker]="true"
-            class="form-field full-width"
-          >
-            <mat-label class="uppercase text-custom-secondary">Select Team</mat-label>
-            <mat-select
-              formControlName="entityId"
-              placeholder="Search team..."
-              (openedChange)="onSelectOpenedChange($event)"
-              panelClass="analysis-entity-select-panel"
+          @if (isEntityLocked()) {
+            <div class="locked-entity-field">
+              <span class="locked-entity-label uppercase text-custom-secondary">Selected Team</span>
+              <p class="locked-entity-value">{{ selectedTeamLabel() }}</p>
+            </div>
+          } @else {
+            <mat-form-field
+              [floatLabel]="'always'"
+              [hideRequiredMarker]="true"
+              class="form-field full-width"
             >
-              <mat-select-trigger>
-                {{ selectedTeamLabel() }}
-              </mat-select-trigger>
+              <mat-label class="uppercase text-custom-secondary">Select Team</mat-label>
+              <mat-select
+                formControlName="entityId"
+                placeholder="Search team..."
+                (openedChange)="onSelectOpenedChange($event)"
+                panelClass="analysis-entity-select-panel"
+              >
+                <mat-select-trigger>
+                  {{ selectedTeamLabel() }}
+                </mat-select-trigger>
 
-              <div class="entity-search-wrapper" (click)="$event.stopPropagation()">
-                <span class="material-symbols-rounded search-icon">search</span>
-                <input
-                  #searchInput
-                  class="entity-search-input"
-                  placeholder="Search by name..."
-                  [value]="searchText()"
-                  (input)="onSearchInput($event)"
-                  (keydown)="$event.stopPropagation()"
-                />
-                @if (searchText()) {
-                  <span
-                    class="material-symbols-rounded search-clear"
-                    (click)="clearSearch(searchInput)"
-                    >close</span
-                  >
+                <div class="entity-search-wrapper" (click)="$event.stopPropagation()">
+                  <span class="material-symbols-rounded search-icon">search</span>
+                  <input
+                    #searchInput
+                    class="entity-search-input"
+                    placeholder="Search by name..."
+                    [value]="searchText()"
+                    (input)="onSearchInput($event)"
+                    (keydown)="$event.stopPropagation()"
+                  />
+                  @if (searchText()) {
+                    <span
+                      class="material-symbols-rounded search-clear"
+                      (click)="clearSearch(searchInput)"
+                      >close</span
+                    >
+                  }
+                </div>
+
+                @for (team of filteredTeams(); track team.id) {
+                  <mat-option [value]="team.id">
+                    {{ team.name }}
+                  </mat-option>
                 }
-              </div>
-
-              @for (team of filteredTeams(); track team.id) {
-                <mat-option [value]="team.id">
-                  {{ team.name }}
-                </mat-option>
+              </mat-select>
+              @if (analysisForm.get('entityId')?.errors && analysisForm.get('entityId')?.touched) {
+                <mat-error>{{ getErrorMessage('entityId') }}</mat-error>
               }
-            </mat-select>
-            @if (analysisForm.get('entityId')?.errors && analysisForm.get('entityId')?.touched) {
-              <mat-error>{{ getErrorMessage('entityId') }}</mat-error>
-            }
-          </mat-form-field>
+            </mat-form-field>
+          }
         </div>
 
         <div class="form-row">

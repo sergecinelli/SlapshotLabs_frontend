@@ -51,6 +51,7 @@
             [game]="schedule"
             [showActions]="false"
             [showScore]="true"
+            [isAnalysisLoading]="analysisLoadingId() === schedule.id"
             (analysis)="viewGameAnalysis($event)"
           />
         }

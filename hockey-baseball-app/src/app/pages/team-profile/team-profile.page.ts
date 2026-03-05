@@ -4,7 +4,11 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatTableModule } from '@angular/material/table';
+import { Observable } from 'rxjs';
 import { ModalService, ModalEvent } from '../../services/modal.service';
+import { AnalysisService } from '../../services/analysis.service';
+import { AnalyticsApiIn } from '../../shared/interfaces/analysis.interface';
+import { TeamAnalysisModal } from '../../shared/components/team-analysis-modal/team-analysis.modal';
 import { ToastService } from '../../services/toast.service';
 import { TeamService } from '../../services/team.service';
 import { PlayerService } from '../../services/player.service';
@@ -21,7 +25,6 @@ import { Goalie } from '../../shared/interfaces/goalie.interface';
 import { TeamFormModal } from '../../shared/components/team-form-modal/team-form.modal';
 import { BreadcrumbDataService } from '../../services/breadcrumb-data.service';
 import { ComponentVisibilityByRoleDirective } from '../../shared/directives/component-visibility-by-role.directive';
-import { ButtonComponent } from '../../shared/components/buttons/button/button.component';
 import { ButtonLoadingComponent } from '../../shared/components/buttons/button-loading/button-loading.component';
 import { visibilityByRoleMap } from './team-profile.role-map';
 import { forkJoin, Subject } from 'rxjs';
@@ -68,7 +71,6 @@ export interface TeamPlayer {
     MatDividerModule,
     MatTableModule,
     ComponentVisibilityByRoleDirective,
-    ButtonComponent,
     ButtonLoadingComponent,
   ],
   templateUrl: './team-profile.page.html',
@@ -90,11 +92,13 @@ export class TeamProfilePage implements OnInit, OnDestroy {
   private breadcrumbData = inject(BreadcrumbDataService);
   private toast = inject(ToastService);
   private teamOptionsService = inject(TeamOptionsService);
+  private analysisService = inject(AnalysisService);
 
   private destroy$ = new Subject<void>();
 
   team: Team | null = null;
   isEditLoading = signal(false);
+  isAnalysisLoading = signal(false);
   roster: (Player | Goalie)[] = [];
   loading = true;
   loadingRoster = false;
@@ -421,7 +425,48 @@ export class TeamProfilePage implements OnInit, OnDestroy {
 
   onRequestTeamAnalysis(): void {
     if (!this.team) return;
-    this.router.navigate(['/analytics/teams', this.team.id]);
+
+    this.isAnalysisLoading.set(true);
+    this.teamService.getTeams().subscribe({
+      next: (result) => {
+        this.isAnalysisLoading.set(false);
+        this.openAnalysisModal(result.teams);
+      },
+      error: () => {
+        this.isAnalysisLoading.set(false);
+        this.toast.show('Failed to load teams', 'error');
+      },
+    });
+  }
+
+  private openAnalysisModal(teams: Team[]): void {
+    this.modalService.openModal(TeamAnalysisModal, {
+      name: 'Create Analysis',
+      icon: 'bar_chart',
+      width: '600px',
+      data: {
+        isEditMode: false,
+        preSelectedTeamId: this.team!.id.toString(),
+        teams,
+      },
+      onCloseWithDataProcessing: (result: {
+        isEditMode: boolean;
+        apiData: AnalyticsApiIn;
+      }) => {
+        const apiCall: Observable<unknown> = this.analysisService.createAnalysis(result.apiData);
+        apiCall.subscribe({
+          next: () => {
+            this.toast.show('Analysis created successfully', 'success');
+            this.modalService.closeModal();
+            this.router.navigate(['/analytics/teams', this.team!.id]);
+          },
+          error: () => {
+            this.toast.show('Failed to create analysis', 'error');
+            this.modalService.broadcastEvent(ModalEvent.StopButtonLoading);
+          },
+        });
+      },
+    });
   }
 
   getCurrentSeason(): string {

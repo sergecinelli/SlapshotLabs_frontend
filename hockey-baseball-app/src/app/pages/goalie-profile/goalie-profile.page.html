@@ -1,17 +1,18 @@
 <div class="goalie-profile-page">
   <!-- Action Buttons Row -->
   <div class="action-buttons-row">
-    <app-button
+    <app-button-loading
       materialIcon="bar_chart"
       [bg]="'upcoming'"
       [bghover]="'upcoming'"
       [color]="'white'"
       [colorhover]="'white'"
       [haveContent]="true"
+      [isLoading]="isAnalysisLoading()"
       (clicked)="onGoalieAnalysis()"
     >
-      Goalie Analysis
-    </app-button>
+      Enter Analysis
+    </app-button-loading>
   </div>
 
   <!-- Loading State -->

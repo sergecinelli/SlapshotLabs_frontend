@@ -58,6 +58,8 @@ export class PlayerAnalysisModal {
     return Array.from(groups, ([teamName, entries]) => ({ teamName, entries }));
   });
 
+  isEntityLocked = computed(() => !!this.data.preSelectedPlayerId || this.isEditMode);
+
   selectedPlayerLabel = computed(() => {
     const entityId = this.selectedEntityId();
     if (!entityId) return '';
