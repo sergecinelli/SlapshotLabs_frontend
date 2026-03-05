@@ -223,6 +223,27 @@ export class AuthService {
     };
   }
 
+  acceptInvitation(invitationToken: string): Observable<void> {
+    return this.apiService.refreshCsrfToken().pipe(
+      switchMap(() => {
+        return this.apiService.post<void>('/auth/invitations', {
+          invitation_token: invitationToken,
+        });
+      }),
+      switchMap(() => {
+        return timer(100).pipe(
+          mergeMap(() => {
+            return this.refreshCurrentUser();
+          })
+        );
+      }),
+      switchMap(() => of(void 0)),
+      catchError((error) => {
+        return throwError(() => error);
+      })
+    );
+  }
+
   /**
    * Force refresh user data from API (ignores cache)
    */

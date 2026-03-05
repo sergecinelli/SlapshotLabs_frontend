@@ -82,6 +82,12 @@ export const routes: Routes = [
     canActivate: [GuestGuard],
   },
 
+  // Invitation route (no guard — accessible to everyone)
+  {
+    path: 'invitations/:token',
+    loadComponent: () => import('./pages/invitation/invitation.page').then((m) => m.InvitationPage),
+  },
+
   // Main application routes with layout
   {
     path: '',

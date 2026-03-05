@@ -1,0 +1,88 @@
+@let isLoadingValue = isLoading();
+
+<div class="invitation-wrapper">
+  <!-- Left: Hero image panel -->
+  <div class="hero-panel">
+    <img src="assets/login-image.jpg" alt="" class="hero-image" />
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <img src="assets/logo-circle-white.png" alt="Slapshot Labs" class="hero-logo" />
+      <h2 class="hero-tagline">ANALYTICS. GAMES. PERFORMANCE.</h2>
+      <div class="hero-stats">
+        <div class="stat">
+          <span class="stat-value">50+</span>
+          <span class="stat-label">Stats Tracked</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+          <span class="stat-value">HD</span>
+          <span class="stat-label">Video Highlights</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+          <span class="stat-value">LIVE</span>
+          <span class="stat-label">Game Dashboard</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right: Invitation content -->
+  <div class="invite-panel">
+    <div class="invite-content">
+      <div class="badge">
+        <span class="material-symbols-rounded badge-icon">mail</span>
+        INVITATION
+      </div>
+
+      <h1 class="title">You've been invited to join the team</h1>
+
+      <p class="description">
+        Accept this invitation to access your team's dashboard — view analytics, schedules, video
+        highlights, player stats, and more.
+      </p>
+
+      <div class="feature-list">
+        <div class="feature-item">
+          <span class="material-symbols-rounded fi-icon">bar_chart</span>
+          <div>
+            <span class="fi-title">Player & Team Analytics</span>
+            <span class="fi-desc">Advanced performance metrics and trends</span>
+          </div>
+        </div>
+        <div class="feature-item">
+          <span class="material-symbols-rounded fi-icon">sports_hockey</span>
+          <div>
+            <span class="fi-title">Live Game Dashboard</span>
+            <span class="fi-desc">Real-time scores and play-by-play tracking</span>
+          </div>
+        </div>
+        <div class="feature-item">
+          <span class="material-symbols-rounded fi-icon">videocam</span>
+          <div>
+            <span class="fi-title">Video Library & Highlights</span>
+            <span class="fi-desc">Review game footage and key moments</span>
+          </div>
+        </div>
+      </div>
+
+      <app-button-loading
+        [isLoading]="isLoadingValue"
+        [isDisabled]="isLoadingValue"
+        [bg]="'primary'"
+        [bghover]="'primary_dark'"
+        [color]="'white'"
+        [colorhover]="'white'"
+        [opacity]="1"
+        [opacityhover]="1"
+        [width]="'auto'"
+        [rounded]="false"
+        [materialIcon]="'how_to_reg'"
+        [haveContent]="true"
+        (clicked)="acceptInvitation()"
+      >
+        {{ isLoadingValue ? 'ACCEPTING...' : 'ACCEPT INVITE' }}
+      </app-button-loading>
+    </div>
+  </div>
+</div>
