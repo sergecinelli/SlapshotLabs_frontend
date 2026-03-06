@@ -9,7 +9,12 @@ import { PlayerService } from '../../services/player.service';
 import { GoalieService } from '../../services/goalie.service';
 import { TeamService } from '../../services/team.service';
 import { ScheduleService } from '../../services/schedule.service';
-import { Analysis, AnalyticsApiIn, AnalysisType } from '../../shared/interfaces/analysis.interface';
+import {
+  Analysis,
+  AnalyticsAccessOut,
+  AnalyticsApiIn,
+  AnalysisType,
+} from '../../shared/interfaces/analysis.interface';
 import { ANALYSIS_TABS, ANALYSIS_TYPE_CONFIG } from '../../shared/constants/analysis.constants';
 import {
   DataTableComponent,
@@ -32,6 +37,7 @@ import {
   GameOption,
 } from '../../shared/components/game-analysis-modal/game-analysis.modal';
 import { AnalysisViewModal } from '../../shared/components/analysis-view-modal/analysis-view.modal';
+import { ShareAnalyticsModal } from '../../shared/components/share-analytics-modal/share-analytics.modal';
 
 @Component({
   selector: 'app-analytics',
@@ -77,6 +83,7 @@ export class AnalyticsPage implements OnInit {
   loading = signal(true);
   isCreateLoading = signal(false);
   editingItemId = signal<string | null>(null);
+  sharingItemId = signal<string | null>(null);
   showTabs = signal(true);
 
   activeTabIndex = computed(() => ANALYSIS_TABS.findIndex((tab) => tab.key === this.activeTab()));
@@ -116,6 +123,16 @@ export class AnalyticsPage implements OnInit {
 
   tableColumns = computed(() => this.columnsByType[this.activeTab()]);
 
+  private readonly shareAction: TableAction = {
+    label: 'Share',
+    action: 'share',
+    variant: 'blue',
+    icon: 'share',
+    roleVisibilityName: 'share-action',
+    roleVisibilityAuthorId: (item: Record<string, unknown>) => item['userId']?.toString() ?? '',
+    isLoading: (item: Record<string, unknown>) => this.sharingItemId() === String(item['id']),
+  };
+
   private readonly baseActions: TableAction[] = [
     {
       label: 'Edit',
@@ -140,6 +157,7 @@ export class AnalyticsPage implements OnInit {
 
     if (tab === 'game') {
       return [
+        this.shareAction,
         {
           label: 'Dashboard',
           action: 'dashboard',
@@ -157,6 +175,7 @@ export class AnalyticsPage implements OnInit {
     }
 
     return [
+      this.shareAction,
       {
         label: 'View',
         action: 'view',
@@ -206,6 +225,9 @@ export class AnalyticsPage implements OnInit {
         break;
       case 'delete':
         this.onDeleteAnalysis(event.item);
+        break;
+      case 'share':
+        this.onShareAnalysis(event.item);
         break;
     }
   }
@@ -313,6 +335,35 @@ export class AnalyticsPage implements OnInit {
             this.modalService.broadcastEvent(ModalEvent.StopButtonLoading);
           },
         });
+      },
+    });
+  }
+
+  private onShareAnalysis(analysis: Analysis): void {
+    this.sharingItemId.set(analysis.id);
+
+    this.analysisService.getAnalyticsAccess(Number(analysis.id)).subscribe({
+      next: (access) => {
+        this.sharingItemId.set(null);
+        this.openShareModal(analysis, access);
+      },
+      error: () => {
+        this.sharingItemId.set(null);
+        this.toast.show('Failed to load access list', 'error');
+      },
+    });
+  }
+
+  private openShareModal(analysis: Analysis, existingAccess: AnalyticsAccessOut[]): void {
+    this.modalService.openModal(ShareAnalyticsModal, {
+      name: 'Share Analysis',
+      icon: 'share',
+      width: '550px',
+      maxWidth: '95vw',
+      data: {
+        analyticsId: Number(analysis.id),
+        analyticsTitle: analysis.title,
+        existingAccess,
       },
     });
   }

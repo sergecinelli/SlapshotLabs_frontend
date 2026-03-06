@@ -9,6 +9,9 @@ import {
   AnalyticsApiOut,
   AnalysisTableData,
   AnalysisType,
+  AnalyticsAccessOut,
+  UserSearchOut,
+  UserSearchRequest,
 } from '../shared/interfaces/analysis.interface';
 
 @Injectable({
@@ -65,6 +68,33 @@ export class AnalysisService {
     return this.apiService.delete<void>(`/hockey/analytics/${id}`).pipe(
       catchError((error) => {
         console.error('Failed to delete analysis:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  searchUsers(request: UserSearchRequest): Observable<UserSearchOut[]> {
+    return this.apiService.post<UserSearchOut[]>('/users/search', request).pipe(
+      catchError((error) => {
+        console.error('Failed to search users:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  getAnalyticsAccess(analyticsId: number): Observable<AnalyticsAccessOut[]> {
+    return this.apiService.get<AnalyticsAccessOut[]>(`/hockey/analytics/${analyticsId}/access`).pipe(
+      catchError((error) => {
+        console.error('Failed to get analytics access:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  updateAnalyticsAccess(analyticsId: number, emails: string[]): Observable<void> {
+    return this.apiService.put<void>(`/hockey/analytics/${analyticsId}/access`, emails).pipe(
+      catchError((error) => {
+        console.error('Failed to update analytics access:', error);
         return throwError(() => error);
       })
     );

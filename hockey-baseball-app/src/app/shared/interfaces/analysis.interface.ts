@@ -70,3 +70,24 @@ export interface AnalysisTableData {
   analytics: Analysis[];
   total: number;
 }
+
+export interface UserSearchRequest {
+  ids?: string[];
+  email?: string;
+  first_name?: string;
+  last_name?: string;
+}
+
+export interface UserSearchOut {
+  id: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+}
+
+export interface AnalyticsAccessOut {
+  id: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+}

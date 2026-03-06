@@ -1,0 +1,125 @@
+@use '../../styles/modal-form' as modal;
+
+.share-analytics-modal {
+  @include modal.material-form-overrides;
+  @include modal.form-section;
+
+  .modal-content {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-width: 450px;
+  }
+
+  .chips-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    padding: 2px 0;
+  }
+
+  .trigger-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background-color: var(--bg-content);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-medium);
+    padding: 4px 10px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--color-dark);
+    max-width: 250px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .trigger-chip-remove {
+    font-size: 14px !important;
+    cursor: pointer;
+    color: var(--gray);
+    flex-shrink: 0;
+
+    &:hover {
+      color: var(--danger);
+    }
+  }
+
+  .email-field-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+
+    .email-field {
+      flex: 1;
+    }
+
+    .add-email-button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 50%;
+      color: var(--green);
+      transition: background-color 0.2s;
+
+      .material-symbols-rounded {
+        font-size: 24px;
+      }
+
+      &:hover {
+        background-color: var(--button-background);
+      }
+    }
+  }
+
+  .autocomplete-option {
+    font-size: 13px;
+  }
+}
+
+.confirm-text {
+  font-size: 14px;
+  color: var(--text-primary);
+  margin: 0;
+  padding-bottom: 5px;
+  padding-left: 20px;
+}
+
+.confirm-email-list {
+  margin: 0;
+  padding-left: 35px;
+  padding-bottom: 20px;
+  list-style: decimal;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  li {
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .confirm-email-badge {
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 600;
+    color: var(--blue-dark);
+    background-color: var(--blue-soft);
+  }
+
+  &.confirm-added .confirm-email-badge {
+    color: var(--green-dark);
+    background-color: var(--green-soft);
+  }
+
+  &.confirm-removed .confirm-email-badge {
+    color: var(--primary-dark);
+    background-color: var(--primary-soft);
+  }
+}

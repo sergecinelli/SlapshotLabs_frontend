@@ -10,5 +10,6 @@ export const visibilityByRoleMap: IVisibilityByRoleMap = {
     'create-analysis-button': [Role.Admin],
     'edit-action': [Role.Admin],
     'delete-action': [Role.Admin, Role.Author],
+    'share-action': [Role.Author],
   },
 };

@@ -1,0 +1,12 @@
+.display-template-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  .template-wrapper {
+    overflow-y: auto;
+    width: 100%;
+    min-width: 400px;
+    padding-top: 10px;
+  }
+}

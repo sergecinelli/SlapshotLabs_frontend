@@ -1,0 +1,52 @@
+@let isLoadingValue = isLoading();
+
+<div class="display-template-content">
+  @if (template) {
+    <div class="template-wrapper">
+      <ng-container *ngTemplateOutlet="template"></ng-container>
+    </div>
+  }
+</div>
+
+<div class="modal-actions">
+  @if (withButtonLoading) {
+    <app-button-loading
+      [isLoading]="isLoadingValue"
+      [isDisabled]="isLoadingValue"
+      [materialIcon]="buttonIcon"
+      [bg]="color"
+      [bghover]="colorSoft"
+      [color]="'text_white'"
+      (clicked)="confirm()"
+    >
+      {{ buttonText }}
+    </app-button-loading>
+  } @else {
+    <app-button
+      [materialIcon]="buttonIcon"
+      [bg]="color"
+      [bghover]="colorSoft"
+      [color]="'text_white'"
+      (clicked)="confirm()"
+    >
+      {{ buttonText }}
+    </app-button>
+  }
+
+  <app-button
+    materialIcon="cancel"
+    [bg]="'transparent'"
+    [bghover]="'button_background'"
+    [br]="'border'"
+    [color]="'text_primary'"
+    [colorhover]="'text_primary'"
+    [opacity]="1"
+    [opacityhover]="1"
+    [rounded]="false"
+    [haveContent]="true"
+    [isDisabled]="isLoadingValue"
+    (clicked)="close()"
+  >
+    Cancel
+  </app-button>
+</div>
