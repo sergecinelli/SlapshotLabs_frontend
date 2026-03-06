@@ -111,19 +111,15 @@
                     {{ getGoalieInitials(goalie) }}
                   </div>
                   <div class="entity-name-group">
-                    <div
+                    <a
                       class="entity-name entity-link"
-                      (click)="viewGoalieProfile(goalie)"
-                      (keyup.enter)="viewGoalieProfile(goalie)"
-                      (keyup.space)="viewGoalieProfile(goalie)"
-                      tabindex="0"
-                      role="button"
+                      [routerLink]="'/teams-and-rosters/goalies/' + goalie.id + '/profile'"
                       [attr.aria-label]="
                         'View ' + goalie.firstName + ' ' + goalie.lastName + ' profile'
                       "
                     >
                       {{ goalie.firstName }} {{ goalie.lastName }}
-                    </div>
+                    </a>
                     <div class="entity-subtitle-row">
                       @if (goalie.jerseyNumber) {
                         <div class="entity-subtitle">#{{ goalie.jerseyNumber }}</div>
@@ -172,15 +168,11 @@
                           />
                         }
                         @if (goalie.teamId) {
-                          <span
+                          <a
                             class="entity-info-value team-link"
-                            (click)="goToTeamProfile(goalie.teamId)"
-                            (keyup.enter)="goToTeamProfile(goalie.teamId)"
-                            (keyup.space)="goToTeamProfile(goalie.teamId)"
-                            tabindex="0"
-                            role="button"
+                            [routerLink]="'/teams-and-rosters/teams/' + goalie.teamId + '/profile'"
                             [attr.aria-label]="'View ' + goalie.team + ' profile'"
-                            >{{ goalie.team }}</span
+                            >{{ goalie.team }}</a
                           >
                         } @else {
                           <span class="entity-info-value">{{ goalie.team }}</span>

@@ -111,19 +111,15 @@
                     {{ getPlayerInitials(player) }}
                   </div>
                   <div class="entity-name-group">
-                    <div
+                    <a
                       class="entity-name entity-link"
-                      (click)="viewPlayerProfile(player)"
-                      (keyup.enter)="viewPlayerProfile(player)"
-                      (keyup.space)="viewPlayerProfile(player)"
-                      tabindex="0"
-                      role="button"
+                      [routerLink]="'/teams-and-rosters/players/' + player.id + '/profile'"
                       [attr.aria-label]="
                         'View ' + player.firstName + ' ' + player.lastName + ' profile'
                       "
                     >
                       {{ player.firstName }} {{ player.lastName }}
-                    </div>
+                    </a>
                     <div class="entity-subtitle-row">
                       @if (player.jerseyNumber) {
                         <div class="entity-subtitle">#{{ player.jerseyNumber }}</div>
@@ -172,15 +168,11 @@
                           />
                         }
                         @if (player.teamId) {
-                          <span
+                          <a
                             class="entity-info-value team-link"
-                            (click)="goToTeamProfile(player.teamId)"
-                            (keyup.enter)="goToTeamProfile(player.teamId)"
-                            (keyup.space)="goToTeamProfile(player.teamId)"
-                            tabindex="0"
-                            role="button"
+                            [routerLink]="'/teams-and-rosters/teams/' + player.teamId + '/profile'"
                             [attr.aria-label]="'View ' + player.team + ' profile'"
-                            >{{ player.team }}</span
+                            >{{ player.team }}</a
                           >
                         } @else {
                           <span class="entity-info-value">{{ player.team }}</span>

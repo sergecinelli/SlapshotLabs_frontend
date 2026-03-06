@@ -3,7 +3,7 @@ import { ModalEvent, ModalService } from '../../services/modal.service';
 import { ToastService } from '../../services/toast.service';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { GoalieService } from '../../services/goalie.service';
 import { TeamService } from '../../services/team.service';
 import { Goalie } from '../../shared/interfaces/goalie.interface';
@@ -46,6 +46,7 @@ import { CardGridComponent } from '../../shared/components/card-grid/card-grid.c
     ButtonRouteComponent,
     CardGridComponent,
     DataTableComponent,
+    RouterLink,
   ],
   templateUrl: './goalies.page.html',
   styleUrl: './goalies.page.scss',
@@ -364,10 +365,6 @@ export class GoaliesPage implements OnInit {
 
   viewGoalieProfile(goalie: Goalie): void {
     this.router.navigate(['/teams-and-rosters/goalies', goalie.id, 'profile']);
-  }
-
-  goToTeamProfile(teamId: number): void {
-    this.router.navigate([`/teams-and-rosters/teams/${teamId}/profile`]);
   }
 
   viewShotSprayChart(goalie: Goalie): void {
