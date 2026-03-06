@@ -8,118 +8,126 @@
 @let hasChangesValue = hasChanges();
 <div class="share-analytics-modal">
   <div class="modal-content">
-      @if (existingAccessValue.length > 0) {
-        <div class="form-section">
-          <div class="section-header">
-            <span class="section-title">Shared With</span>
-          </div>
-          <mat-divider class="section-divider"></mat-divider>
-          <div class="chips-list">
-            @for (user of existingAccessValue; track user.email) {
-              <span class="trigger-chip">
-                {{ user.email }}
-                <span
-                  class="material-symbols-rounded trigger-chip-remove"
-                  (click)="removeExistingAccess(user.email)"
-                >close</span>
-              </span>
-            }
-          </div>
-        </div>
-      }
-
-      @if (addedEmailsValue.length > 0) {
-        <div class="form-section">
-          <div class="section-header">
-            <span class="section-title">New Recipients</span>
-          </div>
-          <mat-divider class="section-divider"></mat-divider>
-          <div class="chips-list">
-            @for (email of addedEmailsValue; track email) {
-              <span class="trigger-chip">
-                {{ email }}
-                <span
-                  class="material-symbols-rounded trigger-chip-remove"
-                  (click)="removeAddedEmail(email)"
-                >close</span>
-              </span>
-            }
-          </div>
-        </div>
-      }
-
+    @if (existingAccessValue.length > 0) {
       <div class="form-section">
         <div class="section-header">
-          <span class="section-title">Add People</span>
+          <span class="section-title">Shared With</span>
         </div>
         <mat-divider class="section-divider"></mat-divider>
-
-        <div class="email-field-row">
-          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="email-field">
-            <mat-label class="uppercase text-custom-secondary">Email</mat-label>
-            <input
-              matInput
-              type="email"
-              [formControl]="emailControlValue"
-              placeholder="Enter email address"
-              (input)="onEmailInput()"
-              (keydown.enter)="addEmail()"
-              [matAutocomplete]="auto"
-            />
-            <mat-autocomplete
-              #auto="matAutocomplete"
-              (optionSelected)="selectUser($event.option.value)"
-            >
-              @for (user of searchResultsValue; track user.id) {
-                <mat-option [value]="user">
-                  <span class="autocomplete-option">
-                    {{ user.first_name }} {{ user.last_name }} ({{ user.email }})
-                  </span>
-                </mat-option>
-              }
-            </mat-autocomplete>
-          </mat-form-field>
-          <button class="add-email-button" (click)="addEmail()" title="Add email">
-            <span class="material-symbols-rounded">add_circle</span>
-          </button>
+        <div class="chips-list">
+          @for (user of existingAccessValue; track user.email) {
+            <span class="trigger-chip">
+              {{ user.email }}
+              <span
+                class="material-symbols-rounded trigger-chip-remove"
+                (click)="removeExistingAccess(user.email)"
+                >close</span
+              >
+            </span>
+          }
         </div>
       </div>
-    </div>
+    }
 
-    <div class="modal-actions">
-      <app-button
-        materialIcon="share"
-        [bg]="'blue'"
-        [bghover]="'blue_dark'"
-        [color]="'text_white'"
-        [haveContent]="true"
-        [appDisableToggle]="!hasChangesValue"
-        (clicked)="onShare()"
-      >
-        Save
-      </app-button>
+    @if (addedEmailsValue.length > 0) {
+      <div class="form-section">
+        <div class="section-header">
+          <span class="section-title">New Recipients</span>
+        </div>
+        <mat-divider class="section-divider"></mat-divider>
+        <div class="chips-list">
+          @for (email of addedEmailsValue; track email) {
+            <span class="trigger-chip">
+              {{ email }}
+              <span
+                class="material-symbols-rounded trigger-chip-remove"
+                (click)="removeAddedEmail(email)"
+                >close</span
+              >
+            </span>
+          }
+        </div>
+      </div>
+    }
 
-      <app-button
-        materialIcon="cancel"
-        [bg]="'transparent'"
-        [bghover]="'button_background'"
-        [br]="'border'"
-        [color]="'text_primary'"
-        [colorhover]="'text_primary'"
-        [opacity]="1"
-        [opacityhover]="1"
-        [rounded]="false"
-        [haveContent]="true"
-        (clicked)="close()"
-      >
-        Cancel
-      </app-button>
+    <div class="form-section">
+      <div class="section-header">
+        <span class="section-title">Add People</span>
+      </div>
+      <mat-divider class="section-divider"></mat-divider>
+
+      <div class="email-field-row">
+        <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="email-field">
+          <mat-label class="uppercase text-custom-secondary">Email</mat-label>
+          <input
+            matInput
+            type="email"
+            [formControl]="emailControlValue"
+            placeholder="Enter email address"
+            (input)="onEmailInput()"
+            (keydown.enter)="addEmail()"
+            [matAutocomplete]="auto"
+          />
+          <mat-autocomplete
+            #auto="matAutocomplete"
+            (optionSelected)="selectUser($event.option.value)"
+          >
+            @for (user of searchResultsValue; track user.id) {
+              <mat-option [value]="user">
+                <span class="autocomplete-option">
+                  {{ user.first_name }} {{ user.last_name }} ({{ user.email }})
+                </span>
+              </mat-option>
+            }
+          </mat-autocomplete>
+        </mat-form-field>
+        <button class="add-email-button" (click)="addEmail()" title="Add email">
+          <span class="material-symbols-rounded">add_circle</span>
+        </button>
+      </div>
     </div>
+  </div>
+
+  <div class="modal-actions">
+    <app-button
+      materialIcon="share"
+      [bg]="'blue'"
+      [bghover]="'blue_dark'"
+      [color]="'text_white'"
+      [haveContent]="true"
+      [appDisableToggle]="!hasChangesValue"
+      (clicked)="onShare()"
+    >
+      Save
+    </app-button>
+
+    <app-button
+      materialIcon="cancel"
+      [bg]="'transparent'"
+      [bghover]="'button_background'"
+      [br]="'border'"
+      [color]="'text_primary'"
+      [colorhover]="'text_primary'"
+      [opacity]="1"
+      [opacityhover]="1"
+      [rounded]="false"
+      [haveContent]="true"
+      (clicked)="close()"
+    >
+      Cancel
+    </app-button>
+  </div>
 </div>
 
 <ng-template #confirmTemplate>
-  @if (confirmNewEmailsValue.length === 0 && confirmKeptEmailsValue.length === 0 && confirmRemovedEmailsValue.length > 0) {
-    <p class="confirm-text">Are you sure you want to revoke access to this analysis for everyone?</p>
+  @if (
+    confirmNewEmailsValue.length === 0 &&
+    confirmKeptEmailsValue.length === 0 &&
+    confirmRemovedEmailsValue.length > 0
+  ) {
+    <p class="confirm-text">
+      Are you sure you want to revoke access to this analysis for everyone?
+    </p>
     <ol class="confirm-email-list confirm-removed">
       @for (email of confirmRemovedEmailsValue; track email) {
         <li>

@@ -383,11 +383,16 @@ export class AnalyticsPage implements OnInit {
       onCloseWithDataProcessing: () => {
         this.analysisService.deleteAnalysis(Number(analysis.id)).subscribe({
           next: () => {
+            const tab = analysis.type;
+            this.analyticsCache.update((cache) => ({
+              ...cache,
+              [tab]: cache[tab].filter((a) => a.id !== analysis.id),
+            }));
             this.modalService.closeModal();
-            this.loadAllAnalytics();
+            this.toast.show('Analysis deleted successfully', 'success');
           },
-          error: (error) => {
-            console.error('Failed to delete analysis:', error);
+          error: () => {
+            this.toast.show('Failed to delete analysis', 'error');
             this.modalService.broadcastEvent(ModalEvent.StopButtonLoading);
           },
         });

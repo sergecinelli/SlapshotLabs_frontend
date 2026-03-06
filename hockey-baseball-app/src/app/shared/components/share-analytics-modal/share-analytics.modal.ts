@@ -49,10 +49,13 @@ export class ShareAnalyticsModal implements OnInit {
   protected confirmRemovedEmails = signal<string[]>([]);
 
   private originalAccess = signal<AnalyticsAccessOut[]>([]);
+  private pendingValidEmail = signal(false);
   private confirmTemplate = viewChild.required<TemplateRef<unknown>>('confirmTemplate');
   private analyticsId = 0;
 
   protected hasChanges = computed(() => {
+    if (this.pendingValidEmail()) return true;
+
     const originalEmails = new Set(this.originalAccess().map((a) => a.email));
     const currentEmails = new Set(this.existingAccess().map((a) => a.email));
     const added = this.addedEmails();
@@ -82,6 +85,8 @@ export class ShareAnalyticsModal implements OnInit {
 
   protected onEmailInput(): void {
     const value = this.emailControl().value.trim();
+    this.pendingValidEmail.set(this.isValidEmail(value));
+
     if (value.length < 2) {
       this.searchResultsList.set([]);
       return;
@@ -100,6 +105,7 @@ export class ShareAnalyticsModal implements OnInit {
 
   protected selectUser(user: UserSearchOut): void {
     this.emailControl().setValue(user.email);
+    this.pendingValidEmail.set(true);
     this.searchResultsList.set([]);
   }
 
@@ -112,6 +118,7 @@ export class ShareAnalyticsModal implements OnInit {
 
     this.addedEmails.update((emails) => [...emails, email]);
     this.emailControl().setValue('');
+    this.pendingValidEmail.set(false);
     this.searchResultsList.set([]);
   }
 
@@ -127,12 +134,10 @@ export class ShareAnalyticsModal implements OnInit {
         this.addedEmails.update((emails) => [...emails, pendingEmail]);
       }
       this.emailControl().setValue('');
+      this.pendingValidEmail.set(false);
     }
 
-    const allEmails = [
-      ...this.existingAccess().map((a) => a.email),
-      ...this.addedEmails(),
-    ];
+    const allEmails = [...this.existingAccess().map((a) => a.email), ...this.addedEmails()];
 
     this.openConfirmation(allEmails);
   }

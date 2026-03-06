@@ -83,12 +83,14 @@ export class AnalysisService {
   }
 
   getAnalyticsAccess(analyticsId: number): Observable<AnalyticsAccessOut[]> {
-    return this.apiService.get<AnalyticsAccessOut[]>(`/hockey/analytics/${analyticsId}/access`).pipe(
-      catchError((error) => {
-        console.error('Failed to get analytics access:', error);
-        return throwError(() => error);
-      })
-    );
+    return this.apiService
+      .get<AnalyticsAccessOut[]>(`/hockey/analytics/${analyticsId}/access`)
+      .pipe(
+        catchError((error) => {
+          console.error('Failed to get analytics access:', error);
+          return throwError(() => error);
+        })
+      );
   }
 
   updateAnalyticsAccess(analyticsId: number, emails: string[]): Observable<void> {
