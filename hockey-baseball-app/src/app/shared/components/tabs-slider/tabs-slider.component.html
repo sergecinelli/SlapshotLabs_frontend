@@ -1,20 +1,26 @@
 @let itemsList = items();
+@let currentIndexValue = currentTabIndex();
+@let leftValue = indicatorLeft();
+@let widthValue = indicatorWidth();
 
-@if (itemsList) {
-  <ul class="tabs" #tabsContainer>
+@if (itemsList.length > 0) {
+  <div class="tabs-container" role="tablist">
+    <div class="indicator" [style.left.px]="leftValue" [style.width.px]="widthValue"></div>
     @for (item of itemsList; track item.key; let i = $index) {
-      <li
+      <button
+        #tabItem
         matRipple
-        [matRippleColor]="rippleColor"
         class="tab"
-        [class.active]="currentTabIndex === i"
+        role="tab"
+        [class.active]="currentIndexValue === i"
+        [attr.aria-selected]="currentIndexValue === i"
         (click)="selectTab(i)"
       >
         @if (item.icon) {
           <span class="material-symbols-rounded tab-icon">{{ item.icon }}</span>
         }
         {{ item.label }}
-      </li>
+      </button>
     }
-  </ul>
+  </div>
 }

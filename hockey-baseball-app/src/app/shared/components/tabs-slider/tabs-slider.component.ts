@@ -1,4 +1,4 @@
-import { Component, effect, input, output } from '@angular/core';
+import { Component, effect, input, output, viewChildren, ElementRef, signal } from '@angular/core';
 import { MatRippleModule } from '@angular/material/core';
 
 export interface TabItem {
@@ -14,8 +14,11 @@ export interface TabItem {
   styleUrl: './tabs-slider.component.scss',
 })
 export class TabsSliderComponent {
-  protected currentTabIndex = 0;
-  protected readonly rippleColor = 'rgba(0, 0, 0, 0.05)';
+  private tabElements = viewChildren<ElementRef>('tabItem');
+
+  protected currentTabIndex = signal(0);
+  protected indicatorLeft = signal(0);
+  protected indicatorWidth = signal(0);
 
   items = input<TabItem[]>([]);
   activeTabIndex = input<number | null>(null);
@@ -28,8 +31,20 @@ export class TabsSliderComponent {
     effect(() => {
       const activeIndex = this.activeTabIndex();
       if (activeIndex !== undefined && activeIndex !== null) {
-        this.currentTabIndex = activeIndex;
+        this.currentTabIndex.set(activeIndex);
       }
+    });
+
+    effect(() => {
+      const tabs = this.tabElements();
+      const index = this.currentTabIndex();
+      requestAnimationFrame(() => {
+        if (tabs.length > 0 && tabs[index]) {
+          const el = tabs[index].nativeElement;
+          this.indicatorLeft.set(el.offsetLeft);
+          this.indicatorWidth.set(el.offsetWidth);
+        }
+      });
     });
   }
 
@@ -38,7 +53,7 @@ export class TabsSliderComponent {
     this.canSelect = false;
     setTimeout(() => (this.canSelect = true), 300);
 
-    this.currentTabIndex = index;
+    this.currentTabIndex.set(index);
     this.selected.emit(this.items()[index].key);
   }
 }
