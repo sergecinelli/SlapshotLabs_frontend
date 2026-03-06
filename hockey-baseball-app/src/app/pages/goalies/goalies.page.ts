@@ -364,7 +364,8 @@ export class GoaliesPage implements OnInit {
         this.modalService.openModal(GoalieAnalysisModal, {
           name: 'Create Goalie Analysis',
           icon: 'bar_chart',
-          width: '600px',
+          width: '100%',
+          maxWidth: '900px',
           data: {
             isEditMode: false,
             preSelectedGoalieId: goalie.id.toString(),

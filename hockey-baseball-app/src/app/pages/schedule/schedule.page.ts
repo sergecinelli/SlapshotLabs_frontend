@@ -656,7 +656,8 @@ export class SchedulePage implements OnInit {
     this.modalService.openModal(GameAnalysisModal, {
       name: 'Create Game Analysis',
       icon: 'bar_chart',
-      width: '600px',
+      width: '100%',
+      maxWidth: '900px',
       data: {
         isEditMode: false,
         preSelectedGameId,

@@ -139,7 +139,8 @@ export class TeamAnalysisPage implements OnInit {
     this.modalService.openModal(TeamAnalysisModal, {
       name: data['isEditMode'] ? 'Edit Team Analysis' : 'Create Team Analysis',
       icon: 'bar_chart',
-      width: '600px',
+      width: '100%',
+      maxWidth: '900px',
       data,
       onCloseWithDataProcessing: (result: {
         isEditMode: boolean;

@@ -295,7 +295,8 @@ export class TeamsPage implements OnInit {
         this.modalService.openModal(TeamAnalysisModal, {
           name: 'Create Team Analysis',
           icon: 'bar_chart',
-          width: '600px',
+          width: '100%',
+          maxWidth: '900px',
           data: {
             isEditMode: false,
             preSelectedTeamId: team.id.toString(),

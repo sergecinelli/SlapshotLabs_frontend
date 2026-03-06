@@ -153,7 +153,8 @@ export class GameAnalysisPage implements OnInit {
     this.modalService.openModal(GameAnalysisModal, {
       name: data['isEditMode'] ? 'Edit Game Analysis' : 'Create Game Analysis',
       icon: 'bar_chart',
-      width: '600px',
+      width: '100%',
+      maxWidth: '900px',
       data,
       onCloseWithDataProcessing: (result: {
         isEditMode: boolean;

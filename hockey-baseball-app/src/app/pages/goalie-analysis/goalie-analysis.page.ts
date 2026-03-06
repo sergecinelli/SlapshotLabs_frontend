@@ -139,7 +139,8 @@ export class GoalieAnalysisPage implements OnInit {
     this.modalService.openModal(GoalieAnalysisModal, {
       name: data['isEditMode'] ? 'Edit Goalie Analysis' : 'Create Goalie Analysis',
       icon: 'bar_chart',
-      width: '600px',
+      width: '100%',
+      maxWidth: '900px',
       data,
       onCloseWithDataProcessing: (result: {
         isEditMode: boolean;

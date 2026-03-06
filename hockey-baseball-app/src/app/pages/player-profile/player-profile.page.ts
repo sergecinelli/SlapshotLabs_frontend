@@ -309,7 +309,8 @@ export class PlayerProfilePage implements OnInit {
     this.modalService.openModal(PlayerAnalysisModal, {
       name: 'Create Player Analysis',
       icon: 'bar_chart',
-      width: '600px',
+      width: '100%',
+      maxWidth: '900px',
       data: {
         isEditMode: false,
         preSelectedPlayerId: this.player!.id.toString(),
