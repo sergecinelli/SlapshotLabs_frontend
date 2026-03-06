@@ -165,9 +165,9 @@ export class ShareAnalyticsModal implements OnInit {
       icon: 'share',
       data: {
         template: this.confirmTemplate(),
-        buttonText: 'Share',
-        buttonIcon: 'share',
-        color: 'blue',
+        buttonText: 'Confirm',
+        buttonIcon: 'check_circle',
+        color: 'green',
         colorSoft: 'blue_dark',
         withButtonLoading: true,
       },
