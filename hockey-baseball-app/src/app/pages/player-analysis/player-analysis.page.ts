@@ -17,6 +17,7 @@ import { ComponentVisibilityByRoleDirective } from '../../shared/directives/comp
 import { visibilityByRoleMap } from './player-analysis.role-map';
 import { PlayerAnalysisModal } from '../../shared/components/player-analysis-modal/player-analysis.modal';
 import { AnalysisViewModal } from '../../shared/components/analysis-view-modal/analysis-view.modal';
+import { DisplayTextModal } from '../../shared/components/display-text-modal/display-text.modal';
 
 @Component({
   selector: 'app-player-analysis',
@@ -172,12 +173,30 @@ export class PlayerAnalysisPage implements OnInit {
   }
 
   private onDeleteAnalysis(analysis: Analysis): void {
-    if (confirm('Are you sure you want to delete this analysis?')) {
-      this.analysisService.deleteAnalysis(Number(analysis.id)).subscribe({
-        next: () => this.loadAnalytics(),
-        error: (error) => console.error('Failed to delete analysis:', error),
-      });
-    }
+    this.modalService.openModal(DisplayTextModal, {
+      name: 'Delete Analysis',
+      icon: 'report',
+      data: {
+        text: 'Are you sure you want to delete this analysis?',
+        buttonText: 'Delete',
+        buttonIcon: 'delete',
+        color: 'primary',
+        colorSoft: 'primary_dark',
+        withButtonLoading: true,
+      },
+      onCloseWithDataProcessing: () => {
+        this.analysisService.deleteAnalysis(Number(analysis.id)).subscribe({
+          next: () => {
+            this.modalService.closeModal();
+            this.loadAnalytics();
+          },
+          error: (error) => {
+            console.error('Failed to delete analysis:', error);
+            this.modalService.broadcastEvent(ModalEvent.StopButtonLoading);
+          },
+        });
+      },
+    });
   }
 
   private loadData(): void {

@@ -27,6 +27,7 @@ import { TeamService } from '../../services/team.service';
 import { GameEventNameService } from '../../services/game-event-name.service';
 import { GameMetadataService } from '../../services/game-metadata.service';
 import { ScheduleService } from '../../services/schedule.service';
+import { DisplayTextModal } from '../../shared/components/display-text-modal/display-text.modal';
 import { forkJoin } from 'rxjs';
 import { formatDateShortWithCommas } from '../../shared/utils/time-converter.util';
 
@@ -130,22 +131,36 @@ export class VideoHighlightsPage implements OnInit {
         this.openEditHighlightModal(item);
         break;
       case 'delete':
-        if (confirm(`Are you sure you want to delete "${item.name}"?`)) {
-          this.loading.set(true);
-          this.highlightsService.deleteHighlightReel(item.id).subscribe({
-            next: () => {
-              const updated = this.rows().filter((r) => r.id !== item.id);
-              this.rows.set(updated);
-              this.loading.set(false);
-              this.toast.show('Highlight reel deleted successfully', 'success');
-            },
-            error: (error) => {
-              console.error('Error deleting highlight reel:', error);
-              this.loading.set(false);
-              this.toast.show('Failed to delete highlight reel', 'error');
-            },
-          });
-        }
+        this.modalService.openModal(DisplayTextModal, {
+          name: 'Delete Highlight Reel',
+          icon: 'report',
+          data: {
+            text: `Are you sure you want to delete <b>${item.name}</b>?`,
+            buttonText: 'Delete',
+            buttonIcon: 'delete',
+            color: 'primary',
+            colorSoft: 'primary_dark',
+            withButtonLoading: true,
+          },
+          onCloseWithDataProcessing: () => {
+            this.loading.set(true);
+            this.highlightsService.deleteHighlightReel(item.id).subscribe({
+              next: () => {
+                const updated = this.rows().filter((r) => r.id !== item.id);
+                this.rows.set(updated);
+                this.loading.set(false);
+                this.modalService.closeModal();
+                this.toast.show('Highlight reel deleted successfully', 'success');
+              },
+              error: (error) => {
+                console.error('Error deleting highlight reel:', error);
+                this.loading.set(false);
+                this.toast.show('Failed to delete highlight reel', 'error');
+                this.modalService.broadcastEvent(ModalEvent.StopButtonLoading);
+              },
+            });
+          },
+        });
         break;
       default:
         console.warn('Unknown action:', action);

@@ -14,6 +14,7 @@ import { ComponentVisibilityByRoleDirective } from '../../shared/directives/comp
 import { visibilityByRoleMap } from './video-library.role-map';
 import { ModalEvent, ModalService } from '../../services/modal.service';
 import { ToastService } from '../../services/toast.service';
+import { DisplayTextModal } from '../../shared/components/display-text-modal/display-text.modal';
 
 @Component({
   selector: 'app-video-library',
@@ -103,19 +104,33 @@ export class VideoLibraryPage implements OnInit {
   }
 
   private deleteVideo(video: Video): void {
-    if (confirm(`Are you sure you want to delete "${video.name}"?`)) {
-      this.videoService.deleteVideo(video.id).subscribe({
-        next: () => {
-          const updatedVideos = this.videos().filter((v) => v.id !== video.id);
-          this.videos.set(updatedVideos);
-          this.toast.show('Video deleted successfully', 'success');
-        },
-        error: (error) => {
-          console.error('Error deleting video:', error);
-          this.toast.show('Failed to delete video', 'error');
-        },
-      });
-    }
+    this.modalService.openModal(DisplayTextModal, {
+      name: 'Delete Video',
+      icon: 'report',
+      data: {
+        text: `Are you sure you want to delete <b>${video.name}</b>?`,
+        buttonText: 'Delete',
+        buttonIcon: 'delete',
+        color: 'primary',
+        colorSoft: 'primary_dark',
+        withButtonLoading: true,
+      },
+      onCloseWithDataProcessing: () => {
+        this.videoService.deleteVideo(video.id).subscribe({
+          next: () => {
+            const updatedVideos = this.videos().filter((v) => v.id !== video.id);
+            this.videos.set(updatedVideos);
+            this.modalService.closeModal();
+            this.toast.show('Video deleted successfully', 'success');
+          },
+          error: (error) => {
+            console.error('Error deleting video:', error);
+            this.toast.show('Failed to delete video', 'error');
+            this.modalService.broadcastEvent(ModalEvent.StopButtonLoading);
+          },
+        });
+      },
+    });
   }
 
   private editVideo(video: Video): void {

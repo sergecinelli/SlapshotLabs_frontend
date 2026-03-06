@@ -43,6 +43,7 @@ import {
   PenaltyEventRequest,
 } from '../../services/game-event.service';
 import { GameEventNameService } from '../../services/game-event-name.service';
+import { DisplayTextModal } from '../../shared/components/display-text-modal/display-text.modal';
 import { ScheduleService } from '../../services/schedule.service';
 import {
   SprayChartTransformOptions,
@@ -2076,20 +2077,34 @@ export class LiveDashboardPage implements OnInit, OnDestroy {
       return;
     }
 
-    if (confirm('Are you sure you want to delete this event?')) {
-      this.gameEventService.deleteGameEvent(eventId).subscribe({
-        next: () => {
-          this.refreshLiveData();
-          // Trigger banner refresh in case a goal was deleted
-          this.bannerService.triggerRefresh();
-          this.toast.show('Event deleted successfully', 'success');
-        },
-        error: (error) => {
-          console.error('Failed to delete event:', error);
-          this.toast.show('Failed to delete event', 'error');
-        },
-      });
-    }
+    this.modalService.openModal(DisplayTextModal, {
+      name: 'Delete Event',
+      icon: 'report',
+      data: {
+        text: 'Are you sure you want to delete this event?',
+        buttonText: 'Delete',
+        buttonIcon: 'delete',
+        color: 'primary',
+        colorSoft: 'primary_dark',
+        withButtonLoading: true,
+      },
+      onCloseWithDataProcessing: () => {
+        this.gameEventService.deleteGameEvent(eventId).subscribe({
+          next: () => {
+            this.refreshLiveData();
+            // Trigger banner refresh in case a goal was deleted
+            this.bannerService.triggerRefresh();
+            this.modalService.closeModal();
+            this.toast.show('Event deleted successfully', 'success');
+          },
+          error: (error) => {
+            console.error('Failed to delete event:', error);
+            this.toast.show('Failed to delete event', 'error');
+            this.modalService.broadcastEvent(ModalEvent.StopButtonLoading);
+          },
+        });
+      },
+    });
   }
 
   /**

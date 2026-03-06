@@ -4,6 +4,7 @@ export type AppColor =
   // Primary colors
   | 'primary'
   | 'primary_dark'
+  | 'primary_soft'
   // Secondary colors
   | 'secondary'
   | 'secondary_tone1'
@@ -67,6 +68,7 @@ export const appColors: IKeyValue<AppColor, string>[] = [
   // Primary colors
   { key: 'primary', value: '#CF142B' },
   { key: 'primary_dark', value: '#B0122A' },
+  { key: 'primary_soft', value: '#ffeef1' },
 
   // Secondary colors
   { key: 'secondary', value: '#778f9c' },

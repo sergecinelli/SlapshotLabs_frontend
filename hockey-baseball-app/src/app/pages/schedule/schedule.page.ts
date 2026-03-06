@@ -18,6 +18,7 @@ import {
   GamePeriodResponse,
 } from '../../services/game-metadata.service';
 import { BannerService } from '../../services/banner.service';
+import { DisplayTextModal } from '../../shared/components/display-text-modal/display-text.modal';
 import { Schedule, GameStatus } from '../../shared/interfaces/schedule.interface';
 import { Team } from '../../shared/interfaces/team.interface';
 import { Arena, Rink } from '../../shared/interfaces/arena.interface';
@@ -593,37 +594,47 @@ export class SchedulePage implements OnInit {
   }
 
   deleteSchedule(schedule: Schedule): void {
-    if (
-      confirm(
-        `Are you sure you want to delete the game between ${schedule.homeTeam} and ${schedule.awayTeam}?`
-      )
-    ) {
-      const gameId = schedule.id;
-      this.deletingGameIds.add(gameId);
-      const numericGameId = parseInt(gameId);
-      this.scheduleService.deleteGame(numericGameId).subscribe({
-        next: () => {
-          this.deletingGameIds.delete(gameId);
+    this.modalService.openModal(DisplayTextModal, {
+      name: 'Delete Game',
+      icon: 'report',
+      data: {
+        text: `Are you sure you want to delete the game between <b>${schedule.homeTeam}</b> and <b>${schedule.awayTeam}</b>?`,
+        buttonText: 'Delete',
+        buttonIcon: 'delete',
+        color: 'primary',
+        colorSoft: 'primary_dark',
+        withButtonLoading: true,
+      },
+      onCloseWithDataProcessing: () => {
+        const gameId = schedule.id;
+        this.deletingGameIds.add(gameId);
+        const numericGameId = parseInt(gameId);
+        this.scheduleService.deleteGame(numericGameId).subscribe({
+          next: () => {
+            this.deletingGameIds.delete(gameId);
 
-          // Remove the game from the list immediately without full reload
-          const currentSchedules = this.schedules();
-          const updatedSchedules = currentSchedules.filter((s) => s.id !== gameId);
-          this.schedules.set(updatedSchedules);
+            // Remove the game from the list immediately without full reload
+            const currentSchedules = this.schedules();
+            const updatedSchedules = currentSchedules.filter((s) => s.id !== gameId);
+            this.schedules.set(updatedSchedules);
 
-          // Also remove from rawGames map
-          this.rawGames.delete(gameId);
+            // Also remove from rawGames map
+            this.rawGames.delete(gameId);
 
-          // Refresh the banner
-          this.bannerService.triggerRefresh();
-          this.toast.show('Game deleted successfully', 'success');
-        },
-        error: (error) => {
-          this.deletingGameIds.delete(gameId);
-          console.error('Error deleting game:', error);
-          this.toast.show('Failed to delete game', 'error');
-        },
-      });
-    }
+            // Refresh the banner
+            this.bannerService.triggerRefresh();
+            this.modalService.closeModal();
+            this.toast.show('Game deleted successfully', 'success');
+          },
+          error: (error) => {
+            this.deletingGameIds.delete(gameId);
+            console.error('Error deleting game:', error);
+            this.toast.show('Failed to delete game', 'error');
+            this.modalService.broadcastEvent(ModalEvent.StopButtonLoading);
+          },
+        });
+      },
+    });
   }
 
   openLiveDashboard(schedule: Schedule): void {

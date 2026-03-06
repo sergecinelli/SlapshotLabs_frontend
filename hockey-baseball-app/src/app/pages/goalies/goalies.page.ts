@@ -18,6 +18,7 @@ import { ButtonLoadingComponent } from '../../shared/components/buttons/button-l
 import { ButtonRouteComponent } from '../../shared/components/buttons/button-route/button-route.component';
 import { PositionService } from '../../services/position.service';
 import { visibilityByRoleMap } from './goalies.role-map';
+import { DisplayTextModal } from '../../shared/components/display-text-modal/display-text.modal';
 import {
   DataTableComponent,
   TableColumn,
@@ -325,23 +326,38 @@ export class GoaliesPage implements OnInit {
   }
 
   deleteGoalie(goalie: Goalie): void {
-    if (confirm(`Are you sure you want to delete ${goalie.firstName} ${goalie.lastName}?`)) {
-      this.goalieService.deleteGoalie(goalie.id).subscribe({
-        next: (success) => {
-          if (success) {
-            const updatedGoalies = this.goalies().filter((g) => g.id !== goalie.id);
-            this.goalies.set(updatedGoalies);
-            this.toast.show('Goalie deleted successfully', 'success');
-          } else {
+    this.modalService.openModal(DisplayTextModal, {
+      name: 'Delete Goalie',
+      icon: 'report',
+      data: {
+        text: `Are you sure you want to delete <b>${goalie.firstName} ${goalie.lastName}</b>?`,
+        buttonText: 'Delete',
+        buttonIcon: 'delete',
+        color: 'primary',
+        colorSoft: 'primary_dark',
+        withButtonLoading: true,
+      },
+      onCloseWithDataProcessing: () => {
+        this.goalieService.deleteGoalie(goalie.id).subscribe({
+          next: (success) => {
+            if (success) {
+              const updatedGoalies = this.goalies().filter((g) => g.id !== goalie.id);
+              this.goalies.set(updatedGoalies);
+              this.modalService.closeModal();
+              this.toast.show('Goalie deleted successfully', 'success');
+            } else {
+              this.toast.show('Failed to delete goalie', 'error');
+              this.modalService.broadcastEvent(ModalEvent.StopButtonLoading);
+            }
+          },
+          error: (error) => {
+            console.error('Error deleting goalie:', error);
             this.toast.show('Failed to delete goalie', 'error');
-          }
-        },
-        error: (error) => {
-          console.error('Error deleting goalie:', error);
-          this.toast.show('Failed to delete goalie', 'error');
-        },
-      });
-    }
+            this.modalService.broadcastEvent(ModalEvent.StopButtonLoading);
+          },
+        });
+      },
+    });
   }
 
   viewGoalieProfile(goalie: Goalie): void {

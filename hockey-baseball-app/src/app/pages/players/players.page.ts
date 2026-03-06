@@ -18,6 +18,7 @@ import { ButtonLoadingComponent } from '../../shared/components/buttons/button-l
 import { ButtonRouteComponent } from '../../shared/components/buttons/button-route/button-route.component';
 import { PositionService } from '../../services/position.service';
 import { visibilityByRoleMap } from './players.role-map';
+import { DisplayTextModal } from '../../shared/components/display-text-modal/display-text.modal';
 import {
   DataTableComponent,
   TableColumn,
@@ -328,23 +329,38 @@ export class PlayersPage implements OnInit {
   }
 
   deletePlayer(player: Player): void {
-    if (confirm(`Are you sure you want to delete ${player.firstName} ${player.lastName}?`)) {
-      this.playerService.deletePlayer(player.id).subscribe({
-        next: (success) => {
-          if (success) {
-            const updatedPlayers = this.players().filter((p) => p.id !== player.id);
-            this.players.set(updatedPlayers);
-            this.toast.show('Player deleted successfully', 'success');
-          } else {
+    this.modalService.openModal(DisplayTextModal, {
+      name: 'Delete Player',
+      icon: 'report',
+      data: {
+        text: `Are you sure you want to delete <b>${player.firstName} ${player.lastName}</b>?`,
+        buttonText: 'Delete',
+        buttonIcon: 'delete',
+        color: 'primary',
+        colorSoft: 'primary_dark',
+        withButtonLoading: true,
+      },
+      onCloseWithDataProcessing: () => {
+        this.playerService.deletePlayer(player.id).subscribe({
+          next: (success) => {
+            if (success) {
+              const updatedPlayers = this.players().filter((p) => p.id !== player.id);
+              this.players.set(updatedPlayers);
+              this.modalService.closeModal();
+              this.toast.show('Player deleted successfully', 'success');
+            } else {
+              this.toast.show('Failed to delete player', 'error');
+              this.modalService.broadcastEvent(ModalEvent.StopButtonLoading);
+            }
+          },
+          error: (error) => {
+            console.error('Error deleting player:', error);
             this.toast.show('Failed to delete player', 'error');
-          }
-        },
-        error: (error) => {
-          console.error('Error deleting player:', error);
-          this.toast.show('Failed to delete player', 'error');
-        },
-      });
-    }
+            this.modalService.broadcastEvent(ModalEvent.StopButtonLoading);
+          },
+        });
+      },
+    });
   }
 
   viewPlayerProfile(player: Player): void {

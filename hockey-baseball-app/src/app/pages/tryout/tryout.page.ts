@@ -25,6 +25,7 @@ import {
   TryoutAddModal,
   TryoutAddModalData,
 } from '../../shared/components/tryout-add-modal/tryout-add.modal';
+import { DisplayTextModal } from '../../shared/components/display-text-modal/display-text.modal';
 
 const TRYOUT_TABS: TabItem[] = [
   { key: 'player', label: 'Players', icon: 'person' },
@@ -181,12 +182,30 @@ export class TryoutPage implements OnInit {
     const teamId = this.teamId();
     if (!teamId) return;
 
-    if (confirm(`Remove ${entry.firstName} ${entry.lastName} from tryout list?`)) {
-      this.tryoutService.removeFromTryout(teamId, entry.id).subscribe({
-        next: () => this.loadEntries(),
-        error: (error) => console.error('Failed to remove from tryout:', error),
-      });
-    }
+    this.modalService.openModal(DisplayTextModal, {
+      name: 'Remove from Tryout',
+      icon: 'report',
+      data: {
+        text: `Remove <b>${entry.firstName} ${entry.lastName}</b> from tryout list?`,
+        buttonText: 'Remove',
+        buttonIcon: 'delete',
+        color: 'primary',
+        colorSoft: 'primary_dark',
+        withButtonLoading: true,
+      },
+      onCloseWithDataProcessing: () => {
+        this.tryoutService.removeFromTryout(teamId, entry.id).subscribe({
+          next: () => {
+            this.modalService.closeModal();
+            this.loadEntries();
+          },
+          error: (error) => {
+            console.error('Failed to remove from tryout:', error);
+            this.modalService.broadcastEvent(ModalEvent.StopButtonLoading);
+          },
+        });
+      },
+    });
   }
 
   private loadEntries(): void {

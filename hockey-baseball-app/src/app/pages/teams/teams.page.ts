@@ -18,6 +18,7 @@ import { ButtonRouteComponent } from '../../shared/components/buttons/button-rou
 import { visibilityByRoleMap } from './teams.role-map';
 import { Observable, forkJoin } from 'rxjs';
 import { AnalysisService } from '../../services/analysis.service';
+import { DisplayTextModal } from '../../shared/components/display-text-modal/display-text.modal';
 import { AnalyticsApiIn } from '../../shared/interfaces/analysis.interface';
 import { TeamAnalysisModal } from '../../shared/components/team-analysis-modal/team-analysis.modal';
 import {
@@ -228,23 +229,38 @@ export class TeamsPage implements OnInit {
   }
 
   deleteTeam(team: Team): void {
-    if (confirm(`Are you sure you want to delete ${team.name}?`)) {
-      this.teamService.deleteTeam(team.id).subscribe({
-        next: (success) => {
-          if (success) {
-            const updatedTeams = this.teams().filter((t) => t.id !== team.id);
-            this.teams.set(updatedTeams);
-            this.toast.show('Team deleted successfully', 'success');
-          } else {
+    this.modalService.openModal(DisplayTextModal, {
+      name: 'Delete Team',
+      icon: 'report',
+      data: {
+        text: `Are you sure you want to delete <b>${team.name}</b>?`,
+        buttonText: 'Delete',
+        buttonIcon: 'delete',
+        color: 'primary',
+        colorSoft: 'primary_dark',
+        withButtonLoading: true,
+      },
+      onCloseWithDataProcessing: () => {
+        this.teamService.deleteTeam(team.id).subscribe({
+          next: (success) => {
+            if (success) {
+              const updatedTeams = this.teams().filter((t) => t.id !== team.id);
+              this.teams.set(updatedTeams);
+              this.modalService.closeModal();
+              this.toast.show('Team deleted successfully', 'success');
+            } else {
+              this.toast.show('Failed to delete team', 'error');
+              this.modalService.broadcastEvent(ModalEvent.StopButtonLoading);
+            }
+          },
+          error: (error) => {
+            console.error('Error deleting team:', error);
             this.toast.show('Failed to delete team', 'error');
-          }
-        },
-        error: (error) => {
-          console.error('Error deleting team:', error);
-          this.toast.show('Failed to delete team', 'error');
-        },
-      });
-    }
+            this.modalService.broadcastEvent(ModalEvent.StopButtonLoading);
+          },
+        });
+      },
+    });
   }
 
   viewTeamProfile(team: Team): void {

@@ -23,6 +23,7 @@ import {
 } from '../../shared/components/tabs-slider/tabs-slider.component';
 import { ComponentVisibilityByRoleDirective } from '../../shared/directives/component-visibility-by-role.directive';
 import { visibilityByRoleMap } from './analytics.role-map';
+import { DisplayTextModal } from '../../shared/components/display-text-modal/display-text.modal';
 import { PlayerAnalysisModal } from '../../shared/components/player-analysis-modal/player-analysis.modal';
 import { GoalieAnalysisModal } from '../../shared/components/goalie-analysis-modal/goalie-analysis.modal';
 import { TeamAnalysisModal } from '../../shared/components/team-analysis-modal/team-analysis.modal';
@@ -317,12 +318,30 @@ export class AnalyticsPage implements OnInit {
   }
 
   private onDeleteAnalysis(analysis: Analysis): void {
-    if (confirm('Are you sure you want to delete this analysis?')) {
-      this.analysisService.deleteAnalysis(Number(analysis.id)).subscribe({
-        next: () => this.loadAllAnalytics(),
-        error: (error) => console.error('Failed to delete analysis:', error),
-      });
-    }
+    this.modalService.openModal(DisplayTextModal, {
+      name: 'Delete Analysis',
+      icon: 'report',
+      data: {
+        text: 'Are you sure you want to delete this analysis?',
+        buttonText: 'Delete',
+        buttonIcon: 'delete',
+        color: 'primary',
+        colorSoft: 'primary_dark',
+        withButtonLoading: true,
+      },
+      onCloseWithDataProcessing: () => {
+        this.analysisService.deleteAnalysis(Number(analysis.id)).subscribe({
+          next: () => {
+            this.modalService.closeModal();
+            this.loadAllAnalytics();
+          },
+          error: (error) => {
+            console.error('Failed to delete analysis:', error);
+            this.modalService.broadcastEvent(ModalEvent.StopButtonLoading);
+          },
+        });
+      },
+    });
   }
 
   private loadAllAnalytics(): void {
