@@ -5,7 +5,16 @@ const app = express();
 
 // Serve static files from the Angular app build directory
 const distDir = path.join(__dirname, 'dist/hockey-baseball-app/browser');
-app.use(express.static(distDir));
+app.use(
+  express.static(distDir, {
+    maxAge: '3d',
+    setHeaders(res, filePath) {
+      if (filePath.endsWith('.html')) {
+        res.setHeader('Cache-Control', 'no-cache');
+      }
+    },
+  })
+);
 
 // Enable CORS for development (optional)
 app.use((req, res, next) => {
