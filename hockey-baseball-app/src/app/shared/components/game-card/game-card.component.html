@@ -84,7 +84,7 @@
           @if (gameValue.homeTeamId) {
             <a
               class="team-name team-link"
-              [routerLink]="['/teams-and-rosters/teams/team-profile', gameValue.homeTeamId]"
+              [routerLink]="['/teams-and-rosters/teams', gameValue.homeTeamId, 'profile']"
               [attr.aria-label]="'View ' + gameValue.homeTeam + ' profile'"
               >{{ gameValue.homeTeam }}</a
             >
@@ -158,7 +158,7 @@
           @if (gameValue.awayTeamId) {
             <a
               class="team-name team-link"
-              [routerLink]="['/teams-and-rosters/teams/team-profile', gameValue.awayTeamId]"
+              [routerLink]="['/teams-and-rosters/teams', gameValue.awayTeamId, 'profile']"
               [attr.aria-label]="'View ' + gameValue.awayTeam + ' profile'"
               >{{ gameValue.awayTeam }}</a
             >

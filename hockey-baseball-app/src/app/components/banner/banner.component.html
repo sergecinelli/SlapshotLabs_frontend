@@ -84,7 +84,7 @@
                 class="bn-logo"
               />
               <a
-                [routerLink]="['/teams-and-rosters/teams/team-profile/', item.away_team_id]"
+                [routerLink]="['/teams-and-rosters/teams', item.away_team_id, 'profile']"
                 class="bn-name"
                 (click)="$event.stopPropagation()"
                 [attr.aria-label]="
@@ -92,7 +92,8 @@
                   getTeamDisplay(item.away_team_abbreviation, item.away_team_name) +
                   ' profile'
                 "
-              >{{ getTeamDisplay(item.away_team_abbreviation, item.away_team_name) }}</a>
+                >{{ getTeamDisplay(item.away_team_abbreviation, item.away_team_name) }}</a
+              >
               <span class="bn-score" [class.bn-score-highlight]="isWinning(item, false)">{{
                 item.away_goals
               }}</span>
@@ -104,7 +105,7 @@
                 class="bn-logo"
               />
               <a
-                [routerLink]="['/teams-and-rosters/teams/team-profile/', item.home_team_id]"
+                [routerLink]="['/teams-and-rosters/teams', item.home_team_id, 'profile']"
                 class="bn-name"
                 (click)="$event.stopPropagation()"
                 [attr.aria-label]="
@@ -112,7 +113,8 @@
                   getTeamDisplay(item.home_team_abbreviation, item.home_team_name) +
                   ' profile'
                 "
-              >{{ getTeamDisplay(item.home_team_abbreviation, item.home_team_name) }}</a>
+                >{{ getTeamDisplay(item.home_team_abbreviation, item.home_team_name) }}</a
+              >
               <span class="bn-score" [class.bn-score-highlight]="isWinning(item, true)">{{
                 item.home_goals
               }}</span>
