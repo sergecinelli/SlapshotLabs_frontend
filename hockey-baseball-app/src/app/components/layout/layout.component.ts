@@ -43,7 +43,7 @@ export class LayoutComponent implements OnInit {
   private router = inject(Router);
   protected themeService = inject(ThemeService);
 
-  protected isCollapsed = signal(false);
+  protected isCollapsed = signal(this.authService.justLoggedIn);
   protected currentUser = signal<UserProfile | null>(null);
   protected teamName = signal<string | null>(null);
 
@@ -52,6 +52,11 @@ export class LayoutComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    if (this.authService.justLoggedIn) {
+      this.authService.justLoggedIn = false;
+      setTimeout(() => this.isCollapsed.set(false), 1000);
+    }
+
     this.authService.getCurrentUser().subscribe({
       next: (user) => {
         this.currentUser.set(user);

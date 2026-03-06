@@ -25,6 +25,9 @@ export class AuthService {
   private isAuthenticatedSubject = new BehaviorSubject<boolean>(false);
   public isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
 
+  justLoggedIn = false;
+  private loggingOut = false;
+
   // Cache for ongoing API requests to prevent multiple simultaneous calls
   private currentUserRequest$: Observable<UserProfile | null> | null = null;
 
@@ -75,6 +78,10 @@ export class AuthService {
           })
         );
       }),
+      tap(() => {
+        this.loggingOut = false;
+        this.justLoggedIn = true;
+      }),
       switchMap(() => of(void 0)), // Convert to Observable<void>
       catchError((error) => {
         console.error('😱 Auth Service - Sign-in failed:', error);
@@ -84,39 +91,47 @@ export class AuthService {
   }
 
   /**
+   * Mark as logging out so guards allow navigation to auth pages
+   */
+  beginLogout(): void {
+    this.loggingOut = true;
+  }
+
+  /**
+   * Clear local auth state (call after transition animation)
+   */
+  clearLocalAuthState(): void {
+    this.currentUserSubject.next(null);
+    this.isAuthenticatedSubject.next(false);
+    this.currentUserRequest$ = null;
+  }
+
+  /**
    * Sign out user
    */
   signOut(): Observable<void> {
     return this.apiService.get<unknown>('/users/signout').pipe(
       switchMap(() => {
-        // After logout, refresh CSRF token for security
         return this.apiService.refreshCsrfToken().pipe(
           tap(() => {
-            this.currentUserSubject.next(null);
-            this.isAuthenticatedSubject.next(false);
+            this.clearLocalAuthState();
           }),
-          switchMap(() => of(void 0)), // Convert to Observable<void>
+          switchMap(() => of(void 0)),
           catchError(() => {
-            // If CSRF refresh fails after logout, clear token completely
-            this.currentUserSubject.next(null);
-            this.isAuthenticatedSubject.next(false);
+            this.clearLocalAuthState();
             this.csrfTokenService.clearCsrfToken();
             return of(void 0);
           })
         );
       }),
       catchError(() => {
-        // If sign-out fails, try to refresh CSRF token anyway then clear local state
         return this.apiService.refreshCsrfToken().pipe(
           tap(() => {
-            this.currentUserSubject.next(null);
-            this.isAuthenticatedSubject.next(false);
+            this.clearLocalAuthState();
           }),
-          switchMap(() => of(void 0)), // Convert to Observable<void>
+          switchMap(() => of(void 0)),
           catchError(() => {
-            // If both sign-out and CSRF refresh fail, clear everything
-            this.currentUserSubject.next(null);
-            this.isAuthenticatedSubject.next(false);
+            this.clearLocalAuthState();
             this.csrfTokenService.clearCsrfToken();
             return of(void 0);
           })
@@ -129,6 +144,11 @@ export class AuthService {
    * Get current user profile
    */
   getCurrentUser(): Observable<UserProfile | null> {
+    // During logout, don't re-fetch from API
+    if (this.loggingOut) {
+      return of(null);
+    }
+
     // If we already have user data, return it from cache
     const currentUser = this.currentUserSubject.value;
     if (currentUser) {
@@ -224,24 +244,7 @@ export class AuthService {
   }
 
   acceptInvitation(invitationToken: string): Observable<void> {
-    return this.apiService.refreshCsrfToken().pipe(
-      switchMap(() => {
-        return this.apiService.post<void>('/auth/invitations', {
-          invitation_token: invitationToken,
-        });
-      }),
-      switchMap(() => {
-        return timer(100).pipe(
-          mergeMap(() => {
-            return this.refreshCurrentUser();
-          })
-        );
-      }),
-      switchMap(() => of(void 0)),
-      catchError((error) => {
-        return throwError(() => error);
-      })
-    );
+    return this.apiService.post<void>(`/users/invitations/${invitationToken}`, {});
   }
 
   /**

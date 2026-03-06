@@ -1,161 +1,168 @@
-<!-- Sign Up Page -->
-<app-auth-layout titleText="SIGN UP HERE">
-  <!-- Sign Up Form -->
-  <form [formGroup]="signUpForm" (ngSubmit)="onSubmit()">
-    <div class="space-y-0">
-      <!-- Email Address -->
-      <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="w-full">
-        <mat-label class="uppercase text-custom-secondary">Email Address</mat-label>
-        <input
-          matInput
-          type="email"
-          autocomplete="email"
-          formControlName="email"
-          placeholder="Enter your email"
-        />
-        @if (email?.invalid && (email?.dirty || email?.touched)) {
-          <mat-error>
-            @if (email?.errors?.['required']) {
-              Email address is required
-            }
-            @if (email?.errors?.['email']) {
-              Please enter a valid email address
-            }
-          </mat-error>
-        }
-      </mat-form-field>
+<app-auth-layout>
+  <div card class="card">
+    <div class="card-columns">
+      <div class="form-column">
+        <h1 class="title">Create your account</h1>
+        <p class="subtitle">Sign up to start tracking your team's performance.</p>
 
-      <!-- First Name and Last Name Row -->
-      <div class="flex space-x-2">
-        <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="w-full">
-          <mat-label class="uppercase text-custom-secondary">First Name</mat-label>
-          <input
-            matInput
-            type="text"
-            autocomplete="given-name"
-            formControlName="firstName"
-            placeholder="First name"
-          />
-          @if (firstName?.invalid && (firstName?.dirty || firstName?.touched)) {
-            <mat-error>
-              @if (firstName?.errors?.['required']) {
-                Required
+        <form [formGroup]="signUpForm" (ngSubmit)="onSubmit()">
+          <div class="space-y-0">
+            <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="w-full">
+              <mat-label class="uppercase text-custom-secondary">Email Address</mat-label>
+              <input
+                matInput
+                type="email"
+                autocomplete="email"
+                formControlName="email"
+                placeholder="Enter your email"
+              />
+              @if (email?.invalid && (email?.dirty || email?.touched)) {
+                <mat-error>
+                  @if (email?.errors?.['required']) {
+                    Email address is required
+                  }
+                  @if (email?.errors?.['email']) {
+                    Please enter a valid email address
+                  }
+                </mat-error>
               }
-              @if (firstName?.errors?.['minlength']) {
-                Min 2 characters
-              }
-            </mat-error>
-          }
-        </mat-form-field>
+            </mat-form-field>
 
-        <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="w-full">
-          <mat-label class="uppercase text-custom-secondary">Last Name</mat-label>
-          <input
-            matInput
-            type="text"
-            autocomplete="family-name"
-            formControlName="lastName"
-            placeholder="Last name"
-          />
-          @if (lastName?.invalid && (lastName?.dirty || lastName?.touched)) {
-            <mat-error>
-              @if (lastName?.errors?.['required']) {
-                Required
+            <div class="flex space-x-2">
+              <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="w-full">
+                <mat-label class="uppercase text-custom-secondary">First Name</mat-label>
+                <input
+                  matInput
+                  type="text"
+                  autocomplete="given-name"
+                  formControlName="firstName"
+                  placeholder="First name"
+                />
+                @if (firstName?.invalid && (firstName?.dirty || firstName?.touched)) {
+                  <mat-error>
+                    @if (firstName?.errors?.['required']) {
+                      Required
+                    }
+                    @if (firstName?.errors?.['minlength']) {
+                      Min 2 characters
+                    }
+                  </mat-error>
+                }
+              </mat-form-field>
+
+              <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="w-full">
+                <mat-label class="uppercase text-custom-secondary">Last Name</mat-label>
+                <input
+                  matInput
+                  type="text"
+                  autocomplete="family-name"
+                  formControlName="lastName"
+                  placeholder="Last name"
+                />
+                @if (lastName?.invalid && (lastName?.dirty || lastName?.touched)) {
+                  <mat-error>
+                    @if (lastName?.errors?.['required']) {
+                      Required
+                    }
+                    @if (lastName?.errors?.['minlength']) {
+                      Min 2 characters
+                    }
+                  </mat-error>
+                }
+              </mat-form-field>
+            </div>
+
+            <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="w-full">
+              <mat-label class="uppercase text-custom-secondary">Phone Number</mat-label>
+              <input
+                matInput
+                type="tel"
+                autocomplete="tel"
+                formControlName="phoneNumber"
+                placeholder="Enter your phone number"
+              />
+              @if (phoneNumber?.invalid && (phoneNumber?.dirty || phoneNumber?.touched)) {
+                <mat-error>
+                  @if (phoneNumber?.errors?.['required']) {
+                    Phone number is required
+                  }
+                  @if (phoneNumber?.errors?.['pattern']) {
+                    Please enter a valid phone number
+                  }
+                </mat-error>
               }
-              @if (lastName?.errors?.['minlength']) {
-                Min 2 characters
+            </mat-form-field>
+
+            <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="w-full">
+              <mat-label class="uppercase text-custom-secondary">Password</mat-label>
+              <input
+                matInput
+                type="password"
+                autocomplete="new-password"
+                formControlName="password"
+                placeholder="Enter your password"
+              />
+              @if (password?.invalid && (password?.dirty || password?.touched)) {
+                <mat-error>
+                  @if (password?.errors?.['required']) {
+                    Password is required
+                  }
+                  @if (password?.errors?.['minlength']) {
+                    Min 6 characters
+                  }
+                </mat-error>
               }
-            </mat-error>
-          }
-        </mat-form-field>
+            </mat-form-field>
+
+            <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="w-full">
+              <mat-label class="uppercase text-custom-secondary">Confirm Password</mat-label>
+              <input
+                matInput
+                type="password"
+                autocomplete="new-password"
+                formControlName="confirmPassword"
+                placeholder="Confirm your password"
+              />
+            </mat-form-field>
+
+            @if (signUpForm.errors?.['passwordMismatch'] && confirmPassword?.dirty) {
+              <div class="text-red-600 text-sm mt-2">Passwords do not match</div>
+            }
+          </div>
+
+          <div class="button-row">
+            <app-button-loading
+              [isLoading]="isLoading"
+              [isDisabled]="signUpForm.invalid || isLoading"
+              type="submit"
+              [bg]="'primary'"
+              [bghover]="'primary'"
+              [color]="'white'"
+              [colorhover]="'white'"
+              [opacity]="signUpForm.invalid || isLoading ? 0.5 : 1"
+              [opacityhover]="1"
+              [width]="'auto'"
+              [rounded]="false"
+              [materialIcon]="'person_add'"
+              [haveContent]="true"
+            >
+              {{ isLoading ? 'SIGNING UP...' : 'SIGN UP' }}
+            </app-button-loading>
+          </div>
+
+          <div class="link-row">
+            <app-auth-link
+              text="Already have an account?"
+              linkText="Login"
+              (linkClicked)="navigateToSignIn()"
+            ></app-auth-link>
+          </div>
+        </form>
       </div>
 
-      <!-- Phone Number -->
-      <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="w-full">
-        <mat-label class="uppercase text-custom-secondary">Phone Number</mat-label>
-        <input
-          matInput
-          type="tel"
-          autocomplete="tel"
-          formControlName="phoneNumber"
-          placeholder="Enter your phone number"
-        />
-        @if (phoneNumber?.invalid && (phoneNumber?.dirty || phoneNumber?.touched)) {
-          <mat-error>
-            @if (phoneNumber?.errors?.['required']) {
-              Phone number is required
-            }
-            @if (phoneNumber?.errors?.['pattern']) {
-              Please enter a valid phone number
-            }
-          </mat-error>
-        }
-      </mat-form-field>
-
-      <!-- Password -->
-      <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="w-full">
-        <mat-label class="uppercase text-custom-secondary">Password</mat-label>
-        <input
-          matInput
-          type="password"
-          autocomplete="new-password"
-          formControlName="password"
-          placeholder="Enter your password"
-        />
-        @if (password?.invalid && (password?.dirty || password?.touched)) {
-          <mat-error>
-            @if (password?.errors?.['required']) {
-              Password is required
-            }
-            @if (password?.errors?.['minlength']) {
-              Min 6 characters
-            }
-          </mat-error>
-        }
-      </mat-form-field>
-
-      <!-- Confirm Password -->
-      <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="w-full">
-        <mat-label class="uppercase text-custom-secondary">Confirm Password</mat-label>
-        <input
-          matInput
-          type="password"
-          autocomplete="new-password"
-          formControlName="confirmPassword"
-          placeholder="Confirm your password"
-        />
-      </mat-form-field>
-
-      <!-- Form-level error for password mismatch -->
-      @if (signUpForm.errors?.['passwordMismatch'] && confirmPassword?.dirty) {
-        <div class="text-red-600 text-sm mt-2">Passwords do not match</div>
-      }
+      <div class="features-column">
+        <app-list [items]="features" title="What you'll get access to" [alignTop]="true" />
+      </div>
     </div>
-
-    <div class="flex justify-center flex-col text-center mt-6">
-      <!-- Sign Up Button -->
-      <app-button-loading
-        [isLoading]="isLoading"
-        [isDisabled]="signUpForm.invalid || isLoading"
-        type="submit"
-        [bg]="'primary'"
-        [bghover]="'primary'"
-        [color]="'white'"
-        [colorhover]="'white'"
-        [opacity]="signUpForm.invalid || isLoading ? 0.5 : 1"
-        [opacityhover]="1"
-        [width]="'auto'"
-        [rounded]="false"
-      >
-        {{ isLoading ? 'SIGNING UP...' : 'SIGN UP' }}
-      </app-button-loading>
-
-      <app-auth-link
-        text="Already have an account?"
-        linkText="Login"
-        (linkClicked)="navigateToSignIn()"
-        class="mt-4"
-      ></app-auth-link>
-    </div>
-  </form>
+  </div>
 </app-auth-layout>

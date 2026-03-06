@@ -58,12 +58,14 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./components/sign-in/sign-in.component').then((m) => m.SignInComponent),
     canActivate: [GuestGuard],
+    data: { animation: 'auth-signin' },
   },
   {
     path: 'sign-up',
     loadComponent: () =>
       import('./components/sign-up/sign-up.component').then((m) => m.SignUpComponent),
     canActivate: [GuestGuard],
+    data: { animation: 'auth-signup' },
   },
   {
     path: 'forgot-password',
@@ -72,6 +74,7 @@ export const routes: Routes = [
         (m) => m.ForgotPasswordComponent
       ),
     canActivate: [GuestGuard],
+    data: { animation: 'auth-forgot' },
   },
   {
     path: 'reset-password',
@@ -80,12 +83,14 @@ export const routes: Routes = [
         (m) => m.ResetPasswordComponent
       ),
     canActivate: [GuestGuard],
+    data: { animation: 'auth-reset' },
   },
 
   // Invitation route (no guard — accessible to everyone)
   {
     path: 'invitations/:token',
     loadComponent: () => import('./pages/invitation/invitation.page').then((m) => m.InvitationPage),
+    data: { animation: 'auth-invitation' },
   },
 
   // Main application routes with layout
@@ -93,6 +98,7 @@ export const routes: Routes = [
     path: '',
     component: LayoutComponent,
     canActivate: [AuthGuard],
+    data: { animation: 'app' },
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       {

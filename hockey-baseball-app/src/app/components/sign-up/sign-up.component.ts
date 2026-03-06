@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import {
   FormBuilder,
   FormGroup,
@@ -13,6 +13,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { AuthLayoutComponent } from '../../shared/components/auth-layout/auth-layout.component';
 import { ButtonLoadingComponent } from '../../shared/components/buttons/button-loading/button-loading.component';
 import { AuthLinkComponent } from '../../shared/components/auth-link/auth-link.component';
+import { ListComponent, IListItem } from '../../shared/components/list/list.component';
 import { AuthService } from '../../services/auth.service';
 import { UserRegistrationForm } from '../../shared/interfaces/auth.interfaces';
 
@@ -25,18 +26,71 @@ import { UserRegistrationForm } from '../../shared/interfaces/auth.interfaces';
     AuthLayoutComponent,
     ButtonLoadingComponent,
     AuthLinkComponent,
+    ListComponent,
   ],
   templateUrl: './sign-up.component.html',
   styleUrl: './sign-up.component.scss',
 })
 export class SignUpComponent {
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
   private formBuilder = inject(FormBuilder);
   private authService = inject(AuthService);
   private snackBar = inject(MatSnackBar);
 
   signUpForm: FormGroup;
   isLoading = false;
+
+  protected readonly features: IListItem[] = [
+    {
+      key: 'analytics',
+      icon: 'bar_chart',
+      name: 'Player & Team Analytics',
+      description: 'Advanced performance metrics and trends',
+    },
+    {
+      key: 'dashboard',
+      icon: 'sports_hockey',
+      name: 'Live Game Dashboard',
+      description: 'Real-time scores and play-by-play tracking',
+    },
+    {
+      key: 'video',
+      icon: 'videocam',
+      name: 'Video Library & Highlights',
+      description: 'Review game footage and key moments',
+    },
+    {
+      key: 'spray-charts',
+      icon: 'scatter_plot',
+      name: 'Spray Charts',
+      description: 'Visual shot placement and scoring patterns',
+    },
+    {
+      key: 'schedules',
+      icon: 'calendar_month',
+      name: 'Game Schedules',
+      description: 'Upcoming games, venues, and game types',
+    },
+    {
+      key: 'rosters',
+      icon: 'groups',
+      name: 'Team & Player Rosters',
+      description: 'Manage teams, players, and goalies',
+    },
+    {
+      key: 'gamesheets',
+      icon: 'description',
+      name: 'Gamesheets',
+      description: 'Detailed game logs with shots, penalties, and faceoffs',
+    },
+    {
+      key: 'tryouts',
+      icon: 'assignment_ind',
+      name: 'Tryout Management',
+      description: 'Evaluate and track player tryout performance',
+    },
+  ];
 
   constructor() {
     this.signUpForm = this.formBuilder.group(
@@ -83,16 +137,10 @@ export class SignUpComponent {
     this.authService.signUp(formValue).subscribe({
       next: () => {
         this.isLoading = false;
-        // this.snackBar.open(
-        //   response.message || 'Registration successful! Please sign in.',
-        //   'Close',
-        //   {
-        //     duration: 5000,
-        //     panelClass: ['success-snackbar']
-        //   }
-        // );
-        // Navigate to sign-in page
-        this.router.navigate(['/sign-in']);
+        const returnUrl = this.route.snapshot.queryParams['returnUrl'];
+        this.router.navigate(['/sign-in'], {
+          queryParams: returnUrl ? { returnUrl } : undefined,
+        });
       },
       error: (error) => {
         this.isLoading = false;
@@ -110,7 +158,10 @@ export class SignUpComponent {
   }
 
   navigateToSignIn() {
-    this.router.navigate(['/sign-in']);
+    const returnUrl = this.route.snapshot.queryParams['returnUrl'];
+    this.router.navigate(['/sign-in'], {
+      queryParams: returnUrl ? { returnUrl } : undefined,
+    });
   }
 
   // Getters for easy access to form controls in template

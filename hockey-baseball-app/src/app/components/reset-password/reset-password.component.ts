@@ -12,6 +12,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { AuthLayoutComponent } from '../../shared/components/auth-layout/auth-layout.component';
 import { ButtonLoadingComponent } from '../../shared/components/buttons/button-loading/button-loading.component';
+import { AuthLinkComponent } from '../../shared/components/auth-link/auth-link.component';
+import { ListComponent, IListItem } from '../../shared/components/list/list.component';
 import { AuthService } from '../../services/auth.service';
 import { PasswordResetConfirm } from '../../shared/interfaces/auth.interfaces';
 
@@ -23,6 +25,8 @@ import { PasswordResetConfirm } from '../../shared/interfaces/auth.interfaces';
     MatInputModule,
     AuthLayoutComponent,
     ButtonLoadingComponent,
+    AuthLinkComponent,
+    ListComponent,
   ],
   templateUrl: './reset-password.component.html',
   styleUrl: './reset-password.component.scss',
@@ -32,6 +36,57 @@ export class ResetPasswordComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private formBuilder = inject(FormBuilder);
   private authService = inject(AuthService);
+
+  protected readonly features: IListItem[] = [
+    {
+      key: 'analytics',
+      icon: 'bar_chart',
+      name: 'Player & Team Analytics',
+      description: 'Advanced performance metrics and trends',
+    },
+    {
+      key: 'dashboard',
+      icon: 'sports_hockey',
+      name: 'Live Game Dashboard',
+      description: 'Real-time scores and play-by-play tracking',
+    },
+    {
+      key: 'video',
+      icon: 'videocam',
+      name: 'Video Library & Highlights',
+      description: 'Review game footage and key moments',
+    },
+    {
+      key: 'spray-charts',
+      icon: 'scatter_plot',
+      name: 'Spray Charts',
+      description: 'Visual shot placement and scoring patterns',
+    },
+    {
+      key: 'schedules',
+      icon: 'calendar_month',
+      name: 'Game Schedules',
+      description: 'Upcoming games, venues, and game types',
+    },
+    {
+      key: 'rosters',
+      icon: 'groups',
+      name: 'Team & Player Rosters',
+      description: 'Manage teams, players, and goalies',
+    },
+    {
+      key: 'gamesheets',
+      icon: 'description',
+      name: 'Gamesheets',
+      description: 'Detailed game logs with shots, penalties, and faceoffs',
+    },
+    {
+      key: 'tryouts',
+      icon: 'assignment_ind',
+      name: 'Tryout Management',
+      description: 'Evaluate and track player tryout performance',
+    },
+  ];
 
   resetPasswordForm: FormGroup;
   isLoading = false;

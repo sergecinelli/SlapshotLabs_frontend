@@ -1,0 +1,49 @@
+@let titleValue = title();
+@let itemsValue = items();
+@let clickableValue = clickable();
+@let alignTopValue = alignTop();
+@let contentTpl = contentTemplate();
+@let suffixTpl = suffixTemplate();
+
+@if (titleValue) {
+  <h3 class="list-title">{{ titleValue }}</h3>
+}
+
+@if (itemsValue.length) {
+  <ul class="list">
+    @for (item of itemsValue; track item.key) {
+      <li
+        [class.clickable]="clickableValue && !item.disabled"
+        [class.disabled]="item.disabled"
+        [class.align-top]="alignTopValue"
+        (click)="onClick(item)"
+      >
+        @if (item.icon) {
+          <div class="item-icon">
+            <span class="material-symbols-rounded icon">{{ item.icon }}</span>
+          </div>
+        }
+
+        @if (contentTpl) {
+          <ng-container *ngTemplateOutlet="contentTpl; context: { $implicit: item }"></ng-container>
+        } @else {
+          <div class="item-content">
+            <div class="item-top-row">
+              <p class="name">{{ item.name }}</p>
+              @if (item.value !== undefined) {
+                <span class="item-value"> {{ item.value }}{{ item.valueSuffix || '' }} </span>
+              }
+            </div>
+            @if (item.description) {
+              <p class="description">{{ item.description }}</p>
+            }
+          </div>
+        }
+
+        @if (suffixTpl) {
+          <ng-container *ngTemplateOutlet="suffixTpl; context: { $implicit: item }"></ng-container>
+        }
+      </li>
+    }
+  </ul>
+}

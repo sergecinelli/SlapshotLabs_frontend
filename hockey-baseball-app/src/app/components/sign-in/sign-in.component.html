@@ -1,94 +1,112 @@
-<!-- Sign In Page -->
-<app-auth-layout titleText="LOGIN HERE">
-  <!-- Sign In Form -->
-  <form [formGroup]="signInForm" (ngSubmit)="onSubmit()">
-    <div class="space-y-0">
-      <!-- Email Address -->
-      <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="w-full">
-        <mat-label class="uppercase text-custom-secondary">Email Address</mat-label>
-        <input
-          matInput
-          type="email"
-          autocomplete="email"
-          formControlName="email"
-          placeholder="Enter your email"
-        />
-        @if (email?.invalid && (email?.dirty || email?.touched)) {
-          <mat-error>
-            @if (email?.errors?.['required']) {
-              Email address is required
-            }
-            @if (email?.errors?.['email']) {
-              Please enter a valid email address
-            }
-          </mat-error>
-        }
-      </mat-form-field>
+<app-auth-layout>
+  <div card class="card">
+    <div class="card-columns">
+      <div class="form-column">
+        <h1 class="title">Welcome back</h1>
+        <p class="subtitle">Sign in to access your team's dashboard, analytics, and more.</p>
+        <form [formGroup]="signInForm" (ngSubmit)="onSubmit()">
+          <div class="space-y-0">
+            <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="w-full">
+              <mat-label class="uppercase text-custom-secondary">Email Address</mat-label>
+              <input
+                matInput
+                type="email"
+                autocomplete="email"
+                formControlName="email"
+                placeholder="Enter your email"
+              />
+              @if (email?.invalid && (email?.dirty || email?.touched)) {
+                <mat-error>
+                  @if (email?.errors?.['required']) {
+                    Email address is required
+                  }
+                  @if (email?.errors?.['email']) {
+                    Please enter a valid email address
+                  }
+                </mat-error>
+              }
+            </mat-form-field>
 
-      <!-- Password -->
-      <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="w-full">
-        <mat-label class="uppercase text-custom-secondary">Password</mat-label>
-        <input
-          matInput
-          type="password"
-          autocomplete="current-password"
-          formControlName="password"
-          placeholder="Enter your password"
-        />
-        @if (password?.invalid && (password?.dirty || password?.touched)) {
-          <mat-error>
-            @if (password?.errors?.['required']) {
-              Password is required
-            }
-            @if (password?.errors?.['minlength']) {
-              At least 6 characters long
-            }
-          </mat-error>
-        }
-      </mat-form-field>
+            <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="w-full">
+              <mat-label class="uppercase text-custom-secondary">Password</mat-label>
+              <input
+                matInput
+                [type]="showPassword ? 'text' : 'password'"
+                autocomplete="current-password"
+                formControlName="password"
+                placeholder="Enter your password"
+              />
+              <span
+                matTextSuffix
+                class="material-symbols-rounded visibility-toggle"
+                (click)="showPassword = !showPassword"
+                role="button"
+                tabindex="0"
+                (keyup.enter)="showPassword = !showPassword"
+                [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'"
+              >
+                {{ showPassword ? 'visibility_off' : 'visibility' }}
+              </span>
+              @if (password?.invalid && (password?.dirty || password?.touched)) {
+                <mat-error>
+                  @if (password?.errors?.['required']) {
+                    Password is required
+                  }
+                  @if (password?.errors?.['minlength']) {
+                    At least 6 characters long
+                  }
+                </mat-error>
+              }
+            </mat-form-field>
+          </div>
+
+          <div class="options-row">
+            <mat-checkbox formControlName="rememberMe">Remember me</mat-checkbox>
+            <a
+              (click)="navigateToForgotPassword()"
+              (keyup.enter)="navigateToForgotPassword()"
+              (keyup.space)="navigateToForgotPassword()"
+              tabindex="0"
+              role="button"
+              class="forgot-link"
+            >
+              Forgot password?
+            </a>
+          </div>
+
+          <div class="button-row">
+            <app-button-loading
+              [isLoading]="isLoading"
+              [isDisabled]="signInForm.invalid || isLoading"
+              type="submit"
+              [bg]="'primary'"
+              [bghover]="'primary'"
+              [color]="'white'"
+              [colorhover]="'white'"
+              [opacity]="signInForm.invalid || isLoading ? 0.5 : 1"
+              [opacityhover]="1"
+              [width]="'auto'"
+              [rounded]="false"
+              [materialIcon]="'login'"
+              [haveContent]="true"
+            >
+              {{ isLoading ? 'SIGNING IN...' : 'SIGN IN' }}
+            </app-button-loading>
+          </div>
+        </form>
+
+        <div class="link-row">
+          <app-auth-link
+            text="Don't have an account?"
+            linkText="Create one"
+            (linkClicked)="navigateToSignUp()"
+          ></app-auth-link>
+        </div>
+      </div>
+
+      <div class="features-column">
+        <app-list [items]="features" title="What you'll get access to" [alignTop]="true" />
+      </div>
     </div>
-
-    <!-- Remember Me and Forgot Password Row -->
-    <div class="flex items-center justify-between mb-4 -ml-2">
-      <mat-checkbox formControlName="rememberMe"> Remember Me </mat-checkbox>
-
-      <a
-        (click)="navigateToForgotPassword()"
-        (keyup.enter)="navigateToForgotPassword()"
-        (keyup.space)="navigateToForgotPassword()"
-        tabindex="0"
-        role="button"
-        class="text-custom-primary hover:text-red-700 no-underline font-medium text-xs cursor-pointer"
-      >
-        Forgot Password?
-      </a>
-    </div>
-
-    <div class="flex flex-col items-center text-center">
-      <!-- Login Button -->
-      <app-button-loading
-        [isLoading]="isLoading"
-        [isDisabled]="signInForm.invalid || isLoading"
-        type="submit"
-        [bg]="'primary'"
-        [bghover]="'primary_dark'"
-        [color]="'white'"
-        [colorhover]="'white'"
-        [opacity]="1"
-        [opacityhover]="1"
-        [width]="'auto'"
-        [rounded]="false"
-        [materialIcon]="'login'"
-        [haveContent]="true"
-      >
-        {{ isLoading ? 'LOGGING IN...' : 'LOGIN' }}
-      </app-button-loading>
-
-      <app-auth-link
-        text="Don't have an account yet?"
-        linkText="Sign up"
-        (linkClicked)="navigateToSignUp()"
-      ></app-auth-link>
-    </div>
-  </form>
+  </div>
 </app-auth-layout>

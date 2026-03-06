@@ -1,0 +1,36 @@
+@use '../../shared/styles/auth-card';
+
+// ── Sign-in specific ────────────────────────────────
+.visibility-toggle {
+  font-size: 20px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  user-select: none;
+  line-height: 1;
+  transition: color 0.2s;
+
+  &:hover {
+    color: var(--gray-tone1);
+  }
+}
+
+.options-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  margin-left: -8px;
+}
+
+.forgot-link {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--primary);
+  cursor: pointer;
+  text-decoration: none;
+  transition: color 0.2s;
+
+  &:hover {
+    color: var(--primary-dark);
+  }
+}

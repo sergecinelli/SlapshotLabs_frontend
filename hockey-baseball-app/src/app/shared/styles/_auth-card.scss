@@ -1,0 +1,63 @@
+// ── Auth Card ────────────────────────────────────────
+// Shared layout for all auth pages (sign-in, sign-up, forgot-password, reset-password, invitation).
+
+.card {
+  background: var(--background);
+  border-radius: var(--radius);
+  padding: 2rem;
+  width: 100%;
+  max-width: 900px;
+}
+
+.card-columns {
+  display: flex;
+  gap: 20px;
+}
+
+.form-column {
+  flex: 1;
+  min-width: 0;
+}
+
+.features-column {
+  flex: 1;
+  min-width: 0;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--text-primary);
+  margin: 0 0 0.5rem;
+}
+
+.subtitle {
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  margin: 0;
+  margin-bottom: 10px;
+}
+
+.button-row {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.link-row {
+  text-align: center;
+  margin-top: 1.25rem;
+}
+
+// ── Responsive ──────────────────────────────────────
+@media (max-width: 900px) {
+  .card-columns {
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .title {
+    font-size: 1.5rem;
+  }
+}

@@ -19,20 +19,18 @@ export class LogoutConfirmationModal {
   protected isLoggingOut = signal(false);
 
   protected logout(): void {
-    this.isLoggingOut.set(true);
-    this.authService.signOut().subscribe({
-      next: () => {
-        this.isLoggingOut.set(false);
-        this.modalService.closeAll();
-        this.navigationService.navigate('/sign-in');
-      },
-      error: (error) => {
-        console.error('Error during sign out:', error);
-        this.isLoggingOut.set(false);
-        this.modalService.closeAll();
-        this.navigationService.navigate('/sign-in');
-      },
-    });
+    this.authService.beginLogout();
+    this.modalService.closeAll();
+    this.navigationService.navigate('/sign-in');
+
+    setTimeout(() => {
+      this.authService.clearLocalAuthState();
+      this.authService.signOut().subscribe({
+        error: (error) => {
+          console.error('Error during sign out:', error);
+        },
+      });
+    }, 600);
   }
 
   protected close(): void {
