@@ -244,7 +244,7 @@ export class AuthService {
   }
 
   acceptInvitation(invitationToken: string): Observable<void> {
-    return this.apiService.post<void>(`/users/invitations/${invitationToken}`, {});
+    return this.apiService.get<void>(`/users/invitations/${invitationToken}`);
   }
 
   /**

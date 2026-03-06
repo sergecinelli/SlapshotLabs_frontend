@@ -122,7 +122,8 @@ export class BannerComponent implements OnInit, OnDestroy, AfterViewInit {
   private scrollElement?: HTMLElement;
 
   ngOnInit(): void {
-    // Subscribe to service state
+    this.bannerService.activate();
+
     this.subscriptions.add(
       this.bannerService.bannerItems$.subscribe((items) => {
         const currentItems = this.bannerItems();
@@ -173,6 +174,7 @@ export class BannerComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   ngOnDestroy(): void {
+    this.bannerService.deactivate();
     this.subscriptions.unsubscribe();
     this.removeScrollListener();
   }

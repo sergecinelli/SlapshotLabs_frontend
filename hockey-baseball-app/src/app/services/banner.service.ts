@@ -50,20 +50,17 @@ export class BannerService implements OnDestroy {
   private abortController = new AbortController();
 
   private isAuthenticated = false;
+  private isActive = false;
 
   constructor() {
     this.broadcastChannel = new BroadcastChannel('game_banner_channel');
     this.setupBroadcastListener();
     this.broadcastChannel.postMessage({ type: 'REQUEST_DATA' });
 
-    // Subscribe to auth state
     this.authService.isAuthenticated$.subscribe((isAuth) => {
       this.isAuthenticated = isAuth;
-      // If we are currently the leader, start/stop polling based on auth status
       if (isAuth) {
-        if (this.isLeader) {
-          this.startPolling();
-        }
+        this.tryStartPolling();
       } else {
         this.stopPolling();
         this.updateState([], false, null);
@@ -71,6 +68,22 @@ export class BannerService implements OnDestroy {
     });
 
     this.requestLeaderLock();
+  }
+
+  activate(): void {
+    this.isActive = true;
+    this.tryStartPolling();
+  }
+
+  deactivate(): void {
+    this.isActive = false;
+    this.stopPolling();
+  }
+
+  private tryStartPolling(): void {
+    if (this.isActive && this.isAuthenticated && this.isLeader) {
+      this.startPolling();
+    }
   }
 
   ngOnDestroy(): void {
@@ -98,11 +111,8 @@ export class BannerService implements OnDestroy {
   private async requestLeaderLock() {
     if (typeof navigator === 'undefined' || !('locks' in navigator)) {
       console.warn('Web Locks API not supported, falling back to local polling');
-      // Fallback: treat as leader
       this.isLeader = true;
-      if (this.isAuthenticated) {
-        this.startPolling();
-      }
+      this.tryStartPolling();
       return;
     }
 
@@ -112,11 +122,7 @@ export class BannerService implements OnDestroy {
         // If we are here, we are the leader.
         console.log('BannerService: Acquired leader lock');
         this.isLeader = true;
-
-        // Start polling if authenticated
-        if (this.isAuthenticated) {
-          this.startPolling();
-        }
+        this.tryStartPolling();
 
         // Keep the lock held indefinitely until we signal to release it
         await new Promise<void>((resolve) => {
@@ -129,11 +135,8 @@ export class BannerService implements OnDestroy {
       });
     } catch (err) {
       console.error('BannerService: Error acquiring lock', err);
-      // Fallback behavior if lock fails: treat as leader
       this.isLeader = true;
-      if (this.isAuthenticated) {
-        this.startPolling();
-      }
+      this.tryStartPolling();
     }
   }
 
