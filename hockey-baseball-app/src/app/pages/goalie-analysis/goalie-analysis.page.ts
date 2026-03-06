@@ -177,7 +177,7 @@ export class GoalieAnalysisPage implements OnInit {
       name: 'Delete Analysis',
       icon: 'report',
       data: {
-        text: 'Are you sure you want to delete this analysis?',
+        text: `Are you sure you want to delete the analysis <b>${analysis.title}</b>?`,
         buttonText: 'Delete',
         buttonIcon: 'delete',
         color: 'primary',

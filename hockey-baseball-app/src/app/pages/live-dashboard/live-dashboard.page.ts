@@ -2077,11 +2077,13 @@ export class LiveDashboardPage implements OnInit, OnDestroy {
       return;
     }
 
+    const event = this.gameEvents().find((e) => e.id === eventId);
+
     this.modalService.openModal(DisplayTextModal, {
       name: 'Delete Event',
       icon: 'report',
       data: {
-        text: 'Are you sure you want to delete this event?',
+        text: `Are you sure you want to delete the event <b>${event?.event}${event?.description ? ': ' : ''}${event?.description}</b>?`,
         buttonText: 'Delete',
         buttonIcon: 'delete',
         color: 'primary',
