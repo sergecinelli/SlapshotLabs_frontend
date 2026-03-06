@@ -5,6 +5,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { ModalService, ModalEvent } from '../../../services/modal.service';
 import { AnalysisService } from '../../../services/analysis.service';
 import { ToastService } from '../../../services/toast.service';
@@ -28,6 +29,7 @@ export interface ShareAnalyticsModalData {
     MatAutocompleteModule,
     MatIconModule,
     MatDividerModule,
+    MatTooltipModule,
     ButtonComponent,
     ComponentDisableToggleDirective,
   ],

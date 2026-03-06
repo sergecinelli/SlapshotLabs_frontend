@@ -101,7 +101,7 @@ export class InvitationPage {
             queryParams: { returnUrl: this.redirectUrl },
           });
         } else {
-          this.toastService.show(error.message, 'error');
+          this.toastService.show(error.error?.message || 'Something went wrong', 'error');
         }
       },
     });

@@ -16,8 +16,8 @@
         <mat-divider class="section-divider"></mat-divider>
         <div class="chips-list">
           @for (user of existingAccessValue; track user.email) {
-            <span class="trigger-chip">
-              {{ user.email }}
+            <span class="trigger-chip" [matTooltip]="user.email" [matTooltipShowDelay]="1000">
+              <span class="trigger-chip-email">{{ user.email }}</span>
               <span
                 class="material-symbols-rounded trigger-chip-remove"
                 (click)="removeExistingAccess(user.email)"
@@ -37,8 +37,8 @@
         <mat-divider class="section-divider"></mat-divider>
         <div class="chips-list">
           @for (email of addedEmailsValue; track email) {
-            <span class="trigger-chip">
-              {{ email }}
+            <span class="trigger-chip" [matTooltip]="email" [matTooltipShowDelay]="1000">
+              <span class="trigger-chip-email">{{ email }}</span>
               <span
                 class="material-symbols-rounded trigger-chip-remove"
                 (click)="removeAddedEmail(email)"
