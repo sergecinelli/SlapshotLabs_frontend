@@ -28,11 +28,11 @@
     >
       @for (item of bannerItemsValue; track item.id) {
         <div
-          class="game-card"
+          class="bn-card"
           [class.clickable]="item.status === 2"
-          [class.live]="item.status === 2"
-          [class.upcoming]="item.status === 1"
-          [class.completed]="item.status === 3"
+          [class.bn-live]="item.status === 2"
+          [class.bn-upcoming]="item.status === 1"
+          [class.bn-completed]="item.status === 3"
           role="button"
           tabindex="0"
           (click)="item.status === 2 && goToLiveDashboard(item.id)"
@@ -41,99 +41,88 @@
           [title]="item.status === 2 ? 'Go To Game Dashboard' : ''"
           [attr.aria-label]="getAriaLabel(item)"
         >
-          <!-- Game Header -->
-          <div class="game-header">
-            <div class="venue-info">
-              <span class="arena-name">{{ item.arena_name }}</span>
-              @if (item.rink_name) {
-                <span class="rink-name">{{ item.rink_name }}</span>
-              }
-            </div>
-            <div class="header-right">
-              <!-- Hover Text for Live Games -->
-              @if (item.status === 2) {
-                <a [routerLink]="['/schedule/live/', item.id]" class="hover-text">
-                  <span class="material-symbols-rounded hover-icon">dashboard</span>
-                  <span class="hover-text-label">View Game Dashboard</span>
-                </a>
-              }
-              <!-- Status Badge -->
+          <div class="bn-header">
+            <div class="bn-header-left">
               <div
-                class="status-badge"
-                [class.live-badge]="item.status === 2"
-                [class.upcoming-badge]="item.status === 1"
-                [class.completed-badge]="item.status === 3"
+                class="bn-chip"
+                [class.bn-chip-live]="item.status === 2"
+                [class.bn-chip-upcoming]="item.status === 1"
+                [class.bn-chip-completed]="item.status === 3"
               >
                 @if (item.status === 2) {
-                  <span class="live-indicator"></span>
-                  <span class="status-text">LIVE</span>
+                  <span class="bn-pulse"></span>
+                }
+                @if (item.status === 2) {
+                  LIVE
                 } @else if (item.status === 1) {
-                  <span class="status-text">UPCOMING</span>
+                  UPCOMING
                 } @else {
-                  <span class="status-text">FINAL</span>
+                  FINAL
+                }
+              </div>
+              <div class="bn-venue-info">
+                <span class="bn-arena">{{ item.arena_name }}</span>
+                @if (item.rink_name) {
+                  <span class="bn-rink">{{ item.rink_name }}</span>
                 }
               </div>
             </div>
+            <div class="bn-header-right">
+              @if (item.status === 2) {
+                <a [routerLink]="['/schedule/live/', item.id]" class="bn-dashboard-link">
+                  <span class="material-symbols-rounded bn-dashboard-icon">dashboard</span>
+                </a>
+              }
+            </div>
           </div>
 
-          <!-- Teams Section -->
-          <div class="teams-section" [class.hidden-on-scroll]="isScrolledValue">
-            <!-- Away Team -->
-            <div class="team-row" [class.winning]="isWinning(item, false)">
-              <div class="team-info">
-                <img
-                  [appCachedSrc]="getTeamLogoUrl(item.away_team_id)"
-                  [alt]="item.away_team_name"
-                  class="team-logo"
-                />
-                <a
-                  [routerLink]="['/teams-and-rosters/teams/team-profile/', item.away_team_id]"
-                  class="team-name"
-                  [attr.aria-label]="
-                    'View ' +
-                    getTeamDisplay(item.away_team_abbreviation, item.away_team_name) +
-                    ' profile'
-                  "
-                  >{{ getTeamDisplay(item.away_team_abbreviation, item.away_team_name) }}</a
-                >
-              </div>
-              <span class="score" [class.winning-score]="isWinning(item, false)">{{
+          <div class="bn-scoreboard" [class.hidden-on-scroll]="isScrolledValue">
+            <div class="bn-team" [class.bn-winner]="isWinning(item, false)">
+              <img
+                [appCachedSrc]="getTeamLogoUrl(item.away_team_id)"
+                [alt]="item.away_team_name"
+                class="bn-logo"
+              />
+              <a
+                [routerLink]="['/teams-and-rosters/teams/team-profile/', item.away_team_id]"
+                class="bn-name"
+                (click)="$event.stopPropagation()"
+                [attr.aria-label]="
+                  'View ' +
+                  getTeamDisplay(item.away_team_abbreviation, item.away_team_name) +
+                  ' profile'
+                "
+              >{{ getTeamDisplay(item.away_team_abbreviation, item.away_team_name) }}</a>
+              <span class="bn-score" [class.bn-score-highlight]="isWinning(item, false)">{{
                 item.away_goals
               }}</span>
             </div>
-
-            <!-- Home Team -->
-            <div class="team-row" [class.winning]="isWinning(item, true)">
-              <div class="team-info">
-                <img
-                  [appCachedSrc]="getTeamLogoUrl(item.home_team_id)"
-                  [alt]="item.home_team_name"
-                  class="team-logo"
-                />
-                <a
-                  [routerLink]="['/teams-and-rosters/teams/team-profile/', item.home_team_id]"
-                  class="team-name"
-                  [attr.aria-label]="
-                    'View ' +
-                    getTeamDisplay(item.home_team_abbreviation, item.home_team_name) +
-                    ' profile'
-                  "
-                  >{{ getTeamDisplay(item.home_team_abbreviation, item.home_team_name) }}</a
-                >
-              </div>
-              <span class="score" [class.winning-score]="isWinning(item, true)">{{
+            <div class="bn-team" [class.bn-winner]="isWinning(item, true)">
+              <img
+                [appCachedSrc]="getTeamLogoUrl(item.home_team_id)"
+                [alt]="item.home_team_name"
+                class="bn-logo"
+              />
+              <a
+                [routerLink]="['/teams-and-rosters/teams/team-profile/', item.home_team_id]"
+                class="bn-name"
+                (click)="$event.stopPropagation()"
+                [attr.aria-label]="
+                  'View ' +
+                  getTeamDisplay(item.home_team_abbreviation, item.home_team_name) +
+                  ' profile'
+                "
+              >{{ getTeamDisplay(item.home_team_abbreviation, item.home_team_name) }}</a>
+              <span class="bn-score" [class.bn-score-highlight]="isWinning(item, true)">{{
                 item.home_goals
               }}</span>
             </div>
           </div>
 
-          <!-- Time/Date Footer -->
-          <div class="game-footer" [class.hidden-on-scroll]="isScrolledValue">
-            <div class="footer-left">
-              @if (item.status !== 1 && item.game_period_name) {
-                <span class="period-badge">{{ item.game_period_name }}</span>
-              }
-            </div>
+          <div class="bn-footer" [class.hidden-on-scroll]="isScrolledValue">
+            @if (item.status !== 1 && item.game_period_name) {
+              <span class="bn-footer-period">{{ item.game_period_name }}</span>
+            }
           </div>
         </div>
       }

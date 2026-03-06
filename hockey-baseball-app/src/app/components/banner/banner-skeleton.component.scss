@@ -7,7 +7,7 @@
   }
 }
 
-@mixin skeleton-base {
+@mixin sk {
   background: linear-gradient(
     90deg,
     var(--border-light) 0%,
@@ -19,7 +19,6 @@
   border-radius: 4px;
 }
 
-// Fade out animation for skeleton
 :host {
   display: block;
   position: absolute;
@@ -40,197 +39,140 @@
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
-    transition:
-      opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1),
-      visibility 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
 
-.skeleton-banner-container {
+.sk-banner-container {
   display: flex;
   gap: 10px;
   align-items: flex-start;
-  overflow-x: auto;
-  overflow-y: hidden;
+  overflow: hidden;
   width: 100%;
   height: 119px;
   padding: 0;
   margin: 0;
   box-sizing: border-box;
-
-  // Hide scrollbar
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-
-  &::-webkit-scrollbar {
-    display: none;
-  }
 }
 
-.skeleton-card {
+.sk-card {
   display: flex;
   flex-direction: column;
-  min-width: 300px;
-  max-width: 360px;
-  width: 300px;
+  min-width: 320px;
+  width: 320px;
   height: 119px;
   padding: 10px;
   padding-bottom: 2px;
-  border-radius: 4px;
+  border-radius: var(--radius-medium);
   background: var(--white);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-light);
   flex-shrink: 0;
-  gap: 2px;
   overflow: hidden;
   box-sizing: border-box;
 }
 
-// Game Header Skeleton
-.skeleton-header {
+.sk-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 15px;
+  gap: 8px;
   margin-top: -8px;
   height: 32px;
   flex-shrink: 0;
 }
 
-.skeleton-venue-info {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-  flex: 1;
-  min-width: 0;
-  justify-content: center;
-}
-
-.skeleton-arena-name {
-  @include skeleton-base;
-  height: 12px;
-  width: 120px;
-  border-radius: 2px;
-}
-
-.skeleton-rink-name {
-  @include skeleton-base;
-  height: 10px;
-  width: 80px;
-  border-radius: 2px;
-}
-
-.skeleton-header-right {
+.sk-header-left {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
   gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
+.sk-header-right {
+  display: flex;
+  align-items: center;
   flex-shrink: 0;
 }
 
-.skeleton-period-badge {
-  @include skeleton-base;
+.sk-chip {
+  @include sk;
+  width: 60px;
   height: 18px;
-  width: 50px;
-  border-radius: 10px;
+  border-radius: 6px;
   flex-shrink: 0;
 }
 
-.skeleton-status-badge {
-  @include skeleton-base;
-  height: 18px;
-  width: 65px;
-  border-radius: 10px;
-  flex-shrink: 0;
+.sk-venue-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
 }
 
-// Teams Section Skeleton
-.skeleton-teams-section {
+.sk-line {
+  @include sk;
+}
+
+.sk-arena {
+  height: 12px;
+  width: 100px;
+  border-radius: 2px;
+}
+
+.sk-rink {
+  height: 10px;
+  width: 70px;
+  border-radius: 2px;
+}
+
+.sk-period {
+  @include sk;
+  height: 10px;
+  width: 40px;
+  border-radius: 2px;
+}
+
+.sk-teams {
   display: flex;
   flex-direction: column;
   gap: 0;
-  padding: 0;
-  margin: 0;
   flex: 1;
   min-height: 0;
   overflow: hidden;
 }
 
-.skeleton-team-row {
+.sk-team-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 8px;
   padding: 2px 0;
-  flex-shrink: 0;
   height: 28px;
+  flex-shrink: 0;
 }
 
-.skeleton-team-info {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  width: fit-content;
-  flex: 1;
-  min-width: 0;
-}
-
-.skeleton-logo {
-  @include skeleton-base;
+.sk-logo {
+  @include sk;
   width: 24px;
   height: 24px;
   border-radius: 50%;
   flex-shrink: 0;
 }
 
-.skeleton-team-name {
-  @include skeleton-base;
+.sk-team-name {
+  @include sk;
   height: 13px;
   width: 100px;
   border-radius: 2px;
   flex-shrink: 0;
 }
 
-.skeleton-score {
-  @include skeleton-base;
+.sk-score {
+  @include sk;
   height: 14px;
   width: 20px;
-  min-width: 24px;
+  min-width: 20px;
+  margin-left: auto;
   flex-shrink: 0;
   border-radius: 2px;
-}
-
-// Game Footer Skeleton
-.skeleton-footer {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 10px;
-  border-top: 1px solid var(--border);
-  margin-top: auto;
-  padding-top: 2px;
-  flex-shrink: 0;
-  height: 18px;
-}
-
-.skeleton-time-info {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  flex-shrink: 0;
-}
-
-.skeleton-icon {
-  @include skeleton-base;
-  width: 14px;
-  height: 14px;
-  border-radius: 2px;
-  flex-shrink: 0;
-}
-
-.skeleton-time-text {
-  @include skeleton-base;
-  height: 10px;
-  width: 60px;
-  border-radius: 2px;
-  flex-shrink: 0;
 }
