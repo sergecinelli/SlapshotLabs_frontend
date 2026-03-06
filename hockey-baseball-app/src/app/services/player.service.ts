@@ -526,6 +526,7 @@ export class PlayerService {
           return {
             season: game.season_name || '',
             date: formattedDate,
+            vsTeamId: game.team_vs_id,
             vsTeamName: vsTeamInfo.name, // Opponent team name
             vsTeamLogo: vsTeamLogoUrl, // Logo URL from API endpoint
             teamName: playerTeamInfo.name, // Player's team name

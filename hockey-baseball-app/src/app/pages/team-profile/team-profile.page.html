@@ -13,6 +13,7 @@
         [isLoading]="isEditLoading()"
         (clicked)="onEditTeamProfile()"
         role-visibility-name="edit-team-button"
+        [attr.role-visibility-team-id]="team?.id"
       >
         Edit Team Profile
       </app-button-loading>

@@ -7,6 +7,6 @@ export const teamProfilePageRolesAccessMap: IPageAccessMap = {
 
 export const visibilityByRoleMap: IVisibilityByRoleMap = {
   show: {
-    'edit-team-button': [Role.Admin, Role.Coach],
+    'edit-team-button': [Role.Admin, Role.CoachOfTeam],
   },
 };

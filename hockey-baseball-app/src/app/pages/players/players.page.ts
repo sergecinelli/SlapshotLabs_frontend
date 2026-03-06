@@ -129,6 +129,7 @@ export class PlayersPage implements OnInit {
       icon: 'stylus',
       iconOnly: true,
       roleVisibilityName: 'edit-action',
+      roleVisibilityTeamId: (item) => item['teamId']?.toString(),
       isLoading: (item) => this.editingPlayerId() === item['id'],
     },
     {
@@ -138,6 +139,7 @@ export class PlayersPage implements OnInit {
       icon: 'delete',
       iconOnly: true,
       roleVisibilityName: 'delete-action',
+      roleVisibilityTeamId: (item) => item['teamId']?.toString(),
     },
   ];
 

@@ -130,6 +130,7 @@ export class GoaliesPage implements OnInit {
       icon: 'stylus',
       iconOnly: true,
       roleVisibilityName: 'edit-action',
+      roleVisibilityTeamId: (item) => item['teamId']?.toString(),
       isLoading: (item) => this.editingGoalieId() === item['id'],
     },
     {
@@ -139,6 +140,7 @@ export class GoaliesPage implements OnInit {
       icon: 'delete',
       iconOnly: true,
       roleVisibilityName: 'delete-action',
+      roleVisibilityTeamId: (item) => item['teamId']?.toString(),
     },
   ];
 

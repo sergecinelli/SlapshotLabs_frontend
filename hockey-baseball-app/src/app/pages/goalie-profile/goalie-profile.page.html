@@ -1,6 +1,20 @@
-<div class="goalie-profile-page">
+<div class="goalie-profile-page" [appVisibilityMap]="visibilityByRoleMap">
   <!-- Action Buttons Row -->
   <div class="action-buttons-row">
+    <app-button-loading
+      materialIcon="stylus"
+      [bg]="'orange'"
+      [bghover]="'orange'"
+      [color]="'white'"
+      [colorhover]="'white'"
+      [haveContent]="true"
+      [isLoading]="isEditLoading()"
+      (clicked)="onEditProfile()"
+      role-visibility-name="edit-goalie-button"
+      [attr.role-visibility-team-id]="goalie?.teamId"
+    >
+      Edit Goalie Profile
+    </app-button-loading>
     <app-button-loading
       materialIcon="bar_chart"
       [bg]="'upcoming'"
@@ -212,13 +226,23 @@
                     <th mat-header-cell *matHeaderCellDef class="header-cell">Team</th>
                     <td mat-cell *matCellDef="let element" class="data-cell team-cell">
                       @if (element.logo) {
-                        <img
-                          [appCachedSrc]="element.logo"
-                          [alt]="element.team + ' logo'"
-                          class="team-logo"
-                        />
+                        <a
+                          [routerLink]="['/teams-and-rosters/teams', element.teamId, 'profile']"
+                          class="team-logo-link"
+                        >
+                          <img
+                            [appCachedSrc]="element.logo"
+                            [alt]="element.team + ' logo'"
+                            class="team-logo"
+                          />
+                        </a>
                       }
-                      <span class="team-name">{{ element.team }}</span>
+                      <a
+                        [routerLink]="['/teams-and-rosters/teams', element.teamId, 'profile']"
+                        class="team-name-link"
+                      >
+                        {{ element.team }}
+                      </a>
                     </td>
                   </ng-container>
 
@@ -329,12 +353,22 @@
                   <ng-container matColumnDef="vsTeam">
                     <th mat-header-cell *matHeaderCellDef class="header-cell">vs Team</th>
                     <td mat-cell *matCellDef="let element" class="data-cell team-cell">
-                      <img
-                        class="team-logo"
-                        [appCachedSrc]="element.vsTeamLogo"
-                        alt="vs team logo"
-                      />
-                      <span class="team-name">{{ element.vsTeamName }}</span>
+                      <a
+                        [routerLink]="['/teams-and-rosters/teams', element.vsTeamId, 'profile']"
+                        class="team-logo-link"
+                      >
+                        <img
+                          class="team-logo"
+                          [appCachedSrc]="element.vsTeamLogo"
+                          alt="vs team logo"
+                        />
+                      </a>
+                      <a
+                        [routerLink]="['/teams-and-rosters/teams', element.vsTeamId, 'profile']"
+                        class="team-name-link"
+                      >
+                        {{ element.vsTeamName }}
+                      </a>
                     </td>
                   </ng-container>
 

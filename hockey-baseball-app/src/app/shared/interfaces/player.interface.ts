@@ -178,6 +178,7 @@ export interface PlayerTeamSeasonApiOut {
 export interface PlayerRecentGameStats {
   season: string;
   date: string;
+  vsTeamId: number;
   vsTeamName: string;
   vsTeamLogo: string;
   teamName: string;

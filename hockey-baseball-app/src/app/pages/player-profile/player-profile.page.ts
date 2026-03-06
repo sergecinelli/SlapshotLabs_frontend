@@ -1,6 +1,6 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatTableModule } from '@angular/material/table';
@@ -57,6 +57,7 @@ import { CachedSrcDirective } from '../../shared/directives/cached-src.directive
     ShotLocationDisplayComponent,
     ComponentVisibilityByRoleDirective,
     ButtonLoadingComponent,
+    RouterLink,
   ],
   templateUrl: './player-profile.page.html',
   styleUrl: './player-profile.page.scss',

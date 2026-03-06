@@ -90,6 +90,8 @@
                   [tooltip]="'Edit'"
                   [isLoading]="editingGoalieId() === goalie.id"
                   (clicked)="editGoalie(goalie)"
+                  role-visibility-name="edit-action"
+                  [attr.role-visibility-team-id]="goalie.teamId"
                 />
                 <app-button
                   [bg]="'transparent'"
@@ -99,6 +101,8 @@
                   [materialIcon]="'delete'"
                   [matTooltip]="'Delete'"
                   (clicked)="deleteGoalie(goalie)"
+                  role-visibility-name="delete-action"
+                  [attr.role-visibility-team-id]="goalie.teamId"
                 />
               </div>
               <div class="header-left">

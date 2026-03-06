@@ -104,8 +104,9 @@
                           @if (getCellValueByKey(element, 'teamId')) {
                             <a
                               [routerLink]="[
-                                '/teams-and-rosters/teams/team-profile',
+                                '/teams-and-rosters/teams',
                                 getCellValueByKey(element, 'teamId'),
+                                'profile',
                               ]"
                               class="team-logo-link"
                             >
@@ -128,8 +129,9 @@
                         @if (getCellValueByKey(element, 'teamId')) {
                           <a
                             [routerLink]="[
-                              '/teams-and-rosters/teams/team-profile',
+                              '/teams-and-rosters/teams',
                               getCellValueByKey(element, 'teamId'),
+                              'profile',
                             ]"
                             class="team-name-link"
                           >
@@ -161,11 +163,12 @@
                           ) {
                             <a
                               [routerLink]="[
-                                '/teams-and-rosters/teams/team-profile',
+                                '/teams-and-rosters/teams',
                                 getCellValueByKey(
                                   element,
                                   column.key === 'homeTeam' ? 'homeTeamId' : 'awayTeamId'
                                 ),
+                                'profile',
                               ]"
                               class="team-logo-link"
                             >
@@ -203,11 +206,12 @@
                         ) {
                           <a
                             [routerLink]="[
-                              '/teams-and-rosters/teams/team-profile',
+                              '/teams-and-rosters/teams',
                               getCellValueByKey(
                                 element,
                                 column.key === 'homeTeam' ? 'homeTeamId' : 'awayTeamId'
                               ),
+                              'profile',
                             ]"
                             class="team-name-link"
                           >
@@ -408,8 +412,9 @@
                           @if (getCellValueByKey(element, 'teamId')) {
                             <a
                               [routerLink]="[
-                                '/teams-and-rosters/teams/team-profile',
+                                '/teams-and-rosters/teams',
                                 getCellValueByKey(element, 'teamId'),
+                                'profile',
                               ]"
                               class="team-logo-link"
                             >
@@ -432,8 +437,9 @@
                         @if (getCellValueByKey(element, 'teamId')) {
                           <a
                             [routerLink]="[
-                              '/teams-and-rosters/teams/team-profile',
+                              '/teams-and-rosters/teams',
                               getCellValueByKey(element, 'teamId'),
+                              'profile',
                             ]"
                             class="team-name-link"
                           >
@@ -505,11 +511,12 @@
                           ) {
                             <a
                               [routerLink]="[
-                                '/teams-and-rosters/teams/team-profile',
+                                '/teams-and-rosters/teams',
                                 getCellValueByKey(
                                   element,
                                   column.key === 'homeTeam' ? 'homeTeamId' : 'awayTeamId'
                                 ),
+                                'profile',
                               ]"
                               class="team-logo-link"
                             >
@@ -547,11 +554,12 @@
                         ) {
                           <a
                             [routerLink]="[
-                              '/teams-and-rosters/teams/team-profile',
+                              '/teams-and-rosters/teams',
                               getCellValueByKey(
                                 element,
                                 column.key === 'homeTeam' ? 'homeTeamId' : 'awayTeamId'
                               ),
+                              'profile',
                             ]"
                             class="team-name-link"
                           >

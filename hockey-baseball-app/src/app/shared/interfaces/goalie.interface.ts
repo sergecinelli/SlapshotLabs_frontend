@@ -121,6 +121,7 @@ export interface GoalieTableData {
 export interface GoalieSeasonStats {
   season: string;
   seasonId: number;
+  teamId: number;
   logo: string;
   team: string;
   gamesPlayed: number;
@@ -137,6 +138,7 @@ export interface GoalieSeasonStats {
 export interface GoalieRecentGameStats {
   season: string;
   date: string;
+  vsTeamId: number;
   vsTeamName: string;
   vsTeamLogo: string;
   teamName: string;

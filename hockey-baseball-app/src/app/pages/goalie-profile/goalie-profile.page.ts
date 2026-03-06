@@ -1,6 +1,6 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
@@ -13,11 +13,15 @@ import { AnalysisService } from '../../services/analysis.service';
 import { AnalyticsApiIn } from '../../shared/interfaces/analysis.interface';
 import { GoalieAnalysisModal } from '../../shared/components/goalie-analysis-modal/goalie-analysis.modal';
 import { GoalieService } from '../../services/goalie.service';
+import { TeamService } from '../../services/team.service';
+import { PositionService, PositionOption } from '../../services/position.service';
+import { Team } from '../../shared/interfaces/team.interface';
 import {
   Goalie,
   GoalieSeasonStats,
   GoalieRecentGameStats,
 } from '../../shared/interfaces/goalie.interface';
+import { GoalieFormModal } from '../../shared/components/goalie-form-modal/goalie-form.modal';
 import {
   ShotLocationDisplayComponent,
   ShotLocationData,
@@ -37,6 +41,8 @@ import {
 import { StorageKey } from '../../services/local-storage.service';
 import { BreadcrumbDataService } from '../../services/breadcrumb-data.service';
 import { ButtonLoadingComponent } from '../../shared/components/buttons/button-loading/button-loading.component';
+import { ComponentVisibilityByRoleDirective } from '../../shared/directives/component-visibility-by-role.directive';
+import { visibilityByRoleMap } from './goalie-profile.role-map';
 import { CachedSrcDirective } from '../../shared/directives/cached-src.directive';
 
 @Component({
@@ -51,11 +57,14 @@ import { CachedSrcDirective } from '../../shared/directives/cached-src.directive
     MatTableModule,
     ShotLocationDisplayComponent,
     ButtonLoadingComponent,
+    ComponentVisibilityByRoleDirective,
+    RouterLink,
   ],
   templateUrl: './goalie-profile.page.html',
   styleUrl: './goalie-profile.page.scss',
 })
 export class GoalieProfilePage implements OnInit {
+  protected visibilityByRoleMap = visibilityByRoleMap;
   protected StorageKey = StorageKey;
 
   private route = inject(ActivatedRoute);
@@ -68,9 +77,12 @@ export class GoalieProfilePage implements OnInit {
   private breadcrumbData = inject(BreadcrumbDataService);
   private modalService = inject(ModalService);
   private toast = inject(ToastService);
+  private teamService = inject(TeamService);
+  private positionService = inject(PositionService);
   private analysisService = inject(AnalysisService);
 
   goalie: Goalie | null = null;
+  isEditLoading = signal(false);
   isAnalysisLoading = signal(false);
   loading = true;
   shotLocationData: ShotLocationData[] = [];
@@ -242,6 +254,55 @@ export class GoalieProfilePage implements OnInit {
 
   getShotLocationData(): ShotLocationData[] {
     return this.shotLocationData;
+  }
+
+  onEditProfile(): void {
+    if (!this.goalie) return;
+
+    this.isEditLoading.set(true);
+    forkJoin({
+      teams: this.teamService.getTeams(),
+      positions: this.positionService.getPositions(),
+    }).subscribe({
+      next: ({ teams, positions }) => {
+        this.isEditLoading.set(false);
+        this.openEditModal(teams.teams, positions);
+      },
+      error: () => {
+        this.isEditLoading.set(false);
+        this.toast.show('Failed to load form data', 'error');
+      },
+    });
+  }
+
+  private openEditModal(teams: Team[], positions: PositionOption[]): void {
+    this.modalService.openModal(GoalieFormModal, {
+      name: 'Edit Goalie',
+      icon: 'sports_hockey',
+      width: '800px',
+      maxWidth: '95vw',
+      data: {
+        goalie: this.goalie,
+        isEditMode: true,
+        teams,
+        positions,
+      },
+      onCloseWithDataProcessing: (result: Partial<Goalie>) => {
+        if (!this.goalie?.id) return;
+
+        this.goalieService.updateGoalie(this.goalie.id, result).subscribe({
+          next: (updatedGoalie) => {
+            this.toast.show('Goalie updated successfully', 'success');
+            this.modalService.closeModal();
+            this.goalie = updatedGoalie;
+          },
+          error: () => {
+            this.toast.show('Failed to update goalie', 'error');
+            this.modalService.broadcastEvent(ModalEvent.StopButtonLoading);
+          },
+        });
+      },
+    });
   }
 
   onGoalieAnalysis(): void {

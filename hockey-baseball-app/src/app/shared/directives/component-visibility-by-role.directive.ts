@@ -27,7 +27,6 @@ export class ComponentVisibilityByRoleDirective implements AfterViewChecked {
     if (!hide && !show) return;
 
     const role = this.roleService.current;
-    if (!this.appVisibilityMap()) return;
 
     const nodeList = this.elementRef.nativeElement.querySelectorAll('[role-visibility-name]');
     if (!nodeList) return;
@@ -36,60 +35,26 @@ export class ComponentVisibilityByRoleDirective implements AfterViewChecked {
       const roleName = el.getAttribute('role-visibility-name');
       if (!roleName) return;
 
-      if (
-        this.appVisibilityMap().show &&
-        this.appVisibilityMap().show![roleName] &&
-        this.appVisibilityMap().show![roleName].includes(Role.Author) &&
-        this.authorCondition(el)
-      ) {
+      const showRoles = show?.[roleName];
+      const hideRoles = hide?.[roleName];
+
+      if (showRoles) {
+        const visible =
+          showRoles.includes(role) ||
+          (showRoles.includes(Role.Author) && this.authorCondition(el)) ||
+          (showRoles.includes(Role.CoachOfTeam) && this.coachCondition(role, el));
+
+        el.style.display = visible ? '' : 'none';
         return;
       }
 
-      if (
-        this.appVisibilityMap().show &&
-        this.appVisibilityMap().show![roleName] &&
-        this.appVisibilityMap().show![roleName].includes(Role.CoachOfTeam) &&
-        this.coachCondition(role, el)
-      ) {
-        return;
-      }
+      if (hideRoles) {
+        const hidden =
+          hideRoles.includes(role) ||
+          (hideRoles.includes(Role.Author) && this.authorCondition(el)) ||
+          (hideRoles.includes(Role.CoachOfTeam) && this.coachCondition(role, el));
 
-      if (
-        this.appVisibilityMap().hide &&
-        this.appVisibilityMap().hide![roleName] &&
-        this.appVisibilityMap().hide![roleName].includes(Role.Author) &&
-        this.authorCondition(el)
-      ) {
-        el.remove();
-        return;
-      }
-
-      if (
-        this.appVisibilityMap().hide &&
-        this.appVisibilityMap().hide![roleName] &&
-        this.appVisibilityMap().hide![roleName].includes(Role.CoachOfTeam) &&
-        this.coachCondition(role, el)
-      ) {
-        el.remove();
-        return;
-      }
-
-      if (
-        this.appVisibilityMap().hide &&
-        this.appVisibilityMap().hide![roleName] &&
-        this.appVisibilityMap().hide![roleName].includes(role)
-      ) {
-        el.remove();
-        return;
-      }
-
-      if (
-        this.appVisibilityMap().show &&
-        this.appVisibilityMap().show![roleName] &&
-        !this.appVisibilityMap().show![roleName].includes(role)
-      ) {
-        el.remove();
-        return;
+        el.style.display = hidden ? 'none' : '';
       }
     });
   }

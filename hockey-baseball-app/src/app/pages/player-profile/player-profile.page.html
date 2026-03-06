@@ -13,6 +13,7 @@
         [isLoading]="isEditLoading()"
         (clicked)="onEditProfile()"
         role-visibility-name="edit-player-button"
+        [attr.role-visibility-team-id]="player?.teamId"
       >
         Edit Player Profile
       </app-button-loading>
@@ -228,13 +229,22 @@
                   <ng-container matColumnDef="vsTeam">
                     <th mat-header-cell *matHeaderCellDef class="header-cell">vs Team</th>
                     <td mat-cell *matCellDef="let element" class="data-cell team-cell">
-                      <img
-                        class="team-logo"
-                        [appCachedSrc]="element.vsTeamLogo"
-                        alt="vs team logo"
-                        class="team-logo"
-                      />
-                      <span class="team-name">{{ element.vsTeamName }}</span>
+                      <a
+                        [routerLink]="['/teams-and-rosters/teams', element.vsTeamId, 'profile']"
+                        class="team-logo-link"
+                      >
+                        <img
+                          class="team-logo"
+                          [appCachedSrc]="element.vsTeamLogo"
+                          alt="vs team logo"
+                        />
+                      </a>
+                      <a
+                        [routerLink]="['/teams-and-rosters/teams', element.vsTeamId, 'profile']"
+                        class="team-name-link"
+                      >
+                        {{ element.vsTeamName }}
+                      </a>
                     </td>
                   </ng-container>
 

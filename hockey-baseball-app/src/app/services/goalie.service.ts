@@ -267,6 +267,7 @@ export class GoalieService {
           return {
             season: '', // Will be filled from seasons list by seasonId
             seasonId: season.season_id,
+            teamId: season.team_id,
             logo: teamInfo.logo,
             team: teamInfo.name,
             gamesPlayed: season.games_played,
@@ -375,6 +376,7 @@ export class GoalieService {
           return {
             season: game.season_name || '',
             date: formattedDate,
+            vsTeamId: game.team_vs_id,
             vsTeamName: vsTeamInfo.name, // Opponent team name
             vsTeamLogo: vsTeamLogoUrl, // Logo URL from API endpoint
             teamName: goalieTeamInfo.name, // Goalie's team name
