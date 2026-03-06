@@ -2,6 +2,9 @@
   <div card class="card">
     <div class="card-columns">
       <div class="form-column">
+        <div class="auth-icon">
+          <span class="material-symbols-rounded">login</span>
+        </div>
         <h1 class="title">Welcome back</h1>
         <p class="subtitle">Sign in to access your team's dashboard, analytics, and more.</p>
         <form [formGroup]="signInForm" (ngSubmit)="onSubmit()">

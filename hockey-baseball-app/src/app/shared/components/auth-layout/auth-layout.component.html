@@ -1,14 +1,16 @@
 @let titleTextValue = titleText();
 
 <div class="auth-wrapper">
-  <!-- Left: Hero panel -->
+  <!-- Left: Photo hero -->
   <div class="hero-panel">
     <img src="assets/auth-hero.jpg" alt="" class="hero-image" />
     <div class="hero-overlay"></div>
+
     <div class="hero-content">
       <img src="assets/logo-circle-white.png" alt="Slapshot Labs" class="hero-logo" />
-      <h1 class="hero-brand">SLAPSHOT LABS</h1>
-      <h2 class="hero-tagline">ANALYTICS. GAMES. PERFORMANCE.</h2>
+      <h1 class="hero-headline">SLAPSHOT<br />LABS</h1>
+      <p class="hero-tagline">Analytics. Games. Performance.</p>
+
       <div class="hero-stats">
         <div class="stat">
           <span class="stat-value">50+</span>
@@ -28,20 +30,26 @@
     </div>
   </div>
 
-  <!-- Right: Content panel -->
+  <!-- Right: Animated content panel -->
   <div class="content-panel">
-    @if (titleTextValue) {
-      <div class="form-content">
-        <div class="form-header">
-          <img src="assets/logo.png" alt="Slapshot Labs" class="form-logo" />
-          <h1 class="form-title">{{ titleTextValue }}</h1>
-          <div class="title-divider"></div>
-        </div>
+    <div class="panel-gradient"></div>
+    <div class="panel-grid"></div>
+    <div class="panel-glow"></div>
 
-        <ng-content></ng-content>
-      </div>
-    } @else {
-      <ng-content select="[card]"></ng-content>
-    }
+    <div class="panel-content">
+      @if (titleTextValue) {
+        <div class="form-content">
+          <div class="form-header">
+            <img src="assets/logo.png" alt="Slapshot Labs" class="form-logo" />
+            <h1 class="form-title">{{ titleTextValue }}</h1>
+            <div class="title-divider"></div>
+          </div>
+
+          <ng-content></ng-content>
+        </div>
+      } @else {
+        <ng-content select="[card]"></ng-content>
+      }
+    </div>
   </div>
 </div>
