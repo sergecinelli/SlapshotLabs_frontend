@@ -2,46 +2,43 @@
 @let teamsValue = teams();
 @let layoutModeValue = layoutMode();
 
-<div class="page-content" [appVisibilityMap]="visibilityByRoleMap">
-  <!-- Header with Add Button -->
-  <div class="entity-page-header">
-    <div class="entity-header-left"></div>
-    <div class="entity-header-actions" style="display: flex; gap: 10px; align-items: center">
-      <!-- View Toggle Button -->
-      <app-button
-        [materialIcon]="layoutModeValue === 'card' ? 'table_rows' : 'grid_view'"
-        [bg]="'white'"
-        [bghover]="'gray_tone3'"
-        [color]="'text_primary'"
-        [colorhover]="'primary'"
-        [width]="'auto'"
-        [rounded]="false"
-        [haveContent]="true"
-        (clicked)="toggleLayout()"
-      >
-        {{ layoutModeValue === 'card' ? 'Table View' : 'Card View' }}
-      </app-button>
+<ng-template appBreadcrumbActions>
+  <app-button
+    [materialIcon]="layoutModeValue === 'card' ? 'table_rows' : 'grid_view'"
+    [bg]="'white'"
+    [bghover]="'gray_tone3'"
+    [color]="'text_primary'"
+    [colorhover]="'primary'"
+    [width]="'auto'"
+    [rounded]="false"
+    [haveContent]="true"
+    (clicked)="toggleLayout()"
+  >
+    {{ layoutModeValue === 'card' ? 'Table View' : 'Card View' }}
+  </app-button>
 
-      <div class="entity-add-button-wrapper" role-visibility-name="add-team-button">
-        <app-button-loading
-          materialIcon="add"
-          [bg]="'primary'"
-          [bghover]="'primary_dark'"
-          [color]="'white'"
-          [colorhover]="'white'"
-          [opacity]="1"
-          [opacityhover]="1"
-          [width]="'auto'"
-          [rounded]="false"
-          [haveContent]="true"
-          [isLoading]="isAddLoading()"
-          (clicked)="openAddTeamModal()"
-        >
-          Add a Team
-        </app-button-loading>
-      </div>
-    </div>
+  <div [appVisibilityMap]="visibilityByRoleMap" style="display: contents">
+    <app-button-loading
+      materialIcon="add"
+      [bg]="'primary'"
+      [bghover]="'primary_dark'"
+      [color]="'white'"
+      [colorhover]="'white'"
+      [opacity]="1"
+      [opacityhover]="1"
+      [width]="'auto'"
+      [rounded]="false"
+      [haveContent]="true"
+      [isLoading]="isAddLoading()"
+      (clicked)="openAddTeamModal()"
+      role-visibility-name="add-team-button"
+    >
+      Add a Team
+    </app-button-loading>
   </div>
+</ng-template>
+
+<div class="page-content" [appVisibilityMap]="visibilityByRoleMap">
 
   <!-- Loading State -->
   @if (loadingValue) {

@@ -44,6 +44,7 @@ import { visibilityByRoleMap } from './player-profile.role-map';
 import { StorageKey } from '../../services/local-storage.service';
 import { BreadcrumbDataService } from '../../services/breadcrumb-data.service';
 import { CachedSrcDirective } from '../../shared/directives/cached-src.directive';
+import { BreadcrumbActionsDirective } from '../../shared/directives/breadcrumb-actions.directive';
 
 @Component({
   selector: 'app-player-profile',
@@ -58,6 +59,7 @@ import { CachedSrcDirective } from '../../shared/directives/cached-src.directive
     ComponentVisibilityByRoleDirective,
     ButtonLoadingComponent,
     RouterLink,
+    BreadcrumbActionsDirective,
   ],
   templateUrl: './player-profile.page.html',
   styleUrl: './player-profile.page.scss',

@@ -27,6 +27,8 @@ import {
   TabItem,
 } from '../../shared/components/tabs-slider/tabs-slider.component';
 import { ComponentVisibilityByRoleDirective } from '../../shared/directives/component-visibility-by-role.directive';
+import { BreadcrumbActionsDirective } from '../../shared/directives/breadcrumb-actions.directive';
+import { BreadcrumbCenterDirective } from '../../shared/directives/breadcrumb-center.directive';
 import { visibilityByRoleMap } from './analytics.role-map';
 import { DisplayTextModal } from '../../shared/components/display-text-modal/display-text.modal';
 import { PlayerAnalysisModal } from '../../shared/components/player-analysis-modal/player-analysis.modal';
@@ -46,6 +48,8 @@ import { ShareAnalyticsModal } from '../../shared/components/share-analytics-mod
     ButtonLoadingComponent,
     TabsSliderComponent,
     ComponentVisibilityByRoleDirective,
+    BreadcrumbActionsDirective,
+    BreadcrumbCenterDirective,
   ],
   templateUrl: './analytics.page.html',
   styleUrl: './analytics.page.scss',

@@ -1,72 +1,87 @@
 @let breadcrumbsValue = breadcrumbs();
+@let actionsTemplateValue = breadcrumbActions.actionsTemplate();
+@let centerTemplateValue = breadcrumbActions.centerTemplate();
 
 <nav class="breadcrumbs-container" aria-label="Breadcrumb">
-  <div class="breadcrumbs-content">
-    @if (breadcrumbsValue.length > 0) {
-      <ol class="breadcrumbs-list">
-        @for (item of breadcrumbsValue; track item.path; let i = $index) {
-          <li class="breadcrumbs-item">
-            @if (isLast(i) && item.isLive) {
-              <!-- Last item with live indicator (pulsing circle) -->
-              <div class="breadcrumbs-current">
-                <div class="breadcrumbs-title-icon-wrapper">
-                  <span class="live-indicator"></span>
+  <div class="breadcrumbs-content" [class.has-center]="!!centerTemplateValue">
+    <div class="breadcrumbs-left">
+      @if (breadcrumbsValue.length > 0) {
+        <ol class="breadcrumbs-list">
+          @for (item of breadcrumbsValue; track item.path; let i = $index) {
+            <li class="breadcrumbs-item">
+              @if (isLast(i) && item.isLive) {
+                <div class="breadcrumbs-current">
+                  <div class="breadcrumbs-title-icon-wrapper">
+                    <span class="live-indicator"></span>
+                  </div>
+                  <h1 class="breadcrumbs-title">{{ item.label }}</h1>
                 </div>
-                <h1 class="breadcrumbs-title">{{ item.label }}</h1>
-              </div>
-            } @else if (item.isLive) {
-              <!-- Live item with pulsing indicator and tournament name -->
-              <a
-                class="breadcrumbs-link"
-                (click)="navigateTo(item.path, $event)"
-                (keyup.enter)="navigateTo(item.path, $event)"
-                (keyup.space)="navigateTo(item.path, $event)"
-                tabindex="0"
-                role="link"
-                [attr.aria-label]="'Navigate to ' + item.label"
-              >
-                <span class="live-indicator"></span>
-                <span class="breadcrumbs-label">{{ item.label }}</span>
-                @if (item.tournamentName) {
-                  <span class="breadcrumbs-divider">|</span>
-                  <span class="breadcrumbs-tournament-name">{{ item.tournamentName }}</span>
+              } @else if (item.isLive) {
+                <a
+                  class="breadcrumbs-link"
+                  (click)="navigateTo(item.path, $event)"
+                  (keyup.enter)="navigateTo(item.path, $event)"
+                  (keyup.space)="navigateTo(item.path, $event)"
+                  tabindex="0"
+                  role="link"
+                  [attr.aria-label]="'Navigate to ' + item.label"
+                >
+                  <span class="live-indicator"></span>
+                  <span class="breadcrumbs-label">{{ item.label }}</span>
+                  @if (item.tournamentName) {
+                    <span class="breadcrumbs-divider">|</span>
+                    <span class="breadcrumbs-tournament-name">{{ item.tournamentName }}</span>
+                  }
+                </a>
+                @if (!isLast(i)) {
+                  <span class="material-symbols-rounded breadcrumbs-separator">chevron_right</span>
                 }
-              </a>
-              @if (!isLast(i)) {
+              } @else if (isLast(i)) {
+                <div class="breadcrumbs-current">
+                  @if (item.icon) {
+                    <div class="breadcrumbs-title-icon-wrapper">
+                      <span class="material-symbols-rounded breadcrumbs-title-icon">
+                        {{ item.icon }}
+                      </span>
+                    </div>
+                  }
+                  <h1 class="breadcrumbs-title">{{ item.label }}</h1>
+                </div>
+              } @else {
+                <a
+                  class="breadcrumbs-link"
+                  (click)="navigateTo(item.path, $event)"
+                  (keyup.enter)="navigateTo(item.path, $event)"
+                  (keyup.space)="navigateTo(item.path, $event)"
+                  tabindex="0"
+                  role="link"
+                  [attr.aria-label]="'Navigate to ' + item.label"
+                >
+                  @if (item.icon) {
+                    <span class="material-symbols-rounded breadcrumbs-icon">{{ item.icon }}</span>
+                  }
+                  <span class="breadcrumbs-label">{{ item.label }}</span>
+                </a>
                 <span class="material-symbols-rounded breadcrumbs-separator">chevron_right</span>
               }
-            } @else if (isLast(i)) {
-              <!-- Last item with icon and title -->
-              <div class="breadcrumbs-current">
-                @if (item.icon) {
-                  <div class="breadcrumbs-title-icon-wrapper">
-                    <span class="material-symbols-rounded breadcrumbs-title-icon">
-                      {{ item.icon }}
-                    </span>
-                  </div>
-                }
-                <h1 class="breadcrumbs-title">{{ item.label }}</h1>
-              </div>
-            } @else {
-              <a
-                class="breadcrumbs-link"
-                (click)="navigateTo(item.path, $event)"
-                (keyup.enter)="navigateTo(item.path, $event)"
-                (keyup.space)="navigateTo(item.path, $event)"
-                tabindex="0"
-                role="link"
-                [attr.aria-label]="'Navigate to ' + item.label"
-              >
-                @if (item.icon) {
-                  <span class="material-symbols-rounded breadcrumbs-icon">{{ item.icon }}</span>
-                }
-                <span class="breadcrumbs-label">{{ item.label }}</span>
-              </a>
-              <span class="material-symbols-rounded breadcrumbs-separator">chevron_right</span>
-            }
-          </li>
-        }
-      </ol>
+            </li>
+          }
+        </ol>
+      }
+    </div>
+
+    @if (centerTemplateValue) {
+      <div class="breadcrumbs-center">
+        <ng-container [ngTemplateOutlet]="centerTemplateValue"></ng-container>
+      </div>
     }
+
+    <div class="breadcrumbs-right">
+      @if (actionsTemplateValue) {
+        <div class="breadcrumbs-actions">
+          <ng-container [ngTemplateOutlet]="actionsTemplateValue"></ng-container>
+        </div>
+      }
+    </div>
   </div>
 </nav>

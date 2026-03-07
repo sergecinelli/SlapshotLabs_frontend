@@ -6,31 +6,35 @@
 @let tableColumnsValue = tableColumns();
 @let tableActionsValue = tableActions();
 
-<div class="page-content" [appVisibilityMap]="visibilityByRoleMap">
-  <div class="analytics-toolbar">
-    @if (showTabsValue) {
-      <app-tabs-slider
-        [items]="tabItems"
-        [activeTabIndex]="activeTabIndexValue"
-        (selected)="onTabChange($event)"
-      ></app-tabs-slider>
-    }
+@if (showTabsValue) {
+  <ng-template appBreadcrumbCenter>
+    <app-tabs-slider
+      [items]="tabItems"
+      [activeTabIndex]="activeTabIndexValue"
+      (selected)="onTabChange($event)"
+    ></app-tabs-slider>
+  </ng-template>
+}
 
-    <div role-visibility-name="create-analysis-button" class="create-button-wrapper">
-      <app-button-loading
-        [materialIcon]="buttonConfigValue.buttonIcon"
-        [bg]="'primary'"
-        [bghover]="'primary'"
-        [color]="'white'"
-        [colorhover]="'white'"
-        [haveContent]="true"
-        [isLoading]="isCreateLoading()"
-        (clicked)="onCreateAnalysis()"
-      >
-        {{ buttonConfigValue.buttonLabel }}
-      </app-button-loading>
-    </div>
+<ng-template appBreadcrumbActions>
+  <div [appVisibilityMap]="visibilityByRoleMap" style="display: contents">
+    <app-button-loading
+      [materialIcon]="buttonConfigValue.buttonIcon"
+      [bg]="'primary'"
+      [bghover]="'primary'"
+      [color]="'white'"
+      [colorhover]="'white'"
+      [haveContent]="true"
+      [isLoading]="isCreateLoading()"
+      (clicked)="onCreateAnalysis()"
+      role-visibility-name="create-analysis-button"
+    >
+      {{ buttonConfigValue.buttonLabel }}
+    </app-button-loading>
   </div>
+</ng-template>
+
+<div class="page-content" [appVisibilityMap]="visibilityByRoleMap">
 
   <app-data-table
     [columns]="tableColumnsValue"

@@ -29,6 +29,7 @@ import {
   GameAnalysisModal,
   GameOption,
 } from '../../shared/components/game-analysis-modal/game-analysis.modal';
+import { BreadcrumbActionsDirective } from '../../shared/directives/breadcrumb-actions.directive';
 
 interface GameDisplay {
   id: number;
@@ -60,6 +61,7 @@ interface GameDisplay {
     ButtonComponent,
     DataTableComponent,
     GameCardComponent,
+    BreadcrumbActionsDirective,
   ],
   templateUrl: './schedules.page.html',
   styleUrl: './schedules.page.scss',

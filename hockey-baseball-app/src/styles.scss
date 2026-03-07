@@ -265,6 +265,7 @@ mat-error {
 
 .page-content {
   padding: 10px;
+  padding-top: 0;
 }
 
 .mat-mdc-table {
@@ -483,14 +484,6 @@ img.cached-img-loading {
   background-size: 2000px 100%;
   animation: cached-img-shimmer 1.5s infinite;
   color: transparent;
-}
-
-.action-buttons-row {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: 5px;
-  margin-bottom: 16px;
 }
 
 .player-filter-panel.mat-mdc-select-panel {

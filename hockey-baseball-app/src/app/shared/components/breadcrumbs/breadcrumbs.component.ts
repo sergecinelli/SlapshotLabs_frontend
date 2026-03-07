@@ -1,8 +1,10 @@
 import { Component, effect, inject, signal } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
 import { Title } from '@angular/platform-browser';
 import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs';
 import { BreadcrumbDataService } from '../../../services/breadcrumb-data.service';
+import { BreadcrumbActionsService } from '../../../services/breadcrumb-actions.service';
 
 export interface BreadcrumbItem {
   label: string;
@@ -21,7 +23,7 @@ export interface BreadcrumbRouteData {
 
 @Component({
   selector: 'app-breadcrumbs',
-  imports: [],
+  imports: [NgTemplateOutlet],
   templateUrl: './breadcrumbs.component.html',
   styleUrl: './breadcrumbs.component.scss',
 })
@@ -29,6 +31,7 @@ export class BreadcrumbsComponent {
   private router = inject(Router);
   private title = inject(Title);
   private breadcrumbData = inject(BreadcrumbDataService);
+  protected breadcrumbActions = inject(BreadcrumbActionsService);
 
   breadcrumbs = signal<BreadcrumbItem[]>([]);
 

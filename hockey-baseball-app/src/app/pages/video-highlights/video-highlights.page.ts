@@ -20,6 +20,7 @@ import {
 } from '../../shared/components/highlight-reel-form-modal/highlight-reel-form.modal';
 import { HighlightReelViewModal } from '../../shared/components/highlight-reel-view-modal/highlight-reel-view.modal';
 import { ComponentVisibilityByRoleDirective } from '../../shared/directives/component-visibility-by-role.directive';
+import { BreadcrumbActionsDirective } from '../../shared/directives/breadcrumb-actions.directive';
 import { visibilityByRoleMap } from './video-highlights.role-map';
 import { AuthService } from '../../services/auth.service';
 import { RoleService } from '../../services/roles/role.service';
@@ -38,6 +39,7 @@ import { formatDateShortWithCommas } from '../../shared/utils/time-converter.uti
     MatIconModule,
     ComponentVisibilityByRoleDirective,
     ButtonLoadingComponent,
+    BreadcrumbActionsDirective,
   ],
   templateUrl: './video-highlights.page.html',
   styleUrl: './video-highlights.page.scss',

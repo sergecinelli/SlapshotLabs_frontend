@@ -33,6 +33,7 @@ import { AnalyticsApiIn } from '../../shared/interfaces/analysis.interface';
 import { PlayerAnalysisModal } from '../../shared/components/player-analysis-modal/player-analysis.modal';
 import { CachedSrcDirective } from '../../shared/directives/cached-src.directive';
 import { CardGridComponent } from '../../shared/components/card-grid/card-grid.component';
+import { BreadcrumbActionsDirective } from '../../shared/directives/breadcrumb-actions.directive';
 
 @Component({
   selector: 'app-players',
@@ -47,6 +48,7 @@ import { CardGridComponent } from '../../shared/components/card-grid/card-grid.c
     CardGridComponent,
     DataTableComponent,
     RouterLink,
+    BreadcrumbActionsDirective,
   ],
   templateUrl: './players.page.html',
   styleUrl: './players.page.scss',

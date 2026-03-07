@@ -20,6 +20,8 @@ import {
   TabItem,
 } from '../../shared/components/tabs-slider/tabs-slider.component';
 import { ComponentVisibilityByRoleDirective } from '../../shared/directives/component-visibility-by-role.directive';
+import { BreadcrumbActionsDirective } from '../../shared/directives/breadcrumb-actions.directive';
+import { BreadcrumbCenterDirective } from '../../shared/directives/breadcrumb-center.directive';
 import { visibilityByRoleMap } from './tryout.role-map';
 import {
   TryoutAddModal,
@@ -39,6 +41,8 @@ const TRYOUT_TABS: TabItem[] = [
     ButtonLoadingComponent,
     TabsSliderComponent,
     ComponentVisibilityByRoleDirective,
+    BreadcrumbActionsDirective,
+    BreadcrumbCenterDirective,
   ],
   templateUrl: './tryout.page.html',
   styleUrl: './tryout.page.scss',

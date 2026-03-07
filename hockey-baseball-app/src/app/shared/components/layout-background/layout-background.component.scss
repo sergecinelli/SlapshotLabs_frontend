@@ -1,0 +1,156 @@
+// ============================================
+// Layout Background — ice rink texture
+// Adjust variables below to tweak the look.
+// ============================================
+
+// Ice config
+$ice-tint: rgba(245, 247, 248, 0.35);
+$ice-highlight: rgba(244, 244, 248, 0.6);
+$scratch-color: rgba(106, 151, 188, 0.12);
+$scratch-color-alt: rgba(68, 94, 117, 0.08);
+$sheen-opacity: 0;
+
+// Host is transparent in the layout flow
+.layout-background {
+  display: contents;
+}
+
+// Background wrapper
+.layout-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+// Ice tint — subtle blue-white gradient like real ice
+.layout-bg__ice {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 120% 80% at 50% 30%, $ice-highlight 0%, transparent 70%),
+    linear-gradient(180deg, $ice-tint 0%, rgba(230, 242, 252, 0.15) 100%);
+}
+
+// Skate scratches — multiple overlapping layers with prime-number
+// spacings and varied angles to break regularity
+.layout-bg__scratches {
+  position: absolute;
+  inset: -50%;
+  width: 200%;
+  height: 200%;
+  background-image:
+    // Dense cluster — short-spacing, subtle
+    repeating-linear-gradient(
+      67deg,
+      transparent,
+      transparent 37px,
+      $scratch-color 37px,
+      $scratch-color 38px
+    ),
+    repeating-linear-gradient(
+      -23deg,
+      transparent,
+      transparent 53px,
+      $scratch-color-alt 53px,
+      $scratch-color-alt 54px
+    ),
+    // Mid cluster — medium spacing
+    repeating-linear-gradient(
+        12deg,
+        transparent,
+        transparent 79px,
+        $scratch-color 79px,
+        $scratch-color 80px
+      ),
+    repeating-linear-gradient(
+      -48deg,
+      transparent,
+      transparent 97px,
+      $scratch-color-alt 97px,
+      $scratch-color-alt 98px
+    ),
+    // Wide cluster — big gaps
+    repeating-linear-gradient(
+        82deg,
+        transparent,
+        transparent 131px,
+        $scratch-color 131px,
+        $scratch-color 132px
+      ),
+    repeating-linear-gradient(
+      -71deg,
+      transparent,
+      transparent 113px,
+      $scratch-color-alt 113px,
+      $scratch-color-alt 114px
+    ),
+    // Extra scattered
+    repeating-linear-gradient(
+        35deg,
+        transparent,
+        transparent 173px,
+        $scratch-color 173px,
+        $scratch-color 174px
+      ),
+    repeating-linear-gradient(
+      -8deg,
+      transparent,
+      transparent 149px,
+      $scratch-color-alt 149px,
+      $scratch-color-alt 150px
+    );
+  background-position:
+    0 0,
+    13px 7px,
+    29px 41px,
+    0 19px,
+    47px 0,
+    11px 33px,
+    67px 23px,
+    3px 59px;
+}
+
+// Light sheen — soft reflection moving across the ice
+.layout-bg__sheen {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.08) 45%,
+    rgba(255, 255, 255, 0.15) 50%,
+    rgba(255, 255, 255, 0.08) 55%,
+    transparent 70%
+  );
+  opacity: $sheen-opacity;
+  animation: ice-sheen 10s ease-in-out infinite;
+}
+
+@keyframes ice-sheen {
+  0%,
+  100% {
+    transform: translateX(-30%);
+    opacity: $sheen-opacity;
+  }
+  50% {
+    transform: translateX(30%);
+    opacity: $sheen-opacity * 0.6;
+  }
+}
+
+// Parent container setup when background is active
+:has(> .layout-background > .layout-bg) {
+  position: relative;
+  background-color: var(--page-background);
+
+  > .app-header,
+  > .page-content-wrapper {
+    background-color: transparent;
+  }
+
+  > app-breadcrumbs .breadcrumbs-container {
+    background-color: transparent;
+  }
+}

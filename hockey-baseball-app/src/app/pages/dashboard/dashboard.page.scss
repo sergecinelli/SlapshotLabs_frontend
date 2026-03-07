@@ -18,7 +18,7 @@
   font-weight: 600;
   color: var(--text-primary);
   padding-left: 10px;
-  margin-bottom: 0;
+  margin-bottom: 10px;
 }
 
 // Loading and Empty States
@@ -40,10 +40,6 @@
 app-card-grid,
 .dashboard-empty {
   animation: card-appear 300ms cubic-bezier(0.18, 0.89, 0.32, 1.28) both;
-}
-
-app-card-grid {
-  margin-top: 10px;
 }
 
 @keyframes card-appear {

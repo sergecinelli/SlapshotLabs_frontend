@@ -15,6 +15,7 @@ import { visibilityByRoleMap } from './video-library.role-map';
 import { ModalEvent, ModalService } from '../../services/modal.service';
 import { ToastService } from '../../services/toast.service';
 import { DisplayTextModal } from '../../shared/components/display-text-modal/display-text.modal';
+import { BreadcrumbActionsDirective } from '../../shared/directives/breadcrumb-actions.directive';
 
 @Component({
   selector: 'app-video-library',
@@ -23,6 +24,7 @@ import { DisplayTextModal } from '../../shared/components/display-text-modal/dis
     MatIconModule,
     ComponentVisibilityByRoleDirective,
     ButtonLoadingComponent,
+    BreadcrumbActionsDirective,
   ],
   templateUrl: './video-library.page.html',
   styleUrl: './video-library.page.scss',

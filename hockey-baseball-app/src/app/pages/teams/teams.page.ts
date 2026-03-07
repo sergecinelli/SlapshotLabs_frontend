@@ -29,6 +29,7 @@ import {
 import { LocalStorageService, StorageKey } from '../../services/local-storage.service';
 import { CachedSrcDirective } from '../../shared/directives/cached-src.directive';
 import { CardGridComponent } from '../../shared/components/card-grid/card-grid.component';
+import { BreadcrumbActionsDirective } from '../../shared/directives/breadcrumb-actions.directive';
 
 @Component({
   selector: 'app-teams',
@@ -42,6 +43,7 @@ import { CardGridComponent } from '../../shared/components/card-grid/card-grid.c
     ButtonRouteComponent,
     CardGridComponent,
     DataTableComponent,
+    BreadcrumbActionsDirective,
   ],
   templateUrl: './teams.page.html',
   styleUrl: './teams.page.scss',

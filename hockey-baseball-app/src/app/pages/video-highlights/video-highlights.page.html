@@ -1,9 +1,8 @@
 @let rowsValue = rows();
 @let loadingValue = loading();
 
-<div class="page-content" [appVisibilityMap]="visibilityByRoleMap">
-  <!-- Create Highlight Reel Button -->
-  <div class="mb-4 flex justify-end">
+<ng-template appBreadcrumbActions>
+  <div [appVisibilityMap]="visibilityByRoleMap" style="display: contents">
     <app-button-loading
       [bg]="'primary'"
       [bghover]="'primary_dark'"
@@ -18,7 +17,9 @@
       Create New Highlight Reel
     </app-button-loading>
   </div>
+</ng-template>
 
+<div class="page-content" [appVisibilityMap]="visibilityByRoleMap">
   <app-data-table
     [columns]="tableColumns"
     [data]="rowsValue"

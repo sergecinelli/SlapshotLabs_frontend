@@ -26,6 +26,7 @@ import { TeamFormModal } from '../../shared/components/team-form-modal/team-form
 import { BreadcrumbDataService } from '../../services/breadcrumb-data.service';
 import { ComponentVisibilityByRoleDirective } from '../../shared/directives/component-visibility-by-role.directive';
 import { ButtonLoadingComponent } from '../../shared/components/buttons/button-loading/button-loading.component';
+import { BreadcrumbActionsDirective } from '../../shared/directives/breadcrumb-actions.directive';
 import { visibilityByRoleMap } from './team-profile.role-map';
 import { forkJoin, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -72,6 +73,7 @@ export interface TeamPlayer {
     MatTableModule,
     ComponentVisibilityByRoleDirective,
     ButtonLoadingComponent,
+    BreadcrumbActionsDirective,
   ],
   templateUrl: './team-profile.page.html',
   styleUrl: './team-profile.page.scss',

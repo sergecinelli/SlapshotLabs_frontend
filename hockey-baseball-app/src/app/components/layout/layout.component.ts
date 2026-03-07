@@ -16,6 +16,7 @@ import { Role } from '../../services/roles/role.interface';
 import { RoleService } from '../../services/roles/role.service';
 import { BreadcrumbsComponent } from '../../shared/components/breadcrumbs/breadcrumbs.component';
 import { LogoutConfirmationModal } from '../../shared/components/logout-confirmation-modal/logout-confirmation.modal';
+import { LayoutBackgroundComponent } from '../../shared/components/layout-background/layout-background.component';
 
 @Component({
   selector: 'app-layout',
@@ -26,6 +27,7 @@ import { LogoutConfirmationModal } from '../../shared/components/logout-confirma
     MatRippleModule,
     MatTooltipModule,
     BreadcrumbsComponent,
+    LayoutBackgroundComponent,
   ],
   templateUrl: './layout.component.html',
   styleUrl: './layout.component.scss',

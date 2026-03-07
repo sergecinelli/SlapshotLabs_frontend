@@ -1,4 +1,13 @@
-import { Component, effect, input, output, viewChildren, ElementRef, signal } from '@angular/core';
+import {
+  Component,
+  effect,
+  input,
+  output,
+  viewChildren,
+  ElementRef,
+  signal,
+  afterNextRender,
+} from '@angular/core';
 import { MatRippleModule } from '@angular/material/core';
 
 export interface TabItem {
@@ -38,14 +47,22 @@ export class TabsSliderComponent {
     effect(() => {
       const tabs = this.tabElements();
       const index = this.currentTabIndex();
-      requestAnimationFrame(() => {
-        if (tabs.length > 0 && tabs[index]) {
-          const el = tabs[index].nativeElement;
-          this.indicatorLeft.set(el.offsetLeft);
-          this.indicatorWidth.set(el.offsetWidth);
-        }
+      requestAnimationFrame(() => this.updateIndicator(tabs, index));
+    });
+
+    afterNextRender(() => {
+      document.fonts.ready.then(() => {
+        this.updateIndicator(this.tabElements(), this.currentTabIndex());
       });
     });
+  }
+
+  private updateIndicator(tabs: readonly ElementRef[], index: number): void {
+    if (tabs.length > 0 && tabs[index]) {
+      const el = tabs[index].nativeElement;
+      this.indicatorLeft.set(el.offsetLeft);
+      this.indicatorWidth.set(el.offsetWidth);
+    }
   }
 
   selectTab(index: number) {

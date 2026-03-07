@@ -42,6 +42,8 @@ import {
 } from '../../shared/components/game-analysis-modal/game-analysis.modal';
 import { tap } from 'rxjs/operators';
 import { convertGMTToLocal, formatDateForDisplay } from '../../shared/utils/time-converter.util';
+import { BreadcrumbActionsDirective } from '../../shared/directives/breadcrumb-actions.directive';
+import { BreadcrumbCenterDirective } from '../../shared/directives/breadcrumb-center.directive';
 
 @Component({
   selector: 'app-schedule',
@@ -53,6 +55,8 @@ import { convertGMTToLocal, formatDateForDisplay } from '../../shared/utils/time
     WeekPaginationComponent,
     CardGridComponent,
     GameCardComponent,
+    BreadcrumbActionsDirective,
+    BreadcrumbCenterDirective,
   ],
   templateUrl: './schedule.page.html',
   styleUrl: './schedule.page.scss',

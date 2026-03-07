@@ -1,6 +1,5 @@
-<div class="goalie-profile-page" [appVisibilityMap]="visibilityByRoleMap">
-  <!-- Action Buttons Row -->
-  <div class="action-buttons-row">
+<ng-template appBreadcrumbActions>
+  <div [appVisibilityMap]="visibilityByRoleMap" style="display: contents">
     <app-button-loading
       materialIcon="stylus"
       [bg]="'orange'"
@@ -15,19 +14,22 @@
     >
       Edit Goalie Profile
     </app-button-loading>
-    <app-button-loading
-      materialIcon="bar_chart"
-      [bg]="'upcoming'"
-      [bghover]="'upcoming_dark'"
-      [color]="'white'"
-      [colorhover]="'white'"
-      [haveContent]="true"
-      [isLoading]="isAnalysisLoading()"
-      (clicked)="onGoalieAnalysis()"
-    >
-      Enter Analysis
-    </app-button-loading>
   </div>
+  <app-button-loading
+    materialIcon="bar_chart"
+    [bg]="'upcoming'"
+    [bghover]="'upcoming_dark'"
+    [color]="'white'"
+    [colorhover]="'white'"
+    [haveContent]="true"
+    [isLoading]="isAnalysisLoading()"
+    (clicked)="onGoalieAnalysis()"
+  >
+    Enter Analysis
+  </app-button-loading>
+</ng-template>
+
+<div class="goalie-profile-page" [appVisibilityMap]="visibilityByRoleMap">
 
   <!-- Loading State -->
   @if (loading) {

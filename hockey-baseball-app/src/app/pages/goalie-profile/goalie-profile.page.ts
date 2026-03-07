@@ -44,6 +44,7 @@ import { ButtonLoadingComponent } from '../../shared/components/buttons/button-l
 import { ComponentVisibilityByRoleDirective } from '../../shared/directives/component-visibility-by-role.directive';
 import { visibilityByRoleMap } from './goalie-profile.role-map';
 import { CachedSrcDirective } from '../../shared/directives/cached-src.directive';
+import { BreadcrumbActionsDirective } from '../../shared/directives/breadcrumb-actions.directive';
 
 @Component({
   selector: 'app-goalie-profile',
@@ -59,6 +60,7 @@ import { CachedSrcDirective } from '../../shared/directives/cached-src.directive
     ButtonLoadingComponent,
     ComponentVisibilityByRoleDirective,
     RouterLink,
+    BreadcrumbActionsDirective,
   ],
   templateUrl: './goalie-profile.page.html',
   styleUrl: './goalie-profile.page.scss',

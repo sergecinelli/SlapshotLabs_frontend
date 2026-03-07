@@ -1,9 +1,8 @@
 @let videosValue = videos();
 @let loadingValue = loading();
 
-<div class="page-content" [appVisibilityMap]="visibilityByRoleMap">
-  <!-- Add Video Button -->
-  <div class="mb-4 flex justify-end" role-visibility-name="add-video-button">
+<ng-template appBreadcrumbActions>
+  <div [appVisibilityMap]="visibilityByRoleMap" style="display: contents">
     <app-button-loading
       [bg]="'primary'"
       [bghover]="'primary_dark'"
@@ -12,11 +11,14 @@
       [materialIcon]="'add'"
       [haveContent]="true"
       (clicked)="openAddVideoModal()"
+      role-visibility-name="add-video-button"
     >
       Add a Video
     </app-button-loading>
   </div>
+</ng-template>
 
+<div class="page-content" [appVisibilityMap]="visibilityByRoleMap">
   <app-data-table
     [columns]="tableColumns"
     [data]="videosValue"

@@ -14,6 +14,7 @@ import {
 } from '../../shared/components/data-table/data-table.component';
 import { ButtonLoadingComponent } from '../../shared/components/buttons/button-loading/button-loading.component';
 import { ComponentVisibilityByRoleDirective } from '../../shared/directives/component-visibility-by-role.directive';
+import { BreadcrumbActionsDirective } from '../../shared/directives/breadcrumb-actions.directive';
 import { visibilityByRoleMap } from './team-analysis.role-map';
 import { TeamAnalysisModal } from '../../shared/components/team-analysis-modal/team-analysis.modal';
 import { AnalysisViewModal } from '../../shared/components/analysis-view-modal/analysis-view.modal';
@@ -21,7 +22,7 @@ import { DisplayTextModal } from '../../shared/components/display-text-modal/dis
 
 @Component({
   selector: 'app-team-analysis',
-  imports: [DataTableComponent, ButtonLoadingComponent, ComponentVisibilityByRoleDirective],
+  imports: [DataTableComponent, ButtonLoadingComponent, ComponentVisibilityByRoleDirective, BreadcrumbActionsDirective],
   templateUrl: './team-analysis.page.html',
   styleUrl: './team-analysis.page.scss',
 })

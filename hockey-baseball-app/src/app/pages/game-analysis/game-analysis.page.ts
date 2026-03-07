@@ -15,6 +15,7 @@ import {
 } from '../../shared/components/data-table/data-table.component';
 import { ButtonLoadingComponent } from '../../shared/components/buttons/button-loading/button-loading.component';
 import { ComponentVisibilityByRoleDirective } from '../../shared/directives/component-visibility-by-role.directive';
+import { BreadcrumbActionsDirective } from '../../shared/directives/breadcrumb-actions.directive';
 import { visibilityByRoleMap } from './game-analysis.role-map';
 import {
   GameAnalysisModal,
@@ -25,7 +26,7 @@ import { DisplayTextModal } from '../../shared/components/display-text-modal/dis
 
 @Component({
   selector: 'app-game-analysis',
-  imports: [DataTableComponent, ButtonLoadingComponent, ComponentVisibilityByRoleDirective],
+  imports: [DataTableComponent, ButtonLoadingComponent, ComponentVisibilityByRoleDirective, BreadcrumbActionsDirective],
   templateUrl: './game-analysis.page.html',
   styleUrl: './game-analysis.page.scss',
 })

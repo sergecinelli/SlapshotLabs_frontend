@@ -1,35 +1,37 @@
+<ng-template appBreadcrumbActions>
+  <div [appVisibilityMap]="visibilityByRoleMap" style="display: contents">
+    <app-button-loading
+      materialIcon="stylus"
+      [bg]="'orange'"
+      [bghover]="'orange'"
+      [color]="'white'"
+      [colorhover]="'white'"
+      [haveContent]="true"
+      [isLoading]="isEditLoading()"
+      (clicked)="onEditTeamProfile()"
+      role-visibility-name="edit-team-button"
+      [attr.role-visibility-team-id]="team?.id"
+    >
+      Edit Team Profile
+    </app-button-loading>
+  </div>
+  <app-button-loading
+    materialIcon="bar_chart"
+    [bg]="'upcoming'"
+    [bghover]="'upcoming_dark'"
+    [color]="'white'"
+    [colorhover]="'white'"
+    [haveContent]="true"
+    [isLoading]="isAnalysisLoading()"
+    (clicked)="onRequestTeamAnalysis()"
+  >
+    Enter Analysis
+  </app-button-loading>
+</ng-template>
+
 <div class="page-content" [appVisibilityMap]="visibilityByRoleMap">
   <!-- Content with padding -->
   <div>
-    <!-- Action Buttons Row -->
-    <div class="action-buttons-row">
-      <app-button-loading
-        materialIcon="stylus"
-        [bg]="'orange'"
-        [bghover]="'orange'"
-        [color]="'white'"
-        [colorhover]="'white'"
-        [haveContent]="true"
-        [isLoading]="isEditLoading()"
-        (clicked)="onEditTeamProfile()"
-        role-visibility-name="edit-team-button"
-        [attr.role-visibility-team-id]="team?.id"
-      >
-        Edit Team Profile
-      </app-button-loading>
-      <app-button-loading
-        materialIcon="bar_chart"
-        [bg]="'upcoming'"
-        [bghover]="'upcoming_dark'"
-        [color]="'white'"
-        [colorhover]="'white'"
-        [haveContent]="true"
-        [isLoading]="isAnalysisLoading()"
-        (clicked)="onRequestTeamAnalysis()"
-      >
-        Enter Analysis
-      </app-button-loading>
-    </div>
 
     <!-- Loading State -->
     @if (loading) {

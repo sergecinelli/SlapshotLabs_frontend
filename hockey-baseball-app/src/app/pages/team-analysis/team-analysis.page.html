@@ -1,8 +1,8 @@
 @let analyticsValue = analytics();
 @let loadingValue = loading();
 
-<div class="page-content" [appVisibilityMap]="visibilityByRoleMap">
-  <div class="action-buttons-row" role-visibility-name="create-analysis-button">
+<ng-template appBreadcrumbActions>
+  <div [appVisibilityMap]="visibilityByRoleMap" style="display: contents">
     <app-button-loading
       materialIcon="add"
       [bg]="'primary'"
@@ -12,11 +12,14 @@
       [haveContent]="true"
       [isLoading]="isCreateLoading()"
       (clicked)="onCreateAnalysis()"
+      role-visibility-name="create-analysis-button"
     >
       Create Team Analysis
     </app-button-loading>
   </div>
+</ng-template>
 
+<div class="page-content" [appVisibilityMap]="visibilityByRoleMap">
   <app-data-table
     [columns]="tableColumns"
     [data]="analyticsValue"

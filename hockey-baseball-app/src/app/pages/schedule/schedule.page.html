@@ -3,33 +3,35 @@
 @let loadingValue = loading();
 @let schedulesValue = schedules();
 
-<div class="page-content" [appVisibilityMap]="visibilityByRoleMap">
-  <!-- Header with Month Pagination and Add Button -->
-  <div class="schedule-header">
-    <div class="schedule-header-left"></div>
-    <app-week-pagination
-      [weekStart]="currentMonthStartValue"
-      [weekEnd]="currentMonthEndValue"
-      [isFirstWeek]="false"
-      [isLastWeek]="false"
-      (weekChange)="onMonthChange($event)"
-    />
-    <div class="add-schedule-button-wrapper">
-      <app-button-loading
-        role-visibility-name="add-schedule-button"
-        [bg]="'primary'"
-        [bghover]="'primary_dark'"
-        [color]="'white'"
-        [colorhover]="'white'"
-        [materialIcon]="'add'"
-        [haveContent]="true"
-        [isLoading]="isAddLoading()"
-        (clicked)="openAddScheduleModal()"
-      >
-        Add to Schedule
-      </app-button-loading>
-    </div>
+<ng-template appBreadcrumbCenter>
+  <app-week-pagination
+    [weekStart]="currentMonthStartValue"
+    [weekEnd]="currentMonthEndValue"
+    [isFirstWeek]="false"
+    [isLastWeek]="false"
+    (weekChange)="onMonthChange($event)"
+  />
+</ng-template>
+
+<ng-template appBreadcrumbActions>
+  <div [appVisibilityMap]="visibilityByRoleMap" style="display: contents">
+    <app-button-loading
+      role-visibility-name="add-schedule-button"
+      [bg]="'primary'"
+      [bghover]="'primary_dark'"
+      [color]="'white'"
+      [colorhover]="'white'"
+      [materialIcon]="'add'"
+      [haveContent]="true"
+      [isLoading]="isAddLoading()"
+      (clicked)="openAddScheduleModal()"
+    >
+      Add to Schedule
+    </app-button-loading>
   </div>
+</ng-template>
+
+<div class="page-content" [appVisibilityMap]="visibilityByRoleMap">
 
   <!-- Loading State -->
   @if (loadingValue) {
