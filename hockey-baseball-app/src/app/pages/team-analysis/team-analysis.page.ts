@@ -22,7 +22,12 @@ import { DisplayTextModal } from '../../shared/components/display-text-modal/dis
 
 @Component({
   selector: 'app-team-analysis',
-  imports: [DataTableComponent, ButtonLoadingComponent, ComponentVisibilityByRoleDirective, BreadcrumbActionsDirective],
+  imports: [
+    DataTableComponent,
+    ButtonLoadingComponent,
+    ComponentVisibilityByRoleDirective,
+    BreadcrumbActionsDirective,
+  ],
   templateUrl: './team-analysis.page.html',
   styleUrl: './team-analysis.page.scss',
 })

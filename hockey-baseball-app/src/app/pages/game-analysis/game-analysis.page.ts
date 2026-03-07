@@ -26,7 +26,12 @@ import { DisplayTextModal } from '../../shared/components/display-text-modal/dis
 
 @Component({
   selector: 'app-game-analysis',
-  imports: [DataTableComponent, ButtonLoadingComponent, ComponentVisibilityByRoleDirective, BreadcrumbActionsDirective],
+  imports: [
+    DataTableComponent,
+    ButtonLoadingComponent,
+    ComponentVisibilityByRoleDirective,
+    BreadcrumbActionsDirective,
+  ],
   templateUrl: './game-analysis.page.html',
   styleUrl: './game-analysis.page.scss',
 })

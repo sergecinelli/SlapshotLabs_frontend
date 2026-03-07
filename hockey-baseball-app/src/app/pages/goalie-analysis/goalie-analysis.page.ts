@@ -22,7 +22,12 @@ import { DisplayTextModal } from '../../shared/components/display-text-modal/dis
 
 @Component({
   selector: 'app-goalie-analysis',
-  imports: [DataTableComponent, ButtonLoadingComponent, ComponentVisibilityByRoleDirective, BreadcrumbActionsDirective],
+  imports: [
+    DataTableComponent,
+    ButtonLoadingComponent,
+    ComponentVisibilityByRoleDirective,
+    BreadcrumbActionsDirective,
+  ],
   templateUrl: './goalie-analysis.page.html',
   styleUrl: './goalie-analysis.page.scss',
 })
