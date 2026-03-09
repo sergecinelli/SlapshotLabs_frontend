@@ -7,9 +7,7 @@
     <div class="dashboard-card-content">
       <!-- Loading State -->
       @if (isLoading) {
-        <div class="dashboard-loading">
-          <div class="dashboard-loading-text">Loading profile data...</div>
-        </div>
+        <app-loading-spinner message="Loading profile data..." size="sm" />
       } @else {
         <!-- Error Message -->
         @if (errorMessage) {

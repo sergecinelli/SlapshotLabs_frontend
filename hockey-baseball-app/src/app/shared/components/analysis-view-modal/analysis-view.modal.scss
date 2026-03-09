@@ -13,50 +13,26 @@
   }
 }
 
-.field {
-  flex: 1;
-  min-width: 200px;
+.subject-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
 
-  &.full-width {
-    flex: 2;
-    min-width: 300px;
+.subject-link {
+  cursor: pointer;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
   }
+}
 
-  .field-label {
-    display: block;
-    font-size: 11px;
-    font-weight: 600;
-    text-transform: uppercase;
-    color: var(--text-secondary);
-  }
-
-  .subject-row {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-
-  .subject-link {
-    cursor: pointer;
-    text-decoration: none;
-
-    &:hover {
-      text-decoration: underline;
-    }
-  }
-
-  .field-value {
-    font-size: 14px;
-    color: var(--text_primary);
-    margin: 0;
-    line-height: 1.5;
-
-    &.analysis-text {
-      white-space: pre-wrap;
-      word-break: break-word;
-      line-height: 1.7;
-      max-height: 50vh;
-      overflow-y: auto;
-    }
-  }
+.analysis-text {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  line-height: 1.7;
+  max-height: 50vh;
+  overflow-y: auto;
 }

@@ -30,6 +30,7 @@ import { LocalStorageService, StorageKey } from '../../services/local-storage.se
 import { CachedSrcDirective } from '../../shared/directives/cached-src.directive';
 import { CardGridComponent } from '../../shared/components/card-grid/card-grid.component';
 import { BreadcrumbActionsDirective } from '../../shared/directives/breadcrumb-actions.directive';
+import { LoadingSpinnerComponent } from '../../shared/components/loading-spinner/loading-spinner.component';
 
 @Component({
   selector: 'app-teams',
@@ -44,6 +45,7 @@ import { BreadcrumbActionsDirective } from '../../shared/directives/breadcrumb-a
     CardGridComponent,
     DataTableComponent,
     BreadcrumbActionsDirective,
+    LoadingSpinnerComponent,
   ],
   templateUrl: './teams.page.html',
   styleUrl: './teams.page.scss',
@@ -361,7 +363,7 @@ export class TeamsPage implements OnInit {
         this.modalService.openModal(TeamFormModal, {
           name: 'Add Team',
           icon: 'groups',
-          width: '800px',
+          width: '900px',
           maxWidth: '95vw',
           data: {
             isEditMode: false,
@@ -408,7 +410,7 @@ export class TeamsPage implements OnInit {
         this.modalService.openModal(TeamFormModal, {
           name: 'Edit Team',
           icon: 'groups',
-          width: '800px',
+          width: '900px',
           maxWidth: '95vw',
           data: {
             team: team,

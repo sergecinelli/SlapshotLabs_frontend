@@ -6,9 +6,9 @@
   <!-- Left Navigation Panel -->
   <div
     [class]="
-      'flex flex-col transition-all duration-300 bg-sidebar-dark relative ' +
-      (isCollapsedValue ? 'w-20' : 'w-64')
+      'flex flex-col transition-all duration-300 relative ' + (isCollapsedValue ? 'w-20' : 'w-64')
     "
+    style="background-color: var(--sidebar)"
   >
     <!-- Logo and Menu Header -->
     <div class="logo-header">
@@ -206,17 +206,12 @@
             <app-button-loading
               materialIcon="logout"
               [bg]="'transparent'"
+              [bghover]="'sidebar_hover'"
               [color]="'text_white'"
               [colorhover]="'primary'"
-              [bghover]="'dark_tone2'"
-              [opacity]="1"
-              [opacityhover]="1"
-              [width]="'auto'"
-              [rounded]="false"
               (clicked)="logout()"
               tooltip="Logout"
-            >
-            </app-button-loading>
+            />
           </div>
         }
       </div>
@@ -234,6 +229,19 @@
         <div class="live-banner-container">
           <app-live-banner class="live-banner"></app-live-banner>
         </div>
+
+        <!-- Theme Toggle -->
+        <app-button
+          [materialIcon]="themeService.isDark() ? 'light_mode' : 'dark_mode'"
+          [bg]="'background'"
+          [bghover]="'item_hover'"
+          [br]="'border'"
+          [color]="'text_primary'"
+          [colorhover]="'text_primary'"
+          [tooltip]="themeService.isDark() ? 'Switch to light theme' : 'Switch to dark theme'"
+          (clicked)="toggleTheme($event)"
+          class="theme-toggle"
+        />
       </div>
     </header>
 
@@ -246,3 +254,5 @@
     </main>
   </div>
 </div>
+
+<app-theme-transition />

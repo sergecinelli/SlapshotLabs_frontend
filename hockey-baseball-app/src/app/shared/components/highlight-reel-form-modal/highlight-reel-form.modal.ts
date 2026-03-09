@@ -1,14 +1,13 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { getFieldError } from '../../validators/form-error.util';
 import { ModalService, ModalEvent } from '../../../services/modal.service';
 import { ButtonComponent } from '../buttons/button/button.component';
 import { ButtonLoadingComponent } from '../buttons/button-loading/button-loading.component';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
+import { FormFieldComponent } from '../form-field/form-field.component';
 import { MatExpansionModule } from '@angular/material/expansion';
-import { MatIconModule } from '@angular/material/icon';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { LoadingSpinnerComponent } from '../loading-spinner/loading-spinner.component';
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { ScheduleService, DashboardGame } from '../../../services/schedule.service';
 import { TeamService } from '../../../services/team.service';
@@ -54,11 +53,9 @@ interface GameListItem {
     ReactiveFormsModule,
     ButtonComponent,
     ButtonLoadingComponent,
-    MatFormFieldModule,
-    MatInputModule,
+    FormFieldComponent,
     MatExpansionModule,
-    MatIconModule,
-    MatProgressSpinnerModule,
+    LoadingSpinnerComponent,
     DragDropModule,
   ],
   templateUrl: './highlight-reel-form.modal.html',
@@ -113,6 +110,7 @@ export class HighlightReelFormModal implements OnInit {
       description: [this.data.reel?.description || '', [Validators.maxLength(1000)]],
     });
 
+    this.modalService.registerDirtyCheck(() => this.form.dirty);
     this.modalService.onEvent$.pipe(takeUntilDestroyed()).subscribe((event) => {
       if (event === ModalEvent.StopButtonLoading) {
         this.isSubmitting.set(false);
@@ -458,6 +456,15 @@ export class HighlightReelFormModal implements OnInit {
   }
   onCancel(): void {
     this.modalService.closeModal();
+  }
+
+  private readonly fieldLabels: Record<string, string> = {
+    name: 'Name',
+    description: 'Description',
+  };
+
+  getErrorMessage(fieldName: string): string {
+    return getFieldError(this.form.get(fieldName), this.fieldLabels[fieldName] || fieldName);
   }
 
   openAddCustomHighlightModal(): void {

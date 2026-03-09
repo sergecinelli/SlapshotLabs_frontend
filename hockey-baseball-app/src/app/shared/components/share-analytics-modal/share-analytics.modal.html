@@ -1,7 +1,6 @@
 @let existingAccessValue = existingAccess();
 @let emailControlValue = emailControl();
 @let addedEmailsValue = addedEmails();
-@let searchResultsValue = searchResultsList();
 @let confirmNewEmailsValue = confirmNewEmails();
 @let confirmKeptEmailsValue = confirmKeptEmails();
 @let confirmRemovedEmailsValue = confirmRemovedEmails();
@@ -10,78 +9,61 @@
   <div class="modal-content">
     @if (existingAccessValue.length > 0) {
       <div class="form-section">
-        <div class="section-header">
-          <span class="section-title">Shared With</span>
-        </div>
-        <mat-divider class="section-divider"></mat-divider>
+        <app-section-header title="Shared With" />
         <div class="chips-list">
           @for (user of existingAccessValue; track user.email) {
-            <span class="trigger-chip" [matTooltip]="user.email" [matTooltipShowDelay]="1000">
-              <span class="trigger-chip-email">{{ user.email }}</span>
+            <span class="chip" [matTooltip]="user.email" [matTooltipShowDelay]="1000">
+              <span class="chip-text">{{ user.email }}</span>
               <span
-                class="material-symbols-rounded trigger-chip-remove"
+                class="material-symbols-rounded chip-remove"
+                role="button"
+                tabindex="0"
                 (click)="removeExistingAccess(user.email)"
+                (keydown.enter)="removeExistingAccess(user.email)"
                 >close</span
               >
             </span>
           }
         </div>
+        <div class="error-slot"></div>
       </div>
     }
 
     @if (addedEmailsValue.length > 0) {
       <div class="form-section">
-        <div class="section-header">
-          <span class="section-title">New Recipients</span>
-        </div>
-        <mat-divider class="section-divider"></mat-divider>
+        <app-section-header title="New Recipients" />
         <div class="chips-list">
           @for (email of addedEmailsValue; track email) {
-            <span class="trigger-chip" [matTooltip]="email" [matTooltipShowDelay]="1000">
-              <span class="trigger-chip-email">{{ email }}</span>
+            <span class="chip" [matTooltip]="email" [matTooltipShowDelay]="1000">
+              <span class="chip-text">{{ email }}</span>
               <span
-                class="material-symbols-rounded trigger-chip-remove"
+                class="material-symbols-rounded chip-remove"
+                role="button"
+                tabindex="0"
                 (click)="removeAddedEmail(email)"
+                (keydown.enter)="removeAddedEmail(email)"
                 >close</span
               >
             </span>
           }
         </div>
+        <div class="error-slot"></div>
       </div>
     }
 
     <div class="form-section">
-      <div class="section-header">
-        <span class="section-title">Add People</span>
-      </div>
-      <mat-divider class="section-divider"></mat-divider>
+      <app-section-header title="Add People" />
 
-      <div class="email-field-row">
-        <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="email-field">
-          <mat-label class="uppercase text-custom-secondary">Email</mat-label>
-          <input
-            matInput
-            type="email"
+      <div class="inline-action-row">
+        <app-form-field label="Email" [error]="getEmailError()">
+          <app-custom-autocomplete
             [formControl]="emailControlValue"
             placeholder="Enter email address"
-            (input)="onEmailInput()"
+            [options]="searchOptions()"
             (keydown.enter)="addEmail()"
-            [matAutocomplete]="auto"
           />
-          <mat-autocomplete
-            #auto="matAutocomplete"
-            (optionSelected)="selectUser($event.option.value)"
-          >
-            @for (user of searchResultsValue; track user.id) {
-              <mat-option [value]="user">
-                <span class="autocomplete-option">
-                  {{ user.first_name }} {{ user.last_name }} ({{ user.email }})
-                </span>
-              </mat-option>
-            }
-          </mat-autocomplete>
-        </mat-form-field>
-        <button class="add-email-button" (click)="addEmail()" title="Add email">
+        </app-form-field>
+        <button class="inline-action-button" (click)="addEmail()" title="Add email">
           <span class="material-symbols-rounded">add_circle</span>
         </button>
       </div>
@@ -89,6 +71,19 @@
   </div>
 
   <div class="modal-actions">
+    <app-button
+      materialIcon="cancel"
+      [bg]="'background'"
+      [bghover]="'item_hover'"
+      [br]="'border'"
+      [color]="'text_primary'"
+      [colorhover]="'text_primary'"
+      [haveContent]="true"
+      (clicked)="close()"
+    >
+      Cancel
+    </app-button>
+
     <app-button
       materialIcon="share"
       [bg]="'blue'"
@@ -99,22 +94,6 @@
       (clicked)="onShare()"
     >
       Share
-    </app-button>
-
-    <app-button
-      materialIcon="cancel"
-      [bg]="'transparent'"
-      [bghover]="'button_background'"
-      [br]="'border'"
-      [color]="'text_primary'"
-      [colorhover]="'text_primary'"
-      [opacity]="1"
-      [opacityhover]="1"
-      [rounded]="false"
-      [haveContent]="true"
-      (clicked)="close()"
-    >
-      Cancel
     </app-button>
   </div>
 </div>

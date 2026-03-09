@@ -1,88 +1,31 @@
 @use '../../styles/modal-form' as modal;
+@use '../../styles/chips' as chips;
 
 .share-analytics-modal {
-  @include modal.material-form-overrides;
-  @include modal.form-section;
+  @include modal.modal-wrapper;
 
   .modal-content {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    min-width: 450px;
+    @include modal.form-section;
   }
 
   .chips-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px;
-    padding: 2px 0;
+    @include chips.chips-list;
   }
 
-  .trigger-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    background-color: var(--bg-content);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-medium);
-    padding: 4px 10px;
-    font-size: 13px;
-    line-height: 1.5;
-    color: var(--color-dark);
-    max-width: 250px;
-    white-space: nowrap;
+  .chip {
+    @include chips.chip;
 
-    &-email {
-      overflow: hidden;
-      text-overflow: ellipsis;
+    &-text {
+      @include chips.chip-text-truncate;
     }
   }
 
-  .trigger-chip-remove {
-    font-size: 14px !important;
-    cursor: pointer;
-    color: var(--gray);
-    flex-shrink: 0;
-
-    &:hover {
-      color: var(--danger);
-    }
+  .chip-remove {
+    @include chips.chip-remove;
   }
 
-  .email-field-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 8px;
-
-    .email-field {
-      flex: 1;
-    }
-
-    .add-email-button {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: none;
-      border: none;
-      cursor: pointer;
-      padding: 4px;
-      border-radius: 50%;
-      color: var(--green);
-      transition: background-color 0.2s;
-
-      .material-symbols-rounded {
-        font-size: 24px;
-      }
-
-      &:hover {
-        background-color: var(--button-background);
-      }
-    }
-  }
-
-  .autocomplete-option {
-    font-size: 13px;
+  .inline-action-row {
+    @include modal.inline-action-row;
   }
 }
 

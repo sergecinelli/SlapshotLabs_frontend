@@ -5,7 +5,7 @@
     margin-bottom: 8px;
 
     .section-title {
-      color: var(--color-dark);
+      color: var(--dark);
       font-size: 1rem;
       font-weight: 500;
       margin: 0;
@@ -15,7 +15,7 @@
 
   .section-divider {
     margin-bottom: 16px;
-    border-top-color: var(--color-primary) !important;
+    border-top-color: var(--primary) !important;
     border-top-width: 2px !important;
     transform: translateZ(0);
     will-change: transform;
@@ -43,9 +43,9 @@
         text-align: center;
         font-size: 14px;
         font-weight: 500;
-        color: var(--color-dark);
+        color: var(--dark);
         padding: 8px;
-        background-color: #f3f4f6;
+        background-color: var(--page-background);
         border-radius: 6px;
       }
     }
@@ -54,7 +54,7 @@
   .error-message {
     margin-top: 8px;
     font-size: 12px;
-    color: #c00;
+    color: var(--danger);
     text-align: center;
   }
 }

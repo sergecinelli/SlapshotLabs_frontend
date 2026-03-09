@@ -4,14 +4,14 @@
 @let actionsValue = actions();
 @let displayedColumnsValue = displayedColumns();
 @let emptyMessageValue = emptyMessage();
+@let loadingMessageValue = loadingMessage();
 
 <div class="data-table-container">
   <!-- Loading State -->
   @if (loadingValue) {
     <div class="loading-state">
       <div class="flex items-center justify-center py-8">
-        <mat-spinner diameter="32"></mat-spinner>
-        <span class="ml-3 text-custom-secondary">Loading...</span>
+        <app-loading-spinner [message]="loadingMessageValue" size="sm" />
       </div>
     </div>
   }

@@ -6,7 +6,7 @@
 <ng-template appBreadcrumbActions>
   <app-button
     [materialIcon]="layoutModeValue === 'card' ? 'table_rows' : 'grid_view'"
-    [bg]="'white'"
+    [bg]="'card_background'"
     [bghover]="'gray_tone3'"
     [color]="'text_primary'"
     [colorhover]="'primary'"
@@ -44,7 +44,7 @@
   <!-- Loading State -->
   @if (loadingValue) {
     <div class="entity-loading">
-      <div class="loading-text">Loading goalies...</div>
+      <app-loading-spinner message="Loading goalies..." size="sm" />
     </div>
   }
 
@@ -72,7 +72,7 @@
                   [color]="'text_secondary'"
                   [colorhover]="'green_dark'"
                   [materialIcon]="'visibility'"
-                  [matTooltip]="'Profile'"
+                  [tooltip]="'Profile'"
                 />
                 <app-button-loading
                   [bg]="'transparent'"
@@ -92,7 +92,7 @@
                   [color]="'text_secondary'"
                   [colorhover]="'primary_dark'"
                   [materialIcon]="'delete'"
-                  [matTooltip]="'Delete'"
+                  [tooltip]="'Delete'"
                   (clicked)="deleteGoalie(goalie)"
                   role-visibility-name="delete-action"
                   [attr.role-visibility-team-id]="goalie.teamId"
@@ -225,7 +225,7 @@
                 <app-button-route
                   [route]="'/teams-and-rosters/goalies/' + goalie.id + '/spray-chart'"
                   [bg]="'transparent'"
-                  [bghover]="'button_background'"
+                  [bghover]="'item_hover'"
                   [br]="'border'"
                   [color]="'text_primary'"
                   [colorhover]="'text_primary'"
@@ -237,7 +237,7 @@
                 </app-button-route>
                 <app-button
                   [bg]="'transparent'"
-                  [bghover]="'button_background'"
+                  [bghover]="'item_hover'"
                   [br]="'border'"
                   [color]="'text_primary'"
                   [colorhover]="'text_primary'"
@@ -247,8 +247,8 @@
                   >Add to Tryout</app-button
                 >
                 <app-button-loading
-                  [bg]="'upcoming'"
-                  [bghover]="'upcoming_dark'"
+                  [bg]="'cyan'"
+                  [bghover]="'cyan_dark'"
                   [color]="'white'"
                   [colorhover]="'white'"
                   [materialIcon]="'bar_chart'"
@@ -272,6 +272,7 @@
           [data]="goaliesValue"
           [actions]="tableActions"
           [loading]="loadingValue"
+          loadingMessage="Loading goalies..."
           (actionClick)="onActionClick($event)"
           (sort)="onSort($event)"
           emptyMessage="No goalies found."

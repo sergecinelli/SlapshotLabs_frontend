@@ -1,0 +1,28 @@
+<div class="form-field">
+  <label class="form-field-label"
+    >{{ label() }}
+    @if (required()) {
+      <span class="required-mark"> *</span>
+    }
+  </label>
+
+  @if (readonly()) {
+    @if (readonlyValue()) {
+      <p class="form-field-readonly-value">{{ readonlyValue() }}</p>
+    } @else {
+      <div class="form-field-readonly-content">
+        <ng-content select="[readonlyContent]"></ng-content>
+      </div>
+    }
+  } @else {
+    <div class="form-field-control">
+      <ng-content></ng-content>
+    </div>
+  }
+
+  <div class="form-field-error-slot">
+    @if (error()) {
+      <span>{{ error() }}</span>
+    }
+  </div>
+</div>

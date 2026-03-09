@@ -17,11 +17,12 @@ import {
   SprayChartUtilsService,
 } from '../../services/spray-chart-utils.service';
 import { ButtonComponent } from '../../shared/components/buttons/button/button.component';
+import { LoadingSpinnerComponent } from '../../shared/components/loading-spinner/loading-spinner.component';
 import { BreadcrumbDataService } from '../../services/breadcrumb-data.service';
 
 @Component({
   selector: 'app-spray-chart',
-  imports: [ShotLocationDisplayComponent, ButtonComponent],
+  imports: [ShotLocationDisplayComponent, ButtonComponent, LoadingSpinnerComponent],
   templateUrl: './spray-chart.page.html',
   styleUrl: './spray-chart.page.scss',
 })

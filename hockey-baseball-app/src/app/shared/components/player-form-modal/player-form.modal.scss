@@ -1,9 +1,7 @@
-@use '../../styles/radio-button-selection';
 @use '../../styles/modal-form';
 
 .player-form-modal {
   @include modal-form.modal-wrapper;
-  @include modal-form.material-form-overrides;
 
   .modal-content {
     @include modal-form.loading-container;
@@ -12,23 +10,9 @@
       @include modal-form.form-section;
 
       .form-section {
-        @include radio-button-selection.shoots-selection-container;
-        @include radio-button-selection.position-selection-container;
-
+        .position-selection-container,
         .shoots-selection-container {
-          .shoots-buttons {
-            display: flex;
-            gap: 12px;
-            flex-wrap: nowrap;
-          }
-        }
-
-        .position-selection-container {
-          .position-buttons {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-          }
+          @include modal-form.selection-container;
         }
       }
     }

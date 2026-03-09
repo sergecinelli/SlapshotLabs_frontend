@@ -6,6 +6,7 @@ import { ButtonLoadingComponent } from '../buttons/button-loading/button-loading
 import { MatTableModule } from '@angular/material/table';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatIconModule } from '@angular/material/icon';
+import { LoadingSpinnerComponent } from '../loading-spinner/loading-spinner.component';
 import { SelectionModel } from '@angular/cdk/collections';
 import { GoalieService } from '../../../services/goalie.service';
 import { PlayerService } from '../../../services/player.service';
@@ -39,6 +40,7 @@ export interface RosterSelectionResult {
     MatTableModule,
     MatCheckboxModule,
     MatIconModule,
+    LoadingSpinnerComponent,
   ],
   templateUrl: './roster-selection.modal.html',
   styleUrl: './roster-selection.modal.scss',

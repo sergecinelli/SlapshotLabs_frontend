@@ -3,160 +3,127 @@
     <form [formGroup]="penaltyForm" class="penalty-form">
       <!-- Penalty Information Section -->
       <div class="form-section">
-        <div class="section-header">
-          <span class="section-title">Penalty Information</span>
-        </div>
-        <mat-divider class="section-divider"></mat-divider>
+        <app-section-header title="Penalty Information" />
 
         <div class="team-selection-container">
-          <div class="team-selection-label uppercase text-custom-secondary">
-            Team that had the penalty
-          </div>
-          <div class="team-buttons">
+          <div class="selection-label">Team that had the penalty</div>
+          <app-card-grid [columns]="teamOptions.length">
             @for (team of teamOptions; track team) {
-              <button
-                type="button"
-                class="team-button"
-                [class.selected]="penaltyForm.get('team')?.value === team.value"
-                (click)="selectTeam(team.value)"
+              <app-card-grid-item
+                [selected]="penaltyForm.get('team')?.value === team.value"
+                (select)="selectTeam(team.value)"
               >
-                <div class="team-avatar">
-                  @if (team.value) {
-                    <img
-                      [appCachedSrc]="getTeamLogoUrl(team.value)"
-                      [alt]="team.label"
-                      class="team-logo-img"
-                    />
-                  }
-                </div>
-                <div class="team-name">{{ team.label }}</div>
-              </button>
+                @if (team.value) {
+                  <img
+                    [appCachedSrc]="getTeamLogoUrl(team.value)"
+                    [alt]="team.label"
+                    class="team-logo-img"
+                  />
+                }
+                {{ team.label }}
+              </app-card-grid-item>
+            }
+          </app-card-grid>
+          <div class="error-slot">
+            @if (penaltyForm.get('team')?.errors && penaltyForm.get('team')?.touched) {
+              <span>{{ getErrorMessage('team') }}</span>
             }
           </div>
-          @if (penaltyForm.get('team')?.errors && penaltyForm.get('team')?.touched) {
-            <div class="team-error">
-              {{ getErrorMessage('team') }}
-            </div>
-          }
         </div>
 
         <div class="player-selection-container">
-          <div class="player-selection-label uppercase text-custom-secondary">
-            Player that had the penalty
-          </div>
-          <div class="player-buttons">
+          <div class="selection-label">Player that had the penalty</div>
+          <app-card-grid [columns]="3">
             @for (player of playerOptions; track player) {
-              <button
-                type="button"
-                class="player-button"
-                [class.selected]="penaltyForm.get('player')?.value === player.value"
-                (click)="selectPlayer(player.value)"
+              <app-card-grid-item
+                [selected]="penaltyForm.get('player')?.value === player.value"
+                (select)="selectPlayer(player.value)"
               >
-                <div class="player-name">{{ player.label }}</div>
-              </button>
+                @if (player.number !== undefined && player.number !== null) {
+                  <span class="player-number">{{ player.number }}</span>
+                }
+                {{ player.label }}
+              </app-card-grid-item>
+            }
+          </app-card-grid>
+          <div class="error-slot">
+            @if (penaltyForm.get('player')?.errors && penaltyForm.get('player')?.touched) {
+              <span>{{ getErrorMessage('player') }}</span>
             }
           </div>
-          @if (penaltyForm.get('player')?.errors && penaltyForm.get('player')?.touched) {
-            <div class="player-error">
-              {{ getErrorMessage('player') }}
-            </div>
-          }
         </div>
 
         <div class="player-selection-container">
-          <div class="player-selection-label uppercase text-custom-secondary">
-            Penalty drawn player
-          </div>
-          <div class="player-buttons">
+          <div class="selection-label">Penalty drawn player</div>
+          <app-card-grid [columns]="3">
             @for (player of penaltyDrawnPlayerOptions; track player) {
-              <button
-                type="button"
-                class="player-button"
-                [class.selected]="penaltyForm.get('penaltyDrawnPlayer')?.value === player.value"
-                (click)="selectPenaltyDrawnPlayer(player.value)"
+              <app-card-grid-item
+                [selected]="penaltyForm.get('penaltyDrawnPlayer')?.value === player.value"
+                (select)="selectPenaltyDrawnPlayer(player.value)"
               >
-                <div class="player-name">{{ player.label }}</div>
-              </button>
+                @if (player.number !== undefined && player.number !== null) {
+                  <span class="player-number">{{ player.number }}</span>
+                }
+                {{ player.label }}
+              </app-card-grid-item>
             }
-          </div>
+          </app-card-grid>
+          <div class="error-slot"></div>
         </div>
 
         <div class="form-row">
-          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
-            <mat-label class="uppercase text-custom-secondary">Length of Penalty</mat-label>
-            <input matInput formControlName="penaltyLength" placeholder="mm:ss" maxlength="6" />
-            @if (
-              penaltyForm.get('penaltyLength')?.errors && penaltyForm.get('penaltyLength')?.touched
-            ) {
-              <mat-error>
-                {{ getErrorMessage('penaltyLength') }}
-              </mat-error>
-            }
-          </mat-form-field>
+          <app-form-field
+            label="Length of Penalty"
+            [required]="true"
+            [error]="getErrorMessage('penaltyLength')"
+          >
+            <input formControlName="penaltyLength" placeholder="mm:ss" maxlength="6" />
+          </app-form-field>
         </div>
 
         <div class="period-selection-container">
-          <div class="period-selection-label uppercase text-custom-secondary">Period</div>
+          <div class="selection-label">Period</div>
           @if (isLoadingPeriods) {
-            <div class="loading-message">Loading periods...</div>
+            <app-loading-spinner message="Loading periods..." size="sm" />
           }
           @if (!isLoadingPeriods) {
-            <div class="period-buttons">
+            <app-card-grid [columns]="periodOptions.length">
               @for (period of periodOptions; track period) {
-                <button
-                  type="button"
-                  class="period-button"
-                  [class.selected]="penaltyForm.get('period')?.value === period.value"
-                  (click)="selectPeriod(period.value)"
+                <app-card-grid-item
+                  [selected]="penaltyForm.get('period')?.value === period.value"
+                  (select)="selectPeriod(period.value)"
                 >
-                  <div class="period-name">{{ period.label }}</div>
-                </button>
+                  {{ period.label }}
+                </app-card-grid-item>
               }
-            </div>
+            </app-card-grid>
           }
-          @if (penaltyForm.get('period')?.errors && penaltyForm.get('period')?.touched) {
-            <div class="period-error">
-              {{ getErrorMessage('period') }}
-            </div>
-          }
+          <div class="error-slot">
+            @if (penaltyForm.get('period')?.errors && penaltyForm.get('period')?.touched) {
+              <span>{{ getErrorMessage('period') }}</span>
+            }
+          </div>
         </div>
 
         <div class="form-row">
-          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
-            <mat-label class="uppercase text-custom-secondary">Time</mat-label>
-            <input matInput formControlName="time" placeholder="mm:ss" maxlength="6" />
-            @if (penaltyForm.get('time')?.errors && penaltyForm.get('time')?.touched) {
-              <mat-error>
-                {{ getErrorMessage('time') }}
-              </mat-error>
-            }
-          </mat-form-field>
+          <app-form-field label="Time" [required]="true" [error]="getErrorMessage('time')">
+            <input formControlName="time" placeholder="mm:ss" maxlength="6" />
+          </app-form-field>
         </div>
       </div>
 
       <!-- YouTube Link Section -->
       <div class="form-section">
-        <div class="section-header">
-          <span class="section-title">Add YouTube Link</span>
-        </div>
-        <mat-divider class="section-divider"></mat-divider>
+        <app-section-header title="Add YouTube Link" />
 
         <div class="form-row">
-          <mat-form-field
-            [floatLabel]="'always'"
-            [hideRequiredMarker]="true"
-            class="form-field full-width"
+          <app-form-field
+            class="full-width"
+            label="YouTube Link"
+            [error]="getErrorMessage('youtubeLink')"
           >
-            <mat-label class="uppercase text-custom-secondary">YouTube Link</mat-label>
-            <input matInput formControlName="youtubeLink" placeholder="YouTube link" />
-            @if (
-              penaltyForm.get('youtubeLink')?.errors && penaltyForm.get('youtubeLink')?.touched
-            ) {
-              <mat-error>
-                {{ getErrorMessage('youtubeLink') }}
-              </mat-error>
-            }
-          </mat-form-field>
+            <input formControlName="youtubeLink" placeholder="YouTube link" />
+          </app-form-field>
         </div>
       </div>
 
@@ -182,15 +149,11 @@
 
   <div class="modal-actions">
     <app-button
-      [bg]="'transparent'"
-      [bghover]="'button_background'"
+      [bg]="'background'"
+      [bghover]="'item_hover'"
       [br]="'border'"
       [color]="'text_primary'"
       [colorhover]="'text_primary'"
-      [opacity]="1"
-      [opacityhover]="1"
-      [width]="'auto'"
-      [rounded]="false"
       [haveContent]="true"
       [isDisabled]="isSubmitting()"
       materialIcon="cancel"
@@ -206,10 +169,6 @@
       [bghover]="'primary_dark'"
       [color]="'white'"
       [colorhover]="'white'"
-      [opacity]="1"
-      [opacityhover]="1"
-      [width]="'auto'"
-      [rounded]="false"
       [haveContent]="true"
       (clicked)="onSubmit()"
     >

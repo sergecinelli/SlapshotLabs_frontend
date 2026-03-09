@@ -90,7 +90,7 @@
   padding: 10px;
   padding-bottom: 2px;
   border-radius: var(--radius-medium);
-  background: var(--white);
+  background: var(--card-background);
   border: 1px solid var(--border-light);
   cursor: default;
   overflow: hidden;
@@ -106,15 +106,15 @@
   }
 
   &.bn-live {
-    border-color: rgba(207, 20, 43, 0.25);
+    border-color: color-mix(in srgb, var(--primary) 25%, transparent);
   }
 
   &.bn-upcoming {
-    border-color: rgba(34, 169, 242, 0.25);
+    border-color: color-mix(in srgb, var(--upcoming) 25%, transparent);
   }
 
   &.bn-completed {
-    border-color: rgba(16, 185, 129, 0.25);
+    border-color: color-mix(in srgb, var(--green) 25%, transparent);
   }
 }
 
@@ -198,12 +198,12 @@
   }
 
   &.bn-chip-upcoming {
-    background: rgba(34, 169, 242, 0.1);
+    background: color-mix(in srgb, var(--upcoming) 10%, transparent);
     color: var(--upcoming);
   }
 
   &.bn-chip-completed {
-    background: rgba(16, 185, 129, 0.1);
+    background: color-mix(in srgb, var(--green) 10%, transparent);
     color: var(--green);
   }
 }

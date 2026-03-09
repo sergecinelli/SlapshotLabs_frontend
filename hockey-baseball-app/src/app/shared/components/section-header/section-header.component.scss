@@ -1,0 +1,24 @@
+:host {
+  display: block;
+  margin-bottom: 10px;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.title {
+  font-size: 16px;
+  font-weight: 500;
+  padding-left: 14px;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.line {
+  flex: 1;
+  height: 1px;
+  background-color: var(--border);
+}

@@ -2,7 +2,6 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
-import { MatDividerModule } from '@angular/material/divider';
 import { MatTableModule } from '@angular/material/table';
 import { Observable } from 'rxjs';
 import { ModalService, ModalEvent } from '../../services/modal.service';
@@ -45,6 +44,7 @@ import { StorageKey } from '../../services/local-storage.service';
 import { BreadcrumbDataService } from '../../services/breadcrumb-data.service';
 import { CachedSrcDirective } from '../../shared/directives/cached-src.directive';
 import { BreadcrumbActionsDirective } from '../../shared/directives/breadcrumb-actions.directive';
+import { LoadingSpinnerComponent } from '../../shared/components/loading-spinner/loading-spinner.component';
 
 @Component({
   selector: 'app-player-profile',
@@ -53,13 +53,13 @@ import { BreadcrumbActionsDirective } from '../../shared/directives/breadcrumb-a
     DecimalPipe,
     MatIconModule,
     MatCardModule,
-    MatDividerModule,
     MatTableModule,
     ShotLocationDisplayComponent,
     ComponentVisibilityByRoleDirective,
     ButtonLoadingComponent,
     RouterLink,
     BreadcrumbActionsDirective,
+    LoadingSpinnerComponent,
   ],
   templateUrl: './player-profile.page.html',
   styleUrl: './player-profile.page.scss',
@@ -266,7 +266,7 @@ export class PlayerProfilePage implements OnInit {
     this.modalService.openModal(PlayerFormModal, {
       name: 'Edit Player',
       icon: 'sports_hockey',
-      width: '800px',
+      width: '900px',
       maxWidth: '95vw',
       data: {
         player: this.player,

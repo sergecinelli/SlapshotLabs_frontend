@@ -8,7 +8,11 @@ import { BreadcrumbDataService } from '../../services/breadcrumb-data.service';
 import { TeamService } from '../../services/team.service';
 import { TryoutService } from '../../services/tryout.service';
 import { TryoutEntry, TryoutTabType } from '../../shared/interfaces/tryout.interface';
-import { forkJoin } from 'rxjs';
+import { Observable, forkJoin, finalize } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { PlayerService } from '../../services/player.service';
+import { GoalieService } from '../../services/goalie.service';
+import { PositionService } from '../../services/position.service';
 import {
   DataTableComponent,
   TableColumn,
@@ -56,6 +60,9 @@ export class TryoutPage implements OnInit {
   private teamService = inject(TeamService);
   private tryoutService = inject(TryoutService);
   private toast = inject(ToastService);
+  private playerService = inject(PlayerService);
+  private goalieService = inject(GoalieService);
+  private positionService = inject(PositionService);
 
   protected visibilityByRoleMap = visibilityByRoleMap;
 
@@ -64,6 +71,7 @@ export class TryoutPage implements OnInit {
   activeTab = signal<TryoutTabType>('player');
   entries = signal<TryoutEntry[]>([]);
   loading = signal(true);
+  isAddLoading = signal(false);
   teamName = signal('');
   teamId = signal<number | null>(null);
 
@@ -154,32 +162,90 @@ export class TryoutPage implements OnInit {
     const teamId = this.teamId();
     if (!teamId) return;
 
-    this.modalService.openModal(TryoutAddModal, {
-      name: 'Add Player to Tryout',
-      icon: 'person_add',
-      width: '800px',
-      maxWidth: '95vw',
-      data: {
-        activeTab: this.activeTab(),
-        teamId,
-      } as TryoutAddModalData,
-      onCloseWithDataProcessing: (result: { entries: Partial<TryoutEntry>[] }) => {
-        const requests = result.entries.map((entry) =>
-          this.tryoutService.addToTryout(teamId, entry)
-        );
-        forkJoin(requests).subscribe({
-          next: () => {
-            this.toast.show('Player(s) added to tryout successfully', 'success');
-            this.modalService.closeModal();
-            this.loadEntries();
-          },
-          error: () => {
-            this.toast.show('Failed to add player(s) to tryout', 'error');
-            this.modalService.broadcastEvent(ModalEvent.StopButtonLoading);
-          },
-        });
-      },
-    });
+    this.isAddLoading.set(true);
+
+    forkJoin({
+      entries: this.loadAvailableEntries(),
+      positions: this.positionService.getPositions(),
+    })
+      .pipe(finalize(() => this.isAddLoading.set(false)))
+      .subscribe({
+        next: ({ entries, positions }) => {
+          this.modalService.openModal(TryoutAddModal, {
+            name: 'Add Player to Tryout',
+            icon: 'person_add',
+            width: '800px',
+            maxWidth: '95vw',
+            data: {
+              activeTab: this.activeTab(),
+              teamId,
+              entries,
+              positions,
+            } as TryoutAddModalData,
+            onCloseWithDataProcessing: (result: { entries: Partial<TryoutEntry>[] }) => {
+              const requests = result.entries.map((entry) =>
+                this.tryoutService.addToTryout(teamId, entry)
+              );
+              forkJoin(requests).subscribe({
+                next: () => {
+                  this.toast.show('Player(s) added to tryout successfully', 'success');
+                  this.modalService.closeModal();
+                  this.loadEntries();
+                },
+                error: () => {
+                  this.toast.show('Failed to add player(s) to tryout', 'error');
+                  this.modalService.broadcastEvent(ModalEvent.StopButtonLoading);
+                },
+              });
+            },
+          });
+        },
+        error: () => {
+          this.toast.show('Failed to load players', 'error');
+        },
+      });
+  }
+
+  private loadAvailableEntries(): Observable<TryoutEntry[]> {
+    if (this.activeTab() === 'goalie') {
+      return this.goalieService.getGoalies({ excludeDefault: true }).pipe(
+        map((data) =>
+          data.goalies.map((g) => ({
+            id: g.id,
+            playerId: g.id,
+            firstName: g.firstName,
+            lastName: g.lastName,
+            position: g.position,
+            shoots: g.shoots,
+            jerseyNumber: g.jerseyNumber,
+            team: g.team,
+            teamId: g.teamId,
+            teamLevelName: g.level,
+            type: 'goalie' as const,
+          }))
+        )
+      );
+    }
+
+    return this.playerService.getPlayers().pipe(
+      map((data) =>
+        data.players.map((p) => ({
+          id: p.id,
+          playerId: p.id,
+          firstName: p.firstName,
+          lastName: p.lastName,
+          position: p.position,
+          shoots: p.shoots,
+          jerseyNumber: p.jerseyNumber,
+          team: p.team,
+          teamId: p.teamId,
+          teamLogo: p.teamLogo,
+          teamAgeGroup: p.teamAgeGroup,
+          teamLevelName: p.teamLevelName,
+          type: 'player' as const,
+        }))
+      )
+    );
   }
 
   private removeFromTryout(entry: TryoutEntry): void {

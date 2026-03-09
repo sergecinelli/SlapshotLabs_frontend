@@ -55,6 +55,7 @@ export class ModalComponent implements OnInit, OnDestroy {
   backdropClick(event: MouseEvent): void {
     if ((event.target as HTMLElement) !== (event.currentTarget as HTMLElement)) return;
     if (this.params?.preventBackdropClose) return;
+    if (this.params?.id && this.modalService.hasDirtyForm(this.params.id)) return;
 
     this.isActiveModal.set(false);
     setTimeout(() => this.backdropClicked.emit(undefined), 200);

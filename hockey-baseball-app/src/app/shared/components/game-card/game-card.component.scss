@@ -5,7 +5,7 @@
 .game-card {
   display: flex;
   flex-direction: column;
-  background: var(--white);
+  background: var(--card-background);
   border-radius: $card-border-radius;
   border: 1px solid var(--border-light);
   padding: 16px;
@@ -14,22 +14,16 @@
   height: 100%;
   box-sizing: border-box;
   box-shadow:
-    0 1px 3px rgba(0, 0, 0, 0.08),
-    0 1px 2px rgba(0, 0, 0, 0.06);
+    0 1px 3px color-mix(in srgb, var(--black) 8%, transparent),
+    0 1px 2px color-mix(in srgb, var(--black) 6%, transparent);
   transition:
     box-shadow 0.2s ease,
     border-color 0.2s ease;
 
   &:hover {
     box-shadow:
-      0 4px 6px rgba(0, 0, 0, 0.1),
-      0 2px 4px rgba(0, 0, 0, 0.08);
-  }
-
-  &.completed .game-date,
-  &.completed .game-time,
-  &.completed .date-time-icon {
-    // color: var(--completed);
+      0 4px 6px color-mix(in srgb, var(--black) 10%, transparent),
+      0 2px 4px color-mix(in srgb, var(--black) 8%, transparent);
   }
 
   &.completed .game-card-header {
@@ -63,7 +57,7 @@
   }
 
   &.completed .header-left:before {
-    background-color: var(--completed);
+    background-color: var(--upcoming);
   }
 }
 
@@ -89,7 +83,7 @@
     left: -16px;
     width: 4px;
     height: calc(100% + 10px);
-    background-color: var(--color-primary);
+    background-color: var(--primary);
     border-radius: 0 5px 5px 0;
   }
 }
@@ -172,24 +166,24 @@
   line-height: 1;
 
   &.live-badge {
-    background: linear-gradient(135deg, rgba(207, 20, 43, 0.1));
+    background: color-mix(in srgb, var(--primary) 10%, transparent);
     color: var(--primary);
-    border: 1px solid rgba(207, 20, 43, 0.2);
-    box-shadow: 0 1px 3px rgba(207, 20, 43, 0.1);
+    border: 1px solid color-mix(in srgb, var(--primary) 20%, transparent);
+    box-shadow: 0 1px 3px color-mix(in srgb, var(--primary) 10%, transparent);
   }
 
   &.upcoming-badge {
-    background: linear-gradient(135deg, rgba(34, 169, 242, 0.1));
+    background: color-mix(in srgb, var(--upcoming) 10%, transparent);
     color: var(--upcoming);
-    border: 1px solid rgba(34, 169, 242, 0.2);
-    box-shadow: 0 1px 3px rgba(34, 169, 242, 0.1);
+    border: 1px solid color-mix(in srgb, var(--upcoming) 20%, transparent);
+    box-shadow: 0 1px 3px color-mix(in srgb, var(--upcoming) 10%, transparent);
   }
 
   &.completed-badge {
-    background: linear-gradient(135deg, rgba(34, 169, 242, 0.1));
-    color: var(--completed);
-    border: 1px solid rgba(34, 169, 242, 0.2);
-    box-shadow: 0 1px 3px rgba(34, 169, 242, 0.1);
+    background: color-mix(in srgb, var(--upcoming) 10%, transparent);
+    color: var(--upcoming);
+    border: 1px solid color-mix(in srgb, var(--upcoming) 20%, transparent);
+    box-shadow: 0 1px 3px color-mix(in srgb, var(--upcoming) 10%, transparent);
   }
 
   .live-indicator {
@@ -197,7 +191,7 @@
     height: 7px;
     border-radius: 50%;
     background: var(--primary);
-    box-shadow: 0 0 8px rgba(207, 20, 43, 0.6);
+    box-shadow: 0 0 8px color-mix(in srgb, var(--primary) 60%, transparent);
     animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
     flex-shrink: 0;
     display: inline-block;
@@ -311,7 +305,7 @@
     }
 
     .team-score-wrapper {
-      background-color: rgba(207, 20, 43, 0.15);
+      background-color: color-mix(in srgb, var(--primary) 15%, transparent);
     }
   }
 
@@ -347,7 +341,7 @@
   height: 60px;
   border-radius: 10px;
   object-fit: cover;
-  background: var(--white);
+  background: var(--gray-tone3);
   flex-shrink: 0;
   align-self: flex-start;
   margin-top: 2px;
@@ -529,7 +523,7 @@
 
   &.winning-home,
   &.winning-away {
-    background-color: rgba(207, 20, 43, 0.15);
+    background-color: color-mix(in srgb, var(--primary) 15%, transparent);
   }
 }
 

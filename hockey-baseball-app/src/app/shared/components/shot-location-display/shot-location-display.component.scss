@@ -35,7 +35,7 @@
         height: 10px;
         border-radius: 50%;
         flex-shrink: 0;
-        border: 2px solid rgba(255, 255, 255, 0.8);
+        border: 2px solid color-mix(in srgb, var(--white) 80%, transparent);
         box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
       }
 
@@ -92,7 +92,7 @@
         padding: 8px 14px;
         background-color: var(--gray-tone3);
         border-radius: 10px;
-        border: 1px solid #e2e8f0;
+        border: 1px solid var(--border);
 
         .goalie-photo-container {
           width: 36px;
@@ -102,7 +102,7 @@
           justify-content: center;
           flex-shrink: 0;
           border-radius: 50%;
-          background: var(--color-white);
+          background: var(--card-background);
           box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
         }
 
@@ -118,7 +118,7 @@
           width: 36px;
           height: 36px;
           border-radius: 50%;
-          background-color: var(--color-white);
+          background-color: var(--card-background);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -146,7 +146,7 @@
         .goalie-name {
           font-size: 14px;
           font-weight: 600;
-          color: var(--color-dark);
+          color: var(--dark);
           line-height: 1.2;
         }
       }
@@ -185,7 +185,7 @@
           height: 26px;
           border-radius: 50%;
           transform: translate(-50%, -50%);
-          border: 2px solid rgba(255, 255, 255, 0.9);
+          border: 2px solid color-mix(in srgb, var(--white) 90%, transparent);
           box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
           pointer-events: auto;
           z-index: 10;
@@ -201,7 +201,7 @@
 
           &.selected {
             box-shadow:
-              0 0 0 3px rgba(255, 255, 255, 0.9),
+              0 0 0 3px color-mix(in srgb, var(--white) 90%, transparent),
               0 0 0 5px var(--marker-color),
               0 2px 8px rgba(0, 0, 0, 0.3);
             transform: translate(-50%, -50%) scale(1.15);
@@ -222,9 +222,9 @@
             min-width: 18px;
             height: 18px;
             padding: 0 4px;
-            background: var(--color-dark);
-            color: var(--color-white);
-            border: 1px solid rgba(255, 255, 255, 0.9);
+            background: var(--sidebar);
+            color: var(--white);
+            border: 1px solid color-mix(in srgb, var(--white) 90%, transparent);
             border-radius: 999px;
             font-weight: 700;
             font-size: 10px;
@@ -277,12 +277,12 @@
     transform: translateX(-50%);
     min-width: 280px;
     max-width: 340px;
-    background: var(--color-white, #fff);
+    background: var(--card-background);
     border-radius: 10px;
     box-shadow: 0 4px 24px rgba(0, 0, 0, 0.18);
     padding: 14px 18px;
     font-size: 13px;
-    color: var(--color-dark);
+    color: var(--dark);
     pointer-events: auto;
 
     &.above {
@@ -294,7 +294,7 @@
       font-size: 14px;
       margin-bottom: 8px;
       padding-bottom: 8px;
-      border-bottom: 1px solid #e5e7eb;
+      border-bottom: 1px solid var(--border);
     }
 
     .popover-body {
@@ -312,13 +312,13 @@
       display: flex;
       margin-top: 10px;
       padding-top: 10px;
-      border-top: 1px solid #e5e7eb;
+      border-top: 1px solid var(--border);
 
       .popover-video-link {
         display: inline-flex;
         align-items: center;
         gap: 6px;
-        color: #ef4444;
+        color: var(--danger);
         font-weight: 700;
         font-size: 14px;
         cursor: pointer;

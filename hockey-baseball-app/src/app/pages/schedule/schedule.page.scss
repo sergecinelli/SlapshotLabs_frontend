@@ -1,3 +1,5 @@
+@use '../../shared/styles/entity-card';
+
 // Header with Week Pagination and Add Button
 .schedule-header {
   display: flex;
@@ -20,17 +22,17 @@
   justify-content: flex-end;
 }
 
-// Loading and Empty States
-.schedule-loading,
+// Empty State
 .schedule-empty {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 48px 24px;
-  min-height: 200px;
+  padding: 32px 24px;
+  background-color: var(--card-background);
+  border-radius: var(--radius);
+  border: 1px solid var(--border-light);
 }
 
-.loading-text,
 .empty-text {
   color: var(--text-secondary);
   font-size: 16px;

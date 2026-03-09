@@ -1,31 +1,9 @@
 .location-selector {
   width: 100%;
 
-  .section-header {
-    margin-bottom: 8px;
-
-    .section-title {
-      color: var(--color-dark);
-      font-size: 1rem;
-      font-weight: 500;
-      margin: 0;
-      padding: 0;
-    }
-  }
-
-  .section-divider {
-    margin-bottom: 16px;
-    border-top-color: var(--color-primary) !important;
-    border-top-width: 2px !important;
-    transform: translateZ(0);
-    will-change: transform;
-    backface-visibility: hidden;
-    -webkit-backface-visibility: hidden;
-  }
-
   .rink-container {
     width: 100%;
-    background: white;
+    border-radius: var(--radius);
 
     .teams-header {
       display: flex;
@@ -39,7 +17,7 @@
         align-items: center;
         gap: 8px;
         font-weight: 500;
-        color: var(--color-dark);
+        color: var(--dark);
 
         &.team-left {
           flex-direction: row;
@@ -54,7 +32,7 @@
           height: 32px;
           object-fit: cover;
           border-radius: 50%;
-          background-color: #f3f4f6;
+          background-color: var(--page-background);
         }
 
         .team-name {
@@ -68,10 +46,11 @@
       max-width: 100%;
       position: relative;
       cursor: crosshair;
-      border-radius: 8px;
       overflow: hidden;
-      background: white;
+      background: var(--background);
+      border-radius: var(--radius);
       border: none !important;
+      overflow: hidden;
 
       .hockey-rink-image {
         width: 100%;
@@ -85,8 +64,8 @@
         position: absolute;
         width: 20px;
         height: 20px;
-        background-color: #d86ecc;
-        border: 2px solid #000;
+        background-color: var(--purple);
+        border: 2px solid var(--black);
         border-radius: 50%;
         transform: translate(-50%, -50%);
         pointer-events: none;
@@ -97,21 +76,21 @@
     .selected-zone {
       margin-top: 12px;
       padding: 8px 12px;
-      background-color: #f3f4f6;
+      background-color: var(--page-background);
       border-radius: 6px;
       font-size: 14px;
-      color: var(--color-dark);
+      color: var(--dark);
 
       strong {
-        color: var(--color-primary);
+        color: var(--primary);
       }
     }
 
     .clear-location-btn {
       margin-top: 8px;
       padding: 6px 16px;
-      background-color: #ef4444;
-      color: white;
+      background-color: var(--danger);
+      color: var(--text-white);
       border: none;
       border-radius: 6px;
       font-size: 14px;
@@ -120,11 +99,11 @@
       transition: background-color 0.2s;
 
       &:hover {
-        background-color: #dc2626;
+        background-color: var(--danger);
       }
 
       &:active {
-        background-color: #b91c1c;
+        background-color: var(--danger);
       }
     }
   }

@@ -1,12 +1,12 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { MatFormFieldModule } from '@angular/material/form-field';
+import { SectionHeaderComponent } from '../section-header/section-header.component';
+import { FormFieldComponent } from '../form-field/form-field.component';
+import { CustomSelectComponent } from '../custom-select/custom-select.component';
+import { CardGridComponent } from '../card-grid/card-grid.component';
+import { CardGridItemComponent } from '../card-grid/card-grid-item.component';
 import { ModalService, ModalEvent } from '../../../services/modal.service';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
-import { MatIconModule } from '@angular/material/icon';
-import { MatDividerModule } from '@angular/material/divider';
 import { forkJoin, of } from 'rxjs';
 import { Goalie } from '../../interfaces/goalie.interface';
 import { Team } from '../../interfaces/team.interface';
@@ -14,6 +14,8 @@ import { TeamService } from '../../../services/team.service';
 import { PositionService, PositionOption } from '../../../services/position.service';
 import { ButtonComponent } from '../buttons/button/button.component';
 import { ButtonLoadingComponent } from '../buttons/button-loading/button-loading.component';
+import { LoadingSpinnerComponent } from '../loading-spinner/loading-spinner.component';
+import { getFieldError } from '../../validators/form-error.util';
 
 export interface GoalieFormModalData {
   goalie?: Goalie;
@@ -33,13 +35,14 @@ export interface TeamOption {
   selector: 'app-goalie-form-modal',
   imports: [
     ReactiveFormsModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
-    MatIconModule,
-    MatDividerModule,
+    SectionHeaderComponent,
+    FormFieldComponent,
+    CustomSelectComponent,
+    CardGridComponent,
+    CardGridItemComponent,
     ButtonComponent,
     ButtonLoadingComponent,
+    LoadingSpinnerComponent,
   ],
   templateUrl: './goalie-form.modal.html',
   styleUrl: './goalie-form.modal.scss',
@@ -70,6 +73,7 @@ export class GoalieFormModal implements OnInit {
     this.isEditMode = data.isEditMode;
     this.goalieForm = this.createForm();
 
+    this.modalService.registerDirtyCheck(() => this.goalieForm.dirty);
     this.modalService.onEvent$.pipe(takeUntilDestroyed()).subscribe((event) => {
       if (event === ModalEvent.StopButtonLoading) {
         this.isSubmitting.set(false);
@@ -283,42 +287,29 @@ export class GoalieFormModal implements OnInit {
     this.modalService.closeModal();
   }
 
+  private readonly fieldLabels: Record<string, string> = {
+    team: 'Team',
+    birthYear: 'Birth Year',
+    jerseyNumber: 'Number',
+    firstName: 'First Name',
+    lastName: 'Last Name',
+    position: 'Position',
+    height: 'Height',
+    weight: 'Weight',
+    shoots: 'Shoots',
+    birthplace: 'Birthplace',
+    addressCountry: 'Country',
+    addressRegion: 'State/Province',
+    addressCity: 'City',
+    addressStreet: 'Street Address',
+    addressPostalCode: 'Postal Code',
+    playerBiography: 'Player Biography',
+    analysis: 'Analysis',
+  };
+
   getErrorMessage(fieldName: string): string {
     const control = this.goalieForm.get(fieldName);
-    if (control?.errors && control.touched) {
-      if (control.errors['required']) {
-        return `${this.getFieldLabel(fieldName)} is required`;
-      }
-      if (control.errors['min']) {
-        return `${this.getFieldLabel(fieldName)} must be at least ${control.errors['min'].min}`;
-      }
-      if (control.errors['max']) {
-        return `${this.getFieldLabel(fieldName)} must be no more than ${control.errors['max'].max}`;
-      }
-    }
-    return '';
-  }
-
-  private getFieldLabel(fieldName: string): string {
-    const labels: Record<string, string> = {
-      team: 'Team',
-      birthYear: 'Birth Year',
-      jerseyNumber: 'Number',
-      firstName: 'First Name',
-      lastName: 'Last Name',
-      position: 'Position',
-      height: 'Height',
-      weight: 'Weight',
-      shoots: 'Shoots',
-      birthplace: 'Birthplace',
-      addressCountry: 'Country',
-      addressRegion: 'State/Province',
-      addressCity: 'City',
-      addressStreet: 'Street Address',
-      addressPostalCode: 'Postal Code',
-      playerBiography: 'Player Biography',
-      analysis: 'Analysis',
-    };
-    return labels[fieldName] || fieldName;
+    const label = this.fieldLabels[fieldName] || fieldName;
+    return getFieldError(control, label);
   }
 }

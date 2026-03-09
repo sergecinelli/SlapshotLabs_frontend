@@ -1,0 +1,38 @@
+<input
+  class="autocomplete-input"
+  [placeholder]="placeholder()"
+  [value]="inputText()"
+  [disabled]="isDisabled()"
+  cdkOverlayOrigin
+  #trigger="cdkOverlayOrigin"
+  (input)="onInput($event)"
+  (focus)="onFocus()"
+  (blur)="onBlur()"
+/>
+
+<ng-template
+  cdkConnectedOverlay
+  [cdkConnectedOverlayOrigin]="trigger"
+  [cdkConnectedOverlayOpen]="isOpen()"
+  [cdkConnectedOverlayHasBackdrop]="true"
+  [cdkConnectedOverlayBackdropClass]="'cdk-overlay-transparent-backdrop'"
+  [cdkConnectedOverlayMinWidth]="panelMinWidth()"
+  [cdkConnectedOverlayOffsetY]="4"
+  [cdkConnectedOverlayPositions]="dropdownPositions"
+  (backdropClick)="close()"
+  (overlayKeydown)="onOverlayKeydown($event)"
+>
+  <div class="custom-autocomplete-panel">
+    @for (option of filteredOptions(); track option.value) {
+      <div
+        class="autocomplete-option"
+        [class.selected]="option.value === value()"
+        (mousedown)="selectOption(option)"
+      >
+        {{ option.label }}
+      </div>
+    } @empty {
+      <div class="autocomplete-empty">No matches</div>
+    }
+  </div>
+</ng-template>

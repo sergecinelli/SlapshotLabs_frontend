@@ -3,61 +3,31 @@
     <form [formGroup]="form" class="custom-highlight-form">
       <div class="form-section">
         <div class="form-row">
-          <mat-form-field
-            [floatLabel]="'always'"
-            [hideRequiredMarker]="true"
-            class="form-field full-width"
-          >
-            <mat-label class="uppercase text-custom-secondary">Name</mat-label>
-            <input matInput formControlName="name" placeholder="Enter name" />
-          </mat-form-field>
+          <app-form-field label="Name" [required]="true" [error]="getErrorMessage('name')">
+            <input formControlName="name" placeholder="Enter name" />
+          </app-form-field>
         </div>
-
         <div class="form-row">
-          <mat-form-field
-            [floatLabel]="'always'"
-            [hideRequiredMarker]="true"
-            class="form-field full-width"
-          >
-            <mat-label class="uppercase text-custom-secondary">Description</mat-label>
+          <app-form-field label="Description">
             <textarea
-              matInput
               formControlName="description"
               rows="3"
               placeholder="Enter description"
             ></textarea>
-          </mat-form-field>
+          </app-form-field>
         </div>
-
-        <div class="form-row">
-          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
-            <mat-label class="uppercase text-custom-secondary">Date</mat-label>
-            <input matInput type="date" formControlName="date" />
-            @if (form.get('date')?.errors && form.get('date')?.touched) {
-              <mat-error> Date is required </mat-error>
-            }
-          </mat-form-field>
-
-          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
-            <mat-label class="uppercase text-custom-secondary">Time</mat-label>
-            <input matInput formControlName="time" placeholder="HH:mm or HH:mm:ss" maxlength="8" />
-            @if (form.get('time')?.errors && form.get('time')?.touched) {
-              <mat-error>
-                {{ getErrorMessage('time') }}
-              </mat-error>
-            }
-          </mat-form-field>
+        <div class="form-row date-time-row">
+          <app-form-field label="Date" [required]="true" [error]="getErrorMessage('date')">
+            <input type="date" formControlName="date" />
+          </app-form-field>
+          <app-form-field label="Time" [required]="true" [error]="getErrorMessage('time')">
+            <input formControlName="time" placeholder="HH:mm or HH:mm:ss" maxlength="8" />
+          </app-form-field>
         </div>
-
         <div class="form-row">
-          <mat-form-field
-            [floatLabel]="'always'"
-            [hideRequiredMarker]="true"
-            class="form-field full-width"
-          >
-            <mat-label class="uppercase text-custom-secondary">Video Link</mat-label>
-            <input matInput formControlName="youtube_link" placeholder="Enter YouTube link" />
-          </mat-form-field>
+          <app-form-field label="Video Link" [error]="getErrorMessage('youtube_link')">
+            <input formControlName="youtube_link" placeholder="Enter YouTube link" />
+          </app-form-field>
         </div>
       </div>
     </form>
@@ -65,15 +35,11 @@
 
   <div class="modal-actions">
     <app-button
-      [bg]="'transparent'"
-      [bghover]="'button_background'"
+      [bg]="'background'"
+      [bghover]="'item_hover'"
       [br]="'border'"
       [color]="'text_primary'"
       [colorhover]="'text_primary'"
-      [opacity]="1"
-      [opacityhover]="1"
-      [width]="'auto'"
-      [rounded]="false"
       [haveContent]="true"
       materialIcon="cancel"
       (clicked)="onCancel()"
@@ -84,14 +50,10 @@
       [isLoading]="false"
       [isDisabled]="form.invalid"
       materialIcon="save"
-      [bg]="'primary'"
-      [bghover]="'primary_dark'"
+      [bg]="'green'"
+      [bghover]="'green'"
       [color]="'white'"
       [colorhover]="'white'"
-      [opacity]="1"
-      [opacityhover]="1"
-      [width]="'auto'"
-      [rounded]="false"
       [haveContent]="true"
       (clicked)="onSave()"
     >

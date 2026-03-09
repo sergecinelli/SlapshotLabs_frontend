@@ -1,0 +1,191 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.custom-select-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 14px;
+  font-family: inherit;
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-medium);
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+  text-align: left;
+
+  &:hover {
+    border-color: var(--secondary);
+  }
+
+  &.open {
+    border-color: var(--primary);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .trigger-text {
+    color: var(--dark);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1;
+  }
+
+  .trigger-placeholder {
+    color: var(--gray);
+    flex: 1;
+  }
+
+  .trigger-arrow {
+    font-size: 20px;
+    color: var(--gray);
+    transition: transform 0.2s;
+    flex-shrink: 0;
+    margin-left: 8px;
+  }
+
+  &.open .trigger-arrow {
+    transform: rotate(180deg);
+  }
+}
+
+::ng-deep .custom-select-panel {
+  background: var(--card-background);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  max-height: 300px;
+  width: max-content;
+  min-width: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  animation: customSelectPanelOpen 0.15s ease-out;
+
+  .select-search-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border-light);
+    flex-shrink: 0;
+
+    .search-icon {
+      font-size: 20px;
+      color: var(--gray);
+    }
+
+    .select-search-input {
+      flex: 1;
+      border: none;
+      outline: none;
+      font-size: 13px;
+      font-family: inherit;
+      background: transparent;
+      color: var(--dark);
+
+      &::placeholder {
+        color: var(--gray);
+      }
+    }
+
+    .search-clear {
+      font-size: 18px;
+      cursor: pointer;
+      color: var(--gray);
+
+      &:hover {
+        color: var(--primary);
+      }
+    }
+  }
+
+  .select-options {
+    overflow-y: auto;
+    max-height: 260px;
+  }
+
+  .select-group-label {
+    padding: 6px 16px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--primary);
+    letter-spacing: 0.5px;
+    background-color: var(--gray-tone3);
+    border-bottom: 1px solid var(--border-light);
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+
+  .select-option {
+    padding: 10px 16px;
+    font-size: 13px;
+    color: var(--dark);
+    cursor: pointer;
+    transition: background-color 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    &:hover {
+      background-color: var(--gray-tone3);
+    }
+
+    &.selected {
+      background-color: var(--gray-tone3);
+      font-weight: 500;
+    }
+  }
+
+  .select-option-label {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .select-option-prefix {
+    color: var(--gray);
+    font-size: 12px;
+    font-weight: 500;
+    flex-shrink: 0;
+  }
+
+  .select-option-suffix {
+    margin-left: auto;
+    font-size: 11px;
+    color: var(--gray);
+    flex-shrink: 0;
+  }
+
+  .select-empty {
+    padding: 16px;
+    text-align: center;
+    font-size: 13px;
+    color: var(--gray);
+  }
+}
+
+@keyframes customSelectPanelOpen {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

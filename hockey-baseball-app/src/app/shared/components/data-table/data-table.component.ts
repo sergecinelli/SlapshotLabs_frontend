@@ -13,7 +13,7 @@ import { RouterLink } from '@angular/router';
 import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSortModule, Sort } from '@angular/material/sort';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { LoadingSpinnerComponent } from '../loading-spinner/loading-spinner.component';
 import { MatTooltipModule, MatTooltip } from '@angular/material/tooltip';
 import { IconService } from '../../../services/icon.service';
 import { ButtonSmallComponent } from '../buttons/button-small/button-small.component';
@@ -56,7 +56,7 @@ export interface TableAction {
     MatTableModule,
     MatButtonModule,
     MatSortModule,
-    MatProgressSpinnerModule,
+    LoadingSpinnerComponent,
     MatTooltipModule,
     ButtonSmallComponent,
     ButtonRouteSmallComponent,
@@ -73,6 +73,7 @@ export class DataTableComponent<T extends Record<string, unknown> = Record<strin
   data = input<T[]>([]);
   actions = input<TableAction[]>([]);
   loading = input(false);
+  loadingMessage = input('Loading...');
   emptyMessage = input('No data available');
 
   actionClick = output<{ action: string; item: T }>();
@@ -248,7 +249,7 @@ export class DataTableComponent<T extends Record<string, unknown> = Record<strin
   private readonly colorMap: Record<string, AppColor> = {
     red: 'primary',
     green: 'green',
-    blue: 'upcoming',
+    blue: 'cyan',
     orange: 'orange',
     purple: 'purple',
     gray: 'text_secondary',
@@ -257,7 +258,7 @@ export class DataTableComponent<T extends Record<string, unknown> = Record<strin
   private readonly colorHoverMap: Record<string, AppColor> = {
     red: 'primary_dark',
     green: 'green_dark',
-    blue: 'upcoming_dark',
+    blue: 'cyan_dark',
     orange: 'orange_dark',
     purple: 'purple_dark',
     gray: 'text_primary',

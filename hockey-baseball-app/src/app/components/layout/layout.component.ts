@@ -11,12 +11,15 @@ import { ModalService } from '../../services/modal.service';
 import { BannerComponent } from '../banner/banner.component';
 import { UserProfile } from '../../shared/interfaces/auth.interfaces';
 import { ButtonLoadingComponent } from '../../shared/components/buttons/button-loading/button-loading.component';
+import { ButtonComponent } from '../../shared/components/buttons/button/button.component';
+import { ThemeTransitionComponent } from '../../shared/components/theme-transition/theme-transition.component';
 import { ThemeService } from '../../services/theme.service';
 import { Role } from '../../services/roles/role.interface';
 import { RoleService } from '../../services/roles/role.service';
 import { BreadcrumbsComponent } from '../../shared/components/breadcrumbs/breadcrumbs.component';
 import { LogoutConfirmationModal } from '../../shared/components/logout-confirmation-modal/logout-confirmation.modal';
 import { LayoutBackgroundComponent } from '../../shared/components/layout-background/layout-background.component';
+import { LayoutShortcuts } from './layout.shortcuts';
 
 @Component({
   selector: 'app-layout',
@@ -24,6 +27,8 @@ import { LayoutBackgroundComponent } from '../../shared/components/layout-backgr
     RouterOutlet,
     BannerComponent,
     ButtonLoadingComponent,
+    ButtonComponent,
+    ThemeTransitionComponent,
     MatRippleModule,
     MatTooltipModule,
     BreadcrumbsComponent,
@@ -41,7 +46,7 @@ export class LayoutComponent implements OnInit {
   private roleService = inject(RoleService);
   private modalService = inject(ModalService);
   private router = inject(Router);
-  protected themeService = inject(ThemeService);
+  readonly themeService = inject(ThemeService);
 
   protected isCollapsed = signal(this.authService.justLoggedIn);
   protected currentUser = signal<UserProfile | null>(null);
@@ -96,36 +101,16 @@ export class LayoutComponent implements OnInit {
     return null;
   }
 
-  protected toggleCollapse(): void {
+  toggleCollapse(): void {
     this.isCollapsed.update((value) => !value);
   }
 
+  protected toggleTheme(event: MouseEvent): void {
+    this.themeService.toggleTheme(event.clientX, event.clientY);
+  }
+
   handleKeyDown(event: KeyboardEvent): void {
-    const target = event.target as HTMLElement;
-    const isInputElement =
-      target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable;
-
-    // Skip keyboard shortcuts if typing in input/textarea
-    if (isInputElement) {
-      return;
-    }
-
-    // Shift+T — toggle navigation menu
-    if (event.shiftKey && event.code === 'KeyT') {
-      event.preventDefault();
-      this.toggleCollapse();
-      return;
-    }
-
-    // Shift+1..9 — navigate to Nth menu item
-    const digit = event.code?.replace('Digit', '');
-    const index = Number(digit) - 1;
-    const items = this.navigationItems();
-
-    if (event.shiftKey && index >= 0 && index < items.length) {
-      event.preventDefault();
-      this.navigate(items[index].path);
-    }
+    LayoutShortcuts.handleKeyboardEvent(event, this);
   }
 
   protected getUserInitials(): string {
@@ -142,11 +127,11 @@ export class LayoutComponent implements OnInit {
     return `${user.first_name || ''} ${user.last_name || ''}`.trim() || 'User';
   }
 
-  protected get navigationItems() {
+  get navigationItems() {
     return this.navigationService.navigationItems;
   }
 
-  protected get currentPath() {
+  get currentPath() {
     return this.navigationService.currentPath;
   }
 
@@ -164,7 +149,7 @@ export class LayoutComponent implements OnInit {
     this.toggleSubmenu(item);
   }
 
-  protected navigate(path: string): void {
+  navigate(path: string): void {
     this.navigationService.navigate(path);
   }
 

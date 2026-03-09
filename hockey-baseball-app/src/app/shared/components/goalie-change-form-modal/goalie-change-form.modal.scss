@@ -1,25 +1,20 @@
-@use '../../styles/radio-button-selection';
 @use '../../styles/modal-form';
 
 .goalie-change-form-modal {
   @include modal-form.modal-wrapper;
-  @include modal-form.material-form-overrides;
 
   .modal-content {
     .goalie-change-form {
       @include modal-form.form-section;
 
       .form-section {
-        @include radio-button-selection.team-selection-container;
-        @include radio-button-selection.period-selection-container;
-        @include radio-button-selection.goalie-selection-container;
+        @include modal-form.selection-container;
 
-        .form-row {
-          .form-field {
-            &.full-width {
-              min-width: 100%;
-            }
-          }
+        .team-logo-img {
+          width: 24px;
+          height: 24px;
+          object-fit: contain;
+          border-radius: 50%;
         }
       }
     }

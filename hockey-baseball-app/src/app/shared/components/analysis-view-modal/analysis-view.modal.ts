@@ -1,9 +1,10 @@
 import { Component, inject, computed } from '@angular/core';
 import { Router } from '@angular/router';
-import { MatDividerModule } from '@angular/material/divider';
+import { SectionHeaderComponent } from '../section-header/section-header.component';
 import { ModalService } from '../../../services/modal.service';
 import { ButtonComponent } from '../buttons/button/button.component';
 import { ButtonSmallComponent } from '../buttons/button-small/button-small.component';
+import { FormFieldComponent } from '../form-field/form-field.component';
 import { Analysis, AnalysisType } from '../../interfaces/analysis.interface';
 
 const PROFILE_ROUTE_SEGMENTS: Partial<Record<AnalysisType, string>> = {
@@ -14,7 +15,7 @@ const PROFILE_ROUTE_SEGMENTS: Partial<Record<AnalysisType, string>> = {
 
 @Component({
   selector: 'app-analysis-view-modal',
-  imports: [MatDividerModule, ButtonComponent, ButtonSmallComponent],
+  imports: [SectionHeaderComponent, ButtonComponent, ButtonSmallComponent, FormFieldComponent],
   templateUrl: './analysis-view.modal.html',
   styleUrl: './analysis-view.modal.scss',
 })

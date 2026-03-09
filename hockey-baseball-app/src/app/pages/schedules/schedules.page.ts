@@ -30,6 +30,7 @@ import {
   GameOption,
 } from '../../shared/components/game-analysis-modal/game-analysis.modal';
 import { BreadcrumbActionsDirective } from '../../shared/directives/breadcrumb-actions.directive';
+import { LoadingSpinnerComponent } from '../../shared/components/loading-spinner/loading-spinner.component';
 
 interface GameDisplay {
   id: number;
@@ -62,6 +63,7 @@ interface GameDisplay {
     DataTableComponent,
     GameCardComponent,
     BreadcrumbActionsDirective,
+    LoadingSpinnerComponent,
   ],
   templateUrl: './schedules.page.html',
   styleUrl: './schedules.page.scss',

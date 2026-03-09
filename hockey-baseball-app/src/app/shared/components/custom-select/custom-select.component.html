@@ -1,0 +1,92 @@
+<button
+  type="button"
+  class="custom-select-trigger"
+  [class.open]="isOpen()"
+  [class.has-value]="!!selectedLabel()"
+  [disabled]="isDisabled()"
+  cdkOverlayOrigin
+  #trigger="cdkOverlayOrigin"
+  (click)="toggle()"
+>
+  @if (selectedLabel()) {
+    <span class="trigger-text">{{ selectedLabel() }}</span>
+  } @else {
+    <span class="trigger-placeholder">{{ placeholder() }}</span>
+  }
+  <span class="material-symbols-rounded trigger-arrow">expand_more</span>
+</button>
+
+<ng-template
+  cdkConnectedOverlay
+  [cdkConnectedOverlayOrigin]="trigger"
+  [cdkConnectedOverlayOpen]="isOpen()"
+  [cdkConnectedOverlayHasBackdrop]="true"
+  [cdkConnectedOverlayBackdropClass]="'cdk-overlay-transparent-backdrop'"
+  [cdkConnectedOverlayMinWidth]="panelMinWidth()"
+  [cdkConnectedOverlayOffsetY]="4"
+  [cdkConnectedOverlayPositions]="dropdownPositions"
+  (backdropClick)="close()"
+  (attach)="onOverlayAttach()"
+  (overlayKeydown)="onOverlayKeydown($event)"
+>
+  <div class="custom-select-panel">
+    @if (searchable()) {
+      <div class="select-search-wrapper">
+        <span class="material-symbols-rounded search-icon">search</span>
+        <input
+          #searchInputEl
+          class="select-search-input"
+          [placeholder]="searchPlaceholder()"
+          (input)="onSearchInput($event)"
+          (keydown)="$event.stopPropagation()"
+        />
+        @if (searchText()) {
+          <span class="material-symbols-rounded search-clear" (click)="clearSearch(searchInputEl)"
+            >close</span
+          >
+        }
+      </div>
+    }
+    <div class="select-options">
+      @if (hasGroups()) {
+        @for (group of filteredGroups(); track group.label) {
+          <div class="select-group">
+            <div class="select-group-label">{{ group.label }}</div>
+            @for (option of group.options; track option.value) {
+              <div
+                class="select-option"
+                [class.selected]="option.value === value()"
+                (click)="selectOption(option)"
+              >
+                @if (option.prefix) {
+                  <span class="select-option-prefix">{{ option.prefix }}</span>
+                }
+                <span class="select-option-label">{{ option.label }}</span>
+                @if (option.suffix) {
+                  <span class="select-option-suffix">{{ option.suffix }}</span>
+                }
+              </div>
+            }
+          </div>
+        } @empty {
+          <div class="select-empty">No results</div>
+        }
+      } @else {
+        @for (option of filteredOptions(); track option.value) {
+          <div
+            class="select-option"
+            [class.selected]="option.value === value()"
+            (click)="selectOption(option)"
+          >
+            @if (option.prefix) {
+              <span class="select-option-prefix">{{ option.prefix }}</span>
+            }
+            {{ option.label }}
+          </div>
+        } @empty {
+          <div class="select-empty">No results</div>
+        }
+      }
+    </div>
+  </div>
+</ng-template>

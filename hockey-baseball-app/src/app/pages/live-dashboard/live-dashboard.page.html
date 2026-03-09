@@ -16,10 +16,7 @@
   <!-- Loading Spinner -->
   @if (isLoadingGameData) {
     <div class="flex items-center justify-center min-h-[60vh]">
-      <div class="text-center">
-        <mat-spinner diameter="60" class="mx-auto"></mat-spinner>
-        <p class="mt-4 text-gray-600 text-lg">Loading game data...</p>
-      </div>
+      <app-loading-spinner message="Loading game data..." size="lg" />
     </div>
   }
 
@@ -151,7 +148,7 @@
           role-visibility-name="add-event-button"
           [attr.role-visibility-team-id]="[homeTeamId, awayTeamId]"
         >
-          <div class="flex flex-wrap gap-3 justify-center">
+          <div class="live-dashboard-actions">
             <app-button
               [bg]="'primary'"
               [bghover]="'primary_dark'"
@@ -939,8 +936,7 @@
       <div class="live-dashboard-card-content">
         @if (isLoadingSprayChartsValue) {
           <div class="live-dashboard-loading">
-            <mat-spinner diameter="60" class="mx-auto"></mat-spinner>
-            <p class="live-dashboard-loading-text">Loading spray charts...</p>
+            <app-loading-spinner message="Loading spray charts..." size="sm" />
           </div>
         }
         @if (!isLoadingSprayChartsValue) {

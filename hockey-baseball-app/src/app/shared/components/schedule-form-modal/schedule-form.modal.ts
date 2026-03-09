@@ -1,17 +1,15 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ModalService, ModalEvent } from '../../../services/modal.service';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule, MatSelectChange } from '@angular/material/select';
-import { MatIconModule } from '@angular/material/icon';
-import { MatDividerModule } from '@angular/material/divider';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
+import { SectionHeaderComponent } from '../section-header/section-header.component';
+import { FormFieldComponent } from '../form-field/form-field.component';
+import { CustomSelectComponent, SelectOption } from '../custom-select/custom-select.component';
+import { CardGridComponent } from '../card-grid/card-grid.component';
+import { CardGridItemComponent } from '../card-grid/card-grid-item.component';
 import { ButtonComponent } from '../buttons/button/button.component';
 import { ButtonLoadingComponent } from '../buttons/button-loading/button-loading.component';
+import { LoadingSpinnerComponent } from '../loading-spinner/loading-spinner.component';
 import { Schedule, GameStatus } from '../../interfaces/schedule.interface';
 import { Team } from '../../interfaces/team.interface';
 import { Arena, Rink } from '../../interfaces/arena.interface';
@@ -34,6 +32,7 @@ import {
 } from '../roster-selection-modal/roster-selection.modal';
 import { forkJoin } from 'rxjs';
 import { convertLocalToGMT, convertGMTToLocal } from '../../utils/time-converter.util';
+import { getFieldError } from '../../validators/form-error.util';
 
 export interface GameData {
   id: number;
@@ -74,15 +73,14 @@ export interface ScheduleFormModalData {
   selector: 'app-schedule-form-modal',
   imports: [
     ReactiveFormsModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
-    MatIconModule,
-    MatDividerModule,
-    MatDatepickerModule,
-    MatNativeDateModule,
+    SectionHeaderComponent,
+    FormFieldComponent,
+    CustomSelectComponent,
+    CardGridComponent,
+    CardGridItemComponent,
     ButtonComponent,
     ButtonLoadingComponent,
+    LoadingSpinnerComponent,
   ],
   templateUrl: './schedule-form.modal.html',
   styleUrl: './schedule-form.modal.scss',
@@ -112,13 +110,19 @@ export class ScheduleFormModal implements OnInit {
   gamePeriods: GamePeriodResponse[] = [];
 
   teamOptions: { value: string; label: string }[] = [];
+  teamSelectOptions: SelectOption[] = [];
   arenaOptions: { value: number; label: string }[] = [];
+  arenaSelectOptions: SelectOption[] = [];
   rinkOptions: { value: number; label: string }[] = [];
+  rinkSelectOptions: SelectOption[] = [];
   goalieOptions: { value: string; label: string }[] = [];
   awayGoalieOptions: { value: string; label: string }[] = [];
+  awayGoalieSelectOptions: SelectOption[] = [];
   homeGoalieOptions: { value: string; label: string }[] = [];
+  homeGoalieSelectOptions: SelectOption[] = [];
   gameTypeOptions: { value: number; label: string }[] = [];
   gameTypeNameOptions: { value: number; label: string }[] = [];
+  gameTypeNameSelectOptions: SelectOption[] = [];
   selectedGameType: GameTypeResponse | null = null;
 
   // Roster selection state
@@ -138,11 +142,44 @@ export class ScheduleFormModal implements OnInit {
     this.isEditMode = data.isEditMode;
     this.scheduleForm = this.createForm();
 
+    this.modalService.registerDirtyCheck(() => this.scheduleForm.dirty);
     this.modalService.onEvent$.pipe(takeUntilDestroyed()).subscribe((event) => {
       if (event === ModalEvent.StopButtonLoading) {
         this.isSubmitting.set(false);
       }
     });
+
+    this.scheduleForm
+      .get('awayTeam')
+      ?.valueChanges.pipe(takeUntilDestroyed())
+      .subscribe((teamId: string) => {
+        this.filterGoaliesByTeam(teamId, 'away');
+        if (this.awayGoalieSelectOptions.length > 0) {
+          this.scheduleForm.patchValue({ awayTeamGoalie: this.awayGoalieSelectOptions[0].value });
+        } else {
+          this.scheduleForm.patchValue({ awayTeamGoalie: '' });
+        }
+      });
+
+    this.scheduleForm
+      .get('homeTeam')
+      ?.valueChanges.pipe(takeUntilDestroyed())
+      .subscribe((teamId: string) => {
+        this.filterGoaliesByTeam(teamId, 'home');
+        if (this.homeGoalieSelectOptions.length > 0) {
+          this.scheduleForm.patchValue({ homeTeamGoalie: this.homeGoalieSelectOptions[0].value });
+        } else {
+          this.scheduleForm.patchValue({ homeTeamGoalie: '' });
+        }
+      });
+
+    this.scheduleForm
+      .get('arena')
+      ?.valueChanges.pipe(takeUntilDestroyed())
+      .subscribe((arenaId: string) => {
+        this.filterRinksByArena(parseInt(arenaId, 10));
+        this.scheduleForm.patchValue({ rink: '' });
+      });
   }
 
   ngOnInit(): void {
@@ -204,6 +241,7 @@ export class ScheduleFormModal implements OnInit {
       this.arenaOptions = this.arenaService.transformArenasToOptions(this.arenas);
       this.goalieOptions = this.transformGoaliesToOptions(this.goalies);
       this.gameTypeOptions = this.gameMetadataService.transformGameTypesToOptions(this.gameTypes);
+      this.syncSelectOptions();
 
       // Set default values
       this.setDefaultValues();
@@ -247,6 +285,7 @@ export class ScheduleFormModal implements OnInit {
           this.gameTypeOptions = this.gameMetadataService.transformGameTypesToOptions(
             this.gameTypes
           );
+          this.syncSelectOptions();
 
           // Set default values
           this.setDefaultValues();
@@ -340,13 +379,12 @@ export class ScheduleFormModal implements OnInit {
         this.onGameTypeChange(this.gameTypeOptions[0].value);
       }
 
-      // Set default arena value
+      // Set default arena value (string for custom-select)
       if (this.arenaOptions.length > 0) {
-        defaultValues['arena'] = this.arenaOptions[0].value;
-        // Filter rinks based on first arena and set default rink
+        defaultValues['arena'] = this.arenaOptions[0].value.toString();
         this.filterRinksByArena(this.arenaOptions[0].value);
-        if (this.rinkOptions.length > 0) {
-          defaultValues['rink'] = this.rinkOptions[0].value;
+        if (this.rinkSelectOptions.length > 0) {
+          defaultValues['rink'] = this.rinkSelectOptions[0].value;
         }
       }
 
@@ -399,8 +437,8 @@ export class ScheduleFormModal implements OnInit {
         homeTeamGoalie: homeGoalieId > 0 ? homeGoalieId.toString() : '',
         date: localDateTime.date,
         time: this.convertTo12Hour(localDateTime.time),
-        arena: arenaId,
-        rink: game.rink_id,
+        arena: arenaId?.toString() ?? '',
+        rink: game.rink_id.toString(),
         tournamentName: game.tournament_name || '',
         status: game.status,
         gameType: gameTypeId,
@@ -448,7 +486,7 @@ export class ScheduleFormModal implements OnInit {
         homeTeamGoalie: homeGoalieId,
         date: schedule.date,
         time: schedule.time ? this.convertTo12Hour(schedule.time) : '',
-        arena: arenaId,
+        arena: arenaId?.toString() ?? '',
         rink: rinkId,
         tournamentName: schedule.tournamentName || '',
         status: this.mapStatusToNumber(schedule.status),
@@ -589,7 +627,7 @@ export class ScheduleFormModal implements OnInit {
   }
 
   onSubmit(): void {
-    if (this.isLoading || this.isSubmitting()) {
+    if (this.isLoading) {
       return;
     }
 
@@ -641,7 +679,7 @@ export class ScheduleFormModal implements OnInit {
         status: formValue.status,
         date: gmtDateTime.date,
         time: gmtDateTime.time,
-        rink_id: formValue.rink,
+        rink_id: parseInt(formValue.rink) || 0,
         home_goalies: homeGoalies,
         away_goalies: awayGoalies,
         home_players: homePlayers,
@@ -670,61 +708,52 @@ export class ScheduleFormModal implements OnInit {
   }
 
   onCancel(): void {
-    if (!this.isSubmitting()) {
-      this.modalService.closeModal();
-    }
+    this.modalService.closeModal();
   }
+
+  private readonly fieldLabels: Record<string, string> = {
+    visitingTeam: 'Visiting Team',
+    homeTeam: 'Home Team',
+    awayTeam: 'Away Team',
+    date: 'Date',
+    time: 'Time',
+    arena: 'Arena',
+    rink: 'Rink',
+    gameType: 'Game Type',
+    status: 'Status',
+    analysis: 'Analysis',
+  };
 
   getErrorMessage(fieldName: string): string {
     const control = this.scheduleForm.get(fieldName);
-    if (control?.errors && control.touched) {
-      if (control.errors['required']) {
-        return `${this.getFieldLabel(fieldName)} is required`;
-      }
-      if (control.errors['pattern']) {
-        if (fieldName === 'time') {
-          return 'Time must be in format h:mm AM/PM (e.g., 7:00 PM)';
-        }
-        return `${this.getFieldLabel(fieldName)} format is invalid`;
-      }
-    }
-    return '';
+    const label = this.fieldLabels[fieldName] || fieldName;
+    const customMessages: Record<string, string> =
+      fieldName === 'time'
+        ? { pattern: 'Time must be in format h:mm AM/PM (e.g., 7:00 PM)' }
+        : { pattern: `${label} format is invalid` };
+    return getFieldError(control, label, customMessages);
   }
 
-  private getFieldLabel(fieldName: string): string {
-    const labels: Record<string, string> = {
-      visitingTeam: 'Visiting Team',
-      homeTeam: 'Home Team',
-      awayTeam: 'Away Team',
-      date: 'Date',
-      time: 'Time',
-      arena: 'Arena',
-      rink: 'Rink',
-      gameType: 'Game Type',
-      status: 'Status',
-      analysis: 'Analysis',
-    };
-    return labels[fieldName] || fieldName;
+  private syncSelectOptions(): void {
+    this.teamSelectOptions = this.teamOptions;
+    this.arenaSelectOptions = this.arenaOptions.map((o) => ({
+      value: o.value.toString(),
+      label: o.label,
+    }));
+    this.rinkSelectOptions = this.rinkOptions.map((o) => ({
+      value: o.value.toString(),
+      label: o.label,
+    }));
+    this.gameTypeNameSelectOptions = this.gameTypeNameOptions.map((o) => ({
+      value: o.value.toString(),
+      label: o.label,
+    }));
   }
 
-  /**
-   * Handle arena selection change and filter rinks
-   */
-  onArenaChange(event: MatSelectChange): void {
-    const arenaId = event.value;
-    this.filterRinksByArena(arenaId);
-    // Reset rink selection when arena changes
-    this.scheduleForm.patchValue({ rink: '' });
-  }
-
-  /**
-   * Filter goalies based on selected team
-   */
   private filterGoaliesByTeam(teamId: string, teamType: 'away' | 'home'): void {
     const numericTeamId = parseInt(teamId, 10);
 
     const filteredGoalies = this.goalies.filter((goalie) => {
-      // Filter by teamId from API data
       return goalie.teamId === numericTeamId;
     });
 
@@ -732,36 +761,10 @@ export class ScheduleFormModal implements OnInit {
 
     if (teamType === 'away') {
       this.awayGoalieOptions = options;
+      this.awayGoalieSelectOptions = options;
     } else {
       this.homeGoalieOptions = options;
-    }
-  }
-
-  /**
-   * Handle away team selection change
-   */
-  onAwayTeamChange(event: MatSelectChange): void {
-    const teamId = event.value;
-    this.filterGoaliesByTeam(teamId, 'away');
-    // Reset away goalie selection
-    if (this.awayGoalieOptions.length > 0) {
-      this.scheduleForm.patchValue({ awayTeamGoalie: this.awayGoalieOptions[0].value });
-    } else {
-      this.scheduleForm.patchValue({ awayTeamGoalie: '' });
-    }
-  }
-
-  /**
-   * Handle home team selection change
-   */
-  onHomeTeamChange(event: MatSelectChange): void {
-    const teamId = event.value;
-    this.filterGoaliesByTeam(teamId, 'home');
-    // Reset home goalie selection
-    if (this.homeGoalieOptions.length > 0) {
-      this.scheduleForm.patchValue({ homeTeamGoalie: this.homeGoalieOptions[0].value });
-    } else {
-      this.scheduleForm.patchValue({ homeTeamGoalie: '' });
+      this.homeGoalieSelectOptions = options;
     }
   }
 
@@ -785,10 +788,14 @@ export class ScheduleFormModal implements OnInit {
         value: name.id,
         label: name.name,
       }));
-      // Set first game type name as default
-      this.scheduleForm.patchValue({ gameTypeName: this.gameTypeNameOptions[0].value });
+      this.gameTypeNameSelectOptions = this.gameTypeNameOptions.map((o) => ({
+        value: o.value.toString(),
+        label: o.label,
+      }));
+      this.scheduleForm.patchValue({ gameTypeName: this.gameTypeNameSelectOptions[0].value });
     } else {
       this.gameTypeNameOptions = [];
+      this.gameTypeNameSelectOptions = [];
       this.scheduleForm.patchValue({ gameTypeName: '' });
     }
   }
@@ -807,6 +814,10 @@ export class ScheduleFormModal implements OnInit {
   private filterRinksByArena(arenaId: number): void {
     const filteredRinks = this.rinks.filter((rink) => rink.arena_id === arenaId);
     this.rinkOptions = this.arenaService.transformRinksToOptions(filteredRinks);
+    this.rinkSelectOptions = this.rinkOptions.map((o) => ({
+      value: o.value.toString(),
+      label: o.label,
+    }));
   }
 
   /**

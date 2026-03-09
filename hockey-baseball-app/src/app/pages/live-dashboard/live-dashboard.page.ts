@@ -6,7 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { LoadingSpinnerComponent } from '../../shared/components/loading-spinner/loading-spinner.component';
 import { VideoViewModal } from '../../shared/components/video-view-modal/video-view.modal';
 import { Video } from '../../shared/interfaces/video.interface';
 import { ModalEvent, ModalService } from '../../services/modal.service';
@@ -131,7 +131,7 @@ interface GameEvent {
     ComponentVisibilityByRoleDirective,
     MatSelectModule,
     MatFormFieldModule,
-    MatProgressSpinnerModule,
+    LoadingSpinnerComponent,
     ShotLocationDisplayComponent,
   ],
   templateUrl: './live-dashboard.page.html',
@@ -1420,7 +1420,7 @@ export class LiveDashboardPage implements OnInit, OnDestroy {
     this.modalService.openModal(ShotFormModal, {
       name: 'Shot',
       icon: 'sports_hockey',
-      width: '800px',
+      width: '900px',
       data: {
         gameId: this.gameId,
         shotEventId: this.shotOnGoalEventId,
@@ -1466,7 +1466,7 @@ export class LiveDashboardPage implements OnInit, OnDestroy {
     this.modalService.openModal(TurnoverFormModal, {
       name: 'Turnover',
       icon: 'swap_horiz',
-      width: '800px',
+      width: '900px',
       data: {
         gameId: this.gameId,
         turnoverEventId: this.turnoverEventId,
@@ -1504,7 +1504,7 @@ export class LiveDashboardPage implements OnInit, OnDestroy {
     this.modalService.openModal(FaceoffFormModal, {
       name: 'Faceoff',
       icon: 'sports_hockey',
-      width: '800px',
+      width: '900px',
       data: {
         gameId: this.gameId,
         faceoffEventId: this.faceoffEventId,
@@ -1542,7 +1542,7 @@ export class LiveDashboardPage implements OnInit, OnDestroy {
     this.modalService.openModal(GoalieChangeFormModal, {
       name: 'Goalie Change',
       icon: 'sports',
-      width: '800px',
+      width: '900px',
       data: {
         gameId: this.gameId,
         goalieChangeEventId: this.goalieChangeEventId,
@@ -1635,7 +1635,7 @@ export class LiveDashboardPage implements OnInit, OnDestroy {
     this.modalService.openModal(PenaltyFormModal, {
       name: 'Penalty',
       icon: 'warning',
-      width: '800px',
+      width: '900px',
       data: {
         gameId: this.gameId,
         penaltyEventId: this.penaltyEventId,
@@ -1702,7 +1702,7 @@ export class LiveDashboardPage implements OnInit, OnDestroy {
     this.modalService.openModal(ShotFormModal, {
       name: 'Shot',
       icon: 'sports_hockey',
-      width: '800px',
+      width: '900px',
       data: {
         gameId: this.gameId,
         shotEventId: this.shotOnGoalEventId,
@@ -1770,7 +1770,7 @@ export class LiveDashboardPage implements OnInit, OnDestroy {
     this.modalService.openModal(TurnoverFormModal, {
       name: 'Turnover',
       icon: 'swap_horiz',
-      width: '800px',
+      width: '900px',
       data: {
         gameId: this.gameId,
         turnoverEventId: this.turnoverEventId,
@@ -1823,7 +1823,7 @@ export class LiveDashboardPage implements OnInit, OnDestroy {
     this.modalService.openModal(FaceoffFormModal, {
       name: 'Faceoff',
       icon: 'sports_hockey',
-      width: '800px',
+      width: '900px',
       data: {
         gameId: this.gameId,
         faceoffEventId: this.faceoffEventId,
@@ -1877,7 +1877,7 @@ export class LiveDashboardPage implements OnInit, OnDestroy {
     this.modalService.openModal(GoalieChangeFormModal, {
       name: 'Goalie Change',
       icon: 'sports',
-      width: '800px',
+      width: '900px',
       data: {
         gameId: this.gameId,
         goalieChangeEventId: this.goalieChangeEventId,
@@ -1970,7 +1970,7 @@ export class LiveDashboardPage implements OnInit, OnDestroy {
     this.modalService.openModal(PenaltyFormModal, {
       name: 'Penalty',
       icon: 'warning',
-      width: '800px',
+      width: '900px',
       data: {
         gameId: this.gameId,
         penaltyEventId: this.penaltyEventId,

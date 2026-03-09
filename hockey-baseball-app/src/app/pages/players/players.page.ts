@@ -34,6 +34,7 @@ import { PlayerAnalysisModal } from '../../shared/components/player-analysis-mod
 import { CachedSrcDirective } from '../../shared/directives/cached-src.directive';
 import { CardGridComponent } from '../../shared/components/card-grid/card-grid.component';
 import { BreadcrumbActionsDirective } from '../../shared/directives/breadcrumb-actions.directive';
+import { LoadingSpinnerComponent } from '../../shared/components/loading-spinner/loading-spinner.component';
 
 @Component({
   selector: 'app-players',
@@ -49,6 +50,7 @@ import { BreadcrumbActionsDirective } from '../../shared/directives/breadcrumb-a
     DataTableComponent,
     RouterLink,
     BreadcrumbActionsDirective,
+    LoadingSpinnerComponent,
   ],
   templateUrl: './players.page.html',
   styleUrl: './players.page.scss',
@@ -430,7 +432,7 @@ export class PlayersPage implements OnInit {
         this.modalService.openModal(PlayerFormModal, {
           name: 'Add Player',
           icon: 'sports_hockey',
-          width: '800px',
+          width: '900px',
           maxWidth: '95vw',
           data: {
             isEditMode: false,
@@ -472,7 +474,7 @@ export class PlayersPage implements OnInit {
         this.modalService.openModal(PlayerFormModal, {
           name: 'Edit Player',
           icon: 'sports_hockey',
-          width: '800px',
+          width: '900px',
           maxWidth: '95vw',
           data: {
             player: player,

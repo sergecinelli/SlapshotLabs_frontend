@@ -10,7 +10,7 @@
             class="clear-all-btn"
             materialIcon="close"
             [bg]="'transparent'"
-            [bghover]="'button_background'"
+            [bghover]="'item_hover'"
             [color]="'gray'"
             [colorhover]="'primary'"
             [haveContent]="true"
@@ -19,77 +19,22 @@
             Clear all
           </app-button-small>
         }
-        <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="search-field">
-          <mat-label class="uppercase text-custom-secondary"
-            >Select existing {{ isGoalie ? 'goalies' : 'players' }}</mat-label
-          >
-          <mat-select
-            [value]="selectedIds()"
+        <app-form-field label="Select existing {{ isGoalie ? 'goalies' : 'players' }}">
+          <app-custom-multi-select
+            [value]="selectedStringIds()"
             [placeholder]="'No ' + (isGoalie ? 'goalies' : 'players') + ' selected'"
-            (selectionChange)="onSelectionChange($event.value)"
-            (openedChange)="onSelectOpenedChange($event)"
-            multiple
-            panelClass="tryout-player-select-panel"
-          >
-            <mat-select-trigger>
-              <div class="trigger-chips">
-                @for (entry of selectedEntriesValue; track entry.id) {
-                  <span class="trigger-chip">
-                    {{ entry.firstName }} {{ entry.lastName }}
-                    <span
-                      class="material-symbols-rounded trigger-chip-remove"
-                      (click)="removeEntry(entry); $event.stopPropagation()"
-                      >close</span
-                    >
-                  </span>
-                }
-              </div>
-            </mat-select-trigger>
-
-            <div class="player-search-wrapper" (click)="$event.stopPropagation()">
-              <span class="material-symbols-rounded search-icon">search</span>
-              <input
-                #playerSearchInput
-                class="player-search-input"
-                placeholder="Search by name..."
-                [value]="searchText()"
-                (input)="onSearchInput($event)"
-                (keydown)="$event.stopPropagation()"
-              />
-              @if (searchText()) {
-                <span
-                  class="material-symbols-rounded search-clear"
-                  (click)="clearSearch(playerSearchInput)"
-                  >close</span
-                >
-              }
-            </div>
-
-            @for (group of groupedEntries(); track group.teamName) {
-              <mat-optgroup [label]="group.teamName">
-                @for (entry of group.entries; track entry.id) {
-                  <mat-option
-                    [value]="entry.id"
-                    [style.display]="playerMatchesSearch(entry) ? '' : 'none'"
-                  >
-                    <span class="player-option">
-                      <span class="player-number-badge">#{{ entry.jerseyNumber }}</span>
-                      {{ entry.firstName }} {{ entry.lastName }}
-                      <span class="player-team-info">{{ entry.teamLevelName }}</span>
-                    </span>
-                  </mat-option>
-                }
-              </mat-optgroup>
-            }
-          </mat-select>
-        </mat-form-field>
+            searchPlaceholder="Search by name..."
+            [optionGroups]="entryOptionGroups()"
+            (valueChange)="onSelectionChange($event)"
+          />
+        </app-form-field>
       </div>
 
       <div class="create-toggle">
         <span class="divider-text">or</span>
         <app-button
           [bg]="'transparent'"
-          [bghover]="'button_background'"
+          [bghover]="'item_hover'"
           [br]="'border'"
           [color]="'text_primary'"
           [colorhover]="'text_primary'"
@@ -105,122 +50,74 @@
     @if (showCreateFormValue) {
       <form [formGroup]="playerForm" class="player-form">
         <div class="form-section">
-          <div class="section-header">
-            <span class="section-title">Personal Information</span>
-          </div>
-          <mat-divider class="section-divider"></mat-divider>
+          <app-section-header title="Personal Information" />
           <div class="form-row">
-            <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
-              <mat-label class="uppercase text-custom-secondary">Number:</mat-label>
+            <app-form-field label="Number" [error]="getErrorMessage('jerseyNumber')">
               <input
-                matInput
                 type="number"
                 formControlName="jerseyNumber"
                 placeholder="Enter jersey number"
               />
-              @if (
-                playerForm.get('jerseyNumber')?.errors && playerForm.get('jerseyNumber')?.touched
-              ) {
-                <mat-error>{{ getErrorMessage('jerseyNumber') }}</mat-error>
-              }
-            </mat-form-field>
-            <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
-              <mat-label class="uppercase text-custom-secondary">First Name</mat-label>
-              <input matInput formControlName="firstName" placeholder="Enter first name" />
-              @if (playerForm.get('firstName')?.errors && playerForm.get('firstName')?.touched) {
-                <mat-error>{{ getErrorMessage('firstName') }}</mat-error>
-              }
-            </mat-form-field>
-            <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
-              <mat-label class="uppercase text-custom-secondary">Last Name:</mat-label>
-              <input matInput formControlName="lastName" placeholder="Enter last name" />
-              @if (playerForm.get('lastName')?.errors && playerForm.get('lastName')?.touched) {
-                <mat-error>{{ getErrorMessage('lastName') }}</mat-error>
-              }
-            </mat-form-field>
-            <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
-              <mat-label class="uppercase text-custom-secondary">Birth Year:</mat-label>
-              <input
-                matInput
-                type="number"
-                formControlName="birthYear"
-                placeholder="Enter birth year"
-              />
-              @if (playerForm.get('birthYear')?.errors && playerForm.get('birthYear')?.touched) {
-                <mat-error>{{ getErrorMessage('birthYear') }}</mat-error>
-              }
-            </mat-form-field>
-            @if (!isGoalie) {
-              <div class="position-selection-container">
-                <span class="position-selection-label uppercase text-custom-secondary"
-                  >Position:</span
-                >
-                <div class="position-buttons">
-                  @for (option of positionOptions; track option) {
-                    <div
-                      class="position-button"
-                      [class.selected]="playerForm.get('position')?.value === option.value"
-                      (click)="playerForm.patchValue({ position: option.value })"
-                      (keydown.enter)="playerForm.patchValue({ position: option.value })"
-                      (keydown.space)="playerForm.patchValue({ position: option.value })"
-                      tabindex="0"
-                      role="button"
-                      [attr.aria-pressed]="playerForm.get('position')?.value === option.value"
-                    >
-                      <span class="position-name">{{ option.label }}</span>
-                    </div>
-                  }
-                </div>
-              </div>
-            }
+            </app-form-field>
+            <app-form-field
+              label="First Name"
+              [required]="true"
+              [error]="getErrorMessage('firstName')"
+            >
+              <input formControlName="firstName" placeholder="Enter first name" />
+            </app-form-field>
+            <app-form-field
+              label="Last Name"
+              [required]="true"
+              [error]="getErrorMessage('lastName')"
+            >
+              <input formControlName="lastName" placeholder="Enter last name" />
+            </app-form-field>
+            <app-form-field label="Birth Year" [error]="getErrorMessage('birthYear')">
+              <input type="number" formControlName="birthYear" placeholder="Enter birth year" />
+            </app-form-field>
           </div>
+          @if (!isGoalie) {
+            <div class="position-selection-container">
+              <div class="selection-label">Position</div>
+              <app-card-grid [columns]="positionOptions.length">
+                @for (option of positionOptions; track option.value) {
+                  <app-card-grid-item
+                    [selected]="playerForm.get('position')?.value === option.value"
+                    (select)="playerForm.patchValue({ position: option.value })"
+                  >
+                    {{ option.label }}
+                  </app-card-grid-item>
+                }
+              </app-card-grid>
+              <div class="error-slot"></div>
+            </div>
+          }
         </div>
 
         <div class="form-section">
-          <div class="section-header">
-            <span class="section-title">Physical Information</span>
-          </div>
-          <mat-divider class="section-divider"></mat-divider>
+          <app-section-header title="Physical Information" />
           <div class="form-row">
-            <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
-              <mat-label class="uppercase text-custom-secondary">Height</mat-label>
-              <input matInput formControlName="height" placeholder="e.g., 6'2&quot;" />
-            </mat-form-field>
-            <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
-              <mat-label class="uppercase text-custom-secondary">Weight</mat-label>
-              <input
-                matInput
-                type="number"
-                formControlName="weight"
-                placeholder="Enter weight in lbs"
-              />
-              @if (playerForm.get('weight')?.errors && playerForm.get('weight')?.touched) {
-                <mat-error>{{ getErrorMessage('weight') }}</mat-error>
+            <app-form-field label="Height">
+              <input formControlName="height" placeholder="e.g., 6'2&quot;" />
+            </app-form-field>
+            <app-form-field label="Weight" [error]="getErrorMessage('weight')">
+              <input type="number" formControlName="weight" placeholder="Enter weight in lbs" />
+            </app-form-field>
+          </div>
+          <div class="shoots-selection-container">
+            <div class="selection-label">Shoots (R/L)</div>
+            <app-card-grid [columns]="shootsOptions.length">
+              @for (option of shootsOptions; track option.value) {
+                <app-card-grid-item
+                  [selected]="playerForm.get('shoots')?.value === option.value"
+                  (select)="playerForm.patchValue({ shoots: option.value })"
+                >
+                  {{ option.label }}
+                </app-card-grid-item>
               }
-            </mat-form-field>
-          </div>
-          <div class="form-row">
-            <div class="shoots-selection-container">
-              <span class="shoots-selection-label uppercase text-custom-secondary"
-                >Shoots (R/L)</span
-              >
-              <div class="shoots-buttons">
-                @for (option of shootsOptions; track option) {
-                  <div
-                    class="shoots-button"
-                    [class.selected]="playerForm.get('shoots')?.value === option.value"
-                    (click)="playerForm.patchValue({ shoots: option.value })"
-                    (keydown.enter)="playerForm.patchValue({ shoots: option.value })"
-                    (keydown.space)="playerForm.patchValue({ shoots: option.value })"
-                    tabindex="0"
-                    role="button"
-                    [attr.aria-pressed]="playerForm.get('shoots')?.value === option.value"
-                  >
-                    <span class="shoots-name">{{ option.label }}</span>
-                  </div>
-                }
-              </div>
-            </div>
+            </app-card-grid>
+            <div class="error-slot"></div>
           </div>
         </div>
       </form>
@@ -229,15 +126,11 @@
 
   <div class="modal-actions">
     <app-button
-      [bg]="'transparent'"
-      [bghover]="'button_background'"
+      [bg]="'background'"
+      [bghover]="'item_hover'"
       [br]="'border'"
       [color]="'text_primary'"
       [colorhover]="'text_primary'"
-      [opacity]="1"
-      [opacityhover]="1"
-      [width]="'auto'"
-      [rounded]="false"
       [haveContent]="true"
       materialIcon="cancel"
       (clicked)="onCancel()"
@@ -252,10 +145,6 @@
         [bghover]="'green'"
         [color]="'white'"
         [colorhover]="'white'"
-        [opacity]="1"
-        [opacityhover]="1"
-        [width]="'auto'"
-        [rounded]="false"
         [haveContent]="true"
         (clicked)="onSubmitSelected()"
       >
@@ -272,10 +161,6 @@
         [bghover]="'green'"
         [color]="'white'"
         [colorhover]="'white'"
-        [opacity]="1"
-        [opacityhover]="1"
-        [width]="'auto'"
-        [rounded]="false"
         [haveContent]="true"
         (clicked)="onSubmitNew()"
       >

@@ -2,14 +2,14 @@ import { Component, inject, signal, computed } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ModalEvent, ModalService } from '../../../services/modal.service';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
-import { MatDividerModule } from '@angular/material/divider';
+import { SectionHeaderComponent } from '../section-header/section-header.component';
 import { Team } from '../../interfaces/team.interface';
 import { Analysis, AnalyticsApiIn } from '../../interfaces/analysis.interface';
 import { ButtonComponent } from '../buttons/button/button.component';
 import { ButtonLoadingComponent } from '../buttons/button-loading/button-loading.component';
+import { FormFieldComponent } from '../form-field/form-field.component';
+import { CustomSelectComponent, SelectOption } from '../custom-select/custom-select.component';
+import { getFieldError } from '../../validators/form-error.util';
 
 export interface TeamAnalysisModalData {
   analysis?: Analysis;
@@ -22,12 +22,11 @@ export interface TeamAnalysisModalData {
   selector: 'app-team-analysis-modal',
   imports: [
     ReactiveFormsModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
-    MatDividerModule,
+    SectionHeaderComponent,
     ButtonComponent,
     ButtonLoadingComponent,
+    FormFieldComponent,
+    CustomSelectComponent,
   ],
   templateUrl: './team-analysis.modal.html',
   styleUrl: './team-analysis.modal.scss',
@@ -42,24 +41,21 @@ export class TeamAnalysisModal {
   isSubmitting = signal(false);
 
   allTeams = signal<Team[]>([]);
-  searchText = signal('');
-  selectedEntityId = signal('');
 
-  filteredTeams = computed(() => {
-    const teams = this.allTeams();
-    const search = this.searchText().toLowerCase();
-    if (!search) return teams;
-    return teams.filter((t) => t.name.toLowerCase().includes(search));
-  });
+  teamOptions = computed<SelectOption[]>(() =>
+    this.allTeams().map((t) => ({ value: String(t.id), label: t.name }))
+  );
 
   isEntityLocked = computed(() => !!this.data.preSelectedTeamId || this.isEditMode);
 
   selectedTeamLabel = computed(() => {
     const entityId = this.selectedEntityId();
     if (!entityId) return '';
-    const team = this.allTeams().find((t) => t.id === entityId);
+    const team = this.allTeams().find((t) => String(t.id) === entityId);
     return team ? team.name : '';
   });
+
+  private selectedEntityId = signal('');
 
   constructor() {
     this.isEditMode = this.data.isEditMode;
@@ -77,6 +73,7 @@ export class TeamAnalysisModal {
       .valueChanges.pipe(takeUntilDestroyed())
       .subscribe((value: string) => this.selectedEntityId.set(value));
 
+    this.modalService.registerDirtyCheck(() => this.analysisForm.dirty);
     this.modalService.onEvent$.pipe(takeUntilDestroyed()).subscribe((event) => {
       if (event === ModalEvent.StopButtonLoading) {
         this.isSubmitting.set(false);
@@ -84,22 +81,6 @@ export class TeamAnalysisModal {
     });
 
     this.patchFormValues();
-  }
-
-  onSelectOpenedChange(opened: boolean): void {
-    if (!opened) {
-      this.searchText.set('');
-    }
-  }
-
-  onSearchInput(event: Event): void {
-    this.searchText.set((event.target as HTMLInputElement).value);
-  }
-
-  clearSearch(input: HTMLInputElement): void {
-    this.searchText.set('');
-    input.value = '';
-    input.focus();
   }
 
   onSubmit(): void {
@@ -130,20 +111,18 @@ export class TeamAnalysisModal {
     this.modalService.closeModal();
   }
 
+  private readonly fieldLabels: Record<string, string> = {
+    entityId: 'Team',
+    title: 'Title',
+    author: 'Author',
+    analysis: 'Analysis',
+  };
+
   getErrorMessage(fieldName: string): string {
-    const control = this.analysisForm.get(fieldName);
-    if (control?.errors && control.touched) {
-      if (control.errors['required']) {
-        const labels: Record<string, string> = {
-          entityId: 'Team',
-          title: 'Title',
-          author: 'Author',
-          analysis: 'Analysis',
-        };
-        return `${labels[fieldName] || fieldName} is required`;
-      }
-    }
-    return '';
+    return getFieldError(
+      this.analysisForm.get(fieldName),
+      this.fieldLabels[fieldName] || fieldName
+    );
   }
 
   private patchFormValues(): void {

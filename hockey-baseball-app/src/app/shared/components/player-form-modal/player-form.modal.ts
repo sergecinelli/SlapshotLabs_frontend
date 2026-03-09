@@ -1,11 +1,10 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
-import { MatIconModule } from '@angular/material/icon';
-import { MatDividerModule } from '@angular/material/divider';
+import { SectionHeaderComponent } from '../section-header/section-header.component';
+import { FormFieldComponent } from '../form-field/form-field.component';
+import { CardGridComponent } from '../card-grid/card-grid.component';
+import { CardGridItemComponent } from '../card-grid/card-grid-item.component';
 import { forkJoin, of } from 'rxjs';
 import { Player } from '../../interfaces/player.interface';
 import { Team } from '../../interfaces/team.interface';
@@ -13,7 +12,9 @@ import { TeamService } from '../../../services/team.service';
 import { PositionService, PositionOption } from '../../../services/position.service';
 import { ButtonComponent } from '../buttons/button/button.component';
 import { ButtonLoadingComponent } from '../buttons/button-loading/button-loading.component';
+import { LoadingSpinnerComponent } from '../loading-spinner/loading-spinner.component';
 import { ModalService, ModalEvent } from '../../../services/modal.service';
+import { getFieldError } from '../../validators/form-error.util';
 
 export interface PlayerFormModalData {
   player?: Player;
@@ -33,13 +34,13 @@ export interface TeamOption {
   selector: 'app-player-form-modal',
   imports: [
     ReactiveFormsModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
-    MatIconModule,
-    MatDividerModule,
+    SectionHeaderComponent,
+    FormFieldComponent,
+    CardGridComponent,
+    CardGridItemComponent,
     ButtonComponent,
     ButtonLoadingComponent,
+    LoadingSpinnerComponent,
   ],
   templateUrl: './player-form.modal.html',
   styleUrl: './player-form.modal.scss',
@@ -60,7 +61,6 @@ export class PlayerFormModal implements OnInit {
     { value: 'Right Shot', label: 'Right Shot' },
     { value: 'Left Shot', label: 'Left Shot' },
   ];
-
   positionOptions: PositionOption[] = [];
   teamOptions: TeamOption[] = [];
 
@@ -70,6 +70,7 @@ export class PlayerFormModal implements OnInit {
     this.isEditMode = data.isEditMode;
     this.playerForm = this.createForm();
 
+    this.modalService.registerDirtyCheck(() => this.playerForm.dirty);
     this.modalService.onEvent$.pipe(takeUntilDestroyed()).subscribe((event) => {
       if (event === ModalEvent.StopButtonLoading) {
         this.isSubmitting.set(false);
@@ -258,46 +259,41 @@ export class PlayerFormModal implements OnInit {
     }
   }
 
+  onPositionSelected(value: string): void {
+    this.playerForm.patchValue({ position: value });
+  }
+
+  onShootsSelected(value: string): void {
+    this.playerForm.patchValue({ shoots: value });
+  }
+
   onCancel(): void {
     this.modalService.closeModal();
   }
 
+  private readonly fieldLabels: Record<string, string> = {
+    team: 'Team',
+    birthYear: 'Birth Year',
+    jerseyNumber: 'Number',
+    firstName: 'First Name',
+    lastName: 'Last Name',
+    position: 'Position',
+    height: 'Height',
+    weight: 'Weight',
+    shoots: 'Shoots',
+    birthplace: 'Birthplace',
+    addressCountry: 'Country',
+    addressRegion: 'State/Province',
+    addressCity: 'City',
+    addressStreet: 'Street Address',
+    addressPostalCode: 'Postal Code',
+    playerBiography: 'Player Biography',
+    analysis: 'Analysis',
+  };
+
   getErrorMessage(fieldName: string): string {
     const control = this.playerForm.get(fieldName);
-    if (control?.errors && control.touched) {
-      if (control.errors['required']) {
-        return `${this.getFieldLabel(fieldName)} is required`;
-      }
-      if (control.errors['min']) {
-        return `${this.getFieldLabel(fieldName)} must be at least ${control.errors['min'].min}`;
-      }
-      if (control.errors['max']) {
-        return `${this.getFieldLabel(fieldName)} must be no more than ${control.errors['max'].max}`;
-      }
-    }
-    return '';
-  }
-
-  private getFieldLabel(fieldName: string): string {
-    const labels: Record<string, string> = {
-      team: 'Team',
-      birthYear: 'Birth Year',
-      jerseyNumber: 'Number',
-      firstName: 'First Name',
-      lastName: 'Last Name',
-      position: 'Position',
-      height: 'Height',
-      weight: 'Weight',
-      shoots: 'Shoots',
-      birthplace: 'Birthplace',
-      addressCountry: 'Country',
-      addressRegion: 'State/Province',
-      addressCity: 'City',
-      addressStreet: 'Street Address',
-      addressPostalCode: 'Postal Code',
-      playerBiography: 'Player Biography',
-      analysis: 'Analysis',
-    };
-    return labels[fieldName] || fieldName;
+    const label = this.fieldLabels[fieldName] || fieldName;
+    return getFieldError(control, label);
   }
 }

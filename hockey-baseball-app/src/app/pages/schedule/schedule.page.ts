@@ -44,6 +44,7 @@ import { tap } from 'rxjs/operators';
 import { convertGMTToLocal, formatDateForDisplay } from '../../shared/utils/time-converter.util';
 import { BreadcrumbActionsDirective } from '../../shared/directives/breadcrumb-actions.directive';
 import { BreadcrumbCenterDirective } from '../../shared/directives/breadcrumb-center.directive';
+import { LoadingSpinnerComponent } from '../../shared/components/loading-spinner/loading-spinner.component';
 
 @Component({
   selector: 'app-schedule',
@@ -57,6 +58,7 @@ import { BreadcrumbCenterDirective } from '../../shared/directives/breadcrumb-ce
     GameCardComponent,
     BreadcrumbActionsDirective,
     BreadcrumbCenterDirective,
+    LoadingSpinnerComponent,
   ],
   templateUrl: './schedule.page.html',
   styleUrl: './schedule.page.scss',
@@ -553,7 +555,7 @@ export class SchedulePage implements OnInit {
     this.modalService.openModal(ScheduleFormModal, {
       name: 'Edit Game',
       icon: 'event',
-      width: '800px',
+      width: '900px',
       maxWidth: '95vw',
       data: {
         schedule: schedule,
@@ -750,7 +752,7 @@ export class SchedulePage implements OnInit {
     this.modalService.openModal(ScheduleFormModal, {
       name: 'Add Game',
       icon: 'event',
-      width: '800px',
+      width: '900px',
       maxWidth: '95vw',
       data: {
         isEditMode: false,

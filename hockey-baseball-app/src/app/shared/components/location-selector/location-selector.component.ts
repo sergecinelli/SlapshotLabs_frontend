@@ -1,8 +1,8 @@
 import { Component, forwardRef, input, output, effect } from '@angular/core';
 
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { MatDividerModule } from '@angular/material/divider';
 import { CachedSrcDirective } from '../../directives/cached-src.directive';
+import { SectionHeaderComponent } from '../section-header/section-header.component';
 
 export interface PuckLocation {
   x: number; // 0-1000
@@ -17,7 +17,7 @@ export interface Team {
 
 @Component({
   selector: 'app-location-selector',
-  imports: [CachedSrcDirective, MatDividerModule],
+  imports: [CachedSrcDirective, SectionHeaderComponent],
   templateUrl: './location-selector.component.html',
   styleUrl: './location-selector.component.scss',
   providers: [
@@ -29,8 +29,7 @@ export interface Team {
   ],
 })
 export class LocationSelectorComponent implements ControlValueAccessor {
-  showTitle = input(true);
-  showDivider = input(true);
+  showHeader = input(true);
   title = input('Set Location');
   imageUrl = input('/assets/images/hockey-rink.svg');
   maxWidth = input('100%');

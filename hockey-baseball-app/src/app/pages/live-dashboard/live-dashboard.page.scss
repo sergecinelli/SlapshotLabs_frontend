@@ -1,23 +1,4 @@
 @use '../../shared/styles/dashboard-card.scss' as *;
-@use 'sass:map';
-
-// Helper function to convert colors from colors.ts to rgba with opacity
-// Colors from colors.ts:
-// primary/live: #CF142B = rgb(207, 20, 43)
-// white: #ffffff = rgb(255, 255, 255)
-// black: #0f0f0f = rgb(15, 15, 15)
-@function rgba-from-color($color-name, $opacity) {
-  $colors: (
-    'primary': rgba(207, 20, 43, $opacity),
-    'live': rgba(207, 20, 43, $opacity),
-    'white': rgba(255, 255, 255, $opacity),
-    'black': rgba(15, 15, 15, $opacity),
-    'upcoming': rgba(34, 169, 242, $opacity),
-    'completed': rgba(34, 169, 242, $opacity),
-    'gray': rgba(135, 135, 135, $opacity),
-  );
-  @return map.get($colors, $color-name);
-}
 
 // Material Design Live Dashboard Cards - using shared dashboard-card styles
 .live-dashboard-card {
@@ -58,6 +39,13 @@
 
 .live-dashboard-actions-wrapper {
   padding: 10px 0;
+
+  .live-dashboard-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 5px;
+  }
 }
 
 // Teams Section (reusing Schedule styles)
@@ -88,7 +76,7 @@
     }
 
     .team-score-wrapper {
-      background-color: rgba-from-color('primary', 0.15);
+      background-color: color-mix(in srgb, var(--primary) 15%, transparent);
     }
   }
 
@@ -124,7 +112,7 @@
   height: 60px;
   border-radius: 10px;
   object-fit: cover;
-  background: var(--white);
+  background: var(--gray-tone3);
   flex-shrink: 0;
   align-self: flex-start;
   margin-top: 2px;
@@ -239,8 +227,8 @@
 
   &.winning-home,
   &.winning-away {
-    background-color: rgba-from-color('primary', 0.1);
-    border: 2px solid rgba-from-color('primary', 0.3);
+    background-color: color-mix(in srgb, var(--primary) 10%, transparent);
+    border: 2px solid color-mix(in srgb, var(--primary) 30%, transparent);
   }
 }
 
@@ -280,7 +268,7 @@
 .live-dashboard-card-header {
   padding: 20px;
   border-bottom: 1px solid var(--border-light);
-  background-color: var(--white);
+  background-color: var(--card-background);
   display: flex;
   align-items: center;
   min-height: 60px;
@@ -342,7 +330,7 @@
   }
 
   &:hover {
-    background-color: rgba(0, 0, 0, 0.04);
+    background-color: color-mix(in srgb, var(--text-primary) 6%, transparent);
   }
 }
 
@@ -351,32 +339,32 @@
   height: 10px;
   border-radius: 50%;
   flex-shrink: 0;
-  border: 2px solid rgba(255, 255, 255, 0.8);
+  border: 2px solid color-mix(in srgb, var(--white) 80%, transparent);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 
   &.dot-goal {
-    background-color: #22c55e;
+    background-color: var(--green);
   }
   &.dot-save {
-    background-color: #3b82f6;
+    background-color: var(--blue);
   }
   &.dot-missed {
-    background-color: #64748b;
+    background-color: var(--secondary);
   }
   &.dot-blocked {
-    background-color: #06b6d4;
+    background-color: var(--cyan);
   }
   &.dot-faceoff {
-    background-color: #ec4899;
+    background-color: var(--pink);
   }
   &.dot-turnover {
-    background-color: #8b5cf6;
+    background-color: var(--violet);
   }
   &.dot-penalty {
-    background-color: #ef4444;
+    background-color: var(--danger);
   }
   &.dot-goalieChange {
-    background-color: #f59e0b;
+    background-color: var(--orange);
   }
 }
 
@@ -424,7 +412,7 @@
 
   &:hover {
     color: var(--text-primary);
-    background-color: rgba(0, 0, 0, 0.04);
+    background-color: color-mix(in srgb, var(--text-primary) 6%, transparent);
   }
 }
 
@@ -446,10 +434,10 @@
   align-items: center;
   gap: 8px;
   padding: 8px 16px;
-  border-bottom: 1px solid var(--border-color, rgba(0, 0, 0, 0.12));
+  border-bottom: 1px solid var(--border);
   position: sticky;
   top: 0;
-  background: var(--surface-color, #fff);
+  background: var(--card-background);
   z-index: 1;
 }
 
@@ -496,7 +484,7 @@
   align-items: center;
   gap: 24px;
   margin-bottom: 0;
-  background: var(--background-invert);
+  background: var(--dark-tone2);
   border-bottom: 2px solid var(--border-light);
 
   @media (max-width: 768px) {
@@ -550,7 +538,7 @@
 .tournament-category {
   font-size: 13px;
   font-weight: 500;
-  color: rgba-from-color('white', 0.8);
+  color: color-mix(in srgb, var(--white) 80%, transparent);
   line-height: 1.4;
   white-space: nowrap;
 }
@@ -584,15 +572,15 @@
 
   // Darker style for arena info (second item)
   &:nth-child(2) {
-    color: rgba-from-color('white', 0.75);
+    color: color-mix(in srgb, var(--white) 75%, transparent);
 
     .tournament-info-icon {
-      color: rgba-from-color('white', 0.75);
+      color: color-mix(in srgb, var(--white) 75%, transparent);
       opacity: 1;
     }
 
     .tournament-info-text {
-      color: rgba-from-color('white', 0.75);
+      color: color-mix(in srgb, var(--white) 75%, transparent);
     }
   }
 }
@@ -664,7 +652,7 @@
   height: 40px;
   border-radius: 8px;
   object-fit: cover;
-  background: var(--white);
+  background: var(--card-background);
   border: 1px solid var(--border-light);
   flex-shrink: 0;
   box-shadow:
@@ -710,12 +698,12 @@
 }
 
 .live-dashboard-table-body {
-  background: var(--white);
+  background: var(--card-background);
 }
 
 .live-dashboard-table-row {
   border-bottom: 1px solid var(--border-light);
-  background: var(--white);
+  background: var(--card-background);
 
   &:hover {
     background: var(--gray-tone3);
@@ -726,7 +714,7 @@
   }
 
   &.live-dashboard-goal-row {
-    background-color: rgba-from-color('primary', 0.06);
+    background-color: color-mix(in srgb, var(--primary) 6%, transparent);
     border-left: 3px solid var(--primary);
 
     .live-dashboard-table-td {
@@ -735,7 +723,7 @@
     }
 
     &:hover {
-      background-color: rgba-from-color('primary', 0.1);
+      background-color: color-mix(in srgb, var(--primary) 10%, transparent);
     }
   }
 }
@@ -770,7 +758,7 @@
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: var(--white);
+  background: var(--card-background);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -905,12 +893,6 @@
   padding: 48px 24px;
 }
 
-.live-dashboard-loading-text {
-  color: var(--text-secondary);
-  font-size: 14px;
-  font-weight: 500;
-}
-
 .stat-increment-btn {
   width: 60px;
   height: 32px;
@@ -920,7 +902,7 @@
   justify-content: center;
   cursor: pointer;
   border: none;
-  background: var(--white);
+  background: var(--card-background);
   padding: 0;
   border-radius: 4px;
 
@@ -951,7 +933,7 @@
   justify-content: center;
   cursor: pointer;
   border: none;
-  background: var(--white);
+  background: var(--card-background);
   padding: 0;
   border-radius: 4px;
 
@@ -978,7 +960,7 @@
   font-size: 16px;
   font-weight: 600;
   background-color: var(--blue);
-  color: white;
+  color: var(--text-white);
   border-radius: 4px;
   cursor: pointer;
   transition: background-color 0.2s ease;
@@ -1027,7 +1009,7 @@
 
   mat-icon,
   .material-symbols-rounded {
-    color: rgba-from-color('black', 0.26) !important;
+    color: color-mix(in srgb, var(--black) 26%, transparent) !important;
   }
 }
 

@@ -5,12 +5,13 @@
   overflow: hidden;
 
   .loading-state {
-    background-color: white;
+    background-color: var(--card-background);
     border-radius: var(--radius);
+    border: 1px solid var(--border-light);
   }
 
   .table-wrapper {
-    background-color: white;
+    background-color: var(--card-background);
     border-radius: var(--radius);
     overflow-x: auto;
     overflow-y: hidden;
@@ -20,16 +21,16 @@
     }
 
     &::-webkit-scrollbar-track {
-      background-color: #f1f5f9;
+      background-color: var(--border-light);
       border-radius: 4px;
     }
 
     &::-webkit-scrollbar-thumb {
-      background-color: #cbd5e1;
+      background-color: var(--secondary-tone1);
       border-radius: 4px;
 
       &:hover {
-        background-color: #94a3b8;
+        background-color: var(--secondary);
       }
     }
 
@@ -48,11 +49,12 @@
 
       .custom-header {
         .mat-mdc-header-cell {
-          @apply bg-gray-200 border-0;
+          background-color: var(--gray-tone3);
+          border: 0;
           font-family: 'Inter', sans-serif !important;
           font-size: 13px !important;
           font-weight: 600 !important;
-          color: #374151 !important;
+          color: var(--text-primary) !important;
           letter-spacing: -0.01em;
 
           * {
@@ -78,7 +80,7 @@
 
         &:hover {
           .mat-mdc-cell {
-            background-color: #f9fafb !important;
+            background-color: var(--item-hover) !important;
           }
         }
       }
@@ -87,8 +89,8 @@
         font-family: 'Inter', sans-serif !important;
         font-size: 13px !important;
         line-height: 1.5 !important;
-        color: #1f2937 !important;
-        border-bottom: 1px solid #e5e7eb !important;
+        color: var(--text-primary) !important;
+        border-bottom: 1px solid var(--border) !important;
         padding: 10px 16px !important;
         white-space: nowrap;
         overflow: hidden;
@@ -301,13 +303,13 @@
 
           .team-info {
             font-size: 12px;
-            color: #6b7280;
+            color: var(--text-secondary);
             margin-bottom: 2px;
           }
 
           .team-goalie {
             font-size: 12px;
-            color: #6b7280;
+            color: var(--text-secondary);
 
             .goalie-name-link {
               color: inherit;
@@ -334,7 +336,7 @@
 
           .arena-address {
             font-size: 12px;
-            color: #6b7280;
+            color: var(--text-secondary);
             margin-bottom: 2px;
           }
         }
@@ -391,21 +393,21 @@
 
         &.mat-mdc-button {
           &.mat-primary {
-            background-color: var(--color-primary) !important;
-            color: white !important;
+            background-color: var(--primary) !important;
+            color: var(--text-white) !important;
           }
 
           &.mat-warn {
-            background-color: #ef4444 !important;
-            color: white !important;
+            background-color: var(--danger) !important;
+            color: var(--text-white) !important;
           }
 
           &:not(.mat-primary):not(.mat-warn) {
-            background-color: #f3f4f6 !important;
-            color: #374151 !important;
+            background-color: var(--button-background) !important;
+            color: var(--text-primary) !important;
 
             &:hover {
-              background-color: #e5e7eb !important;
+              background-color: var(--border) !important;
             }
           }
         }
@@ -431,7 +433,7 @@
   }
 
   .empty-state {
-    background-color: white;
+    background-color: var(--card-background);
     border-radius: var(--radius);
   }
 
@@ -446,18 +448,18 @@
     min-width: 80px;
 
     &.game-in-progress {
-      background-color: #fef3c7;
-      color: #92400e;
+      background-color: color-mix(in srgb, var(--orange) 15%, var(--background));
+      color: var(--orange);
     }
 
     &.not-started {
-      background-color: #e5e7eb;
-      color: #374151;
+      background-color: var(--border);
+      color: var(--text-primary);
     }
 
     &.game-over {
-      background-color: #d1fae5;
-      color: #065f46;
+      background-color: var(--green-soft);
+      color: var(--green-dark);
     }
   }
 
@@ -469,28 +471,28 @@
     display: inline-block;
 
     &.regular-season {
-      background-color: #dbeafe;
-      color: #1e40af;
+      background-color: var(--blue-soft);
+      color: var(--blue-dark);
     }
 
     &.playoff {
-      background-color: #fce7f3;
-      color: #be185d;
+      background-color: color-mix(in srgb, var(--pink) 15%, var(--background));
+      color: var(--pink);
     }
 
     &.tournament {
-      background-color: #f3e8ff;
-      color: #7c3aed;
+      background-color: color-mix(in srgb, var(--violet) 15%, var(--background));
+      color: var(--violet);
     }
 
     &.exhibition {
-      background-color: #fef3c7;
-      color: #92400e;
+      background-color: color-mix(in srgb, var(--orange) 15%, var(--background));
+      color: var(--orange);
     }
 
     &.summer-league {
-      background-color: #d1fae5;
-      color: #065f46;
+      background-color: var(--green-soft);
+      color: var(--green-dark);
     }
   }
 }

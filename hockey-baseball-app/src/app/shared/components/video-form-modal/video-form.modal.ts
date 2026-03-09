@@ -4,10 +4,10 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { ModalService, ModalEvent } from '../../../services/modal.service';
 import { ButtonComponent } from '../buttons/button/button.component';
 import { ButtonLoadingComponent } from '../buttons/button-loading/button-loading.component';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatIconModule } from '@angular/material/icon';
-import { MatDividerModule } from '@angular/material/divider';
+import { SectionHeaderComponent } from '../section-header/section-header.component';
+import { FormFieldComponent } from '../form-field/form-field.component';
+import { youtubeUrlValidator } from '../../validators/url.validator';
+import { getFieldError } from '../../validators/form-error.util';
 import { Video } from '../../interfaces/video.interface';
 
 export interface VideoFormModalData {
@@ -21,10 +21,8 @@ export interface VideoFormModalData {
     ReactiveFormsModule,
     ButtonComponent,
     ButtonLoadingComponent,
-    MatFormFieldModule,
-    MatInputModule,
-    MatIconModule,
-    MatDividerModule,
+    SectionHeaderComponent,
+    FormFieldComponent,
   ],
   templateUrl: './video-form.modal.html',
   styleUrl: './video-form.modal.scss',
@@ -42,6 +40,7 @@ export class VideoFormModal implements OnInit {
     this.isEditMode = this.data.isEditMode;
     this.videoForm = this.createForm();
 
+    this.modalService.registerDirtyCheck(() => this.videoForm.dirty);
     this.modalService.onEvent$.pipe(takeUntilDestroyed()).subscribe((event) => {
       if (event === ModalEvent.StopButtonLoading) {
         this.isSubmitting.set(false);
@@ -59,21 +58,8 @@ export class VideoFormModal implements OnInit {
     return this.fb.group({
       name: ['', [Validators.required, Validators.maxLength(255)]],
       description: ['', [Validators.required, Validators.maxLength(1000)]],
-      youtube_link: ['', [Validators.required, this.youtubeUrlValidator]],
+      youtube_link: ['', [Validators.required, youtubeUrlValidator]],
     });
-  }
-
-  /**
-   * Custom validator for YouTube URLs
-   */
-  private youtubeUrlValidator(control: { value: string }) {
-    if (!control.value) {
-      return null;
-    }
-
-    const youtubeRegex =
-      /^(https?:\/\/)?(www\.)?(youtube\.com\/(watch\?v=|embed\/|shorts\/)|youtu\.be\/)[\w-]+(\?[^\s]*)?$/;
-    return youtubeRegex.test(control.value) ? null : { invalidYoutubeUrl: true };
   }
 
   private populateForm(video: Video): void {
@@ -85,55 +71,33 @@ export class VideoFormModal implements OnInit {
   }
 
   onSubmit(): void {
-    if (this.videoForm.valid) {
-      const formValue = this.videoForm.value;
-      this.isSubmitting.set(true);
-      this.modalService.closeWithDataProcessing({
-        name: formValue.name,
-        description: formValue.description,
-        youtube_link: formValue.youtube_link,
+    if (this.videoForm.invalid) {
+      Object.keys(this.videoForm.controls).forEach((key) => {
+        this.videoForm.get(key)?.markAsTouched();
       });
+      return;
     }
+
+    const formValue = this.videoForm.value;
+    this.isSubmitting.set(true);
+    this.modalService.closeWithDataProcessing({
+      name: formValue.name,
+      description: formValue.description,
+      youtube_link: formValue.youtube_link,
+    });
   }
 
   onCancel(): void {
     this.modalService.closeModal();
   }
 
-  get name() {
-    return this.videoForm.get('name');
-  }
-
-  get description() {
-    return this.videoForm.get('description');
-  }
-
-  get youtube_link() {
-    return this.videoForm.get('youtube_link');
-  }
+  private readonly fieldLabels: Record<string, string> = {
+    name: 'Video Name',
+    description: 'Description',
+    youtube_link: 'YouTube Link',
+  };
 
   getErrorMessage(field: string): string {
-    const control = this.videoForm.get(field);
-
-    if (!control || !control.errors) {
-      return '';
-    }
-
-    if (control.hasError('required')) {
-      const fieldName =
-        field === 'youtube_link' ? 'YouTube link' : field.charAt(0).toUpperCase() + field.slice(1);
-      return `${fieldName} is required`;
-    }
-
-    if (control.hasError('maxlength')) {
-      const maxLength = control.errors['maxlength'].requiredLength;
-      return `Cannot exceed ${maxLength} characters`;
-    }
-
-    if (control.hasError('invalidYoutubeUrl')) {
-      return 'Please enter a valid YouTube URL';
-    }
-
-    return 'Invalid field';
+    return getFieldError(this.videoForm.get(field), this.fieldLabels[field] || field);
   }
 }

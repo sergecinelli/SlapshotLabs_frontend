@@ -17,8 +17,8 @@
   </div>
   <app-button-loading
     materialIcon="bar_chart"
-    [bg]="'upcoming'"
-    [bghover]="'upcoming_dark'"
+    [bg]="'cyan'"
+    [bghover]="'cyan_dark'"
     [color]="'white'"
     [colorhover]="'white'"
     [haveContent]="true"
@@ -32,8 +32,10 @@
 <div class="goalie-profile-page" [appVisibilityMap]="visibilityByRoleMap">
   <!-- Loading State -->
   @if (loading) {
-    <div class="loading-container">
-      <p>Loading goalie profile...</p>
+    <div class="dashboard-card">
+      <div class="dashboard-card-content">
+        <app-loading-spinner message="Loading goalie profile..." size="sm" />
+      </div>
     </div>
   }
 

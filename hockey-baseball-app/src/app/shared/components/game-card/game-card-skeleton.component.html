@@ -1,145 +1,75 @@
-<div class="game-card-skeleton-container">
-  <!-- Current and Upcoming Games Skeleton -->
-  <div class="game-card-skeleton-section">
-    <div class="game-card-skeleton-cards-container">
-      @for (item of [].constructor(0); track $index) {
-        <div class="game-card-skeleton-card">
-          <!-- Card Header Skeleton -->
-          <div class="game-card-header">
-            <div class="header-left">
-              <div class="game-date-time-row">
-                <div class="date-time-item">
-                  <div class="skeleton-icon"></div>
-                  <div class="skeleton-date"></div>
-                </div>
-                <div class="date-time-item">
-                  <div class="skeleton-icon"></div>
-                  <div class="skeleton-time"></div>
-                </div>
-              </div>
-              <div class="game-type-info">
-                <div class="skeleton-game-type"></div>
-              </div>
+<div class="game-card-skeleton-cards-container">
+  @for (item of [].constructor(count()); track $index) {
+    <div class="game-card-skeleton-card">
+      <!-- Card Header Skeleton -->
+      <div class="game-card-header">
+        <div class="header-left">
+          <div class="game-date-time-row">
+            <div class="date-time-item">
+              <div class="skeleton-icon"></div>
+              <div class="skeleton-date"></div>
             </div>
-            <div class="header-right">
-              <div class="game-status-row">
-                <div class="skeleton-status-badge"></div>
-              </div>
-              <div class="venue-info">
-                <div class="skeleton-venue-name"></div>
-                <div class="skeleton-venue-location"></div>
-              </div>
+            <div class="date-time-item">
+              <div class="skeleton-icon"></div>
+              <div class="skeleton-time"></div>
             </div>
           </div>
+          <div class="game-type-info">
+            <div class="skeleton-game-type"></div>
+          </div>
+        </div>
+        <div class="header-right">
+          <div class="game-status-row">
+            <div class="skeleton-status-badge"></div>
+          </div>
+          <div class="venue-info">
+            <div class="skeleton-venue-name"></div>
+            <div class="skeleton-venue-location"></div>
+          </div>
+        </div>
+      </div>
 
-          <!-- Teams Section Skeleton -->
-          <div class="game-teams-section">
-            <!-- Left Team Skeleton -->
-            <div class="team-section team-section-left">
-              <div class="team-info team-info-left">
-                <div class="team-name-group">
-                  <div class="skeleton-team-name"></div>
-                  <div class="skeleton-team-location"></div>
-                  <div class="skeleton-team-goalie"></div>
-                </div>
-                <div class="skeleton-logo"></div>
-              </div>
+      <!-- Teams Section Skeleton -->
+      <div class="game-teams-section">
+        <!-- Left Team Skeleton -->
+        <div class="team-section team-section-left">
+          <div class="team-info team-info-left">
+            <div class="team-name-group">
+              <div class="skeleton-team-name"></div>
+              <div class="skeleton-team-location"></div>
+              <div class="skeleton-team-goalie"></div>
             </div>
+            <div class="skeleton-logo"></div>
+          </div>
+        </div>
 
-            <!-- Center Separator Skeleton -->
-            <div class="score-center-container">
-              <div class="skeleton-separator"></div>
+        <!-- Center Score/Separator Skeleton -->
+        <div class="score-center-container">
+          @if (showScore()) {
+            <div class="skeleton-score-wrapper">
+              <div class="skeleton-score"></div>
             </div>
+            <div class="skeleton-separator"></div>
+            <div class="skeleton-score-wrapper">
+              <div class="skeleton-score"></div>
+            </div>
+          } @else {
+            <div class="skeleton-separator"></div>
+          }
+        </div>
 
-            <!-- Right Team Skeleton -->
-            <div class="team-section team-section-right">
-              <div class="team-info team-info-right">
-                <div class="skeleton-logo"></div>
-                <div class="team-name-group">
-                  <div class="skeleton-team-name"></div>
-                  <div class="skeleton-team-location"></div>
-                  <div class="skeleton-team-goalie"></div>
-                </div>
-              </div>
+        <!-- Right Team Skeleton -->
+        <div class="team-section team-section-right">
+          <div class="team-info team-info-right">
+            <div class="skeleton-logo"></div>
+            <div class="team-name-group">
+              <div class="skeleton-team-name"></div>
+              <div class="skeleton-team-location"></div>
+              <div class="skeleton-team-goalie"></div>
             </div>
           </div>
         </div>
-      }
+      </div>
     </div>
-  </div>
-
-  <!-- Game Results Skeleton -->
-  <div class="game-card-skeleton-section">
-    <div class="game-card-skeleton-cards-container">
-      @for (item of [].constructor(2); track $index) {
-        <div class="game-card-skeleton-card">
-          <!-- Card Header Skeleton -->
-          <div class="game-card-header">
-            <div class="header-left">
-              <div class="game-date-time-row">
-                <div class="date-time-item">
-                  <div class="skeleton-icon"></div>
-                  <div class="skeleton-date"></div>
-                </div>
-                <div class="date-time-item">
-                  <div class="skeleton-icon"></div>
-                  <div class="skeleton-time"></div>
-                </div>
-              </div>
-              <div class="game-type-info">
-                <div class="skeleton-game-type"></div>
-              </div>
-            </div>
-            <div class="header-right">
-              <div class="game-status-row">
-                <div class="skeleton-status-badge"></div>
-              </div>
-              <div class="venue-info">
-                <div class="skeleton-venue-name"></div>
-                <div class="skeleton-venue-location"></div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Teams Section Skeleton -->
-          <div class="game-teams-section">
-            <!-- Left Team Skeleton -->
-            <div class="team-section team-section-left">
-              <div class="team-info team-info-left">
-                <div class="team-name-group">
-                  <div class="skeleton-team-name"></div>
-                  <div class="skeleton-team-location"></div>
-                  <div class="skeleton-team-goalie"></div>
-                </div>
-                <div class="skeleton-logo"></div>
-              </div>
-            </div>
-
-            <!-- Center Score Skeleton -->
-            <div class="score-center-container">
-              <div class="skeleton-score-wrapper">
-                <div class="skeleton-score"></div>
-              </div>
-              <div class="skeleton-separator"></div>
-              <div class="skeleton-score-wrapper">
-                <div class="skeleton-score"></div>
-              </div>
-            </div>
-
-            <!-- Right Team Skeleton -->
-            <div class="team-section team-section-right">
-              <div class="team-info team-info-right">
-                <div class="skeleton-logo"></div>
-                <div class="team-name-group">
-                  <div class="skeleton-team-name"></div>
-                  <div class="skeleton-team-location"></div>
-                  <div class="skeleton-team-goalie"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      }
-    </div>
-  </div>
+  }
 </div>

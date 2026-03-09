@@ -1,4 +1,5 @@
 @use '../../shared/styles/variables' as *;
+@use '../../shared/styles/entity-card';
 
 // Header
 .schedules-header {
@@ -36,17 +37,17 @@
   gap: 10px;
 }
 
-// Loading and Empty States
-.schedules-loading,
+// Empty State
 .schedules-empty {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 48px 24px;
-  min-height: 200px;
+  padding: 32px 24px;
+  background-color: var(--card-background);
+  border-radius: var(--radius);
+  border: 1px solid var(--border-light);
 }
 
-.loading-text,
 .empty-text {
   color: var(--text-secondary);
   font-size: 16px;
@@ -70,7 +71,7 @@
 .schedules-table-container {
   overflow-x: auto;
   border-radius: $table-container-border-radius;
-  background: var(--white);
+  background: var(--card-background);
   border: 1px solid var(--border-light);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
   margin-top: 20px;
@@ -78,7 +79,7 @@
 
 // Game Card
 .game-card {
-  background: var(--white);
+  background: var(--card-background);
   border-radius: $card-border-radius;
   border: 1px solid var(--border-light);
   padding: 20px;
@@ -121,18 +122,18 @@
   letter-spacing: 0.5px;
 
   &.status-upcoming {
-    background-color: #dbeafe;
-    color: #1d4ed8;
+    background-color: var(--blue-soft);
+    color: var(--blue);
   }
 
   &.status-live {
-    background-color: #fee2e2;
-    color: #dc2626;
+    background-color: var(--danger-soft);
+    color: var(--danger);
   }
 
   &.status-completed {
-    background-color: #dcfce7;
-    color: #16a34a;
+    background-color: var(--green-soft);
+    color: var(--green);
   }
 }
 

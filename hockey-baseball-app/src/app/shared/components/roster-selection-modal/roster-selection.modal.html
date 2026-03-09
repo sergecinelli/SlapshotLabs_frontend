@@ -6,7 +6,7 @@
   <div class="modal-content">
     @if (isLoadingValue) {
       <div class="loading-container">
-        <p>Loading roster...</p>
+        <app-loading-spinner message="Loading roster..." size="sm" />
       </div>
     }
 
@@ -129,15 +129,11 @@
 
   <div class="modal-actions">
     <app-button
-      [bg]="'transparent'"
-      [bghover]="'button_background'"
+      [bg]="'background'"
+      [bghover]="'item_hover'"
       [br]="'border'"
       [color]="'text_primary'"
       [colorhover]="'text_primary'"
-      [opacity]="1"
-      [opacityhover]="1"
-      [width]="'auto'"
-      [rounded]="false"
       [haveContent]="true"
       materialIcon="cancel"
       (clicked)="onCancel()"
@@ -152,10 +148,6 @@
       [bghover]="'primary_dark'"
       [color]="'white'"
       [colorhover]="'white'"
-      [opacity]="1"
-      [opacityhover]="1"
-      [width]="'auto'"
-      [rounded]="false"
       [haveContent]="true"
       (clicked)="onConfirm()"
     >

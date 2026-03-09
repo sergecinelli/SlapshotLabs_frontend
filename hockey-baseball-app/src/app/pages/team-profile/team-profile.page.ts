@@ -2,7 +2,6 @@ import { Component, OnInit, OnDestroy, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
-import { MatDividerModule } from '@angular/material/divider';
 import { MatTableModule } from '@angular/material/table';
 import { Observable } from 'rxjs';
 import { ModalService, ModalEvent } from '../../services/modal.service';
@@ -27,6 +26,7 @@ import { BreadcrumbDataService } from '../../services/breadcrumb-data.service';
 import { ComponentVisibilityByRoleDirective } from '../../shared/directives/component-visibility-by-role.directive';
 import { ButtonLoadingComponent } from '../../shared/components/buttons/button-loading/button-loading.component';
 import { BreadcrumbActionsDirective } from '../../shared/directives/breadcrumb-actions.directive';
+import { LoadingSpinnerComponent } from '../../shared/components/loading-spinner/loading-spinner.component';
 import { visibilityByRoleMap } from './team-profile.role-map';
 import { forkJoin, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -69,11 +69,11 @@ export interface TeamPlayer {
   imports: [
     MatIconModule,
     MatCardModule,
-    MatDividerModule,
     MatTableModule,
     ComponentVisibilityByRoleDirective,
     ButtonLoadingComponent,
     BreadcrumbActionsDirective,
+    LoadingSpinnerComponent,
   ],
   templateUrl: './team-profile.page.html',
   styleUrl: './team-profile.page.scss',
@@ -394,7 +394,7 @@ export class TeamProfilePage implements OnInit, OnDestroy {
     this.modalService.openModal(TeamFormModal, {
       name: 'Edit Team',
       icon: 'groups',
-      width: '800px',
+      width: '900px',
       maxWidth: '95vw',
       data: {
         team: this.team,

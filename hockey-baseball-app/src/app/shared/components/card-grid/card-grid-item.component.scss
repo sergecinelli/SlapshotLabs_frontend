@@ -1,0 +1,53 @@
+:host {
+  display: block;
+  border: 1px solid var(--border);
+  background-color: var(--background);
+  cursor: pointer;
+  overflow: hidden;
+
+  &:hover {
+    background-color: var(--item-hover);
+  }
+
+  &.selected {
+    color: var(--primary);
+  }
+}
+
+.item-content {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  padding: 10px 15px;
+  min-height: 42px;
+  font-size: 14px;
+  font-weight: 500;
+  color: inherit;
+  text-align: left;
+  line-height: 1.4;
+}
+
+.check-icon {
+  margin-left: auto;
+  font-size: 18px;
+  color: var(--primary);
+  visibility: hidden;
+
+  &.visible {
+    visibility: visible;
+  }
+}
+
+::ng-deep .player-number {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+:host(.selected) ::ng-deep .player-number {
+  color: var(--primary);
+}

@@ -71,7 +71,7 @@
   padding: 0;
   border-radius: 8px;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-  background: var(--card-background, #ffffff);
+  background: var(--card-background);
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -99,7 +99,7 @@
     word-wrap: break-word;
     margin-top: 9px;
     padding-bottom: 5px;
-    color: var(--text-primary, #333);
+    color: var(--text-primary);
   }
 
   .toast-actions {

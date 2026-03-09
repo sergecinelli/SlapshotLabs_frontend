@@ -1,0 +1,86 @@
+<div
+  class="custom-multi-select-trigger"
+  [class.open]="isOpen()"
+  [class.has-value]="hasSelection()"
+  [class.disabled]="isDisabled()"
+  cdkOverlayOrigin
+  #trigger="cdkOverlayOrigin"
+  (click)="toggle()"
+>
+  @if (hasSelection()) {
+    <div class="trigger-chips">
+      @for (option of selectedOptions(); track option.value) {
+        <span class="trigger-chip">
+          {{ option.label }}
+          <span
+            class="material-symbols-rounded trigger-chip-remove"
+            (click)="removeChip(option, $event)"
+            >close</span
+          >
+        </span>
+      }
+    </div>
+  } @else {
+    <span class="trigger-placeholder">{{ placeholder() }}</span>
+  }
+  <span class="material-symbols-rounded trigger-arrow">expand_more</span>
+</div>
+
+<ng-template
+  cdkConnectedOverlay
+  [cdkConnectedOverlayOrigin]="trigger"
+  [cdkConnectedOverlayOpen]="isOpen()"
+  [cdkConnectedOverlayHasBackdrop]="true"
+  [cdkConnectedOverlayBackdropClass]="'cdk-overlay-transparent-backdrop'"
+  [cdkConnectedOverlayMinWidth]="panelMinWidth()"
+  [cdkConnectedOverlayOffsetY]="4"
+  [cdkConnectedOverlayPositions]="dropdownPositions"
+  (backdropClick)="close()"
+  (attach)="onOverlayAttach()"
+  (overlayKeydown)="onOverlayKeydown($event)"
+>
+  <div class="custom-multi-select-panel">
+    <div class="select-search-wrapper">
+      <span class="material-symbols-rounded search-icon">search</span>
+      <input
+        #searchInputEl
+        class="select-search-input"
+        [placeholder]="searchPlaceholder()"
+        (input)="onSearchInput($event)"
+        (keydown)="$event.stopPropagation()"
+      />
+      @if (searchText()) {
+        <span class="material-symbols-rounded search-clear" (click)="clearSearch(searchInputEl)"
+          >close</span
+        >
+      }
+    </div>
+    <div class="select-options">
+      @for (group of filteredGroups(); track group.label) {
+        <div class="select-group">
+          <div class="select-group-label">{{ group.label }}</div>
+          @for (option of group.options; track option.value) {
+            <div
+              class="select-option"
+              [class.selected]="isSelected(option.value)"
+              (click)="toggleOption(option)"
+            >
+              <span class="material-symbols-rounded select-option-check">{{
+                isSelected(option.value) ? 'check_box' : 'check_box_outline_blank'
+              }}</span>
+              @if (option.prefix) {
+                <span class="select-option-prefix">{{ option.prefix }}</span>
+              }
+              <span class="select-option-label">{{ option.label }}</span>
+              @if (option.suffix) {
+                <span class="select-option-suffix">{{ option.suffix }}</span>
+              }
+            </div>
+          }
+        </div>
+      } @empty {
+        <div class="select-empty">No results</div>
+      }
+    </div>
+  </div>
+</ng-template>

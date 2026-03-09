@@ -254,7 +254,7 @@ export class DashboardPage implements OnInit {
         this.modalService.openModal(TeamFormModal, {
           name: 'Add Team',
           icon: 'groups',
-          width: '800px',
+          width: '900px',
           maxWidth: '95vw',
           data: { isEditMode: false, ageGroups, levels, divisions } as TeamFormModalData,
           onCloseWithDataProcessing: (result) => {
@@ -294,7 +294,7 @@ export class DashboardPage implements OnInit {
         this.modalService.openModal(PlayerFormModal, {
           name: 'Add Player',
           icon: 'sports_hockey',
-          width: '800px',
+          width: '900px',
           maxWidth: '95vw',
           data: { isEditMode: false, teams: teams.teams, positions } as PlayerFormModalData,
           onCloseWithDataProcessing: (result: Partial<Player>) => {
@@ -330,7 +330,7 @@ export class DashboardPage implements OnInit {
         this.modalService.openModal(GoalieFormModal, {
           name: 'Add Goalie',
           icon: 'sports_hockey',
-          width: '800px',
+          width: '900px',
           maxWidth: '95vw',
           data: { isEditMode: false, teams: teams.teams, positions } as GoalieFormModalData,
           onCloseWithDataProcessing: (result: Partial<Goalie>) => {
@@ -371,7 +371,7 @@ export class DashboardPage implements OnInit {
         this.modalService.openModal(ScheduleFormModal, {
           name: 'Add Game',
           icon: 'event',
-          width: '800px',
+          width: '940px',
           maxWidth: '95vw',
           data: {
             isEditMode: false,

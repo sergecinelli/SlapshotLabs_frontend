@@ -8,6 +8,41 @@
   --radius-small: 5px;
 }
 
+// ============================================
+// View Transitions API (theme toggle animation)
+// ============================================
+
+:root.theme-transitioning *,
+:root.theme-transitioning *::before,
+:root.theme-transitioning *::after {
+  transition: none !important;
+  animation: none !important;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+::view-transition-old(root) {
+  z-index: 1;
+}
+
+::view-transition-new(root) {
+  z-index: 9999;
+  animation: 600ms cubic-bezier(0.4, 0, 0.2, 1) both circle-reveal;
+}
+
+@keyframes circle-reveal {
+  from {
+    clip-path: circle(0% at var(--click-x) var(--click-y));
+  }
+  to {
+    clip-path: circle(150% at var(--click-x) var(--click-y));
+  }
+}
+
 // Global CSS Variables
 // Note: All colors are defined in colors.ts and set via ThemeService
 // ThemeService automatically creates CSS variables in format: --[key] (with _ replaced by -)
@@ -126,11 +161,12 @@ html {
 }
 
 body {
-  color-scheme: light;
-
-  background-color: #ffffff;
-  color: #090b0c;
+  background-color: var(--background, #ffffff);
+  color: var(--text-primary, #090b0c);
   font: var(--mat-sys-body-medium);
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
 
   margin: 0;
 }
@@ -141,28 +177,28 @@ body {
 
 @layer utilities {
   .text-custom-primary {
-    color: var(--color-primary);
+    color: var(--primary);
   }
   .text-custom-dark {
-    color: var(--color-dark);
+    color: var(--dark);
   }
   .text-custom-secondary {
-    color: var(--color-secondary);
+    color: var(--secondary);
   }
   .bg-custom-primary {
-    background-color: var(--color-primary);
+    background-color: var(--primary);
   }
   .bg-custom-secondary {
-    background-color: var(--color-secondary);
+    background-color: var(--secondary);
   }
   .bg-custom-white {
-    background-color: var(--color-white);
+    background-color: var(--white);
   }
   .border-custom-primary {
-    border-color: var(--color-primary);
+    border-color: var(--primary);
   }
   .border-custom-secondary {
-    border-color: var(--color-secondary);
+    border-color: var(--secondary);
   }
 }
 
@@ -177,26 +213,26 @@ body {
 }
 
 .mat-mdc-button.mat-mdc-button-disabled {
-  background-color: var(--color-secondary) !important;
+  background-color: var(--secondary) !important;
   color: white !important;
   opacity: 1 !important;
   cursor: not-allowed;
 }
 
 .mat-mdc-outlined-button.mat-mdc-button-disabled {
-  background-color: var(--color-secondary) !important;
+  background-color: var(--secondary) !important;
   color: white !important;
-  border-color: var(--color-secondary) !important;
+  border-color: var(--secondary) !important;
   opacity: 1 !important;
   cursor: not-allowed;
 }
 
 .loading-button {
-  background-color: var(--color-secondary) !important;
+  background-color: var(--secondary) !important;
   color: white !important;
 
   &.mat-mdc-outlined-button {
-    border-color: var(--color-secondary) !important;
+    border-color: var(--secondary) !important;
   }
 }
 
@@ -206,9 +242,9 @@ body {
   &:disabled {
     opacity: 1 !important;
     cursor: not-allowed;
-    background-color: var(--color-secondary) !important;
+    background-color: var(--secondary) !important;
     color: white !important;
-    border-color: var(--color-secondary) !important;
+    border-color: var(--secondary) !important;
   }
 
   &:not(:disabled):hover {
@@ -231,22 +267,22 @@ body {
 }
 
 .mat-mdc-input-element::placeholder {
-  color: var(--color-secondary) !important;
+  color: var(--secondary) !important;
   opacity: 0.7 !important;
 }
 
 .mat-mdc-input-element::-webkit-input-placeholder {
-  color: var(--color-secondary) !important;
+  color: var(--secondary) !important;
   opacity: 0.7 !important;
 }
 
 .mat-mdc-input-element::-moz-placeholder {
-  color: var(--color-secondary) !important;
+  color: var(--secondary) !important;
   opacity: 0.7 !important;
 }
 
 .mat-mdc-input-element:-ms-input-placeholder {
-  color: var(--color-secondary) !important;
+  color: var(--secondary) !important;
   opacity: 0.7 !important;
 }
 
@@ -257,7 +293,7 @@ mat-card {
 }
 
 mat-error {
-  color: var(--color-primary) !important;
+  color: var(--primary) !important;
   padding-left: 0 !important;
   margin-left: -16px !important;
   font-size: 0.875rem;
@@ -275,9 +311,9 @@ mat-error {
   --mat-sort-arrow-color: #6b7280;
 }
 
-.mat-mdc-tooltip {
+.mdc-tooltip__surface {
   background-color: rgba(97, 97, 97, 0.9) !important;
-  color: white !important;
+  color: var(--white) !important;
   font-size: 12px !important;
   padding: 6px 8px !important;
   border-radius: 4px !important;
@@ -286,13 +322,8 @@ mat-error {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
 }
 
-.cdk-overlay-container .mat-mdc-tooltip {
-  background-color: rgba(97, 97, 97, 0.9) !important;
-  color: white !important;
-}
-
 .mat-mdc-select-panel {
-  background-color: white !important;
+  background-color: var(--background) !important;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
   border-radius: 4px !important;
   max-height: 300px !important;
@@ -301,23 +332,23 @@ mat-error {
 }
 
 .mat-mdc-option {
-  background-color: white !important;
-  color: var(--color-dark) !important;
+  background-color: var(--background) !important;
+  color: var(--dark) !important;
   min-height: 48px !important;
   padding: 0 16px !important;
 
   &:hover:not(.mdc-list-item--disabled) {
-    background-color: #f3f4f6 !important;
+    background-color: var(--item-hover) !important;
   }
 
   &.mdc-list-item--selected:not(.mdc-list-item--disabled) {
-    background-color: var(--color-primary) !important;
-    color: white !important;
+    background-color: var(--primary) !important;
+    color: var(--text-white) !important;
   }
 
   &.mat-mdc-option-active {
     background-color: rgba(207, 20, 43, 0.1) !important;
-    color: var(--color-primary) !important;
+    color: var(--primary) !important;
   }
 }
 
@@ -337,7 +368,7 @@ mat-error {
   .mat-mdc-text-field-wrapper {
     .mdc-line-ripple::before,
     .mdc-line-ripple::after {
-      border-bottom-color: var(--color-primary) !important;
+      border-bottom-color: var(--primary) !important;
       z-index: 1 !important;
     }
   }
@@ -345,7 +376,7 @@ mat-error {
 
 .mat-mdc-select {
   .mat-mdc-select-value {
-    color: var(--color-dark) !important;
+    color: var(--dark) !important;
   }
 
   .mat-mdc-select-arrow-wrapper {
@@ -353,12 +384,12 @@ mat-error {
   }
 
   .mat-mdc-select-arrow {
-    color: var(--color-secondary) !important;
+    color: var(--secondary) !important;
   }
 
   &.mat-mdc-select-focused {
     .mat-mdc-select-arrow {
-      color: var(--color-primary) !important;
+      color: var(--primary) !important;
     }
   }
 }
@@ -464,6 +495,10 @@ mat-error {
   }
 }
 
+.mat-mdc-dialog-surface {
+  background-color: var(--page-background) !important;
+}
+
 // Player filter dropdown panel (live dashboard)
 @keyframes cached-img-shimmer {
   0% {
@@ -501,8 +536,8 @@ img.cached-img-loading {
       min-height: 32px !important;
       line-height: 32px !important;
       padding: 0 16px !important;
-      background-color: #f9fafb !important;
-      border-bottom: 1px solid #e5e7eb;
+      background-color: var(--button-background) !important;
+      border-bottom: 1px solid var(--border);
 
       .mdc-list-item__primary-text {
         font-size: 11px !important;
@@ -514,7 +549,7 @@ img.cached-img-loading {
 
     + .mat-mdc-optgroup {
       .mat-mdc-optgroup-label {
-        border-top: 1px solid #e5e7eb;
+        border-top: 1px solid var(--border);
       }
     }
   }
@@ -526,15 +561,215 @@ img.cached-img-loading {
   }
 
   .mat-mdc-option.mdc-list-item--selected:not(.mdc-list-item--disabled) {
-    background-color: white !important;
-    color: var(--color-dark) !important;
+    background-color: var(--background) !important;
+    color: var(--dark) !important;
   }
 
   .mat-mdc-option.mdc-list-item--selected:not(.mdc-list-item--disabled):hover {
-    background-color: #f3f4f6 !important;
+    background-color: var(--item-hover) !important;
   }
 
   .mat-pseudo-checkbox-minimal {
     display: inline-block !important;
+  }
+}
+
+// ============================================
+// Dark Theme Overrides
+// ============================================
+
+body[data-theme='dark'] {
+  // Angular Material Card
+  mat-card,
+  .mat-mdc-card {
+    background-color: var(--card-background) !important;
+    color: var(--text-primary) !important;
+    box-shadow:
+      0 4px 12px rgba(0, 0, 0, 0.4),
+      0 2px 6px rgba(0, 0, 0, 0.3) !important;
+  }
+
+  // Angular Material Table
+  .mat-mdc-table {
+    background-color: var(--card-background) !important;
+
+    .mat-mdc-header-row {
+      background-color: var(--page-background) !important;
+    }
+
+    .mat-mdc-header-cell {
+      color: var(--text-secondary) !important;
+      border-bottom-color: var(--border) !important;
+    }
+
+    .mat-mdc-row {
+      background-color: var(--card-background) !important;
+
+      &:hover {
+        background-color: var(--item-hover) !important;
+      }
+    }
+
+    .mat-mdc-cell {
+      color: var(--text-primary) !important;
+      border-bottom-color: var(--border) !important;
+    }
+
+    .mat-mdc-no-data-row {
+      color: var(--text-secondary) !important;
+    }
+  }
+
+  // Angular Material Form Fields
+  .mat-mdc-form-field {
+    .mat-mdc-text-field-wrapper {
+      background-color: var(--input-background) !important;
+    }
+
+    .mat-mdc-input-element {
+      color: var(--text-primary) !important;
+      caret-color: var(--primary) !important;
+    }
+
+    .mdc-floating-label,
+    .mat-mdc-floating-label {
+      color: var(--text-secondary) !important;
+    }
+
+    .mdc-line-ripple::before {
+      border-bottom-color: var(--input-border) !important;
+    }
+  }
+
+  // Angular Material Select
+  .mat-mdc-select-panel {
+    background-color: var(--card-background) !important;
+  }
+
+  .mat-mdc-option {
+    background-color: var(--card-background) !important;
+    color: var(--text-primary) !important;
+
+    &:hover:not(.mdc-list-item--disabled) {
+      background-color: var(--item-hover) !important;
+    }
+
+    &.mdc-list-item--selected:not(.mdc-list-item--disabled) {
+      background-color: var(--primary) !important;
+      color: var(--text-white) !important;
+    }
+  }
+
+  // Angular Material Dialog
+  .mat-mdc-dialog-surface {
+    background-color: var(--page-background) !important;
+    color: var(--text-primary) !important;
+  }
+
+  // Angular Material Button
+  .mat-mdc-button,
+  .mat-mdc-raised-button,
+  .mat-mdc-outlined-button,
+  .mat-mdc-flat-button {
+    color: var(--text-primary) !important;
+
+    &.mat-primary,
+    &.mat-accent {
+      color: var(--text-white) !important;
+    }
+  }
+
+  .mat-mdc-outlined-button:not(.mat-primary):not(.mat-accent):not(.mat-warn) {
+    border-color: var(--border) !important;
+  }
+
+  // Angular Material Checkbox / Radio
+  .mat-mdc-checkbox .mdc-checkbox__background {
+    border-color: var(--text-secondary) !important;
+  }
+
+  .mat-mdc-radio-button .mdc-radio__outer-circle {
+    border-color: var(--text-secondary) !important;
+  }
+
+  // Angular Material Tabs
+  .mat-mdc-tab-group,
+  .mat-mdc-tab-nav-bar {
+    .mat-mdc-tab:not(.mdc-tab--active) {
+      color: var(--text-secondary) !important;
+    }
+
+    .mat-mdc-tab.mdc-tab--active {
+      color: var(--text-primary) !important;
+    }
+  }
+
+  // Angular Material Tooltip
+  .mdc-tooltip__surface {
+    background-color: var(--dark-tone2) !important;
+    color: var(--text-primary) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4) !important;
+  }
+
+  // Angular Material Chip
+  .mat-mdc-chip {
+    background-color: var(--button-background) !important;
+    color: var(--text-primary) !important;
+    border-color: var(--border) !important;
+  }
+
+  // Angular Material Menu
+  .mat-mdc-menu-panel {
+    background-color: var(--card-background) !important;
+    border: 1px solid var(--border) !important;
+  }
+
+  .mat-mdc-menu-item {
+    color: var(--text-primary) !important;
+
+    &:hover {
+      background-color: var(--item-hover) !important;
+    }
+  }
+
+  // Angular Material Paginator
+  .mat-mdc-paginator {
+    background-color: var(--card-background) !important;
+    color: var(--text-primary) !important;
+  }
+
+  // Scrollbar dark overrides
+  * {
+    scrollbar-color: var(--gray) var(--border-light);
+  }
+
+  *::-webkit-scrollbar-track {
+    background: var(--border-light);
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background-color: var(--gray);
+    border-color: var(--border-light);
+
+    &:hover {
+      background-color: var(--text-secondary);
+    }
+  }
+
+  // Player filter panel dark overrides
+  .player-filter-panel.mat-mdc-select-panel {
+    .mat-mdc-optgroup .mat-mdc-optgroup-label {
+      background-color: var(--page-background) !important;
+      border-bottom-color: var(--border) !important;
+    }
+  }
+
+  // Pseudo checkbox
+  .mat-pseudo-checkbox {
+    color: var(--text-secondary) !important;
+  }
+
+  .mat-pseudo-checkbox-checked {
+    background-color: var(--primary) !important;
   }
 }

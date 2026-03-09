@@ -1,27 +1,30 @@
-@use '../../styles/radio-button-selection';
 @use '../../styles/modal-form';
 
 .faceoff-form-modal {
   @include modal-form.modal-wrapper;
-  @include modal-form.material-form-overrides;
 
   .modal-content {
     .faceoff-form {
       @include modal-form.form-section;
 
       .form-section {
-        @include radio-button-selection.team-selection-container;
-        @include radio-button-selection.period-selection-container;
-        @include radio-button-selection.player-selection-container;
+        @include modal-form.selection-container;
+
+        .team-logo-img {
+          width: 24px;
+          height: 24px;
+          object-fit: contain;
+          border-radius: 50%;
+        }
 
         .location-error {
           margin-top: 8px;
           padding: 8px 12px;
-          background-color: #fee;
-          border: 1px solid #fcc;
+          background-color: var(--danger-soft);
+          border: 1px solid var(--danger-border);
           border-radius: 6px;
           font-size: 12px;
-          color: #c00;
+          color: var(--danger);
         }
       }
     }

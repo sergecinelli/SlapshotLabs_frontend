@@ -3,12 +3,10 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ModalEvent, ModalService } from '../../../services/modal.service';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
-import { MatIconModule } from '@angular/material/icon';
-import { MatDividerModule } from '@angular/material/divider';
-
+import { SectionHeaderComponent } from '../section-header/section-header.component';
+import { FormFieldComponent } from '../form-field/form-field.component';
+import { CardGridComponent } from '../card-grid/card-grid.component';
+import { CardGridItemComponent } from '../card-grid/card-grid-item.component';
 import { TeamService } from '../../../services/team.service';
 import { GoalieService } from '../../../services/goalie.service';
 import { GameMetadataService } from '../../../services/game-metadata.service';
@@ -17,6 +15,8 @@ import { ButtonComponent } from '../buttons/button/button.component';
 import { ButtonLoadingComponent } from '../buttons/button-loading/button-loading.component';
 import { environment } from '../../../../environments/environment';
 import { CachedSrcDirective } from '../../directives/cached-src.directive';
+import { LoadingSpinnerComponent } from '../loading-spinner/loading-spinner.component';
+import { getFieldError, GAME_TIME_PATTERN_ERROR } from '../../validators/form-error.util';
 
 export interface GoalieChangeFormData {
   teamLogo: string;
@@ -32,14 +32,13 @@ export interface GoalieChangeFormData {
   imports: [
     CachedSrcDirective,
     ReactiveFormsModule,
-
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
-    MatIconModule,
-    MatDividerModule,
+    SectionHeaderComponent,
+    FormFieldComponent,
+    CardGridComponent,
+    CardGridItemComponent,
     ButtonComponent,
     ButtonLoadingComponent,
+    LoadingSpinnerComponent,
   ],
   templateUrl: './goalie-change-form.modal.html',
   styleUrl: './goalie-change-form.modal.scss',
@@ -55,7 +54,7 @@ export class GoalieChangeFormModal implements OnInit {
     goalieChangeEventId: number;
     periodOptions?: { value: number; label: string }[];
     teamOptions?: { value: number; label: string; logo?: string }[];
-    goalieOptions?: { value: number; label: string; teamId: number }[];
+    goalieOptions?: { value: number; label: string; teamId: number; number?: number }[];
     homeTeamId?: number;
     awayTeamId?: number;
     homeStartGoalieId?: number;
@@ -81,8 +80,8 @@ export class GoalieChangeFormModal implements OnInit {
 
   // Data to be loaded from API
   teamOptions: { value: number; label: string; logo?: string }[] = [];
-  goaliesByTeam: Record<number, { value: number; label: string }[]> = {};
-  goalieOptions: { value: number; label: string }[] = [];
+  goaliesByTeam: Record<number, { value: number; label: string; number?: number }[]> = {};
+  goalieOptions: { value: number; label: string; number?: number }[] = [];
   periodOptions: { value: number; label: string }[] = [];
 
   isLoadingTeams = false;
@@ -98,6 +97,7 @@ export class GoalieChangeFormModal implements OnInit {
     this.eventId = this.dialogData.eventId;
     this.setupTeamChangeListener();
 
+    this.modalService.registerDirtyCheck(() => this.goalieChangeForm.dirty);
     this.modalService.onEvent$.pipe(takeUntilDestroyed()).subscribe((event) => {
       if (event === ModalEvent.StopButtonLoading) {
         this.isSubmitting.set(false);
@@ -277,6 +277,7 @@ export class GoalieChangeFormModal implements OnInit {
         .map((goalie) => ({
           value: goalie.value,
           label: goalie.label,
+          number: goalie.number,
         }));
 
       // Cache the filtered goalies
@@ -337,7 +338,7 @@ export class GoalieChangeFormModal implements OnInit {
   }
 
   onSubmit(): void {
-    if (this.goalieChangeForm.valid && !this.isSubmitting()) {
+    if (this.goalieChangeForm.valid) {
       this.isSubmitting.set(true);
       const formValue = this.goalieChangeForm.value;
 
@@ -379,28 +380,20 @@ export class GoalieChangeFormModal implements OnInit {
     this.modalService.closeModal();
   }
 
-  getErrorMessage(fieldName: string): string {
-    const control = this.goalieChangeForm.get(fieldName);
-    if (control?.errors && control.touched) {
-      if (control.errors['required']) {
-        return `${this.getFieldLabel(fieldName)} is required`;
-      }
-      if (control.errors['pattern']) {
-        return 'Time must be in mm:ss format (max 200:00)';
-      }
-    }
-    return '';
-  }
+  private readonly fieldLabels: Record<string, string> = {
+    team: 'Team',
+    goalie: 'Goalie',
+    period: 'Period',
+    time: 'Time',
+    note: 'Note',
+  };
 
-  private getFieldLabel(fieldName: string): string {
-    const labels: Record<string, string> = {
-      team: 'Team',
-      goalie: 'Goalie',
-      period: 'Period',
-      time: 'Time',
-      note: 'Note',
-    };
-    return labels[fieldName] || fieldName;
+  getErrorMessage(fieldName: string): string {
+    return getFieldError(
+      this.goalieChangeForm.get(fieldName),
+      this.fieldLabels[fieldName] || fieldName,
+      GAME_TIME_PATTERN_ERROR
+    );
   }
 
   getTeamLogoUrl(teamId: number): string {

@@ -2,12 +2,12 @@ import { Component, inject } from '@angular/core';
 
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ModalService } from '../../../services/modal.service';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
 import { ButtonComponent } from '../buttons/button/button.component';
 import { ButtonLoadingComponent } from '../buttons/button-loading/button-loading.component';
-import { MatIconModule } from '@angular/material/icon';
+import { FormFieldComponent } from '../form-field/form-field.component';
 import { convertLocalToGMT } from '../../utils/time-converter.util';
+import { youtubeUrlValidator } from '../../validators/url.validator';
+import { getFieldError } from '../../validators/form-error.util';
 
 export interface CustomHighlightFormResult {
   name: string;
@@ -22,20 +22,17 @@ export interface CustomHighlightFormResult {
 
 @Component({
   selector: 'app-custom-highlight-modal',
-  imports: [
-    ReactiveFormsModule,
-    MatFormFieldModule,
-    MatInputModule,
-    ButtonComponent,
-    ButtonLoadingComponent,
-    MatIconModule,
-  ],
+  imports: [ReactiveFormsModule, ButtonComponent, ButtonLoadingComponent, FormFieldComponent],
   templateUrl: './custom-highlight.modal.html',
   styleUrls: ['./custom-highlight.modal.scss'],
 })
 export class CustomHighlightModal {
   private modalService = inject(ModalService);
   private fb = inject(FormBuilder);
+
+  constructor() {
+    this.modalService.registerDirtyCheck(() => this.form.dirty);
+  }
 
   form: FormGroup = this.fb.group({
     name: ['', [Validators.required, Validators.maxLength(200)]],
@@ -48,7 +45,7 @@ export class CustomHighlightModal {
         Validators.pattern(/^([0-1]?[0-9]|2[0-3]):([0-5][0-9])(:([0-5][0-9]))?$/),
       ],
     ],
-    youtube_link: ['', [Validators.maxLength(500)]],
+    youtube_link: ['', [youtubeUrlValidator, Validators.maxLength(500)]],
   });
 
   onCancel(): void {
@@ -80,27 +77,17 @@ export class CustomHighlightModal {
     this.modalService.closeWithData(value);
   }
 
-  getErrorMessage(fieldName: string): string {
-    const control = this.form.get(fieldName);
-    if (control?.errors && control.touched) {
-      if (control.errors['required']) {
-        return `${this.getFieldLabel(fieldName)} is required`;
-      }
-      if (control.errors['pattern']) {
-        return 'Time must be in HH:mm or HH:mm:ss format (e.g., 14:30 or 14:30:00)';
-      }
-    }
-    return '';
-  }
+  private readonly fieldLabels: Record<string, string> = {
+    name: 'Name',
+    description: 'Description',
+    date: 'Date',
+    time: 'Time',
+    youtube_link: 'Video Link',
+  };
 
-  private getFieldLabel(fieldName: string): string {
-    const labels: Record<string, string> = {
-      name: 'Name',
-      description: 'Description',
-      date: 'Date',
-      time: 'Time',
-      youtube_link: 'Video Link',
-    };
-    return labels[fieldName] || fieldName;
+  getErrorMessage(fieldName: string): string {
+    return getFieldError(this.form.get(fieldName), this.fieldLabels[fieldName] || fieldName, {
+      pattern: 'Time must be in HH:mm or HH:mm:ss format (e.g., 14:30 or 14:30:00)',
+    });
   }
 }

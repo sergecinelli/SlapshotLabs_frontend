@@ -2,123 +2,47 @@
   <div class="modal-content">
     <form [formGroup]="analysisForm" class="analysis-form">
       <div class="form-section">
-        <div class="section-header">
-          <span class="section-title">Analysis Details</span>
-        </div>
-        <mat-divider class="section-divider"></mat-divider>
-
+        <app-section-header title="Analysis Details" />
         <div class="form-row">
           @if (isEntityLocked()) {
-            <div class="locked-entity-field">
-              <span class="locked-entity-label uppercase text-custom-secondary"
-                >Selected Goalie</span
-              >
-              <p class="locked-entity-value">{{ selectedGoalieLabel() }}</p>
-            </div>
+            <app-form-field
+              label="Selected Goalie"
+              [readonly]="true"
+              [readonlyValue]="selectedGoalieLabel()"
+            />
           } @else {
-            <mat-form-field
-              [floatLabel]="'always'"
-              [hideRequiredMarker]="true"
-              class="form-field full-width"
+            <app-form-field
+              label="Select Goalie"
+              [required]="true"
+              [error]="getErrorMessage('entityId')"
             >
-              <mat-label class="uppercase text-custom-secondary">Select Goalie</mat-label>
-              <mat-select
+              <app-custom-select
                 formControlName="entityId"
                 placeholder="Search goalie..."
-                (openedChange)="onSelectOpenedChange($event)"
-                panelClass="analysis-entity-select-panel"
-              >
-                <mat-select-trigger>
-                  {{ selectedGoalieLabel() }}
-                </mat-select-trigger>
-
-                <div class="entity-search-wrapper" (click)="$event.stopPropagation()">
-                  <span class="material-symbols-rounded search-icon">search</span>
-                  <input
-                    #searchInput
-                    class="entity-search-input"
-                    placeholder="Search by name..."
-                    [value]="searchText()"
-                    (input)="onSearchInput($event)"
-                    (keydown)="$event.stopPropagation()"
-                  />
-                  @if (searchText()) {
-                    <span
-                      class="material-symbols-rounded search-clear"
-                      (click)="clearSearch(searchInput)"
-                      >close</span
-                    >
-                  }
-                </div>
-
-                @for (group of groupedGoalies(); track group.teamName) {
-                  <mat-optgroup [label]="group.teamName">
-                    @for (goalie of group.entries; track goalie.id) {
-                      <mat-option
-                        [value]="goalie.id"
-                        [style.display]="isGoalieVisible(goalie) ? '' : 'none'"
-                      >
-                        <span class="entity-option">
-                          <span class="entity-number-badge">#{{ goalie.jerseyNumber }}</span>
-                          {{ goalie.firstName }} {{ goalie.lastName }}
-                        </span>
-                      </mat-option>
-                    }
-                  </mat-optgroup>
-                }
-              </mat-select>
-              @if (analysisForm.get('entityId')?.errors && analysisForm.get('entityId')?.touched) {
-                <mat-error>{{ getErrorMessage('entityId') }}</mat-error>
-              }
-            </mat-form-field>
+                [searchable]="true"
+                searchPlaceholder="Search by name..."
+                [optionGroups]="goalieOptionGroups()"
+              />
+            </app-form-field>
           }
         </div>
 
         <div class="form-row">
-          <mat-form-field
-            [floatLabel]="'always'"
-            [hideRequiredMarker]="true"
-            class="form-field full-width"
-          >
-            <mat-label class="uppercase text-custom-secondary">Title</mat-label>
-            <input matInput formControlName="title" placeholder="Enter title" />
-            @if (analysisForm.get('title')?.errors && analysisForm.get('title')?.touched) {
-              <mat-error>{{ getErrorMessage('title') }}</mat-error>
-            }
-          </mat-form-field>
+          <app-form-field label="Title" [required]="true" [error]="getErrorMessage('title')">
+            <input formControlName="title" placeholder="Enter title" />
+          </app-form-field>
         </div>
 
         <div class="form-row">
-          <mat-form-field
-            [floatLabel]="'always'"
-            [hideRequiredMarker]="true"
-            class="form-field full-width"
-          >
-            <mat-label class="uppercase text-custom-secondary">Author</mat-label>
-            <input matInput formControlName="author" placeholder="Enter author name" />
-            @if (analysisForm.get('author')?.errors && analysisForm.get('author')?.touched) {
-              <mat-error>{{ getErrorMessage('author') }}</mat-error>
-            }
-          </mat-form-field>
+          <app-form-field label="Author" [required]="true" [error]="getErrorMessage('author')">
+            <input formControlName="author" placeholder="Enter author name" />
+          </app-form-field>
         </div>
 
         <div class="form-row">
-          <mat-form-field
-            [floatLabel]="'always'"
-            [hideRequiredMarker]="true"
-            class="form-field full-width"
-          >
-            <mat-label class="uppercase text-custom-secondary">Analysis</mat-label>
-            <textarea
-              matInput
-              formControlName="analysis"
-              rows="6"
-              placeholder="Enter analysis"
-            ></textarea>
-            @if (analysisForm.get('analysis')?.errors && analysisForm.get('analysis')?.touched) {
-              <mat-error>{{ getErrorMessage('analysis') }}</mat-error>
-            }
-          </mat-form-field>
+          <app-form-field label="Analysis" [required]="true" [error]="getErrorMessage('analysis')">
+            <textarea formControlName="analysis" rows="6" placeholder="Enter analysis"></textarea>
+          </app-form-field>
         </div>
       </div>
     </form>
@@ -126,15 +50,11 @@
 
   <div class="modal-actions">
     <app-button
-      [bg]="'transparent'"
-      [bghover]="'button_background'"
+      [bg]="'background'"
+      [bghover]="'item_hover'"
       [br]="'border'"
       [color]="'text_primary'"
       [colorhover]="'text_primary'"
-      [opacity]="1"
-      [opacityhover]="1"
-      [width]="'auto'"
-      [rounded]="false"
       [haveContent]="true"
       materialIcon="cancel"
       (clicked)="onCancel()"
@@ -149,10 +69,6 @@
       [bghover]="isEditMode ? 'orange' : 'green'"
       [color]="'white'"
       [colorhover]="'white'"
-      [opacity]="1"
-      [opacityhover]="1"
-      [width]="'auto'"
-      [rounded]="false"
       [haveContent]="true"
       (clicked)="onSubmit()"
     >

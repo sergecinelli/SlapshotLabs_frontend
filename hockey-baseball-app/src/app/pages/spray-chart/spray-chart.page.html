@@ -8,9 +8,7 @@
       </div>
       <div class="dashboard-card-content">
         @if (loading) {
-          <div class="dashboard-loading">
-            <div class="dashboard-loading-text">Loading spray chart data...</div>
-          </div>
+          <app-loading-spinner message="Loading spray chart data..." size="sm" />
         } @else if (!goalie && !player) {
           <div class="dashboard-empty">
             {{ entityType === 'player' ? 'Player' : 'Goalie' }} not found.

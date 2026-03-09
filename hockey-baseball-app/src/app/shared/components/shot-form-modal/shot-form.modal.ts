@@ -1,16 +1,15 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ModalEvent, ModalService } from '../../../services/modal.service';
 import { ButtonComponent } from '../buttons/button/button.component';
 import { ButtonLoadingComponent } from '../buttons/button-loading/button-loading.component';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
-import { MatIconModule } from '@angular/material/icon';
-import { MatDividerModule } from '@angular/material/divider';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { FormFieldComponent } from '../form-field/form-field.component';
+import { youtubeUrlValidator } from '../../validators/url.validator';
+import { getFieldError, GAME_TIME_PATTERN_ERROR } from '../../validators/form-error.util';
+import { CardGridComponent } from '../card-grid/card-grid.component';
+import { CardGridItemComponent } from '../card-grid/card-grid-item.component';
 import { ShotEventRequest } from '../../../services/game-event.service';
 import { environment } from '../../../../environments/environment';
 import {
@@ -19,6 +18,7 @@ import {
 } from '../shot-location-selector/shot-location-selector.component';
 import { Team } from '../location-selector/location-selector.component';
 import { CachedSrcDirective } from '../../directives/cached-src.directive';
+import { SectionHeaderComponent } from '../section-header/section-header.component';
 
 export interface ShotFormData {
   shotType: 'save' | 'goal' | 'missed' | 'blocked';
@@ -47,12 +47,11 @@ export interface ShotFormData {
     ReactiveFormsModule,
     ButtonComponent,
     ButtonLoadingComponent,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
-    MatIconModule,
-    MatDividerModule,
     MatCheckboxModule,
+    SectionHeaderComponent,
+    FormFieldComponent,
+    CardGridComponent,
+    CardGridItemComponent,
     ShotLocationSelectorComponent,
   ],
   templateUrl: './shot-form.modal.html',
@@ -108,7 +107,6 @@ export class ShotFormModal implements OnInit {
   teamOptions: { value: number; label: string; logo?: string }[] = [];
   periodOptions: { value: number; label: string }[] = [];
   shotTypeOptions: { value: number; label: string }[] = [];
-
   // Filtered options based on selected team
   playerOptions: { value: number; label: string; number?: number }[] = [];
   blockingPlayerOptions: { value: number; label: string; number?: number }[] = [];
@@ -128,6 +126,7 @@ export class ShotFormModal implements OnInit {
     this.eventId = this.dialogData.eventId;
     this.setupConditionalValidation();
 
+    this.modalService.registerDirtyCheck(() => this.shotForm.dirty);
     this.modalService.onEvent$.pipe(takeUntilDestroyed()).subscribe((event) => {
       if (event === ModalEvent.StopButtonLoading) {
         this.isSubmitting.set(false);
@@ -230,7 +229,7 @@ export class ShotFormModal implements OnInit {
         '',
         [Validators.required, Validators.pattern(/^([0-9]{1,2}|1[0-9][0-9]|200):([0-5][0-9])$/)],
       ],
-      youtubeLink: [''],
+      youtubeLink: ['', [youtubeUrlValidator]],
       // Goal fields
       scoringTeam: [null as number | null],
       scoringPlayer: [null as number | null],
@@ -460,7 +459,7 @@ export class ShotFormModal implements OnInit {
   }
 
   onSubmit(): void {
-    if (this.shotForm.valid && !this.isSubmitting()) {
+    if (this.shotForm.valid) {
       this.isSubmitting.set(true);
       const formValue = this.shotForm.value;
 
@@ -515,35 +514,27 @@ export class ShotFormModal implements OnInit {
     this.modalService.closeModal();
   }
 
-  getErrorMessage(fieldName: string): string {
-    const control = this.shotForm.get(fieldName);
-    if (control?.errors && control.touched) {
-      if (control.errors['required']) {
-        return `${this.getFieldLabel(fieldName)} is required`;
-      }
-      if (control.errors['pattern']) {
-        return 'Time must be in mm:ss format (max 200:00)';
-      }
-    }
-    return '';
-  }
+  private readonly fieldLabels: Record<string, string> = {
+    shotType: 'Shot Type',
+    period: 'Period',
+    time: 'Time',
+    youtubeLink: 'YouTube Link',
+    scoringTeam: 'Scoring Team',
+    scoringPlayer: 'Scoring Player',
+    assistPlayer: 'Assist Player',
+    goalieScored: 'Goalie',
+    shootingTeam: 'Shooting Team',
+    shootingPlayer: 'Shooting Player',
+    blockingPlayer: 'Blocking Player',
+    goalieInNet: 'Goalie',
+    scoringChanceNote: 'Note',
+  };
 
-  private getFieldLabel(fieldName: string): string {
-    const labels: Record<string, string> = {
-      shotType: 'Shot Type',
-      period: 'Period',
-      time: 'Time',
-      youtubeLink: 'YouTube Link',
-      scoringTeam: 'Scoring Team',
-      scoringPlayer: 'Scoring Player',
-      assistPlayer: 'Assist Player',
-      goalieScored: 'Goalie',
-      shootingTeam: 'Shooting Team',
-      shootingPlayer: 'Shooting Player',
-      blockingPlayer: 'Blocking Player',
-      goalieInNet: 'Goalie',
-      scoringChanceNote: 'Note',
-    };
-    return labels[fieldName] || fieldName;
+  getErrorMessage(fieldName: string): string {
+    return getFieldError(
+      this.shotForm.get(fieldName),
+      this.fieldLabels[fieldName] || fieldName,
+      GAME_TIME_PATTERN_ERROR
+    );
   }
 }

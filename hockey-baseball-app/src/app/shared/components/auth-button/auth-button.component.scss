@@ -2,11 +2,11 @@ button {
   &[disabled] {
     opacity: 1 !important;
     cursor: not-allowed;
-    background-color: var(--color-secondary) !important;
-    color: white !important;
+    background-color: var(--secondary) !important;
+    color: var(--text-white) !important;
 
     &.mat-mdc-outlined-button {
-      border-color: var(--color-secondary) !important;
+      border-color: var(--secondary) !important;
     }
   }
 

@@ -2,14 +2,14 @@ import { Component, inject, signal, computed } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ModalEvent, ModalService } from '../../../services/modal.service';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
-import { MatDividerModule } from '@angular/material/divider';
 import { Player } from '../../interfaces/player.interface';
 import { Analysis, AnalyticsApiIn } from '../../interfaces/analysis.interface';
 import { ButtonComponent } from '../buttons/button/button.component';
 import { ButtonLoadingComponent } from '../buttons/button-loading/button-loading.component';
+import { SectionHeaderComponent } from '../section-header/section-header.component';
+import { FormFieldComponent } from '../form-field/form-field.component';
+import { CustomSelectComponent, SelectOptionGroup } from '../custom-select/custom-select.component';
+import { getFieldError } from '../../validators/form-error.util';
 
 export interface PlayerAnalysisModalData {
   analysis?: Analysis;
@@ -22,12 +22,11 @@ export interface PlayerAnalysisModalData {
   selector: 'app-player-analysis-modal',
   imports: [
     ReactiveFormsModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
-    MatDividerModule,
     ButtonComponent,
     ButtonLoadingComponent,
+    SectionHeaderComponent,
+    FormFieldComponent,
+    CustomSelectComponent,
   ],
   templateUrl: './player-analysis.modal.html',
   styleUrl: './player-analysis.modal.scss',
@@ -42,20 +41,24 @@ export class PlayerAnalysisModal {
   isSubmitting = signal(false);
 
   allPlayers = signal<Player[]>([]);
-  searchText = signal('');
   selectedEntityId = signal('');
 
-  groupedPlayers = computed(() => {
+  playerOptionGroups = computed<SelectOptionGroup[]>(() => {
     const players = this.allPlayers();
-    const search = this.searchText().toLowerCase();
     const groups = new Map<string, Player[]>();
     for (const player of players) {
-      if (search && !this.playerMatchesSearch(player, search)) continue;
       const key = player.team || 'Unknown Team';
       if (!groups.has(key)) groups.set(key, []);
       groups.get(key)!.push(player);
     }
-    return Array.from(groups, ([teamName, entries]) => ({ teamName, entries }));
+    return Array.from(groups, ([teamName, entries]) => ({
+      label: teamName,
+      options: entries.map((p) => ({
+        value: p.id,
+        label: `${p.firstName} ${p.lastName}`,
+        prefix: `#${p.jerseyNumber}`,
+      })),
+    }));
   });
 
   isEntityLocked = computed(() => !!this.data.preSelectedPlayerId || this.isEditMode);
@@ -83,6 +86,7 @@ export class PlayerAnalysisModal {
       .valueChanges.pipe(takeUntilDestroyed())
       .subscribe((value: string) => this.selectedEntityId.set(value));
 
+    this.modalService.registerDirtyCheck(() => this.analysisForm.dirty);
     this.modalService.onEvent$.pipe(takeUntilDestroyed()).subscribe((event) => {
       if (event === ModalEvent.StopButtonLoading) {
         this.isSubmitting.set(false);
@@ -90,26 +94,6 @@ export class PlayerAnalysisModal {
     });
 
     this.patchFormValues();
-  }
-
-  onSelectOpenedChange(opened: boolean): void {
-    if (!opened) {
-      this.searchText.set('');
-    }
-  }
-
-  onSearchInput(event: Event): void {
-    this.searchText.set((event.target as HTMLInputElement).value);
-  }
-
-  clearSearch(input: HTMLInputElement): void {
-    this.searchText.set('');
-    input.value = '';
-    input.focus();
-  }
-
-  isPlayerVisible(player: Player): boolean {
-    return this.playerMatchesSearch(player, this.searchText().toLowerCase());
   }
 
   onSubmit(): void {
@@ -140,20 +124,18 @@ export class PlayerAnalysisModal {
     this.modalService.closeModal();
   }
 
+  private readonly fieldLabels: Record<string, string> = {
+    entityId: 'Player',
+    title: 'Title',
+    author: 'Author',
+    analysis: 'Analysis',
+  };
+
   getErrorMessage(fieldName: string): string {
-    const control = this.analysisForm.get(fieldName);
-    if (control?.errors && control.touched) {
-      if (control.errors['required']) {
-        const labels: Record<string, string> = {
-          entityId: 'Player',
-          title: 'Title',
-          author: 'Author',
-          analysis: 'Analysis',
-        };
-        return `${labels[fieldName] || fieldName} is required`;
-      }
-    }
-    return '';
+    return getFieldError(
+      this.analysisForm.get(fieldName),
+      this.fieldLabels[fieldName] || fieldName
+    );
   }
 
   private patchFormValues(): void {
@@ -167,14 +149,5 @@ export class PlayerAnalysisModal {
     } else if (this.data.preSelectedPlayerId) {
       this.analysisForm.patchValue({ entityId: this.data.preSelectedPlayerId });
     }
-  }
-
-  private playerMatchesSearch(player: Player, search: string): boolean {
-    if (!search) return true;
-    return (
-      player.firstName.toLowerCase().includes(search) ||
-      player.lastName.toLowerCase().includes(search) ||
-      String(player.jerseyNumber).includes(search)
-    );
   }
 }

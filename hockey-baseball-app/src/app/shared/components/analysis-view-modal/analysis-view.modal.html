@@ -2,54 +2,58 @@
   <div class="modal-content">
     <div class="analysis-form">
       <div class="form-section">
-        <div class="section-header">
-          <span class="section-title">Analysis Details</span>
-        </div>
-        <mat-divider class="section-divider"></mat-divider>
+        <app-section-header title="Analysis Details" />
 
         <div class="form-row">
-          <div class="field full-width">
-            <span class="field-label">Subject</span>
-            <div class="subject-row">
-              @if (profileRoute()) {
-                <a class="field-value subject-link" (click)="goToProfile()">
+          @if (profileRoute()) {
+            <app-form-field label="Subject" [readonly]="true" class="full-width">
+              <div readonlyContent class="subject-row">
+                <a class="subject-link" (click)="goToProfile()">
                   {{ data.entityName }}
                 </a>
                 <app-button-small
                   materialIcon="visibility"
                   [bg]="'transparent'"
-                  [bghover]="'button_background'"
+                  [bghover]="'item_hover'"
                   [color]="'text_secondary'"
                   [colorhover]="'green_dark'"
                   tooltip="View Profile"
                   (clicked)="goToProfile()"
                 />
-              } @else {
-                <p class="field-value">{{ data.entityName }}</p>
-              }
-            </div>
-          </div>
+              </div>
+            </app-form-field>
+          } @else {
+            <app-form-field
+              label="Subject"
+              [readonly]="true"
+              [readonlyValue]="data.entityName"
+              class="full-width"
+            />
+          }
         </div>
 
         <div class="form-row">
-          <div class="field full-width">
-            <span class="field-label">Title</span>
-            <p class="field-value">{{ data.title }}</p>
-          </div>
+          <app-form-field
+            label="Title"
+            [readonly]="true"
+            [readonlyValue]="data.title"
+            class="full-width"
+          />
         </div>
 
         <div class="form-row">
-          <div class="field full-width">
-            <span class="field-label">Author</span>
-            <p class="field-value">{{ data.author }}</p>
-          </div>
+          <app-form-field
+            label="Author"
+            [readonly]="true"
+            [readonlyValue]="data.author"
+            class="full-width"
+          />
         </div>
 
         <div class="form-row">
-          <div class="field full-width">
-            <span class="field-label">Analysis</span>
-            <p class="field-value analysis-text">{{ data.analysis }}</p>
-          </div>
+          <app-form-field label="Analysis" [readonly]="true" class="full-width">
+            <p readonlyContent class="analysis-text">{{ data.analysis }}</p>
+          </app-form-field>
         </div>
       </div>
     </div>
@@ -58,15 +62,11 @@
   <div class="modal-actions">
     <app-button
       materialIcon="cancel"
-      [bg]="'transparent'"
-      [bghover]="'button_background'"
+      [bg]="'background'"
+      [bghover]="'item_hover'"
       [br]="'border'"
       [color]="'text_primary'"
       [colorhover]="'text_primary'"
-      [opacity]="1"
-      [opacityhover]="1"
-      [width]="'auto'"
-      [rounded]="false"
       [haveContent]="true"
       (clicked)="onClose()"
     >

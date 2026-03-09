@@ -3,18 +3,12 @@
 .custom-highlight-modal {
   @include modal-form.modal-wrapper;
 
-  @include modal-form.material-form-overrides;
-
   .modal-content {
     .custom-highlight-form {
       @include modal-form.form-section;
 
-      .form-section .form-row .form-field {
+      .form-section .form-row.date-time-row app-form-field {
         min-width: 150px;
-
-        &.full-width {
-          min-width: 100%;
-        }
       }
     }
   }

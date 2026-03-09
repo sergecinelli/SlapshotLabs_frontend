@@ -13,6 +13,7 @@
 <ng-template appBreadcrumbActions>
   <div [appVisibilityMap]="visibilityByRoleMap" style="display: contents">
     <app-button-loading
+      [isLoading]="isAddLoading()"
       materialIcon="add"
       [bg]="'primary'"
       [bghover]="'primary'"
@@ -33,6 +34,7 @@
     [data]="entriesValue"
     [actions]="tableActions"
     [loading]="loadingValue"
+    loadingMessage="Loading tryout entries..."
     emptyMessage="No tryout entries found"
     (actionClick)="onActionClick($event)"
   ></app-data-table>

@@ -1,22 +1,19 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { AsyncPipe } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { MatFormFieldModule } from '@angular/material/form-field';
 import { ModalService, ModalEvent } from '../../../services/modal.service';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
-import { MatAutocompleteModule } from '@angular/material/autocomplete';
-import { MatIconModule } from '@angular/material/icon';
-import { MatDividerModule } from '@angular/material/divider';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { SectionHeaderComponent } from '../section-header/section-header.component';
+import { LoadingSpinnerComponent } from '../loading-spinner/loading-spinner.component';
 import { Team } from '../../interfaces/team.interface';
 import { TeamLevel, Division } from '../../interfaces/team-level.interface';
 import { TeamOptionsService } from '../../../services/team-options.service';
 import { ButtonComponent } from '../buttons/button/button.component';
 import { ButtonLoadingComponent } from '../buttons/button-loading/button-loading.component';
-import { forkJoin, Observable, of } from 'rxjs';
-import { map, startWith } from 'rxjs/operators';
+import { FormFieldComponent } from '../form-field/form-field.component';
+import { CustomSelectComponent, SelectOption } from '../custom-select/custom-select.component';
+import { CustomAutocompleteComponent } from '../custom-autocomplete/custom-autocomplete.component';
+import { forkJoin } from 'rxjs';
+import { getFieldError } from '../../validators/form-error.util';
 
 export interface TeamFormModalData {
   team?: Team;
@@ -29,17 +26,14 @@ export interface TeamFormModalData {
 @Component({
   selector: 'app-team-form-modal',
   imports: [
-    AsyncPipe,
     ReactiveFormsModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
-    MatAutocompleteModule,
-    MatIconModule,
-    MatDividerModule,
-    MatProgressSpinnerModule,
+    SectionHeaderComponent,
+    LoadingSpinnerComponent,
     ButtonComponent,
     ButtonLoadingComponent,
+    FormFieldComponent,
+    CustomSelectComponent,
+    CustomAutocompleteComponent,
   ],
   templateUrl: './team-form.modal.html',
   styleUrl: './team-form.modal.scss',
@@ -54,12 +48,10 @@ export class TeamFormModal implements OnInit {
   isEditMode: boolean;
   isLoading = true;
 
-  groupOptions: { value: string; label: string }[] = [];
-  levelOptions: { value: string; label: string }[] = [];
-  divisionOptions: { value: string; label: string }[] = [];
-  filteredGroupOptions: Observable<{ value: string; label: string }[]> = of([]);
+  groupOptions: SelectOption[] = [];
+  levelOptions: SelectOption[] = [];
+  divisionOptions: SelectOption[] = [];
 
-  // Image picker properties
   isSubmitting = signal(false);
 
   selectedFile: File | null = null;
@@ -67,8 +59,8 @@ export class TeamFormModal implements OnInit {
   imageError: string | null = null;
   isDragging = false;
   isImageLoading = false;
-  logoRemoved = false; // Track if user explicitly removed the logo
-  readonly MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+  logoRemoved = false;
+  readonly MAX_FILE_SIZE = 5 * 1024 * 1024;
   readonly ALLOWED_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
 
   constructor() {
@@ -77,6 +69,7 @@ export class TeamFormModal implements OnInit {
     this.isEditMode = data.isEditMode;
     this.teamForm = this.createForm();
 
+    this.modalService.registerDirtyCheck(() => this.teamForm.dirty);
     this.modalService.onEvent$.pipe(takeUntilDestroyed()).subscribe((event) => {
       if (event === ModalEvent.StopButtonLoading) {
         this.isSubmitting.set(false);
@@ -87,29 +80,6 @@ export class TeamFormModal implements OnInit {
   ngOnInit(): void {
     this.loadOptions();
   }
-
-  private setupGroupFilter(): void {
-    this.filteredGroupOptions = this.teamForm.get('group')!.valueChanges.pipe(
-      startWith(''),
-      map((value: string) => {
-        if (!value || typeof value !== 'string') {
-          return this.groupOptions;
-        }
-        const filterValue = value.toLowerCase();
-        return this.groupOptions.filter(
-          (option) =>
-            option.label.toLowerCase().includes(filterValue) ||
-            option.value.toLowerCase().includes(filterValue)
-        );
-      })
-    );
-  }
-
-  protected displayGroupFn = (value: string): string => {
-    if (!value) return '';
-    const option = this.groupOptions.find((opt) => opt.value === value);
-    return option ? option.label : value;
-  };
 
   private createForm(): FormGroup {
     return this.fb.group({
@@ -123,9 +93,6 @@ export class TeamFormModal implements OnInit {
     });
   }
 
-  /**
-   * Load dropdown options from API and local data
-   */
   private loadOptions(): void {
     this.isLoading = true;
 
@@ -145,7 +112,6 @@ export class TeamFormModal implements OnInit {
       error: (error) => {
         console.error('Failed to load options:', error);
         this.groupOptions = this.teamOptionsService.getGroupOptions();
-        this.setupGroupFilter();
         this.setDefaultValues();
 
         if (this.isEditMode && this.data.team) {
@@ -159,7 +125,6 @@ export class TeamFormModal implements OnInit {
 
   private applyOptions(ageGroups: string[], levels: TeamLevel[], divisions: Division[]): void {
     this.groupOptions = this.teamOptionsService.transformAgeGroupsToOptions(ageGroups);
-    this.setupGroupFilter();
     this.levelOptions = this.teamOptionsService.transformLevelsToOptions(levels);
     this.divisionOptions = this.teamOptionsService.transformDivisionsToOptions(divisions);
     this.setDefaultValues();
@@ -171,11 +136,7 @@ export class TeamFormModal implements OnInit {
     this.isLoading = false;
   }
 
-  /**
-   * Set default values for form controls
-   */
   private setDefaultValues(): void {
-    // Only set defaults if no values are already present (for new forms)
     if (!this.isEditMode) {
       this.teamForm.patchValue({
         group: this.groupOptions[0]?.value || '1U',
@@ -184,7 +145,6 @@ export class TeamFormModal implements OnInit {
       });
     }
 
-    // Update validity after setting values
     this.teamForm.updateValueAndValidity();
   }
 
@@ -199,23 +159,16 @@ export class TeamFormModal implements OnInit {
       logo: team.logo,
     });
 
-    // Set existing logo as preview if available
     if (team.logo && team.logo !== '/assets/icons/teams.svg' && !team.logo.includes('/assets/')) {
       this.isImageLoading = true;
       this.imagePreview = team.logo;
     }
   }
 
-  /**
-   * Handle image load success
-   */
   onImageLoad(): void {
     this.isImageLoading = false;
   }
 
-  /**
-   * Handle image load error - fallback to upload placeholder
-   */
   onImageError(): void {
     console.warn('Failed to load team logo, using default upload view');
     this.isImageLoading = false;
@@ -223,9 +176,6 @@ export class TeamFormModal implements OnInit {
     this.teamForm.patchValue({ logo: '' });
   }
 
-  /**
-   * Handle file selection from input
-   */
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (!input.files || input.files.length === 0) {
@@ -236,14 +186,10 @@ export class TeamFormModal implements OnInit {
     this.validateAndProcessFile(file);
   }
 
-  /**
-   * Validate file and convert to base64
-   */
   private validateAndProcessFile(file: File): void {
     this.imageError = null;
-    this.logoRemoved = false; // Reset removed flag when new file is selected
+    this.logoRemoved = false;
 
-    // Validate file type
     if (!this.ALLOWED_TYPES.includes(file.type)) {
       this.imageError = 'Invalid file type. Please upload a JPEG, PNG, GIF, or WebP image.';
       this.selectedFile = null;
@@ -251,7 +197,6 @@ export class TeamFormModal implements OnInit {
       return;
     }
 
-    // Validate file size
     if (file.size > this.MAX_FILE_SIZE) {
       this.imageError = `File size exceeds ${this.MAX_FILE_SIZE / (1024 * 1024)}MB limit.`;
       this.selectedFile = null;
@@ -259,20 +204,15 @@ export class TeamFormModal implements OnInit {
       return;
     }
 
-    // Store the file and create preview
     this.selectedFile = file;
     this.convertFileToBase64(file);
   }
 
-  /**
-   * Convert file to base64 for preview and storage
-   */
   private convertFileToBase64(file: File): void {
     this.isImageLoading = true;
     const reader = new FileReader();
     reader.onload = () => {
       this.imagePreview = reader.result as string;
-      // Update form control with base64 data
       this.teamForm.patchValue({ logo: reader.result as string });
       this.isImageLoading = false;
     };
@@ -285,53 +225,37 @@ export class TeamFormModal implements OnInit {
     reader.readAsDataURL(file);
   }
 
-  /**
-   * Remove selected image
-   */
   removeImage(): void {
     this.selectedFile = null;
     this.imagePreview = null;
     this.imageError = null;
     this.isImageLoading = false;
-    this.logoRemoved = true; // Mark that logo was explicitly removed
+    this.logoRemoved = true;
     this.teamForm.patchValue({ logo: '' });
 
-    // Reset file input
     const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
     if (fileInput) {
       fileInput.value = '';
     }
   }
 
-  /**
-   * Trigger file input click
-   */
   triggerFileInput(): void {
     const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
     fileInput?.click();
   }
 
-  /**
-   * Handle drag over event
-   */
   onDragOver(event: DragEvent): void {
     event.preventDefault();
     event.stopPropagation();
     this.isDragging = true;
   }
 
-  /**
-   * Handle drag leave event
-   */
   onDragLeave(event: DragEvent): void {
     event.preventDefault();
     event.stopPropagation();
     this.isDragging = false;
   }
 
-  /**
-   * Handle drop event
-   */
   onDrop(event: DragEvent): void {
     event.preventDefault();
     event.stopPropagation();
@@ -346,13 +270,12 @@ export class TeamFormModal implements OnInit {
 
   onSubmit(): void {
     if (this.isLoading) {
-      return; // Prevent submission while loading
+      return;
     }
 
     if (this.teamForm.valid) {
       const formValue = this.teamForm.value;
 
-      // Find the selected level and division names for display
       const selectedLevel = this.levelOptions.find((opt) => opt.value === formValue.level);
       const selectedDivision = this.divisionOptions.find((opt) => opt.value === formValue.division);
 
@@ -372,11 +295,9 @@ export class TeamFormModal implements OnInit {
         teamData.id = this.data.team.id;
       }
 
-      // Include the file if one was selected
       if (this.selectedFile) {
         teamData.logoFile = this.selectedFile;
       } else if (this.logoRemoved) {
-        // If logo was removed, create an empty blob to signal deletion
         const emptyBlob = new Blob([], { type: 'application/octet-stream' });
         teamData.logoFile = new File([emptyBlob], 'empty.dat');
         teamData.logoRemoved = true;
@@ -385,7 +306,6 @@ export class TeamFormModal implements OnInit {
       this.isSubmitting.set(true);
       this.modalService.closeWithDataProcessing(teamData);
     } else {
-      // Mark all fields as touched to show validation errors
       Object.keys(this.teamForm.controls).forEach((key) => {
         this.teamForm.get(key)?.markAsTouched();
       });
@@ -396,16 +316,10 @@ export class TeamFormModal implements OnInit {
     this.modalService.closeModal();
   }
 
-  /**
-   * Get form validity status for debugging
-   */
   get isFormValid(): boolean {
     return this.teamForm.valid;
   }
 
-  /**
-   * Get form errors for debugging
-   */
   get formErrors(): Record<string, unknown> {
     const errors: Record<string, unknown> = {};
     Object.keys(this.teamForm.controls).forEach((key) => {
@@ -417,35 +331,19 @@ export class TeamFormModal implements OnInit {
     return errors;
   }
 
+  private readonly fieldLabels: Record<string, string> = {
+    name: 'Team Name',
+    group: 'Group',
+    level: 'Level',
+    division: 'Division',
+    city: 'City',
+    abbreviation: 'Abbreviation',
+    logo: 'Team Logo',
+  };
+
   getErrorMessage(fieldName: string): string {
     const control = this.teamForm.get(fieldName);
-    if (control?.errors && control.touched) {
-      if (control.errors['required']) {
-        return `${this.getFieldLabel(fieldName)} is required`;
-      }
-      if (control.errors['minlength']) {
-        return `${this.getFieldLabel(fieldName)} must be at least ${control.errors['minlength'].requiredLength} characters long`;
-      }
-      if (control.errors['min']) {
-        return `${this.getFieldLabel(fieldName)} must be at least ${control.errors['min'].min}`;
-      }
-      if (control.errors['max']) {
-        return `${this.getFieldLabel(fieldName)} must be no more than ${control.errors['max'].max}`;
-      }
-    }
-    return '';
-  }
-
-  private getFieldLabel(fieldName: string): string {
-    const labels: Record<string, string> = {
-      name: 'Team Name',
-      group: 'Group',
-      level: 'Level',
-      division: 'Division',
-      city: 'City',
-      abbreviation: 'Abbreviation',
-      logo: 'Team Logo',
-    };
-    return labels[fieldName] || fieldName;
+    const label = this.fieldLabels[fieldName] || fieldName;
+    return getFieldError(control, label);
   }
 }

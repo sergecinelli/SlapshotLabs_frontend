@@ -1,0 +1,77 @@
+@use '../../styles/modal-form';
+
+:host {
+  display: block;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.form-field-label {
+  @include modal-form.form-label;
+
+  .required-mark {
+    color: var(--primary);
+  }
+}
+
+.form-field-readonly-value,
+.form-field-readonly-content {
+  margin: 0;
+  font-size: 14px;
+  color: var(--dark);
+  padding: 0 2px;
+  padding-left: 14px;
+  line-height: 1.5;
+}
+
+.form-field-control {
+  ::ng-deep {
+    input,
+    textarea {
+      margin: 0;
+      width: 100%;
+      min-height: 42px;
+      font-size: 14px;
+      font-family: inherit;
+      color: var(--dark);
+      background: var(--background);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-medium);
+      padding: 10px 12px;
+      outline: none;
+      box-sizing: border-box;
+      transition: border-color 0.2s;
+
+      &:focus {
+        border-color: var(--primary);
+      }
+
+      &::placeholder {
+        color: var(--gray);
+      }
+    }
+
+    textarea {
+      display: block;
+      resize: vertical;
+      line-height: 1.5;
+    }
+  }
+}
+
+.form-field-error-slot {
+  min-height: 18px;
+  padding-top: 3px;
+  padding-left: 13px;
+
+  span {
+    display: block;
+    font-size: 12px;
+    color: var(--primary);
+    line-height: 1.2;
+  }
+}

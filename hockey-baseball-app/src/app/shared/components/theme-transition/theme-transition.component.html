@@ -1,0 +1,9 @@
+@if (isTransitioning()) {
+  <div
+    class="theme-transition-overlay"
+    [class.light-to-dark]="transitionDirection() === 'light-to-dark'"
+    [class.dark-to-light]="transitionDirection() === 'dark-to-light'"
+  >
+    <div #transitionCurtain class="transition-curtain"></div>
+  </div>
+}

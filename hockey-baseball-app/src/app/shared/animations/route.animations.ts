@@ -31,7 +31,7 @@ export const routeTransition = trigger('routeTransition', [
     ]
   ),
 
-  // App → Auth (logout): sign-in fades in on top of the dashboard
+  // App → Auth (logout): sign-in fades in on top, app just fades out (no scale)
   transition(
     (from, to) => from === 'app' && isAuth(to),
     [
@@ -39,14 +39,9 @@ export const routeTransition = trigger('routeTransition', [
         optional: true,
       }),
       group([
-        query(
-          ':leave',
-          [
-            style({ zIndex: 0 }),
-            animate('500ms ease-in', style({ opacity: 0, transform: 'scale(0.95)' })),
-          ],
-          { optional: true }
-        ),
+        query(':leave', [style({ zIndex: 0 }), animate('500ms ease-in', style({ opacity: 0 }))], {
+          optional: true,
+        }),
         query(
           ':enter',
           [

@@ -8,7 +8,7 @@
     justify-content: flex-start;
     padding: 20px;
     border-bottom: 1px solid var(--border-light);
-    background-color: var(--white);
+    background-color: var(--card-background);
     min-height: 60px;
   }
 
@@ -25,7 +25,7 @@
     height: 100%;
 
     mat-icon {
-      color: var(--color-primary);
+      color: var(--primary);
       font-size: 24px;
       width: 24px;
       height: 24px;
@@ -61,7 +61,7 @@
         .team-logo {
           width: 120px;
           height: 120px;
-          background-color: #f3f4f6;
+          background-color: var(--page-background);
           border-radius: 12px;
           display: flex;
           align-items: center;
@@ -103,7 +103,7 @@
 
           span {
             background-color: var(--secondary);
-            color: white;
+            color: var(--text-white);
             padding: 4px 12px;
             border-radius: 16px;
             font-weight: 500;
@@ -115,7 +115,7 @@
             }
 
             &.city {
-              background-color: #6b7280;
+              background-color: var(--text-secondary);
             }
 
             &.team-record {
@@ -132,7 +132,7 @@
 
       span {
         background-color: var(--secondary);
-        color: white;
+        color: var(--text-white);
         padding: 6px 16px;
         border-radius: 16px;
         font-weight: 500;
@@ -140,15 +140,15 @@
         white-space: nowrap;
 
         &.age-group {
-          background-color: #6366f1;
+          background-color: var(--violet);
         }
 
         &.level {
-          background-color: #10b981;
+          background-color: var(--green);
         }
 
         &.division {
-          background-color: #f59e0b;
+          background-color: var(--orange);
         }
       }
     }
@@ -180,7 +180,7 @@
 
 // Table Container
 .table-container {
-  background-color: var(--white);
+  background-color: var(--card-background);
   border-radius: 4px;
   border: 1px solid var(--border);
   overflow-x: auto;
@@ -191,16 +191,16 @@
   }
 
   &::-webkit-scrollbar-track {
-    background-color: #f1f5f9;
+    background-color: var(--border-light);
     border-radius: 4px;
   }
 
   &::-webkit-scrollbar-thumb {
-    background-color: #cbd5e1;
+    background-color: var(--secondary-tone1);
     border-radius: 4px;
 
     &:hover {
-      background-color: #94a3b8;
+      background-color: var(--secondary);
     }
   }
 }
@@ -212,8 +212,8 @@
 
   .mat-mdc-header-row {
     .mat-mdc-header-cell {
-      background-color: #e5e7eb;
-      color: #4b5563;
+      background-color: var(--border);
+      color: var(--text-secondary);
       font-weight: 500;
       font-size: 14px !important;
       padding: 8px 12px !important;
@@ -272,8 +272,8 @@
 
     .mat-mdc-header-row {
       .mat-mdc-header-cell {
-        background-color: #e5e7eb;
-        color: #4b5563;
+        background-color: var(--border);
+        color: var(--text-secondary);
         font-weight: 500;
         font-size: 14px !important;
         padding: 8px 12px !important;
@@ -306,15 +306,15 @@
           font-weight: 600;
 
           &.win {
-            color: #10b981 !important;
+            color: var(--green) !important;
           }
 
           &.loss {
-            color: #ef4444 !important;
+            color: var(--danger) !important;
           }
 
           &.tie {
-            color: #f59e0b !important;
+            color: var(--orange) !important;
           }
         }
       }
@@ -330,8 +330,8 @@
 
   .mat-mdc-header-row {
     .mat-mdc-header-cell {
-      background-color: #e5e7eb;
-      color: #4b5563;
+      background-color: var(--border);
+      color: var(--text-secondary);
       font-weight: 500;
       font-size: 14px !important;
       padding: 8px 12px !important;

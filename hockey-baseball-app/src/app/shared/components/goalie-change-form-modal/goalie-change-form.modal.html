@@ -3,141 +3,111 @@
     <form [formGroup]="goalieChangeForm" class="goalie-change-form">
       <!-- Team Selection Section -->
       <div class="form-section">
-        <div class="section-header">
-          <span class="section-title">Select the Team that Changed their Goalie</span>
-        </div>
-        <mat-divider class="section-divider"></mat-divider>
+        <app-section-header title="Select the Team that Changed their Goalie" />
 
         <div class="team-selection-container">
-          <div class="team-buttons">
+          <app-card-grid [columns]="teamOptions.length">
             @for (team of teamOptions; track team) {
-              <button
-                type="button"
-                class="team-button"
-                [class.selected]="goalieChangeForm.get('team')?.value === team.value"
-                (click)="selectTeam(team.value)"
+              <app-card-grid-item
+                [selected]="goalieChangeForm.get('team')?.value === team.value"
+                (select)="selectTeam(team.value)"
               >
-                <div class="team-avatar">
-                  @if (team.value) {
-                    <img
-                      [appCachedSrc]="getTeamLogoUrl(team.value)"
-                      [alt]="team.label"
-                      class="team-logo-img"
-                    />
-                  }
-                </div>
-                <div class="team-name">{{ team.label }}</div>
-              </button>
+                @if (team.value) {
+                  <img
+                    [appCachedSrc]="getTeamLogoUrl(team.value)"
+                    [alt]="team.label"
+                    class="team-logo-img"
+                  />
+                }
+                {{ team.label }}
+              </app-card-grid-item>
+            }
+          </app-card-grid>
+          <div class="error-slot">
+            @if (goalieChangeForm.get('team')?.errors && goalieChangeForm.get('team')?.touched) {
+              <span>{{ getErrorMessage('team') }}</span>
             }
           </div>
-          @if (goalieChangeForm.get('team')?.errors && goalieChangeForm.get('team')?.touched) {
-            <div class="team-error">
-              {{ getErrorMessage('team') }}
-            </div>
-          }
         </div>
       </div>
 
       <!-- Goalie Selection Section -->
       <div class="form-section">
-        <div class="section-header">
-          <span class="section-title">Select Goalie</span>
-        </div>
-        <mat-divider class="section-divider"></mat-divider>
+        <app-section-header title="Select Goalie" />
 
         <div class="goalie-selection-container">
-          <div class="goalie-buttons">
+          <app-card-grid [columns]="3">
             @for (goalie of goalieOptions; track goalie) {
-              <button
-                type="button"
-                class="goalie-button"
-                [class.selected]="goalieChangeForm.get('goalie')?.value === goalie.value"
-                (click)="selectGoalie(goalie.value)"
+              <app-card-grid-item
+                [selected]="goalieChangeForm.get('goalie')?.value === goalie.value"
+                (select)="selectGoalie(goalie.value)"
               >
-                <div class="goalie-name">{{ goalie.label }}</div>
-              </button>
+                @if (goalie.number !== undefined && goalie.number !== null) {
+                  <span class="player-number">{{ goalie.number }}</span>
+                }
+                {{ goalie.label }}
+              </app-card-grid-item>
+            }
+          </app-card-grid>
+          <div class="error-slot">
+            @if (
+              goalieChangeForm.get('goalie')?.errors && goalieChangeForm.get('goalie')?.touched
+            ) {
+              <span>{{ getErrorMessage('goalie') }}</span>
             }
           </div>
-          @if (goalieChangeForm.get('goalie')?.errors && goalieChangeForm.get('goalie')?.touched) {
-            <div class="goalie-error">
-              {{ getErrorMessage('goalie') }}
-            </div>
-          }
         </div>
       </div>
 
       <!-- Period and Time Section -->
       <div class="form-section">
-        <div class="section-header">
-          <span class="section-title">Game Details</span>
-        </div>
-        <mat-divider class="section-divider"></mat-divider>
+        <app-section-header title="Game Details" />
 
         <div class="period-selection-container">
-          <div class="period-selection-label uppercase text-custom-secondary">Period</div>
+          <div class="selection-label">Period</div>
           @if (isLoadingPeriods) {
-            <div class="loading-message">Loading periods...</div>
+            <app-loading-spinner message="Loading periods..." size="sm" />
           }
           @if (!isLoadingPeriods) {
-            <div class="period-buttons">
+            <app-card-grid [columns]="periodOptions.length">
               @for (period of periodOptions; track period) {
-                <button
-                  type="button"
-                  class="period-button"
-                  [class.selected]="goalieChangeForm.get('period')?.value === period.value"
-                  (click)="selectPeriod(period.value)"
+                <app-card-grid-item
+                  [selected]="goalieChangeForm.get('period')?.value === period.value"
+                  (select)="selectPeriod(period.value)"
                 >
-                  <div class="period-name">{{ period.label }}</div>
-                </button>
+                  {{ period.label }}
+                </app-card-grid-item>
               }
-            </div>
+            </app-card-grid>
           }
-          @if (goalieChangeForm.get('period')?.errors && goalieChangeForm.get('period')?.touched) {
-            <div class="period-error">
-              {{ getErrorMessage('period') }}
-            </div>
-          }
+          <div class="error-slot">
+            @if (
+              goalieChangeForm.get('period')?.errors && goalieChangeForm.get('period')?.touched
+            ) {
+              <span>{{ getErrorMessage('period') }}</span>
+            }
+          </div>
         </div>
 
         <div class="form-row">
-          <mat-form-field [floatLabel]="'always'" [hideRequiredMarker]="true" class="form-field">
-            <mat-label class="uppercase text-custom-secondary">Time</mat-label>
-            <input matInput formControlName="time" placeholder="mm:ss" maxlength="6" />
-            @if (goalieChangeForm.get('time')?.errors && goalieChangeForm.get('time')?.touched) {
-              <mat-error>
-                {{ getErrorMessage('time') }}
-              </mat-error>
-            }
-          </mat-form-field>
+          <app-form-field label="Time" [required]="true" [error]="getErrorMessage('time')">
+            <input formControlName="time" placeholder="mm:ss" maxlength="6" />
+          </app-form-field>
         </div>
       </div>
 
       <!-- Note Section -->
       <div class="form-section">
-        <div class="section-header">
-          <span class="section-title">Note</span>
-        </div>
-        <mat-divider class="section-divider"></mat-divider>
+        <app-section-header title="Note" />
 
         <div class="form-row">
-          <mat-form-field
-            [floatLabel]="'always'"
-            [hideRequiredMarker]="true"
-            class="form-field full-width"
-          >
-            <mat-label class="uppercase text-custom-secondary">Note</mat-label>
+          <app-form-field class="full-width" label="Note" [error]="getErrorMessage('note')">
             <textarea
-              matInput
               formControlName="note"
               placeholder="Describe why the goalie was pulled"
               rows="3"
             ></textarea>
-            @if (goalieChangeForm.get('note')?.errors && goalieChangeForm.get('note')?.touched) {
-              <mat-error>
-                {{ getErrorMessage('note') }}
-              </mat-error>
-            }
-          </mat-form-field>
+          </app-form-field>
         </div>
       </div>
     </form>
@@ -145,15 +115,11 @@
 
   <div class="modal-actions">
     <app-button
-      [bg]="'transparent'"
-      [bghover]="'button_background'"
+      [bg]="'background'"
+      [bghover]="'item_hover'"
       [br]="'border'"
       [color]="'text_primary'"
       [colorhover]="'text_primary'"
-      [opacity]="1"
-      [opacityhover]="1"
-      [width]="'auto'"
-      [rounded]="false"
       [haveContent]="true"
       materialIcon="cancel"
       (clicked)="onCancel()"
@@ -168,10 +134,6 @@
       [bghover]="isEditMode ? 'orange' : 'green'"
       [color]="'white'"
       [colorhover]="'white'"
-      [opacity]="1"
-      [opacityhover]="1"
-      [width]="'auto'"
-      [rounded]="false"
       [haveContent]="true"
       (clicked)="onSubmit()"
     >

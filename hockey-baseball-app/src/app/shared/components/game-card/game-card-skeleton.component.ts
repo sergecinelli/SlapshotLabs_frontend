@@ -1,5 +1,4 @@
-import { Component } from '@angular/core';
-import {} from '@angular/common';
+import { Component, input } from '@angular/core';
 
 @Component({
   selector: 'app-game-card-skeleton',
@@ -8,6 +7,6 @@ import {} from '@angular/common';
   styleUrl: './game-card-skeleton.component.scss',
 })
 export class GameCardSkeletonComponent {
-  skeletonCountUpcoming = 2;
-  skeletonCountGameResults = 6;
+  count = input(2);
+  showScore = input(false);
 }

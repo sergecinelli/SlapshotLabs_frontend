@@ -2,16 +2,12 @@
 @let team2Value = team2();
 
 <div class="shot-location-selector">
-  <div class="section-header">
-    <span class="section-title">Shot Location</span>
-  </div>
-  <mat-divider class="section-divider"></mat-divider>
+  <app-section-header title="Shot Location" />
 
   <div class="location-grid">
     <div class="location-column">
       <app-location-selector
-        [showTitle]="false"
-        [showDivider]="false"
+        [showHeader]="false"
         [showTeams]="true"
         [team1]="team1Value"
         [team2]="team2Value"
@@ -22,8 +18,7 @@
 
     <div class="location-column">
       <app-location-selector
-        [showTitle]="false"
-        [showDivider]="false"
+        [showHeader]="false"
         [showTeams]="false"
         [imageUrl]="'/assets/images/net.svg'"
         [showClearButton]="true"

@@ -5,7 +5,7 @@
 // Business-focused Material Design without animations
 
 @mixin dashboard-card-base {
-  background: var(--white);
+  background: var(--card-background);
   border-radius: $card-border-radius;
   border: 1px solid var(--border-light);
   overflow: hidden;
@@ -42,7 +42,7 @@
 .dashboard-card-header {
   padding: 20px;
   border-bottom: 1px solid var(--border-light);
-  background-color: var(--white);
+  background-color: var(--card-background);
   display: flex;
   align-items: center;
   min-height: 60px;
@@ -61,23 +61,7 @@
 .dashboard-card-content {
   padding: 20px;
   flex: 1;
-  background-color: var(--white);
-}
-
-// Loading state
-.dashboard-loading {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 48px 24px;
-  gap: 16px;
-}
-
-.dashboard-loading-text {
-  color: var(--text-secondary);
-  font-size: 14px;
-  font-weight: 500;
+  background-color: var(--card-background);
 }
 
 // Empty state

@@ -17,7 +17,7 @@
   top: 0px;
   bottom: 0px;
   border-radius: 8px;
-  background: var(--white);
+  background: var(--card-background);
   border: 1px solid var(--border-light);
   transition:
     left 0.3s cubic-bezier(0.4, 1.24, 0.3, 1),
@@ -48,7 +48,7 @@
   font-family: inherit;
   line-height: 1.2;
   cursor: pointer;
-  color: var(--text-secondary);
+  color: var(--text-primary);
   background: transparent;
   border: none;
   border-radius: var(--radius-medium);
@@ -71,7 +71,23 @@
   }
 
   ::ng-deep .mat-ripple-element {
-    background-color: var(--white);
+    background-color: var(--card-background);
     opacity: 0.3;
+  }
+}
+
+:host.big {
+  .tabs-container {
+    padding: 4px 0;
+    gap: 3px;
+  }
+
+  .tab {
+    padding: 9px 20px;
+    font-size: 14px;
+
+    .tab-icon {
+      font-size: 20px;
+    }
   }
 }

@@ -1,5 +1,5 @@
 import { Component, input, output, effect } from '@angular/core';
-import { MatDividerModule } from '@angular/material/divider';
+import { SectionHeaderComponent } from '../section-header/section-header.component';
 import {
   LocationSelectorComponent,
   PuckLocation,
@@ -18,7 +18,7 @@ export interface ShotLocation {
 
 @Component({
   selector: 'app-shot-location-selector',
-  imports: [MatDividerModule, LocationSelectorComponent],
+  imports: [SectionHeaderComponent, LocationSelectorComponent],
   templateUrl: './shot-location-selector.component.html',
   styleUrl: './shot-location-selector.component.scss',
 })

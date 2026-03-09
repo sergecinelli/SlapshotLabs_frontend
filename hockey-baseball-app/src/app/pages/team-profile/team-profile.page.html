@@ -17,8 +17,8 @@
   </div>
   <app-button-loading
     materialIcon="bar_chart"
-    [bg]="'upcoming'"
-    [bghover]="'upcoming_dark'"
+    [bg]="'cyan'"
+    [bghover]="'cyan_dark'"
     [color]="'white'"
     [colorhover]="'white'"
     [haveContent]="true"
@@ -36,9 +36,7 @@
     @if (loading) {
       <div class="dashboard-card">
         <div class="dashboard-card-content">
-          <div class="dashboard-loading">
-            <div class="dashboard-loading-text">Loading team profile...</div>
-          </div>
+          <app-loading-spinner message="Loading team profile..." size="sm" />
         </div>
       </div>
     }
@@ -302,9 +300,7 @@
           <div class="dashboard-card-content">
             <!-- Loading state -->
             @if (loadingRoster) {
-              <div class="dashboard-loading">
-                <div class="dashboard-loading-text">Loading roster...</div>
-              </div>
+              <app-loading-spinner message="Loading roster..." size="sm" />
             }
 
             <!-- Empty state -->

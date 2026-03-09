@@ -1,15 +1,10 @@
-@use '../../styles/radio-button-selection';
 @use '../../styles/modal-form';
 
 .tryout-add-modal {
   @include modal-form.modal-wrapper;
 
-  @include modal-form.material-form-overrides;
-
   .modal-content {
     .search-section {
-      margin-bottom: 16px;
-
       .select-field-wrapper {
         position: relative;
 
@@ -18,16 +13,6 @@
           top: 0;
           right: 0;
           z-index: 1;
-        }
-
-        .search-field {
-          width: 100%;
-
-          ::ng-deep .mat-mdc-select-placeholder {
-            color: var(--secondary) !important;
-            font-size: 14px !important;
-            opacity: 0.7;
-          }
         }
       }
 
@@ -48,159 +33,11 @@
       @include modal-form.form-section;
 
       .form-section {
-        @include radio-button-selection.shoots-selection-container;
-        @include radio-button-selection.position-selection-container;
-
+        .position-selection-container,
         .shoots-selection-container {
-          .shoots-buttons {
-            display: flex;
-            gap: 12px;
-            flex-wrap: nowrap;
-          }
-        }
-
-        .position-selection-container {
-          .position-buttons {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-          }
+          @include modal-form.selection-container;
         }
       }
     }
-  }
-}
-
-.trigger-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  padding: 2px 0;
-}
-
-.trigger-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  background-color: #f3f4f6;
-  border: 1px solid #e5e7eb;
-  border-radius: 4px;
-  padding: 2px 6px;
-  font-size: 12px;
-  line-height: 1.4;
-  color: var(--color-dark);
-  max-width: 180px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.trigger-chip-remove {
-  font-size: 14px !important;
-  cursor: pointer;
-  color: var(--gray);
-  flex-shrink: 0;
-
-  &:hover {
-    color: var(--danger);
-  }
-}
-
-::ng-deep .tryout-player-select-panel.mat-mdc-select-panel {
-  min-width: 320px !important;
-  max-height: 360px !important;
-  padding: 0 !important;
-
-  .mat-mdc-option {
-    min-height: 40px !important;
-    font-size: 13px !important;
-    padding: 0 16px !important;
-  }
-
-  .mat-mdc-option.mdc-list-item--selected:not(.mdc-list-item--disabled) {
-    background-color: white !important;
-    color: var(--color-dark) !important;
-  }
-
-  .mat-mdc-option.mdc-list-item--selected:not(.mdc-list-item--disabled):hover {
-    background-color: #f3f4f6 !important;
-  }
-
-  .mat-mdc-optgroup-label {
-    min-height: 32px !important;
-    font-size: 11px !important;
-    font-weight: 600 !important;
-    text-transform: uppercase;
-    color: var(--color-primary) !important;
-    letter-spacing: 0.5px;
-    background-color: #f9fafb;
-    border-bottom: 1px solid #e5e7eb;
-    position: sticky;
-    top: 37px;
-    z-index: 1;
-  }
-
-  .mat-pseudo-checkbox-minimal {
-    display: inline-block !important;
-  }
-}
-
-.player-search-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  border-bottom: 1px solid #e5e7eb;
-  position: sticky;
-  top: 0;
-  background: white;
-  z-index: 1;
-
-  .search-icon {
-    font-size: 20px;
-    color: var(--gray);
-  }
-
-  .player-search-input {
-    flex: 1;
-    border: none;
-    outline: none;
-    font-size: 13px;
-    background: transparent;
-    color: var(--color-dark);
-
-    &::placeholder {
-      color: var(--gray);
-    }
-  }
-
-  .search-clear {
-    font-size: 18px;
-    cursor: pointer;
-    color: var(--gray);
-
-    &:hover {
-      color: var(--danger);
-    }
-  }
-}
-
-.player-option {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 13px;
-  width: 100%;
-
-  .player-number-badge {
-    color: var(--gray);
-    font-size: 12px;
-    font-weight: 500;
-  }
-
-  .player-team-info {
-    margin-left: auto;
-    font-size: 11px;
-    color: var(--gray);
   }
 }

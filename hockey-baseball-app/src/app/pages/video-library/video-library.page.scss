@@ -2,18 +2,18 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  background-color: var(--color-primary) !important;
-  color: white !important;
+  background-color: var(--primary) !important;
+  color: var(--text-white) !important;
   font-weight: 500;
   padding: 8px 16px;
   border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(207, 20, 43, 0.3);
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--primary) 30%, transparent);
   transition: all 0.3s ease;
 
   &:hover {
-    background-color: #b8122a !important;
+    background-color: var(--primary-dark) !important;
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(207, 20, 43, 0.4);
+    box-shadow: 0 4px 12px color-mix(in srgb, var(--primary) 40%, transparent);
   }
 
   &:active {

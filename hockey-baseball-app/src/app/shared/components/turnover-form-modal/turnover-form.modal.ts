@@ -1,15 +1,15 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ModalEvent, ModalService } from '../../../services/modal.service';
 import { ButtonComponent } from '../buttons/button/button.component';
 import { ButtonLoadingComponent } from '../buttons/button-loading/button-loading.component';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
-import { MatIconModule } from '@angular/material/icon';
-import { MatDividerModule } from '@angular/material/divider';
+import { SectionHeaderComponent } from '../section-header/section-header.component';
+import { FormFieldComponent } from '../form-field/form-field.component';
+import { CardGridComponent } from '../card-grid/card-grid.component';
+import { youtubeUrlValidator } from '../../validators/url.validator';
+import { getFieldError, GAME_TIME_PATTERN_ERROR } from '../../validators/form-error.util';
+import { CardGridItemComponent } from '../card-grid/card-grid-item.component';
 import {
   LocationSelectorComponent,
   PuckLocation,
@@ -21,6 +21,7 @@ import { GameMetadataService } from '../../../services/game-metadata.service';
 import { TurnoverEventRequest } from '../../../services/game-event.service';
 import { environment } from '../../../../environments/environment';
 import { CachedSrcDirective } from '../../directives/cached-src.directive';
+import { LoadingSpinnerComponent } from '../loading-spinner/loading-spinner.component';
 
 export interface TurnoverFormData {
   teamLogo: string;
@@ -39,12 +40,12 @@ export interface TurnoverFormData {
     ReactiveFormsModule,
     ButtonComponent,
     ButtonLoadingComponent,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
-    MatIconModule,
-    MatDividerModule,
+    SectionHeaderComponent,
+    FormFieldComponent,
+    CardGridComponent,
+    CardGridItemComponent,
     LocationSelectorComponent,
+    LoadingSpinnerComponent,
   ],
   templateUrl: './turnover-form.modal.html',
   styleUrl: './turnover-form.modal.scss',
@@ -60,7 +61,7 @@ export class TurnoverFormModal implements OnInit {
     turnoverEventId: number;
     periodOptions?: { value: number; label: string }[];
     teamOptions?: { value: number; label: string; logo?: string }[];
-    playerOptions?: { value: number; label: string; teamId: number }[];
+    playerOptions?: { value: number; label: string; teamId: number; number?: number }[];
     // Edit mode fields
     isEditMode?: boolean;
     eventId?: number;
@@ -86,7 +87,7 @@ export class TurnoverFormModal implements OnInit {
 
   // Data to be loaded from API
   teamOptions: { value: number; label: string; logo?: string }[] = [];
-  playerOptions: { value: number; label: string }[] = [];
+  playerOptions: { value: number; label: string; number?: number }[] = [];
   periodOptions: { value: number; label: string }[] = [];
 
   isLoadingTeams = false;
@@ -101,6 +102,7 @@ export class TurnoverFormModal implements OnInit {
     this.isEditMode = this.dialogData.isEditMode || false;
     this.eventId = this.dialogData.eventId;
 
+    this.modalService.registerDirtyCheck(() => this.turnoverForm.dirty);
     this.modalService.onEvent$.pipe(takeUntilDestroyed()).subscribe((event) => {
       if (event === ModalEvent.StopButtonLoading) {
         this.isSubmitting.set(false);
@@ -185,7 +187,7 @@ export class TurnoverFormModal implements OnInit {
         [Validators.required, Validators.pattern(/^([0-9]{1,2}|1[0-9][0-9]|200):([0-5][0-9])$/)],
       ],
       location: ['', Validators.required],
-      youtubeLink: [''],
+      youtubeLink: ['', [youtubeUrlValidator]],
     });
   }
 
@@ -271,6 +273,7 @@ export class TurnoverFormModal implements OnInit {
         .map((player) => ({
           value: player.value,
           label: player.label,
+          number: player.number,
         }));
 
       if (this.playerOptions.length > 0) {
@@ -299,7 +302,7 @@ export class TurnoverFormModal implements OnInit {
   }
 
   onSubmit(): void {
-    if (this.turnoverForm.valid && !this.isSubmitting()) {
+    if (this.turnoverForm.valid) {
       this.isSubmitting.set(true);
       const formValue = this.turnoverForm.value;
 
@@ -341,29 +344,21 @@ export class TurnoverFormModal implements OnInit {
     this.modalService.closeModal();
   }
 
-  getErrorMessage(fieldName: string): string {
-    const control = this.turnoverForm.get(fieldName);
-    if (control?.errors && control.touched) {
-      if (control.errors['required']) {
-        return `${this.getFieldLabel(fieldName)} is required`;
-      }
-      if (control.errors['pattern']) {
-        return 'Time must be in mm:ss format (max 200:00)';
-      }
-    }
-    return '';
-  }
+  private readonly fieldLabels: Record<string, string> = {
+    team: 'Team',
+    player: 'Player',
+    period: 'Period',
+    time: 'Time',
+    location: 'Location',
+    youtubeLink: 'YouTube Link',
+  };
 
-  private getFieldLabel(fieldName: string): string {
-    const labels: Record<string, string> = {
-      team: 'Team',
-      player: 'Player',
-      period: 'Period',
-      time: 'Time',
-      location: 'Location',
-      youtubeLink: 'YouTube Link',
-    };
-    return labels[fieldName] || fieldName;
+  getErrorMessage(fieldName: string): string {
+    return getFieldError(
+      this.turnoverForm.get(fieldName),
+      this.fieldLabels[fieldName] || fieldName,
+      GAME_TIME_PATTERN_ERROR
+    );
   }
 
   get selectedTeamData(): Team | undefined {

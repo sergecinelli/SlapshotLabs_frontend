@@ -2,11 +2,12 @@ import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ModalService, ModalEvent } from '../../../services/modal.service';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
-import { MatIconModule } from '@angular/material/icon';
-import { MatDividerModule } from '@angular/material/divider';
+import { SectionHeaderComponent } from '../section-header/section-header.component';
+import { FormFieldComponent } from '../form-field/form-field.component';
+import { CardGridComponent } from '../card-grid/card-grid.component';
+import { CardGridItemComponent } from '../card-grid/card-grid-item.component';
+import { CustomMultiSelectComponent } from '../custom-multi-select/custom-multi-select.component';
+import { SelectOptionGroup } from '../custom-select/custom-select.component';
 import { PlayerService } from '../../../services/player.service';
 import { GoalieService } from '../../../services/goalie.service';
 import { TryoutEntry, TryoutTabType } from '../../interfaces/tryout.interface';
@@ -16,24 +17,27 @@ import { PositionService, PositionOption } from '../../../services/position.serv
 import { ButtonComponent } from '../buttons/button/button.component';
 import { ButtonSmallComponent } from '../buttons/button-small/button-small.component';
 import { ButtonLoadingComponent } from '../buttons/button-loading/button-loading.component';
+import { getFieldError } from '../../validators/form-error.util';
 
 export interface TryoutAddModalData {
   activeTab: TryoutTabType;
   teamId: number;
+  entries?: TryoutEntry[];
+  positions?: PositionOption[];
 }
 
 @Component({
   selector: 'app-tryout-add-modal',
   imports: [
     ReactiveFormsModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
-    MatIconModule,
-    MatDividerModule,
     ButtonComponent,
     ButtonSmallComponent,
     ButtonLoadingComponent,
+    SectionHeaderComponent,
+    FormFieldComponent,
+    CardGridComponent,
+    CardGridItemComponent,
+    CustomMultiSelectComponent,
   ],
   templateUrl: './tryout-add.modal.html',
   styleUrl: './tryout-add.modal.scss',
@@ -48,28 +52,35 @@ export class TryoutAddModal implements OnInit {
 
   playerForm!: FormGroup;
   allEntries = signal<TryoutEntry[]>([]);
-  selectedIds = signal<(string | number)[]>([]);
-  searchText = signal('');
+  selectedIds = signal<string[]>([]);
   showCreateForm = signal(false);
   isSubmitting = signal(false);
   positionOptions: PositionOption[] = [];
 
+  selectedStringIds = computed(() => this.selectedIds());
+
   selectedEntries = computed(() => {
-    const ids = new Set(this.selectedIds().map(String));
+    const ids = new Set(this.selectedIds());
     return this.allEntries().filter((e) => ids.has(String(e.id)));
   });
 
-  groupedEntries = computed(() => {
+  entryOptionGroups = computed<SelectOptionGroup[]>(() => {
     const entries = this.allEntries();
-    const search = this.searchText().toLowerCase();
     const groups = new Map<string, TryoutEntry[]>();
     for (const entry of entries) {
-      if (search && !this.entryMatchesSearch(entry, search)) continue;
       const key = entry.team || 'Unknown Team';
       if (!groups.has(key)) groups.set(key, []);
       groups.get(key)!.push(entry);
     }
-    return Array.from(groups, ([teamName, entries]) => ({ teamName, entries }));
+    return Array.from(groups, ([teamName, items]) => ({
+      label: teamName,
+      options: items.map((e) => ({
+        value: String(e.id),
+        label: `${e.firstName} ${e.lastName}`,
+        prefix: `#${e.jerseyNumber}`,
+        suffix: e.teamLevelName,
+      })),
+    }));
   });
 
   shootsOptions = [
@@ -82,6 +93,7 @@ export class TryoutAddModal implements OnInit {
   }
 
   constructor() {
+    this.modalService.registerDirtyCheck(() => this.playerForm.dirty);
     this.modalService.onEvent$.pipe(takeUntilDestroyed()).subscribe((event) => {
       if (event === ModalEvent.StopButtonLoading) {
         this.isSubmitting.set(false);
@@ -91,44 +103,22 @@ export class TryoutAddModal implements OnInit {
 
   ngOnInit(): void {
     this.playerForm = this.createForm();
-    this.loadPositions();
-    this.loadSearchData();
-  }
 
-  onSelectionChange(ids: (string | number)[]): void {
-    this.selectedIds.set(ids);
-  }
+    if (this.data.positions?.length) {
+      this.applyPositions(this.data.positions);
+    } else {
+      this.loadPositions();
+    }
 
-  onSelectOpenedChange(opened: boolean): void {
-    if (!opened) {
-      this.searchText.set('');
+    if (this.data.entries?.length) {
+      this.allEntries.set(this.data.entries);
+    } else {
+      this.loadSearchData();
     }
   }
 
-  onSearchInput(event: Event): void {
-    this.searchText.set((event.target as HTMLInputElement).value);
-  }
-
-  clearSearch(input: HTMLInputElement): void {
-    this.searchText.set('');
-    input.value = '';
-    input.focus();
-  }
-
-  playerMatchesSearch(entry: TryoutEntry): boolean {
-    return this.entryMatchesSearch(entry, this.searchText().toLowerCase());
-  }
-
-  private entryMatchesSearch(entry: TryoutEntry, search: string): boolean {
-    if (!search) return true;
-    return (
-      entry.firstName.toLowerCase().includes(search) ||
-      entry.lastName.toLowerCase().includes(search)
-    );
-  }
-
-  removeEntry(entry: TryoutEntry): void {
-    this.selectedIds.update((ids) => ids.filter((id) => String(id) !== String(entry.id)));
+  onSelectionChange(ids: string[]): void {
+    this.selectedIds.set(ids);
   }
 
   clearSelection(): void {
@@ -172,20 +162,21 @@ export class TryoutAddModal implements OnInit {
     this.modalService.closeModal();
   }
 
+  private readonly fieldLabels: Record<string, string> = {
+    firstName: 'First Name',
+    lastName: 'Last Name',
+    position: 'Position',
+    shoots: 'Shoots',
+    jerseyNumber: 'Number',
+    height: 'Height',
+    weight: 'Weight',
+    birthYear: 'Birth Year',
+  };
+
   getErrorMessage(fieldName: string): string {
     const control = this.playerForm.get(fieldName);
-    if (control?.errors && control.touched) {
-      if (control.errors['required']) {
-        return `${this.getFieldLabel(fieldName)} is required`;
-      }
-      if (control.errors['min']) {
-        return `${this.getFieldLabel(fieldName)} must be at least ${control.errors['min'].min}`;
-      }
-      if (control.errors['max']) {
-        return `${this.getFieldLabel(fieldName)} must be no more than ${control.errors['max'].max}`;
-      }
-    }
-    return '';
+    const label = this.fieldLabels[fieldName] || fieldName;
+    return getFieldError(control, label);
   }
 
   private loadSearchData(): void {
@@ -249,29 +240,17 @@ export class TryoutAddModal implements OnInit {
     });
   }
 
-  private loadPositions(): void {
-    this.positionService.getPositions().subscribe({
-      next: (positions) => {
-        this.positionOptions = positions;
-        if (positions.length > 0) {
-          this.playerForm.patchValue({ position: positions[0].value });
-        }
-      },
-      error: (error) => console.error('Failed to load positions:', error),
-    });
+  private applyPositions(positions: PositionOption[]): void {
+    this.positionOptions = positions;
+    if (positions.length > 0) {
+      this.playerForm.patchValue({ position: positions[0].value });
+    }
   }
 
-  private getFieldLabel(fieldName: string): string {
-    const labels: Record<string, string> = {
-      firstName: 'First Name',
-      lastName: 'Last Name',
-      position: 'Position',
-      shoots: 'Shoots',
-      jerseyNumber: 'Number',
-      height: 'Height',
-      weight: 'Weight',
-      birthYear: 'Birth Year',
-    };
-    return labels[fieldName] || fieldName;
+  private loadPositions(): void {
+    this.positionService.getPositions().subscribe({
+      next: (positions) => this.applyPositions(positions),
+      error: (error) => console.error('Failed to load positions:', error),
+    });
   }
 }

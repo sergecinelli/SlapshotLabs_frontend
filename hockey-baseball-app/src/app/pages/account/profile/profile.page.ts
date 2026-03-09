@@ -3,13 +3,14 @@ import {} from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ButtonLoadingComponent } from '../../../shared/components/buttons/button-loading/button-loading.component';
 import { ButtonComponent } from '../../../shared/components/buttons/button/button.component';
+import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
 import { UserProfile, UserEditRequest } from '../../../shared/interfaces/auth.interfaces';
 
 @Component({
   selector: 'app-profile',
-  imports: [ReactiveFormsModule, ButtonLoadingComponent, ButtonComponent],
+  imports: [ReactiveFormsModule, ButtonLoadingComponent, ButtonComponent, LoadingSpinnerComponent],
   templateUrl: './profile.page.html',
   styleUrl: './profile.page.scss',
 })

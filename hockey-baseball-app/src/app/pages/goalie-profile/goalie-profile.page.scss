@@ -8,30 +8,23 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    color: var(--color-secondary);
-    border-color: var(--color-secondary);
+    color: var(--secondary);
+    border-color: var(--secondary);
 
     &:hover {
-      background-color: rgba(119, 143, 156, 0.1);
+      background-color: color-mix(in srgb, var(--secondary) 10%, transparent);
     }
-  }
-
-  .loading-container {
-    text-align: center;
-    padding: 48px;
-    color: var(--color-secondary);
-    font-size: 1.125rem;
   }
 
   .error-container {
     text-align: center;
     padding: 48px;
-    color: var(--color-dark);
+    color: var(--dark);
 
     p {
       font-size: 1.125rem;
       margin-bottom: 24px;
-      color: var(--color-secondary);
+      color: var(--secondary);
     }
   }
 
@@ -73,36 +66,36 @@
           align-items: center;
 
           .team {
-            background-color: var(--color-primary);
-            color: white;
+            background-color: var(--primary);
+            color: var(--text-white);
             padding: 8px 16px;
             border-radius: 20px;
             font-weight: 600;
             font-size: 0.8125rem;
             letter-spacing: 0.3px;
-            box-shadow: 0 2px 4px rgba(207, 20, 43, 0.2);
+            box-shadow: 0 2px 4px color-mix(in srgb, var(--primary) 20%, transparent);
           }
 
           .position {
-            background-color: var(--color-secondary);
-            color: white;
+            background-color: var(--secondary);
+            color: var(--text-white);
             padding: 8px 16px;
             border-radius: 20px;
             font-weight: 600;
             font-size: 0.8125rem;
             letter-spacing: 0.3px;
-            box-shadow: 0 2px 4px rgba(119, 143, 156, 0.2);
+            box-shadow: 0 2px 4px color-mix(in srgb, var(--secondary) 20%, transparent);
           }
 
           .jersey {
-            background-color: var(--color-dark);
-            color: white;
+            background-color: var(--dark);
+            color: var(--text-white);
             padding: 8px 16px;
             border-radius: 20px;
             font-weight: 600;
             font-size: 0.8125rem;
             letter-spacing: 0.3px;
-            box-shadow: 0 2px 4px rgba(15, 15, 15, 0.2);
+            box-shadow: 0 2px 4px color-mix(in srgb, var(--black) 20%, transparent);
           }
         }
       }
@@ -121,7 +114,7 @@
           max-width: 120px;
           max-height: 120px;
           box-sizing: border-box;
-          background-color: #f3f4f6;
+          background-color: var(--page-background);
           border-radius: 50%;
           display: flex;
           align-items: center;
@@ -151,7 +144,7 @@
         justify-content: flex-start;
         padding: 20px;
         border-bottom: 1px solid var(--border-light);
-        background-color: var(--white);
+        background-color: var(--card-background);
         min-height: 60px;
       }
 
@@ -168,7 +161,7 @@
         height: 100%;
 
         mat-icon {
-          color: var(--color-primary);
+          color: var(--primary);
           font-size: 24px;
           width: 24px;
           height: 24px;
@@ -180,7 +173,7 @@
         }
 
         .material-symbols-rounded {
-          color: var(--color-primary);
+          color: var(--primary);
           font-size: 24px;
           width: 24px;
           height: 24px;
@@ -208,13 +201,13 @@
         align-items: center;
         justify-content: center;
         padding: 48px 24px;
-        color: var(--color-secondary);
+        color: var(--secondary);
 
         .empty-icon {
           font-size: 4rem;
           width: 4rem;
           height: 4rem;
-          color: var(--color-secondary);
+          color: var(--secondary);
           opacity: 0.5;
           margin-bottom: 16px;
         }
@@ -246,7 +239,7 @@
 
           .label {
             font-weight: 500;
-            color: var(--color-secondary);
+            color: var(--secondary);
             font-size: 0.75rem;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -254,7 +247,7 @@
 
           .value {
             font-weight: 500;
-            color: var(--color-dark);
+            color: var(--dark);
             font-size: 0.875rem;
           }
         }
@@ -276,18 +269,18 @@
       }
 
       .stat-box {
-        background-color: #ffffff;
-        border: 2px solid #e5e7eb;
+        background-color: var(--card-background);
+        border: 2px solid var(--border);
         border-radius: 8px;
         padding: 20px 16px;
         text-align: center;
 
         &.highlight {
-          border-color: var(--color-primary);
-          background-color: rgba(207, 20, 43, 0.04);
+          border-color: var(--primary);
+          background-color: color-mix(in srgb, var(--primary) 4%, transparent);
 
           .stat-value {
-            color: var(--color-primary);
+            color: var(--primary);
           }
         }
 
@@ -317,8 +310,8 @@
       margin-top: 20px;
 
       .penalty-stat-box {
-        background-color: #f9fafb;
-        border: 1px solid #e5e7eb;
+        background-color: var(--item-hover);
+        border: 1px solid var(--border);
         border-radius: 6px;
         padding: 12px 16px;
         text-align: center;
@@ -346,7 +339,7 @@
         justify-content: space-between;
         align-items: center;
         padding: 16px 0;
-        border-bottom: 1px solid #f3f4f6;
+        border-bottom: 1px solid var(--page-background);
 
         &:last-child {
           border-bottom: none;
@@ -360,7 +353,7 @@
 
         .label {
           font-weight: 500;
-          color: var(--color-secondary);
+          color: var(--secondary);
           min-width: 120px;
           font-size: 0.875rem;
           text-transform: uppercase;
@@ -369,7 +362,7 @@
 
         .value {
           font-weight: 600;
-          color: var(--color-dark);
+          color: var(--dark);
           text-align: right;
           font-size: 1rem;
         }
@@ -379,18 +372,12 @@
         }
       }
     }
-
-    mat-divider {
-      margin: 16px 0;
-      border-color: var(--color-primary) !important;
-      border-top-width: 2px !important;
-    }
   }
 }
 
 // Table Container - matches player-profile structure
 .table-container {
-  background-color: var(--white);
+  background-color: var(--card-background);
   border-radius: 4px;
   border: 1px solid var(--border);
   overflow-x: auto;
@@ -401,16 +388,16 @@
   }
 
   &::-webkit-scrollbar-track {
-    background-color: #f1f5f9;
+    background-color: var(--gray-tone3);
     border-radius: 4px;
   }
 
   &::-webkit-scrollbar-thumb {
-    background-color: #cbd5e1;
+    background-color: var(--secondary-tone1);
     border-radius: 4px;
 
     &:hover {
-      background-color: #94a3b8;
+      background-color: var(--secondary);
     }
   }
 }
@@ -423,8 +410,8 @@
 
   .mat-mdc-header-row {
     .mat-mdc-header-cell {
-      background-color: #e5e7eb;
-      color: #4b5563;
+      background-color: var(--border);
+      color: var(--text-secondary);
       font-weight: 500;
       font-size: 14px !important;
       padding: 8px 12px !important;

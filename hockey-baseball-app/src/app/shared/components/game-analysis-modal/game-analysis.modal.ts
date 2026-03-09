@@ -2,13 +2,13 @@ import { Component, inject, signal, computed } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ModalEvent, ModalService } from '../../../services/modal.service';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
-import { MatDividerModule } from '@angular/material/divider';
 import { Analysis, AnalyticsApiIn } from '../../interfaces/analysis.interface';
 import { ButtonComponent } from '../buttons/button/button.component';
 import { ButtonLoadingComponent } from '../buttons/button-loading/button-loading.component';
+import { SectionHeaderComponent } from '../section-header/section-header.component';
+import { FormFieldComponent } from '../form-field/form-field.component';
+import { CustomSelectComponent, SelectOption } from '../custom-select/custom-select.component';
+import { getFieldError } from '../../validators/form-error.util';
 
 export interface GameOption {
   value: string;
@@ -26,12 +26,11 @@ export interface GameAnalysisModalData {
   selector: 'app-game-analysis-modal',
   imports: [
     ReactiveFormsModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
-    MatDividerModule,
     ButtonComponent,
     ButtonLoadingComponent,
+    SectionHeaderComponent,
+    FormFieldComponent,
+    CustomSelectComponent,
   ],
   templateUrl: './game-analysis.modal.html',
   styleUrl: './game-analysis.modal.scss',
@@ -46,15 +45,11 @@ export class GameAnalysisModal {
   isSubmitting = signal(false);
 
   allGames = signal<GameOption[]>([]);
-  searchText = signal('');
   selectedEntityId = signal('');
 
-  filteredGames = computed(() => {
-    const games = this.allGames();
-    const search = this.searchText().toLowerCase();
-    if (!search) return games;
-    return games.filter((g) => g.label.toLowerCase().includes(search));
-  });
+  gameOptions = computed<SelectOption[]>(() =>
+    this.allGames().map((g) => ({ value: g.value, label: g.label }))
+  );
 
   isEntityLocked = computed(() => !!this.data.preSelectedGameId || this.isEditMode);
 
@@ -81,6 +76,7 @@ export class GameAnalysisModal {
       .valueChanges.pipe(takeUntilDestroyed())
       .subscribe((value: string) => this.selectedEntityId.set(value));
 
+    this.modalService.registerDirtyCheck(() => this.analysisForm.dirty);
     this.modalService.onEvent$.pipe(takeUntilDestroyed()).subscribe((event) => {
       if (event === ModalEvent.StopButtonLoading) {
         this.isSubmitting.set(false);
@@ -88,22 +84,6 @@ export class GameAnalysisModal {
     });
 
     this.patchFormValues();
-  }
-
-  onSelectOpenedChange(opened: boolean): void {
-    if (!opened) {
-      this.searchText.set('');
-    }
-  }
-
-  onSearchInput(event: Event): void {
-    this.searchText.set((event.target as HTMLInputElement).value);
-  }
-
-  clearSearch(input: HTMLInputElement): void {
-    this.searchText.set('');
-    input.value = '';
-    input.focus();
   }
 
   onSubmit(): void {
@@ -134,20 +114,18 @@ export class GameAnalysisModal {
     this.modalService.closeModal();
   }
 
+  private readonly fieldLabels: Record<string, string> = {
+    entityId: 'Game',
+    title: 'Title',
+    author: 'Author',
+    analysis: 'Analysis',
+  };
+
   getErrorMessage(fieldName: string): string {
-    const control = this.analysisForm.get(fieldName);
-    if (control?.errors && control.touched) {
-      if (control.errors['required']) {
-        const labels: Record<string, string> = {
-          entityId: 'Game',
-          title: 'Title',
-          author: 'Author',
-          analysis: 'Analysis',
-        };
-        return `${labels[fieldName] || fieldName} is required`;
-      }
-    }
-    return '';
+    return getFieldError(
+      this.analysisForm.get(fieldName),
+      this.fieldLabels[fieldName] || fieldName
+    );
   }
 
   private patchFormValues(): void {

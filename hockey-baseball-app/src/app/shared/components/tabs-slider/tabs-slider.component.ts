@@ -7,6 +7,7 @@ import {
   ElementRef,
   signal,
   afterNextRender,
+  HostBinding,
 } from '@angular/core';
 import { MatRippleModule } from '@angular/material/core';
 
@@ -31,6 +32,11 @@ export class TabsSliderComponent {
 
   items = input<TabItem[]>([]);
   activeTabIndex = input<number | null>(null);
+  size = input<'default' | 'big'>('default');
+
+  @HostBinding('class.big') get isBig() {
+    return this.size() === 'big';
+  }
 
   selected = output<string>();
 

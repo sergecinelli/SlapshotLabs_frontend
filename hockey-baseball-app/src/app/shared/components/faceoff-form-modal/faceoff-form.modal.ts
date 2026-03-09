@@ -1,27 +1,27 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ModalEvent, ModalService } from '../../../services/modal.service';
 import { ButtonComponent } from '../buttons/button/button.component';
 import { ButtonLoadingComponent } from '../buttons/button-loading/button-loading.component';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
-import { MatIconModule } from '@angular/material/icon';
-import { MatDividerModule } from '@angular/material/divider';
+import { SectionHeaderComponent } from '../section-header/section-header.component';
+import { FormFieldComponent } from '../form-field/form-field.component';
+import { CardGridComponent } from '../card-grid/card-grid.component';
+import { youtubeUrlValidator } from '../../validators/url.validator';
+import { getFieldError, GAME_TIME_PATTERN_ERROR } from '../../validators/form-error.util';
+import { CardGridItemComponent } from '../card-grid/card-grid-item.component';
 import {
   LocationSelectorComponent,
   PuckLocation,
   Team,
 } from '../location-selector/location-selector.component';
-
 import { TeamService } from '../../../services/team.service';
 import { PlayerService } from '../../../services/player.service';
 import { GameMetadataService } from '../../../services/game-metadata.service';
 import { FaceoffEventRequest } from '../../../services/game-event.service';
 import { environment } from '../../../../environments/environment';
 import { CachedSrcDirective } from '../../directives/cached-src.directive';
+import { LoadingSpinnerComponent } from '../loading-spinner/loading-spinner.component';
 
 export interface FaceoffFormData {
   winnerTeamLogo: string;
@@ -41,15 +41,14 @@ export interface FaceoffFormData {
   imports: [
     CachedSrcDirective,
     ReactiveFormsModule,
-
     ButtonComponent,
     ButtonLoadingComponent,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
-    MatIconModule,
-    MatDividerModule,
+    SectionHeaderComponent,
+    FormFieldComponent,
+    CardGridComponent,
+    CardGridItemComponent,
     LocationSelectorComponent,
+    LoadingSpinnerComponent,
   ],
   templateUrl: './faceoff-form.modal.html',
   styleUrl: './faceoff-form.modal.scss',
@@ -65,7 +64,7 @@ export class FaceoffFormModal implements OnInit {
     faceoffEventId: number;
     periodOptions?: { value: number; label: string }[];
     teamOptions?: { value: number; label: string; logo?: string }[];
-    playerOptions?: { value: number; label: string; teamId: number }[];
+    playerOptions?: { value: number; label: string; teamId: number; number?: number }[];
     // Edit mode fields
     isEditMode?: boolean;
     eventId?: number;
@@ -93,9 +92,9 @@ export class FaceoffFormModal implements OnInit {
 
   // Data to be loaded from API
   teamOptions: { value: number; label: string; logo?: string }[] = [];
-  playersByTeam: Record<number, { value: number; label: string }[]> = {};
-  winnerPlayerOptions: { value: number; label: string }[] = [];
-  loserPlayerOptions: { value: number; label: string }[] = [];
+  playersByTeam: Record<number, { value: number; label: string; number?: number }[]> = {};
+  winnerPlayerOptions: { value: number; label: string; number?: number }[] = [];
+  loserPlayerOptions: { value: number; label: string; number?: number }[] = [];
   periodOptions: { value: number; label: string }[] = [];
 
   isLoadingTeams = false;
@@ -112,6 +111,7 @@ export class FaceoffFormModal implements OnInit {
     this.eventId = this.dialogData.eventId;
     this.setupTeamChangeListeners();
 
+    this.modalService.registerDirtyCheck(() => this.faceoffForm.dirty);
     this.modalService.onEvent$.pipe(takeUntilDestroyed()).subscribe((event) => {
       if (event === ModalEvent.StopButtonLoading) {
         this.isSubmitting.set(false);
@@ -213,7 +213,7 @@ export class FaceoffFormModal implements OnInit {
         [Validators.required, Validators.pattern(/^([0-9]{1,2}|1[0-9][0-9]|200):([0-5][0-9])$/)],
       ],
       location: [''],
-      youtubeLink: [''],
+      youtubeLink: ['', [youtubeUrlValidator]],
     });
   }
 
@@ -273,6 +273,7 @@ export class FaceoffFormModal implements OnInit {
         .map((player) => ({
           value: player.value,
           label: player.label,
+          number: player.number,
         }));
 
       // Cache the filtered players
@@ -436,7 +437,7 @@ export class FaceoffFormModal implements OnInit {
   }
 
   onSubmit(): void {
-    if (this.faceoffForm.valid && !this.isSubmitting()) {
+    if (this.faceoffForm.valid) {
       this.isSubmitting.set(true);
       const formValue = this.faceoffForm.value;
 
@@ -477,31 +478,23 @@ export class FaceoffFormModal implements OnInit {
     this.modalService.closeModal();
   }
 
-  getErrorMessage(fieldName: string): string {
-    const control = this.faceoffForm.get(fieldName);
-    if (control?.errors && control.touched) {
-      if (control.errors['required']) {
-        return `${this.getFieldLabel(fieldName)} is required`;
-      }
-      if (control.errors['pattern']) {
-        return 'Time must be in mm:ss format (max 200:00)';
-      }
-    }
-    return '';
-  }
+  private readonly fieldLabels: Record<string, string> = {
+    winnerTeam: 'Faceoff Winner Team',
+    winnerPlayer: 'Faceoff Winner Player',
+    loserTeam: 'Faceoff Loser Team',
+    loserPlayer: 'Faceoff Loser Player',
+    period: 'Period',
+    time: 'Time',
+    location: 'Location',
+    youtubeLink: 'YouTube Link',
+  };
 
-  private getFieldLabel(fieldName: string): string {
-    const labels: Record<string, string> = {
-      winnerTeam: 'Faceoff Winner Team',
-      winnerPlayer: 'Faceoff Winner Player',
-      loserTeam: 'Faceoff Loser Team',
-      loserPlayer: 'Faceoff Loser Player',
-      period: 'Period',
-      time: 'Time',
-      location: 'Location',
-      youtubeLink: 'YouTube Link',
-    };
-    return labels[fieldName] || fieldName;
+  getErrorMessage(fieldName: string): string {
+    return getFieldError(
+      this.faceoffForm.get(fieldName),
+      this.fieldLabels[fieldName] || fieldName,
+      GAME_TIME_PATTERN_ERROR
+    );
   }
 
   get winnerTeamData(): Team | undefined {

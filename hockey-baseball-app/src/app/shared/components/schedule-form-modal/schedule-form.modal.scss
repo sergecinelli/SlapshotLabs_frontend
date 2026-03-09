@@ -1,10 +1,7 @@
 @use '../../styles/modal-form';
-@use '../../styles/radio-button-selection';
 
 .schedule-form-modal {
   @include modal-form.modal-wrapper;
-
-  @include modal-form.material-form-overrides;
 
   .modal-content {
     @include modal-form.loading-container;
@@ -13,24 +10,14 @@
       @include modal-form.form-section;
 
       .form-section {
-        .form-row {
-          .roster-button {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 10px 16px;
-            font-size: 14px;
-
-            mat-icon {
-              font-size: 20px;
-              width: 20px;
-              height: 20px;
-            }
-          }
+        .form-row app-form-field.roster-field {
+          flex: 0 0 calc(50% - 1px);
         }
 
-        @include radio-button-selection.game-type-selection-container;
-        @include radio-button-selection.status-selection-container;
+        .game-type-selection-container,
+        .status-selection-container {
+          @include modal-form.selection-container;
+        }
       }
     }
   }

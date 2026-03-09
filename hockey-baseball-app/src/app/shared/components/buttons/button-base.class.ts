@@ -1,6 +1,7 @@
 import {
   ElementRef,
   OnInit,
+  OnDestroy,
   AfterContentInit,
   Directive,
   inject,
@@ -9,6 +10,7 @@ import {
   effect,
   signal,
 } from '@angular/core';
+import { Subscription } from 'rxjs';
 import {
   ButtonMaterialIconsClass,
   ButtonMaterialSymbolsClass,
@@ -22,7 +24,7 @@ import { TooltipPosition } from '@angular/material/tooltip';
 @Directive({
   host: { '[style.width]': 'width()' },
 })
-export abstract class ButtonBaseClass implements OnInit, AfterContentInit {
+export abstract class ButtonBaseClass implements OnInit, AfterContentInit, OnDestroy {
   protected static readonly BUTTON_TRANSITION = '0.1s cubic-bezier(0.175, 0.885, 0.32, 1.06)';
 
   protected getColor(color: AppColor) {
@@ -81,6 +83,8 @@ export abstract class ButtonBaseClass implements OnInit, AfterContentInit {
   protected themeService = inject(ThemeService);
   protected elRef = inject(ElementRef);
 
+  private themeSubscription: Subscription | null = null;
+
   private isMatIconFillEffect = effect(() => {
     this._isMatIconFillOriginal = this.isMatIconFill();
     this.isMatIconFillCurrent = this.isMatIconFill();
@@ -104,6 +108,17 @@ export abstract class ButtonBaseClass implements OnInit, AfterContentInit {
     if (this.isActive()) {
       this.applyActiveStyles();
     }
+
+    this.themeSubscription = this.themeService.themeChanged$.subscribe(() => {
+      requestAnimationFrame(() => {
+        const newStyles = this.isActive() ? this.getHoverStyles() : this.getDefaultStyles();
+        this.styles = { ...this.styles, ...newStyles };
+      });
+    });
+  }
+
+  ngOnDestroy() {
+    this.themeSubscription?.unsubscribe();
   }
 
   ngAfterContentInit() {

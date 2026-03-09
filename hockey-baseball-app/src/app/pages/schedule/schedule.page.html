@@ -34,8 +34,8 @@
 <div class="page-content" [appVisibilityMap]="visibilityByRoleMap">
   <!-- Loading State -->
   @if (loadingValue) {
-    <div class="schedule-loading">
-      <div class="loading-text">Loading games...</div>
+    <div class="entity-loading">
+      <app-loading-spinner message="Loading games..." size="sm" />
     </div>
   }
 

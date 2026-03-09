@@ -6,11 +6,12 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 48px 24px;
-  min-height: 200px;
+  padding: 32px 24px;
+  background-color: var(--card-background);
+  border-radius: var(--radius);
+  border: 1px solid var(--border-light);
 }
 
-.loading-text,
 .empty-text {
   color: var(--text-secondary);
   font-size: 16px;
@@ -26,13 +27,13 @@ app-card-grid {
 .entity-table-container {
   overflow-x: auto;
   border-radius: var(--radius);
-  background: var(--white);
+  background: var(--card-background);
   border: 1px solid var(--border-light);
 }
 
 // Entity Card
 .entity-card {
-  background: var(--white);
+  background: var(--card-background);
   border: 1px solid var(--border-light);
   padding: 10px;
   width: 100%;

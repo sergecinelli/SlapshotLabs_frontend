@@ -6,7 +6,7 @@
 <ng-template appBreadcrumbActions>
   <app-button
     [materialIcon]="layoutModeValue === 'card' ? 'table_rows' : 'grid_view'"
-    [bg]="'white'"
+    [bg]="'card_background'"
     [bghover]="'gray_tone3'"
     [color]="'text_primary'"
     [colorhover]="'primary'"
@@ -22,8 +22,8 @@
 <div class="page-content" [appVisibilityMap]="visibilityByRoleMap">
   <!-- Loading State -->
   @if (loadingValue) {
-    <div class="schedules-loading">
-      <div class="loading-text">Loading schedules...</div>
+    <div class="entity-loading">
+      <app-loading-spinner message="Loading schedules..." size="sm" />
     </div>
   }
 
@@ -57,6 +57,7 @@
           [data]="gamesValue"
           [actions]="tableActions"
           [loading]="loadingValue"
+          loadingMessage="Loading schedules..."
           (actionClick)="onActionClick($event)"
           (sort)="onSort($event)"
           emptyMessage="No schedules found."

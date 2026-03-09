@@ -51,6 +51,7 @@ export class ModalService implements OnDestroy {
 
   modals: ModalInstance[] = [];
   private readonly animationDuration = 200;
+  private dirtyChecks = new Map<string, () => boolean>();
 
   private isClosing = false;
   private isClosingAll = false;
@@ -114,6 +115,15 @@ export class ModalService implements OnDestroy {
 
   getModalById(id: string): ModalInstance | undefined {
     return this.modals.find((m) => m.params?.id === id);
+  }
+
+  registerDirtyCheck(fn: () => boolean, id?: string): void {
+    const modalId = id ?? this.modals[this.modals.length - 1]?.id;
+    if (modalId) this.dirtyChecks.set(modalId, fn);
+  }
+
+  hasDirtyForm(id: string): boolean {
+    return this.dirtyChecks.get(id)?.() ?? false;
   }
 
   broadcastEvent(event: ModalEvent): void {
@@ -273,6 +283,7 @@ export class ModalService implements OnDestroy {
         console.warn(`[ModalService] destroy failed for "${params?.name}"`, err);
       }
 
+      this.dirtyChecks.delete(m.id);
       this.modals = this.modals.filter((x) => x.ref !== ref);
       this._onClose.next({ id: m.id, name: params?.name });
     }

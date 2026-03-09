@@ -5,7 +5,7 @@
 <ng-template appBreadcrumbActions>
   <app-button
     [materialIcon]="layoutModeValue === 'card' ? 'table_rows' : 'grid_view'"
-    [bg]="'white'"
+    [bg]="'card_background'"
     [bghover]="'gray_tone3'"
     [color]="'text_primary'"
     [colorhover]="'primary'"
@@ -42,7 +42,7 @@
   <!-- Loading State -->
   @if (loadingValue) {
     <div class="entity-loading">
-      <div class="loading-text">Loading teams...</div>
+      <app-loading-spinner message="Loading teams..." size="sm" />
     </div>
   }
 
@@ -70,7 +70,7 @@
                   [color]="'text_secondary'"
                   [colorhover]="'green_dark'"
                   [materialIcon]="'visibility'"
-                  [matTooltip]="'Profile'"
+                  [tooltip]="'Profile'"
                 />
                 <app-button-loading
                   [bg]="'transparent'"
@@ -89,7 +89,7 @@
                   [color]="'text_secondary'"
                   [colorhover]="'primary_dark'"
                   [materialIcon]="'delete'"
-                  [matTooltip]="'Delete'"
+                  [tooltip]="'Delete'"
                   (clicked)="deleteTeam(team)"
                   role-visibility-name="delete-action"
                 />
@@ -187,7 +187,7 @@
                 <app-button-route
                   [route]="'/teams-and-rosters/teams/' + team.id + '/schedule'"
                   [bg]="'transparent'"
-                  [bghover]="'button_background'"
+                  [bghover]="'item_hover'"
                   [br]="'border'"
                   [color]="'text_primary'"
                   [colorhover]="'text_primary'"
@@ -201,7 +201,7 @@
                   [route]="'/teams-and-rosters/players'"
                   [queryParams]="getPlayersQueryParams(team)"
                   [bg]="'transparent'"
-                  [bghover]="'button_background'"
+                  [bghover]="'item_hover'"
                   [br]="'border'"
                   [color]="'text_primary'"
                   [colorhover]="'text_primary'"
@@ -215,7 +215,7 @@
                   [route]="'/teams-and-rosters/goalies'"
                   [queryParams]="getGoaliesQueryParams(team)"
                   [bg]="'transparent'"
-                  [bghover]="'button_background'"
+                  [bghover]="'item_hover'"
                   [br]="'border'"
                   [color]="'text_primary'"
                   [colorhover]="'text_primary'"
@@ -226,8 +226,8 @@
                   Goalies
                 </app-button-route>
                 <app-button-loading
-                  [bg]="'upcoming'"
-                  [bghover]="'upcoming_dark'"
+                  [bg]="'cyan'"
+                  [bghover]="'cyan_dark'"
                   [color]="'white'"
                   [colorhover]="'white'"
                   [materialIcon]="'bar_chart'"
@@ -251,6 +251,7 @@
           [data]="teamsValue"
           [actions]="tableActions"
           [loading]="loadingValue"
+          loadingMessage="Loading teams..."
           (actionClick)="onActionClick($event)"
           (sort)="onSort($event)"
           emptyMessage="No teams found."

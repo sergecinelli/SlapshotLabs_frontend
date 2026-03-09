@@ -17,8 +17,8 @@
   </div>
   <app-button-loading
     materialIcon="bar_chart"
-    [bg]="'upcoming'"
-    [bghover]="'upcoming_dark'"
+    [bg]="'cyan'"
+    [bghover]="'cyan_dark'"
     [color]="'white'"
     [colorhover]="'white'"
     [haveContent]="true"
@@ -36,9 +36,7 @@
     @if (loading) {
       <div class="dashboard-card">
         <div class="dashboard-card-content">
-          <div class="dashboard-loading">
-            <div class="dashboard-loading-text">Loading player profile...</div>
-          </div>
+          <app-loading-spinner message="Loading player profile..." size="sm" />
         </div>
       </div>
     }

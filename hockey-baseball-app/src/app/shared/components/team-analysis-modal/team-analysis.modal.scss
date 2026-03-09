@@ -1,3 +1,14 @@
-@use '../../styles/analysis-modal';
+@use '../../styles/modal-form';
 
-@include analysis-modal.entity-select-panel;
+.analysis-modal {
+  @include modal-form.modal-wrapper;
+  max-width: none;
+
+  .modal-content {
+    @include modal-form.loading-container;
+
+    .analysis-form {
+      @include modal-form.form-section;
+    }
+  }
+}

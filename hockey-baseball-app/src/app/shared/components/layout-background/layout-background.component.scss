@@ -119,9 +119,9 @@ $sheen-opacity: 0;
   background: linear-gradient(
     135deg,
     transparent 30%,
-    rgba(255, 255, 255, 0.08) 45%,
-    rgba(255, 255, 255, 0.15) 50%,
-    rgba(255, 255, 255, 0.08) 55%,
+    color-mix(in srgb, var(--white) 8%, transparent) 45%,
+    color-mix(in srgb, var(--white) 15%, transparent) 50%,
+    color-mix(in srgb, var(--white) 8%, transparent) 55%,
     transparent 70%
   );
   opacity: $sheen-opacity;

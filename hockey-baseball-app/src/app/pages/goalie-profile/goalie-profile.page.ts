@@ -4,7 +4,6 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
-import { MatDividerModule } from '@angular/material/divider';
 import { MatTableModule } from '@angular/material/table';
 import { Observable, forkJoin } from 'rxjs';
 import { ModalService, ModalEvent } from '../../services/modal.service';
@@ -45,6 +44,7 @@ import { ComponentVisibilityByRoleDirective } from '../../shared/directives/comp
 import { visibilityByRoleMap } from './goalie-profile.role-map';
 import { CachedSrcDirective } from '../../shared/directives/cached-src.directive';
 import { BreadcrumbActionsDirective } from '../../shared/directives/breadcrumb-actions.directive';
+import { LoadingSpinnerComponent } from '../../shared/components/loading-spinner/loading-spinner.component';
 
 @Component({
   selector: 'app-goalie-profile',
@@ -54,13 +54,13 @@ import { BreadcrumbActionsDirective } from '../../shared/directives/breadcrumb-a
     MatButtonModule,
     MatIconModule,
     MatCardModule,
-    MatDividerModule,
     MatTableModule,
     ShotLocationDisplayComponent,
     ButtonLoadingComponent,
     ComponentVisibilityByRoleDirective,
     RouterLink,
     BreadcrumbActionsDirective,
+    LoadingSpinnerComponent,
   ],
   templateUrl: './goalie-profile.page.html',
   styleUrl: './goalie-profile.page.scss',
@@ -281,7 +281,7 @@ export class GoalieProfilePage implements OnInit {
     this.modalService.openModal(GoalieFormModal, {
       name: 'Edit Goalie',
       icon: 'sports_hockey',
-      width: '800px',
+      width: '900px',
       maxWidth: '95vw',
       data: {
         goalie: this.goalie,

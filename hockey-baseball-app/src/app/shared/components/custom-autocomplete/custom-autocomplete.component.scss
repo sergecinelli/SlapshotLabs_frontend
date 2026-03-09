@@ -1,0 +1,52 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+::ng-deep .custom-autocomplete-panel {
+  background: var(--card-background);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  max-height: 200px;
+  width: max-content;
+  min-width: 100%;
+  overflow-y: auto;
+  animation: autocompleteOpen 0.15s ease-out;
+
+  .autocomplete-option {
+    padding: 10px 16px;
+    font-size: 13px;
+    color: var(--dark);
+    cursor: pointer;
+    transition: background-color 0.15s;
+
+    &:hover {
+      background-color: var(--gray-tone3);
+    }
+
+    &.selected {
+      background-color: var(--gray-tone3);
+      font-weight: 500;
+    }
+  }
+
+  .autocomplete-empty {
+    padding: 16px;
+    text-align: center;
+    font-size: 13px;
+    color: var(--gray);
+  }
+}
+
+@keyframes autocompleteOpen {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

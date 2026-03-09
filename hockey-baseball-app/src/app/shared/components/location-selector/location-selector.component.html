@@ -1,7 +1,6 @@
 @let team1Value = team1();
 @let team2Value = team2();
-@let showTitleValue = showTitle();
-@let showDividerValue = showDivider();
+@let showHeaderValue = showHeader();
 @let titleValue = title();
 @let showTeamsValue = showTeams();
 @let maxWidthValue = maxWidth();
@@ -9,13 +8,8 @@
 @let showClearButtonValue = showClearButton();
 
 <div class="location-selector">
-  @if (showTitleValue) {
-    <div class="section-header">
-      <span class="section-title">{{ titleValue }}</span>
-    </div>
-  }
-  @if (showDividerValue) {
-    <mat-divider class="section-divider"></mat-divider>
+  @if (showHeaderValue) {
+    <app-section-header [title]="titleValue" />
   }
 
   <div class="rink-container">

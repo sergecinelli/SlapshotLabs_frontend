@@ -2,25 +2,10 @@
 
 .video-form-modal {
   @include modal-form.modal-wrapper;
-  max-width: none;
-
-  @include modal-form.material-form-overrides;
 
   .modal-content {
     .video-form {
       @include modal-form.form-section;
-
-      .form-section {
-        .form-row {
-          .form-field {
-            &.full-width {
-              flex: 1;
-              width: 100%;
-              min-width: 100%;
-            }
-          }
-        }
-      }
     }
   }
 }
