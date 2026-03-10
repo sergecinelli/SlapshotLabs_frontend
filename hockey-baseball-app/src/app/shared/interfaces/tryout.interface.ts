@@ -34,15 +34,14 @@ export type PlayerTryoutApiType = 'players' | 'goalies';
 
 export interface PlayerTryoutApiIn {
   player_id: number;
-  team_id?: number | null;
-  player_type: PlayerTryoutApiType;
+  team_id: number;
   status: TryoutStatus;
-  notes?: string | null;
+  note: string | null;
 }
 
 export interface PlayerTryoutApiUpdate {
   status: TryoutStatus;
-  notes?: string | null;
+  note: string | null;
 }
 
 export interface TryoutStatusHistoryUser {

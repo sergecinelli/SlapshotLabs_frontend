@@ -59,15 +59,14 @@ export class TryoutService {
   addToTryout(
     teamId: number | null,
     playerId: number,
-    type: TryoutEntryType,
+    _type: TryoutEntryType,
     note?: string
   ): Observable<{ id: number }> {
     const body: PlayerTryoutApiIn = {
       player_id: playerId,
-      team_id: teamId,
-      player_type: toApiType(type),
+      team_id: teamId!,
       status: TryoutStatus.TryingOut,
-      notes: note || null,
+      note: note || null,
     };
     return this.apiService.post<{ id: number }>(BASE_URL, body).pipe(
       catchError((error) => {
@@ -83,7 +82,7 @@ export class TryoutService {
     status: TryoutStatus,
     note?: string
   ): Observable<void> {
-    const body: PlayerTryoutApiUpdate = { status, notes: note || null };
+    const body: PlayerTryoutApiUpdate = { status, note: note || null };
     return this.apiService.put<void>(`${BASE_URL}/${tryoutId}`, body).pipe(
       catchError((error) => {
         console.error('Failed to update tryout status:', error);
