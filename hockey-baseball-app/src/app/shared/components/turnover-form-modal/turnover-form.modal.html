@@ -30,7 +30,10 @@
           }
         </app-form-field>
 
-        <app-form-field label="Player that turned the puck over" [error]="getErrorMessage('player')">
+        <app-form-field
+          label="Player that turned the puck over"
+          [error]="getErrorMessage('player')"
+        >
           @if (isLoadingPlayers) {
             <app-loading-spinner message="Loading players..." size="sm" />
           }

@@ -119,6 +119,8 @@ export class GoaliesPage implements OnInit {
       variant: 'gray',
       icon: 'person_add',
       iconOnly: true,
+      roleVisibilityName: 'add-to-tryout-action',
+      roleVisibilityTeamId: (item) => item['teamId']?.toString(),
     },
     {
       label: 'Profile',
@@ -512,8 +514,29 @@ export class GoaliesPage implements OnInit {
     const teamId = user?.team_id;
     if (!teamId) return;
 
-    this.tryoutService.addToTryout(teamId, parseInt(goalie.id, 10), 'goalie').subscribe({
-      error: (error) => console.error('Failed to add to tryout:', error),
+    this.modalService.openModal(DisplayTextModal, {
+      name: 'Add to Tryout',
+      icon: 'person_add',
+      data: {
+        text: `Are you sure you want to add <b>${goalie.firstName} ${goalie.lastName}</b> to the tryout list?`,
+        buttonText: 'Add to Tryout',
+        buttonIcon: 'person_add',
+        color: 'primary',
+        colorSoft: 'primary_dark',
+        withButtonLoading: true,
+      },
+      onCloseWithDataProcessing: () => {
+        this.tryoutService.addToTryout(teamId, parseInt(goalie.id, 10), 'goalie').subscribe({
+          next: () => {
+            this.modalService.closeModal();
+            this.toast.show('Goalie added to tryout list', 'success');
+          },
+          error: (err: { message?: string }) => {
+            this.toast.show(err?.message || 'Failed to add goalie to tryout', 'error');
+            this.modalService.broadcastEvent(ModalEvent.StopButtonLoading);
+          },
+        });
+      },
     });
   }
 }

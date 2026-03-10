@@ -8,6 +8,7 @@ export enum Role {
   Unknown = -1,
   Author = -2,
   CoachOfTeam = -3,
+  MemberOfTeam = -4,
 }
 
 export interface IPageAccessMap {

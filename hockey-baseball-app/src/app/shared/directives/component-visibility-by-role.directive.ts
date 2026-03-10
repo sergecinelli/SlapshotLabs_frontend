@@ -42,7 +42,8 @@ export class ComponentVisibilityByRoleDirective implements AfterViewChecked {
         const visible =
           showRoles.includes(role) ||
           (showRoles.includes(Role.Author) && this.authorCondition(el)) ||
-          (showRoles.includes(Role.CoachOfTeam) && this.coachCondition(role, el));
+          (showRoles.includes(Role.CoachOfTeam) && this.coachCondition(role, el)) ||
+          (showRoles.includes(Role.MemberOfTeam) && this.memberOfTeamCondition(role, el));
 
         el.style.display = visible ? '' : 'none';
         return;
@@ -52,7 +53,8 @@ export class ComponentVisibilityByRoleDirective implements AfterViewChecked {
         const hidden =
           hideRoles.includes(role) ||
           (hideRoles.includes(Role.Author) && this.authorCondition(el)) ||
-          (hideRoles.includes(Role.CoachOfTeam) && this.coachCondition(role, el));
+          (hideRoles.includes(Role.CoachOfTeam) && this.coachCondition(role, el)) ||
+          (hideRoles.includes(Role.MemberOfTeam) && this.memberOfTeamCondition(role, el));
 
         el.style.display = hidden ? 'none' : '';
       }
@@ -77,6 +79,19 @@ export class ComponentVisibilityByRoleDirective implements AfterViewChecked {
     }
 
     return false;
+  }
+
+  private memberOfTeamCondition(roleName: Role, el: HTMLElement): boolean {
+    if (roleName !== Role.Coach && roleName !== Role.Player) return false;
+
+    const teamIdAttr = el.getAttribute('role-visibility-team-id');
+    if (!teamIdAttr) return false;
+
+    const currentUser = this.authService.getCurrentUserValue();
+    const userTeamId = currentUser?.team_id?.toString() ?? '';
+    if (!userTeamId) return false;
+
+    return teamIdAttr.split(',').includes(userTeamId);
   }
 
   private authorCondition(el: HTMLElement): boolean {

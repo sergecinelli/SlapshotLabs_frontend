@@ -49,7 +49,10 @@
               }
             </app-card-grid>
           </app-form-field>
-          <app-form-field label="Player That scored a Goal" [error]="getErrorMessage('scoringPlayer')">
+          <app-form-field
+            label="Player That scored a Goal"
+            [error]="getErrorMessage('scoringPlayer')"
+          >
             <app-card-grid [columns]="3">
               @for (player of playerOptions; track player) {
                 <app-card-grid-item
@@ -79,7 +82,10 @@
               }
             </app-card-grid>
           </app-form-field>
-          <app-form-field label="Goalie that got Scored On" [error]="getErrorMessage('goalieScored')">
+          <app-form-field
+            label="Goalie that got Scored On"
+            [error]="getErrorMessage('goalieScored')"
+          >
             <app-card-grid [columns]="3">
               @for (goalie of goalieOptions; track goalie) {
                 <app-card-grid-item
@@ -142,7 +148,10 @@
               }
             </app-card-grid>
           </app-form-field>
-          <app-form-field label="Player that shot the puck" [error]="getErrorMessage('shootingPlayer')">
+          <app-form-field
+            label="Player that shot the puck"
+            [error]="getErrorMessage('shootingPlayer')"
+          >
             <app-card-grid [columns]="3">
               @for (player of playerOptions; track player) {
                 <app-card-grid-item
