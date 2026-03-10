@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal, computed } from '@angular/core';
+import { Component, inject, signal, computed } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { ModalService, ModalEvent } from '../../../services/modal.service';
@@ -14,7 +14,7 @@ import {
 import { Player } from '../../interfaces/player.interface';
 import { Goalie } from '../../interfaces/goalie.interface';
 import { PositionOption } from '../../../services/position.service';
-import { TeamService } from '../../../services/team.service';
+import { Team } from '../../interfaces/team.interface';
 import { CustomSelectComponent, SelectOption } from '../custom-select/custom-select.component';
 import { SectionHeaderComponent } from '../section-header/section-header.component';
 import { FormFieldComponent } from '../form-field/form-field.component';
@@ -31,8 +31,10 @@ import { GoalieFormModal, GoalieFormModalData } from '../goalie-form-modal/goali
 export interface TryoutAddModalData {
   activeTab: TryoutTabType;
   teamId: number | null;
-  entries?: TryoutEntry[];
-  positions?: PositionOption[];
+  playerEntries: TryoutEntry[];
+  goalieEntries: TryoutEntry[];
+  positions: PositionOption[];
+  teams: Team[];
 }
 
 export interface TryoutAddModalResult {
@@ -59,18 +61,20 @@ export interface TryoutAddModalResult {
   templateUrl: './tryout-add.modal.html',
   styleUrl: './tryout-add.modal.scss',
 })
-export class TryoutAddModal implements OnInit {
+export class TryoutAddModal {
   private modalService = inject(ModalService);
   private playerService = inject(PlayerService);
   private goalieService = inject(GoalieService);
-  private teamService = inject(TeamService);
   private toast = inject(ToastService);
   data = inject(ModalService).getModalData<TryoutAddModalData>();
 
-  allEntries = signal<TryoutEntry[]>([]);
+  private playerEntries = signal<TryoutEntry[]>(this.data.playerEntries);
+  private goalieEntries = signal<TryoutEntry[]>(this.data.goalieEntries);
   selectedIds = signal<string[]>([]);
   isSubmitting = signal(false);
-  teamOptions = signal<SelectOption[]>([]);
+  teamOptions = signal<SelectOption[]>(
+    this.data.teams.map((t) => ({ value: t.id, label: t.name }))
+  );
   selectedTeamId = signal<string | null>(this.data.teamId ? String(this.data.teamId) : null);
   showTeamSelect = !this.data.teamId;
   selectedType = signal<TryoutEntryType>(
@@ -80,6 +84,10 @@ export class TryoutAddModal implements OnInit {
 
   isAllTab = this.data.activeTab === 'all';
   selectedStringIds = computed(() => this.selectedIds());
+
+  allEntries = computed(() =>
+    this.selectedType() === 'goalie' ? this.goalieEntries() : this.playerEntries()
+  );
 
   selectedEntries = computed(() => {
     const ids = new Set(this.selectedIds());
@@ -118,17 +126,9 @@ export class TryoutAddModal implements OnInit {
         this.isSubmitting.set(false);
       }
     });
-  }
 
-  ngOnInit(): void {
-    if (this.data.entries?.length) {
-      this.allEntries.set(this.data.entries);
-    } else {
-      this.loadSearchData();
-    }
-
-    if (this.showTeamSelect) {
-      this.loadTeams();
+    if (this.showTeamSelect && this.data.teams.length > 0 && !this.selectedTeamId()) {
+      this.selectedTeamId.set(this.data.teams[0].id);
     }
   }
 
@@ -144,7 +144,6 @@ export class TryoutAddModal implements OnInit {
     if (type === this.selectedType()) return;
     this.selectedType.set(type);
     this.selectedIds.set([]);
-    this.loadSearchData();
   }
 
   onSubmitSelected(): void {
@@ -172,6 +171,7 @@ export class TryoutAddModal implements OnInit {
         data: {
           isEditMode: false,
           positions: this.data.positions,
+          teams: this.data.teams,
         } as GoalieFormModalData,
         onCloseWithDataProcessing: (result: Partial<Goalie>) => {
           this.goalieService.addGoalie(result).subscribe({
@@ -179,7 +179,7 @@ export class TryoutAddModal implements OnInit {
               this.toast.show('Goalie created successfully', 'success');
               this.modalService.closeModal();
               const entry = this.goalieToEntry(newGoalie);
-              this.allEntries.update((entries) => [entry, ...entries]);
+              this.goalieEntries.update((entries) => [entry, ...entries]);
               this.selectedIds.update((ids) => [...ids, String(newGoalie.id)]);
             },
             error: () => {
@@ -198,6 +198,7 @@ export class TryoutAddModal implements OnInit {
         data: {
           isEditMode: false,
           positions: this.data.positions,
+          teams: this.data.teams,
         } as PlayerFormModalData,
         onCloseWithDataProcessing: (result: Partial<Player>) => {
           this.playerService.addPlayer(result).subscribe({
@@ -205,7 +206,7 @@ export class TryoutAddModal implements OnInit {
               this.toast.show('Player created successfully', 'success');
               this.modalService.closeModal();
               const entry = this.playerToEntry(newPlayer);
-              this.allEntries.update((entries) => [entry, ...entries]);
+              this.playerEntries.update((entries) => [entry, ...entries]);
               this.selectedIds.update((ids) => [...ids, String(newPlayer.id)]);
             },
             error: () => {
@@ -230,20 +231,6 @@ export class TryoutAddModal implements OnInit {
     if (this.data.teamId) return this.data.teamId;
     const selected = this.selectedTeamId();
     return selected ? parseInt(selected, 10) : null;
-  }
-
-  private loadSearchData(): void {
-    if (this.isGoalie) {
-      this.goalieService.getGoalies({ excludeDefault: true }).subscribe({
-        next: (data) => this.allEntries.set(data.goalies.map((g) => this.goalieToEntry(g))),
-        error: (error) => console.error('Failed to load goalies:', error),
-      });
-    } else {
-      this.playerService.getPlayers().subscribe({
-        next: (data) => this.allEntries.set(data.players.map((p) => this.playerToEntry(p))),
-        error: (error) => console.error('Failed to load players:', error),
-      });
-    }
   }
 
   private playerToEntry(player: Player): TryoutEntry {
@@ -292,21 +279,5 @@ export class TryoutAddModal implements OnInit {
       changedBy: null,
       changedAt: null,
     };
-  }
-
-  private loadTeams(): void {
-    this.teamService.getTeams().subscribe({
-      next: (data) => {
-        const options = data.teams.map((team) => ({
-          value: team.id,
-          label: team.name,
-        }));
-        this.teamOptions.set(options);
-        if (options.length > 0 && !this.selectedTeamId()) {
-          this.selectedTeamId.set(options[0].value);
-        }
-      },
-      error: (error) => console.error('Failed to load teams:', error),
-    });
   }
 }

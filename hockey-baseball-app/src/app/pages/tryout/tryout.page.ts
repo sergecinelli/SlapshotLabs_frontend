@@ -15,10 +15,13 @@ import {
   TryoutStatus,
 } from '../../shared/interfaces/tryout.interface';
 import { Observable, forkJoin, finalize, of } from 'rxjs';
-import { map, catchError } from 'rxjs/operators';
-import { PlayerService } from '../../services/player.service';
-import { GoalieService } from '../../services/goalie.service';
+import { map, switchMap, catchError } from 'rxjs/operators';
+import { ApiService } from '../../services/api.service';
 import { PositionService } from '../../services/position.service';
+import { Team } from '../../shared/interfaces/team.interface';
+import { PlayerApiOutData } from '../../shared/interfaces/player.interface';
+import { GoalieApiOutData } from '../../shared/interfaces/goalie.interface';
+import { isDefaultGoalieName } from '../../shared/constants/goalie.constants';
 import {
   DataTableComponent,
   TableColumn,
@@ -71,11 +74,10 @@ export class TryoutPage implements OnInit {
   private modalService = inject(ModalService);
   private authService = inject(AuthService);
   private teamService = inject(TeamService);
+  private apiService = inject(ApiService);
   private tryoutService = inject(TryoutService);
   private roleService = inject(RoleService);
   private toast = inject(ToastService);
-  private playerService = inject(PlayerService);
-  private goalieService = inject(GoalieService);
   private positionService = inject(PositionService);
 
   protected visibilityByRoleMap = visibilityByRoleMap;
@@ -229,13 +231,23 @@ export class TryoutPage implements OnInit {
 
     this.isAddLoading.set(true);
 
-    forkJoin({
-      entries: this.loadAvailableEntries(),
-      positions: this.positionService.getPositions(),
-    })
-      .pipe(finalize(() => this.isAddLoading.set(false)))
+    this.teamService
+      .getTeams()
+      .pipe(
+        switchMap((teamsData) => {
+          const teams = teamsData.teams;
+          const teamMap = new Map(teams.map((t) => [parseInt(t.id), t]));
+
+          return forkJoin({
+            playerEntries: this.loadPlayerEntries(teamMap),
+            goalieEntries: this.loadGoalieEntries(teamMap),
+            positions: this.positionService.getPositions(),
+          }).pipe(map((data) => ({ ...data, teams })));
+        }),
+        finalize(() => this.isAddLoading.set(false))
+      )
       .subscribe({
-        next: ({ entries, positions }) => {
+        next: ({ playerEntries, goalieEntries, positions, teams }) => {
           this.modalService.openModal(TryoutAddModal, {
             name: 'Add to Tryout List',
             icon: 'person_add',
@@ -244,8 +256,10 @@ export class TryoutPage implements OnInit {
             data: {
               activeTab: tab,
               teamId,
-              entries,
+              playerEntries,
+              goalieEntries,
               positions,
+              teams: teamId ? [] : teams,
             } as TryoutAddModalData,
             onCloseWithDataProcessing: (result: TryoutAddModalResult) => {
               const type = result.type;
@@ -318,60 +332,78 @@ export class TryoutPage implements OnInit {
     });
   }
 
-  private loadAvailableEntries(): Observable<TryoutEntry[]> {
-    if (this.activeTab() === 'goalie') {
-      return this.goalieService.getGoalies({ excludeDefault: true }).pipe(
-        map((data) =>
-          data.goalies.map((g) => ({
-            id: g.id,
+  private loadPlayerEntries(teamMap: Map<number, Team>): Observable<TryoutEntry[]> {
+    return this.apiService.get<PlayerApiOutData[]>('/hockey/player/list').pipe(
+      map((players) =>
+        players.map((p) => {
+          const team = teamMap.get(p.team_id);
+          return {
+            id: String(p.id),
             tryoutId: 0,
-            playerId: g.id,
-            firstName: g.firstName,
-            lastName: g.lastName,
-            position: g.position,
-            shoots: g.shoots,
-            jerseyNumber: g.jerseyNumber,
-            team: g.team,
-            teamId: g.teamId,
-            teamLevelName: g.level,
-            type: 'goalie' as const,
+            playerId: String(p.id),
+            firstName: p.first_name,
+            lastName: p.last_name,
+            position: this.mapPositionIdToName(p.position_id),
+            shoots: p.shoots === 'R' ? 'Right Shot' : 'Left Shot',
+            jerseyNumber: p.number,
+            team: team?.name || '',
+            teamId: p.team_id,
+            teamLevelName: team?.level || '',
+            type: 'player' as const,
             status: TryoutStatus.TryingOut,
             hasAnalytics: false,
             note: null,
             userId: null,
             changedBy: null,
             changedAt: null,
-          }))
-        )
-      );
-    }
-
-    return this.playerService.getPlayers().pipe(
-      map((data) =>
-        data.players.map((p) => ({
-          id: p.id,
-          tryoutId: 0,
-          playerId: p.id,
-          firstName: p.firstName,
-          lastName: p.lastName,
-          position: p.position,
-          shoots: p.shoots,
-          jerseyNumber: p.jerseyNumber,
-          team: p.team,
-          teamId: p.teamId,
-          teamLogo: p.teamLogo,
-          teamAgeGroup: p.teamAgeGroup,
-          teamLevelName: p.teamLevelName,
-          type: 'player' as const,
-          status: TryoutStatus.TryingOut,
-          hasAnalytics: false,
-          note: null,
-          userId: null,
-          changedBy: null,
-          changedAt: null,
-        }))
+          };
+        })
       )
     );
+  }
+
+  private loadGoalieEntries(teamMap: Map<number, Team>): Observable<TryoutEntry[]> {
+    return this.apiService.get<GoalieApiOutData[]>('/hockey/goalie/list').pipe(
+      map((goalies) =>
+        goalies
+          .filter((g) => !isDefaultGoalieName(g.first_name, g.last_name))
+          .map((g) => {
+            const team = teamMap.get(g.team_id);
+            return {
+              id: String(g.id),
+              tryoutId: 0,
+              playerId: String(g.id),
+              firstName: g.first_name,
+              lastName: g.last_name,
+              position: 'Goalie',
+              shoots: g.shoots === 'R' ? 'Right Shot' : 'Left Shot',
+              jerseyNumber: g.number,
+              team: team?.name || '',
+              teamId: g.team_id,
+              teamLevelName: team?.level || '',
+              type: 'goalie' as const,
+              status: TryoutStatus.TryingOut,
+              hasAnalytics: false,
+              note: null,
+              userId: null,
+              changedBy: null,
+              changedAt: null,
+            };
+          })
+      )
+    );
+  }
+
+  private mapPositionIdToName(positionId: number): string {
+    const positionMap: Record<number, string> = {
+      1: 'Left Wing',
+      2: 'Center',
+      3: 'Right Wing',
+      4: 'Left Defense',
+      5: 'Right Defense',
+      6: 'Goalie',
+    };
+    return positionMap[positionId] || 'Center';
   }
 
   private removeFromTryout(entry: TryoutEntry): void {

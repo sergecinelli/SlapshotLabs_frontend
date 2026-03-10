@@ -285,18 +285,15 @@ export class DashboardPage implements OnInit {
 
   openAddPlayerModal(): void {
     this.addPlayerLoading.set(true);
-    forkJoin({
-      teams: this.teamService.getTeams(),
-      positions: this.positionService.getPositions(),
-    }).subscribe({
-      next: ({ teams, positions }) => {
+    this.positionService.getPositions().subscribe({
+      next: (positions) => {
         this.addPlayerLoading.set(false);
         this.modalService.openModal(PlayerFormModal, {
           name: 'Add Player',
           icon: 'sports_hockey',
           width: '900px',
           maxWidth: '95vw',
-          data: { isEditMode: false, teams: teams.teams, positions } as PlayerFormModalData,
+          data: { isEditMode: false, teams: this.teams(), positions } as PlayerFormModalData,
           onCloseWithDataProcessing: (result: Partial<Player>) => {
             this.playerService.addPlayer(result).subscribe({
               next: () => {
@@ -321,18 +318,15 @@ export class DashboardPage implements OnInit {
 
   openAddGoalieModal(): void {
     this.addGoalieLoading.set(true);
-    forkJoin({
-      teams: this.teamService.getTeams(),
-      positions: this.positionService.getPositions(),
-    }).subscribe({
-      next: ({ teams, positions }) => {
+    this.positionService.getPositions().subscribe({
+      next: (positions) => {
         this.addGoalieLoading.set(false);
         this.modalService.openModal(GoalieFormModal, {
           name: 'Add Goalie',
           icon: 'sports_hockey',
           width: '900px',
           maxWidth: '95vw',
-          data: { isEditMode: false, teams: teams.teams, positions } as GoalieFormModalData,
+          data: { isEditMode: false, teams: this.teams(), positions } as GoalieFormModalData,
           onCloseWithDataProcessing: (result: Partial<Goalie>) => {
             this.goalieService.addGoalie(result).subscribe({
               next: () => {
