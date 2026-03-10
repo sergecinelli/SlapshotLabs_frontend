@@ -268,8 +268,8 @@ export class TryoutModal {
   profileRoute = computed(() => {
     const entity = this.data.singleEntity;
     if (!entity) return null;
-    const segment = entity.type === 'goalie' ? 'goalies/goalie-profile' : 'players/player-profile';
-    return `/teams-and-rosters/${segment}/${entity.playerId}`;
+    const segment = entity.type === 'goalie' ? 'goalies' : 'players';
+    return `/teams-and-rosters/${segment}/${entity.playerId}/profile`;
   });
 
   teamRoute = computed(() => {

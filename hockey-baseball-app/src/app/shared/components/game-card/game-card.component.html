@@ -100,8 +100,9 @@
             <a
               class="team-goalie goalie-link"
               [routerLink]="[
-                '/teams-and-rosters/goalies/goalie-profile',
+                '/teams-and-rosters/goalies',
                 gameValue.homeTeamGoalieId,
+                'profile',
               ]"
               [attr.aria-label]="'View ' + gameValue.homeTeamGoalie + ' profile'"
             >
@@ -174,8 +175,9 @@
             <a
               class="team-goalie goalie-link"
               [routerLink]="[
-                '/teams-and-rosters/goalies/goalie-profile',
+                '/teams-and-rosters/goalies',
                 gameValue.awayTeamGoalieId,
+                'profile',
               ]"
               [attr.aria-label]="'View ' + gameValue.awayTeamGoalie + ' profile'"
             >

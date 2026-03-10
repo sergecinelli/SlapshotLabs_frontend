@@ -79,12 +79,14 @@
                         [routerLink]="
                           column.key === 'playerName'
                             ? [
-                                '/teams-and-rosters/players/player-profile',
+                                '/teams-and-rosters/players',
                                 getCellValueByKey(element, 'id'),
+                                'profile',
                               ]
                             : [
-                                '/teams-and-rosters/goalies/goalie-profile',
+                                '/teams-and-rosters/goalies',
                                 getCellValueByKey(element, 'id'),
+                                'profile',
                               ]
                         "
                         class="player-name-link"
@@ -245,13 +247,14 @@
                           ) {
                             <a
                               [routerLink]="[
-                                '/teams-and-rosters/goalies/goalie-profile',
+                                '/teams-and-rosters/goalies',
                                 getCellValueByKey(
                                   element,
                                   column.key === 'homeTeam'
                                     ? 'homeTeamGoalieId'
                                     : 'awayTeamGoalieId'
                                 ),
+                                'profile',
                               ]"
                               class="goalie-name-link"
                             >
@@ -393,12 +396,14 @@
                         [routerLink]="
                           column.key === 'playerName'
                             ? [
-                                '/teams-and-rosters/players/player-profile',
+                                '/teams-and-rosters/players',
                                 getCellValueByKey(element, 'id'),
+                                'profile',
                               ]
                             : [
-                                '/teams-and-rosters/goalies/goalie-profile',
+                                '/teams-and-rosters/goalies',
                                 getCellValueByKey(element, 'id'),
+                                'profile',
                               ]
                         "
                         class="player-name-link"
@@ -599,13 +604,14 @@
                           ) {
                             <a
                               [routerLink]="[
-                                '/teams-and-rosters/goalies/goalie-profile',
+                                '/teams-and-rosters/goalies',
                                 getCellValueByKey(
                                   element,
                                   column.key === 'homeTeam'
                                     ? 'homeTeamGoalieId'
                                     : 'awayTeamGoalieId'
                                 ),
+                                'profile',
                               ]"
                               class="goalie-name-link"
                             >
