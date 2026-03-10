@@ -5,7 +5,7 @@
       <div class="form-section">
         <app-section-header title="Select the Team that Changed their Goalie" />
 
-        <div class="team-selection-container">
+        <app-form-field label="Team" [error]="getErrorMessage('team')">
           <app-card-grid [columns]="teamOptions.length">
             @for (team of teamOptions; track team) {
               <app-card-grid-item
@@ -23,19 +23,14 @@
               </app-card-grid-item>
             }
           </app-card-grid>
-          <div class="error-slot">
-            @if (goalieChangeForm.get('team')?.errors && goalieChangeForm.get('team')?.touched) {
-              <span>{{ getErrorMessage('team') }}</span>
-            }
-          </div>
-        </div>
+        </app-form-field>
       </div>
 
       <!-- Goalie Selection Section -->
       <div class="form-section">
         <app-section-header title="Select Goalie" />
 
-        <div class="goalie-selection-container">
+        <app-form-field label="Goalie" [error]="getErrorMessage('goalie')">
           <app-card-grid [columns]="3">
             @for (goalie of goalieOptions; track goalie) {
               <app-card-grid-item
@@ -49,22 +44,14 @@
               </app-card-grid-item>
             }
           </app-card-grid>
-          <div class="error-slot">
-            @if (
-              goalieChangeForm.get('goalie')?.errors && goalieChangeForm.get('goalie')?.touched
-            ) {
-              <span>{{ getErrorMessage('goalie') }}</span>
-            }
-          </div>
-        </div>
+        </app-form-field>
       </div>
 
       <!-- Period and Time Section -->
       <div class="form-section">
         <app-section-header title="Game Details" />
 
-        <div class="period-selection-container">
-          <div class="selection-label">Period</div>
+        <app-form-field label="Period" [error]="getErrorMessage('period')">
           @if (isLoadingPeriods) {
             <app-loading-spinner message="Loading periods..." size="sm" />
           }
@@ -80,14 +67,7 @@
               }
             </app-card-grid>
           }
-          <div class="error-slot">
-            @if (
-              goalieChangeForm.get('period')?.errors && goalieChangeForm.get('period')?.touched
-            ) {
-              <span>{{ getErrorMessage('period') }}</span>
-            }
-          </div>
-        </div>
+        </app-form-field>
 
         <div class="form-row">
           <app-form-field label="Time" [required]="true" [error]="getErrorMessage('time')">

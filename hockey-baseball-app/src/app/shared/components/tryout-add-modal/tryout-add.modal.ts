@@ -25,14 +25,8 @@ import { SelectOptionGroup } from '../custom-select/custom-select.component';
 import { ButtonComponent } from '../buttons/button/button.component';
 import { ButtonSmallComponent } from '../buttons/button-small/button-small.component';
 import { ButtonLoadingComponent } from '../buttons/button-loading/button-loading.component';
-import {
-  PlayerFormModal,
-  PlayerFormModalData,
-} from '../player-form-modal/player-form.modal';
-import {
-  GoalieFormModal,
-  GoalieFormModalData,
-} from '../goalie-form-modal/goalie-form.modal';
+import { PlayerFormModal, PlayerFormModalData } from '../player-form-modal/player-form.modal';
+import { GoalieFormModal, GoalieFormModalData } from '../goalie-form-modal/goalie-form.modal';
 
 export interface TryoutAddModalData {
   activeTab: TryoutTabType;

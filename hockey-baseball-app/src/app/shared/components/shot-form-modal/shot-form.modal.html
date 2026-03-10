@@ -5,8 +5,7 @@
       <div class="form-section">
         <app-section-header title="Shot Information" />
 
-        <div class="shot-type-container">
-          <div class="selection-label">Type of Shot</div>
+        <app-form-field label="Type of Shot" [error]="getErrorMessage('shotType')">
           <app-card-grid [columns]="shotTypeOptions.length">
             @for (type of shotTypeOptions; track type.value) {
               <app-card-grid-item
@@ -17,28 +16,21 @@
               </app-card-grid-item>
             }
           </app-card-grid>
-          <div class="error-slot">
-            @if (shotForm.get('shotType')?.errors && shotForm.get('shotType')?.touched) {
-              <span>{{ getErrorMessage('shotType') }}</span>
-            }
-          </div>
-        </div>
+        </app-form-field>
 
         <!-- Scoring Chance Checkbox -->
-        <div class="scoring-chance-container">
+        <app-form-field label="Scoring Chance">
           <mat-checkbox formControlName="isScoringChance" class="scoring-chance-checkbox">
             Scoring Chance
           </mat-checkbox>
-          <div class="error-slot"></div>
-        </div>
+        </app-form-field>
       </div>
 
       <!-- Goal Section -->
       @if (isGoal) {
         <div class="form-section">
           <app-section-header title="Goal Details" />
-          <div class="team-selection-container">
-            <div class="selection-label">Team that Scored a Goal</div>
+          <app-form-field label="Team that Scored a Goal" [error]="getErrorMessage('scoringTeam')">
             <app-card-grid [columns]="teamOptions.length">
               @for (team of teamOptions; track team) {
                 <app-card-grid-item
@@ -56,14 +48,8 @@
                 </app-card-grid-item>
               }
             </app-card-grid>
-            <div class="error-slot">
-              @if (shotForm.get('scoringTeam')?.errors && shotForm.get('scoringTeam')?.touched) {
-                <span>{{ getErrorMessage('scoringTeam') }}</span>
-              }
-            </div>
-          </div>
-          <div class="player-selection-container">
-            <div class="selection-label">Player That scored a Goal</div>
+          </app-form-field>
+          <app-form-field label="Player That scored a Goal" [error]="getErrorMessage('scoringPlayer')">
             <app-card-grid [columns]="3">
               @for (player of playerOptions; track player) {
                 <app-card-grid-item
@@ -77,16 +63,8 @@
                 </app-card-grid-item>
               }
             </app-card-grid>
-            <div class="error-slot">
-              @if (
-                shotForm.get('scoringPlayer')?.errors && shotForm.get('scoringPlayer')?.touched
-              ) {
-                <span>{{ getErrorMessage('scoringPlayer') }}</span>
-              }
-            </div>
-          </div>
-          <div class="player-selection-container">
-            <div class="selection-label">Player that got Assist</div>
+          </app-form-field>
+          <app-form-field label="Player that got Assist">
             <app-card-grid [columns]="3">
               @for (player of playerOptions; track player) {
                 <app-card-grid-item
@@ -100,10 +78,8 @@
                 </app-card-grid-item>
               }
             </app-card-grid>
-            <div class="error-slot"></div>
-          </div>
-          <div class="goalie-selection-container">
-            <div class="selection-label">Goalie that got Scored On</div>
+          </app-form-field>
+          <app-form-field label="Goalie that got Scored On" [error]="getErrorMessage('goalieScored')">
             <app-card-grid [columns]="3">
               @for (goalie of goalieOptions; track goalie) {
                 <app-card-grid-item
@@ -117,14 +93,8 @@
                 </app-card-grid-item>
               }
             </app-card-grid>
-            <div class="error-slot">
-              @if (shotForm.get('goalieScored')?.errors && shotForm.get('goalieScored')?.touched) {
-                <span>{{ getErrorMessage('goalieScored') }}</span>
-              }
-            </div>
-          </div>
-          <div class="goal-type-container">
-            <div class="selection-label">Goal Type</div>
+          </app-form-field>
+          <app-form-field label="Goal Type">
             <app-card-grid [columns]="3">
               <app-card-grid-item
                 [selected]="shotForm.get('goalType')?.value === 'Short Handed'"
@@ -145,8 +115,7 @@
                 Power Play
               </app-card-grid-item>
             </app-card-grid>
-            <div class="error-slot"></div>
-          </div>
+          </app-form-field>
         </div>
       }
 
@@ -154,8 +123,7 @@
       @if (isNonGoal) {
         <div class="form-section">
           <app-section-header title="Shot Details" />
-          <div class="team-selection-container">
-            <div class="selection-label">Team that shot the puck</div>
+          <app-form-field label="Team that shot the puck" [error]="getErrorMessage('shootingTeam')">
             <app-card-grid [columns]="teamOptions.length">
               @for (team of teamOptions; track team) {
                 <app-card-grid-item
@@ -173,14 +141,8 @@
                 </app-card-grid-item>
               }
             </app-card-grid>
-            <div class="error-slot">
-              @if (shotForm.get('shootingTeam')?.errors && shotForm.get('shootingTeam')?.touched) {
-                <span>{{ getErrorMessage('shootingTeam') }}</span>
-              }
-            </div>
-          </div>
-          <div class="player-selection-container">
-            <div class="selection-label">Player that shot the puck</div>
+          </app-form-field>
+          <app-form-field label="Player that shot the puck" [error]="getErrorMessage('shootingPlayer')">
             <app-card-grid [columns]="3">
               @for (player of playerOptions; track player) {
                 <app-card-grid-item
@@ -194,17 +156,9 @@
                 </app-card-grid-item>
               }
             </app-card-grid>
-            <div class="error-slot">
-              @if (
-                shotForm.get('shootingPlayer')?.errors && shotForm.get('shootingPlayer')?.touched
-              ) {
-                <span>{{ getErrorMessage('shootingPlayer') }}</span>
-              }
-            </div>
-          </div>
+          </app-form-field>
           @if (isBlocked) {
-            <div class="player-selection-container">
-              <div class="selection-label">Player that blocked the shot</div>
+            <app-form-field label="Player that blocked the shot">
               <app-card-grid [columns]="3">
                 @for (player of blockingPlayerOptions; track player) {
                   <app-card-grid-item
@@ -218,11 +172,9 @@
                   </app-card-grid-item>
                 }
               </app-card-grid>
-              <div class="error-slot"></div>
-            </div>
+            </app-form-field>
           }
-          <div class="goalie-selection-container">
-            <div class="selection-label">Goalie in Net</div>
+          <app-form-field label="Goalie in Net" [error]="getErrorMessage('goalieInNet')">
             <app-card-grid [columns]="3">
               @for (goalie of goalieOptions; track goalie) {
                 <app-card-grid-item
@@ -236,12 +188,7 @@
                 </app-card-grid-item>
               }
             </app-card-grid>
-            <div class="error-slot">
-              @if (shotForm.get('goalieInNet')?.errors && shotForm.get('goalieInNet')?.touched) {
-                <span>{{ getErrorMessage('goalieInNet') }}</span>
-              }
-            </div>
-          </div>
+          </app-form-field>
         </div>
       }
 
@@ -269,8 +216,7 @@
       <div class="form-section">
         <app-section-header title="Time Information" />
 
-        <div class="period-selection-container">
-          <div class="selection-label">Period</div>
+        <app-form-field label="Period" [error]="getErrorMessage('period')">
           <app-card-grid [columns]="periodOptions.length">
             @for (period of periodOptions; track period) {
               <app-card-grid-item
@@ -281,12 +227,7 @@
               </app-card-grid-item>
             }
           </app-card-grid>
-          <div class="error-slot">
-            @if (shotForm.get('period')?.errors && shotForm.get('period')?.touched) {
-              <span>{{ getErrorMessage('period') }}</span>
-            }
-          </div>
-        </div>
+        </app-form-field>
 
         <div class="form-row">
           <app-form-field label="Time" [required]="true" [error]="getErrorMessage('time')">

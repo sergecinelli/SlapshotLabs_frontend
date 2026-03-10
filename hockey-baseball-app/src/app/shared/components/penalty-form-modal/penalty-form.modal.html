@@ -5,8 +5,7 @@
       <div class="form-section">
         <app-section-header title="Penalty Information" />
 
-        <div class="team-selection-container">
-          <div class="selection-label">Team that had the penalty</div>
+        <app-form-field label="Team that had the penalty" [error]="getErrorMessage('team')">
           <app-card-grid [columns]="teamOptions.length">
             @for (team of teamOptions; track team) {
               <app-card-grid-item
@@ -24,15 +23,9 @@
               </app-card-grid-item>
             }
           </app-card-grid>
-          <div class="error-slot">
-            @if (penaltyForm.get('team')?.errors && penaltyForm.get('team')?.touched) {
-              <span>{{ getErrorMessage('team') }}</span>
-            }
-          </div>
-        </div>
+        </app-form-field>
 
-        <div class="player-selection-container">
-          <div class="selection-label">Player that had the penalty</div>
+        <app-form-field label="Player that had the penalty" [error]="getErrorMessage('player')">
           <app-card-grid [columns]="3">
             @for (player of playerOptions; track player) {
               <app-card-grid-item
@@ -46,15 +39,9 @@
               </app-card-grid-item>
             }
           </app-card-grid>
-          <div class="error-slot">
-            @if (penaltyForm.get('player')?.errors && penaltyForm.get('player')?.touched) {
-              <span>{{ getErrorMessage('player') }}</span>
-            }
-          </div>
-        </div>
+        </app-form-field>
 
-        <div class="player-selection-container">
-          <div class="selection-label">Penalty drawn player</div>
+        <app-form-field label="Penalty drawn player">
           <app-card-grid [columns]="3">
             @for (player of penaltyDrawnPlayerOptions; track player) {
               <app-card-grid-item
@@ -68,8 +55,7 @@
               </app-card-grid-item>
             }
           </app-card-grid>
-          <div class="error-slot"></div>
-        </div>
+        </app-form-field>
 
         <div class="form-row">
           <app-form-field
@@ -81,8 +67,7 @@
           </app-form-field>
         </div>
 
-        <div class="period-selection-container">
-          <div class="selection-label">Period</div>
+        <app-form-field label="Period" [error]="getErrorMessage('period')">
           @if (isLoadingPeriods) {
             <app-loading-spinner message="Loading periods..." size="sm" />
           }
@@ -98,12 +83,7 @@
               }
             </app-card-grid>
           }
-          <div class="error-slot">
-            @if (penaltyForm.get('period')?.errors && penaltyForm.get('period')?.touched) {
-              <span>{{ getErrorMessage('period') }}</span>
-            }
-          </div>
-        </div>
+        </app-form-field>
 
         <div class="form-row">
           <app-form-field label="Time" [required]="true" [error]="getErrorMessage('time')">

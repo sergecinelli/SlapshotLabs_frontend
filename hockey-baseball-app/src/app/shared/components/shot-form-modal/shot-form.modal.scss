@@ -8,25 +8,21 @@
       @include modal-form.form-section;
 
       .form-section {
-        .scoring-chance-container {
-          .scoring-chance-checkbox {
-            ::ng-deep .mdc-checkbox__background {
-              border-color: var(--primary) !important;
-            }
+        .scoring-chance-checkbox {
+          ::ng-deep .mdc-checkbox__background {
+            border-color: var(--primary) !important;
+          }
 
-            ::ng-deep .mdc-checkbox--selected .mdc-checkbox__background {
-              background-color: var(--primary) !important;
-              border-color: var(--primary) !important;
-            }
+          ::ng-deep .mdc-checkbox--selected .mdc-checkbox__background {
+            background-color: var(--primary) !important;
+            border-color: var(--primary) !important;
+          }
 
-            ::ng-deep .mdc-label {
-              font-size: 14px;
-              color: var(--dark);
-            }
+          ::ng-deep .mdc-label {
+            font-size: 14px;
+            color: var(--dark);
           }
         }
-
-        @include modal-form.selection-container;
 
         .team-logo-img {
           width: 24px;

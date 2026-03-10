@@ -22,30 +22,29 @@
       @if (isAllTab) {
         <div class="form-section">
           <app-section-header title="Player Type" />
-          <app-card-grid [columns]="2">
-            <app-card-grid-item
-              [selected]="selectedType() === 'player'"
-              (select)="onTypeChange('player')"
-            >
-              <span class="material-symbols-rounded">person</span>
-              Player
-            </app-card-grid-item>
-            <app-card-grid-item
-              [selected]="selectedType() === 'goalie'"
-              (select)="onTypeChange('goalie')"
-            >
-              <span class="material-symbols-rounded">shield</span>
-              Goalie
-            </app-card-grid-item>
-          </app-card-grid>
-          <div class="error-slot"></div>
+          <app-form-field label="Select type">
+            <app-card-grid [columns]="2">
+              <app-card-grid-item
+                [selected]="selectedType() === 'player'"
+                (select)="onTypeChange('player')"
+              >
+                <span class="material-symbols-rounded">person</span>
+                Player
+              </app-card-grid-item>
+              <app-card-grid-item
+                [selected]="selectedType() === 'goalie'"
+                (select)="onTypeChange('goalie')"
+              >
+                <span class="material-symbols-rounded">shield</span>
+                Goalie
+              </app-card-grid-item>
+            </app-card-grid>
+          </app-form-field>
         </div>
       }
 
       <div class="form-section">
-        <app-section-header
-          title="Select Existing {{ isGoalie ? 'Goalie' : 'Player' }}"
-        />
+        <app-section-header title="Select Existing {{ isGoalie ? 'Goalie' : 'Player' }}" />
         <div class="select-field-wrapper">
           @if (selectedEntriesValue.length > 0) {
             <app-button-small
@@ -61,14 +60,10 @@
               Clear all
             </app-button-small>
           }
-          <app-form-field
-            label="Select existing {{ isGoalie ? 'goalies' : 'players' }}"
-          >
+          <app-form-field label="Select existing {{ isGoalie ? 'goalies' : 'players' }}">
             <app-custom-multi-select
               [value]="selectedStringIds()"
-              [placeholder]="
-                'No ' + (isGoalie ? 'goalies' : 'players') + ' selected'
-              "
+              [placeholder]="'No ' + (isGoalie ? 'goalies' : 'players') + ' selected'"
               searchPlaceholder="Search by name..."
               [optionGroups]="entryOptionGroups()"
               (valueChange)="onSelectionChange($event)"
@@ -76,9 +71,7 @@
           </app-form-field>
         </div>
         <div class="form-row">
-          <app-form-field
-            label="Or create new {{ isGoalie ? 'goalie' : 'player' }}"
-          >
+          <app-form-field label="Or create new {{ isGoalie ? 'goalie' : 'player' }}">
             <app-button
               [bg]="'background'"
               [bghover]="'item_hover'"

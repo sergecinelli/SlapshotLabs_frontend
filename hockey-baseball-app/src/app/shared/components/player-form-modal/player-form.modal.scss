@@ -8,13 +8,6 @@
 
     .player-form {
       @include modal-form.form-section;
-
-      .form-section {
-        .position-selection-container,
-        .shoots-selection-container {
-          @include modal-form.selection-container;
-        }
-      }
     }
   }
 }

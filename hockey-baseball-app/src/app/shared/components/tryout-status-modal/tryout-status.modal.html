@@ -6,7 +6,8 @@
   <div class="modal-content">
     <div class="player-section">
       <app-section-header title="Player" />
-      <app-list [items]="playerListItem()" [alignTop]="true">
+      <app-form-field label="Player info">
+        <app-list [items]="playerListItem()" [alignTop]="true">
         <ng-template #content let-item>
           <div class="player-card">
             <div class="item-icon player-avatar">{{ playerInitials() }}</div>
@@ -51,12 +52,14 @@
           </span>
         </ng-template>
       </app-list>
+      </app-form-field>
     </div>
 
     @if (historyListItems().length > 0) {
       <div class="history-section">
         <app-section-header title="Status History" />
-        <app-list [items]="historyListItems()" [alignTop]="true">
+        <app-form-field label="History">
+          <app-list [items]="historyListItems()" [alignTop]="true">
           <ng-template #content let-item>
             <div
               class="item-icon"
@@ -94,12 +97,13 @@
             </div>
           </ng-template>
         </app-list>
+        </app-form-field>
       </div>
     }
 
     <div class="status-section">
       <app-section-header title="Change Status" />
-      <div class="status-options">
+      <app-form-field label="Select status">
         <app-card-grid [columns]="statuses.length">
           @for (option of statuses; track option.value) {
             <app-card-grid-item
@@ -119,9 +123,9 @@
             </app-card-grid-item>
           }
         </app-card-grid>
-      </div>
+      </app-form-field>
 
-      <form [formGroup]="statusForm" class="note-form">
+      <form [formGroup]="statusForm">
         <app-form-field label="Note (optional)">
           <textarea
             formControlName="note"

@@ -49,8 +49,7 @@
               <input type="number" formControlName="birthYear" placeholder="Enter birth year" />
             </app-form-field>
           </div>
-          <div class="position-selection-container">
-            <div class="selection-label">Position</div>
+          <app-form-field label="Position" [error]="getErrorMessage('position')">
             <app-card-grid [columns]="positionOptions.length">
               @for (pos of positionOptions; track pos.value) {
                 <app-card-grid-item
@@ -61,12 +60,7 @@
                 </app-card-grid-item>
               }
             </app-card-grid>
-            <div class="error-slot">
-              @if (playerForm.get('position')?.errors && playerForm.get('position')?.touched) {
-                <span>{{ getErrorMessage('position') }}</span>
-              }
-            </div>
-          </div>
+          </app-form-field>
         </div>
         <!-- Physical Information Section -->
         <div class="form-section">
@@ -82,8 +76,7 @@
               <input formControlName="birthplace" placeholder="Country Born In" />
             </app-form-field>
           </div>
-          <div class="shoots-selection-container">
-            <div class="selection-label">Shoots (R/L)</div>
+          <app-form-field label="Shoots (R/L)" [error]="getErrorMessage('shoots')">
             <app-card-grid [columns]="shootsOptions.length">
               @for (opt of shootsOptions; track opt.value) {
                 <app-card-grid-item
@@ -94,12 +87,7 @@
                 </app-card-grid-item>
               }
             </app-card-grid>
-            <div class="error-slot">
-              @if (playerForm.get('shoots')?.errors && playerForm.get('shoots')?.touched) {
-                <span>{{ getErrorMessage('shoots') }}</span>
-              }
-            </div>
-          </div>
+          </app-form-field>
         </div>
         <!-- Address Section -->
         <div class="form-section">

@@ -78,29 +78,18 @@
     }
 
     .status-section {
-      .status-options {
-        margin-bottom: 12px;
+      .status-option {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 13px;
+        font-weight: 500;
 
-        .status-option {
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          font-size: 13px;
-          font-weight: 500;
-
-          .material-symbols-rounded {
-            font-size: 18px;
-          }
+        .material-symbols-rounded {
+          font-size: 18px;
         }
       }
 
-      .note-form {
-        textarea {
-          width: 100%;
-          resize: vertical;
-          min-height: 60px;
-        }
-      }
     }
   }
 }

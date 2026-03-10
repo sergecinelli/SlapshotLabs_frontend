@@ -78,11 +78,6 @@
   line-height: 1.2;
 }
 
-@mixin selection-container {
-  .selection-label {
-    @include form-label;
-  }
-}
 
 @mixin inline-action-row {
   display: flex;

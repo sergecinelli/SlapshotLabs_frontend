@@ -14,10 +14,6 @@
           flex: 0 0 calc(50% - 1px);
         }
 
-        .game-type-selection-container,
-        .status-selection-container {
-          @include modal-form.selection-container;
-        }
       }
     }
   }

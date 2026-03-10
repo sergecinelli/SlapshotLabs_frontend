@@ -5,8 +5,7 @@
       <div class="form-section">
         <app-section-header title="Faceoff Winner" />
 
-        <div class="team-selection-container">
-          <div class="selection-label">Team</div>
+        <app-form-field label="Team" [error]="getErrorMessage('winnerTeam')">
           @if (isLoadingTeams) {
             <app-loading-spinner message="Loading teams..." size="sm" />
           }
@@ -29,15 +28,9 @@
               }
             </app-card-grid>
           }
-          <div class="error-slot">
-            @if (faceoffForm.get('winnerTeam')?.errors && faceoffForm.get('winnerTeam')?.touched) {
-              <span>{{ getErrorMessage('winnerTeam') }}</span>
-            }
-          </div>
-        </div>
+        </app-form-field>
 
-        <div class="player-selection-container">
-          <div class="selection-label">Player</div>
+        <app-form-field label="Player" [error]="getErrorMessage('winnerPlayer')">
           @if (isLoadingWinnerPlayers) {
             <app-loading-spinner message="Loading players..." size="sm" />
           }
@@ -56,22 +49,14 @@
               }
             </app-card-grid>
           }
-          <div class="error-slot">
-            @if (
-              faceoffForm.get('winnerPlayer')?.errors && faceoffForm.get('winnerPlayer')?.touched
-            ) {
-              <span>{{ getErrorMessage('winnerPlayer') }}</span>
-            }
-          </div>
-        </div>
+        </app-form-field>
       </div>
 
       <!-- Faceoff Loser Section -->
       <div class="form-section">
         <app-section-header title="Faceoff Loser" />
 
-        <div class="team-selection-container">
-          <div class="selection-label">Team</div>
+        <app-form-field label="Team" [error]="getErrorMessage('loserTeam')">
           @if (isLoadingTeams) {
             <app-loading-spinner message="Loading teams..." size="sm" />
           }
@@ -94,15 +79,9 @@
               }
             </app-card-grid>
           }
-          <div class="error-slot">
-            @if (faceoffForm.get('loserTeam')?.errors && faceoffForm.get('loserTeam')?.touched) {
-              <span>{{ getErrorMessage('loserTeam') }}</span>
-            }
-          </div>
-        </div>
+        </app-form-field>
 
-        <div class="player-selection-container">
-          <div class="selection-label">Player</div>
+        <app-form-field label="Player" [error]="getErrorMessage('loserPlayer')">
           @if (isLoadingLoserPlayers) {
             <app-loading-spinner message="Loading players..." size="sm" />
           }
@@ -121,22 +100,14 @@
               }
             </app-card-grid>
           }
-          <div class="error-slot">
-            @if (
-              faceoffForm.get('loserPlayer')?.errors && faceoffForm.get('loserPlayer')?.touched
-            ) {
-              <span>{{ getErrorMessage('loserPlayer') }}</span>
-            }
-          </div>
-        </div>
+        </app-form-field>
       </div>
 
       <!-- Period and Time Section -->
       <div class="form-section">
         <app-section-header title="Faceoff Details" />
 
-        <div class="period-selection-container">
-          <div class="selection-label">Period</div>
+        <app-form-field label="Period" [error]="getErrorMessage('period')">
           @if (isLoadingPeriods) {
             <app-loading-spinner message="Loading periods..." size="sm" />
           }
@@ -152,12 +123,7 @@
               }
             </app-card-grid>
           }
-          <div class="error-slot">
-            @if (faceoffForm.get('period')?.errors && faceoffForm.get('period')?.touched) {
-              <span>{{ getErrorMessage('period') }}</span>
-            }
-          </div>
-        </div>
+        </app-form-field>
 
         <div class="form-row">
           <app-form-field label="Time" [required]="true" [error]="getErrorMessage('time')">

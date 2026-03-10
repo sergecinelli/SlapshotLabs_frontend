@@ -8,12 +8,6 @@
 
     .goalie-form {
       @include modal-form.form-section;
-
-      .form-section {
-        .shoots-selection-container {
-          @include modal-form.selection-container;
-        }
-      }
     }
   }
 }

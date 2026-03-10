@@ -115,8 +115,7 @@
         <!-- Game Details -->
         <div class="form-section">
           <app-section-header title="Game Details" />
-          <div class="game-type-selection-container">
-            <div class="selection-label">Game Type</div>
+          <app-form-field label="Game Type" [error]="getErrorMessage('gameType')">
             <app-card-grid [columns]="gameTypeOptions.length">
               @for (option of gameTypeOptions; track option.value) {
                 <app-card-grid-item
@@ -127,12 +126,7 @@
                 </app-card-grid-item>
               }
             </app-card-grid>
-            <div class="error-slot">
-              @if (scheduleForm.get('gameType')?.errors && scheduleForm.get('gameType')?.touched) {
-                <span>{{ getErrorMessage('gameType') }}</span>
-              }
-            </div>
-          </div>
+          </app-form-field>
           @if (gameTypeNameSelectOptions.length > 0) {
             <div class="form-row">
               <app-form-field label="{{ selectedGameType?.name ?? '' }} Name">
@@ -143,8 +137,7 @@
               </app-form-field>
             </div>
           }
-          <div class="status-selection-container">
-            <div class="selection-label">Status</div>
+          <app-form-field label="Status" [error]="getErrorMessage('status')">
             <app-card-grid [columns]="statusOptions.length">
               @for (option of statusOptions; track option.value) {
                 <app-card-grid-item
@@ -155,12 +148,7 @@
                 </app-card-grid-item>
               }
             </app-card-grid>
-            <div class="error-slot">
-              @if (scheduleForm.get('status')?.errors && scheduleForm.get('status')?.touched) {
-                <span>{{ getErrorMessage('status') }}</span>
-              }
-            </div>
-          </div>
+          </app-form-field>
         </div>
         <!-- Analysis Section -->
         <div class="form-section">
