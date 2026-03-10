@@ -102,17 +102,13 @@
                     <div class="team-logo-placeholder"></div>
                   }
                   <div class="entity-name-group">
-                    <div
-                      class="entity-name entity-link"
-                      (click)="viewTeamProfile(team)"
-                      (keyup.enter)="viewTeamProfile(team)"
-                      (keyup.space)="viewTeamProfile(team)"
-                      tabindex="0"
-                      role="button"
-                      [attr.aria-label]="'View ' + team.name + ' profile'"
+                    <app-clickable-link
+                      class="entity-name"
+                      [route]="'/teams-and-rosters/teams/' + team.id + '/profile'"
+                      [ariaLabel]="'View ' + team.name + ' profile'"
                     >
                       {{ team.name }}
-                    </div>
+                    </app-clickable-link>
                     @if (team.abbreviation) {
                       <div class="entity-subtitle">{{ team.abbreviation }}</div>
                     }

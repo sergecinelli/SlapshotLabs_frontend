@@ -86,29 +86,26 @@
       <div class="team-info team-info-left">
         <div class="team-name-group">
           @if (gameValue.homeTeamId) {
-            <a
-              class="team-name team-link"
-              [routerLink]="['/teams-and-rosters/teams', gameValue.homeTeamId, 'profile']"
-              [attr.aria-label]="'View ' + gameValue.homeTeam + ' profile'"
-              >{{ gameValue.homeTeam }}</a
+            <app-clickable-link
+              class="team-name"
+              [route]="['/teams-and-rosters/teams', gameValue.homeTeamId, 'profile']"
+              [ariaLabel]="'View ' + gameValue.homeTeam + ' profile'"
+              >{{ gameValue.homeTeam }}</app-clickable-link
             >
           } @else {
             <div class="team-name">{{ gameValue.homeTeam }}</div>
           }
           <div class="team-location">{{ getTeamLocation(true) }}</div>
           @if (gameValue.homeTeamGoalie && gameValue.homeTeamGoalieId) {
-            <a
-              class="team-goalie goalie-link"
-              [routerLink]="[
-                '/teams-and-rosters/goalies',
-                gameValue.homeTeamGoalieId,
-                'profile',
-              ]"
-              [attr.aria-label]="'View ' + gameValue.homeTeamGoalie + ' profile'"
+            <app-clickable-link
+              class="team-goalie"
+              [route]="['/teams-and-rosters/goalies', gameValue.homeTeamGoalieId, 'profile']"
+              [ariaLabel]="'View ' + gameValue.homeTeamGoalie + ' profile'"
+              [flex]="true"
             >
               <span class="goalie-name">{{ gameValue.homeTeamGoalie }}</span>
               <span class="material-symbols-rounded goalie-icon">shield</span>
-            </a>
+            </app-clickable-link>
           } @else if (gameValue.homeTeamGoalie) {
             <div class="team-goalie">
               <span class="goalie-name">{{ gameValue.homeTeamGoalie }}</span>
@@ -161,29 +158,26 @@
         }
         <div class="team-name-group">
           @if (gameValue.awayTeamId) {
-            <a
-              class="team-name team-link"
-              [routerLink]="['/teams-and-rosters/teams', gameValue.awayTeamId, 'profile']"
-              [attr.aria-label]="'View ' + gameValue.awayTeam + ' profile'"
-              >{{ gameValue.awayTeam }}</a
+            <app-clickable-link
+              class="team-name"
+              [route]="['/teams-and-rosters/teams', gameValue.awayTeamId, 'profile']"
+              [ariaLabel]="'View ' + gameValue.awayTeam + ' profile'"
+              >{{ gameValue.awayTeam }}</app-clickable-link
             >
           } @else {
             <div class="team-name">{{ gameValue.awayTeam }}</div>
           }
           <div class="team-location">{{ getTeamLocation(false) }}</div>
           @if (gameValue.awayTeamGoalie && gameValue.awayTeamGoalieId) {
-            <a
-              class="team-goalie goalie-link"
-              [routerLink]="[
-                '/teams-and-rosters/goalies',
-                gameValue.awayTeamGoalieId,
-                'profile',
-              ]"
-              [attr.aria-label]="'View ' + gameValue.awayTeamGoalie + ' profile'"
+            <app-clickable-link
+              class="team-goalie"
+              [route]="['/teams-and-rosters/goalies', gameValue.awayTeamGoalieId, 'profile']"
+              [ariaLabel]="'View ' + gameValue.awayTeamGoalie + ' profile'"
+              [flex]="true"
             >
               <span class="material-symbols-rounded goalie-icon">shield</span>
               <span class="goalie-name">{{ gameValue.awayTeamGoalie }}</span>
-            </a>
+            </app-clickable-link>
           } @else if (gameValue.awayTeamGoalie) {
             <div class="team-goalie">
               <span class="material-symbols-rounded goalie-icon">shield</span>

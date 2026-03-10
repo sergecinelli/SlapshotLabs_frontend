@@ -159,7 +159,7 @@ export class GameAnalysisPage implements OnInit {
 
   private openAnalysisModal(
     data: { isEditMode: boolean; analysis?: Analysis },
-    games: GameOption[],
+    games: GameOption[]
   ): void {
     const modalData: AnalysisModalData = {
       mode: data.isEditMode ? 'edit' : 'create',

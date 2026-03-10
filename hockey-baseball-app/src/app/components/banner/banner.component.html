@@ -83,16 +83,18 @@
                 [alt]="item.away_team_name"
                 class="bn-logo"
               />
-              <a
-                [routerLink]="['/teams-and-rosters/teams', item.away_team_id, 'profile']"
+              <app-clickable-link
                 class="bn-name"
-                (click)="$event.stopPropagation()"
-                [attr.aria-label]="
+                [route]="['/teams-and-rosters/teams', item.away_team_id, 'profile']"
+                [ariaLabel]="
                   'View ' +
                   getTeamDisplay(item.away_team_abbreviation, item.away_team_name) +
                   ' profile'
                 "
-                >{{ getTeamDisplay(item.away_team_abbreviation, item.away_team_name) }}</a
+                (click)="$event.stopPropagation()"
+                >{{
+                  getTeamDisplay(item.away_team_abbreviation, item.away_team_name)
+                }}</app-clickable-link
               >
               <span class="bn-score" [class.bn-score-highlight]="isWinning(item, false)">{{
                 item.away_goals
@@ -104,16 +106,18 @@
                 [alt]="item.home_team_name"
                 class="bn-logo"
               />
-              <a
-                [routerLink]="['/teams-and-rosters/teams', item.home_team_id, 'profile']"
+              <app-clickable-link
                 class="bn-name"
-                (click)="$event.stopPropagation()"
-                [attr.aria-label]="
+                [route]="['/teams-and-rosters/teams', item.home_team_id, 'profile']"
+                [ariaLabel]="
                   'View ' +
                   getTeamDisplay(item.home_team_abbreviation, item.home_team_name) +
                   ' profile'
                 "
-                >{{ getTeamDisplay(item.home_team_abbreviation, item.home_team_name) }}</a
+                (click)="$event.stopPropagation()"
+                >{{
+                  getTeamDisplay(item.home_team_abbreviation, item.home_team_name)
+                }}</app-clickable-link
               >
               <span class="bn-score" [class.bn-score-highlight]="isWinning(item, true)">{{
                 item.home_goals

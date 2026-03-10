@@ -34,6 +34,7 @@ import { CachedSrcDirective } from '../../shared/directives/cached-src.directive
 import { CardGridComponent } from '../../shared/components/card-grid/card-grid.component';
 import { BreadcrumbActionsDirective } from '../../shared/directives/breadcrumb-actions.directive';
 import { LoadingSpinnerComponent } from '../../shared/components/loading-spinner/loading-spinner.component';
+import { ClickableLinkComponent } from '../../shared/components/clickable-link/clickable-link.component';
 
 @Component({
   selector: 'app-teams',
@@ -49,6 +50,7 @@ import { LoadingSpinnerComponent } from '../../shared/components/loading-spinner
     DataTableComponent,
     BreadcrumbActionsDirective,
     LoadingSpinnerComponent,
+    ClickableLinkComponent,
   ],
   templateUrl: './teams.page.html',
   styleUrl: './teams.page.scss',

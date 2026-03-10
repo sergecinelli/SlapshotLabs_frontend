@@ -22,19 +22,3 @@
     }
   }
 }
-
-.subject-row {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.subject-link {
-  color: inherit;
-  cursor: pointer;
-  text-decoration: none;
-
-  &:hover {
-    text-decoration: underline;
-  }
-}

@@ -104,15 +104,13 @@
                     {{ getGoalieInitials(goalie) }}
                   </div>
                   <div class="entity-name-group">
-                    <a
-                      class="entity-name entity-link"
-                      [routerLink]="'/teams-and-rosters/goalies/' + goalie.id + '/profile'"
-                      [attr.aria-label]="
-                        'View ' + goalie.firstName + ' ' + goalie.lastName + ' profile'
-                      "
+                    <app-clickable-link
+                      class="entity-name"
+                      [route]="'/teams-and-rosters/goalies/' + goalie.id + '/profile'"
+                      [ariaLabel]="'View ' + goalie.firstName + ' ' + goalie.lastName + ' profile'"
                     >
                       {{ goalie.firstName }} {{ goalie.lastName }}
-                    </a>
+                    </app-clickable-link>
                     <div class="entity-subtitle-row">
                       @if (goalie.jerseyNumber) {
                         <div class="entity-subtitle">#{{ goalie.jerseyNumber }}</div>
@@ -161,11 +159,11 @@
                           />
                         }
                         @if (goalie.teamId) {
-                          <a
-                            class="entity-info-value team-link"
-                            [routerLink]="'/teams-and-rosters/teams/' + goalie.teamId + '/profile'"
-                            [attr.aria-label]="'View ' + goalie.team + ' profile'"
-                            >{{ goalie.team }}</a
+                          <app-clickable-link
+                            class="entity-info-value"
+                            [route]="'/teams-and-rosters/teams/' + goalie.teamId + '/profile'"
+                            [ariaLabel]="'View ' + goalie.team + ' profile'"
+                            >{{ goalie.team }}</app-clickable-link
                           >
                         } @else {
                           <span class="entity-info-value">{{ goalie.team }}</span>

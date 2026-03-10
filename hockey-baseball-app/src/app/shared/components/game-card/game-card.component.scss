@@ -406,23 +406,6 @@
   min-width: 0;
   line-height: 1.2;
   display: block;
-
-  &.team-link {
-    text-decoration: none;
-    color: inherit;
-    cursor: pointer;
-    transition: text-decoration 0.2s ease;
-
-    &:hover {
-      text-decoration: underline;
-    }
-
-    &:focus-visible {
-      outline: 2px solid var(--primary);
-      outline-offset: 2px;
-      border-radius: 2px;
-    }
-  }
 }
 
 .team-location {
@@ -464,24 +447,6 @@
 
   .team-section-right & {
     justify-content: flex-start;
-  }
-
-  &.goalie-link {
-    text-decoration: none;
-    color: var(--text-secondary);
-    transition: text-decoration 0.2s ease;
-    width: fit-content;
-    cursor: pointer;
-
-    &:hover {
-      text-decoration: underline;
-    }
-
-    &:focus-visible {
-      outline: 2px solid var(--primary);
-      outline-offset: 2px;
-      border-radius: 2px;
-    }
   }
 }
 

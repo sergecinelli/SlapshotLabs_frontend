@@ -1,7 +1,7 @@
 import { Component, inject, signal, computed } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { ClickableLinkComponent } from '../clickable-link/clickable-link.component';
 import { ModalService, ModalEvent } from '../../../services/modal.service';
 import { PlayerService } from '../../../services/player.service';
 import { GoalieService } from '../../../services/goalie.service';
@@ -58,7 +58,6 @@ export interface TryoutModalResult {
   selector: 'app-tryout-modal',
   imports: [
     FormsModule,
-    RouterLink,
     ButtonComponent,
     ButtonSmallComponent,
     ButtonLoadingComponent,
@@ -68,12 +67,12 @@ export interface TryoutModalResult {
     CardGridItemComponent,
     CustomMultiSelectComponent,
     CustomSelectComponent,
+    ClickableLinkComponent,
   ],
   templateUrl: './tryout.modal.html',
   styleUrl: './tryout.modal.scss',
 })
 export class TryoutModal {
-  private router = inject(Router);
   private modalService = inject(ModalService);
   private playerService = inject(PlayerService);
   private goalieService = inject(GoalieService);
@@ -277,24 +276,6 @@ export class TryoutModal {
     if (!entity?.teamId) return null;
     return `/teams-and-rosters/teams/${entity.teamId}/profile`;
   });
-
-  closeModals(): void {
-    this.modalService.closeAll();
-  }
-
-  goToProfile(): void {
-    const route = this.profileRoute();
-    if (!route) return;
-    this.modalService.closeAll();
-    this.router.navigate([route]);
-  }
-
-  goToTeam(): void {
-    const route = this.teamRoute();
-    if (!route) return;
-    this.modalService.closeAll();
-    this.router.navigate([route]);
-  }
 
   private get resolvedTeamId(): number | null {
     if (this.data.teamId) return this.data.teamId;

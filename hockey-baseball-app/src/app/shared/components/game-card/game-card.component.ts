@@ -1,5 +1,5 @@
 import { Component, input, output } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { ClickableLinkComponent } from '../clickable-link/clickable-link.component';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Schedule, GameStatus } from '../../interfaces/schedule.interface';
@@ -17,7 +17,7 @@ import { CachedSrcDirective } from '../../directives/cached-src.directive';
   selector: 'app-game-card',
   imports: [
     CachedSrcDirective,
-    RouterLink,
+    ClickableLinkComponent,
     MatIconModule,
     MatTooltipModule,
     ButtonRouteComponent,

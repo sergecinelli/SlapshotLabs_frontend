@@ -3,7 +3,7 @@ import { ModalEvent, ModalService } from '../../services/modal.service';
 import { ToastService } from '../../services/toast.service';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { PlayerService } from '../../services/player.service';
 import { TeamService } from '../../services/team.service';
 import { Player } from '../../shared/interfaces/player.interface';
@@ -42,6 +42,7 @@ import { CachedSrcDirective } from '../../shared/directives/cached-src.directive
 import { CardGridComponent } from '../../shared/components/card-grid/card-grid.component';
 import { BreadcrumbActionsDirective } from '../../shared/directives/breadcrumb-actions.directive';
 import { LoadingSpinnerComponent } from '../../shared/components/loading-spinner/loading-spinner.component';
+import { ClickableLinkComponent } from '../../shared/components/clickable-link/clickable-link.component';
 
 @Component({
   selector: 'app-players',
@@ -55,7 +56,7 @@ import { LoadingSpinnerComponent } from '../../shared/components/loading-spinner
     ButtonRouteComponent,
     CardGridComponent,
     DataTableComponent,
-    RouterLink,
+    ClickableLinkComponent,
     BreadcrumbActionsDirective,
     LoadingSpinnerComponent,
   ],

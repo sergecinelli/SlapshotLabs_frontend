@@ -12,47 +12,29 @@
               [readonly]="true"
               class="full-width"
             >
-              <div readonlyContent class="subject-row">
-                <a
-                  class="subject-link"
-                  [routerLink]="profileRoute()"
-                  (click)="closeModals()"
-                >
-                  {{ data.singleEntity.name }}
-                </a>
-                <app-button-small
-                  materialIcon="visibility"
-                  [bg]="'transparent'"
-                  [bghover]="'item_hover'"
-                  [color]="'text_secondary'"
-                  [colorhover]="'green_dark'"
-                  tooltip="View Profile"
-                  (clicked)="goToProfile()"
-                />
-              </div>
+              <app-clickable-link
+                readonlyContent
+                [route]="profileRoute()!"
+                [showIcon]="true"
+                iconTooltip="View Profile"
+                [closeModals]="true"
+              >
+                {{ data.singleEntity.name }}
+              </app-clickable-link>
             </app-form-field>
           </div>
           <div class="form-row">
             @if (data.singleEntity.teamId) {
               <app-form-field label="Current Team" [readonly]="true" class="full-width">
-                <div readonlyContent class="subject-row">
-                  <a
-                    class="subject-link"
-                    [routerLink]="teamRoute()"
-                    (click)="closeModals()"
-                  >
-                    {{ data.singleEntity.team }}
-                  </a>
-                  <app-button-small
-                    materialIcon="visibility"
-                    [bg]="'transparent'"
-                    [bghover]="'item_hover'"
-                    [color]="'text_secondary'"
-                    [colorhover]="'green_dark'"
-                    tooltip="View Team"
-                    (clicked)="goToTeam()"
-                  />
-                </div>
+                <app-clickable-link
+                  readonlyContent
+                  [route]="teamRoute()!"
+                  [showIcon]="true"
+                  iconTooltip="View Team"
+                  [closeModals]="true"
+                >
+                  {{ data.singleEntity.team }}
+                </app-clickable-link>
               </app-form-field>
             } @else {
               <app-form-field

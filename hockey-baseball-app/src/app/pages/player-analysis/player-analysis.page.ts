@@ -115,7 +115,7 @@ export class PlayerAnalysisPage implements OnInit {
 
   private openAnalysisModal(
     data: { isEditMode: boolean; analysis?: Analysis },
-    players: Player[],
+    players: Player[]
   ): void {
     const modalData: AnalysisModalData = {
       mode: data.isEditMode ? 'edit' : 'create',

@@ -1,7 +1,6 @@
 import { Component, inject, signal, computed } from '@angular/core';
 import { LowerCasePipe } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ModalEvent, ModalService } from '../../../services/modal.service';
 import { Analysis, AnalysisType, AnalyticsApiIn } from '../../interfaces/analysis.interface';
@@ -9,8 +8,8 @@ import { Player } from '../../interfaces/player.interface';
 import { Goalie } from '../../interfaces/goalie.interface';
 import { Team } from '../../interfaces/team.interface';
 import { ButtonComponent } from '../buttons/button/button.component';
-import { ButtonSmallComponent } from '../buttons/button-small/button-small.component';
 import { ButtonLoadingComponent } from '../buttons/button-loading/button-loading.component';
+import { ClickableLinkComponent } from '../clickable-link/clickable-link.component';
 import { SectionHeaderComponent } from '../section-header/section-header.component';
 import { FormFieldComponent } from '../form-field/form-field.component';
 import {
@@ -69,13 +68,12 @@ const PROFILE_ROUTE_SEGMENTS: Partial<Record<AnalysisType, string>> = {
   imports: [
     LowerCasePipe,
     ReactiveFormsModule,
-    RouterLink,
     ButtonComponent,
-    ButtonSmallComponent,
     ButtonLoadingComponent,
     SectionHeaderComponent,
     FormFieldComponent,
     CustomSelectComponent,
+    ClickableLinkComponent,
   ],
   templateUrl: './analysis.modal.html',
   styleUrl: './analysis.modal.scss',
@@ -83,7 +81,6 @@ const PROFILE_ROUTE_SEGMENTS: Partial<Record<AnalysisType, string>> = {
 export class AnalysisModal {
   private fb = inject(FormBuilder);
   private modalService = inject(ModalService);
-  private router = inject(Router);
   data = inject(ModalService).getModalData<AnalysisModalData>();
 
   readonly mode = this.data.mode;
@@ -108,23 +105,33 @@ export class AnalysisModal {
 
   entityOptionGroups = computed<SelectOptionGroup[]>(() => {
     if (this.analysisType === 'player' && this.data.players) {
-      return this.groupEntities(this.data.players, (p) => p.team || 'Unknown Team', (p) => ({
-        value: p.id,
-        label: `${p.firstName} ${p.lastName}`,
-        prefix: `#${p.jerseyNumber}`,
-      }));
+      return this.groupEntities(
+        this.data.players,
+        (p) => p.team || 'Unknown Team',
+        (p) => ({
+          value: p.id,
+          label: `${p.firstName} ${p.lastName}`,
+          prefix: `#${p.jerseyNumber}`,
+        })
+      );
     }
     if (this.analysisType === 'goalie' && this.data.goalies) {
-      return this.groupEntities(this.data.goalies, (g) => g.team || 'Unknown Team', (g) => ({
-        value: g.id,
-        label: `${g.firstName} ${g.lastName}`,
-        prefix: `#${g.jerseyNumber}`,
-      }));
+      return this.groupEntities(
+        this.data.goalies,
+        (g) => g.team || 'Unknown Team',
+        (g) => ({
+          value: g.id,
+          label: `${g.firstName} ${g.lastName}`,
+          prefix: `#${g.jerseyNumber}`,
+        })
+      );
     }
     return [];
   });
 
-  useOptionGroups = computed(() => this.analysisType === 'player' || this.analysisType === 'goalie');
+  useOptionGroups = computed(
+    () => this.analysisType === 'player' || this.analysisType === 'goalie'
+  );
 
   isEntityLocked = computed(() => !!this.data.preSelectedEntityId || this.isEditMode);
 
@@ -229,17 +236,6 @@ export class AnalysisModal {
     this.modalService.closeModal();
   }
 
-  closeModals(): void {
-    this.modalService.closeAll();
-  }
-
-  goToProfile(): void {
-    const route = this.profileRoute();
-    if (!route) return;
-    this.modalService.closeAll();
-    this.router.navigate([route]);
-  }
-
   getErrorMessage(fieldName: string): string {
     return getFieldError(
       this.analysisForm.get(fieldName),
@@ -263,7 +259,7 @@ export class AnalysisModal {
   private groupEntities<T>(
     items: T[],
     groupKeyFn: (item: T) => string,
-    mapFn: (item: T) => SelectOption,
+    mapFn: (item: T) => SelectOption
   ): SelectOptionGroup[] {
     const groups = new Map<string, SelectOption[]>();
     for (const item of items) {

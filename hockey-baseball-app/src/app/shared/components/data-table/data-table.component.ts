@@ -20,6 +20,7 @@ import { ButtonSmallComponent } from '../buttons/button-small/button-small.compo
 import { ButtonRouteSmallComponent } from '../buttons/button-route-small/button-route-small.component';
 import { AppColor } from '../../constants/colors';
 import { CachedSrcDirective } from '../../directives/cached-src.directive';
+import { ClickableLinkComponent } from '../clickable-link/clickable-link.component';
 import {
   getStatusStyle,
   getStatusTooltip,
@@ -68,6 +69,7 @@ export interface TableAction {
     MatTooltipModule,
     ButtonSmallComponent,
     ButtonRouteSmallComponent,
+    ClickableLinkComponent,
   ],
   templateUrl: './data-table.component.html',
   styleUrl: './data-table.component.scss',

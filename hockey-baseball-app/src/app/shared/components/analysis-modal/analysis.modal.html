@@ -8,24 +8,15 @@
           <div class="form-row">
             @if (profileRoute()) {
               <app-form-field label="Subject" [readonly]="true" class="full-width">
-                <div readonlyContent class="subject-row">
-                  <a
-                    class="subject-link"
-                    [routerLink]="profileRoute()"
-                    (click)="closeModals()"
-                  >
-                    {{ data.analysis.entityName }}
-                  </a>
-                  <app-button-small
-                    materialIcon="visibility"
-                    [bg]="'transparent'"
-                    [bghover]="'item_hover'"
-                    [color]="'text_secondary'"
-                    [colorhover]="'green_dark'"
-                    tooltip="View Profile"
-                    (clicked)="goToProfile()"
-                  />
-                </div>
+                <app-clickable-link
+                  readonlyContent
+                  [route]="profileRoute()!"
+                  [showIcon]="true"
+                  iconTooltip="View Profile"
+                  [closeModals]="true"
+                >
+                  {{ data.analysis.entityName }}
+                </app-clickable-link>
               </app-form-field>
             } @else {
               <app-form-field
@@ -70,28 +61,16 @@
           <app-section-header title="Analysis Details" />
           <div class="form-row">
             @if (isEntityLocked() && profileRoute()) {
-              <app-form-field
-                label="Selected {{ entityLabel }}"
-                [readonly]="true"
-              >
-                <div readonlyContent class="subject-row">
-                  <a
-                    class="subject-link"
-                    [routerLink]="profileRoute()"
-                    (click)="closeModals()"
-                  >
-                    {{ selectedEntityLabel() }}
-                  </a>
-                  <app-button-small
-                    materialIcon="visibility"
-                    [bg]="'transparent'"
-                    [bghover]="'item_hover'"
-                    [color]="'text_secondary'"
-                    [colorhover]="'green_dark'"
-                    tooltip="View Profile"
-                    (clicked)="goToProfile()"
-                  />
-                </div>
+              <app-form-field label="Selected {{ entityLabel }}" [readonly]="true">
+                <app-clickable-link
+                  readonlyContent
+                  [route]="profileRoute()!"
+                  [showIcon]="true"
+                  iconTooltip="View Profile"
+                  [closeModals]="true"
+                >
+                  {{ selectedEntityLabel() }}
+                </app-clickable-link>
               </app-form-field>
             } @else if (isEntityLocked()) {
               <app-form-field
@@ -148,11 +127,7 @@
               [required]="true"
               [error]="getErrorMessage('analysis')"
             >
-              <textarea
-                formControlName="analysis"
-                rows="6"
-                placeholder="Enter analysis"
-              ></textarea>
+              <textarea formControlName="analysis" rows="6" placeholder="Enter analysis"></textarea>
             </app-form-field>
           </div>
         </div>

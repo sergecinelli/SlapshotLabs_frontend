@@ -137,23 +137,6 @@ app-card-grid {
   text-overflow: ellipsis;
   white-space: nowrap;
   line-height: 1.2;
-
-  &.entity-link {
-    color: inherit;
-    text-decoration: none;
-    width: fit-content;
-    transition: text-decoration 0.2s ease;
-
-    &:hover {
-      text-decoration: underline;
-    }
-
-    &:focus-visible {
-      outline: 2px solid var(--primary);
-      outline-offset: 2px;
-      border-radius: 2px;
-    }
-  }
 }
 
 .entity-subtitle-row {
@@ -211,22 +194,6 @@ app-card-grid {
 .entity-info-value {
   color: var(--text-primary);
   font-weight: 500;
-
-  &.team-link {
-    color: inherit;
-    text-decoration: none;
-    transition: text-decoration 0.2s ease;
-
-    &:hover {
-      text-decoration: underline;
-    }
-
-    &:focus-visible {
-      outline: 2px solid var(--primary);
-      outline-offset: 2px;
-      border-radius: 2px;
-    }
-  }
 }
 
 // Stats Section

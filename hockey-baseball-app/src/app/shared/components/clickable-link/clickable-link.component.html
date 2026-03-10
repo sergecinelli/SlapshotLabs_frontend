@@ -1,0 +1,19 @@
+<a
+  class="clickable-link"
+  [routerLink]="route()"
+  [attr.aria-label]="ariaLabel()"
+  (click)="onLinkClick()"
+>
+  <ng-content></ng-content>
+</a>
+@if (showIcon()) {
+  <app-button-small
+    materialIcon="visibility"
+    [bg]="'transparent'"
+    [bghover]="'item_hover'"
+    [color]="'text_secondary'"
+    [colorhover]="'green_dark'"
+    [tooltip]="iconTooltip()"
+    (clicked)="onIconClick()"
+  />
+}

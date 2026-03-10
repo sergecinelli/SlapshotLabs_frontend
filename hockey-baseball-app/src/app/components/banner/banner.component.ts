@@ -9,6 +9,7 @@ import {
 } from '@angular/core';
 import { trigger, transition, style, animate, query, stagger } from '@angular/animations';
 import { Router, RouterLink } from '@angular/router';
+import { ClickableLinkComponent } from '../../shared/components/clickable-link/clickable-link.component';
 import { environment } from '../../../environments/environment';
 import { BannerService, GameBannerItem } from '../../services/banner.service';
 import { Subscription } from 'rxjs';
@@ -17,7 +18,7 @@ import { CachedSrcDirective } from '../../shared/directives/cached-src.directive
 
 @Component({
   selector: 'app-live-banner',
-  imports: [CachedSrcDirective, BannerSkeletonComponent, RouterLink],
+  imports: [CachedSrcDirective, BannerSkeletonComponent, RouterLink, ClickableLinkComponent],
   templateUrl: './banner.component.html',
   styleUrl: './banner.component.scss',
   animations: [

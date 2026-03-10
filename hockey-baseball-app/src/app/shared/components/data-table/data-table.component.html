@@ -75,8 +75,9 @@
                 @case ('text') {
                   @if (column.key === 'playerName' || column.key === 'goalieName') {
                     @if (getCellValueByKey(element, 'id')) {
-                      <a
-                        [routerLink]="
+                      <app-clickable-link
+                        class="player-name-link"
+                        [route]="
                           column.key === 'playerName'
                             ? [
                                 '/teams-and-rosters/players',
@@ -89,11 +90,10 @@
                                 'profile',
                               ]
                         "
-                        class="player-name-link"
                       >
                         {{ getCellValueByKey(element, 'firstName') }}
                         {{ getCellValueByKey(element, 'lastName') }}
-                      </a>
+                      </app-clickable-link>
                     } @else {
                       <span>
                         {{ getCellValueByKey(element, 'firstName') }}
@@ -130,16 +130,16 @@
                       </div>
                       <div class="team-content">
                         @if (getCellValueByKey(element, 'teamId')) {
-                          <a
-                            [routerLink]="[
+                          <app-clickable-link
+                            class="team-name-link"
+                            [route]="[
                               '/teams-and-rosters/teams',
                               getCellValueByKey(element, 'teamId'),
                               'profile',
                             ]"
-                            class="team-name-link"
                           >
                             {{ getCellValue(element, column) || '-' }}
-                          </a>
+                          </app-clickable-link>
                         } @else {
                           <div class="team-name">{{ getCellValue(element, column) || '-' }}</div>
                         }
@@ -207,8 +207,9 @@
                             column.key === 'homeTeam' ? 'homeTeamId' : 'awayTeamId'
                           )
                         ) {
-                          <a
-                            [routerLink]="[
+                          <app-clickable-link
+                            class="team-name-link"
+                            [route]="[
                               '/teams-and-rosters/teams',
                               getCellValueByKey(
                                 element,
@@ -216,10 +217,9 @@
                               ),
                               'profile',
                             ]"
-                            class="team-name-link"
                           >
                             {{ getCellValue(element, column) || '-' }}
-                          </a>
+                          </app-clickable-link>
                         } @else {
                           <div class="team-name">{{ getCellValue(element, column) || '-' }}</div>
                         }
@@ -245,8 +245,9 @@
                               column.key === 'homeTeam' ? 'homeTeamGoalieId' : 'awayTeamGoalieId'
                             )
                           ) {
-                            <a
-                              [routerLink]="[
+                            <app-clickable-link
+                              class="goalie-name-link"
+                              [route]="[
                                 '/teams-and-rosters/goalies',
                                 getCellValueByKey(
                                   element,
@@ -256,7 +257,6 @@
                                 ),
                                 'profile',
                               ]"
-                              class="goalie-name-link"
                             >
                               {{
                                 getCellValueByKey(
@@ -264,7 +264,7 @@
                                   column.key === 'homeTeam' ? 'homeTeamGoalie' : 'awayTeamGoalie'
                                 ) || '-'
                               }}
-                            </a>
+                            </app-clickable-link>
                           } @else {
                             <span>{{
                               getCellValueByKey(
@@ -296,9 +296,12 @@
                           />
                         </a>
                       }
-                      <a [routerLink]="getEntityProfileRoute(element)" class="entity-name-link">
+                      <app-clickable-link
+                        class="entity-name-link"
+                        [route]="getEntityProfileRoute(element)"
+                      >
                         {{ getCellValue(element, column) || '-' }}
-                      </a>
+                      </app-clickable-link>
                     </div>
                   } @else {
                     <span>
@@ -392,8 +395,9 @@
                 @default {
                   @if (column.key === 'playerName' || column.key === 'goalieName') {
                     @if (getCellValueByKey(element, 'id')) {
-                      <a
-                        [routerLink]="
+                      <app-clickable-link
+                        class="player-name-link"
+                        [route]="
                           column.key === 'playerName'
                             ? [
                                 '/teams-and-rosters/players',
@@ -406,11 +410,10 @@
                                 'profile',
                               ]
                         "
-                        class="player-name-link"
                       >
                         {{ getCellValueByKey(element, 'firstName') }}
                         {{ getCellValueByKey(element, 'lastName') }}
-                      </a>
+                      </app-clickable-link>
                     } @else {
                       <span>
                         {{ getCellValueByKey(element, 'firstName') }}
@@ -447,16 +450,16 @@
                       </div>
                       <div class="team-content">
                         @if (getCellValueByKey(element, 'teamId')) {
-                          <a
-                            [routerLink]="[
+                          <app-clickable-link
+                            class="team-name-link"
+                            [route]="[
                               '/teams-and-rosters/teams',
                               getCellValueByKey(element, 'teamId'),
                               'profile',
                             ]"
-                            class="team-name-link"
                           >
                             {{ getCellValue(element, column) || '-' }}
-                          </a>
+                          </app-clickable-link>
                         } @else {
                           <div class="team-name">{{ getCellValue(element, column) || '-' }}</div>
                         }
@@ -486,16 +489,16 @@
                           />
                         </a>
                       }
-                      <a
-                        [routerLink]="[
+                      <app-clickable-link
+                        class="team-name-link"
+                        [route]="[
                           '/teams-and-rosters/teams',
                           getCellValueByKey(element, 'id'),
                           'profile',
                         ]"
-                        class="team-name-link"
                       >
                         {{ getCellValue(element, column) || '-' }}
-                      </a>
+                      </app-clickable-link>
                     </div>
                   } @else if (column.key === 'arenaRink') {
                     <div class="arena-rink-cell">
@@ -564,8 +567,9 @@
                             column.key === 'homeTeam' ? 'homeTeamId' : 'awayTeamId'
                           )
                         ) {
-                          <a
-                            [routerLink]="[
+                          <app-clickable-link
+                            class="team-name-link"
+                            [route]="[
                               '/teams-and-rosters/teams',
                               getCellValueByKey(
                                 element,
@@ -573,10 +577,9 @@
                               ),
                               'profile',
                             ]"
-                            class="team-name-link"
                           >
                             {{ getCellValue(element, column) || '-' }}
-                          </a>
+                          </app-clickable-link>
                         } @else {
                           <div class="team-name">{{ getCellValue(element, column) || '-' }}</div>
                         }
@@ -602,8 +605,9 @@
                               column.key === 'homeTeam' ? 'homeTeamGoalieId' : 'awayTeamGoalieId'
                             )
                           ) {
-                            <a
-                              [routerLink]="[
+                            <app-clickable-link
+                              class="goalie-name-link"
+                              [route]="[
                                 '/teams-and-rosters/goalies',
                                 getCellValueByKey(
                                   element,
@@ -613,7 +617,6 @@
                                 ),
                                 'profile',
                               ]"
-                              class="goalie-name-link"
                             >
                               {{
                                 getCellValueByKey(
@@ -621,7 +624,7 @@
                                   column.key === 'homeTeam' ? 'homeTeamGoalie' : 'awayTeamGoalie'
                                 ) || '-'
                               }}
-                            </a>
+                            </app-clickable-link>
                           } @else {
                             <span>{{
                               getCellValueByKey(
@@ -653,9 +656,12 @@
                           />
                         </a>
                       }
-                      <a [routerLink]="getEntityProfileRoute(element)" class="entity-name-link">
+                      <app-clickable-link
+                        class="entity-name-link"
+                        [route]="getEntityProfileRoute(element)"
+                      >
                         {{ getCellValue(element, column) || '-' }}
-                      </a>
+                      </app-clickable-link>
                     </div>
                   } @else {
                     <span>

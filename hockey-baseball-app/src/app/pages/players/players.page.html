@@ -104,15 +104,13 @@
                     {{ getPlayerInitials(player) }}
                   </div>
                   <div class="entity-name-group">
-                    <a
-                      class="entity-name entity-link"
-                      [routerLink]="'/teams-and-rosters/players/' + player.id + '/profile'"
-                      [attr.aria-label]="
-                        'View ' + player.firstName + ' ' + player.lastName + ' profile'
-                      "
+                    <app-clickable-link
+                      class="entity-name"
+                      [route]="'/teams-and-rosters/players/' + player.id + '/profile'"
+                      [ariaLabel]="'View ' + player.firstName + ' ' + player.lastName + ' profile'"
                     >
                       {{ player.firstName }} {{ player.lastName }}
-                    </a>
+                    </app-clickable-link>
                     <div class="entity-subtitle-row">
                       @if (player.jerseyNumber) {
                         <div class="entity-subtitle">#{{ player.jerseyNumber }}</div>
@@ -161,11 +159,11 @@
                           />
                         }
                         @if (player.teamId) {
-                          <a
-                            class="entity-info-value team-link"
-                            [routerLink]="'/teams-and-rosters/teams/' + player.teamId + '/profile'"
-                            [attr.aria-label]="'View ' + player.team + ' profile'"
-                            >{{ player.team }}</a
+                          <app-clickable-link
+                            class="entity-info-value"
+                            [route]="'/teams-and-rosters/teams/' + player.teamId + '/profile'"
+                            [ariaLabel]="'View ' + player.team + ' profile'"
+                            >{{ player.team }}</app-clickable-link
                           >
                         } @else {
                           <span class="entity-info-value">{{ player.team }}</span>
