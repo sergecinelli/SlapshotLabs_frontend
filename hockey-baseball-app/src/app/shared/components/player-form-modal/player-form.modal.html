@@ -11,7 +11,7 @@
         <div class="form-section">
           <app-section-header title="Team Information" />
           <div class="form-row">
-            <app-form-field label="Team" [required]="true" [error]="getErrorMessage('team')">
+            <app-form-field label="Team" [error]="getErrorMessage('team')">
               <app-custom-select
                 formControlName="team"
                 [options]="teamOptions"

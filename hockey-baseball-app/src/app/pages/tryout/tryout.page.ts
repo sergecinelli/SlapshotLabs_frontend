@@ -37,10 +37,10 @@ import { BreadcrumbActionsDirective } from '../../shared/directives/breadcrumb-a
 import { BreadcrumbCenterDirective } from '../../shared/directives/breadcrumb-center.directive';
 import { visibilityByRoleMap } from './tryout.role-map';
 import {
-  TryoutAddModal,
-  TryoutAddModalData,
-  TryoutAddModalResult,
-} from '../../shared/components/tryout-add-modal/tryout-add.modal';
+  TryoutModal,
+  TryoutModalData,
+  TryoutModalResult,
+} from '../../shared/components/tryout-modal/tryout.modal';
 import {
   TryoutStatusModal,
   TryoutStatusModalData,
@@ -145,7 +145,8 @@ export class TryoutPage implements OnInit {
       action: 'analysis',
       variant: 'blue',
       icon: 'bar_chart',
-      condition: (item) => item['hasAnalytics'] === true,
+      isDisabled: (item) => item['hasAnalytics'] !== true,
+      tooltip: (item) => (item['hasAnalytics'] !== true ? 'No analytics available' : null),
     },
     {
       label: 'Profile',
@@ -248,7 +249,7 @@ export class TryoutPage implements OnInit {
       )
       .subscribe({
         next: ({ playerEntries, goalieEntries, positions, teams }) => {
-          this.modalService.openModal(TryoutAddModal, {
+          this.modalService.openModal(TryoutModal, {
             name: 'Add to Tryout List',
             icon: 'person_add',
             width: '800px',
@@ -260,8 +261,8 @@ export class TryoutPage implements OnInit {
               goalieEntries,
               positions,
               teams: teamId ? [] : teams,
-            } as TryoutAddModalData,
-            onCloseWithDataProcessing: (result: TryoutAddModalResult) => {
+            } as TryoutModalData,
+            onCloseWithDataProcessing: (result: TryoutModalResult) => {
               const type = result.type;
               const resolvedTeamId = result.teamId;
               const note = result.note || undefined;

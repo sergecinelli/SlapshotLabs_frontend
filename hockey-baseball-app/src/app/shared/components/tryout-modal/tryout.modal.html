@@ -1,0 +1,216 @@
+@let selectedEntriesValue = selectedEntries();
+
+<div class="tryout-modal">
+  <div class="modal-content">
+    <div class="tryout-form">
+      @if (isSingleMode && data.singleEntity) {
+        <div class="form-section">
+          <app-section-header title="{{ isGoalie ? 'Goalie' : 'Player' }} Information" />
+          <div class="form-row">
+            <app-form-field
+              label="{{ isGoalie ? 'Goalie' : 'Player' }}"
+              [readonly]="true"
+              class="full-width"
+            >
+              <div readonlyContent class="subject-row">
+                <a
+                  class="subject-link"
+                  [routerLink]="profileRoute()"
+                  (click)="closeModals()"
+                >
+                  {{ data.singleEntity.name }}
+                </a>
+                <app-button-small
+                  materialIcon="visibility"
+                  [bg]="'transparent'"
+                  [bghover]="'item_hover'"
+                  [color]="'text_secondary'"
+                  [colorhover]="'green_dark'"
+                  tooltip="View Profile"
+                  (clicked)="goToProfile()"
+                />
+              </div>
+            </app-form-field>
+          </div>
+          <div class="form-row">
+            @if (data.singleEntity.teamId) {
+              <app-form-field label="Current Team" [readonly]="true" class="full-width">
+                <div readonlyContent class="subject-row">
+                  <a
+                    class="subject-link"
+                    [routerLink]="teamRoute()"
+                    (click)="closeModals()"
+                  >
+                    {{ data.singleEntity.team }}
+                  </a>
+                  <app-button-small
+                    materialIcon="visibility"
+                    [bg]="'transparent'"
+                    [bghover]="'item_hover'"
+                    [color]="'text_secondary'"
+                    [colorhover]="'green_dark'"
+                    tooltip="View Team"
+                    (clicked)="goToTeam()"
+                  />
+                </div>
+              </app-form-field>
+            } @else {
+              <app-form-field
+                label="Current Team"
+                [readonly]="true"
+                [readonlyValue]="'No Team'"
+                class="full-width"
+              />
+            }
+          </div>
+        </div>
+      }
+
+      @if (showTeamSelect) {
+        <div class="form-section">
+          <app-section-header title="Team Information" />
+          <div class="form-row">
+            <app-form-field label="Team">
+              <app-custom-select
+                [ngModel]="selectedTeamId()"
+                (ngModelChange)="onTeamChange($event)"
+                [options]="teamOptions()"
+                [searchable]="true"
+              />
+            </app-form-field>
+          </div>
+        </div>
+      }
+
+      @if (!isSingleMode && isAllTab) {
+        <div class="form-section">
+          <app-section-header title="Player Type" />
+          <app-form-field label="Select type">
+            <app-card-grid [columns]="2">
+              <app-card-grid-item
+                [selected]="selectedType() === 'player'"
+                (select)="onTypeChange('player')"
+              >
+                <span class="material-symbols-rounded">person</span>
+                Player
+              </app-card-grid-item>
+              <app-card-grid-item
+                [selected]="selectedType() === 'goalie'"
+                (select)="onTypeChange('goalie')"
+              >
+                <span class="material-symbols-rounded">shield</span>
+                Goalie
+              </app-card-grid-item>
+            </app-card-grid>
+          </app-form-field>
+        </div>
+      }
+
+      @if (!isSingleMode) {
+        <div class="form-section">
+          <app-section-header title="Select Existing {{ isGoalie ? 'Goalie' : 'Player' }}" />
+          <div class="select-field-wrapper">
+            @if (selectedEntriesValue.length > 0) {
+              <app-button-small
+                class="clear-all-btn"
+                materialIcon="close"
+                [bg]="'transparent'"
+                [bghover]="'item_hover'"
+                [color]="'gray'"
+                [colorhover]="'primary'"
+                [haveContent]="true"
+                (clicked)="clearSelection()"
+              >
+                Clear all
+              </app-button-small>
+            }
+            <app-form-field label="Select existing {{ isGoalie ? 'goalies' : 'players' }}">
+              <app-custom-multi-select
+                [value]="selectedStringIds()"
+                [placeholder]="'No ' + (isGoalie ? 'goalies' : 'players') + ' selected'"
+                searchPlaceholder="Search by name..."
+                [optionGroups]="entryOptionGroups()"
+                (valueChange)="onSelectionChange($event)"
+              />
+            </app-form-field>
+          </div>
+          <div class="form-row">
+            <app-form-field label="Or create new {{ isGoalie ? 'goalie' : 'player' }}">
+              <app-button
+                [bg]="'background'"
+                [bghover]="'item_hover'"
+                [br]="'border'"
+                [color]="'primary'"
+                [colorhover]="'primary'"
+                [width]="'100%'"
+                [materialIcon]="'person_add'"
+                [haveContent]="true"
+                (clicked)="openCreateModal()"
+              >
+                Create New {{ isGoalie ? 'Goalie' : 'Player' }}
+              </app-button>
+            </app-form-field>
+          </div>
+        </div>
+      }
+
+      <div class="form-section">
+        <app-section-header title="Note" />
+        <div class="form-row">
+          <app-form-field class="full-width" label="Note (optional)">
+            <textarea
+              placeholder="Add a note..."
+              rows="2"
+              [value]="note()"
+              (input)="note.set($any($event.target).value)"
+            ></textarea>
+          </app-form-field>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-actions">
+    <app-button
+      [bg]="'background'"
+      [bghover]="'item_hover'"
+      [br]="'border'"
+      [color]="'text_primary'"
+      [colorhover]="'text_primary'"
+      [haveContent]="true"
+      materialIcon="cancel"
+      (clicked)="onCancel()"
+    >
+      Cancel
+    </app-button>
+    @if (isSingleMode) {
+      <app-button-loading
+        [isLoading]="isSubmitting()"
+        materialIcon="person_add"
+        [bg]="'green'"
+        [bghover]="'green'"
+        [color]="'white'"
+        [colorhover]="'white'"
+        [haveContent]="true"
+        (clicked)="onSubmitSelected()"
+      >
+        Add to Tryout
+      </app-button-loading>
+    }
+    @if (!isSingleMode && selectedEntriesValue.length > 0) {
+      <app-button-loading
+        [isLoading]="isSubmitting()"
+        materialIcon="group_add"
+        [bg]="'green'"
+        [bghover]="'green'"
+        [color]="'white'"
+        [colorhover]="'white'"
+        [haveContent]="true"
+        (clicked)="onSubmitSelected()"
+      >
+        Add {{ selectedEntriesValue.length }} {{ isGoalie ? 'Goalie' : 'Player'
+        }}{{ selectedEntriesValue.length > 1 ? 's' : '' }}
+      </app-button-loading>
+    }
+  </div>
+</div>

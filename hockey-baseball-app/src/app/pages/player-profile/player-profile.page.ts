@@ -3,11 +3,13 @@ import { DecimalPipe } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatTableModule } from '@angular/material/table';
-import { Observable } from 'rxjs';
 import { ModalService, ModalEvent } from '../../services/modal.service';
 import { AnalysisService } from '../../services/analysis.service';
-import { AnalyticsApiIn } from '../../shared/interfaces/analysis.interface';
-import { PlayerAnalysisModal } from '../../shared/components/player-analysis-modal/player-analysis.modal';
+import {
+  AnalysisModal,
+  AnalysisModalData,
+  AnalysisModalResult,
+} from '../../shared/components/analysis-modal/analysis.modal';
 import { ToastService } from '../../services/toast.service';
 import { MatIconModule } from '@angular/material/icon';
 import { forkJoin } from 'rxjs';
@@ -309,19 +311,21 @@ export class PlayerProfilePage implements OnInit {
   }
 
   private openAnalysisModal(players: Player[]): void {
-    this.modalService.openModal(PlayerAnalysisModal, {
+    const modalData: AnalysisModalData = {
+      mode: 'create',
+      analysisType: 'player',
+      preSelectedEntityId: this.player!.id.toString(),
+      players,
+    };
+
+    this.modalService.openModal(AnalysisModal, {
       name: 'Create Player Analysis',
       icon: 'bar_chart',
       width: '100%',
       maxWidth: '900px',
-      data: {
-        isEditMode: false,
-        preSelectedPlayerId: this.player!.id.toString(),
-        players,
-      },
-      onCloseWithDataProcessing: (result: { isEditMode: boolean; apiData: AnalyticsApiIn }) => {
-        const apiCall: Observable<unknown> = this.analysisService.createAnalysis(result.apiData);
-        apiCall.subscribe({
+      data: modalData,
+      onCloseWithDataProcessing: (result: AnalysisModalResult) => {
+        this.analysisService.createAnalysis(result.apiData).subscribe({
           next: () => {
             this.toast.show('Analysis created successfully', 'success');
             this.modalService.closeModal();

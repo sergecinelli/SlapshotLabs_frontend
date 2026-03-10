@@ -6,49 +6,39 @@
         <app-section-header title="Faceoff Winner" />
 
         <app-form-field label="Team" [error]="getErrorMessage('winnerTeam')">
-          @if (isLoadingTeams) {
-            <app-loading-spinner message="Loading teams..." size="sm" />
-          }
-          @if (!isLoadingTeams) {
-            <app-card-grid [columns]="teamOptions.length">
-              @for (team of teamOptions; track team) {
-                <app-card-grid-item
-                  [selected]="faceoffForm.get('winnerTeam')?.value === team.value"
-                  (select)="selectWinnerTeam(team.value)"
-                >
-                  @if (team.value) {
-                    <img
-                      [appCachedSrc]="getTeamLogoUrl(team.value)"
-                      [alt]="team.label"
-                      class="team-logo-img"
-                    />
-                  }
-                  {{ team.label }}
-                </app-card-grid-item>
-              }
-            </app-card-grid>
-          }
+          <app-card-grid [columns]="teamOptions.length">
+            @for (team of teamOptions; track team) {
+              <app-card-grid-item
+                [selected]="faceoffForm.get('winnerTeam')?.value === team.value"
+                (select)="selectWinnerTeam(team.value)"
+              >
+                @if (team.value) {
+                  <img
+                    [appCachedSrc]="getTeamLogoUrl(team.value)"
+                    [alt]="team.label"
+                    class="team-logo-img"
+                  />
+                }
+                {{ team.label }}
+              </app-card-grid-item>
+            }
+          </app-card-grid>
         </app-form-field>
 
         <app-form-field label="Player" [error]="getErrorMessage('winnerPlayer')">
-          @if (isLoadingWinnerPlayers) {
-            <app-loading-spinner message="Loading players..." size="sm" />
-          }
-          @if (!isLoadingWinnerPlayers) {
-            <app-card-grid [columns]="3">
-              @for (player of winnerPlayerOptions; track player) {
-                <app-card-grid-item
-                  [selected]="faceoffForm.get('winnerPlayer')?.value === player.value"
-                  (select)="selectWinnerPlayer(player.value)"
-                >
-                  @if (player.number !== undefined && player.number !== null) {
-                    <span class="player-number">{{ player.number }}</span>
-                  }
-                  {{ player.label }}
-                </app-card-grid-item>
-              }
-            </app-card-grid>
-          }
+          <app-card-grid [columns]="3">
+            @for (player of winnerPlayerOptions; track player) {
+              <app-card-grid-item
+                [selected]="faceoffForm.get('winnerPlayer')?.value === player.value"
+                (select)="selectWinnerPlayer(player.value)"
+              >
+                @if (player.number !== undefined && player.number !== null) {
+                  <span class="player-number">{{ player.number }}</span>
+                }
+                {{ player.label }}
+              </app-card-grid-item>
+            }
+          </app-card-grid>
         </app-form-field>
       </div>
 
@@ -57,49 +47,39 @@
         <app-section-header title="Faceoff Loser" />
 
         <app-form-field label="Team" [error]="getErrorMessage('loserTeam')">
-          @if (isLoadingTeams) {
-            <app-loading-spinner message="Loading teams..." size="sm" />
-          }
-          @if (!isLoadingTeams) {
-            <app-card-grid [columns]="teamOptions.length">
-              @for (team of teamOptions; track team) {
-                <app-card-grid-item
-                  [selected]="faceoffForm.get('loserTeam')?.value === team.value"
-                  (select)="selectLoserTeam(team.value)"
-                >
-                  @if (team.value) {
-                    <img
-                      [appCachedSrc]="getTeamLogoUrl(team.value)"
-                      [alt]="team.label"
-                      class="team-logo-img"
-                    />
-                  }
-                  {{ team.label }}
-                </app-card-grid-item>
-              }
-            </app-card-grid>
-          }
+          <app-card-grid [columns]="teamOptions.length">
+            @for (team of teamOptions; track team) {
+              <app-card-grid-item
+                [selected]="faceoffForm.get('loserTeam')?.value === team.value"
+                (select)="selectLoserTeam(team.value)"
+              >
+                @if (team.value) {
+                  <img
+                    [appCachedSrc]="getTeamLogoUrl(team.value)"
+                    [alt]="team.label"
+                    class="team-logo-img"
+                  />
+                }
+                {{ team.label }}
+              </app-card-grid-item>
+            }
+          </app-card-grid>
         </app-form-field>
 
         <app-form-field label="Player" [error]="getErrorMessage('loserPlayer')">
-          @if (isLoadingLoserPlayers) {
-            <app-loading-spinner message="Loading players..." size="sm" />
-          }
-          @if (!isLoadingLoserPlayers) {
-            <app-card-grid [columns]="3">
-              @for (player of loserPlayerOptions; track player) {
-                <app-card-grid-item
-                  [selected]="faceoffForm.get('loserPlayer')?.value === player.value"
-                  (select)="selectLoserPlayer(player.value)"
-                >
-                  @if (player.number !== undefined && player.number !== null) {
-                    <span class="player-number">{{ player.number }}</span>
-                  }
-                  {{ player.label }}
-                </app-card-grid-item>
-              }
-            </app-card-grid>
-          }
+          <app-card-grid [columns]="3">
+            @for (player of loserPlayerOptions; track player) {
+              <app-card-grid-item
+                [selected]="faceoffForm.get('loserPlayer')?.value === player.value"
+                (select)="selectLoserPlayer(player.value)"
+              >
+                @if (player.number !== undefined && player.number !== null) {
+                  <span class="player-number">{{ player.number }}</span>
+                }
+                {{ player.label }}
+              </app-card-grid-item>
+            }
+          </app-card-grid>
         </app-form-field>
       </div>
 
@@ -108,21 +88,16 @@
         <app-section-header title="Faceoff Details" />
 
         <app-form-field label="Period" [error]="getErrorMessage('period')">
-          @if (isLoadingPeriods) {
-            <app-loading-spinner message="Loading periods..." size="sm" />
-          }
-          @if (!isLoadingPeriods) {
-            <app-card-grid [columns]="periodOptions.length">
-              @for (period of periodOptions; track period) {
-                <app-card-grid-item
-                  [selected]="faceoffForm.get('period')?.value === period.value"
-                  (select)="selectPeriod(period.value)"
-                >
-                  {{ period.label }}
-                </app-card-grid-item>
-              }
-            </app-card-grid>
-          }
+          <app-card-grid [columns]="periodOptions.length">
+            @for (period of periodOptions; track period) {
+              <app-card-grid-item
+                [selected]="faceoffForm.get('period')?.value === period.value"
+                (select)="selectPeriod(period.value)"
+              >
+                {{ period.label }}
+              </app-card-grid-item>
+            }
+          </app-card-grid>
         </app-form-field>
 
         <div class="form-row">

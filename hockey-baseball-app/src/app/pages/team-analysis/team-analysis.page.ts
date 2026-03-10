@@ -6,7 +6,8 @@ import { Observable, forkJoin } from 'rxjs';
 import { AnalysisService } from '../../services/analysis.service';
 import { TeamService } from '../../services/team.service';
 import { BreadcrumbDataService } from '../../services/breadcrumb-data.service';
-import { Analysis, AnalyticsApiIn } from '../../shared/interfaces/analysis.interface';
+import { Analysis } from '../../shared/interfaces/analysis.interface';
+import { Team } from '../../shared/interfaces/team.interface';
 import {
   DataTableComponent,
   TableColumn,
@@ -16,8 +17,11 @@ import { ButtonLoadingComponent } from '../../shared/components/buttons/button-l
 import { ComponentVisibilityByRoleDirective } from '../../shared/directives/component-visibility-by-role.directive';
 import { BreadcrumbActionsDirective } from '../../shared/directives/breadcrumb-actions.directive';
 import { visibilityByRoleMap } from './team-analysis.role-map';
-import { TeamAnalysisModal } from '../../shared/components/team-analysis-modal/team-analysis.modal';
-import { AnalysisViewModal } from '../../shared/components/analysis-view-modal/analysis-view.modal';
+import {
+  AnalysisModal,
+  AnalysisModalData,
+  AnalysisModalResult,
+} from '../../shared/components/analysis-modal/analysis.modal';
 import { DisplayTextModal } from '../../shared/components/display-text-modal/display-text.modal';
 
 @Component({
@@ -88,10 +92,7 @@ export class TeamAnalysisPage implements OnInit {
   }
 
   onCreateAnalysis(): void {
-    this.loadEntityOptionsAndOpenModal({
-      isEditMode: false,
-      preSelectedTeamId: this.teamId,
-    });
+    this.loadEntityOptionsAndOpenModal({ isEditMode: false });
   }
 
   onTableAction(event: { action: string; item: Analysis }): void {
@@ -109,12 +110,16 @@ export class TeamAnalysisPage implements OnInit {
   }
 
   private onViewAnalysis(analysis: Analysis): void {
-    this.modalService.openModal(AnalysisViewModal, {
+    this.modalService.openModal(AnalysisModal, {
       name: analysis.title,
       icon: 'visibility',
       width: '100%',
       maxWidth: '900px',
-      data: analysis,
+      data: {
+        mode: 'view',
+        analysisType: 'team',
+        analysis,
+      } satisfies AnalysisModalData,
     });
   }
 
@@ -123,16 +128,15 @@ export class TeamAnalysisPage implements OnInit {
     this.loadEntityOptionsAndOpenModal({ analysis, isEditMode: true });
   }
 
-  private loadEntityOptionsAndOpenModal(data: Record<string, unknown>): void {
-    const isEdit = !!data['isEditMode'];
-    if (!isEdit) {
+  private loadEntityOptionsAndOpenModal(data: { isEditMode: boolean; analysis?: Analysis }): void {
+    if (!data.isEditMode) {
       this.isCreateLoading.set(true);
     }
     this.teamService.getTeams().subscribe({
       next: (result) => {
         this.isCreateLoading.set(false);
         this.editingItemId.set(null);
-        this.openAnalysisModal({ ...data, teams: result.teams });
+        this.openAnalysisModal(data, result.teams);
       },
       error: (error) => {
         console.error('Failed to load teams:', error);
@@ -142,18 +146,25 @@ export class TeamAnalysisPage implements OnInit {
     });
   }
 
-  private openAnalysisModal(data: Record<string, unknown>): void {
-    this.modalService.openModal(TeamAnalysisModal, {
-      name: data['isEditMode'] ? 'Edit Team Analysis' : 'Create Team Analysis',
+  private openAnalysisModal(
+    data: { isEditMode: boolean; analysis?: Analysis },
+    teams: Team[],
+  ): void {
+    const modalData: AnalysisModalData = {
+      mode: data.isEditMode ? 'edit' : 'create',
+      analysisType: 'team',
+      analysis: data.analysis,
+      preSelectedEntityId: this.teamId,
+      teams,
+    };
+
+    this.modalService.openModal(AnalysisModal, {
+      name: data.isEditMode ? 'Edit Team Analysis' : 'Create Team Analysis',
       icon: 'bar_chart',
       width: '100%',
       maxWidth: '900px',
-      data,
-      onCloseWithDataProcessing: (result: {
-        isEditMode: boolean;
-        analysisId?: string;
-        apiData: AnalyticsApiIn;
-      }) => {
+      data: modalData,
+      onCloseWithDataProcessing: (result: AnalysisModalResult) => {
         const apiCall: Observable<unknown> = result.isEditMode
           ? this.analysisService.updateAnalysis(Number(result.analysisId!), result.apiData)
           : this.analysisService.createAnalysis(result.apiData);

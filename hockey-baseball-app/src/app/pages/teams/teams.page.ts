@@ -16,11 +16,14 @@ import { ButtonComponent } from '../../shared/components/buttons/button/button.c
 import { ButtonLoadingComponent } from '../../shared/components/buttons/button-loading/button-loading.component';
 import { ButtonRouteComponent } from '../../shared/components/buttons/button-route/button-route.component';
 import { visibilityByRoleMap } from './teams.role-map';
-import { Observable, forkJoin } from 'rxjs';
+import { forkJoin } from 'rxjs';
 import { AnalysisService } from '../../services/analysis.service';
 import { DisplayTextModal } from '../../shared/components/display-text-modal/display-text.modal';
-import { AnalyticsApiIn } from '../../shared/interfaces/analysis.interface';
-import { TeamAnalysisModal } from '../../shared/components/team-analysis-modal/team-analysis.modal';
+import {
+  AnalysisModal,
+  AnalysisModalData,
+  AnalysisModalResult,
+} from '../../shared/components/analysis-modal/analysis.modal';
 import {
   DataTableComponent,
   TableColumn,
@@ -312,24 +315,21 @@ export class TeamsPage implements OnInit {
     this.teamService.getTeams().subscribe({
       next: (result) => {
         this.analysisLoadingId.set(null);
-        this.modalService.openModal(TeamAnalysisModal, {
+        const modalData: AnalysisModalData = {
+          mode: 'create',
+          analysisType: 'team',
+          preSelectedEntityId: team.id.toString(),
+          teams: result.teams,
+        };
+
+        this.modalService.openModal(AnalysisModal, {
           name: 'Create Team Analysis',
           icon: 'bar_chart',
           width: '100%',
           maxWidth: '900px',
-          data: {
-            isEditMode: false,
-            preSelectedTeamId: team.id.toString(),
-            teams: result.teams,
-          },
-          onCloseWithDataProcessing: (modalResult: {
-            isEditMode: boolean;
-            apiData: AnalyticsApiIn;
-          }) => {
-            const apiCall: Observable<unknown> = this.analysisService.createAnalysis(
-              modalResult.apiData
-            );
-            apiCall.subscribe({
+          data: modalData,
+          onCloseWithDataProcessing: (modalResult: AnalysisModalResult) => {
+            this.analysisService.createAnalysis(modalResult.apiData).subscribe({
               next: () => {
                 this.toast.show('Analysis created successfully', 'success');
                 this.modalService.closeModal();

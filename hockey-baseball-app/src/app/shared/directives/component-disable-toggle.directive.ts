@@ -2,12 +2,16 @@ import { Directive, ElementRef, Renderer2, inject, input, effect } from '@angula
 
 @Directive({
   selector: '[appDisableToggle]',
-  host: { '(keydown)': 'handleKeyboardEvent($event)' },
+  host: {
+    '(keydown)': 'handleKeyboardEvent($event)',
+    '(click)': 'handleClickEvent($event)',
+  },
 })
 export class ComponentDisableToggleDirective {
   disableOpacity = input(0.55);
   animateDisable = input(true);
   appDisableToggle = input(false);
+  keepPointerEvents = input(false);
 
   private isDisabled = false;
   private elementRef = inject(ElementRef);
@@ -15,6 +19,7 @@ export class ComponentDisableToggleDirective {
 
   private disableEffect = effect(() => {
     const value = this.appDisableToggle();
+    const keepPointer = this.keepPointerEvents();
     this.isDisabled = value;
 
     if (this.animateDisable()) {
@@ -30,8 +35,10 @@ export class ComponentDisableToggleDirective {
         String(this.disableOpacity())
       );
       this.renderer.setStyle(this.elementRef.nativeElement, 'user-select', 'none');
-      this.renderer.setStyle(this.elementRef.nativeElement, 'pointer-events', 'none');
-      this.renderer.setStyle(this.elementRef.nativeElement, 'cursor', 'not-allowed');
+      if (!keepPointer) {
+        this.renderer.setStyle(this.elementRef.nativeElement, 'pointer-events', 'none');
+      }
+      this.renderer.setStyle(this.elementRef.nativeElement, 'cursor', 'default');
     } else {
       this.renderer.setStyle(this.elementRef.nativeElement, 'opacity', null);
       this.renderer.setStyle(this.elementRef.nativeElement, 'user-select', null);
@@ -39,6 +46,13 @@ export class ComponentDisableToggleDirective {
       this.renderer.setStyle(this.elementRef.nativeElement, 'cursor', 'pointer');
     }
   });
+
+  handleClickEvent(event: MouseEvent) {
+    if (this.isDisabled) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+  }
 
   handleKeyboardEvent(event: KeyboardEvent) {
     if (this.isDisabled) {

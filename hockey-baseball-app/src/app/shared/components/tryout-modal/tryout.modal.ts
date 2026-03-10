@@ -1,6 +1,7 @@
 import { Component, inject, signal, computed } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
 import { ModalService, ModalEvent } from '../../../services/modal.service';
 import { PlayerService } from '../../../services/player.service';
 import { GoalieService } from '../../../services/goalie.service';
@@ -28,16 +29,25 @@ import { ButtonLoadingComponent } from '../buttons/button-loading/button-loading
 import { PlayerFormModal, PlayerFormModalData } from '../player-form-modal/player-form.modal';
 import { GoalieFormModal, GoalieFormModalData } from '../goalie-form-modal/goalie-form.modal';
 
-export interface TryoutAddModalData {
+export interface TryoutSingleEntity {
+  playerId: number;
+  name: string;
+  team: string;
+  teamId: number | null;
+  type: TryoutEntryType;
+}
+
+export interface TryoutModalData {
   activeTab: TryoutTabType;
   teamId: number | null;
   playerEntries: TryoutEntry[];
   goalieEntries: TryoutEntry[];
   positions: PositionOption[];
   teams: Team[];
+  singleEntity?: TryoutSingleEntity;
 }
 
-export interface TryoutAddModalResult {
+export interface TryoutModalResult {
   selectedIds: number[];
   type: TryoutEntryType;
   teamId: number | null;
@@ -45,9 +55,10 @@ export interface TryoutAddModalResult {
 }
 
 @Component({
-  selector: 'app-tryout-add-modal',
+  selector: 'app-tryout-modal',
   imports: [
     FormsModule,
+    RouterLink,
     ButtonComponent,
     ButtonSmallComponent,
     ButtonLoadingComponent,
@@ -58,30 +69,33 @@ export interface TryoutAddModalResult {
     CustomMultiSelectComponent,
     CustomSelectComponent,
   ],
-  templateUrl: './tryout-add.modal.html',
-  styleUrl: './tryout-add.modal.scss',
+  templateUrl: './tryout.modal.html',
+  styleUrl: './tryout.modal.scss',
 })
-export class TryoutAddModal {
+export class TryoutModal {
+  private router = inject(Router);
   private modalService = inject(ModalService);
   private playerService = inject(PlayerService);
   private goalieService = inject(GoalieService);
   private toast = inject(ToastService);
-  data = inject(ModalService).getModalData<TryoutAddModalData>();
+  data = inject(ModalService).getModalData<TryoutModalData>();
 
   private playerEntries = signal<TryoutEntry[]>(this.data.playerEntries);
   private goalieEntries = signal<TryoutEntry[]>(this.data.goalieEntries);
   selectedIds = signal<string[]>([]);
   isSubmitting = signal(false);
-  teamOptions = signal<SelectOption[]>(
-    this.data.teams.map((t) => ({ value: t.id, label: t.name }))
-  );
-  selectedTeamId = signal<string | null>(this.data.teamId ? String(this.data.teamId) : null);
+  teamOptions = signal<SelectOption[]>([
+    { value: '', label: 'No Team' },
+    ...this.data.teams.map((t) => ({ value: t.id, label: t.name })),
+  ]);
+  selectedTeamId = signal<string>(this.data.teamId ? String(this.data.teamId) : '');
   showTeamSelect = !this.data.teamId;
   selectedType = signal<TryoutEntryType>(
     this.data.activeTab === 'all' ? 'player' : this.data.activeTab
   );
   note = signal('');
 
+  isSingleMode = !!this.data.singleEntity;
   isAllTab = this.data.activeTab === 'all';
   selectedStringIds = computed(() => this.selectedIds());
 
@@ -118,8 +132,10 @@ export class TryoutAddModal {
   }
 
   constructor() {
-    this.modalService.registerDirtyCheck(
-      () => this.selectedIds().length > 0 || this.note().length > 0
+    this.modalService.registerDirtyCheck(() =>
+      this.isSingleMode
+        ? this.note().length > 0
+        : this.selectedIds().length > 0 || this.note().length > 0
     );
     this.modalService.onEvent$.pipe(takeUntilDestroyed()).subscribe((event) => {
       if (event === ModalEvent.StopButtonLoading) {
@@ -127,8 +143,12 @@ export class TryoutAddModal {
       }
     });
 
-    if (this.showTeamSelect && this.data.teams.length > 0 && !this.selectedTeamId()) {
-      this.selectedTeamId.set(this.data.teams[0].id);
+    if (this.isSingleMode && this.data.singleEntity) {
+      this.selectedType.set(this.data.singleEntity.type);
+    }
+
+    if (this.showTeamSelect && !this.selectedTeamId()) {
+      this.selectedTeamId.set('');
     }
   }
 
@@ -147,14 +167,32 @@ export class TryoutAddModal {
   }
 
   onSubmitSelected(): void {
+    if (this.isSingleMode) {
+      this.onSubmitSingle();
+      return;
+    }
+
     const entries = this.selectedEntries();
     if (!entries.length) return;
 
     this.isSubmitting.set(true);
     const selectedPlayerIds = entries.map((e) => parseInt(e.playerId, 10));
-    const result: TryoutAddModalResult = {
+    const result: TryoutModalResult = {
       selectedIds: selectedPlayerIds,
       type: this.selectedType(),
+      teamId: this.resolvedTeamId,
+      note: this.note(),
+    };
+    this.modalService.closeWithDataProcessing(result);
+  }
+
+  onSubmitSingle(): void {
+    if (!this.data.singleEntity) return;
+
+    this.isSubmitting.set(true);
+    const result: TryoutModalResult = {
+      selectedIds: [this.data.singleEntity.playerId],
+      type: this.data.singleEntity.type,
       teamId: this.resolvedTeamId,
       note: this.note(),
     };
@@ -227,10 +265,41 @@ export class TryoutAddModal {
     this.selectedTeamId.set(teamId);
   }
 
+  profileRoute = computed(() => {
+    const entity = this.data.singleEntity;
+    if (!entity) return null;
+    const segment = entity.type === 'goalie' ? 'goalies/goalie-profile' : 'players/player-profile';
+    return `/teams-and-rosters/${segment}/${entity.playerId}`;
+  });
+
+  teamRoute = computed(() => {
+    const entity = this.data.singleEntity;
+    if (!entity?.teamId) return null;
+    return `/teams-and-rosters/teams/${entity.teamId}/profile`;
+  });
+
+  closeModals(): void {
+    this.modalService.closeAll();
+  }
+
+  goToProfile(): void {
+    const route = this.profileRoute();
+    if (!route) return;
+    this.modalService.closeAll();
+    this.router.navigate([route]);
+  }
+
+  goToTeam(): void {
+    const route = this.teamRoute();
+    if (!route) return;
+    this.modalService.closeAll();
+    this.router.navigate([route]);
+  }
+
   private get resolvedTeamId(): number | null {
     if (this.data.teamId) return this.data.teamId;
     const selected = this.selectedTeamId();
-    return selected ? parseInt(selected, 10) : null;
+    return selected && selected !== '' ? parseInt(selected, 10) : null;
   }
 
   private playerToEntry(player: Player): TryoutEntry {

@@ -7,7 +7,7 @@ import { ToastService } from '../../services/toast.service';
 import { TeamService } from '../../services/team.service';
 import { ScheduleService } from '../../services/schedule.service';
 import { BreadcrumbDataService } from '../../services/breadcrumb-data.service';
-import { Analysis, AnalyticsApiIn } from '../../shared/interfaces/analysis.interface';
+import { Analysis } from '../../shared/interfaces/analysis.interface';
 import {
   DataTableComponent,
   TableColumn,
@@ -18,10 +18,11 @@ import { ComponentVisibilityByRoleDirective } from '../../shared/directives/comp
 import { BreadcrumbActionsDirective } from '../../shared/directives/breadcrumb-actions.directive';
 import { visibilityByRoleMap } from './game-analysis.role-map';
 import {
-  GameAnalysisModal,
+  AnalysisModal,
+  AnalysisModalData,
+  AnalysisModalResult,
   GameOption,
-} from '../../shared/components/game-analysis-modal/game-analysis.modal';
-import { AnalysisViewModal } from '../../shared/components/analysis-view-modal/analysis-view.modal';
+} from '../../shared/components/analysis-modal/analysis.modal';
 import { DisplayTextModal } from '../../shared/components/display-text-modal/display-text.modal';
 
 @Component({
@@ -94,10 +95,7 @@ export class GameAnalysisPage implements OnInit {
   }
 
   onCreateAnalysis(): void {
-    this.loadEntityOptionsAndOpenModal({
-      isEditMode: false,
-      preSelectedGameId: this.gameId,
-    });
+    this.loadEntityOptionsAndOpenModal({ isEditMode: false });
   }
 
   onTableAction(event: { action: string; item: Analysis }): void {
@@ -115,12 +113,16 @@ export class GameAnalysisPage implements OnInit {
   }
 
   private onViewAnalysis(analysis: Analysis): void {
-    this.modalService.openModal(AnalysisViewModal, {
+    this.modalService.openModal(AnalysisModal, {
       name: analysis.title,
       icon: 'visibility',
       width: '100%',
       maxWidth: '900px',
-      data: analysis,
+      data: {
+        mode: 'view',
+        analysisType: 'game',
+        analysis,
+      } satisfies AnalysisModalData,
     });
   }
 
@@ -129,9 +131,8 @@ export class GameAnalysisPage implements OnInit {
     this.loadEntityOptionsAndOpenModal({ analysis, isEditMode: true });
   }
 
-  private loadEntityOptionsAndOpenModal(data: Record<string, unknown>): void {
-    const isEdit = !!data['isEditMode'];
-    if (!isEdit) {
+  private loadEntityOptionsAndOpenModal(data: { isEditMode: boolean; analysis?: Analysis }): void {
+    if (!data.isEditMode) {
       this.isCreateLoading.set(true);
     }
     forkJoin({
@@ -146,7 +147,7 @@ export class GameAnalysisPage implements OnInit {
           value: String(g.id),
           label: `${teamMap.get(g.away_team_id) ?? 'Unknown'} at ${teamMap.get(g.home_team_id) ?? 'Unknown'} - ${g.date ?? ''}`,
         }));
-        this.openAnalysisModal({ ...data, games: gameOptions });
+        this.openAnalysisModal(data, gameOptions);
       },
       error: (error) => {
         console.error('Failed to load games:', error);
@@ -156,18 +157,25 @@ export class GameAnalysisPage implements OnInit {
     });
   }
 
-  private openAnalysisModal(data: Record<string, unknown>): void {
-    this.modalService.openModal(GameAnalysisModal, {
-      name: data['isEditMode'] ? 'Edit Game Analysis' : 'Create Game Analysis',
+  private openAnalysisModal(
+    data: { isEditMode: boolean; analysis?: Analysis },
+    games: GameOption[],
+  ): void {
+    const modalData: AnalysisModalData = {
+      mode: data.isEditMode ? 'edit' : 'create',
+      analysisType: 'game',
+      analysis: data.analysis,
+      preSelectedEntityId: this.gameId,
+      games,
+    };
+
+    this.modalService.openModal(AnalysisModal, {
+      name: data.isEditMode ? 'Edit Game Analysis' : 'Create Game Analysis',
       icon: 'bar_chart',
       width: '100%',
       maxWidth: '900px',
-      data,
-      onCloseWithDataProcessing: (result: {
-        isEditMode: boolean;
-        analysisId?: string;
-        apiData: AnalyticsApiIn;
-      }) => {
+      data: modalData,
+      onCloseWithDataProcessing: (result: AnalysisModalResult) => {
         const apiCall: Observable<unknown> = result.isEditMode
           ? this.analysisService.updateAnalysis(Number(result.analysisId!), result.apiData)
           : this.analysisService.createAnalysis(result.apiData);

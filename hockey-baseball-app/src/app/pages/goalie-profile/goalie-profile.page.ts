@@ -5,12 +5,15 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
 import { MatTableModule } from '@angular/material/table';
-import { Observable, forkJoin } from 'rxjs';
+import { forkJoin } from 'rxjs';
 import { ModalService, ModalEvent } from '../../services/modal.service';
 import { ToastService } from '../../services/toast.service';
 import { AnalysisService } from '../../services/analysis.service';
-import { AnalyticsApiIn } from '../../shared/interfaces/analysis.interface';
-import { GoalieAnalysisModal } from '../../shared/components/goalie-analysis-modal/goalie-analysis.modal';
+import {
+  AnalysisModal,
+  AnalysisModalData,
+  AnalysisModalResult,
+} from '../../shared/components/analysis-modal/analysis.modal';
 import { GoalieService } from '../../services/goalie.service';
 import { TeamService } from '../../services/team.service';
 import { PositionService, PositionOption } from '../../services/position.service';
@@ -324,19 +327,21 @@ export class GoalieProfilePage implements OnInit {
   }
 
   private openAnalysisModal(goalies: Goalie[]): void {
-    this.modalService.openModal(GoalieAnalysisModal, {
+    const modalData: AnalysisModalData = {
+      mode: 'create',
+      analysisType: 'goalie',
+      preSelectedEntityId: this.goalie!.id.toString(),
+      goalies,
+    };
+
+    this.modalService.openModal(AnalysisModal, {
       name: 'Create Goalie Analysis',
       icon: 'bar_chart',
       width: '100%',
       maxWidth: '900px',
-      data: {
-        isEditMode: false,
-        preSelectedGoalieId: this.goalie!.id.toString(),
-        goalies,
-      },
-      onCloseWithDataProcessing: (result: { isEditMode: boolean; apiData: AnalyticsApiIn }) => {
-        const apiCall: Observable<unknown> = this.analysisService.createAnalysis(result.apiData);
-        apiCall.subscribe({
+      data: modalData,
+      onCloseWithDataProcessing: (result: AnalysisModalResult) => {
+        this.analysisService.createAnalysis(result.apiData).subscribe({
           next: () => {
             this.toast.show('Analysis created successfully', 'success');
             this.modalService.closeModal();

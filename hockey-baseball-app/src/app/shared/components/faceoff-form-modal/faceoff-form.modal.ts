@@ -15,13 +15,9 @@ import {
   PuckLocation,
   Team,
 } from '../location-selector/location-selector.component';
-import { TeamService } from '../../../services/team.service';
-import { PlayerService } from '../../../services/player.service';
-import { GameMetadataService } from '../../../services/game-metadata.service';
 import { FaceoffEventRequest } from '../../../services/game-event.service';
 import { environment } from '../../../../environments/environment';
 import { CachedSrcDirective } from '../../directives/cached-src.directive';
-import { LoadingSpinnerComponent } from '../loading-spinner/loading-spinner.component';
 
 export interface FaceoffFormData {
   winnerTeamLogo: string;
@@ -48,7 +44,6 @@ export interface FaceoffFormData {
     CardGridComponent,
     CardGridItemComponent,
     LocationSelectorComponent,
-    LoadingSpinnerComponent,
   ],
   templateUrl: './faceoff-form.modal.html',
   styleUrl: './faceoff-form.modal.scss',
@@ -56,9 +51,6 @@ export interface FaceoffFormData {
 export class FaceoffFormModal implements OnInit {
   private fb = inject(FormBuilder);
   private modalService = inject(ModalService);
-  private teamService = inject(TeamService);
-  private playerService = inject(PlayerService);
-  private gameMetadataService = inject(GameMetadataService);
   private dialogData = inject(ModalService).getModalData<{
     gameId: number;
     faceoffEventId: number;
@@ -90,17 +82,11 @@ export class FaceoffFormModal implements OnInit {
   faceoffForm: FormGroup;
   puckLocation: PuckLocation | null = null;
 
-  // Data to be loaded from API
   teamOptions: { value: number; label: string; logo?: string }[] = [];
-  playersByTeam: Record<number, { value: number; label: string; number?: number }[]> = {};
   winnerPlayerOptions: { value: number; label: string; number?: number }[] = [];
   loserPlayerOptions: { value: number; label: string; number?: number }[] = [];
   periodOptions: { value: number; label: string }[] = [];
 
-  isLoadingTeams = false;
-  isLoadingWinnerPlayers = false;
-  isLoadingLoserPlayers = false;
-  isLoadingPeriods = false;
   isSubmitting = signal(false);
 
   constructor() {
@@ -120,24 +106,12 @@ export class FaceoffFormModal implements OnInit {
   }
 
   ngOnInit(): void {
-    // Load options
-    if (this.dialogData.teamOptions && this.dialogData.teamOptions.length > 0) {
-      this.teamOptions = this.dialogData.teamOptions;
-    } else {
-      this.loadTeams();
-    }
+    this.teamOptions = this.dialogData.teamOptions ?? [];
+    this.periodOptions = this.dialogData.periodOptions ?? [];
 
-    if (this.dialogData.periodOptions && this.dialogData.periodOptions.length > 0) {
-      this.periodOptions = this.dialogData.periodOptions;
-    } else {
-      this.loadPeriods();
-    }
-
-    // Edit mode: populate with existing data
     if (this.isEditMode && this.dialogData.existingData) {
       const existing = this.dialogData.existingData;
 
-      // Restore location if available
       if (
         existing.iceTopOffset !== undefined &&
         existing.iceLeftOffset !== undefined &&
@@ -150,10 +124,8 @@ export class FaceoffFormModal implements OnInit {
         };
       }
 
-      // Find loser team (opposite of winner)
       const loserTeam = this.teamOptions.find((t) => t.value !== existing.winnerTeamId);
 
-      // Populate form
       this.faceoffForm.patchValue({
         winnerTeam: existing.winnerTeamId,
         loserTeam: loserTeam?.value,
@@ -165,36 +137,21 @@ export class FaceoffFormModal implements OnInit {
         youtubeLink: existing.youtubeLink || '',
       });
 
-      // Load players for both teams
       if (existing.winnerTeamId) {
-        if (this.dialogData.playerOptions && this.dialogData.playerOptions.length > 0) {
-          this.filterPlayersForTeam(existing.winnerTeamId, 'winner');
-        } else {
-          this.loadPlayersForTeam(existing.winnerTeamId, 'winner');
-        }
+        this.filterPlayersForTeam(existing.winnerTeamId, 'winner');
       }
-      if (loserTeam && this.dialogData.playerOptions && this.dialogData.playerOptions.length > 0) {
+      if (loserTeam) {
         this.filterPlayersForTeam(loserTeam.value, 'loser');
-      } else if (loserTeam) {
-        this.loadPlayersForTeam(loserTeam.value, 'loser');
       }
     } else {
-      // Create mode: Set defaults
       if (this.teamOptions.length > 1) {
         this.faceoffForm.patchValue({
           winnerTeam: this.teamOptions[0].value,
           loserTeam: this.teamOptions[1].value,
         });
-
-        if (this.dialogData.playerOptions && this.dialogData.playerOptions.length > 0) {
-          this.filterPlayersForTeam(this.teamOptions[0].value, 'winner');
-          this.filterPlayersForTeam(this.teamOptions[1].value, 'loser');
-        } else {
-          this.loadPlayersForTeam(this.teamOptions[0].value, 'winner');
-          this.loadPlayersForTeam(this.teamOptions[1].value, 'loser');
-        }
+        this.filterPlayersForTeam(this.teamOptions[0].value, 'winner');
+        this.filterPlayersForTeam(this.teamOptions[1].value, 'loser');
       }
-
       if (this.periodOptions.length > 0) {
         this.faceoffForm.patchValue({ period: this.periodOptions[0].value });
       }
@@ -217,190 +174,49 @@ export class FaceoffFormModal implements OnInit {
     });
   }
 
-  private loadTeams(): void {
-    this.isLoadingTeams = true;
-    this.teamService.getTeams().subscribe({
-      next: (response) => {
-        this.teamOptions = response.teams.map((team) => ({
-          value: parseInt(team.id),
-          label: team.name,
-          logo: team.logo,
-        }));
-        this.isLoadingTeams = false;
-
-        // Set default values after teams are loaded
-        if (this.teamOptions.length > 1) {
-          this.faceoffForm.patchValue({
-            winnerTeam: this.teamOptions[0].value,
-            loserTeam: this.teamOptions[1].value,
-          });
-          // Load players for both teams
-          this.loadPlayersForTeam(this.teamOptions[0].value, 'winner');
-          this.loadPlayersForTeam(this.teamOptions[1].value, 'loser');
-        }
-      },
-      error: (error) => {
-        console.error('Failed to load teams:', error);
-        this.isLoadingTeams = false;
-      },
-    });
-  }
-
-  private loadPeriods(): void {
-    this.isLoadingPeriods = true;
-    this.gameMetadataService.getGamePeriods().subscribe({
-      next: (periods) => {
-        this.periodOptions = this.gameMetadataService.transformGamePeriodsToOptions(periods);
-        this.isLoadingPeriods = false;
-        if (this.periodOptions.length > 0) {
-          this.faceoffForm.patchValue({ period: this.periodOptions[0].value });
-        }
-      },
-      error: (error) => {
-        console.error('Failed to load periods:', error);
-        this.isLoadingPeriods = false;
-      },
-    });
-  }
-
-  /**
-   * Filter players from pre-loaded player options based on team
-   */
   private filterPlayersForTeam(teamId: number, teamType: 'winner' | 'loser'): void {
-    if (this.dialogData.playerOptions) {
-      const filteredPlayers = this.dialogData.playerOptions
-        .filter((player) => player.teamId === teamId)
-        .map((player) => ({
-          value: player.value,
-          label: player.label,
-          number: player.number,
-        }));
+    const filteredPlayers = (this.dialogData.playerOptions ?? [])
+      .filter((player) => player.teamId === teamId)
+      .map((player) => ({
+        value: player.value,
+        label: player.label,
+        number: player.number,
+      }));
 
-      // Cache the filtered players
-      this.playersByTeam[teamId] = filteredPlayers;
-
-      if (teamType === 'winner') {
-        this.winnerPlayerOptions = filteredPlayers;
-        if (this.winnerPlayerOptions.length > 0) {
-          this.faceoffForm.patchValue({ winnerPlayer: this.winnerPlayerOptions[0].value });
-        } else {
-          this.faceoffForm.patchValue({ winnerPlayer: '' });
-        }
-      } else {
-        this.loserPlayerOptions = filteredPlayers;
-        if (this.loserPlayerOptions.length > 0) {
-          this.faceoffForm.patchValue({ loserPlayer: this.loserPlayerOptions[0].value });
-        } else {
-          this.faceoffForm.patchValue({ loserPlayer: '' });
-        }
-      }
-    }
-  }
-
-  private loadPlayersForTeam(teamId: number, teamType: 'winner' | 'loser'): void {
     if (teamType === 'winner') {
-      this.isLoadingWinnerPlayers = true;
-    } else {
-      this.isLoadingLoserPlayers = true;
-    }
-
-    // Check if we already have players cached for this team
-    if (this.playersByTeam[teamId]) {
-      if (teamType === 'winner') {
-        this.winnerPlayerOptions = this.playersByTeam[teamId];
-        this.isLoadingWinnerPlayers = false;
-        if (this.winnerPlayerOptions.length > 0) {
-          this.faceoffForm.patchValue({ winnerPlayer: this.winnerPlayerOptions[0].value });
-        }
+      this.winnerPlayerOptions = filteredPlayers;
+      if (this.winnerPlayerOptions.length > 0) {
+        this.faceoffForm.patchValue({ winnerPlayer: this.winnerPlayerOptions[0].value });
       } else {
-        this.loserPlayerOptions = this.playersByTeam[teamId];
-        this.isLoadingLoserPlayers = false;
-        if (this.loserPlayerOptions.length > 0) {
-          this.faceoffForm.patchValue({ loserPlayer: this.loserPlayerOptions[0].value });
-        }
+        this.faceoffForm.patchValue({ winnerPlayer: '' });
       }
-      return;
+    } else {
+      this.loserPlayerOptions = filteredPlayers;
+      if (this.loserPlayerOptions.length > 0) {
+        this.faceoffForm.patchValue({ loserPlayer: this.loserPlayerOptions[0].value });
+      } else {
+        this.faceoffForm.patchValue({ loserPlayer: '' });
+      }
     }
-
-    this.playerService.getPlayersByTeam(teamId).subscribe({
-      next: (players) => {
-        const playerOptions = players.map((player) => ({
-          value: parseInt(player.id),
-          label: `${player.firstName} ${player.lastName}`,
-        }));
-
-        // Cache the players
-        this.playersByTeam[teamId] = playerOptions;
-
-        if (teamType === 'winner') {
-          this.winnerPlayerOptions = playerOptions;
-          this.isLoadingWinnerPlayers = false;
-          if (this.winnerPlayerOptions.length > 0) {
-            this.faceoffForm.patchValue({ winnerPlayer: this.winnerPlayerOptions[0].value });
-          } else {
-            this.faceoffForm.patchValue({ winnerPlayer: '' });
-          }
-        } else {
-          this.loserPlayerOptions = playerOptions;
-          this.isLoadingLoserPlayers = false;
-          if (this.loserPlayerOptions.length > 0) {
-            this.faceoffForm.patchValue({ loserPlayer: this.loserPlayerOptions[0].value });
-          } else {
-            this.faceoffForm.patchValue({ loserPlayer: '' });
-          }
-        }
-      },
-      error: (error) => {
-        console.error(`Failed to load players for team ${teamId}:`, error);
-        if (teamType === 'winner') {
-          this.isLoadingWinnerPlayers = false;
-        } else {
-          this.isLoadingLoserPlayers = false;
-        }
-      },
-    });
   }
 
   private setupTeamChangeListeners(): void {
-    const usePreloadedPlayers =
-      this.dialogData.playerOptions && this.dialogData.playerOptions.length > 0;
-
-    // When winner team changes, automatically set loser team to the opposite and update players
     this.faceoffForm.get('winnerTeam')?.valueChanges.subscribe((winnerTeam) => {
       const loserTeam = this.teamOptions.find((t) => t.value !== winnerTeam);
       if (loserTeam) {
         this.faceoffForm.patchValue({ loserTeam: loserTeam.value }, { emitEvent: false });
-        // Manually update loser players since we disabled event emission
-        if (usePreloadedPlayers) {
-          this.filterPlayersForTeam(loserTeam.value, 'loser');
-        } else {
-          this.loadPlayersForTeam(loserTeam.value, 'loser');
-        }
+        this.filterPlayersForTeam(loserTeam.value, 'loser');
       }
-      if (usePreloadedPlayers) {
-        this.filterPlayersForTeam(winnerTeam, 'winner');
-      } else {
-        this.loadPlayersForTeam(winnerTeam, 'winner');
-      }
+      this.filterPlayersForTeam(winnerTeam, 'winner');
     });
 
-    // When loser team changes, automatically set winner team to the opposite and update players
     this.faceoffForm.get('loserTeam')?.valueChanges.subscribe((loserTeam) => {
       const winnerTeam = this.teamOptions.find((t) => t.value !== loserTeam);
       if (winnerTeam) {
         this.faceoffForm.patchValue({ winnerTeam: winnerTeam.value }, { emitEvent: false });
-        // Manually update winner players since we disabled event emission
-        if (usePreloadedPlayers) {
-          this.filterPlayersForTeam(winnerTeam.value, 'winner');
-        } else {
-          this.loadPlayersForTeam(winnerTeam.value, 'winner');
-        }
+        this.filterPlayersForTeam(winnerTeam.value, 'winner');
       }
-      if (usePreloadedPlayers) {
-        this.filterPlayersForTeam(loserTeam, 'loser');
-      } else {
-        this.loadPlayersForTeam(loserTeam, 'loser');
-      }
+      this.filterPlayersForTeam(loserTeam, 'loser');
     });
   }
 

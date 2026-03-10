@@ -2,10 +2,11 @@ import { Component, input } from '@angular/core';
 import { NgStyle } from '@angular/common';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ButtonBaseClass } from '../button-base.class';
+import { ComponentDisableToggleDirective } from '../../../directives/component-disable-toggle.directive';
 
 @Component({
   selector: 'app-button-small',
-  imports: [NgStyle, MatTooltipModule],
+  imports: [NgStyle, MatTooltipModule, ComponentDisableToggleDirective],
   templateUrl: './button-small.component.html',
   styleUrl: '../button.component.scss',
 })

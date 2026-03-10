@@ -15,13 +15,9 @@ import {
   PuckLocation,
   Team,
 } from '../location-selector/location-selector.component';
-import { TeamService } from '../../../services/team.service';
-import { PlayerService } from '../../../services/player.service';
-import { GameMetadataService } from '../../../services/game-metadata.service';
 import { PenaltyEventRequest } from '../../../services/game-event.service';
 import { environment } from '../../../../environments/environment';
 import { CachedSrcDirective } from '../../directives/cached-src.directive';
-import { LoadingSpinnerComponent } from '../loading-spinner/loading-spinner.component';
 
 export interface PenaltyFormData {
   teamLogo: string;
@@ -46,7 +42,6 @@ export interface PenaltyFormData {
     CardGridComponent,
     CardGridItemComponent,
     LocationSelectorComponent,
-    LoadingSpinnerComponent,
   ],
   templateUrl: './penalty-form.modal.html',
   styleUrl: './penalty-form.modal.scss',
@@ -54,9 +49,6 @@ export interface PenaltyFormData {
 export class PenaltyFormModal implements OnInit {
   private fb = inject(FormBuilder);
   private modalService = inject(ModalService);
-  private teamService = inject(TeamService);
-  private playerService = inject(PlayerService);
-  private gameMetadataService = inject(GameMetadataService);
   private dialogData = inject(ModalService).getModalData<{
     gameId: number;
     penaltyEventId: number;
@@ -88,16 +80,11 @@ export class PenaltyFormModal implements OnInit {
   penaltyForm: FormGroup;
   puckLocation: PuckLocation | null = null;
 
-  // Data to be loaded from API
   teamOptions: { value: number; label: string; logo?: string }[] = [];
-  playersByTeam: Record<number, { value: number; label: string; number?: number }[]> = {};
   playerOptions: { value: number; label: string; number?: number }[] = [];
   penaltyDrawnPlayerOptions: { value: number; label: string; number?: number }[] = [];
   periodOptions: { value: number; label: string }[] = [];
 
-  isLoadingTeams = false;
-  isLoadingPlayers = false;
-  isLoadingPeriods = false;
   isSubmitting = signal(false);
 
   constructor() {
@@ -117,24 +104,12 @@ export class PenaltyFormModal implements OnInit {
   }
 
   ngOnInit(): void {
-    // Load options
-    if (this.dialogData.teamOptions && this.dialogData.teamOptions.length > 0) {
-      this.teamOptions = this.dialogData.teamOptions;
-    } else {
-      this.loadTeams();
-    }
+    this.teamOptions = this.dialogData.teamOptions ?? [];
+    this.periodOptions = this.dialogData.periodOptions ?? [];
 
-    if (this.dialogData.periodOptions && this.dialogData.periodOptions.length > 0) {
-      this.periodOptions = this.dialogData.periodOptions;
-    } else {
-      this.loadPeriods();
-    }
-
-    // Edit mode: populate with existing data
     if (this.isEditMode && this.dialogData.existingData) {
       const existing = this.dialogData.existingData;
 
-      // Restore location if available
       if (
         existing.iceTopOffset !== undefined &&
         existing.iceLeftOffset !== undefined &&
@@ -147,7 +122,6 @@ export class PenaltyFormModal implements OnInit {
         };
       }
 
-      // Populate form
       this.penaltyForm.patchValue({
         team: existing.teamId,
         player: existing.playerId,
@@ -159,24 +133,13 @@ export class PenaltyFormModal implements OnInit {
         youtubeLink: existing.youtubeLink || '',
       });
 
-      // Load players for the existing team
       if (existing.teamId) {
-        if (this.dialogData.playerOptions && this.dialogData.playerOptions.length > 0) {
-          this.filterPlayersForTeam(existing.teamId);
-        } else {
-          this.loadPlayersForTeam(existing.teamId);
-        }
+        this.filterPlayersForTeam(existing.teamId);
       }
     } else {
-      // Create mode: Set defaults
       if (this.teamOptions.length > 0) {
         this.penaltyForm.patchValue({ team: this.teamOptions[0].value });
-
-        if (this.dialogData.playerOptions && this.dialogData.playerOptions.length > 0) {
-          this.filterPlayersForTeam(this.teamOptions[0].value);
-        } else {
-          this.loadPlayersForTeam(this.teamOptions[0].value);
-        }
+        this.filterPlayersForTeam(this.teamOptions[0].value);
       }
 
       if (this.periodOptions.length > 0) {
@@ -204,196 +167,41 @@ export class PenaltyFormModal implements OnInit {
     });
   }
 
-  private loadTeams(): void {
-    this.isLoadingTeams = true;
-    this.teamService.getTeams().subscribe({
-      next: (response) => {
-        this.teamOptions = response.teams.map((team) => ({
-          value: parseInt(team.id),
-          label: team.name,
-          logo: team.logo,
-        }));
-        this.isLoadingTeams = false;
-
-        // Set default team after teams are loaded
-        if (this.teamOptions.length > 0) {
-          this.penaltyForm.patchValue({
-            team: this.teamOptions[0].value,
-          });
-          // Load players for default team
-          this.loadPlayersForTeam(this.teamOptions[0].value);
-        }
-      },
-      error: (error) => {
-        console.error('Failed to load teams:', error);
-        this.isLoadingTeams = false;
-      },
-    });
-  }
-
-  private loadPeriods(): void {
-    this.isLoadingPeriods = true;
-    this.gameMetadataService.getGamePeriods().subscribe({
-      next: (periods) => {
-        this.periodOptions = this.gameMetadataService.transformGamePeriodsToOptions(periods);
-        this.isLoadingPeriods = false;
-        if (this.periodOptions.length > 0) {
-          this.penaltyForm.patchValue({ period: this.periodOptions[0].value });
-        }
-      },
-      error: (error) => {
-        console.error('Failed to load periods:', error);
-        this.isLoadingPeriods = false;
-      },
-    });
-  }
-
-  private loadPlayersForTeam(teamId: number): void {
-    this.isLoadingPlayers = true;
-
-    // Check if we already have players cached for this team
-    if (this.playersByTeam[teamId]) {
-      this.playerOptions = this.playersByTeam[teamId];
-      this.isLoadingPlayers = false;
-      if (this.playerOptions.length > 0) {
-        this.penaltyForm.patchValue({ player: this.playerOptions[0].value });
-      }
-
-      // Update penalty drawn players from preloaded data or cache
-      this.updatePenaltyDrawnPlayers(teamId);
-      return;
-    }
-
-    // If we have preloaded data, use it instead of API call
-    if (this.dialogData.playerOptions && this.dialogData.playerOptions.length > 0) {
-      this.filterPlayersForTeam(teamId);
-      this.isLoadingPlayers = false;
-      return;
-    }
-
-    // Only make API call if no preloaded data (fallback case)
-    this.playerService.getPlayersByTeam(teamId).subscribe({
-      next: (players) => {
-        const playerOptions = players.map((player) => ({
-          value: parseInt(player.id),
-          label: `${player.firstName} ${player.lastName}`,
-        }));
-
-        // Cache the players
-        this.playersByTeam[teamId] = playerOptions;
-        this.playerOptions = playerOptions;
-        this.isLoadingPlayers = false;
-
-        if (this.playerOptions.length > 0) {
-          this.penaltyForm.patchValue({ player: this.playerOptions[0].value });
-        } else {
-          this.penaltyForm.patchValue({ player: '' });
-        }
-
-        // Update penalty drawn players from preloaded data or cache
-        this.updatePenaltyDrawnPlayers(teamId);
-      },
-      error: (error) => {
-        console.error(`Failed to load players for team ${teamId}:`, error);
-        this.isLoadingPlayers = false;
-      },
-    });
-  }
-
-  private updatePenaltyDrawnPlayers(teamId: number): void {
+  private filterPlayersForTeam(teamId: number): void {
     const oppositeTeam = this.teamOptions.find((t) => t.value !== teamId);
-    if (!oppositeTeam) {
-      this.penaltyDrawnPlayerOptions = [];
-      return;
+
+    const filteredPlayers = (this.dialogData.playerOptions ?? [])
+      .filter((player) => player.teamId === teamId)
+      .map((player) => ({
+        value: player.value,
+        label: player.label,
+        number: player.number,
+      }));
+
+    this.playerOptions = filteredPlayers;
+
+    if (this.playerOptions.length > 0) {
+      this.penaltyForm.patchValue({ player: this.playerOptions[0].value });
+    } else {
+      this.penaltyForm.patchValue({ player: '' });
     }
 
-    // First, try preloaded data (most common case)
-    if (this.dialogData.playerOptions && this.dialogData.playerOptions.length > 0) {
-      this.penaltyDrawnPlayerOptions = this.dialogData.playerOptions
+    if (oppositeTeam) {
+      this.penaltyDrawnPlayerOptions = (this.dialogData.playerOptions ?? [])
         .filter((player) => player.teamId === oppositeTeam.value)
         .map((player) => ({
           value: player.value,
           label: player.label,
           number: player.number,
         }));
-      return;
-    }
-
-    // Then, try cache (if we loaded via API before)
-    if (this.playersByTeam[oppositeTeam.value]) {
-      this.penaltyDrawnPlayerOptions = this.playersByTeam[oppositeTeam.value];
-      return;
-    }
-
-    // Only make API call as last resort (should rarely happen)
-    this.playerService.getPlayersByTeam(oppositeTeam.value).subscribe({
-      next: (players) => {
-        const playerOptions = players.map((player) => ({
-          value: parseInt(player.id),
-          label: `${player.firstName} ${player.lastName}`,
-        }));
-
-        this.playersByTeam[oppositeTeam.value] = playerOptions;
-        this.penaltyDrawnPlayerOptions = playerOptions;
-      },
-      error: (error) => {
-        console.error(`Failed to load players for opposite team ${oppositeTeam.value}:`, error);
-        this.penaltyDrawnPlayerOptions = [];
-      },
-    });
-  }
-
-  /**
-   * Filter players from pre-loaded player options based on team
-   */
-  private filterPlayersForTeam(teamId: number): void {
-    const oppositeTeam = this.teamOptions.find((t) => t.value !== teamId);
-
-    if (this.dialogData.playerOptions) {
-      const filteredPlayers = this.dialogData.playerOptions
-        .filter((player) => player.teamId === teamId)
-        .map((player) => ({
-          value: player.value,
-          label: player.label,
-          number: player.number,
-        }));
-
-      // Cache the filtered players
-      this.playersByTeam[teamId] = filteredPlayers;
-      this.playerOptions = filteredPlayers;
-
-      if (this.playerOptions.length > 0) {
-        this.penaltyForm.patchValue({ player: this.playerOptions[0].value });
-      } else {
-        this.penaltyForm.patchValue({ player: '' });
-      }
-
-      // Filter penalty drawn players from the opposite team
-      if (oppositeTeam) {
-        this.penaltyDrawnPlayerOptions = this.dialogData.playerOptions
-          .filter((player) => player.teamId === oppositeTeam.value)
-          .map((player) => ({
-            value: player.value,
-            label: player.label,
-            number: player.number,
-          }));
-      } else {
-        this.penaltyDrawnPlayerOptions = [];
-      }
+    } else {
+      this.penaltyDrawnPlayerOptions = [];
     }
   }
 
   private setupTeamChangeListener(): void {
-    const usePreloadedPlayers =
-      this.dialogData.playerOptions && this.dialogData.playerOptions.length > 0;
-
-    // When team changes, update available players
     this.penaltyForm.get('team')?.valueChanges.subscribe((team) => {
-      if (usePreloadedPlayers) {
-        this.filterPlayersForTeam(team);
-      } else {
-        this.loadPlayersForTeam(team);
-      }
+      this.filterPlayersForTeam(team);
     });
   }
 

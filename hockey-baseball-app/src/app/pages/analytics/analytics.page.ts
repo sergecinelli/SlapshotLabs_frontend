@@ -1,4 +1,4 @@
-import { Component, OnInit, computed, signal, inject, Type } from '@angular/core';
+import { Component, OnInit, computed, signal, inject } from '@angular/core';
 import { Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Observable, forkJoin, map } from 'rxjs';
@@ -31,14 +31,12 @@ import { BreadcrumbActionsDirective } from '../../shared/directives/breadcrumb-a
 import { BreadcrumbCenterDirective } from '../../shared/directives/breadcrumb-center.directive';
 import { visibilityByRoleMap } from './analytics.role-map';
 import { DisplayTextModal } from '../../shared/components/display-text-modal/display-text.modal';
-import { PlayerAnalysisModal } from '../../shared/components/player-analysis-modal/player-analysis.modal';
-import { GoalieAnalysisModal } from '../../shared/components/goalie-analysis-modal/goalie-analysis.modal';
-import { TeamAnalysisModal } from '../../shared/components/team-analysis-modal/team-analysis.modal';
 import {
-  GameAnalysisModal,
+  AnalysisModal,
+  AnalysisModalData,
+  AnalysisModalResult,
   GameOption,
-} from '../../shared/components/game-analysis-modal/game-analysis.modal';
-import { AnalysisViewModal } from '../../shared/components/analysis-view-modal/analysis-view.modal';
+} from '../../shared/components/analysis-modal/analysis.modal';
 import { ShareAnalyticsModal } from '../../shared/components/share-analytics-modal/share-analytics.modal';
 
 @Component({
@@ -237,12 +235,16 @@ export class AnalyticsPage implements OnInit {
   }
 
   private onViewAnalysis(analysis: Analysis): void {
-    this.modalService.openModal(AnalysisViewModal, {
+    this.modalService.openModal(AnalysisModal, {
       name: analysis.title,
       icon: 'visibility',
       width: '100%',
       maxWidth: '900px',
-      data: analysis,
+      data: {
+        mode: 'view',
+        analysisType: analysis.type,
+        analysis,
+      } satisfies AnalysisModalData,
     });
   }
 
@@ -292,13 +294,6 @@ export class AnalyticsPage implements OnInit {
   }
 
   private openAnalysisModal(type: AnalysisType, data: Record<string, unknown>): void {
-    const componentMap: Record<AnalysisType, Type<unknown>> = {
-      player: PlayerAnalysisModal,
-      goalie: GoalieAnalysisModal,
-      team: TeamAnalysisModal,
-      game: GameAnalysisModal,
-    };
-
     const labelMap: Record<AnalysisType, string> = {
       player: 'Player',
       goalie: 'Goalie',
@@ -307,18 +302,25 @@ export class AnalyticsPage implements OnInit {
     };
 
     const label = labelMap[type];
+    const isEdit = !!data['isEditMode'];
 
-    this.modalService.openModal(componentMap[type], {
-      name: data['isEditMode'] ? `Edit ${label} Analysis` : `Create ${label} Analysis`,
+    const modalData: AnalysisModalData = {
+      mode: isEdit ? 'edit' : 'create',
+      analysisType: type,
+      analysis: data['analysis'] as Analysis | undefined,
+      players: data['players'] as AnalysisModalData['players'],
+      goalies: data['goalies'] as AnalysisModalData['goalies'],
+      teams: data['teams'] as AnalysisModalData['teams'],
+      games: data['games'] as AnalysisModalData['games'],
+    };
+
+    this.modalService.openModal(AnalysisModal, {
+      name: isEdit ? `Edit ${label} Analysis` : `Create ${label} Analysis`,
       icon: 'bar_chart',
       width: '900px',
       maxWidth: '95vw',
-      data,
-      onCloseWithDataProcessing: (result: {
-        isEditMode: boolean;
-        analysisId?: string;
-        apiData: AnalyticsApiIn;
-      }) => {
+      data: modalData,
+      onCloseWithDataProcessing: (result: AnalysisModalResult) => {
         const apiCall: Observable<unknown> = result.isEditMode
           ? this.analysisService.updateAnalysis(Number(result.analysisId!), result.apiData)
           : this.analysisService.createAnalysis(result.apiData);

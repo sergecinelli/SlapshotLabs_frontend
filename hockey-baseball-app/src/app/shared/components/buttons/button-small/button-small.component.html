@@ -8,9 +8,12 @@
 @let roundedValue = rounded();
 @let widthValue = width();
 @let isActiveValue = isActive();
+@let isDisabledValue = isDisabled();
 
 <div
   class="app-button small"
+  [appDisableToggle]="isDisabledValue"
+  [keepPointerEvents]="!!tooltipValue"
   [matTooltip]="tooltipValue"
   [matTooltipShowDelay]="tooltipDelayValue"
   [matTooltipPosition]="tooltipPosValue"

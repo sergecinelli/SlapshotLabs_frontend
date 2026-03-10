@@ -1,0 +1,192 @@
+<div class="analysis-modal">
+  <div class="modal-content">
+    @if (isViewMode && data.analysis) {
+      <div class="analysis-form">
+        <div class="form-section">
+          <app-section-header title="Analysis Details" />
+
+          <div class="form-row">
+            @if (profileRoute()) {
+              <app-form-field label="Subject" [readonly]="true" class="full-width">
+                <div readonlyContent class="subject-row">
+                  <a
+                    class="subject-link"
+                    [routerLink]="profileRoute()"
+                    (click)="closeModals()"
+                  >
+                    {{ data.analysis.entityName }}
+                  </a>
+                  <app-button-small
+                    materialIcon="visibility"
+                    [bg]="'transparent'"
+                    [bghover]="'item_hover'"
+                    [color]="'text_secondary'"
+                    [colorhover]="'green_dark'"
+                    tooltip="View Profile"
+                    (clicked)="goToProfile()"
+                  />
+                </div>
+              </app-form-field>
+            } @else {
+              <app-form-field
+                label="Subject"
+                [readonly]="true"
+                [readonlyValue]="data.analysis.entityName"
+                class="full-width"
+              />
+            }
+          </div>
+
+          <div class="form-row">
+            <app-form-field
+              label="Title"
+              [readonly]="true"
+              [readonlyValue]="data.analysis.title"
+              class="full-width"
+            />
+          </div>
+
+          <div class="form-row">
+            <app-form-field
+              label="Author"
+              [readonly]="true"
+              [readonlyValue]="data.analysis.author"
+              class="full-width"
+            />
+          </div>
+
+          <div class="form-row">
+            <app-form-field label="Analysis" [readonly]="true" class="full-width">
+              <p readonlyContent class="analysis-text">{{ data.analysis.analysis }}</p>
+            </app-form-field>
+          </div>
+        </div>
+      </div>
+    }
+
+    @if (!isViewMode) {
+      <form [formGroup]="analysisForm" class="analysis-form">
+        <div class="form-section">
+          <app-section-header title="Analysis Details" />
+          <div class="form-row">
+            @if (isEntityLocked() && profileRoute()) {
+              <app-form-field
+                label="Selected {{ entityLabel }}"
+                [readonly]="true"
+              >
+                <div readonlyContent class="subject-row">
+                  <a
+                    class="subject-link"
+                    [routerLink]="profileRoute()"
+                    (click)="closeModals()"
+                  >
+                    {{ selectedEntityLabel() }}
+                  </a>
+                  <app-button-small
+                    materialIcon="visibility"
+                    [bg]="'transparent'"
+                    [bghover]="'item_hover'"
+                    [color]="'text_secondary'"
+                    [colorhover]="'green_dark'"
+                    tooltip="View Profile"
+                    (clicked)="goToProfile()"
+                  />
+                </div>
+              </app-form-field>
+            } @else if (isEntityLocked()) {
+              <app-form-field
+                label="Selected {{ entityLabel }}"
+                [readonly]="true"
+                [readonlyValue]="selectedEntityLabel()"
+              />
+            } @else if (useOptionGroups()) {
+              <app-form-field
+                label="Select {{ entityLabel }}"
+                [required]="true"
+                [error]="getErrorMessage('entityId')"
+              >
+                <app-custom-select
+                  formControlName="entityId"
+                  placeholder="Search {{ entityLabel | lowercase }}..."
+                  [searchable]="true"
+                  searchPlaceholder="Search by name..."
+                  [optionGroups]="entityOptionGroups()"
+                />
+              </app-form-field>
+            } @else {
+              <app-form-field
+                label="Select {{ entityLabel }}"
+                [required]="true"
+                [error]="getErrorMessage('entityId')"
+              >
+                <app-custom-select
+                  formControlName="entityId"
+                  placeholder="Search {{ entityLabel | lowercase }}..."
+                  [searchable]="true"
+                  searchPlaceholder="Search by name..."
+                  [options]="entityOptions()"
+                />
+              </app-form-field>
+            }
+          </div>
+
+          <div class="form-row">
+            <app-form-field label="Title" [required]="true" [error]="getErrorMessage('title')">
+              <input formControlName="title" placeholder="Enter title" />
+            </app-form-field>
+          </div>
+
+          <div class="form-row">
+            <app-form-field label="Author" [required]="true" [error]="getErrorMessage('author')">
+              <input formControlName="author" placeholder="Enter author name" />
+            </app-form-field>
+          </div>
+
+          <div class="form-row">
+            <app-form-field
+              label="Analysis"
+              [required]="true"
+              [error]="getErrorMessage('analysis')"
+            >
+              <textarea
+                formControlName="analysis"
+                rows="6"
+                placeholder="Enter analysis"
+              ></textarea>
+            </app-form-field>
+          </div>
+        </div>
+      </form>
+    }
+  </div>
+
+  <div class="modal-actions">
+    <app-button
+      [bg]="'background'"
+      [bghover]="'item_hover'"
+      [br]="'border'"
+      [color]="'text_primary'"
+      [colorhover]="'text_primary'"
+      [haveContent]="true"
+      materialIcon="cancel"
+      (clicked)="onCancel()"
+    >
+      {{ isViewMode ? 'Close' : 'Cancel' }}
+    </app-button>
+    @if (!isViewMode) {
+      <app-button-loading
+        [isLoading]="isSubmitting()"
+        [isDisabled]="analysisForm.invalid"
+        materialIcon="save"
+        [bg]="isEditMode ? 'orange' : 'green'"
+        [bghover]="isEditMode ? 'orange' : 'green'"
+        [color]="'white'"
+        [colorhover]="'white'"
+        [haveContent]="true"
+        (clicked)="onSubmit()"
+      >
+        {{ isEditMode ? 'Update Analysis' : 'Create Analysis' }}
+      </app-button-loading>
+    }
+  </div>
+</div>

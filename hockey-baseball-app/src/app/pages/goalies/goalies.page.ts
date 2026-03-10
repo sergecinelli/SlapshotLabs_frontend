@@ -26,11 +26,18 @@ import {
 } from '../../shared/components/data-table/data-table.component';
 import { LocalStorageService, StorageKey } from '../../services/local-storage.service';
 import { TryoutService } from '../../services/tryout.service';
-import { AuthService } from '../../services/auth.service';
-import { Observable } from 'rxjs';
+import {
+  TryoutModal,
+  TryoutModalData,
+  TryoutModalResult,
+} from '../../shared/components/tryout-modal/tryout.modal';
+
 import { AnalysisService } from '../../services/analysis.service';
-import { AnalyticsApiIn } from '../../shared/interfaces/analysis.interface';
-import { GoalieAnalysisModal } from '../../shared/components/goalie-analysis-modal/goalie-analysis.modal';
+import {
+  AnalysisModal,
+  AnalysisModalData,
+  AnalysisModalResult,
+} from '../../shared/components/analysis-modal/analysis.modal';
 import { CachedSrcDirective } from '../../shared/directives/cached-src.directive';
 import { CardGridComponent } from '../../shared/components/card-grid/card-grid.component';
 import { BreadcrumbActionsDirective } from '../../shared/directives/breadcrumb-actions.directive';
@@ -66,7 +73,6 @@ export class GoaliesPage implements OnInit {
   private router = inject(Router);
   private storage = inject(LocalStorageService);
   private tryoutService = inject(TryoutService);
-  private authService = inject(AuthService);
   private toast = inject(ToastService);
   private positionService = inject(PositionService);
   private analysisService = inject(AnalysisService);
@@ -382,24 +388,21 @@ export class GoaliesPage implements OnInit {
     this.goalieService.getGoalies().subscribe({
       next: (result) => {
         this.analysisLoadingId.set(null);
-        this.modalService.openModal(GoalieAnalysisModal, {
+        const modalData: AnalysisModalData = {
+          mode: 'create',
+          analysisType: 'goalie',
+          preSelectedEntityId: goalie.id.toString(),
+          goalies: result.goalies,
+        };
+
+        this.modalService.openModal(AnalysisModal, {
           name: 'Create Goalie Analysis',
           icon: 'bar_chart',
           width: '100%',
           maxWidth: '900px',
-          data: {
-            isEditMode: false,
-            preSelectedGoalieId: goalie.id.toString(),
-            goalies: result.goalies,
-          },
-          onCloseWithDataProcessing: (modalResult: {
-            isEditMode: boolean;
-            apiData: AnalyticsApiIn;
-          }) => {
-            const apiCall: Observable<unknown> = this.analysisService.createAnalysis(
-              modalResult.apiData
-            );
-            apiCall.subscribe({
+          data: modalData,
+          onCloseWithDataProcessing: (modalResult: AnalysisModalResult) => {
+            this.analysisService.createAnalysis(modalResult.apiData).subscribe({
               next: () => {
                 this.toast.show('Analysis created successfully', 'success');
                 this.modalService.closeModal();
@@ -510,32 +513,39 @@ export class GoaliesPage implements OnInit {
   }
 
   addToTryout(goalie: Goalie): void {
-    const user = this.authService.getCurrentUserValue();
-    const teamId = user?.team_id;
-    if (!teamId) return;
-
-    this.modalService.openModal(DisplayTextModal, {
+    this.modalService.openModal(TryoutModal, {
       name: 'Add to Tryout',
       icon: 'person_add',
+      width: '600px',
+      maxWidth: '95vw',
       data: {
-        text: `Are you sure you want to add <b>${goalie.firstName} ${goalie.lastName}</b> to the tryout list?`,
-        buttonText: 'Add to Tryout',
-        buttonIcon: 'person_add',
-        color: 'primary',
-        colorSoft: 'primary_dark',
-        withButtonLoading: true,
-      },
-      onCloseWithDataProcessing: () => {
-        this.tryoutService.addToTryout(teamId, parseInt(goalie.id, 10), 'goalie').subscribe({
-          next: () => {
-            this.modalService.closeModal();
-            this.toast.show('Goalie added to tryout list', 'success');
-          },
-          error: (err: { message?: string }) => {
-            this.toast.show(err?.message || 'Failed to add goalie to tryout', 'error');
-            this.modalService.broadcastEvent(ModalEvent.StopButtonLoading);
-          },
-        });
+        activeTab: 'goalie' as const,
+        teamId: goalie.teamId ?? null,
+        playerEntries: [],
+        goalieEntries: [],
+        positions: [],
+        teams: [],
+        singleEntity: {
+          playerId: parseInt(goalie.id, 10),
+          name: `${goalie.firstName} ${goalie.lastName}`,
+          team: goalie.team,
+          teamId: goalie.teamId ?? null,
+          type: 'goalie' as const,
+        },
+      } satisfies TryoutModalData,
+      onCloseWithDataProcessing: (result: TryoutModalResult) => {
+        this.tryoutService
+          .addToTryout(result.teamId, result.selectedIds[0], 'goalie', result.note || undefined)
+          .subscribe({
+            next: () => {
+              this.modalService.closeModal();
+              this.toast.show('Goalie added to tryout list', 'success');
+            },
+            error: (err: { message?: string }) => {
+              this.toast.show(err?.message || 'Failed to add goalie to tryout', 'error');
+              this.modalService.broadcastEvent(ModalEvent.StopButtonLoading);
+            },
+          });
       },
     });
   }

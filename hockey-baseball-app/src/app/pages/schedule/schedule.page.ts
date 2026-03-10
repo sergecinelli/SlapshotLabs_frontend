@@ -33,13 +33,14 @@ import { CardGridComponent } from '../../shared/components/card-grid/card-grid.c
 import { GameCardComponent } from '../../shared/components/game-card/game-card.component';
 import { visibilityByRoleMap } from './schedule.role-map';
 import { getGameStatusLabel } from '../../shared/constants/statuses.constants';
-import { Observable, forkJoin } from 'rxjs';
+import { forkJoin } from 'rxjs';
 import { AnalysisService } from '../../services/analysis.service';
-import { AnalyticsApiIn } from '../../shared/interfaces/analysis.interface';
 import {
-  GameAnalysisModal,
+  AnalysisModal,
+  AnalysisModalData,
+  AnalysisModalResult,
   GameOption,
-} from '../../shared/components/game-analysis-modal/game-analysis.modal';
+} from '../../shared/components/analysis-modal/analysis.modal';
 import { tap } from 'rxjs/operators';
 import { convertGMTToLocal, formatDateForDisplay } from '../../shared/utils/time-converter.util';
 import { BreadcrumbActionsDirective } from '../../shared/directives/breadcrumb-actions.directive';
@@ -670,19 +671,21 @@ export class SchedulePage implements OnInit {
   }
 
   private openGameAnalysisModal(games: GameOption[], preSelectedGameId: string): void {
-    this.modalService.openModal(GameAnalysisModal, {
+    const modalData: AnalysisModalData = {
+      mode: 'create',
+      analysisType: 'game',
+      preSelectedEntityId: preSelectedGameId,
+      games,
+    };
+
+    this.modalService.openModal(AnalysisModal, {
       name: 'Create Game Analysis',
       icon: 'bar_chart',
       width: '100%',
       maxWidth: '900px',
-      data: {
-        isEditMode: false,
-        preSelectedGameId,
-        games,
-      },
-      onCloseWithDataProcessing: (result: { isEditMode: boolean; apiData: AnalyticsApiIn }) => {
-        const apiCall: Observable<unknown> = this.analysisService.createAnalysis(result.apiData);
-        apiCall.subscribe({
+      data: modalData,
+      onCloseWithDataProcessing: (result: AnalysisModalResult) => {
+        this.analysisService.createAnalysis(result.apiData).subscribe({
           next: () => {
             this.toast.show('Analysis created successfully', 'success');
             this.modalService.closeModal();

@@ -6,70 +6,55 @@
         <app-section-header title="Turnover Information" />
 
         <app-form-field label="Team that turned the puck over" [error]="getErrorMessage('team')">
-          @if (isLoadingTeams) {
-            <app-loading-spinner message="Loading teams..." size="sm" />
-          }
-          @if (!isLoadingTeams) {
-            <app-card-grid [columns]="teamOptions.length">
-              @for (team of teamOptions; track team) {
-                <app-card-grid-item
-                  [selected]="turnoverForm.get('team')?.value === team.value"
-                  (select)="selectTeam(team.value)"
-                >
-                  @if (team.value) {
-                    <img
-                      [appCachedSrc]="getTeamLogoUrl(team.value)"
-                      [alt]="team.label"
-                      class="team-logo-img"
-                    />
-                  }
-                  {{ team.label }}
-                </app-card-grid-item>
-              }
-            </app-card-grid>
-          }
+          <app-card-grid [columns]="teamOptions.length">
+            @for (team of teamOptions; track team) {
+              <app-card-grid-item
+                [selected]="turnoverForm.get('team')?.value === team.value"
+                (select)="selectTeam(team.value)"
+              >
+                @if (team.value) {
+                  <img
+                    [appCachedSrc]="getTeamLogoUrl(team.value)"
+                    [alt]="team.label"
+                    class="team-logo-img"
+                  />
+                }
+                {{ team.label }}
+              </app-card-grid-item>
+            }
+          </app-card-grid>
         </app-form-field>
 
         <app-form-field
           label="Player that turned the puck over"
           [error]="getErrorMessage('player')"
         >
-          @if (isLoadingPlayers) {
-            <app-loading-spinner message="Loading players..." size="sm" />
-          }
-          @if (!isLoadingPlayers) {
-            <app-card-grid [columns]="3">
-              @for (player of playerOptions; track player) {
-                <app-card-grid-item
-                  [selected]="turnoverForm.get('player')?.value === player.value"
-                  (select)="selectPlayer(player.value)"
-                >
-                  @if (player.number !== undefined && player.number !== null) {
-                    <span class="player-number">{{ player.number }}</span>
-                  }
-                  {{ player.label }}
-                </app-card-grid-item>
-              }
-            </app-card-grid>
-          }
+          <app-card-grid [columns]="3">
+            @for (player of playerOptions; track player) {
+              <app-card-grid-item
+                [selected]="turnoverForm.get('player')?.value === player.value"
+                (select)="selectPlayer(player.value)"
+              >
+                @if (player.number !== undefined && player.number !== null) {
+                  <span class="player-number">{{ player.number }}</span>
+                }
+                {{ player.label }}
+              </app-card-grid-item>
+            }
+          </app-card-grid>
         </app-form-field>
 
         <app-form-field label="Period" [error]="getErrorMessage('period')">
-          @if (isLoadingPeriods) {
-            <app-loading-spinner message="Loading periods..." size="sm" />
-          }
-          @if (!isLoadingPeriods) {
-            <app-card-grid [columns]="periodOptions.length">
-              @for (period of periodOptions; track period) {
-                <app-card-grid-item
-                  [selected]="turnoverForm.get('period')?.value === period.value"
-                  (select)="selectPeriod(period.value)"
-                >
-                  {{ period.label }}
-                </app-card-grid-item>
-              }
-            </app-card-grid>
-          }
+          <app-card-grid [columns]="periodOptions.length">
+            @for (period of periodOptions; track period) {
+              <app-card-grid-item
+                [selected]="turnoverForm.get('period')?.value === period.value"
+                (select)="selectPeriod(period.value)"
+              >
+                {{ period.label }}
+              </app-card-grid-item>
+            }
+          </app-card-grid>
         </app-form-field>
 
         <div class="form-row">

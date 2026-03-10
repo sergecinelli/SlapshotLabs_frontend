@@ -6,7 +6,8 @@ import { Observable, forkJoin } from 'rxjs';
 import { AnalysisService } from '../../services/analysis.service';
 import { PlayerService } from '../../services/player.service';
 import { BreadcrumbDataService } from '../../services/breadcrumb-data.service';
-import { Analysis, AnalyticsApiIn } from '../../shared/interfaces/analysis.interface';
+import { Analysis } from '../../shared/interfaces/analysis.interface';
+import { Player } from '../../shared/interfaces/player.interface';
 import {
   DataTableComponent,
   TableColumn,
@@ -16,8 +17,11 @@ import { ButtonLoadingComponent } from '../../shared/components/buttons/button-l
 import { ComponentVisibilityByRoleDirective } from '../../shared/directives/component-visibility-by-role.directive';
 import { BreadcrumbActionsDirective } from '../../shared/directives/breadcrumb-actions.directive';
 import { visibilityByRoleMap } from './player-analysis.role-map';
-import { PlayerAnalysisModal } from '../../shared/components/player-analysis-modal/player-analysis.modal';
-import { AnalysisViewModal } from '../../shared/components/analysis-view-modal/analysis-view.modal';
+import {
+  AnalysisModal,
+  AnalysisModalData,
+  AnalysisModalResult,
+} from '../../shared/components/analysis-modal/analysis.modal';
 import { DisplayTextModal } from '../../shared/components/display-text-modal/display-text.modal';
 
 @Component({
@@ -88,22 +92,18 @@ export class PlayerAnalysisPage implements OnInit {
   }
 
   onCreateAnalysis(): void {
-    this.loadEntityOptionsAndOpenModal({
-      isEditMode: false,
-      preSelectedPlayerId: this.playerId,
-    });
+    this.loadEntityOptionsAndOpenModal({ isEditMode: false });
   }
 
-  private loadEntityOptionsAndOpenModal(data: Record<string, unknown>): void {
-    const isEdit = !!data['isEditMode'];
-    if (!isEdit) {
+  private loadEntityOptionsAndOpenModal(data: { isEditMode: boolean; analysis?: Analysis }): void {
+    if (!data.isEditMode) {
       this.isCreateLoading.set(true);
     }
     this.playerService.getPlayers().subscribe({
       next: (result) => {
         this.isCreateLoading.set(false);
         this.editingItemId.set(null);
-        this.openAnalysisModal({ ...data, players: result.players });
+        this.openAnalysisModal(data, result.players);
       },
       error: (error) => {
         console.error('Failed to load players:', error);
@@ -113,18 +113,25 @@ export class PlayerAnalysisPage implements OnInit {
     });
   }
 
-  private openAnalysisModal(data: Record<string, unknown>): void {
-    this.modalService.openModal(PlayerAnalysisModal, {
-      name: data['isEditMode'] ? 'Edit Player Analysis' : 'Create Player Analysis',
+  private openAnalysisModal(
+    data: { isEditMode: boolean; analysis?: Analysis },
+    players: Player[],
+  ): void {
+    const modalData: AnalysisModalData = {
+      mode: data.isEditMode ? 'edit' : 'create',
+      analysisType: 'player',
+      analysis: data.analysis,
+      preSelectedEntityId: this.playerId,
+      players,
+    };
+
+    this.modalService.openModal(AnalysisModal, {
+      name: data.isEditMode ? 'Edit Player Analysis' : 'Create Player Analysis',
       icon: 'bar_chart',
       width: '100%',
       maxWidth: '900px',
-      data,
-      onCloseWithDataProcessing: (result: {
-        isEditMode: boolean;
-        analysisId?: string;
-        apiData: AnalyticsApiIn;
-      }) => {
+      data: modalData,
+      onCloseWithDataProcessing: (result: AnalysisModalResult) => {
         const apiCall: Observable<unknown> = result.isEditMode
           ? this.analysisService.updateAnalysis(Number(result.analysisId!), result.apiData)
           : this.analysisService.createAnalysis(result.apiData);
@@ -164,12 +171,16 @@ export class PlayerAnalysisPage implements OnInit {
   }
 
   private onViewAnalysis(analysis: Analysis): void {
-    this.modalService.openModal(AnalysisViewModal, {
+    this.modalService.openModal(AnalysisModal, {
       name: analysis.title,
       icon: 'visibility',
       width: '100%',
       maxWidth: '900px',
-      data: analysis,
+      data: {
+        mode: 'view',
+        analysisType: 'player',
+        analysis,
+      } satisfies AnalysisModalData,
     });
   }
 

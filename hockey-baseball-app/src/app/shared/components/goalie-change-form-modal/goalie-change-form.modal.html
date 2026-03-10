@@ -52,21 +52,16 @@
         <app-section-header title="Game Details" />
 
         <app-form-field label="Period" [error]="getErrorMessage('period')">
-          @if (isLoadingPeriods) {
-            <app-loading-spinner message="Loading periods..." size="sm" />
-          }
-          @if (!isLoadingPeriods) {
-            <app-card-grid [columns]="periodOptions.length">
-              @for (period of periodOptions; track period) {
-                <app-card-grid-item
-                  [selected]="goalieChangeForm.get('period')?.value === period.value"
-                  (select)="selectPeriod(period.value)"
-                >
-                  {{ period.label }}
-                </app-card-grid-item>
-              }
-            </app-card-grid>
-          }
+          <app-card-grid [columns]="periodOptions.length">
+            @for (period of periodOptions; track period) {
+              <app-card-grid-item
+                [selected]="goalieChangeForm.get('period')?.value === period.value"
+                (select)="selectPeriod(period.value)"
+              >
+                {{ period.label }}
+              </app-card-grid-item>
+            }
+          </app-card-grid>
         </app-form-field>
 
         <div class="form-row">

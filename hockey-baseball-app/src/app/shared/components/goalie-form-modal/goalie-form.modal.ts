@@ -101,11 +101,14 @@ export class GoalieFormModal implements OnInit {
       positions: positionsObservable,
     }).subscribe({
       next: ({ teams, positions }) => {
-        // Transform teams to options format
-        this.teamOptions = teams.teams.map((team) => ({
-          value: team.id,
-          label: team.name,
-        }));
+        // Transform teams to options format with "No Team" option
+        this.teamOptions = [
+          { value: '', label: 'No Team' },
+          ...teams.teams.map((team) => ({
+            value: team.id,
+            label: team.name,
+          })),
+        ];
 
         this.positionOptions = positions;
 
@@ -138,11 +141,11 @@ export class GoalieFormModal implements OnInit {
   private setDefaultFormValues(): void {
     const defaultValues: Record<string, string> = {};
 
-    // Set team from data.teamId if provided, otherwise use first team
+    // Set team from data.teamId if provided, otherwise default to "No Team"
     if (this.data.teamId) {
       defaultValues['team'] = this.data.teamId;
-    } else if (this.teamOptions.length > 0) {
-      defaultValues['team'] = this.teamOptions[0].value;
+    } else {
+      defaultValues['team'] = '';
     }
 
     // Set first position as default
@@ -163,7 +166,7 @@ export class GoalieFormModal implements OnInit {
 
   private createForm(): FormGroup {
     return this.fb.group({
-      team: ['', [Validators.required]],
+      team: [''],
       birthYear: ['', [Validators.min(1900), Validators.max(new Date().getFullYear())]],
       jerseyNumber: ['', [Validators.min(1), Validators.max(99)]],
       firstName: ['', [Validators.required]],

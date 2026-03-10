@@ -86,7 +86,7 @@ export class CustomSelectComponent implements ControlValueAccessor {
 
   selectedLabel = computed(() => {
     const v = this.value();
-    if (!v) return '';
+    if (v == null) return '';
     const flat = this.options().find((o) => o.value === v);
     if (flat) return flat.label;
     for (const group of this.optionGroups()) {

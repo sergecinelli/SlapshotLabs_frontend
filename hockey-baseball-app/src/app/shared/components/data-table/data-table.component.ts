@@ -48,6 +48,8 @@ export interface TableAction {
   roleVisibilityTeamId?: string | ((item: Record<string, unknown>) => string | undefined);
   roleVisibilityAuthorId?: string | ((item: Record<string, unknown>) => string | undefined);
   condition?: (item: Record<string, unknown>) => boolean;
+  isDisabled?: (item: Record<string, unknown>) => boolean;
+  tooltip?: string | ((item: Record<string, unknown>) => string | null);
   route?: (item: Record<string, unknown>) => string;
   isLoading?: (item: Record<string, unknown>) => boolean;
 }
@@ -271,5 +273,13 @@ export class DataTableComponent<T extends Record<string, unknown> = Record<strin
 
   getActionColorHover(variant?: string): AppColor {
     return this.colorHoverMap[variant ?? 'gray'] ?? 'text_primary';
+  }
+
+  getActionTooltip(action: TableAction, element: Record<string, unknown>): string | null {
+    if (action.tooltip) {
+      const value = typeof action.tooltip === 'function' ? action.tooltip(element) : action.tooltip;
+      if (value) return value;
+    }
+    return action.iconOnly ? action.label : null;
   }
 }
