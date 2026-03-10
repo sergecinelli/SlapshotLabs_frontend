@@ -1,155 +1,184 @@
-import { Injectable } from '@angular/core';
-import { Observable, of, delay } from 'rxjs';
-import { TryoutEntry, TryoutTabType } from '../shared/interfaces/tryout.interface';
+import { Injectable, inject } from '@angular/core';
+import { Observable, forkJoin, throwError } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
+import { ApiService } from './api.service';
+import { TeamService } from './team.service';
+import {
+  TryoutEntry,
+  TryoutEntryType,
+  TryoutStatus,
+  TryoutStatusHistoryEntry,
+  TryoutStatusHistoryUser,
+  PlayerTryoutApiOut,
+  PlayerTryoutApiIn,
+  PlayerTryoutApiUpdate,
+  PlayerTryoutApiType,
+} from '../shared/interfaces/tryout.interface';
 
-const MOCK_TRYOUT_PLAYERS: TryoutEntry[] = [
-  {
-    id: '1',
-    playerId: '101',
-    firstName: 'Connor',
-    lastName: 'Smith',
-    position: 'Center',
-    shoots: 'L',
-    jerseyNumber: 97,
-    team: 'Edmonton Eagles',
-    teamId: 10,
-    teamAgeGroup: 'U18',
-    teamLevelName: 'AAA',
-    type: 'player',
-  },
-  {
-    id: '2',
-    playerId: '102',
-    firstName: 'Jack',
-    lastName: 'Miller',
-    position: 'Left Wing',
-    shoots: 'L',
-    jerseyNumber: 13,
-    team: 'Toronto Wolves',
-    teamId: 11,
-    teamAgeGroup: 'U16',
-    teamLevelName: 'AA',
-    type: 'player',
-  },
-  {
-    id: '3',
-    playerId: '103',
-    firstName: 'Nathan',
-    lastName: 'Johnson',
-    position: 'Right Defense',
-    shoots: 'R',
-    jerseyNumber: 8,
-    team: 'Calgary Storm',
-    teamId: 12,
-    teamAgeGroup: 'U18',
-    teamLevelName: 'AAA',
-    type: 'player',
-  },
-  {
-    id: '4',
-    playerId: '104',
-    firstName: 'Tyler',
-    lastName: 'Brown',
-    position: 'Right Wing',
-    shoots: 'R',
-    jerseyNumber: 21,
-    team: 'Vancouver Hawks',
-    teamId: 13,
-    teamAgeGroup: 'U16',
-    teamLevelName: 'A',
-    type: 'player',
-  },
-  {
-    id: '5',
-    playerId: '105',
-    firstName: 'Brady',
-    lastName: 'Wilson',
-    position: 'Left Defense',
-    shoots: 'L',
-    jerseyNumber: 44,
-    team: 'Ottawa Titans',
-    teamId: 14,
-    teamAgeGroup: 'U18',
-    teamLevelName: 'AA',
-    type: 'player',
-  },
-];
+const BASE_URL = '/hockey/player-tryouts';
 
-const MOCK_TRYOUT_GOALIES: TryoutEntry[] = [
-  {
-    id: '6',
-    playerId: '201',
-    firstName: 'Carey',
-    lastName: 'Anderson',
-    position: 'Goalie',
-    shoots: 'L',
-    jerseyNumber: 31,
-    team: 'Montreal Vipers',
-    teamId: 15,
-    teamAgeGroup: 'U18',
-    teamLevelName: 'AAA',
-    type: 'goalie',
-  },
-  {
-    id: '7',
-    playerId: '202',
-    firstName: 'Sergei',
-    lastName: 'Petrov',
-    position: 'Goalie',
-    shoots: 'L',
-    jerseyNumber: 35,
-    team: 'Winnipeg Blaze',
-    teamId: 16,
-    teamAgeGroup: 'U16',
-    teamLevelName: 'AA',
-    type: 'goalie',
-  },
-  {
-    id: '8',
-    playerId: '203',
-    firstName: 'Jake',
-    lastName: 'Thompson',
-    position: 'Goalie',
-    shoots: 'R',
-    jerseyNumber: 1,
-    team: 'Calgary Storm',
-    teamId: 12,
-    teamAgeGroup: 'U18',
-    teamLevelName: 'AAA',
-    type: 'goalie',
-  },
-];
+function toApiType(type: TryoutEntryType): PlayerTryoutApiType {
+  return type === 'goalie' ? 'goalies' : 'players';
+}
 
 @Injectable({
   providedIn: 'root',
 })
 export class TryoutService {
-  getTryoutEntries(teamId: number, type: TryoutTabType): Observable<TryoutEntry[]> {
-    const data = type === 'player' ? MOCK_TRYOUT_PLAYERS : MOCK_TRYOUT_GOALIES;
-    return of(data).pipe(delay(300));
+  private apiService = inject(ApiService);
+  private teamService = inject(TeamService);
+
+  getTryoutEntries(teamId?: number | null, type?: TryoutEntryType): Observable<TryoutEntry[]> {
+    const playerType = toApiType(type ?? 'player');
+    const query = teamId ? `?team_id=${teamId}` : '';
+    return forkJoin({
+      tryouts: this.apiService.get<PlayerTryoutApiOut[]>(`${BASE_URL}/list/${playerType}${query}`),
+      teams: this.teamService.getTeams(),
+    }).pipe(
+      map(({ tryouts, teams }) => {
+        const teamMap = new Map(
+          teams.teams.map((t) => [
+            parseInt(t.id),
+            { name: t.name, logo: t.logo, group: t.group, level: t.level },
+          ])
+        );
+        const entryType = type ?? 'player';
+        return tryouts.map((t) =>
+          entryType === 'goalie'
+            ? this.mapGoalieTryoutToEntry(t, teamMap)
+            : this.mapPlayerTryoutToEntry(t, teamMap)
+        );
+      }),
+      catchError((error) => {
+        console.error(`Failed to fetch ${playerType} tryouts:`, error);
+        return throwError(() => error);
+      })
+    );
   }
 
-  addToTryout(teamId: number, entry: Partial<TryoutEntry>): Observable<TryoutEntry> {
-    const newEntry: TryoutEntry = {
-      id: String(Date.now()),
-      playerId: entry.playerId || String(Date.now()),
-      firstName: entry.firstName || '',
-      lastName: entry.lastName || '',
-      position: entry.position || '',
-      shoots: entry.shoots || '',
-      jerseyNumber: entry.jerseyNumber || 0,
-      team: entry.team || '',
-      teamId: entry.teamId,
-      teamLogo: entry.teamLogo,
-      teamAgeGroup: entry.teamAgeGroup,
-      teamLevelName: entry.teamLevelName,
-      type: entry.type || 'player',
+  addToTryout(
+    teamId: number | null,
+    playerId: number,
+    type: TryoutEntryType,
+    note?: string
+  ): Observable<{ id: number }> {
+    const body: PlayerTryoutApiIn = {
+      player_id: playerId,
+      team_id: teamId,
+      player_type: toApiType(type),
+      status: TryoutStatus.TryingOut,
+      notes: note || null,
     };
-    return of(newEntry).pipe(delay(200));
+    return this.apiService.post<{ id: number }>(BASE_URL, body).pipe(
+      catchError((error) => {
+        console.error('Failed to add tryout:', error);
+        return throwError(() => error);
+      })
+    );
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  removeFromTryout(teamId: number, entryId: string): Observable<boolean> {
-    return of(true).pipe(delay(200));
+  updateTryoutStatus(
+    tryoutId: number,
+    type: TryoutEntryType,
+    status: TryoutStatus,
+    note?: string
+  ): Observable<void> {
+    const body: PlayerTryoutApiUpdate = { status, notes: note || null };
+    return this.apiService.put<void>(`${BASE_URL}/${tryoutId}`, body).pipe(
+      catchError((error) => {
+        console.error('Failed to update tryout status:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  removeFromTryout(tryoutId: number, type: TryoutEntryType): Observable<void> {
+    return this.apiService.delete<void>(`${BASE_URL}/${tryoutId}`).pipe(
+      catchError((error) => {
+        console.error('Failed to delete tryout:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  getStatusHistory(
+    tryoutId: number,
+    type: TryoutEntryType
+  ): Observable<TryoutStatusHistoryEntry[]> {
+    return this.apiService
+      .get<TryoutStatusHistoryEntry[]>(`${BASE_URL}/${tryoutId}/status-history`)
+      .pipe(
+        catchError((error) => {
+          console.error('Failed to fetch status history:', error);
+          return throwError(() => error);
+        })
+      );
+  }
+
+  private mapPlayerTryoutToEntry(
+    tryout: PlayerTryoutApiOut,
+    teamMap: Map<number, { name: string; logo: string; group: string; level: string }>
+  ): TryoutEntry {
+    const playerTeam = teamMap.get(tryout.team_id);
+    const player = tryout.player;
+
+    return {
+      id: String(player.id),
+      tryoutId: tryout.id,
+      playerId: String(player.id),
+      firstName: player.first_name,
+      lastName: player.last_name,
+      position: player.position_name,
+      shoots: player.shoots,
+      jerseyNumber: player.number,
+      team: tryout.team_name || playerTeam?.name || '',
+      teamId: tryout.team_id,
+      teamLogo: playerTeam?.logo || '',
+      teamAgeGroup: playerTeam?.group || '',
+      teamLevelName: playerTeam?.level || '',
+      type: 'player',
+      status: tryout.status,
+      hasAnalytics: player.has_analytics,
+      note: tryout.note,
+      userId: tryout.user?.id ?? null,
+      changedBy: this.formatChangedBy(tryout.changed_by),
+      changedAt: tryout.changed_at,
+    };
+  }
+
+  private mapGoalieTryoutToEntry(
+    tryout: PlayerTryoutApiOut,
+    teamMap: Map<number, { name: string; logo: string; group: string; level: string }>
+  ): TryoutEntry {
+    const goalieTeam = teamMap.get(tryout.team_id);
+    const goalie = tryout.player;
+
+    return {
+      id: String(goalie.id),
+      tryoutId: tryout.id,
+      playerId: String(goalie.id),
+      firstName: goalie.first_name,
+      lastName: goalie.last_name,
+      position: 'Goalie',
+      shoots: goalie.shoots,
+      jerseyNumber: goalie.number,
+      team: tryout.team_name || goalieTeam?.name || '',
+      teamId: tryout.team_id,
+      teamLogo: goalieTeam?.logo || '',
+      teamAgeGroup: goalieTeam?.group || '',
+      teamLevelName: goalieTeam?.level || '',
+      type: 'goalie',
+      status: tryout.status,
+      hasAnalytics: goalie.has_analytics,
+      note: tryout.note,
+      userId: tryout.user?.id ?? null,
+      changedBy: this.formatChangedBy(tryout.changed_by),
+      changedAt: tryout.changed_at,
+    };
+  }
+
+  private formatChangedBy(user: TryoutStatusHistoryUser | null): string | null {
+    if (!user) return null;
+    return `${user.first_name} ${user.last_name}`.trim() || null;
   }
 }

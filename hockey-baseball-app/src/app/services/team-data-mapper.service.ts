@@ -22,6 +22,7 @@ export class TeamDataMapperService {
       division: this.teamOptionsService.getDivisionName(apiTeam.division_id), // Keep using service for division until division_name is available
       divisionId: apiTeam.division_id, // Store ID for form selection
       city: apiTeam.city || '',
+      birthYear: apiTeam.birth_year ?? null,
       abbreviation: apiTeam.abbreviation,
       logo: `${environment.apiUrl}/hockey/team/${apiTeam.id}/logo`, // Logo fetched from separate endpoint
       createdAt: new Date(),
@@ -45,6 +46,7 @@ export class TeamDataMapperService {
       level_id: this.teamOptionsService.getLevelId(team.level || 'NHL'),
       division_id: this.teamOptionsService.getDivisionId(team.division || 'Atlantic'),
       city: team.city || '',
+      birth_year: team.birthYear ?? null,
       abbreviation: team.abbreviation,
     };
   }
@@ -78,6 +80,9 @@ export class TeamDataMapperService {
     }
     if (team.abbreviation !== undefined) {
       updateData.abbreviation = team.abbreviation;
+    }
+    if (team.birthYear !== undefined) {
+      updateData.birth_year = team.birthYear;
     }
 
     return updateData;

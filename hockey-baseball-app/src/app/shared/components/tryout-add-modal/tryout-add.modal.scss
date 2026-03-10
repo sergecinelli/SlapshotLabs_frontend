@@ -4,38 +4,19 @@
   @include modal-form.modal-wrapper;
 
   .modal-content {
-    .search-section {
-      .select-field-wrapper {
-        position: relative;
-
-        .clear-all-btn {
-          position: absolute;
-          top: 0;
-          right: 0;
-          z-index: 1;
-        }
-      }
-
-      .create-toggle {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        margin-top: 8px;
-
-        .divider-text {
-          color: var(--gray);
-          font-size: 13px;
-        }
-      }
-    }
-
-    .player-form {
+    .tryout-form {
       @include modal-form.form-section;
 
       .form-section {
-        .position-selection-container,
-        .shoots-selection-container {
-          @include modal-form.selection-container;
+        .select-field-wrapper {
+          position: relative;
+
+          .clear-all-btn {
+            position: absolute;
+            top: 0;
+            right: 0;
+            z-index: 1;
+          }
         }
       }
     }

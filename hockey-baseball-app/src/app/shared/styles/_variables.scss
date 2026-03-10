@@ -1,5 +1,5 @@
 // Shared SCSS variables
 
 // Border radius
-$card-border-radius: 4px;
+$card-border-radius: var(--radius);
 $table-container-border-radius: var(--radius);

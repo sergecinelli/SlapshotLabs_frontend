@@ -10,7 +10,8 @@
   }
 
   &.selected {
-    color: var(--primary);
+    background-color: var(--input-background);
+    color: var(--accent-color, var(--primary));
   }
 }
 
@@ -32,7 +33,7 @@
 .check-icon {
   margin-left: auto;
   font-size: 18px;
-  color: var(--primary);
+  color: var(--accent-color, var(--primary));
   visibility: hidden;
 
   &.visible {
@@ -49,5 +50,5 @@
 }
 
 :host(.selected) ::ng-deep .player-number {
-  color: var(--primary);
+  color: var(--accent-color, var(--primary));
 }

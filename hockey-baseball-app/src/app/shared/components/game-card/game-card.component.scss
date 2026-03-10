@@ -164,6 +164,7 @@
   color: var(--text-secondary);
   transition: all 0.2s ease;
   line-height: 1;
+  cursor: help;
 
   &.live-badge {
     background: color-mix(in srgb, var(--primary) 10%, transparent);

@@ -7,6 +7,19 @@
     }
     @if (!isLoading) {
       <form [formGroup]="playerForm" class="player-form">
+        <!-- Team Information Section -->
+        <div class="form-section">
+          <app-section-header title="Team Information" />
+          <div class="form-row">
+            <app-form-field label="Team" [required]="true" [error]="getErrorMessage('team')">
+              <app-custom-select
+                formControlName="team"
+                [options]="teamOptions"
+                [searchable]="true"
+              />
+            </app-form-field>
+          </div>
+        </div>
         <!-- Personal Information Section -->
         <div class="form-section">
           <app-section-header title="Personal Information" />

@@ -5,6 +5,7 @@ import { SectionHeaderComponent } from '../section-header/section-header.compone
 import { FormFieldComponent } from '../form-field/form-field.component';
 import { CardGridComponent } from '../card-grid/card-grid.component';
 import { CardGridItemComponent } from '../card-grid/card-grid-item.component';
+import { CustomSelectComponent } from '../custom-select/custom-select.component';
 import { forkJoin, of } from 'rxjs';
 import { Player } from '../../interfaces/player.interface';
 import { Team } from '../../interfaces/team.interface';
@@ -38,6 +39,7 @@ export interface TeamOption {
     FormFieldComponent,
     CardGridComponent,
     CardGridItemComponent,
+    CustomSelectComponent,
     ButtonComponent,
     ButtonLoadingComponent,
     LoadingSpinnerComponent,
@@ -160,7 +162,7 @@ export class PlayerFormModal implements OnInit {
 
   private createForm(): FormGroup {
     return this.fb.group({
-      team: [''],
+      team: ['', [Validators.required]],
       birthYear: ['', [Validators.min(1900), Validators.max(new Date().getFullYear())]],
       jerseyNumber: ['', [Validators.min(1), Validators.max(99)]],
       firstName: ['', [Validators.required]],

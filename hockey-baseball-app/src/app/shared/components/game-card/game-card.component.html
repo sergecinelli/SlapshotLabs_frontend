@@ -48,6 +48,10 @@
           [class.live-badge]="gameValue.status === GameStatus.GameInProgress"
           [class.upcoming-badge]="gameValue.status === GameStatus.NotStarted"
           [class.completed-badge]="gameValue.status === GameStatus.GameOver"
+          [matTooltip]="getStatusTooltip(gameValue.status)"
+          matTooltipPosition="above"
+          [matTooltipShowDelay]="tooltipDelay"
+          [matTooltipDisabled]="!getStatusTooltip(gameValue.status)"
         >
           @if (gameValue.status === GameStatus.GameInProgress) {
             <span class="live-indicator"></span>

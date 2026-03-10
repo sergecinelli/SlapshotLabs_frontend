@@ -1,10 +1,18 @@
-import { Component, contentChild, input, output, TemplateRef } from '@angular/core';
+import {
+  Component,
+  contentChild,
+  input,
+  output,
+  TemplateRef,
+  ViewEncapsulation,
+} from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
 
 export interface IListItem {
   key: string | number;
   name: string;
   description?: string;
+  secondDescription?: string;
   icon?: string;
   value?: string;
   valueSuffix?: string;
@@ -17,6 +25,7 @@ export interface IListItem {
   imports: [NgTemplateOutlet],
   templateUrl: './list.component.html',
   styleUrl: './list.component.scss',
+  encapsulation: ViewEncapsulation.None,
 })
 export class ListComponent {
   items = input.required<IListItem[]>();

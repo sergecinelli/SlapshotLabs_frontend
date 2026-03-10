@@ -18,9 +18,6 @@
                 [searchable]="true"
               />
             </app-form-field>
-            <app-form-field label="Birth Year" [error]="getErrorMessage('birthYear')">
-              <input type="number" formControlName="birthYear" placeholder="Enter birth year" />
-            </app-form-field>
           </div>
         </div>
         <!-- Personal Information Section -->
@@ -47,6 +44,9 @@
               [error]="getErrorMessage('lastName')"
             >
               <input formControlName="lastName" placeholder="Enter last name" />
+            </app-form-field>
+            <app-form-field label="Birth Year" [error]="getErrorMessage('birthYear')">
+              <input type="number" formControlName="birthYear" placeholder="Enter birth year" />
             </app-form-field>
           </div>
         </div>

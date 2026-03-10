@@ -1,127 +1,115 @@
-@let showCreateFormValue = showCreateForm();
 @let selectedEntriesValue = selectedEntries();
 
 <div class="tryout-add-modal">
   <div class="modal-content">
-    <div class="search-section">
-      <div class="select-field-wrapper">
-        @if (selectedEntriesValue.length > 0) {
-          <app-button-small
-            class="clear-all-btn"
-            materialIcon="close"
-            [bg]="'transparent'"
-            [bghover]="'item_hover'"
-            [color]="'gray'"
-            [colorhover]="'primary'"
-            [haveContent]="true"
-            (clicked)="clearSelection()"
-          >
-            Clear all
-          </app-button-small>
-        }
-        <app-form-field label="Select existing {{ isGoalie ? 'goalies' : 'players' }}">
-          <app-custom-multi-select
-            [value]="selectedStringIds()"
-            [placeholder]="'No ' + (isGoalie ? 'goalies' : 'players') + ' selected'"
-            searchPlaceholder="Search by name..."
-            [optionGroups]="entryOptionGroups()"
-            (valueChange)="onSelectionChange($event)"
-          />
-        </app-form-field>
-      </div>
-
-      <div class="create-toggle">
-        <span class="divider-text">or</span>
-        <app-button
-          [bg]="'transparent'"
-          [bghover]="'item_hover'"
-          [br]="'border'"
-          [color]="'text_primary'"
-          [colorhover]="'text_primary'"
-          [haveContent]="true"
-          materialIcon="{{ showCreateFormValue ? 'expand_less' : 'expand_more' }}"
-          (clicked)="toggleCreateForm()"
-        >
-          {{ showCreateFormValue ? 'Hide Form' : 'Create New ' + (isGoalie ? 'Goalie' : 'Player') }}
-        </app-button>
-      </div>
-    </div>
-
-    @if (showCreateFormValue) {
-      <form [formGroup]="playerForm" class="player-form">
+    <div class="tryout-form">
+      @if (showTeamSelect) {
         <div class="form-section">
-          <app-section-header title="Personal Information" />
+          <app-section-header title="Team Information" />
           <div class="form-row">
-            <app-form-field label="Number" [error]="getErrorMessage('jerseyNumber')">
-              <input
-                type="number"
-                formControlName="jerseyNumber"
-                placeholder="Enter jersey number"
+            <app-form-field label="Team" [required]="true">
+              <app-custom-select
+                [ngModel]="selectedTeamId()"
+                (ngModelChange)="onTeamChange($event)"
+                [options]="teamOptions()"
+                [searchable]="true"
               />
             </app-form-field>
-            <app-form-field
-              label="First Name"
-              [required]="true"
-              [error]="getErrorMessage('firstName')"
-            >
-              <input formControlName="firstName" placeholder="Enter first name" />
-            </app-form-field>
-            <app-form-field
-              label="Last Name"
-              [required]="true"
-              [error]="getErrorMessage('lastName')"
-            >
-              <input formControlName="lastName" placeholder="Enter last name" />
-            </app-form-field>
-            <app-form-field label="Birth Year" [error]="getErrorMessage('birthYear')">
-              <input type="number" formControlName="birthYear" placeholder="Enter birth year" />
-            </app-form-field>
           </div>
-          @if (!isGoalie) {
-            <div class="position-selection-container">
-              <div class="selection-label">Position</div>
-              <app-card-grid [columns]="positionOptions.length">
-                @for (option of positionOptions; track option.value) {
-                  <app-card-grid-item
-                    [selected]="playerForm.get('position')?.value === option.value"
-                    (select)="playerForm.patchValue({ position: option.value })"
-                  >
-                    {{ option.label }}
-                  </app-card-grid-item>
-                }
-              </app-card-grid>
-              <div class="error-slot"></div>
-            </div>
-          }
         </div>
+      }
 
+      @if (isAllTab) {
         <div class="form-section">
-          <app-section-header title="Physical Information" />
-          <div class="form-row">
-            <app-form-field label="Height">
-              <input formControlName="height" placeholder="e.g., 6'2&quot;" />
-            </app-form-field>
-            <app-form-field label="Weight" [error]="getErrorMessage('weight')">
-              <input type="number" formControlName="weight" placeholder="Enter weight in lbs" />
-            </app-form-field>
-          </div>
-          <div class="shoots-selection-container">
-            <div class="selection-label">Shoots (R/L)</div>
-            <app-card-grid [columns]="shootsOptions.length">
-              @for (option of shootsOptions; track option.value) {
-                <app-card-grid-item
-                  [selected]="playerForm.get('shoots')?.value === option.value"
-                  (select)="playerForm.patchValue({ shoots: option.value })"
-                >
-                  {{ option.label }}
-                </app-card-grid-item>
-              }
-            </app-card-grid>
-            <div class="error-slot"></div>
-          </div>
+          <app-section-header title="Player Type" />
+          <app-card-grid [columns]="2">
+            <app-card-grid-item
+              [selected]="selectedType() === 'player'"
+              (select)="onTypeChange('player')"
+            >
+              <span class="material-symbols-rounded">person</span>
+              Player
+            </app-card-grid-item>
+            <app-card-grid-item
+              [selected]="selectedType() === 'goalie'"
+              (select)="onTypeChange('goalie')"
+            >
+              <span class="material-symbols-rounded">shield</span>
+              Goalie
+            </app-card-grid-item>
+          </app-card-grid>
+          <div class="error-slot"></div>
         </div>
-      </form>
-    }
+      }
+
+      <div class="form-section">
+        <app-section-header
+          title="Select Existing {{ isGoalie ? 'Goalie' : 'Player' }}"
+        />
+        <div class="select-field-wrapper">
+          @if (selectedEntriesValue.length > 0) {
+            <app-button-small
+              class="clear-all-btn"
+              materialIcon="close"
+              [bg]="'transparent'"
+              [bghover]="'item_hover'"
+              [color]="'gray'"
+              [colorhover]="'primary'"
+              [haveContent]="true"
+              (clicked)="clearSelection()"
+            >
+              Clear all
+            </app-button-small>
+          }
+          <app-form-field
+            label="Select existing {{ isGoalie ? 'goalies' : 'players' }}"
+          >
+            <app-custom-multi-select
+              [value]="selectedStringIds()"
+              [placeholder]="
+                'No ' + (isGoalie ? 'goalies' : 'players') + ' selected'
+              "
+              searchPlaceholder="Search by name..."
+              [optionGroups]="entryOptionGroups()"
+              (valueChange)="onSelectionChange($event)"
+            />
+          </app-form-field>
+        </div>
+        <div class="form-row">
+          <app-form-field
+            label="Or create new {{ isGoalie ? 'goalie' : 'player' }}"
+          >
+            <app-button
+              [bg]="'background'"
+              [bghover]="'item_hover'"
+              [br]="'border'"
+              [color]="'primary'"
+              [colorhover]="'primary'"
+              [width]="'100%'"
+              [materialIcon]="'person_add'"
+              [haveContent]="true"
+              (clicked)="openCreateModal()"
+            >
+              Create New {{ isGoalie ? 'Goalie' : 'Player' }}
+            </app-button>
+          </app-form-field>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <app-section-header title="Note" />
+        <div class="form-row">
+          <app-form-field class="full-width" label="Note (optional)">
+            <textarea
+              placeholder="Add a note..."
+              rows="2"
+              [value]="note()"
+              (input)="note.set($any($event.target).value)"
+            ></textarea>
+          </app-form-field>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div class="modal-actions">
@@ -150,21 +138,6 @@
       >
         Add {{ selectedEntriesValue.length }} {{ isGoalie ? 'Goalie' : 'Player'
         }}{{ selectedEntriesValue.length > 1 ? 's' : '' }}
-      </app-button-loading>
-    }
-    @if (showCreateFormValue) {
-      <app-button-loading
-        [isLoading]="isSubmitting()"
-        [isDisabled]="playerForm.invalid"
-        materialIcon="save"
-        [bg]="'green'"
-        [bghover]="'green'"
-        [color]="'white'"
-        [colorhover]="'white'"
-        [haveContent]="true"
-        (clicked)="onSubmitNew()"
-      >
-        Create {{ isGoalie ? 'Goalie' : 'Player' }}
       </app-button-loading>
     }
   </div>

@@ -1,35 +1,57 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 import { ModalService, ModalEvent } from '../../../services/modal.service';
+import { PlayerService } from '../../../services/player.service';
+import { GoalieService } from '../../../services/goalie.service';
+import { ToastService } from '../../../services/toast.service';
+import {
+  TryoutEntry,
+  TryoutEntryType,
+  TryoutTabType,
+  TryoutStatus,
+} from '../../interfaces/tryout.interface';
+import { Player } from '../../interfaces/player.interface';
+import { Goalie } from '../../interfaces/goalie.interface';
+import { PositionOption } from '../../../services/position.service';
+import { TeamService } from '../../../services/team.service';
+import { CustomSelectComponent, SelectOption } from '../custom-select/custom-select.component';
 import { SectionHeaderComponent } from '../section-header/section-header.component';
 import { FormFieldComponent } from '../form-field/form-field.component';
 import { CardGridComponent } from '../card-grid/card-grid.component';
 import { CardGridItemComponent } from '../card-grid/card-grid-item.component';
 import { CustomMultiSelectComponent } from '../custom-multi-select/custom-multi-select.component';
 import { SelectOptionGroup } from '../custom-select/custom-select.component';
-import { PlayerService } from '../../../services/player.service';
-import { GoalieService } from '../../../services/goalie.service';
-import { TryoutEntry, TryoutTabType } from '../../interfaces/tryout.interface';
-import { Player } from '../../interfaces/player.interface';
-import { Goalie } from '../../interfaces/goalie.interface';
-import { PositionService, PositionOption } from '../../../services/position.service';
 import { ButtonComponent } from '../buttons/button/button.component';
 import { ButtonSmallComponent } from '../buttons/button-small/button-small.component';
 import { ButtonLoadingComponent } from '../buttons/button-loading/button-loading.component';
-import { getFieldError } from '../../validators/form-error.util';
+import {
+  PlayerFormModal,
+  PlayerFormModalData,
+} from '../player-form-modal/player-form.modal';
+import {
+  GoalieFormModal,
+  GoalieFormModalData,
+} from '../goalie-form-modal/goalie-form.modal';
 
 export interface TryoutAddModalData {
   activeTab: TryoutTabType;
-  teamId: number;
+  teamId: number | null;
   entries?: TryoutEntry[];
   positions?: PositionOption[];
+}
+
+export interface TryoutAddModalResult {
+  selectedIds: number[];
+  type: TryoutEntryType;
+  teamId: number | null;
+  note: string;
 }
 
 @Component({
   selector: 'app-tryout-add-modal',
   imports: [
-    ReactiveFormsModule,
+    FormsModule,
     ButtonComponent,
     ButtonSmallComponent,
     ButtonLoadingComponent,
@@ -38,25 +60,31 @@ export interface TryoutAddModalData {
     CardGridComponent,
     CardGridItemComponent,
     CustomMultiSelectComponent,
+    CustomSelectComponent,
   ],
   templateUrl: './tryout-add.modal.html',
   styleUrl: './tryout-add.modal.scss',
 })
 export class TryoutAddModal implements OnInit {
-  private fb = inject(FormBuilder);
   private modalService = inject(ModalService);
   private playerService = inject(PlayerService);
   private goalieService = inject(GoalieService);
-  private positionService = inject(PositionService);
+  private teamService = inject(TeamService);
+  private toast = inject(ToastService);
   data = inject(ModalService).getModalData<TryoutAddModalData>();
 
-  playerForm!: FormGroup;
   allEntries = signal<TryoutEntry[]>([]);
   selectedIds = signal<string[]>([]);
-  showCreateForm = signal(false);
   isSubmitting = signal(false);
-  positionOptions: PositionOption[] = [];
+  teamOptions = signal<SelectOption[]>([]);
+  selectedTeamId = signal<string | null>(this.data.teamId ? String(this.data.teamId) : null);
+  showTeamSelect = !this.data.teamId;
+  selectedType = signal<TryoutEntryType>(
+    this.data.activeTab === 'all' ? 'player' : this.data.activeTab
+  );
+  note = signal('');
 
+  isAllTab = this.data.activeTab === 'all';
   selectedStringIds = computed(() => this.selectedIds());
 
   selectedEntries = computed(() => {
@@ -83,17 +111,14 @@ export class TryoutAddModal implements OnInit {
     }));
   });
 
-  shootsOptions = [
-    { value: 'Left Shot', label: 'Left Shot' },
-    { value: 'Right Shot', label: 'Right Shot' },
-  ];
-
   get isGoalie(): boolean {
-    return this.data.activeTab === 'goalie';
+    return this.selectedType() === 'goalie';
   }
 
   constructor() {
-    this.modalService.registerDirtyCheck(() => this.playerForm.dirty);
+    this.modalService.registerDirtyCheck(
+      () => this.selectedIds().length > 0 || this.note().length > 0
+    );
     this.modalService.onEvent$.pipe(takeUntilDestroyed()).subscribe((event) => {
       if (event === ModalEvent.StopButtonLoading) {
         this.isSubmitting.set(false);
@@ -102,18 +127,14 @@ export class TryoutAddModal implements OnInit {
   }
 
   ngOnInit(): void {
-    this.playerForm = this.createForm();
-
-    if (this.data.positions?.length) {
-      this.applyPositions(this.data.positions);
-    } else {
-      this.loadPositions();
-    }
-
     if (this.data.entries?.length) {
       this.allEntries.set(this.data.entries);
     } else {
       this.loadSearchData();
+    }
+
+    if (this.showTeamSelect) {
+      this.loadTeams();
     }
   }
 
@@ -125,8 +146,11 @@ export class TryoutAddModal implements OnInit {
     this.selectedIds.set([]);
   }
 
-  toggleCreateForm(): void {
-    this.showCreateForm.set(!this.showCreateForm());
+  onTypeChange(type: TryoutEntryType): void {
+    if (type === this.selectedType()) return;
+    this.selectedType.set(type);
+    this.selectedIds.set([]);
+    this.loadSearchData();
   }
 
   onSubmitSelected(): void {
@@ -134,26 +158,68 @@ export class TryoutAddModal implements OnInit {
     if (!entries.length) return;
 
     this.isSubmitting.set(true);
-    this.modalService.closeWithDataProcessing({ entries });
+    const selectedPlayerIds = entries.map((e) => parseInt(e.playerId, 10));
+    const result: TryoutAddModalResult = {
+      selectedIds: selectedPlayerIds,
+      type: this.selectedType(),
+      teamId: this.resolvedTeamId,
+      note: this.note(),
+    };
+    this.modalService.closeWithDataProcessing(result);
   }
 
-  onSubmitNew(): void {
-    if (this.playerForm.valid) {
-      const formValue = this.playerForm.value;
-      const entry: Partial<TryoutEntry> = {
-        firstName: formValue.firstName,
-        lastName: formValue.lastName,
-        position: this.isGoalie ? 'Goalie' : formValue.position,
-        shoots: formValue.shoots,
-        jerseyNumber: formValue.jerseyNumber,
-        type: this.data.activeTab,
-      };
-
-      this.isSubmitting.set(true);
-      this.modalService.closeWithDataProcessing({ entries: [entry] });
+  openCreateModal(): void {
+    if (this.isGoalie) {
+      this.modalService.openModal(GoalieFormModal, {
+        name: 'Create Goalie',
+        icon: 'sports_hockey',
+        width: '900px',
+        maxWidth: '95vw',
+        data: {
+          isEditMode: false,
+          positions: this.data.positions,
+        } as GoalieFormModalData,
+        onCloseWithDataProcessing: (result: Partial<Goalie>) => {
+          this.goalieService.addGoalie(result).subscribe({
+            next: (newGoalie) => {
+              this.toast.show('Goalie created successfully', 'success');
+              this.modalService.closeModal();
+              const entry = this.goalieToEntry(newGoalie);
+              this.allEntries.update((entries) => [entry, ...entries]);
+              this.selectedIds.update((ids) => [...ids, String(newGoalie.id)]);
+            },
+            error: () => {
+              this.toast.show('Failed to create goalie', 'error');
+              this.modalService.broadcastEvent(ModalEvent.StopButtonLoading);
+            },
+          });
+        },
+      });
     } else {
-      Object.keys(this.playerForm.controls).forEach((key) => {
-        this.playerForm.get(key)?.markAsTouched();
+      this.modalService.openModal(PlayerFormModal, {
+        name: 'Create Player',
+        icon: 'sports_hockey',
+        width: '900px',
+        maxWidth: '95vw',
+        data: {
+          isEditMode: false,
+          positions: this.data.positions,
+        } as PlayerFormModalData,
+        onCloseWithDataProcessing: (result: Partial<Player>) => {
+          this.playerService.addPlayer(result).subscribe({
+            next: (newPlayer) => {
+              this.toast.show('Player created successfully', 'success');
+              this.modalService.closeModal();
+              const entry = this.playerToEntry(newPlayer);
+              this.allEntries.update((entries) => [entry, ...entries]);
+              this.selectedIds.update((ids) => [...ids, String(newPlayer.id)]);
+            },
+            error: () => {
+              this.toast.show('Failed to create player', 'error');
+              this.modalService.broadcastEvent(ModalEvent.StopButtonLoading);
+            },
+          });
+        },
       });
     }
   }
@@ -162,21 +228,14 @@ export class TryoutAddModal implements OnInit {
     this.modalService.closeModal();
   }
 
-  private readonly fieldLabels: Record<string, string> = {
-    firstName: 'First Name',
-    lastName: 'Last Name',
-    position: 'Position',
-    shoots: 'Shoots',
-    jerseyNumber: 'Number',
-    height: 'Height',
-    weight: 'Weight',
-    birthYear: 'Birth Year',
-  };
+  onTeamChange(teamId: string): void {
+    this.selectedTeamId.set(teamId);
+  }
 
-  getErrorMessage(fieldName: string): string {
-    const control = this.playerForm.get(fieldName);
-    const label = this.fieldLabels[fieldName] || fieldName;
-    return getFieldError(control, label);
+  private get resolvedTeamId(): number | null {
+    if (this.data.teamId) return this.data.teamId;
+    const selected = this.selectedTeamId();
+    return selected ? parseInt(selected, 10) : null;
   }
 
   private loadSearchData(): void {
@@ -196,6 +255,7 @@ export class TryoutAddModal implements OnInit {
   private playerToEntry(player: Player): TryoutEntry {
     return {
       id: player.id,
+      tryoutId: 0,
       playerId: player.id,
       firstName: player.firstName,
       lastName: player.lastName,
@@ -208,12 +268,19 @@ export class TryoutAddModal implements OnInit {
       teamAgeGroup: player.teamAgeGroup,
       teamLevelName: player.teamLevelName,
       type: 'player',
+      status: TryoutStatus.TryingOut,
+      hasAnalytics: false,
+      note: null,
+      userId: null,
+      changedBy: null,
+      changedAt: null,
     };
   }
 
   private goalieToEntry(goalie: Goalie): TryoutEntry {
     return {
       id: goalie.id,
+      tryoutId: 0,
       playerId: goalie.id,
       firstName: goalie.firstName,
       lastName: goalie.lastName,
@@ -224,33 +291,28 @@ export class TryoutAddModal implements OnInit {
       teamId: goalie.teamId,
       teamLevelName: goalie.level,
       type: 'goalie',
+      status: TryoutStatus.TryingOut,
+      hasAnalytics: false,
+      note: null,
+      userId: null,
+      changedBy: null,
+      changedAt: null,
     };
   }
 
-  private createForm(): FormGroup {
-    return this.fb.group({
-      firstName: ['', [Validators.required]],
-      lastName: ['', [Validators.required]],
-      position: [''],
-      shoots: [this.shootsOptions[0]?.value || ''],
-      jerseyNumber: ['', [Validators.min(1), Validators.max(99)]],
-      height: [''],
-      weight: ['', [Validators.min(1)]],
-      birthYear: ['', [Validators.min(1900), Validators.max(new Date().getFullYear())]],
-    });
-  }
-
-  private applyPositions(positions: PositionOption[]): void {
-    this.positionOptions = positions;
-    if (positions.length > 0) {
-      this.playerForm.patchValue({ position: positions[0].value });
-    }
-  }
-
-  private loadPositions(): void {
-    this.positionService.getPositions().subscribe({
-      next: (positions) => this.applyPositions(positions),
-      error: (error) => console.error('Failed to load positions:', error),
+  private loadTeams(): void {
+    this.teamService.getTeams().subscribe({
+      next: (data) => {
+        const options = data.teams.map((team) => ({
+          value: team.id,
+          label: team.name,
+        }));
+        this.teamOptions.set(options);
+        if (options.length > 0 && !this.selectedTeamId()) {
+          this.selectedTeamId.set(options[0].value);
+        }
+      },
+      error: (error) => console.error('Failed to load teams:', error),
     });
   }
 }

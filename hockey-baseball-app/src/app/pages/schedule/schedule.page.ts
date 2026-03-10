@@ -32,7 +32,7 @@ import { ComponentVisibilityByRoleDirective } from '../../shared/directives/comp
 import { CardGridComponent } from '../../shared/components/card-grid/card-grid.component';
 import { GameCardComponent } from '../../shared/components/game-card/game-card.component';
 import { visibilityByRoleMap } from './schedule.role-map';
-import { getGameStatusLabel } from '../../shared/constants/game-status.constants';
+import { getGameStatusLabel } from '../../shared/constants/statuses.constants';
 import { Observable, forkJoin } from 'rxjs';
 import { AnalysisService } from '../../services/analysis.service';
 import { AnalyticsApiIn } from '../../shared/interfaces/analysis.interface';

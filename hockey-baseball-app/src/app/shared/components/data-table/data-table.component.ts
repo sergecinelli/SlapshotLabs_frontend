@@ -20,6 +20,12 @@ import { ButtonSmallComponent } from '../buttons/button-small/button-small.compo
 import { ButtonRouteSmallComponent } from '../buttons/button-route-small/button-route-small.component';
 import { AppColor } from '../../constants/colors';
 import { CachedSrcDirective } from '../../directives/cached-src.directive';
+import {
+  getStatusStyle,
+  getStatusTooltip,
+  STATUS_COLOR,
+  STATUS_TOOLTIP_DELAY,
+} from '../../constants/statuses.constants';
 
 export interface TableColumn {
   key: string;
@@ -68,6 +74,8 @@ export class DataTableComponent<T extends Record<string, unknown> = Record<strin
   private elementRef = inject(ElementRef);
   private renderer = inject(Renderer2);
   iconService = inject(IconService);
+
+  readonly tooltipDelay = STATUS_TOOLTIP_DELAY;
 
   columns = input<TableColumn[]>([]);
   data = input<T[]>([]);
@@ -141,6 +149,10 @@ export class DataTableComponent<T extends Record<string, unknown> = Record<strin
       return '-';
     }
 
+    if (column.type === 'custom' && (column.key === 'status' || column.key === 'gameType')) {
+      return getStatusTooltip(String(value));
+    }
+
     switch (column.key) {
       case 'weight':
         return `${new Intl.NumberFormat().format(Number(value))} lbs`;
@@ -169,6 +181,13 @@ export class DataTableComponent<T extends Record<string, unknown> = Record<strin
     item: T,
     column: TableColumn
   ): void {
+    if (column.type === 'custom' && (column.key === 'status' || column.key === 'gameType')) {
+      const value = this.getCellValue(item, column);
+      const tooltip = getStatusTooltip(String(value));
+      matTooltip.disabled = !tooltip;
+      return;
+    }
+
     if (column.showTooltip === true) {
       matTooltip.disabled = false;
       return;
@@ -183,36 +202,18 @@ export class DataTableComponent<T extends Record<string, unknown> = Record<strin
     matTooltip.disabled = !isTextTruncated;
   }
 
-  getStatusBadgeClass(status: unknown): string {
-    const statusNum = Number(status);
-    const statusMap: Record<number, string> = {
-      1: 'status-badge not-started',
-      2: 'status-badge game-in-progress',
-      3: 'status-badge game-over',
-    };
-    return statusMap[statusNum] || 'status-badge';
+  getStatusBadgeStyle(status: unknown): Record<string, string> {
+    return getStatusStyle(String(status)) || getStatusStyle(Number(status));
   }
 
   getStatusLabel(status: unknown): string {
-    const statusNum = Number(status);
-    const statusLabelMap: Record<number, string> = {
-      1: 'Not Started',
-      2: 'Game in Progress',
-      3: 'Game Over',
-    };
-    return statusLabelMap[statusNum] || String(status);
+    return (
+      STATUS_COLOR[String(status)]?.label || STATUS_COLOR[Number(status)]?.label || String(status)
+    );
   }
 
-  getGameTypeBadgeClass(gameType: unknown): string {
-    const typeStr = String(gameType || '');
-    const typeMap: Record<string, string> = {
-      'Regular Season': 'game-type-badge regular-season',
-      Playoff: 'game-type-badge playoff',
-      Tournament: 'game-type-badge tournament',
-      Exhibition: 'game-type-badge exhibition',
-      'Summer League': 'game-type-badge summer-league',
-    };
-    return typeMap[typeStr] || 'game-type-badge';
+  getGameTypeBadgeStyle(gameType: unknown): Record<string, string> {
+    return getStatusStyle(String(gameType));
   }
 
   getEntityProfileRoute(item: T): string[] {

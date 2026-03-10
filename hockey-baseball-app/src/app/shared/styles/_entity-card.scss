@@ -78,9 +78,9 @@ app-card-grid {
   gap: 12px;
 }
 
-.entity-avatar {
-  width: 60px;
-  height: 60px;
+@mixin entity-avatar($size: 60px, $font-size: 18px) {
+  width: $size;
+  height: $size;
   border-radius: var(--radius-medium);
   background-color: var(--gray-tone3);
   display: flex;
@@ -88,8 +88,36 @@ app-card-grid {
   justify-content: center;
   color: var(--text-secondary);
   font-weight: 600;
-  font-size: 18px;
+  font-size: $font-size;
   flex-shrink: 0;
+}
+
+.entity-avatar {
+  @include entity-avatar;
+}
+
+@mixin list-item-content {
+  .item-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .name {
+    margin: 0;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .description {
+    margin: 0;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    line-height: 1.4;
+  }
 }
 
 .entity-name-group {

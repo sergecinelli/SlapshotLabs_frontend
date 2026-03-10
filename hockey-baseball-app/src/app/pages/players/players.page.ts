@@ -517,23 +517,8 @@ export class PlayersPage implements OnInit {
     const teamId = user?.team_id;
     if (!teamId) return;
 
-    this.tryoutService
-      .addToTryout(teamId, {
-        playerId: player.id,
-        firstName: player.firstName,
-        lastName: player.lastName,
-        position: player.position,
-        shoots: player.shoots,
-        jerseyNumber: player.jerseyNumber,
-        team: player.team,
-        teamId: player.teamId,
-        teamLogo: player.teamLogo,
-        teamAgeGroup: player.teamAgeGroup,
-        teamLevelName: player.teamLevelName || player.level,
-        type: 'player',
-      })
-      .subscribe({
-        error: (error) => console.error('Failed to add to tryout:', error),
-      });
+    this.tryoutService.addToTryout(teamId, parseInt(player.id, 10), 'player').subscribe({
+      error: (error) => console.error('Failed to add to tryout:', error),
+    });
   }
 }

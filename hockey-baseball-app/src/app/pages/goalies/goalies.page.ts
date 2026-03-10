@@ -512,21 +512,8 @@ export class GoaliesPage implements OnInit {
     const teamId = user?.team_id;
     if (!teamId) return;
 
-    this.tryoutService
-      .addToTryout(teamId, {
-        playerId: goalie.id,
-        firstName: goalie.firstName,
-        lastName: goalie.lastName,
-        position: goalie.position,
-        shoots: goalie.shoots,
-        jerseyNumber: goalie.jerseyNumber,
-        team: goalie.team,
-        teamId: goalie.teamId,
-        teamLevelName: goalie.level,
-        type: 'goalie',
-      })
-      .subscribe({
-        error: (error) => console.error('Failed to add to tryout:', error),
-      });
+    this.tryoutService.addToTryout(teamId, parseInt(goalie.id, 10), 'goalie').subscribe({
+      error: (error) => console.error('Failed to add to tryout:', error),
+    });
   }
 }

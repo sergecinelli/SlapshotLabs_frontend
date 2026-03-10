@@ -65,10 +65,13 @@
 
 @mixin form-label {
   display: block;
-  font-size: 10px;
-  font-weight: 400;
+  // font-size: 10px;
+  font-size: 12px;
+  // font-weight: 400;
+  font-weight: 600;
   text-transform: uppercase;
-  color: var(--secondary);
+  // color: var(--secondary);
+  color: var(--gray);
   margin-bottom: 4px;
   padding: 0 2px;
   padding-left: 14px;

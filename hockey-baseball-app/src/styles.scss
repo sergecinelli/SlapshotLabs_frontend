@@ -499,6 +499,27 @@ mat-error {
   background-color: var(--page-background) !important;
 }
 
+.status-badge {
+  display: inline-block;
+  width: fit-content;
+  min-width: 60px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-align: center;
+  cursor: help;
+}
+
+.game-type-badge {
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  display: inline-block;
+  cursor: help;
+}
+
 // Player filter dropdown panel (live dashboard)
 @keyframes cached-img-shimmer {
   0% {

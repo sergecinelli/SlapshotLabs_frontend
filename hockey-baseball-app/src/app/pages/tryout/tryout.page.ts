@@ -1,15 +1,21 @@
 import { Component, OnInit, computed, signal, inject } from '@angular/core';
 import { Location } from '@angular/common';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ModalService, ModalEvent } from '../../services/modal.service';
 import { ToastService } from '../../services/toast.service';
 import { AuthService } from '../../services/auth.service';
-import { BreadcrumbDataService } from '../../services/breadcrumb-data.service';
 import { TeamService } from '../../services/team.service';
 import { TryoutService } from '../../services/tryout.service';
-import { TryoutEntry, TryoutTabType } from '../../shared/interfaces/tryout.interface';
-import { Observable, forkJoin, finalize } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { RoleService } from '../../services/roles/role.service';
+import { Role } from '../../services/roles/role.interface';
+import {
+  TryoutEntry,
+  TryoutEntryType,
+  TryoutTabType,
+  TryoutStatus,
+} from '../../shared/interfaces/tryout.interface';
+import { Observable, forkJoin, finalize, of } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
 import { PlayerService } from '../../services/player.service';
 import { GoalieService } from '../../services/goalie.service';
 import { PositionService } from '../../services/position.service';
@@ -30,10 +36,17 @@ import { visibilityByRoleMap } from './tryout.role-map';
 import {
   TryoutAddModal,
   TryoutAddModalData,
+  TryoutAddModalResult,
 } from '../../shared/components/tryout-add-modal/tryout-add.modal';
+import {
+  TryoutStatusModal,
+  TryoutStatusModalData,
+  TryoutStatusModalResult,
+} from '../../shared/components/tryout-status-modal/tryout-status.modal';
 import { DisplayTextModal } from '../../shared/components/display-text-modal/display-text.modal';
 
 const TRYOUT_TABS: TabItem[] = [
+  { key: 'all', label: 'All', icon: 'groups' },
   { key: 'player', label: 'Players', icon: 'person' },
   { key: 'goalie', label: 'Goalies', icon: 'shield' },
 ];
@@ -52,13 +65,14 @@ const TRYOUT_TABS: TabItem[] = [
   styleUrl: './tryout.page.scss',
 })
 export class TryoutPage implements OnInit {
+  private route = inject(ActivatedRoute);
   private location = inject(Location);
   private router = inject(Router);
   private modalService = inject(ModalService);
   private authService = inject(AuthService);
-  private breadcrumbData = inject(BreadcrumbDataService);
   private teamService = inject(TeamService);
   private tryoutService = inject(TryoutService);
+  private roleService = inject(RoleService);
   private toast = inject(ToastService);
   private playerService = inject(PlayerService);
   private goalieService = inject(GoalieService);
@@ -68,14 +82,38 @@ export class TryoutPage implements OnInit {
 
   readonly tabItems = TRYOUT_TABS;
 
-  activeTab = signal<TryoutTabType>('player');
-  entries = signal<TryoutEntry[]>([]);
+  private readonly entryTypes: TryoutEntryType[] = ['player', 'goalie'];
+
+  activeTab = signal<TryoutTabType>('all');
+  private entriesCache = signal<Record<TryoutEntryType, TryoutEntry[]>>({
+    player: [],
+    goalie: [],
+  });
   loading = signal(true);
   isAddLoading = signal(false);
+  private statusLoadingId = signal<number | null>(null);
   teamName = signal('');
   teamId = signal<number | null>(null);
 
   activeTabIndex = computed(() => TRYOUT_TABS.findIndex((tab) => tab.key === this.activeTab()));
+
+  filteredEntries = computed(() => {
+    const role = this.roleService.current;
+    const cache = this.entriesCache();
+    const tab = this.activeTab();
+    const all = tab === 'all' ? [...cache.player, ...cache.goalie] : cache[tab];
+
+    if (role === Role.Admin || role === Role.Coach) {
+      return all;
+    }
+
+    const currentUser = this.authService.getCurrentUserValue();
+    if (!currentUser) return [];
+
+    const userId = Number(currentUser.id);
+    // return all.filter((entry) => entry.userId === userId);
+    return all;
+  });
 
   tableColumns: TableColumn[] = [
     { key: 'team', label: 'Current Team', sortable: true, width: '200px' },
@@ -85,10 +123,28 @@ export class TryoutPage implements OnInit {
     { key: 'lastName', label: 'Last Name', sortable: true, width: '120px' },
     { key: 'position', label: 'Position', sortable: true, width: '120px' },
     { key: 'shoots', label: 'Shoots', sortable: true, width: '80px' },
+    { key: 'changedBy', label: 'Changed By', sortable: true, width: '120px' },
+    { key: 'changedAt', label: 'Changed At', sortable: true, type: 'date', width: '140px' },
+    { key: 'note', label: 'Note', sortable: false, width: '150px' },
+    { key: 'status', label: 'Status', sortable: true, type: 'custom', width: '80px' },
   ];
 
   tableActions: TableAction[] = [
-    { label: 'Analysis', action: 'analysis', variant: 'blue', icon: 'bar_chart' },
+    {
+      label: 'Change Status',
+      action: 'change-status',
+      variant: 'orange',
+      icon: 'swap_horiz',
+      roleVisibilityName: 'change-status-action',
+      isLoading: (item) => item['tryoutId'] === this.statusLoadingId(),
+    },
+    {
+      label: 'Analysis',
+      action: 'analysis',
+      variant: 'blue',
+      icon: 'bar_chart',
+      condition: (item) => item['hasAnalytics'] === true,
+    },
     {
       label: 'Profile',
       action: 'view-profile',
@@ -107,26 +163,33 @@ export class TryoutPage implements OnInit {
   ];
 
   ngOnInit(): void {
+    const tabParam = this.route.snapshot.queryParams['tab'] as TryoutTabType | undefined;
+    const validTabs: TryoutTabType[] = ['all', 'player', 'goalie'];
+    if (tabParam && validTabs.includes(tabParam)) {
+      this.activeTab.set(tabParam);
+    }
+
     const user = this.authService.getCurrentUserValue();
-    const teamId = user?.team_id ?? null;
+    const role = this.roleService.current;
+    const needsTeamFilter = role === Role.Player;
+    const teamId = needsTeamFilter ? (user?.team_id ?? null) : null;
+
+    this.teamId.set(teamId);
 
     if (teamId) {
-      this.teamId.set(teamId);
       this.teamService.getTeamById(String(teamId)).subscribe({
         next: (team) => {
           if (team) {
             this.teamName.set(team.name);
-            const label = [team.name, team.group, team.level].filter(Boolean).join(' ');
-            this.breadcrumbData.entityName.set(label);
           }
-          this.loadEntries();
+          this.loadAllEntries();
         },
         error: () => {
-          this.loadEntries();
+          this.loadAllEntries();
         },
       });
     } else {
-      this.loading.set(false);
+      this.loadAllEntries();
     }
   }
 
@@ -135,15 +198,17 @@ export class TryoutPage implements OnInit {
     if (tab === this.activeTab()) return;
     this.activeTab.set(tab);
     this.location.replaceState('/tryout', `tab=${tab}`);
-    this.loadEntries();
   }
 
   onActionClick(event: { action: string; item: TryoutEntry }): void {
     const { action, item } = event;
     switch (action) {
+      case 'change-status':
+        this.openChangeStatusModal(item);
+        break;
       case 'analysis': {
-        const path = item.type === 'goalie' ? '/analytics/goalies' : '/analytics/players';
-        this.router.navigate([path]);
+        const segment = item.type === 'goalie' ? 'goalies' : 'players';
+        this.router.navigate(['/analytics', segment, item.playerId]);
         break;
       }
       case 'view-profile': {
@@ -160,7 +225,7 @@ export class TryoutPage implements OnInit {
 
   openAddModal(): void {
     const teamId = this.teamId();
-    if (!teamId) return;
+    const tab = this.activeTab();
 
     this.isAddLoading.set(true);
 
@@ -172,28 +237,36 @@ export class TryoutPage implements OnInit {
       .subscribe({
         next: ({ entries, positions }) => {
           this.modalService.openModal(TryoutAddModal, {
-            name: 'Add Player to Tryout',
+            name: 'Add to Tryout List',
             icon: 'person_add',
             width: '800px',
             maxWidth: '95vw',
             data: {
-              activeTab: this.activeTab(),
+              activeTab: tab,
               teamId,
               entries,
               positions,
             } as TryoutAddModalData,
-            onCloseWithDataProcessing: (result: { entries: Partial<TryoutEntry>[] }) => {
-              const requests = result.entries.map((entry) =>
-                this.tryoutService.addToTryout(teamId, entry)
+            onCloseWithDataProcessing: (result: TryoutAddModalResult) => {
+              const type = result.type;
+              const resolvedTeamId = result.teamId;
+              const note = result.note || undefined;
+              const requests = result.selectedIds.map((playerId) =>
+                this.tryoutService.addToTryout(resolvedTeamId, playerId, type, note)
               );
+              if (!requests.length) {
+                this.modalService.closeModal();
+                return;
+              }
               forkJoin(requests).subscribe({
                 next: () => {
-                  this.toast.show('Player(s) added to tryout successfully', 'success');
+                  const label = type === 'goalie' ? 'Goalie(s)' : 'Player(s)';
+                  this.toast.show(`${label} added to tryout successfully`, 'success');
                   this.modalService.closeModal();
-                  this.loadEntries();
+                  this.loadAllEntries();
                 },
                 error: () => {
-                  this.toast.show('Failed to add player(s) to tryout', 'error');
+                  this.toast.show('Failed to add to tryout', 'error');
                   this.modalService.broadcastEvent(ModalEvent.StopButtonLoading);
                 },
               });
@@ -201,9 +274,48 @@ export class TryoutPage implements OnInit {
           });
         },
         error: () => {
-          this.toast.show('Failed to load players', 'error');
+          this.toast.show('Failed to load data', 'error');
         },
       });
+  }
+
+  private openChangeStatusModal(entry: TryoutEntry): void {
+    this.statusLoadingId.set(entry.tryoutId);
+
+    this.tryoutService.getStatusHistory(entry.tryoutId, entry.type).subscribe({
+      next: (statusHistory) => {
+        this.statusLoadingId.set(null);
+        this.modalService.openModal(TryoutStatusModal, {
+          name: 'Change Status',
+          icon: 'swap_horiz',
+          width: '600px',
+          maxWidth: '95vw',
+          data: {
+            entry,
+            statusHistory,
+          } as TryoutStatusModalData,
+          onCloseWithDataProcessing: (result: TryoutStatusModalResult) => {
+            this.tryoutService
+              .updateTryoutStatus(entry.tryoutId, entry.type, result.status, result.note)
+              .subscribe({
+                next: () => {
+                  this.toast.show('Status updated successfully', 'success');
+                  this.modalService.closeModal();
+                  this.loadAllEntries();
+                },
+                error: () => {
+                  this.toast.show('Failed to update status', 'error');
+                  this.modalService.broadcastEvent(ModalEvent.StopButtonLoading);
+                },
+              });
+          },
+        });
+      },
+      error: () => {
+        this.statusLoadingId.set(null);
+        this.toast.show('Failed to load status history', 'error');
+      },
+    });
   }
 
   private loadAvailableEntries(): Observable<TryoutEntry[]> {
@@ -212,6 +324,7 @@ export class TryoutPage implements OnInit {
         map((data) =>
           data.goalies.map((g) => ({
             id: g.id,
+            tryoutId: 0,
             playerId: g.id,
             firstName: g.firstName,
             lastName: g.lastName,
@@ -222,6 +335,12 @@ export class TryoutPage implements OnInit {
             teamId: g.teamId,
             teamLevelName: g.level,
             type: 'goalie' as const,
+            status: TryoutStatus.TryingOut,
+            hasAnalytics: false,
+            note: null,
+            userId: null,
+            changedBy: null,
+            changedAt: null,
           }))
         )
       );
@@ -231,6 +350,7 @@ export class TryoutPage implements OnInit {
       map((data) =>
         data.players.map((p) => ({
           id: p.id,
+          tryoutId: 0,
           playerId: p.id,
           firstName: p.firstName,
           lastName: p.lastName,
@@ -243,15 +363,18 @@ export class TryoutPage implements OnInit {
           teamAgeGroup: p.teamAgeGroup,
           teamLevelName: p.teamLevelName,
           type: 'player' as const,
+          status: TryoutStatus.TryingOut,
+          hasAnalytics: false,
+          note: null,
+          userId: null,
+          changedBy: null,
+          changedAt: null,
         }))
       )
     );
   }
 
   private removeFromTryout(entry: TryoutEntry): void {
-    const teamId = this.teamId();
-    if (!teamId) return;
-
     this.modalService.openModal(DisplayTextModal, {
       name: 'Remove from Tryout',
       icon: 'report',
@@ -264,10 +387,10 @@ export class TryoutPage implements OnInit {
         withButtonLoading: true,
       },
       onCloseWithDataProcessing: () => {
-        this.tryoutService.removeFromTryout(teamId, entry.id).subscribe({
+        this.tryoutService.removeFromTryout(entry.tryoutId, entry.type).subscribe({
           next: () => {
             this.modalService.closeModal();
-            this.loadEntries();
+            this.loadAllEntries();
           },
           error: (error) => {
             console.error('Failed to remove from tryout:', error);
@@ -278,19 +401,23 @@ export class TryoutPage implements OnInit {
     });
   }
 
-  private loadEntries(): void {
+  private loadAllEntries(): void {
     const teamId = this.teamId();
-    if (!teamId) return;
-
     this.loading.set(true);
-    this.tryoutService.getTryoutEntries(teamId, this.activeTab()).subscribe({
-      next: (entries) => {
-        this.entries.set(entries);
-        this.loading.set(false);
+
+    const requests = this.entryTypes.reduce(
+      (acc, type) => {
+        acc[type] = this.tryoutService
+          .getTryoutEntries(teamId, type)
+          .pipe(catchError(() => of([])));
+        return acc;
       },
-      error: (error) => {
-        console.error('Failed to load tryout entries:', error);
-        this.entries.set([]);
+      {} as Record<TryoutEntryType, Observable<TryoutEntry[]>>
+    );
+
+    forkJoin(requests).subscribe({
+      next: (cache) => {
+        this.entriesCache.set(cache);
         this.loading.set(false);
       },
     });

@@ -1,0 +1,163 @@
+@let statuses = availableStatuses();
+@let currentStatus = data.entry.status;
+@let selected = selectedStatus();
+
+<div class="tryout-status-modal">
+  <div class="modal-content">
+    <div class="player-section">
+      <app-section-header title="Player" />
+      <app-list [items]="playerListItem()" [alignTop]="true">
+        <ng-template #content let-item>
+          <div class="player-card">
+            <div class="item-icon player-avatar">{{ playerInitials() }}</div>
+            <div class="item-content">
+              <div class="item-top-row">
+                <p class="name">
+                  <a
+                    class="player-name-link"
+                    [href]="playerProfileRoute()"
+                    (click)="goToPlayer($event)"
+                  >
+                    {{ data.entry.firstName }} {{ data.entry.lastName }}
+                  </a>
+                  @if (data.entry.jerseyNumber) {
+                    <span class="player-number">#{{ data.entry.jerseyNumber }}</span>
+                  }
+                </p>
+              </div>
+              @if (data.entry.team) {
+                <p class="description-secondary">
+                  <a
+                    class="team-name-link"
+                    [href]="teamProfileRoute()"
+                    (click)="goToTeam($event)"
+                    >{{ data.entry.team }}</a
+                  >
+                </p>
+              } @else {
+                <p class="description-secondary">No team assigned</p>
+              }
+            </div>
+          </div>
+        </ng-template>
+        <ng-template #suffix>
+          <span
+            class="status-badge font-semibold whitespace-nowrap"
+            [style]="getStatusStyle(currentStatus)"
+            [matTooltip]="getStatusTooltip(currentStatus)"
+            [matTooltipShowDelay]="tooltipDelay"
+          >
+            {{ currentStatus }}
+          </span>
+        </ng-template>
+      </app-list>
+    </div>
+
+    @if (historyListItems().length > 0) {
+      <div class="history-section">
+        <app-section-header title="Status History" />
+        <app-list [items]="historyListItems()" [alignTop]="true">
+          <ng-template #content let-item>
+            <div
+              class="item-icon"
+              [class.history-icon-muted]="!item.data.isLatest"
+              [style]="item.data.isLatest ? getStatusIconStyle(item.name) : null"
+            >
+              <span class="material-symbols-rounded">{{ getStatusIcon(item.name) }}</span>
+            </div>
+            <div class="item-content" [class.history-content-muted]="!item.data.isLatest">
+              <div class="item-top-row">
+                <p
+                  class="name status-with-help"
+                  [class.history-muted-name]="!item.data.isLatest"
+                  [matTooltip]="getStatusTooltip(item.name)"
+                  matTooltipPosition="above"
+                  [matTooltipShowDelay]="tooltipDelay"
+                >
+                  {{ item.name }}
+                  <span class="help-icon">
+                    <span class="material-symbols-rounded">help</span>
+                  </span>
+                </p>
+                @if (item.value) {
+                  <span class="item-value">{{ item.value }}</span>
+                }
+              </div>
+              @if (item.data.user) {
+                <p class="description-secondary">
+                  by {{ item.data.user.first_name }} {{ item.data.user.last_name }}
+                </p>
+              }
+              @if (item.data.note) {
+                <p class="description">{{ item.data.note }}</p>
+              }
+            </div>
+          </ng-template>
+        </app-list>
+      </div>
+    }
+
+    <div class="status-section">
+      <app-section-header title="Change Status" />
+      <div class="status-options">
+        <app-card-grid [columns]="statuses.length">
+          @for (option of statuses; track option.value) {
+            <app-card-grid-item
+              [selected]="selected === option.value"
+              [accentColor]="getStatusStyle(option.value)['color']"
+              (select)="onStatusSelect(option.value)"
+            >
+              <span
+                class="status-option"
+                [style.color]="
+                  selected === option.value ? getStatusStyle(option.value)['color'] : null
+                "
+              >
+                <span class="material-symbols-rounded">{{ option.icon }}</span>
+                {{ option.label }}
+              </span>
+            </app-card-grid-item>
+          }
+        </app-card-grid>
+      </div>
+
+      <form [formGroup]="statusForm" class="note-form">
+        <app-form-field label="Note (optional)">
+          <textarea
+            formControlName="note"
+            placeholder="Add a note about this status change..."
+            rows="3"
+          ></textarea>
+        </app-form-field>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal-actions">
+    <app-button
+      [bg]="'background'"
+      [bghover]="'item_hover'"
+      [br]="'border'"
+      [color]="'text_primary'"
+      [colorhover]="'text_primary'"
+      [haveContent]="true"
+      materialIcon="cancel"
+      (clicked)="onCancel()"
+    >
+      Cancel
+    </app-button>
+    <app-button-loading
+      [isLoading]="isSubmitting()"
+      [isDisabled]="!canSubmit()"
+      materialIcon="save"
+      [bg]="'green'"
+      [bghover]="'green'"
+      [color]="'white'"
+      [colorhover]="'white'"
+      [haveContent]="true"
+      (clicked)="onSubmit()"
+    >
+      Update Status
+    </app-button-loading>
+  </div>
+</div>

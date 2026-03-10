@@ -1,4 +1,4 @@
-@let entriesValue = entries();
+@let entriesValue = filteredEntries();
 @let loadingValue = loading();
 @let activeTabIndexValue = activeTabIndex();
 
@@ -11,7 +11,7 @@
 </ng-template>
 
 <ng-template appBreadcrumbActions>
-  <div [appVisibilityMap]="visibilityByRoleMap" style="display: contents">
+  <div [appVisibilityMap]="visibilityByRoleMap">
     <app-button-loading
       [isLoading]="isAddLoading()"
       materialIcon="add"
@@ -23,7 +23,7 @@
       (clicked)="openAddModal()"
       role-visibility-name="add-player-button"
     >
-      Add Player
+      Add to Tryout List
     </app-button-loading>
   </div>
 </ng-template>

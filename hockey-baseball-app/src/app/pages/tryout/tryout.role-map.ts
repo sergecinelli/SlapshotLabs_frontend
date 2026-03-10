@@ -7,7 +7,8 @@ export const tryoutPageRolesAccessMap: IPageAccessMap = {
 
 export const visibilityByRoleMap: IVisibilityByRoleMap = {
   show: {
-    'add-player-button': [Role.Admin, Role.Coach],
+    'add-player-button': [Role.Admin, Role.Coach, Role.Player],
+    'change-status-action': [Role.Admin, Role.Coach, Role.Player],
     'delete-action': [Role.Admin, Role.Coach],
   },
 };

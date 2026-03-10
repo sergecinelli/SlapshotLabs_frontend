@@ -10,6 +10,7 @@ import { ThemeService } from '../../../services/theme.service';
   host: {
     role: 'button',
     '[class.selected]': 'selected()',
+    '[style.--accent-color]': 'accentColor()',
     '(click)': 'select.emit()',
   },
 })
@@ -17,6 +18,7 @@ export class CardGridItemComponent {
   private themeService = inject(ThemeService);
 
   selected = input(false);
+  accentColor = input<string>();
   select = output<void>();
 
   get rippleColor() {

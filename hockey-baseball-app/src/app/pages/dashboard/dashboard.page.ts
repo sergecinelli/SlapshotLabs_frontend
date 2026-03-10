@@ -54,7 +54,7 @@ import { ComponentVisibilityByRoleDirective } from '../../shared/directives/comp
 import { CardGridComponent } from '../../shared/components/card-grid/card-grid.component';
 import { GameCardComponent } from '../../shared/components/game-card/game-card.component';
 import { GameCardSkeletonComponent } from '../../shared/components/game-card/game-card-skeleton.component';
-import { getGameStatusLabel } from '../../shared/constants/game-status.constants';
+import { getGameStatusLabel } from '../../shared/constants/statuses.constants';
 import {
   convertGMTToLocalWithDateShift,
   formatDateForDisplay,

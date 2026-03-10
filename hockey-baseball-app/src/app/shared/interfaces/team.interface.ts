@@ -7,6 +7,7 @@ export interface TeamApiOut {
   level_name?: string;
   division_id: number;
   city: string;
+  birth_year?: number | null;
   games_played: number;
   goals_for: number;
   goals_against: number;
@@ -23,6 +24,7 @@ export interface TeamApiIn {
   level_id: number;
   division_id: number;
   city: string;
+  birth_year?: number | null;
   abbreviation?: string;
 }
 
@@ -44,6 +46,7 @@ export interface Team {
   losses: number;
   ties: number;
   points: number;
+  birthYear?: number | null;
   abbreviation?: string;
   createdAt?: Date; // Creation date for sorting
   [key: string]: unknown; // Index signature for compatibility with Record<string, unknown>

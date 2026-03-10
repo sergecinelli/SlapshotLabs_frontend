@@ -66,6 +66,7 @@
               "
               [matTooltip]="getTooltipText(element, column)"
               matTooltipPosition="above"
+              [matTooltipShowDelay]="tooltipDelay"
               [matTooltipDisabled]="column.showTooltip === false"
               (mouseenter)="onCellMouseEnter(cellElement, tooltip, element, column)"
             >
@@ -359,14 +360,20 @@
                 <!-- Custom rendering -->
                 @case ('custom') {
                   @if (column.key === 'status') {
-                    <span [class]="getStatusBadgeClass(getCellValue(element, column))">
+                    <span
+                      class="status-badge"
+                      [style]="getStatusBadgeStyle(getCellValue(element, column))"
+                    >
                       {{
                         getCellValueByKey(element, 'statusName') ||
                           getStatusLabel(getCellValue(element, column))
                       }}
                     </span>
                   } @else if (column.key === 'gameType') {
-                    <span [class]="getGameTypeBadgeClass(getCellValue(element, column))">
+                    <span
+                      class="game-type-badge"
+                      [style]="getGameTypeBadgeStyle(getCellValue(element, column))"
+                    >
                       {{
                         getCellValueByKey(element, 'gameTypeName') || getCellValue(element, column)
                       }}
