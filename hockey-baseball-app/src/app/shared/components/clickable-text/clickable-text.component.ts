@@ -2,7 +2,9 @@ import { Component, input, output, computed } from '@angular/core';
 
 @Component({
   selector: 'app-clickable-text',
-  template: `<span class="clickable-text" (click)="clicked.emit($event)"><ng-content></ng-content></span>`,
+  template: `<span class="clickable-text" (click)="clicked.emit($event)"
+    ><ng-content></ng-content
+  ></span>`,
   styleUrl: './clickable-text.component.scss',
   host: {
     '[style.font-size]': 'fontSize()',

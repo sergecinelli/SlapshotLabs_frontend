@@ -25,7 +25,13 @@
     ></iframe>
   }
 
-  <app-empty-label [isShow]="!url && !isModalOpen()" icon="error" color="primary" bgColor="primary_soft" position="top">
+  <app-empty-label
+    [isShow]="!url && !isModalOpen()"
+    icon="error"
+    color="primary"
+    bgColor="primary_soft"
+    position="top"
+  >
     <span colorized>
       Please enter a
       <app-clickable-text fontWeight="600" (clicked)="openSeasonIdModal()"
