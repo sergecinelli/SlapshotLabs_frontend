@@ -7,6 +7,5 @@ import { Component, input } from '@angular/core';
   styleUrl: './game-card-skeleton.component.scss',
 })
 export class GameCardSkeletonComponent {
-  count = input(2);
-  showScore = input(false);
+  skeletonCount = input(2);
 }

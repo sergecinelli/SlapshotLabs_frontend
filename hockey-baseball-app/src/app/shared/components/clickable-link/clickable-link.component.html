@@ -1,3 +1,8 @@
+@if (icon(); as iconName) {
+  @if (iconPosition() === 'before') {
+    <span class="material-symbols-rounded link-icon">{{ iconName }}</span>
+  }
+}
 <a
   class="clickable-link"
   [routerLink]="route()"
@@ -6,14 +11,19 @@
 >
   <ng-content></ng-content>
 </a>
-@if (showIcon()) {
+@if (icon(); as iconName) {
+  @if (iconPosition() === 'after') {
+    <span class="material-symbols-rounded link-icon">{{ iconName }}</span>
+  }
+}
+@if (linkIcon()) {
   <app-button-small
     materialIcon="visibility"
     [bg]="'transparent'"
     [bghover]="'item_hover'"
     [color]="'text_secondary'"
     [colorhover]="'green_dark'"
-    [tooltip]="iconTooltip()"
-    (clicked)="onIconClick()"
+    [tooltip]="linkIconTooltip()"
+    (clicked)="onLinkIconClick()"
   />
 }

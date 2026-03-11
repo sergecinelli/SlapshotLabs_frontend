@@ -15,8 +15,8 @@
               <app-clickable-link
                 readonlyContent
                 [route]="profileRoute()!"
-                [showIcon]="true"
-                iconTooltip="View Profile"
+                [linkIcon]="true"
+                linkIconTooltip="View Profile"
                 [closeModals]="true"
               >
                 {{ data.singleEntity.name }}
@@ -29,8 +29,8 @@
                 <app-clickable-link
                   readonlyContent
                   [route]="teamRoute()!"
-                  [showIcon]="true"
-                  iconTooltip="View Team"
+                  [linkIcon]="true"
+                  linkIconTooltip="View Team"
                   [closeModals]="true"
                 >
                   {{ data.singleEntity.team }}

@@ -48,6 +48,18 @@
 // ThemeService automatically creates CSS variables in format: --[key] (with _ replaced by -)
 // Legacy variables (--color-primary, --sidebar-dark, etc.) are also created from colors.ts
 
+// DSEG7 Classic — Seven-segment display font (scoreboard digits)
+@font-face {
+  font-family: 'DSEG7Classic';
+  src:
+    url('assets/fonts/DSEG7Classic/DSEG7Classic-Bold.woff2') format('woff2'),
+    url('assets/fonts/DSEG7Classic/DSEG7Classic-Bold.woff') format('woff'),
+    url('assets/fonts/DSEG7Classic/DSEG7Classic-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 // Inter Font Family
 @font-face {
   font-family: 'Inter';

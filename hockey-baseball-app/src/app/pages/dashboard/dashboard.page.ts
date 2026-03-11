@@ -2,7 +2,6 @@ import { Component, OnInit, signal, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { ModalService, ModalEvent } from '../../services/modal.service';
 import { ToastService } from '../../services/toast.service';
-import { MatIconModule } from '@angular/material/icon';
 import { ButtonLoadingComponent } from '../../shared/components/buttons/button-loading/button-loading.component';
 import { ScheduleService } from '../../services/schedule.service';
 import { TeamService } from '../../services/team.service';
@@ -64,7 +63,6 @@ import {
 @Component({
   selector: 'app-dashboard',
   imports: [
-    MatIconModule,
     ButtonLoadingComponent,
     CardGridComponent,
     ComponentVisibilityByRoleDirective,

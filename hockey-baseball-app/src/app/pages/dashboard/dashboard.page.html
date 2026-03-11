@@ -78,12 +78,11 @@
       </app-button-loading>
     </div>
 
-    <!-- Main Content -->
     <!-- Current and Upcoming Games -->
     <div class="dashboard-section">
       <h2 class="dashboard-section-title">Current and Upcoming Games</h2>
       @if (loadingValue) {
-        <app-game-card-skeleton [count]="2" />
+        <app-game-card-skeleton [skeletonCount]="2" />
       } @else if (upcomingGamesValue.length === 0) {
         <div class="dashboard-empty">
           <div class="empty-text">No current or upcoming games scheduled.</div>
@@ -109,7 +108,7 @@
     <div class="dashboard-section">
       <h2 class="dashboard-section-title">Game Results</h2>
       @if (loadingValue) {
-        <app-game-card-skeleton [count]="2" [showScore]="true" />
+        <app-game-card-skeleton [skeletonCount]="2" />
       } @else if (gameResultsValue.length === 0) {
         <div class="dashboard-empty">
           <div class="empty-text">No completed games found.</div>

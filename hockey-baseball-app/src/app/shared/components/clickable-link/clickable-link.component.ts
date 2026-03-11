@@ -9,7 +9,8 @@ import { ButtonSmallComponent } from '../buttons/button-small/button-small.compo
   templateUrl: './clickable-link.component.html',
   styleUrl: './clickable-link.component.scss',
   host: {
-    '[class.has-icon]': 'showIcon()',
+    '[class.has-link-icon]': 'linkIcon()',
+    '[class.has-icon]': '!!icon()',
     '[class.is-flex]': 'flex()',
     '[style.font-size]': 'fontSize()',
     '[style.font-weight]': 'fontWeight()',
@@ -21,8 +22,10 @@ export class ClickableLinkComponent {
   private modalService = inject(ModalService);
 
   route = input.required<string | unknown[]>();
-  showIcon = input(false);
-  iconTooltip = input('');
+  linkIcon = input(false);
+  linkIconTooltip = input('');
+  icon = input<string | null>(null);
+  iconPosition = input<'before' | 'after'>('before');
   ariaLabel = input<string | null>(null);
   closeModals = input(false);
   fontSize = input<string | null>(null);
@@ -41,7 +44,7 @@ export class ClickableLinkComponent {
     }
   }
 
-  onIconClick(): void {
+  onLinkIconClick(): void {
     if (this.closeModals()) {
       this.modalService.closeAll();
     }

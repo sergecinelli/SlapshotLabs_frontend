@@ -1,10 +1,16 @@
 :host {
   display: inline;
 
-  &.has-icon {
+  &.has-link-icon {
     display: inline-flex;
     align-items: center;
     gap: 6px;
+  }
+
+  &.has-icon {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
   }
 
   &.is-flex .clickable-link {
@@ -36,4 +42,10 @@
     outline-offset: 2px;
     border-radius: 2px;
   }
+}
+
+.link-icon {
+  flex-shrink: 0;
+  font-size: inherit;
+  line-height: 1;
 }
