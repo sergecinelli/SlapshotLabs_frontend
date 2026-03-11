@@ -1,10 +1,12 @@
 <div class="form-field">
-  <label class="form-field-label"
-    >{{ label() }}
-    @if (required()) {
-      <span class="required-mark"> *</span>
-    }
-  </label>
+  @if (label()) {
+    <label class="form-field-label"
+      >{{ label() }}
+      @if (required()) {
+        <span class="required-mark"> *</span>
+      }
+    </label>
+  }
 
   @if (readonly()) {
     @if (readonlyValue()) {

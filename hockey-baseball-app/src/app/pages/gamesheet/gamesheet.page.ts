@@ -10,7 +10,12 @@ import { ClickableTextComponent } from '../../shared/components/clickable-text/c
 
 @Component({
   selector: 'app-gamesheet',
-  imports: [BreadcrumbActionsDirective, ButtonComponent, EmptyLabelComponent, ClickableTextComponent],
+  imports: [
+    BreadcrumbActionsDirective,
+    ButtonComponent,
+    EmptyLabelComponent,
+    ClickableTextComponent,
+  ],
   templateUrl: './gamesheet.page.html',
   styleUrl: './gamesheet.page.scss',
 })
@@ -41,7 +46,7 @@ export class GamesheetPage implements OnInit {
   protected openSeasonIdModal(): void {
     this.isModalOpen.set(true);
     this.modalService.openModal(SeasonIdModal, {
-      name: 'SeasonID',
+      name: 'Gamesheet Access',
       icon: 'edit',
       showClose: !!this.seasonId(),
       data: { currentSeasonId: this.seasonId() },

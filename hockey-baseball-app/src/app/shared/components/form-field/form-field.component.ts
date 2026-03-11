@@ -7,7 +7,7 @@ import { Component, ChangeDetectionStrategy, input } from '@angular/core';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FormFieldComponent {
-  label = input.required<string>();
+  label = input<string>();
   required = input(false);
   error = input('');
   readonly = input(false);
