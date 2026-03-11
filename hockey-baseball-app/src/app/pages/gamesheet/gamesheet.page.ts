@@ -39,7 +39,6 @@ export class GamesheetPage implements OnInit {
     this.modalService.openModal(SeasonIdModal, {
       name: 'SeasonID',
       icon: 'edit',
-      preventBackdropClose: !this.seasonId(),
       showClose: !!this.seasonId(),
       data: { currentSeasonId: this.seasonId() },
       width: '500px',
