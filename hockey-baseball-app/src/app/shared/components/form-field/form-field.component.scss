@@ -30,6 +30,13 @@
 
 .form-field-control {
   ::ng-deep {
+    .info {
+      font-size: 14px;
+      color: var(--text-primary);
+      margin: 0;
+      padding-left: 14px;
+    }
+
     input,
     textarea {
       margin: 0;
@@ -52,6 +59,16 @@
 
       &::placeholder {
         color: var(--gray);
+      }
+
+      &[type='number'] {
+        -moz-appearance: textfield;
+
+        &::-webkit-outer-spin-button,
+        &::-webkit-inner-spin-button {
+          -webkit-appearance: none;
+          margin: 0;
+        }
       }
     }
 

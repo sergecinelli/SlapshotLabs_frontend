@@ -1,9 +1,27 @@
-<div class="gamesheet-container">
-  <iframe
-    [src]="gamesheetUrl"
-    frameborder="0"
-    allowFullscreen
-    class="gamesheet-iframe"
-    title="Gamesheet Standings"
-  ></iframe>
-</div>
+@let url = gamesheetUrl();
+
+<ng-template appBreadcrumbActions>
+  <app-button
+    materialIcon="edit"
+    [bg]="'primary'"
+    [bghover]="'primary'"
+    [color]="'white'"
+    [colorhover]="'white'"
+    [haveContent]="true"
+    (clicked)="openSeasonIdModal()"
+  >
+    Edit Season ID{{ seasonId() ? ' (' + seasonId() + ')' : '' }}
+  </app-button>
+</ng-template>
+
+@if (url) {
+  <div class="gamesheet-container">
+    <iframe
+      [src]="url"
+      frameborder="0"
+      allowFullscreen
+      class="gamesheet-iframe"
+      title="Gamesheet Standings"
+    ></iframe>
+  </div>
+}

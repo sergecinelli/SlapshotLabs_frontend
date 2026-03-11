@@ -27,6 +27,7 @@ export interface UserProfile {
   role_id: number;
   role_name: string;
   team_id: number | null;
+  gamesheet_seasonid: string | null;
 }
 
 export interface UserEditRequest {
@@ -40,6 +41,7 @@ export interface UserEditRequest {
   street?: string | null;
   postal_code?: string | null;
   password?: string | null;
+  gamesheet_seasonid?: string | null;
 }
 
 export interface PasswordResetRequest {

@@ -1,0 +1,39 @@
+@let isSubmittingValue = isSubmitting();
+
+<div class="season-id-modal">
+  <app-form-field label=" ">
+    <p class="info">Set the SeasonID for your team to view the Gamesheet details</p>
+  </app-form-field>
+
+  <app-form-field label="SeasonID">
+    <input [formControl]="seasonIdControl" type="number" placeholder="Enter SeasonID" />
+  </app-form-field>
+</div>
+
+<div class="modal-actions">
+  <app-button
+    materialIcon="cancel"
+    [bg]="'background'"
+    [bghover]="'item_hover'"
+    [br]="'border'"
+    [color]="'text_primary'"
+    [colorhover]="'text_primary'"
+    [haveContent]="true"
+    [isDisabled]="isSubmittingValue"
+    (clicked)="close()"
+  >
+    Cancel
+  </app-button>
+
+  <app-button-loading
+    [isLoading]="isSubmittingValue"
+    materialIcon="check"
+    [bg]="'primary'"
+    [bghover]="'primary_dark'"
+    [color]="'text_white'"
+    [haveContent]="true"
+    (clicked)="submit()"
+  >
+    Save
+  </app-button-loading>
+</div>
