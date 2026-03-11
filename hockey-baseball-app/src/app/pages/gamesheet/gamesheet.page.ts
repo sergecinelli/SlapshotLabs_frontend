@@ -44,16 +44,7 @@ export class GamesheetPage implements OnInit {
       data: { currentSeasonId: this.seasonId() },
       width: '500px',
       onCloseWithData: (data: unknown) => {
-        const value = data as string | null;
-        this.seasonId.set(value);
-        if (!value) {
-          this.openSeasonIdModal();
-        }
-      },
-      onClose: () => {
-        if (!this.seasonId()) {
-          this.openSeasonIdModal();
-        }
+        this.seasonId.set(data as string | null);
       },
     });
   }
