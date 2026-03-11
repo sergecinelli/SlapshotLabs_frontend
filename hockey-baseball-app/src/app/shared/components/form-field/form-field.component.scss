@@ -62,11 +62,11 @@
       }
 
       &[type='number'] {
-        -moz-appearance: textfield;
+        -moz-appearance: auto;
 
         &::-webkit-outer-spin-button,
         &::-webkit-inner-spin-button {
-          -webkit-appearance: none;
+          -webkit-appearance: auto;
           margin: 0;
         }
       }

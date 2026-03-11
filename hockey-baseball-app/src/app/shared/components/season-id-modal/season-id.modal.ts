@@ -22,8 +22,8 @@ export class SeasonIdModal {
   private dialogData = this.modalService.getModalData<SeasonIdModalData>();
 
   protected isSubmitting = signal(false);
-  protected seasonIdControl = new FormControl<string | null>(
-    this.dialogData?.currentSeasonId ?? null
+  protected seasonIdControl = new FormControl<number | null>(
+    this.dialogData?.currentSeasonId ? Number(this.dialogData.currentSeasonId) : null
   );
 
   constructor() {
@@ -34,7 +34,7 @@ export class SeasonIdModal {
     if (this.isSubmitting()) return;
 
     const value = this.seasonIdControl.value;
-    const rawValue = value != null && value !== '' ? String(value) : null;
+    const rawValue = value != null ? String(value) : null;
     this.isSubmitting.set(true);
 
     this.authService.editUser({ gamesheet_seasonid: rawValue }).subscribe({
