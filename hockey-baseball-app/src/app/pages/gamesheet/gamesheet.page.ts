@@ -5,10 +5,12 @@ import { ModalService } from '../../services/modal.service';
 import { SeasonIdModal } from '../../shared/components/season-id-modal/season-id.modal';
 import { BreadcrumbActionsDirective } from '../../shared/directives/breadcrumb-actions.directive';
 import { ButtonComponent } from '../../shared/components/buttons/button/button.component';
+import { EmptyLabelComponent } from '../../shared/components/empty-label/empty-label.component';
+import { ClickableTextComponent } from '../../shared/components/clickable-text/clickable-text.component';
 
 @Component({
   selector: 'app-gamesheet',
-  imports: [BreadcrumbActionsDirective, ButtonComponent],
+  imports: [BreadcrumbActionsDirective, ButtonComponent, EmptyLabelComponent, ClickableTextComponent],
   templateUrl: './gamesheet.page.html',
   styleUrl: './gamesheet.page.scss',
 })
@@ -18,6 +20,7 @@ export class GamesheetPage implements OnInit {
   private modalService = inject(ModalService);
 
   protected seasonId = signal<string | null>(null);
+  protected isModalOpen = signal(false);
 
   protected gamesheetUrl = computed<SafeResourceUrl | null>(() => {
     const id = this.seasonId();
@@ -36,13 +39,18 @@ export class GamesheetPage implements OnInit {
   }
 
   protected openSeasonIdModal(): void {
+    this.isModalOpen.set(true);
     this.modalService.openModal(SeasonIdModal, {
       name: 'SeasonID',
       icon: 'edit',
       showClose: !!this.seasonId(),
       data: { currentSeasonId: this.seasonId() },
       width: '500px',
+      onClose: () => {
+        this.isModalOpen.set(false);
+      },
       onCloseWithData: (data: unknown) => {
+        this.isModalOpen.set(false);
         this.seasonId.set(data as string | null);
       },
     });

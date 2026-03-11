@@ -1,0 +1,21 @@
+:host {
+  display: inline;
+}
+
+.clickable-text {
+  color: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  cursor: pointer;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+}

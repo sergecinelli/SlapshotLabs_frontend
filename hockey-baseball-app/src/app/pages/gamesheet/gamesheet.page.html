@@ -14,8 +14,8 @@
   </app-button>
 </ng-template>
 
-@if (url) {
-  <div class="gamesheet-container">
+<div class="gamesheet-container">
+  @if (url) {
     <iframe
       [src]="url"
       frameborder="0"
@@ -23,5 +23,15 @@
       class="gamesheet-iframe"
       title="Gamesheet Standings"
     ></iframe>
-  </div>
-}
+  }
+
+  <app-empty-label [isShow]="!url && !isModalOpen()" icon="error" color="primary" bgColor="primary_soft" position="top">
+    <span colorized>
+      Please enter a
+      <app-clickable-text fontWeight="600" (clicked)="openSeasonIdModal()"
+        >Season ID</app-clickable-text
+      >
+      to display Gamesheet data
+    </span>
+  </app-empty-label>
+</div>

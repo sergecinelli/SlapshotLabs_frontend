@@ -1,0 +1,57 @@
+@let colorValue = color();
+@let isShowValue = isShow();
+@let iconValue = icon();
+@let textValue = text();
+@let delayValue = delayShowAnimation();
+@let animationShowValue = animationShowTransitionMS();
+@let animationHideValue = animationHideTransitionMS();
+
+@if (!colorValue) {
+  <div class="text-container" [class.position-top]="position() === 'top'">
+    <span
+      class="text-wrapper"
+      appAnimate
+      [delayShowAnimation]="delayValue"
+      [animateToggle]="isShowValue"
+      [animationShowTransitionMS]="animationShowValue"
+      [animationHideTransitionMS]="animationHideValue"
+    >
+      <div class="content-wrapper">
+        @if (iconValue) {
+          <span class="material-symbols-rounded icon">{{ iconValue }}</span>
+        }
+        @if (textValue) {
+          <span class="text" [innerHTML]="textValue"></span>
+        } @else {
+          <span class="text"><ng-content></ng-content></span>
+        }
+      </div>
+    </span>
+  </div>
+} @else {
+  <div class="text-container" [class.position-top]="position() === 'top'">
+    <span
+      class="text-wrapper"
+      appAnimate
+      [delayShowAnimation]="delayValue"
+      [animateToggle]="isShowValue"
+      [animationShowTransitionMS]="animationShowValue"
+      [animationHideTransitionMS]="animationHideValue"
+    >
+      <div
+        class="content-wrapper colorized"
+        [style.color]="_color"
+        [style.background]="_backgroundColor"
+      >
+        @if (iconValue) {
+          <span class="material-symbols-rounded icon">{{ iconValue }}</span>
+        }
+        @if (textValue) {
+          <span class="text" [innerHTML]="textValue"></span>
+        } @else {
+          <span class="text"><ng-content select="[colorized]"></ng-content></span>
+        }
+      </div>
+    </span>
+  </div>
+}
