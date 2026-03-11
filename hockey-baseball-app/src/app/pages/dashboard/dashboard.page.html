@@ -88,7 +88,7 @@
           <div class="empty-text">No current or upcoming games scheduled.</div>
         </div>
       } @else {
-        <app-card-grid [columns]="2">
+        <app-card-grid [columns]="2" [radius]="20">
           @for (game of upcomingGamesValue; track game.id; let i = $index) {
             @if (i < 5) {
               <app-game-card
@@ -114,7 +114,7 @@
           <div class="empty-text">No completed games found.</div>
         </div>
       } @else {
-        <app-card-grid [columns]="2">
+        <app-card-grid [columns]="2" [radius]="20">
           @for (game of gameResultsValue; track game.id; let i = $index) {
             @if (i < 5) {
               <app-game-card

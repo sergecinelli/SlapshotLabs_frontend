@@ -47,7 +47,11 @@
       }
       @if (gameValue.gameType || gameValue.gameTypeName) {
         <span class="game-type">
-          {{ gameValue.gameType }}@if (gameValue.gameType && gameValue.gameTypeName) { &middot; }{{ gameValue.gameTypeName }}
+          {{ gameValue.gameType }}
+          @if (gameValue.gameType && gameValue.gameTypeName) {
+            &middot;
+          }
+          {{ gameValue.gameTypeName }}
         </span>
       }
     </div>
@@ -65,11 +69,7 @@
     <div class="sb-team sb-home" [class.sb-winner]="isWinning(true)">
       <div class="sb-team-identity">
         @if (gameValue.homeTeamLogo) {
-          <img
-            [appCachedSrc]="gameValue.homeTeamLogo"
-            [alt]="gameValue.homeTeam"
-            class="sb-logo"
-          />
+          <img [appCachedSrc]="gameValue.homeTeamLogo" [alt]="gameValue.homeTeam" class="sb-logo" />
         } @else {
           <div class="sb-logo-empty">
             <span class="material-symbols-rounded">shield</span>
@@ -81,7 +81,8 @@
               class="sb-name"
               [route]="['/teams-and-rosters/teams', gameValue.homeTeamId, 'profile']"
               [ariaLabel]="'View ' + gameValue.homeTeam + ' profile'"
-            >{{ gameValue.homeTeam }}</app-clickable-link>
+              >{{ gameValue.homeTeam }}</app-clickable-link
+            >
           } @else {
             <span class="sb-name">{{ gameValue.homeTeam }}</span>
           }
@@ -95,7 +96,8 @@
           [ariaLabel]="'View ' + gameValue.homeTeamGoalie + ' profile'"
           [icon]="'shield'"
           [iconPosition]="'before'"
-        >{{ gameValue.homeTeamGoalie }}</app-clickable-link>
+          >{{ gameValue.homeTeamGoalie }}</app-clickable-link
+        >
       } @else if (gameValue.homeTeamGoalie) {
         <span class="sb-goalie">
           <span class="material-symbols-rounded sb-goalie-icon">shield</span>
@@ -130,11 +132,7 @@
     <div class="sb-team sb-away" [class.sb-winner]="isWinning(false)">
       <div class="sb-team-identity">
         @if (gameValue.awayTeamLogo) {
-          <img
-            [appCachedSrc]="gameValue.awayTeamLogo"
-            [alt]="gameValue.awayTeam"
-            class="sb-logo"
-          />
+          <img [appCachedSrc]="gameValue.awayTeamLogo" [alt]="gameValue.awayTeam" class="sb-logo" />
         } @else {
           <div class="sb-logo-empty">
             <span class="material-symbols-rounded">shield</span>
@@ -146,7 +144,8 @@
               class="sb-name"
               [route]="['/teams-and-rosters/teams', gameValue.awayTeamId, 'profile']"
               [ariaLabel]="'View ' + gameValue.awayTeam + ' profile'"
-            >{{ gameValue.awayTeam }}</app-clickable-link>
+              >{{ gameValue.awayTeam }}</app-clickable-link
+            >
           } @else {
             <span class="sb-name">{{ gameValue.awayTeam }}</span>
           }
@@ -160,7 +159,8 @@
           [ariaLabel]="'View ' + gameValue.awayTeamGoalie + ' profile'"
           [icon]="'shield'"
           [iconPosition]="'after'"
-        >{{ gameValue.awayTeamGoalie }}</app-clickable-link>
+          >{{ gameValue.awayTeamGoalie }}</app-clickable-link
+        >
       } @else if (gameValue.awayTeamGoalie) {
         <span class="sb-goalie">
           <span class="sb-goalie-name">{{ gameValue.awayTeamGoalie }}</span>

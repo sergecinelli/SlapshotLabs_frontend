@@ -142,7 +142,8 @@ app-clickable-link.status-chip {
 }
 
 .game-type {
-  font-size: 11px;
+  font-size: 12px;
+  font-weight: 500;
   color: var(--text-secondary);
   white-space: nowrap;
   overflow: hidden;
@@ -157,7 +158,6 @@ app-clickable-link.status-chip {
   align-items: stretch;
   gap: 0;
   flex: 1;
-  // background-color: var(--page-background);
   background-color: var(--card-background);
 }
 
@@ -171,14 +171,12 @@ app-clickable-link.status-chip {
   background-color: var(--card-background);
 
   &.sb-home {
-    // border-radius: 0 var(--radius-medium) var(--radius-medium) 0;
     align-items: flex-start;
   }
 
   &.sb-away {
     align-items: flex-end;
     text-align: right;
-    // border-radius: var(--radius-medium) 0 0 var(--radius-medium);
 
     .sb-team-identity {
       flex-direction: row-reverse;
@@ -313,7 +311,7 @@ app-clickable-link.sb-goalie {
   background: var(--page-background);
   position: relative;
   min-width: 110px;
-  border-radius: 10px;
+  border-radius: var(--radius-medium);
 }
 
 .sb-score {

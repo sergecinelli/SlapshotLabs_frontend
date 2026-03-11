@@ -59,7 +59,7 @@
   @if (!loadingValue && playersValue.length > 0) {
     @if (layoutModeValue === 'card') {
       <!-- Card View -->
-      <app-card-grid [columns]="2">
+      <app-card-grid [columns]="2" [radius]="20">
         @for (player of playersValue; track player.id) {
           <div class="entity-card">
             <!-- Card Header -->

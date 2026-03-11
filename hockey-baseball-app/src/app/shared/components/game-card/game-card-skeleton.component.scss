@@ -96,7 +96,7 @@
   gap: 0;
   flex: 1;
   min-height: 117px;
-  background-color: var(--page-background);
+  background-color: var(--card-background);
 }
 
 .sk-team {
@@ -106,16 +106,14 @@
   padding: 20px;
   gap: 10px;
   min-width: 0;
-  background-color: var(--background);
+  background-color: var(--card-background);
 
   &.sk-team-home {
-    border-radius: 0 var(--radius-small) var(--radius-small) 0;
     align-items: flex-start;
   }
 
   &.sk-team-away {
     align-items: flex-end;
-    border-radius: var(--radius-small) 0 0 var(--radius-small);
 
     .sk-team-identity {
       flex-direction: row-reverse;
@@ -184,6 +182,7 @@
   background: var(--page-background);
   position: relative;
   min-width: 110px;
+  border-radius: var(--radius-medium);
 }
 
 .sk-score {

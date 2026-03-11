@@ -48,7 +48,7 @@
 
   <!-- Game Cards -->
   @if (!loadingValue && schedulesValue.length > 0) {
-    <app-card-grid [columns]="2">
+    <app-card-grid [columns]="2" [radius]="20">
       @for (schedule of schedulesValue; track schedule.id) {
         <app-game-card
           [game]="schedule"
