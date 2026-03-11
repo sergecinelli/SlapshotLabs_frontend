@@ -26,6 +26,10 @@ export class SeasonIdModal {
     this.dialogData?.currentSeasonId ?? null
   );
 
+  constructor() {
+    this.modalService.registerDirtyCheck(() => this.seasonIdControl.dirty);
+  }
+
   protected submit(): void {
     if (this.isSubmitting()) return;
 
