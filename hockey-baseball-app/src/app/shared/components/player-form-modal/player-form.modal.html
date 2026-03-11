@@ -165,7 +165,6 @@
     </app-button>
     <app-button-loading
       [isLoading]="isSubmitting()"
-      [isDisabled]="isLoading || playerForm.invalid"
       materialIcon="save"
       [bg]="isEditMode ? 'orange' : 'green'"
       [bghover]="isEditMode ? 'orange' : 'green'"

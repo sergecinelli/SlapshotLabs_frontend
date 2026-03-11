@@ -154,7 +154,6 @@
     </app-button>
     <app-button-loading
       [isLoading]="isSubmitting()"
-      [isDisabled]="isLoading || goalieForm.invalid"
       materialIcon="save"
       [bg]="isEditMode ? 'orange' : 'green'"
       [bghover]="isEditMode ? 'orange' : 'green'"
