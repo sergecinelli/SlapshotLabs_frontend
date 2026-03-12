@@ -21,7 +21,7 @@
           <div class="date-time-item">
             <span class="material-symbols-rounded date-time-icon">schedule</span>
             <span class="game-time">{{ formatTimeTo12Hour(gameValue.time) }}</span>
-            @if (gameValue.periodName && gameValue.status !== GameStatus.NotStarted) {
+            @if (gameValue.periodName && gameValue.status === GameStatus.GameInProgress) {
               <span class="game-period-separator">-</span>
               <span class="game-period-text">{{ gameValue.periodName }}</span>
             }
