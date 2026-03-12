@@ -146,7 +146,6 @@
       [color]="'text_primary'"
       [colorhover]="'text_primary'"
       [haveContent]="true"
-      [isDisabled]="isLoading"
       materialIcon="cancel"
       (clicked)="onCancel()"
     >
@@ -154,6 +153,7 @@
     </app-button>
     <app-button-loading
       [isLoading]="isSubmitting()"
+      [isDisabled]="goalieForm.invalid"
       materialIcon="save"
       [bg]="isEditMode ? 'orange' : 'green'"
       [bghover]="isEditMode ? 'orange' : 'green'"

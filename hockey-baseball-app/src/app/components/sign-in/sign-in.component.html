@@ -80,6 +80,7 @@
           <div class="button-row">
             <app-button-loading
               [isLoading]="isLoading"
+              [isDisabled]="signInForm.invalid"
               type="submit"
               [bg]="'primary'"
               [bghover]="'primary'"

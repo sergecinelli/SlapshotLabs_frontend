@@ -124,6 +124,7 @@
     </app-button>
     <app-button-loading
       [isLoading]="isSubmitting()"
+      [isDisabled]="teamForm.invalid"
       materialIcon="save"
       [bg]="isEditMode ? 'orange' : 'green'"
       [bghover]="isEditMode ? 'orange' : 'green'"

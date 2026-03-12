@@ -227,6 +227,7 @@
     </app-button>
     <app-button-loading
       [isLoading]="isSubmitting()"
+      [isDisabled]="form.invalid"
       materialIcon="save"
       [bg]="'primary'"
       [bghover]="'primary_dark'"

@@ -158,6 +158,7 @@
     </app-button>
     <app-button-loading
       [isLoading]="isSubmitting()"
+      [isDisabled]="faceoffForm.invalid"
       materialIcon="save"
       [bg]="'primary'"
       [bghover]="'primary_dark'"

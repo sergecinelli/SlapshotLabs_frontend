@@ -136,6 +136,7 @@
           <div class="button-row">
             <app-button-loading
               [isLoading]="isLoading"
+              [isDisabled]="signUpForm.invalid"
               type="submit"
               [bg]="'primary'"
               [bghover]="'primary'"

@@ -187,6 +187,7 @@
     </app-button>
     <app-button-loading
       [isLoading]="isSubmitting()"
+      [isDisabled]="scheduleForm.invalid"
       materialIcon="save"
       [bg]="isEditMode ? 'orange' : 'green'"
       [bghover]="isEditMode ? 'orange' : 'green'"

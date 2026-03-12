@@ -48,6 +48,7 @@
     </app-button>
     <app-button-loading
       [isLoading]="false"
+      [isDisabled]="form.invalid"
       materialIcon="save"
       [bg]="'green'"
       [bghover]="'green'"

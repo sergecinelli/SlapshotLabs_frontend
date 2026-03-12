@@ -152,6 +152,7 @@
     </app-button>
     <app-button-loading
       [isLoading]="isSubmitting()"
+      [isDisabled]="!canSubmit()"
       materialIcon="save"
       [bg]="'green'"
       [bghover]="'green'"

@@ -151,6 +151,7 @@
     @if (!isViewMode) {
       <app-button-loading
         [isLoading]="isSubmitting()"
+        [isDisabled]="analysisForm.invalid"
         materialIcon="save"
         [bg]="isEditMode ? 'orange' : 'green'"
         [bghover]="isEditMode ? 'orange' : 'green'"

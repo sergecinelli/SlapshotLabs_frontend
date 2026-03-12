@@ -116,6 +116,7 @@
     </app-button>
     <app-button-loading
       [isLoading]="isSubmitting()"
+      [isDisabled]="turnoverForm.invalid"
       materialIcon="save"
       [bg]="'primary'"
       [bghover]="'primary_dark'"
