@@ -49,10 +49,6 @@
     color: var(--upcoming);
   }
 
-  &.not-started .game-card-header {
-    border-left: 4px solid var(--upcoming);
-  }
-
   &.not-started .header-left:before {
     background-color: var(--upcoming);
   }
@@ -171,32 +167,32 @@
   line-height: 1;
 
   &.live-badge {
-    background: linear-gradient(135deg, rgba(207, 20, 43, 0.1));
-    color: var(--primary);
-    border: 1px solid rgba(207, 20, 43, 0.2);
-    box-shadow: 0 1px 3px rgba(207, 20, 43, 0.1);
+    background: color-mix(in srgb, var(--live) 10%, transparent);
+    color: var(--live);
+    border: 1px solid color-mix(in srgb, var(--live) 20%, transparent);
+    box-shadow: 0 1px 3px color-mix(in srgb, var(--live) 10%, transparent);
   }
 
   &.upcoming-badge {
-    background: linear-gradient(135deg, rgba(34, 169, 242, 0.1));
+    background: color-mix(in srgb, var(--upcoming) 10%, transparent);
     color: var(--upcoming);
-    border: 1px solid rgba(34, 169, 242, 0.2);
-    box-shadow: 0 1px 3px rgba(34, 169, 242, 0.1);
+    border: 1px solid color-mix(in srgb, var(--upcoming) 20%, transparent);
+    box-shadow: 0 1px 3px color-mix(in srgb, var(--upcoming) 10%, transparent);
   }
 
   &.completed-badge {
-    background: linear-gradient(135deg, rgba(34, 169, 242, 0.1));
-    color: var(--completed);
-    border: 1px solid rgba(34, 169, 242, 0.2);
-    box-shadow: 0 1px 3px rgba(34, 169, 242, 0.1);
+    background: color-mix(in srgb, var(--upcoming) 10%, transparent);
+    color: var(--upcoming);
+    border: 1px solid color-mix(in srgb, var(--upcoming) 20%, transparent);
+    box-shadow: 0 1px 3px color-mix(in srgb, var(--upcoming) 10%, transparent);
   }
 
   .live-indicator {
     width: 7px;
     height: 7px;
     border-radius: 50%;
-    background: var(--primary);
-    box-shadow: 0 0 8px rgba(207, 20, 43, 0.6);
+    background: var(--live);
+    box-shadow: 0 0 8px color-mix(in srgb, var(--live) 60%, transparent);
     animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
     flex-shrink: 0;
     display: inline-block;
@@ -310,7 +306,7 @@
     }
 
     .team-score-wrapper {
-      background-color: rgba(207, 20, 43, 0.15);
+      background-color: color-mix(in srgb, var(--primary) 15%, transparent);
     }
   }
 
@@ -528,7 +524,7 @@
 
   &.winning-home,
   &.winning-away {
-    background-color: rgba(207, 20, 43, 0.15);
+    background-color: color-mix(in srgb, var(--primary) 15%, transparent);
   }
 }
 
