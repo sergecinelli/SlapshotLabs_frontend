@@ -1,25 +1,18 @@
 import { Component, input, output } from '@angular/core';
-import { ClickableLinkComponent } from '../clickable-link/clickable-link.component';
+import { RouterLink } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
-import { MatTooltipModule } from '@angular/material/tooltip';
 import { Schedule, GameStatus } from '../../interfaces/schedule.interface';
 import { ButtonRouteComponent } from '../buttons/button-route/button-route.component';
 import { ButtonLoadingComponent } from '../buttons/button-loading/button-loading.component';
-import {
-  getGameStatusLabel,
-  getStatusTooltip,
-  isOvertimeStatus,
-  STATUS_TOOLTIP_DELAY,
-} from '../../constants/statuses.constants';
+import { getGameStatusLabel, isOvertimeStatus } from '../../constants/statuses.constants';
 import { CachedSrcDirective } from '../../directives/cached-src.directive';
 
 @Component({
   selector: 'app-game-card',
   imports: [
     CachedSrcDirective,
-    ClickableLinkComponent,
+    RouterLink,
     MatIconModule,
-    MatTooltipModule,
     ButtonRouteComponent,
     ButtonLoadingComponent,
   ],
@@ -39,10 +32,7 @@ export class GameCardComponent {
 
   protected readonly GameStatus = GameStatus;
   protected readonly getGameStatusLabel = getGameStatusLabel;
-  protected readonly getStatusTooltip = getStatusTooltip;
   protected readonly isOvertimeStatus = isOvertimeStatus;
-
-  protected readonly tooltipDelay = STATUS_TOOLTIP_DELAY;
 
   onEdit(): void {
     this.edit.emit(this.game());
