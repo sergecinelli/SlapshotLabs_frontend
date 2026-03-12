@@ -181,10 +181,10 @@
   }
 
   &.completed-badge {
-    background: color-mix(in srgb, var(--upcoming) 10%, transparent);
-    color: var(--upcoming);
-    border: 1px solid color-mix(in srgb, var(--upcoming) 20%, transparent);
-    box-shadow: 0 1px 3px color-mix(in srgb, var(--upcoming) 10%, transparent);
+    background: color-mix(in srgb, var(--completed) 10%, transparent);
+    color: var(--completed);
+    border: 1px solid color-mix(in srgb, var(--completed) 20%, transparent);
+    box-shadow: 0 1px 3px color-mix(in srgb, var(--completed) 10%, transparent);
   }
 
   .live-indicator {

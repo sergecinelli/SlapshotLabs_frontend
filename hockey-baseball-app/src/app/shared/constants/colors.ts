@@ -9,9 +9,10 @@ export type AppColor =
   | 'secondary'
   | 'secondary_tone1'
   | 'secondary_dark'
+  // Status colors
   | 'upcoming'
-  // Banner status colors (semantic aliases)
   | 'live'
+  | 'completed'
   // Dark colors
   | 'dark'
   | 'dark_tone2'
@@ -78,10 +79,11 @@ export const appColors: IKeyValue<AppColor, string>[] = [
   { key: 'secondary', value: '#778f9c' },
   { key: 'secondary_tone1', value: '#c6cddb' },
   { key: 'secondary_dark', value: '#5f7a88' },
-  { key: 'upcoming', value: '#22a9f2' },
 
-  // Banner status colors (semantic aliases)
+  // Status colors
+  { key: 'upcoming', value: '#3D0CC6' },
   { key: 'live', value: '#CF142B' },
+  { key: 'completed', value: '#22a9f2' },
 
   // Dark colors
   { key: 'dark', value: '#090b0c' },
@@ -159,10 +161,11 @@ export const appColorsDark: IKeyValue<AppColor, string>[] = [
   { key: 'secondary', value: '#6B7F8C' },
   { key: 'secondary_tone1', value: '#4A5568' },
   { key: 'secondary_dark', value: '#5A7080' },
-  { key: 'upcoming', value: '#22a9f2' },
 
-  // Banner status colors (semantic aliases)
+  // Status colors
+  { key: 'upcoming', value: '#3D0CC6' },
   { key: 'live', value: '#CF142B' },
+  { key: 'completed', value: '#22a9f2' },
 
   // Dark colors
   { key: 'dark', value: '#E1E2E6' },
