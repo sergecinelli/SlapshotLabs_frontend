@@ -155,7 +155,7 @@ export class LiveGameService {
 
   getGameEvents(gameId: number, playerIds?: number[]): Observable<GameEvent[]> {
     const params =
-      playerIds && playerIds.length > 0 ? `?player_id=${playerIds.join(',')}` : '';
+      playerIds && playerIds.length > 0 ? `?player_ids=${playerIds.join(',')}` : '';
     return this.apiService.get<GameEvent[]>(`/hockey/game/${gameId}/events${params}`);
   }
 
