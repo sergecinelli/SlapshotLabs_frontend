@@ -15,8 +15,8 @@ import { GameMetadataService } from '../../services/game-metadata.service';
 import { GameEventNameService } from '../../services/game-event-name.service';
 import { Schedule, GameStatus, GameType } from '../../shared/interfaces/schedule.interface';
 import { Team } from '../../shared/interfaces/team.interface';
-import { Player } from '../../shared/interfaces/player.interface';
-import { Goalie } from '../../shared/interfaces/goalie.interface';
+import { Player, PlayerApiOutData } from '../../shared/interfaces/player.interface';
+import { Goalie, GoalieApiOutData } from '../../shared/interfaces/goalie.interface';
 import { Arena, Rink } from '../../shared/interfaces/arena.interface';
 import {
   PlayerFormModal,
@@ -455,11 +455,13 @@ export class DashboardPage implements OnInit {
     this.createHighlightLoading.set(true);
     forkJoin({
       teams: this.teamService.getTeams(),
+      players: this.apiService.get<PlayerApiOutData[]>('/hockey/player/list'),
+      goalies: this.apiService.get<GoalieApiOutData[]>('/hockey/goalie/list'),
       eventNames: this.gameEventNameService.getGameEventNames(),
       gamePeriods: this.gameMetadataService.getGamePeriods(),
       games: this.scheduleService.getGameList(),
     }).subscribe({
-      next: ({ teams, eventNames, gamePeriods, games }) => {
+      next: ({ teams, players, goalies, eventNames, gamePeriods, games }) => {
         this.createHighlightLoading.set(false);
         this.modalService.openModal(HighlightReelFormModal, {
           name: 'Create Highlight Reel',
@@ -469,6 +471,8 @@ export class DashboardPage implements OnInit {
           data: {
             isEditMode: false,
             teams: teams.teams,
+            players,
+            goalies,
             eventNames,
             gamePeriods,
             games,

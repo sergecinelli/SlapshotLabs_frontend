@@ -153,6 +153,12 @@ export class LiveGameService {
     return this.apiService.get<LiveGameData>(`/hockey/game/${gameId}/live-data`);
   }
 
+  getGameEvents(gameId: number, playerIds?: number[]): Observable<GameEvent[]> {
+    const params =
+      playerIds && playerIds.length > 0 ? `?player_id=${playerIds.join(',')}` : '';
+    return this.apiService.get<GameEvent[]>(`/hockey/game/${gameId}/events${params}`);
+  }
+
   /**
    * Update a defensive zone exit row by ID with partial fields
    */

@@ -25,6 +25,9 @@ import { visibilityByRoleMap } from './video-highlights.role-map';
 import { AuthService } from '../../services/auth.service';
 import { RoleService } from '../../services/roles/role.service';
 import { TeamService } from '../../services/team.service';
+import { ApiService } from '../../services/api.service';
+import { PlayerApiOutData } from '../../shared/interfaces/player.interface';
+import { GoalieApiOutData } from '../../shared/interfaces/goalie.interface';
 import { GameEventNameService } from '../../services/game-event-name.service';
 import { GameMetadataService } from '../../services/game-metadata.service';
 import { ScheduleService } from '../../services/schedule.service';
@@ -56,6 +59,7 @@ export class VideoHighlightsPage implements OnInit {
   private teamService = inject(TeamService);
   private gameEventNameService = inject(GameEventNameService);
   private gameMetadataService = inject(GameMetadataService);
+  private apiService = inject(ApiService);
   private scheduleService = inject(ScheduleService);
 
   rows = signal<HighlightReelRow[]>([]);
@@ -189,11 +193,13 @@ export class VideoHighlightsPage implements OnInit {
   openCreateHighlightModal(): void {
     this.isAddLoading.set(true);
     this.loadHighlightFormData().subscribe({
-      next: ({ teams, eventNames, gamePeriods, games }) => {
+      next: ({ teams, players, goalies, eventNames, gamePeriods, games }) => {
         this.isAddLoading.set(false);
         this.openHighlightModal({
           isEditMode: false,
           teams: teams.teams,
+          players,
+          goalies,
           eventNames,
           gamePeriods,
           games,
@@ -220,6 +226,8 @@ export class VideoHighlightsPage implements OnInit {
   private loadHighlightFormData() {
     return forkJoin({
       teams: this.teamService.getTeams(),
+      players: this.apiService.get<PlayerApiOutData[]>('/hockey/player/list'),
+      goalies: this.apiService.get<GoalieApiOutData[]>('/hockey/goalie/list'),
       eventNames: this.gameEventNameService.getGameEventNames(),
       gamePeriods: this.gameMetadataService.getGamePeriods(),
       games: this.scheduleService.getGameList(),

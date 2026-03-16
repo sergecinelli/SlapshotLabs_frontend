@@ -44,11 +44,22 @@
             Add Custom Highlight
           </app-button>
         </div>
+        <div class="form-row">
+          <app-form-field label="Filter by Players">
+            <app-custom-multi-select
+              [value]="selectedPlayerIds()"
+              [optionGroups]="playerOptionGroups()"
+              placeholder="All events (no filter)"
+              searchPlaceholder="Search by name..."
+              (valueChange)="onPlayerSelectionChange($event)"
+            />
+          </app-form-field>
+        </div>
         <div class="two-column-layout">
           <!-- Left Column: Games List -->
           <div class="column games-column">
             <mat-accordion>
-              @for (game of gamesValue; track game) {
+              @for (game of gamesValue; track game.id) {
                 <mat-expansion-panel (opened)="onPanelOpened(game)">
                   <mat-expansion-panel-header>
                     <mat-panel-title>{{ game.label }}</mat-panel-title>
