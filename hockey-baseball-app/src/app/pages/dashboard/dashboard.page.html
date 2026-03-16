@@ -15,6 +15,7 @@
         [materialIcon]="'group_add'"
         [haveContent]="true"
         [isLoading]="addTeamLoading()"
+        [isDisabled]="loadingValue"
         (clicked)="openAddTeamModal()"
       >
         Add Team
@@ -28,6 +29,7 @@
         [materialIcon]="'person_add'"
         [haveContent]="true"
         [isLoading]="addPlayerLoading()"
+        [isDisabled]="loadingValue"
         (clicked)="openAddPlayerModal()"
       >
         Add Player
@@ -41,6 +43,7 @@
         [materialIcon]="'shield'"
         [haveContent]="true"
         [isLoading]="addGoalieLoading()"
+        [isDisabled]="loadingValue"
         (clicked)="openAddGoalieModal()"
       >
         Add Goalie
@@ -54,6 +57,7 @@
         [materialIcon]="'sports_hockey'"
         [haveContent]="true"
         [isLoading]="addGameLoading()"
+        [isDisabled]="loadingValue"
         (clicked)="openAddGameModal()"
       >
         Add Game
@@ -67,6 +71,7 @@
         [materialIcon]="'video_library'"
         [haveContent]="true"
         [isLoading]="createHighlightLoading()"
+        [isDisabled]="loadingValue"
         (clicked)="createHighlightReel()"
       >
         Create Highlight Reel

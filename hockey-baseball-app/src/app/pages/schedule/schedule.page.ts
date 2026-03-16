@@ -556,7 +556,7 @@ export class SchedulePage implements OnInit {
     this.modalService.openModal(ScheduleFormModal, {
       name: 'Edit Game',
       icon: 'event',
-      width: '900px',
+      width: '920px',
       maxWidth: '95vw',
       data: {
         schedule: schedule,
