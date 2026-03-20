@@ -572,27 +572,18 @@ export class SchedulePage implements OnInit {
       } as ScheduleFormModalData,
       onCloseWithDataProcessing: (result: {
         isEditMode: boolean;
-        gameId?: number;
+        gameId?: string;
         gameData: Record<string, unknown>;
       }) => {
-        const apiCall = result.isEditMode
-          ? this.scheduleService.updateGame(result.gameId!, result.gameData)
-          : this.scheduleService.createGame(result.gameData);
-        apiCall.subscribe({
+        this.scheduleService.updateGame(parseInt(schedule.id), result.gameData).subscribe({
           next: () => {
-            this.toast.show(
-              result.isEditMode ? 'Game updated successfully' : 'Game created successfully',
-              'success'
-            );
+            this.toast.show('Game updated successfully', 'success');
             this.modalService.closeModal();
             this.loadSchedules(false);
             this.bannerService.triggerRefresh();
           },
           error: () => {
-            this.toast.show(
-              result.isEditMode ? 'Failed to update game' : 'Failed to create game',
-              'error'
-            );
+            this.toast.show('Failed to update game', 'error');
             this.modalService.broadcastEvent(ModalEvent.StopButtonLoading);
           },
         });
@@ -769,27 +760,18 @@ export class SchedulePage implements OnInit {
       } as ScheduleFormModalData,
       onCloseWithDataProcessing: (result: {
         isEditMode: boolean;
-        gameId?: number;
+        gameId?: string;
         gameData: Record<string, unknown>;
       }) => {
-        const apiCall = result.isEditMode
-          ? this.scheduleService.updateGame(result.gameId!, result.gameData)
-          : this.scheduleService.createGame(result.gameData);
-        apiCall.subscribe({
+        this.scheduleService.createGame(result.gameData).subscribe({
           next: () => {
-            this.toast.show(
-              result.isEditMode ? 'Game updated successfully' : 'Game created successfully',
-              'success'
-            );
+            this.toast.show('Game created successfully', 'success');
             this.modalService.closeModal();
             this.loadSchedules(false);
             this.bannerService.triggerRefresh();
           },
           error: () => {
-            this.toast.show(
-              result.isEditMode ? 'Failed to update game' : 'Failed to create game',
-              'error'
-            );
+            this.toast.show('Failed to create game', 'error');
             this.modalService.broadcastEvent(ModalEvent.StopButtonLoading);
           },
         });
