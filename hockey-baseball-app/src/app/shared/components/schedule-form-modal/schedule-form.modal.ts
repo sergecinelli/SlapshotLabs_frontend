@@ -254,8 +254,6 @@ export class ScheduleFormModal implements OnInit {
       // Load roster data if in edit mode
       if (this.isEditMode && this.data.gameData) {
         this.loadGameRoster(this.data.gameData.id);
-      } else {
-        this.initializeRosterSelections();
       }
 
       this.isLoading = false;
@@ -298,8 +296,6 @@ export class ScheduleFormModal implements OnInit {
           // Load roster data if in edit mode
           if (this.isEditMode && this.data.gameData) {
             this.loadGameRoster(this.data.gameData.id);
-          } else {
-            this.initializeRosterSelections();
           }
 
           this.isLoading = false;
@@ -565,11 +561,6 @@ export class ScheduleFormModal implements OnInit {
       return;
     }
 
-    // Initialize rosters if not already set
-    if (this.homeGoalieIds.length === 0 && this.homePlayerIds.length === 0) {
-      this.initializeRosterSelections();
-    }
-
     const homeTeam = this.teams.find((t) => parseInt(t.id) === homeTeamId);
     const teamName = homeTeam ? homeTeam.name : 'Home Team';
 
@@ -598,11 +589,6 @@ export class ScheduleFormModal implements OnInit {
     const awayTeamId = parseInt(this.scheduleForm.get('awayTeam')?.value);
     if (isNaN(awayTeamId)) {
       return;
-    }
-
-    // Initialize rosters if not already set
-    if (this.awayGoalieIds.length === 0 && this.awayPlayerIds.length === 0) {
-      this.initializeRosterSelections();
     }
 
     const awayTeam = this.teams.find((t) => parseInt(t.id) === awayTeamId);
@@ -636,16 +622,6 @@ export class ScheduleFormModal implements OnInit {
 
       const homeTeamId = parseInt(formValue.homeTeam);
       const awayTeamId = parseInt(formValue.awayTeam);
-
-      // Use selected roster IDs, or initialize with all team members if not set
-      if (
-        this.homeGoalieIds.length === 0 ||
-        this.homePlayerIds.length === 0 ||
-        this.awayGoalieIds.length === 0 ||
-        this.awayPlayerIds.length === 0
-      ) {
-        this.initializeRosterSelections();
-      }
 
       const homeGoalies = this.homeGoalieIds;
       const awayGoalies = this.awayGoalieIds;

@@ -97,17 +97,11 @@ export class RosterSelectionModal implements OnInit {
           }))
         );
 
-        // Select all by default
-        this.goalieSelection.select(...this.goalies().map((g) => g.id));
-        this.playerSelection.select(...this.players().map((p) => p.id));
-
-        // If there are pre-selected IDs, use those instead
+        // Pre-select previously selected IDs
         if (this.data.selectedGoalieIds && this.data.selectedGoalieIds.length > 0) {
-          this.goalieSelection.clear();
           this.goalieSelection.select(...this.data.selectedGoalieIds);
         }
         if (this.data.selectedPlayerIds && this.data.selectedPlayerIds.length > 0) {
-          this.playerSelection.clear();
           this.playerSelection.select(...this.data.selectedPlayerIds);
         }
 
