@@ -206,6 +206,8 @@ export class GoaliesPage implements OnInit {
                 return {
                   ...goalie,
                   teamLogo: team.logo,
+                  teamAgeGroup: team.group,
+                  teamLevelName: team.level,
                 };
               }
             }
@@ -238,6 +240,8 @@ export class GoaliesPage implements OnInit {
                 return {
                   ...goalie,
                   teamLogo: team.logo,
+                  teamAgeGroup: team.group,
+                  teamLevelName: team.level,
                 };
               }
             }

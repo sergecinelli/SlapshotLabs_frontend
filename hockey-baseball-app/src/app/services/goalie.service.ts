@@ -30,20 +30,10 @@ export class GoalieService {
   private teamService = inject(TeamService);
 
   getGoalies(options?: GetGoaliesOptions): Observable<GoalieTableData> {
-    return forkJoin({
-      goalies: this.apiService.get<GoalieApiOutData[]>('/hockey/goalie/list'),
-      teams: this.teamService.getTeams(),
-    }).pipe(
-      map(({ goalies: apiGoalies, teams }) => {
-        // Create team ID to name mapping
-        const teamMap = new Map(teams.teams.map((t) => [parseInt(t.id), t.name]));
-
-        // Map goalies with team names
+    return this.apiService.get<GoalieApiOutData[]>('/hockey/goalie/list').pipe(
+      map((apiGoalies) => {
         let mapped = apiGoalies.map((apiGoalie) =>
-          GoalieDataMapper.fromApiOutFormat(
-            { photo: '', data: apiGoalie },
-            teamMap.get(apiGoalie.team_id)
-          )
+          GoalieDataMapper.fromApiOutFormat({ photo: '', data: apiGoalie })
         );
 
         if (options?.excludeDefault) {
@@ -89,18 +79,9 @@ export class GoalieService {
       return throwError(() => new Error(`Invalid goalie ID: ${id}`));
     }
 
-    return forkJoin({
-      goalie: this.apiService.get<GoalieApiOutData>(`/hockey/goalie/${numericId}`),
-      teams: this.teamService.getTeams(),
-    }).pipe(
-      map(({ goalie: apiGoalie, teams }) => {
-        // Create team ID to name mapping
-        const teamMap = new Map(teams.teams.map((t) => [parseInt(t.id), t.name]));
-        // Single goalie endpoint returns flat object without photo wrapper
-        return GoalieDataMapper.fromApiOutFormat(
-          { photo: '', data: apiGoalie },
-          teamMap.get(apiGoalie.team_id)
-        );
+    return this.apiService.get<GoalieApiOutData>(`/hockey/goalie/${numericId}`).pipe(
+      map((apiGoalie) => {
+        return GoalieDataMapper.fromApiOutFormat({ photo: '', data: apiGoalie });
       }),
       catchError((error) => {
         console.error(`Failed to fetch goalie with ID ${id}:`, error);

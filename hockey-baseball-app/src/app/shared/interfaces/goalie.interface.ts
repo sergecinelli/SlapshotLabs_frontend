@@ -34,6 +34,7 @@ export interface GoalieApiIn {
 export interface GoalieApiOutData {
   id: number;
   team_id: number;
+  team_name: string | null;
   height: number; // Height in inches
   weight: number; // Weight in lbs
   shoots: string; // "R" for Right Shot, "L" for Left Shot

@@ -1,13 +1,4 @@
-import {
-  Component,
-  ElementRef,
-  Renderer2,
-  inject,
-  input,
-  output,
-  effect,
-  computed,
-} from '@angular/core';
+import { Component, ElementRef, Renderer2, inject, input, output, computed } from '@angular/core';
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { MatTableModule } from '@angular/material/table';

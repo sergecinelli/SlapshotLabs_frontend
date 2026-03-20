@@ -27,17 +27,10 @@ export class PlayerService {
   private teamService = inject(TeamService);
 
   getPlayers(): Observable<PlayerTableData> {
-    return forkJoin({
-      players: this.apiService.get<PlayerApiOutData[]>('/hockey/player/list'),
-      teams: this.teamService.getTeams(),
-    }).pipe(
-      map(({ players: apiPlayers, teams }) => {
-        // Create team ID to name mapping
-        const teamMap = new Map(teams.teams.map((t) => [parseInt(t.id), t.name]));
-
-        // Map players with team names
+    return this.apiService.get<PlayerApiOutData[]>('/hockey/player/list').pipe(
+      map((apiPlayers) => {
         const players = apiPlayers.map((apiPlayer) =>
-          this.fromApiOutFormat({ photo: '', data: apiPlayer }, teamMap.get(apiPlayer.team_id))
+          this.fromApiOutFormat({ photo: '', data: apiPlayer })
         );
         return {
           players: players,
@@ -72,18 +65,9 @@ export class PlayerService {
       return throwError(() => new Error(`Invalid player ID: ${id}`));
     }
 
-    return forkJoin({
-      player: this.apiService.get<PlayerApiOutData>(`/hockey/player/${numericId}`),
-      teams: this.teamService.getTeams(),
-    }).pipe(
-      map(({ player: apiPlayer, teams }) => {
-        // Create team ID to name mapping
-        const teamMap = new Map(teams.teams.map((t) => [parseInt(t.id), t.name]));
-        // Single player endpoint returns flat object without photo wrapper
-        return this.fromApiOutFormat(
-          { photo: '', data: apiPlayer },
-          teamMap.get(apiPlayer.team_id)
-        );
+    return this.apiService.get<PlayerApiOutData>(`/hockey/player/${numericId}`).pipe(
+      map((apiPlayer) => {
+        return this.fromApiOutFormat({ photo: '', data: apiPlayer });
       }),
       catchError((error) => {
         console.error(`Failed to fetch player with ID ${id}:`, error);
@@ -189,7 +173,7 @@ export class PlayerService {
     );
   }
 
-  private fromApiOutFormat(apiPlayer: PlayerApiOut, teamName?: string): Player {
+  private fromApiOutFormat(apiPlayer: PlayerApiOut): Player {
     const data = apiPlayer.data;
     const heightFeet = Math.floor(data.height / 12);
     const heightInches = data.height % 12;
@@ -197,8 +181,8 @@ export class PlayerService {
 
     return {
       id: data.id.toString(),
-      teamId: data.team_id, // Store team ID from API
-      team: teamName || `Team ${data.team_id}`,
+      teamId: data.team_id,
+      team: data.team_name || `Team ${data.team_id}`,
       position: this.mapPositionIdToName(data.position_id),
       height: heightString,
       weight: data.weight,

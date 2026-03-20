@@ -40,6 +40,7 @@ export interface PlayerApiIn {
 export interface PlayerApiOutData {
   id: number;
   team_id: number;
+  team_name: string | null;
   position_id: number;
   height: number; // Height in inches
   weight: number; // Weight in lbs

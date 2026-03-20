@@ -253,10 +253,7 @@ export class HighlightReelFormModal implements OnInit {
     this.isLoading = false;
   }
 
-  private buildPlayerOptionGroups(
-    players: PlayerApiOutData[],
-    goalies: GoalieApiOutData[]
-  ): void {
+  private buildPlayerOptionGroups(players: PlayerApiOutData[], goalies: GoalieApiOutData[]): void {
     const playerOptions = players.map((p) => ({
       value: String(p.id),
       label: `${p.first_name} ${p.last_name}`,
@@ -358,9 +355,7 @@ export class HighlightReelFormModal implements OnInit {
   }
 
   private updateGame(gameId: number, patch: Partial<GameListItem>): void {
-    this.games.update((list) =>
-      list.map((g) => (g.id === gameId ? { ...g, ...patch } : g))
-    );
+    this.games.update((list) => list.map((g) => (g.id === gameId ? { ...g, ...patch } : g)));
   }
 
   getTeamLogoUrl(teamId: number): string {

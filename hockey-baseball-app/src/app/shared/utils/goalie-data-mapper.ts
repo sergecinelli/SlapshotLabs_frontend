@@ -90,18 +90,12 @@ export class GoalieDataMapper {
     };
   }
 
-  /**
-   * Transform API GoalieApiOut data to frontend Goalie format
-   * @param apiGoalie - API goalie data
-   * @param teamName - Optional team name (since API only has team_id)
-   * @returns Goalie object
-   */
-  static fromApiOutFormat(apiGoalie: GoalieApiOut, teamName?: string): Goalie {
+  static fromApiOutFormat(apiGoalie: GoalieApiOut): Goalie {
     const data = apiGoalie.data;
     return {
       id: data.id.toString(),
-      teamId: data.team_id, // Store team ID from API
-      team: teamName || `Team ${data.team_id}`,
+      teamId: data.team_id,
+      team: data.team_name || `Team ${data.team_id}`,
       level: 'Professional', // Default value since not in API
       position: 'Goalie',
       height: this.inchesToHeightString(data.height),
