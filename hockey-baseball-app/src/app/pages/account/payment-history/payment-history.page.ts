@@ -21,6 +21,7 @@ export class PaymentHistoryPage implements OnInit {
   private paymentService = inject(PaymentService);
   private currencyPipe = new CurrencyFormatPipe();
 
+  rawTransactions = signal<Transaction[]>([]);
   transactions = signal<Transaction[]>([]);
   isLoading = signal(true);
 
@@ -29,12 +30,12 @@ export class PaymentHistoryPage implements OnInit {
   totalCount = signal(0);
 
   totalPaid = computed(() => {
-    return this.transactions().reduce((sum, t) => sum + parseFloat(t.amount || '0'), 0);
+    return this.rawTransactions().reduce((sum, t) => sum + parseFloat(t.amount || '0'), 0);
   });
 
   averageAmount = computed(() => {
-    const total = this.totalCount();
-    return total > 0 ? this.totalPaid() / total : 0;
+    const count = this.rawTransactions().length;
+    return count > 0 ? this.totalPaid() / count : 0;
   });
 
   readonly columns: TableColumn[] = [
@@ -65,6 +66,7 @@ export class PaymentHistoryPage implements OnInit {
       next: (response) => {
         this.totalPages.set(response.total_pages);
         this.totalCount.set(response.count);
+        this.rawTransactions.set(response.items);
         this.transactions.set(
           response.items.map((t) => ({
             ...t,
