@@ -1,0 +1,46 @@
+<div class="add-payment-modal">
+  <div class="modal-content">
+    @if (isLoadingDropin()) {
+      <div class="loading-container">
+        <app-loading-spinner message="Loading payment form..." size="sm" />
+      </div>
+    }
+
+    @if (dropinError()) {
+      <div class="error-banner">
+        <span class="material-symbols-rounded error-icon">error</span>
+        <span>{{ dropinError() }}</span>
+      </div>
+    }
+
+    <div #dropinContainer class="dropin-container" [class.hidden]="isLoadingDropin()"></div>
+  </div>
+
+  <div class="modal-actions">
+    <app-button
+      [bg]="'background'"
+      [bghover]="'item_hover'"
+      [br]="'border'"
+      [color]="'text_primary'"
+      [colorhover]="'text_primary'"
+      [haveContent]="true"
+      materialIcon="cancel"
+      (clicked)="onCancel()"
+    >
+      Cancel
+    </app-button>
+    <app-button-loading
+      [isLoading]="isSubmitting()"
+      [isDisabled]="isLoadingDropin() || !isPaymentReady()"
+      materialIcon="check_circle"
+      [bg]="'green'"
+      [bghover]="'green_dark'"
+      [color]="'white'"
+      [colorhover]="'white'"
+      [haveContent]="true"
+      (clicked)="onSubmit()"
+    >
+      Add Payment Method
+    </app-button-loading>
+  </div>
+</div>

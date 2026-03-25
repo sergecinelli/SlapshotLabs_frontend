@@ -1,5 +1,10 @@
 import { GameStatus, GameType } from '../interfaces/schedule.interface';
 import { TryoutStatus } from '../interfaces/tryout.interface';
+import {
+  TransactionStatus,
+  BraintreeTransactionStatus,
+  SubscriptionStatus,
+} from '../interfaces/payment.interface';
 
 export interface StatusColor {
   color: string;
@@ -80,6 +85,138 @@ export const STATUS_COLOR: Record<string, StatusConfig> = {
     color: 'var(--green-dark)',
     backgroundColor: 'var(--green-soft)',
     tooltip: 'Summer league game',
+  },
+
+  // Payment Transaction Statuses
+  [TransactionStatus.Paid]: {
+    color: 'var(--green-dark)',
+    backgroundColor: 'var(--green-soft)',
+    label: 'Paid',
+    icon: 'check_circle',
+    tooltip: 'Payment completed successfully',
+  },
+  [TransactionStatus.Failed]: {
+    color: 'var(--danger)',
+    backgroundColor: 'var(--danger-soft)',
+    label: 'Failed',
+    icon: 'error',
+    tooltip: 'Payment failed',
+  },
+  [TransactionStatus.Pending]: {
+    color: 'var(--orange)',
+    backgroundColor: 'color-mix(in srgb, var(--orange) 15%, var(--background))',
+    label: 'Pending',
+    icon: 'schedule',
+    tooltip: 'Payment is being processed',
+  },
+  [TransactionStatus.Refunded]: {
+    color: 'var(--blue-dark)',
+    backgroundColor: 'var(--blue-soft)',
+    label: 'Refunded',
+    icon: 'undo',
+    tooltip: 'Payment has been refunded',
+  },
+
+  // Braintree Transaction Statuses
+  [BraintreeTransactionStatus.SubmittedForSettlement]: {
+    color: 'var(--green-dark)',
+    backgroundColor: 'var(--green-soft)',
+    icon: 'check_circle',
+    label: 'Submitted For Settlement',
+    tooltip: 'Payment submitted for settlement',
+  },
+  [BraintreeTransactionStatus.Settled]: {
+    color: 'var(--green-dark)',
+    backgroundColor: 'var(--green-soft)',
+    icon: 'check_circle',
+    label: 'Settled',
+    tooltip: 'Payment settled',
+  },
+  [BraintreeTransactionStatus.Settling]: {
+    color: 'var(--green-dark)',
+    backgroundColor: 'var(--green-soft)',
+    icon: 'check_circle',
+    label: 'Settling',
+    tooltip: 'Payment is settling',
+  },
+  [BraintreeTransactionStatus.Authorized]: {
+    color: 'var(--orange)',
+    backgroundColor: 'color-mix(in srgb, var(--orange) 15%, var(--background))',
+    icon: 'schedule',
+    label: 'Authorized',
+    tooltip: 'Payment authorized',
+  },
+  [BraintreeTransactionStatus.Authorizing]: {
+    color: 'var(--orange)',
+    backgroundColor: 'color-mix(in srgb, var(--orange) 15%, var(--background))',
+    icon: 'schedule',
+    label: 'Authorizing',
+    tooltip: 'Payment is authorizing',
+  },
+  [BraintreeTransactionStatus.SettlementPending]: {
+    color: 'var(--orange)',
+    backgroundColor: 'color-mix(in srgb, var(--orange) 15%, var(--background))',
+    icon: 'schedule',
+    label: 'Settlement Pending',
+    tooltip: 'Settlement pending',
+  },
+  [BraintreeTransactionStatus.GatewayRejected]: {
+    color: 'var(--danger)',
+    backgroundColor: 'var(--danger-soft)',
+    icon: 'error',
+    label: 'Gateway Rejected',
+    tooltip: 'Payment rejected by gateway',
+  },
+  [BraintreeTransactionStatus.ProcessorDeclined]: {
+    color: 'var(--danger)',
+    backgroundColor: 'var(--danger-soft)',
+    icon: 'error',
+    label: 'Processor Declined',
+    tooltip: 'Payment declined by processor',
+  },
+  [BraintreeTransactionStatus.Failed]: {
+    color: 'var(--danger)',
+    backgroundColor: 'var(--danger-soft)',
+    icon: 'error',
+    label: 'Failed',
+    tooltip: 'Payment failed',
+  },
+  [BraintreeTransactionStatus.Voided]: {
+    color: 'var(--blue-dark)',
+    backgroundColor: 'var(--blue-soft)',
+    icon: 'undo',
+    label: 'Voided',
+    tooltip: 'Payment voided',
+  },
+
+  // Subscription Statuses
+  [SubscriptionStatus.Active]: {
+    color: 'var(--text-white)',
+    backgroundColor: 'var(--green-dark)',
+    label: 'Active',
+    icon: 'check_circle',
+    tooltip: 'Subscription is active',
+  },
+  [SubscriptionStatus.Canceled]: {
+    color: 'var(--text-white)',
+    backgroundColor: 'var(--danger)',
+    label: 'Canceled',
+    icon: 'cancel',
+    tooltip: 'Subscription has been canceled',
+  },
+  [SubscriptionStatus.PastDue]: {
+    color: 'var(--text-white)',
+    backgroundColor: 'var(--orange)',
+    label: 'Past Due',
+    icon: 'warning',
+    tooltip: 'Payment is past due',
+  },
+  [SubscriptionStatus.Expired]: {
+    color: 'var(--text-white)',
+    backgroundColor: 'var(--text-secondary)',
+    label: 'Expired',
+    icon: 'event_busy',
+    tooltip: 'Subscription has expired',
   },
 };
 

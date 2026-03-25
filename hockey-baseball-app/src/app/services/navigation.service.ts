@@ -35,6 +35,11 @@ export class NavigationService {
         expanded: false,
         children: [
           { label: 'Profile', path: '/account/profile', icon: 'profile' },
+          {
+            label: 'Subscription Plans',
+            path: '/account/subscription-plans',
+            icon: 'subscription',
+          },
           { label: 'Payment Method', path: '/account/payment-method', icon: 'payment' },
           { label: 'Payment History', path: '/account/payment-history', icon: 'history' },
         ],
@@ -177,6 +182,7 @@ export class NavigationService {
       dashboard: 'dashboard',
       account: 'account_circle',
       profile: 'person',
+      subscription: 'workspace_premium',
       payment: 'credit_card',
       history: 'history',
       teams: 'groups',

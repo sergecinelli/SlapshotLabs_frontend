@@ -1,0 +1,84 @@
+:host {
+  display: block;
+}
+
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  align-items: start;
+  gap: 10px;
+  padding: 0 0 10px;
+
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.stat-card {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  grid-template-rows: auto auto;
+  column-gap: 10px;
+  padding: 15px;
+  background: var(--gray-tone3);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+
+  .stat-icon {
+    grid-row: 1 / -1;
+    align-self: center;
+  }
+
+  .stat-label {
+    grid-column: 2;
+    text-align: center;
+  }
+
+  .stat-value {
+    grid-column: 2;
+    text-align: center;
+  }
+
+  &::after {
+    content: '';
+    grid-row: 1 / -1;
+    grid-column: 3;
+    width: 52px;
+  }
+}
+
+.stat-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0;
+}
+
+.stat-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.stat-icon {
+  font-size: 32px;
+  padding: 10px;
+  border-radius: var(--radius-medium);
+
+  &.transactions-icon {
+    color: var(--primary);
+    background: var(--primary-soft);
+  }
+
+  &.paid-icon {
+    color: var(--green-dark);
+    background: var(--green-soft);
+  }
+
+  &.average-icon {
+    color: var(--blue-dark);
+    background: var(--blue-soft);
+  }
+}

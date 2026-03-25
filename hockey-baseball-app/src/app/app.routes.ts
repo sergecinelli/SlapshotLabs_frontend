@@ -126,6 +126,19 @@ export const routes: Routes = [
         },
       },
       {
+        path: 'account/subscription-plans',
+        loadComponent: () =>
+          import('./pages/account/subscription-plans/subscription-plans.page').then(
+            (m) => m.SubscriptionPlansPage
+          ),
+        data: {
+          breadcrumbs: [
+            { label: 'Account', path: '/account', icon: 'account_circle' },
+            { label: 'Subscription Plans', icon: 'workspace_premium' },
+          ],
+        },
+      },
+      {
         path: 'account/payment-method',
         loadComponent: () =>
           import('./pages/account/payment-method/payment-method.page').then(

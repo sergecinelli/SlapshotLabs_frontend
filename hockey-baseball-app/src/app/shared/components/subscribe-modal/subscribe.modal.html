@@ -1,0 +1,127 @@
+@let planValue = plan();
+@let methodsValue = paymentMethods();
+
+<div class="subscribe-modal">
+  @if (planValue) {
+    <!-- Plan Summary -->
+    <div class="plan-summary">
+      <div class="plan-summary-row">
+        <div class="plan-icon-wrapper">
+          <span class="material-symbols-rounded plan-summary-icon">workspace_premium</span>
+        </div>
+        <div class="plan-summary-info">
+          <h3 class="plan-summary-name">{{ planValue.name }}</h3>
+          <p class="plan-summary-description">{{ planValue.description }}</p>
+        </div>
+      </div>
+      <div class="plan-summary-price">
+        <span class="price-value">{{ planValue.price | currencyFormat }}</span>
+        <span class="price-period">/month</span>
+      </div>
+    </div>
+
+    <!-- Payment Section -->
+    <div class="payment-section">
+      <h4 class="payment-section-title">
+        <span class="material-symbols-rounded">credit_card</span>
+        Payment Method
+      </h4>
+
+      @if (hasExistingMethods()) {
+        <!-- Existing Cards -->
+        @if (!useNewCard()) {
+          <div class="methods-list">
+            @for (method of methodsValue; track method.token) {
+              <button
+                class="method-option"
+                [class.selected]="selectedMethodToken() === method.token"
+                (click)="onSelectMethod(method.token)"
+              >
+                <span class="method-radio">
+                  @if (selectedMethodToken() === method.token) {
+                    <span class="material-symbols-rounded radio-icon">radio_button_checked</span>
+                  } @else {
+                    <span class="material-symbols-rounded radio-icon">radio_button_unchecked</span>
+                  }
+                </span>
+                <div class="method-details">
+                  <span class="method-brand">{{ method.brand }}</span>
+                  <span class="method-display">{{ method.display }}</span>
+                </div>
+                @if (method.is_default) {
+                  <span class="method-default-badge">Default</span>
+                }
+                <span class="method-expiry">{{ method.expiration }}</span>
+              </button>
+            }
+          </div>
+
+          <button class="add-new-link" (click)="onUseNewCard()">
+            <span class="material-symbols-rounded">add_circle</span>
+            Use a new payment method
+          </button>
+        } @else {
+          <button class="back-link" (click)="onUseExistingCard()">
+            <span class="material-symbols-rounded">arrow_back</span>
+            Use existing payment method
+          </button>
+
+          <div class="dropin-wrapper">
+            @if (isLoadingDropin()) {
+              <div class="loading-container">
+                <app-loading-spinner message="Loading payment form..." size="sm" />
+              </div>
+            }
+            <div #dropinContainer class="dropin-container" [class.hidden]="isLoadingDropin()"></div>
+          </div>
+        }
+      } @else {
+        <!-- No existing cards - show Braintree Drop-in -->
+        <div class="dropin-wrapper">
+          @if (isLoadingDropin()) {
+            <div class="loading-container">
+              <app-loading-spinner message="Loading payment form..." size="sm" />
+            </div>
+          }
+          <div #dropinContainer class="dropin-container" [class.hidden]="isLoadingDropin()"></div>
+        </div>
+      }
+    </div>
+
+    @if (error()) {
+      <div class="error-banner">
+        <span class="material-symbols-rounded error-icon">error</span>
+        <span>{{ error() }}</span>
+      </div>
+    }
+  }
+
+  <!-- Actions -->
+  <div class="modal-actions">
+    <app-button
+      [bg]="'background'"
+      [bghover]="'item_hover'"
+      [br]="'border'"
+      [color]="'text_primary'"
+      [colorhover]="'text_primary'"
+      [haveContent]="true"
+      materialIcon="close"
+      (clicked)="onCancel()"
+    >
+      Cancel
+    </app-button>
+    <app-button-loading
+      [isLoading]="isSubmitting()"
+      [isDisabled]="isLoadingDropin()"
+      materialIcon="rocket_launch"
+      [bg]="'primary'"
+      [bghover]="'primary_dark'"
+      [color]="'white'"
+      [colorhover]="'white'"
+      [haveContent]="true"
+      (clicked)="onSubscribe()"
+    >
+      Subscribe Now
+    </app-button-loading>
+  </div>
+</div>

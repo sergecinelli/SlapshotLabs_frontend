@@ -1,0 +1,111 @@
+@let plansValue = plans();
+@let subscriptionValue = subscription();
+
+<div class="page-content">
+  @if (isLoading()) {
+    <app-loading-spinner message="Loading subscription plans..." size="sm" />
+  } @else {
+    <div class="page-sections">
+      <section class="plans-section">
+        @if (plansValue.length > 0) {
+          <div class="section-header-row">
+            <span class="material-symbols-rounded section-icon">workspace_premium</span>
+            <div class="section-header-text">
+              @if (animatedTitle() !== null) {
+                <h2 class="section-title">
+                  <span>{{ animatedTitle() }}</span
+                  ><span class="typing-cursor" [class.blinking]="isTyping()">|</span>
+                </h2>
+              } @else if (subscriptionValue) {
+                <h2 class="section-title">Welcome to the team!</h2>
+              } @else {
+                <h2 class="section-title">Choose Your Plan</h2>
+              }
+              <p class="section-subtitle">
+                @if (subscriptionValue) {
+                  You're on the <strong>{{ subscriptionValue.name }}</strong> plan. Switch plans
+                  anytime.
+                } @else {
+                  Select the plan that best fits your needs. Upgrade or change anytime.
+                }
+              </p>
+            </div>
+            @if (subscriptionValue) {
+              <app-button
+                [bg]="'item_selected'"
+                [bghover]="'item_hover'"
+                [br]="'border'"
+                [color]="'text_primary'"
+                [colorhover]="'text_primary'"
+                [haveContent]="true"
+                materialIcon="cancel"
+                (clicked)="onCancelSubscription()"
+              >
+                Cancel Subscription
+              </app-button>
+            }
+          </div>
+          <div class="plans-grid">
+            @for (plan of plansValue; track plan.id) {
+              <div
+                class="dashboard-card plan-card"
+                [class.active]="subscriptionValue?.name === plan.name"
+                [class.deactivating]="previousPlanName() === plan.name"
+                [class.just-activated]="justActivatedPlanId() === plan.id"
+              >
+                @if (subscriptionValue?.name === plan.name || previousPlanName() === plan.name) {
+                  <div class="plan-ribbon" [class.ribbon-exit]="previousPlanName() === plan.name">
+                    <span>Active</span>
+                  </div>
+                }
+                <div class="plan-card-header">
+                  <h3 class="plan-card-name">{{ plan.name }}</h3>
+                  <p class="plan-card-description">{{ plan.description }}</p>
+                </div>
+                <div class="plan-card-price">
+                  <span class="plan-price-value">{{ plan.price | currencyFormat }}</span>
+                  <span class="plan-price-period">/month</span>
+                </div>
+                <div class="plan-card-bottom">
+                  <ul class="plan-card-features">
+                    <li class="plan-feature">
+                      <span class="material-symbols-rounded plan-feature-icon">groups</span>
+                      <span>{{ plan.users_count | number }} active subscribers</span>
+                    </li>
+                    @for (feature of plan.features; track feature) {
+                      <li class="plan-feature">
+                        <span class="material-symbols-rounded plan-feature-icon">verified</span>
+                        <span>{{ feature }}</span>
+                      </li>
+                    }
+                  </ul>
+                  @if (subscriptionValue?.name !== plan.name) {
+                    <div class="plan-card-action">
+                      <app-button
+                        [bg]="'primary'"
+                        [bghover]="'primary_dark'"
+                        [color]="'white'"
+                        [colorhover]="'white'"
+                        [haveContent]="true"
+                        materialIcon="rocket_launch"
+                        (clicked)="onSelectPlan(plan, $event)"
+                      >
+                        Subscribe
+                      </app-button>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        } @else {
+          <div class="empty-cards">
+            <span class="material-symbols-rounded empty-icon">inventory_2</span>
+            <p class="empty-text">No plans available</p>
+            <p class="empty-hint">Check back later for subscription options</p>
+          </div>
+        }
+      </section>
+    </div>
+  }
+</div>

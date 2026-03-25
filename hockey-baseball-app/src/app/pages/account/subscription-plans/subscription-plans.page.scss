@@ -1,0 +1,293 @@
+@use '../../../shared/styles/dashboard-card.scss' as *;
+
+:host {
+  display: block;
+
+  .page-content {
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+  }
+}
+
+.page-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+  max-width: 1100px;
+}
+
+// ─── Plans Section ─────────────────────
+.plans-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.section-header-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  padding-left: 10px;
+
+  > app-button {
+    flex-shrink: 0;
+    margin-left: auto;
+  }
+}
+
+.section-icon {
+  font-size: 32px;
+  color: var(--primary);
+  flex-shrink: 0;
+  align-self: center;
+}
+
+.section-header-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.section-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.typing-cursor {
+  color: var(--primary);
+  font-weight: 400;
+  opacity: 0;
+
+  &.blinking {
+    animation: blink-cursor 0.6s step-end infinite;
+  }
+}
+
+@keyframes blink-cursor {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.section-subtitle {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+// ─── Plans Grid ─────────────────────
+.plans-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+
+  @media (max-width: 1080px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.plan-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 25px;
+  overflow: hidden;
+  transition:
+    border-color 0.4s ease,
+    background-color 0.4s ease,
+    box-shadow 0.4s ease;
+
+  &.active {
+    border-color: var(--primary);
+  }
+
+  &.deactivating {
+    border-color: var(--primary);
+    background: color-mix(in srgb, var(--primary) 3%, var(--card-background));
+  }
+
+  &.just-activated {
+    animation: card-pulse 0.6s ease;
+  }
+}
+
+@keyframes card-pulse {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--primary) 40%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 0 12px color-mix(in srgb, var(--primary) 0%, transparent);
+  }
+  100% {
+    box-shadow: none;
+  }
+}
+
+.plan-ribbon {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: var(--primary);
+  color: var(--white);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  padding: 6px 16px;
+  border-radius: 0 0 0 10px;
+  animation: ribbon-slide 0.3s ease-out;
+
+  &.ribbon-exit {
+    animation: ribbon-exit 0.35s ease forwards;
+  }
+}
+
+@keyframes ribbon-slide {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes ribbon-exit {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+}
+
+.plan-card-header {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.plan-card-name {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+  transition: color 0.4s ease;
+
+  .plan-card.active & {
+    color: var(--primary);
+  }
+}
+
+.plan-card-description {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.4;
+}
+
+// ─── Price ─────────────────────
+.plan-card-price {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+}
+
+.plan-price-currency {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.plan-price-value {
+  font-size: 36px;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.5px;
+  line-height: 1;
+}
+
+.plan-price-period {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-left: 2px;
+}
+
+// ─── Bottom Row ─────────────────────
+.plan-card-bottom {
+  display: flex;
+  align-items: flex-end;
+  gap: 20px;
+  flex: 1;
+}
+
+.plan-card-features {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  flex: 1;
+  align-self: flex-start;
+}
+
+.plan-feature {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text-primary);
+  line-height: 1.3;
+}
+
+.plan-feature-icon {
+  font-size: 16px;
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+.plan-card-action {
+  flex-shrink: 0;
+}
+
+// ─── Empty State ─────────────────────
+.empty-cards {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 40px 20px;
+}
+
+.empty-icon {
+  font-size: 48px;
+  color: var(--border);
+}
+
+.empty-text {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.empty-hint {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin: 0;
+}

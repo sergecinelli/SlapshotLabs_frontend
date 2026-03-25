@@ -13,9 +13,6 @@
   max-width: 100%;
   height: 100%;
   box-sizing: border-box;
-  box-shadow:
-    0 1px 3px rgba(0, 0, 0, 0.08),
-    0 1px 2px rgba(0, 0, 0, 0.06);
   transition:
     box-shadow 0.2s ease,
     border-color 0.2s ease;
@@ -26,21 +23,10 @@
       0 2px 4px rgba(0, 0, 0, 0.08);
   }
 
-  &.completed .game-date,
-  &.completed .game-time,
-  &.completed .date-time-icon {
-  }
-
-  &.completed .game-card-header {
-  }
-
   &.in-progress .game-date,
   &.in-progress .game-time,
   &.in-progress .date-time-icon {
     color: var(--live);
-  }
-
-  &.in-progress .game-card-header {
   }
 
   &.not-started .game-date,

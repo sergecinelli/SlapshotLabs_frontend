@@ -805,4 +805,10 @@ body[data-theme='dark'] {
   .mat-pseudo-checkbox-checked {
     background-color: var(--primary) !important;
   }
+
+  // Braintree Drop-in
+  [data-braintree-id='methods-label'],
+  [data-braintree-id='methods-edit'] {
+    color: var(--text-secondary) !important;
+  }
 }

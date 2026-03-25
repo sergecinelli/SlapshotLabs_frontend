@@ -1,7 +1,227 @@
+@let subscriptionValue = subscription();
+@let activeCardValue = activeCard();
+@let hasMultipleCardsValue = hasMultipleCards();
+@let hasCardsValue = hasCards();
+@let paymentMethodsValue = paymentMethods();
+@let activeCardIndexValue = activeCardIndex();
+@let slideDirectionValue = slideDirection();
+
 <div class="page-content">
-  <div class="flex items-center justify-center h-96">
-    <div class="text-center">
-      <p class="text-custom-secondary">This feature will be implemented in the future.</p>
+  @if (isLoading()) {
+    <app-loading-spinner message="Loading payment information..." size="sm" />
+  } @else {
+    <div class="page-sections">
+      <div class="payment-layout" [class.no-subscription]="!subscriptionValue">
+        <!-- Payment Methods -->
+        <section class="payment-section">
+          <div class="section-header-row">
+            <span class="material-symbols-rounded section-icon">credit_card</span>
+            <div class="section-header-text">
+              <h2 class="section-title">Payment Methods</h2>
+              <p class="section-subtitle">Add, remove, or set a default payment method.</p>
+            </div>
+            <app-button-loading
+              [isLoading]="isAddingCard()"
+              [bg]="'primary'"
+              [bghover]="'primary_dark'"
+              [color]="'white'"
+              [colorhover]="'white'"
+              [haveContent]="true"
+              materialIcon="credit_card_gear"
+              (clicked)="onAddCard()"
+            >
+              Manage
+            </app-button-loading>
+          </div>
+          <div class="dashboard-card methods-card">
+            <div class="dashboard-card-content cards-content">
+              @if (hasCardsValue && activeCardValue) {
+                <!-- Card Visual -->
+                <div class="card-carousel">
+                  @if (hasMultipleCardsValue) {
+                    <button class="carousel-arrow left" (click)="onPrevCard()">
+                      <span class="material-symbols-rounded">chevron_left</span>
+                    </button>
+                  }
+
+                  <div class="card-stage">
+                    <div
+                      class="credit-card"
+                      [class.slide-out-left]="slideDirectionValue === 'left'"
+                      [class.slide-out-right]="slideDirectionValue === 'right'"
+                    >
+                      <div class="card-top-row">
+                        <span class="card-chip">
+                          <span class="material-symbols-rounded">sim_card</span>
+                        </span>
+                        @if (activeCardValue.is_default) {
+                          <span class="primary-badge">Default</span>
+                        }
+                      </div>
+
+                      <div class="card-number">
+                        {{ formatCardDisplay(activeCardValue.display) }}
+                      </div>
+
+                      <div class="card-bottom-row">
+                        <div class="card-expiry">
+                          <span class="card-field-label">Expires</span>
+                          <span class="card-field-value">{{
+                            formatExpiry(activeCardValue.expiration)
+                          }}</span>
+                        </div>
+                        <div class="card-brand">
+                          {{ activeCardValue.brand }}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  @if (hasMultipleCardsValue) {
+                    <button class="carousel-arrow right" (click)="onNextCard()">
+                      <span class="material-symbols-rounded">chevron_right</span>
+                    </button>
+                  }
+                </div>
+
+                <!-- Dots Indicator -->
+                @if (hasMultipleCardsValue) {
+                  <div class="carousel-dots">
+                    @for (method of paymentMethodsValue; track method.token; let i = $index) {
+                      <button
+                        class="dot"
+                        [class.active]="i === activeCardIndexValue"
+                        (click)="onSelectCard(i)"
+                      ></button>
+                    }
+                  </div>
+                }
+
+                <!-- Card Actions -->
+                <div class="card-actions">
+                  @if (!activeCardValue.is_default) {
+                    <app-button-loading
+                      [isLoading]="isSettingDefault()"
+                      [bg]="'blue'"
+                      [bghover]="'blue_dark'"
+                      [color]="'white'"
+                      [colorhover]="'white'"
+                      [haveContent]="true"
+                      materialIcon="star"
+                      (clicked)="onSetPrimary()"
+                    >
+                      Set as Default
+                    </app-button-loading>
+                  } @else {
+                    <div class="primary-indicator">
+                      <span class="material-symbols-rounded">verified</span>
+                      <span>This is your default payment method</span>
+                    </div>
+                  }
+                </div>
+              } @else {
+                <div class="empty-cards">
+                  <span class="material-symbols-rounded empty-icon">credit_card</span>
+                  <p class="empty-text">No payment methods added yet</p>
+                  <p class="empty-hint">Add a card to get started</p>
+                </div>
+              }
+            </div>
+          </div>
+        </section>
+
+        <!-- Subscription Plan -->
+        <section class="payment-section">
+          <div class="section-header-row">
+            <span class="material-symbols-rounded section-icon">loyalty</span>
+            <div class="section-header-text">
+              <h2 class="section-title">Subscription Plan</h2>
+              <p class="section-subtitle">Your current plan and billing details.</p>
+            </div>
+          </div>
+          <div class="dashboard-card subscription-card">
+            <div class="dashboard-card-content">
+              @if (subscriptionValue) {
+                <div class="plan-info">
+                  <div class="plan-name">{{ subscriptionValue.name }}</div>
+
+                  <div class="plan-stats">
+                    <div class="stat-block">
+                      <span class="stat-label">Price</span>
+                      <span class="stat-value price">{{
+                        subscriptionValue.price | currencyFormat
+                      }}</span>
+                    </div>
+                    <div class="stat-block">
+                      <span class="stat-label">Status</span>
+                      <span
+                        class="status-badge"
+                        [style]="getStatusBadgeStyle(subscriptionValue.status)"
+                        [matTooltip]="getStatusTooltipText(subscriptionValue.status)"
+                        matTooltipPosition="above"
+                        [matTooltipShowDelay]="tooltipDelay"
+                      >
+                        {{ subscriptionValue.status }}
+                      </span>
+                    </div>
+                    <div class="stat-block">
+                      <span class="stat-label">Next Billing</span>
+                      <span class="stat-value">{{ subscriptionValue.next_billing_date }}</span>
+                    </div>
+                    <div class="stat-block">
+                      <span class="stat-label">Users in Plan</span>
+                      <span class="stat-value">{{ subscriptionValue.users_count }} Active</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="plan-actions">
+                  <app-button
+                    [bg]="'blue'"
+                    [bghover]="'blue_dark'"
+                    [color]="'white'"
+                    [colorhover]="'white'"
+                    [haveContent]="true"
+                    materialIcon="workspace_premium"
+                    (clicked)="onUpgradePlan()"
+                  >
+                    Upgrade Plan
+                  </app-button>
+                  <app-button
+                    [bg]="'item_selected'"
+                    [bghover]="'item_hover'"
+                    [br]="'border'"
+                    [color]="'text_primary'"
+                    [colorhover]="'text_primary'"
+                    [haveContent]="true"
+                    materialIcon="cancel"
+                    (clicked)="onCancelSubscription()"
+                  >
+                    Cancel Subscription
+                  </app-button>
+                </div>
+              } @else {
+                <div class="empty-cards">
+                  <span class="material-symbols-rounded empty-icon">shopping_cart</span>
+                  <p class="empty-text">No active subscription</p>
+                  <p class="empty-hint">Subscribe to a plan to get started</p>
+                  <app-button
+                    [bg]="'blue'"
+                    [bghover]="'blue_dark'"
+                    [color]="'white'"
+                    [colorhover]="'white'"
+                    [haveContent]="true"
+                    materialIcon="workspace_premium"
+                    (clicked)="onUpgradePlan()"
+                  >
+                    View Plans
+                  </app-button>
+                </div>
+              }
+            </div>
+          </div>
+        </section>
+      </div>
     </div>
-  </div>
+  }
 </div>

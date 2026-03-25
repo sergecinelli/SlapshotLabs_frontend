@@ -1,7 +1,31 @@
 <div class="page-content">
-  <div class="flex items-center justify-center h-96">
-    <div class="text-center">
-      <p class="text-custom-secondary">This feature will be implemented in the future.</p>
+  @if (!isLoading()) {
+    <div class="stats-row">
+      <div class="stat-card">
+        <span class="material-symbols-rounded stat-icon transactions-icon">receipt_long</span>
+        <span class="stat-label">Total Transactions</span>
+        <span class="stat-value">{{ totalTransactions() }}</span>
+      </div>
+      <div class="stat-card">
+        <span class="material-symbols-rounded stat-icon paid-icon">attach_money</span>
+        <span class="stat-label">Total Paid</span>
+        <span class="stat-value">{{ totalPaid() | currencyFormat }}</span>
+      </div>
+      <div class="stat-card">
+        <span class="material-symbols-rounded stat-icon average-icon">functions</span>
+        <span class="stat-label">Average Amount</span>
+        <span class="stat-value">{{ averageAmount() | currencyFormat }}</span>
+      </div>
     </div>
-  </div>
+  }
+
+  <app-data-table
+    [columns]="columns"
+    [data]="transactions()"
+    [actions]="actions"
+    [loading]="isLoading()"
+    loadingMessage="Loading transactions..."
+    emptyMessage="No transactions found"
+    (actionClick)="onActionClick($event)"
+  />
 </div>
