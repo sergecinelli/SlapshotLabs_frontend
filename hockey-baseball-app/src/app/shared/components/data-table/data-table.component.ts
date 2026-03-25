@@ -1,4 +1,4 @@
-import { Component, ElementRef, Renderer2, inject, input, output, computed } from '@angular/core';
+import { Component, inject, input, output, computed } from '@angular/core';
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { MatTableModule } from '@angular/material/table';
@@ -66,8 +66,6 @@ export interface TableAction {
   styleUrl: './data-table.component.scss',
 })
 export class DataTableComponent<T extends Record<string, unknown> = Record<string, unknown>> {
-  private elementRef = inject(ElementRef);
-  private renderer = inject(Renderer2);
   iconService = inject(IconService);
 
   readonly tooltipDelay = STATUS_TOOLTIP_DELAY;
@@ -78,6 +76,8 @@ export class DataTableComponent<T extends Record<string, unknown> = Record<strin
   loading = input(false);
   loadingMessage = input('Loading...');
   emptyMessage = input('No data available');
+  maxHeight = input<string | null>(null);
+  scrollable = input(false);
 
   actionClick = output<{ action: string; item: T }>();
   sort = output<{ column: string; direction: 'asc' | 'desc' }>();

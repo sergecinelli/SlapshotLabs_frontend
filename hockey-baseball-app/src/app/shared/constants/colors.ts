@@ -46,6 +46,7 @@ export type AppColor =
   | 'text_primary'
   | 'text_secondary'
   | 'text_white'
+  | 'text_black'
   // Action colors
   | 'orange'
   | 'orange_dark'
@@ -124,6 +125,7 @@ export const appColors: IKeyValue<AppColor, string>[] = [
   { key: 'text_primary', value: '#0F0F0F' },
   { key: 'text_secondary', value: '#878787' },
   { key: 'text_white', value: '#ffffff' },
+  { key: 'text_black', value: '#0f0f0f' },
 
   // Action colors
   { key: 'orange', value: '#ff8509' },
@@ -206,6 +208,7 @@ export const appColorsDark: IKeyValue<AppColor, string>[] = [
   { key: 'text_primary', value: '#F9FAFB' },
   { key: 'text_secondary', value: '#9CA3AF' },
   { key: 'text_white', value: '#ffffff' },
+  { key: 'text_black', value: '#0f0f0f' },
 
   // Action colors
   { key: 'orange', value: '#D8852E' },

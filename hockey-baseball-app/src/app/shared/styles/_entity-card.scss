@@ -1,7 +1,6 @@
 @use 'variables' as *;
 
-// Loading and Empty States
-.entity-loading,
+// Empty State
 .entity-empty {
   display: flex;
   justify-content: center;

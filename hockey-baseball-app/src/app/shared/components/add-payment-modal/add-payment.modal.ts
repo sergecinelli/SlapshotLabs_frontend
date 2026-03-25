@@ -48,7 +48,6 @@ export class AddPaymentModal implements OnInit {
         container: this.dropinContainer.nativeElement,
         vaultManager: true,
       });
-      this.isPaymentReady.set(this.dropinInstance.isPaymentMethodRequestable());
       this.dropinInstance.on('paymentMethodRequestable', () => this.isPaymentReady.set(true));
       this.dropinInstance.on('noPaymentMethodRequestable', () => this.isPaymentReady.set(false));
       this.isLoadingDropin.set(false);

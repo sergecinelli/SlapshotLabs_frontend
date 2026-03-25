@@ -205,17 +205,17 @@
                   <span class="material-symbols-rounded empty-icon">shopping_cart</span>
                   <p class="empty-text">No active subscription</p>
                   <p class="empty-hint">Subscribe to a plan to get started</p>
-                  <app-button
+                  <app-button-route
+                    route="/account/subscription-plans"
                     [bg]="'blue'"
                     [bghover]="'blue_dark'"
                     [color]="'white'"
                     [colorhover]="'white'"
                     [haveContent]="true"
                     materialIcon="workspace_premium"
-                    (clicked)="onUpgradePlan()"
                   >
                     View Plans
-                  </app-button>
+                  </app-button-route>
                 </div>
               }
             </div>

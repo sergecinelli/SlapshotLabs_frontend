@@ -5,20 +5,22 @@
 @let displayedColumnsValue = displayedColumns();
 @let emptyMessageValue = emptyMessage();
 @let loadingMessageValue = loadingMessage();
+@let maxHeightValue = maxHeight();
+@let scrollableValue = scrollable();
 
 <div class="data-table-container">
   <!-- Loading State -->
   @if (loadingValue) {
-    <div class="loading-state">
-      <div class="flex items-center justify-center py-8">
-        <app-loading-spinner [message]="loadingMessageValue" size="sm" />
-      </div>
-    </div>
+    <app-loading-spinner [message]="loadingMessageValue" size="sm" />
   }
 
   <!-- Material Table -->
   @if (!loadingValue) {
-    <div class="table-wrapper">
+    <div
+      class="table-wrapper"
+      [class.scrollable]="scrollableValue || maxHeightValue"
+      [style.max-height]="maxHeightValue"
+    >
       <table
         mat-table
         [dataSource]="dataValue"

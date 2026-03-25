@@ -46,35 +46,42 @@
             }
           </div>
           <div class="plans-grid">
-            @for (plan of plansValue; track plan.id) {
+            @for (plan of plansValue; track plan.id; let i = $index) {
               <div
                 class="dashboard-card plan-card"
                 [class.active]="subscriptionValue?.name === plan.name"
                 [class.deactivating]="previousPlanName() === plan.name"
                 [class.just-activated]="justActivatedPlanId() === plan.id"
+                [attr.data-plan-index]="i % 4"
               >
                 @if (subscriptionValue?.name === plan.name || previousPlanName() === plan.name) {
                   <div class="plan-ribbon" [class.ribbon-exit]="previousPlanName() === plan.name">
                     <span>Active</span>
                   </div>
                 }
-                <div class="plan-card-header">
-                  <h3 class="plan-card-name">{{ plan.name }}</h3>
+                <div class="plan-card-banner">
+                  <div class="plan-banner-deco plan-banner-deco--1"></div>
+                  <div class="plan-banner-deco plan-banner-deco--2"></div>
+                  <div class="plan-banner-dashes"></div>
+                  <div class="plan-banner-content">
+                    <h3 class="plan-card-name">{{ plan.name }}</h3>
+                    <div class="plan-card-price">
+                      <span class="plan-price-value">{{ plan.price | currencyFormat }}</span>
+                      <span class="plan-price-divider"></span>
+                      <span class="plan-price-period">per<br />month</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="plan-card-body">
                   <p class="plan-card-description">{{ plan.description }}</p>
-                </div>
-                <div class="plan-card-price">
-                  <span class="plan-price-value">{{ plan.price | currencyFormat }}</span>
-                  <span class="plan-price-period">/month</span>
-                </div>
-                <div class="plan-card-bottom">
                   <ul class="plan-card-features">
                     <li class="plan-feature">
-                      <span class="material-symbols-rounded plan-feature-icon">groups</span>
+                      <span class="plan-feature-dot"></span>
                       <span>{{ plan.users_count | number }} active subscribers</span>
                     </li>
                     @for (feature of plan.features; track feature) {
                       <li class="plan-feature">
-                        <span class="material-symbols-rounded plan-feature-icon">verified</span>
+                        <span class="plan-feature-dot"></span>
                         <span>{{ feature }}</span>
                       </li>
                     }

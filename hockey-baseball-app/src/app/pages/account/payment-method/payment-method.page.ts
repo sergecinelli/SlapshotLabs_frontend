@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { firstValueFrom, forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { ButtonComponent } from '../../../shared/components/buttons/button/button.component';
+import { ButtonRouteComponent } from '../../../shared/components/buttons/button-route/button-route.component';
 import { ButtonLoadingComponent } from '../../../shared/components/buttons/button-loading/button-loading.component';
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
 import { ModalEvent, ModalService } from '../../../services/modal.service';
@@ -23,6 +24,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
   selector: 'app-payment-method',
   imports: [
     ButtonComponent,
+    ButtonRouteComponent,
     ButtonLoadingComponent,
     LoadingSpinnerComponent,
     CurrencyFormatPipe,

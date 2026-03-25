@@ -7,10 +7,13 @@ import {
 import { PaymentService } from '../../../services/payment.service';
 import { Transaction } from '../../../shared/interfaces/payment.interface';
 import { CurrencyFormatPipe } from '../../../shared/pipes/currency-format.pipe';
+import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
+import { DEFAULT_PAGE_SIZE } from '../../../shared/constants/pagination.constants';
 
 @Component({
   selector: 'app-payment-history',
-  imports: [DataTableComponent, CurrencyFormatPipe],
+  imports: [DataTableComponent, CurrencyFormatPipe, LoadingSpinnerComponent, PaginationComponent],
   templateUrl: './payment-history.page.html',
   styleUrl: './payment-history.page.scss',
 })
@@ -18,18 +21,19 @@ export class PaymentHistoryPage implements OnInit {
   private paymentService = inject(PaymentService);
   private currencyPipe = new CurrencyFormatPipe();
 
-  rawTransactions = signal<Transaction[]>([]);
   transactions = signal<Transaction[]>([]);
   isLoading = signal(true);
 
-  totalTransactions = computed(() => this.rawTransactions().length);
+  currentPage = signal(1);
+  totalPages = signal(0);
+  totalCount = signal(0);
 
   totalPaid = computed(() => {
-    return this.rawTransactions().reduce((sum, t) => sum + parseFloat(t.amount || '0'), 0);
+    return this.transactions().reduce((sum, t) => sum + parseFloat(t.amount || '0'), 0);
   });
 
   averageAmount = computed(() => {
-    const total = this.totalTransactions();
+    const total = this.totalCount();
     return total > 0 ? this.totalPaid() / total : 0;
   });
 
@@ -49,12 +53,20 @@ export class PaymentHistoryPage implements OnInit {
     this.loadData();
   }
 
+  goToPage(page: number): void {
+    if (page < 1 || page > this.totalPages() || page === this.currentPage()) return;
+    this.currentPage.set(page);
+    this.loadData();
+  }
+
   private loadData(): void {
-    this.paymentService.getPaymentHistory().subscribe({
-      next: (transactions) => {
-        this.rawTransactions.set(transactions);
+    this.isLoading.set(true);
+    this.paymentService.getPaymentHistory(this.currentPage(), DEFAULT_PAGE_SIZE).subscribe({
+      next: (response) => {
+        this.totalPages.set(response.total_pages);
+        this.totalCount.set(response.count);
         this.transactions.set(
-          transactions.map((t) => ({
+          response.items.map((t) => ({
             ...t,
             amount: this.currencyPipe.transform(t.amount),
           }))

@@ -43,9 +43,7 @@
 <div class="page-content" [appVisibilityMap]="visibilityByRoleMap">
   <!-- Loading State -->
   @if (loadingValue) {
-    <div class="entity-loading">
-      <app-loading-spinner message="Loading goalies..." size="sm" />
-    </div>
+    <app-loading-spinner message="Loading goalies..." size="sm" />
   }
 
   <!-- Empty State -->

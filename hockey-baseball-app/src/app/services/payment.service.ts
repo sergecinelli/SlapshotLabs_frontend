@@ -11,6 +11,7 @@ import {
   SubscribeRequest,
   MessageResponse,
 } from '../shared/interfaces/payment.interface';
+import { PaginatedResponse } from '../shared/interfaces/paginated-response.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -52,7 +53,9 @@ export class PaymentService {
     });
   }
 
-  getPaymentHistory(): Observable<Transaction[]> {
-    return this.apiService.get<Transaction[]>('/users/payment-history');
+  getPaymentHistory(page: number, pageSize: number): Observable<PaginatedResponse<Transaction>> {
+    return this.apiService.get<PaginatedResponse<Transaction>>(
+      `/users/payment-history?page=${page}&page_size=${pageSize}`
+    );
   }
 }

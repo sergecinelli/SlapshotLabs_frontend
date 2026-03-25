@@ -1,20 +1,34 @@
+:host {
+  display: contents;
+}
+
 .data-table-container {
   width: 100%;
   max-width: 100%;
   border-radius: var(--radius);
   overflow: hidden;
-
-  .loading-state {
-    background-color: var(--card-background);
-    border-radius: var(--radius);
-    border: 1px solid var(--border-light);
-  }
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
 
   .table-wrapper {
     background-color: var(--card-background);
     border-radius: var(--radius);
     overflow-x: auto;
     overflow-y: hidden;
+
+    &.scrollable {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+
+      .mat-mdc-header-row {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+      }
+    }
 
     &::-webkit-scrollbar {
       height: 8px;
