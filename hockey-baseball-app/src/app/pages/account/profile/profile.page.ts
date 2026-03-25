@@ -1,16 +1,17 @@
 import { Component, OnInit, inject } from '@angular/core';
-import {} from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ButtonLoadingComponent } from '../../../shared/components/buttons/button-loading/button-loading.component';
 import { ButtonComponent } from '../../../shared/components/buttons/button/button.component';
+import { FormFieldComponent } from '../../../shared/components/form-field/form-field.component';
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
 import { UserProfile, UserEditRequest } from '../../../shared/interfaces/auth.interfaces';
+import { getFieldError } from '../../../shared/validators/form-error.util';
 
 @Component({
   selector: 'app-profile',
-  imports: [ReactiveFormsModule, ButtonLoadingComponent, ButtonComponent, LoadingSpinnerComponent],
+  imports: [ReactiveFormsModule, ButtonLoadingComponent, ButtonComponent, FormFieldComponent, LoadingSpinnerComponent],
   templateUrl: './profile.page.html',
   styleUrl: './profile.page.scss',
 })
@@ -124,40 +125,26 @@ export class ProfilePage implements OnInit {
   }
 
   onResetPassword() {
-    // Navigate to forgot password or reset password functionality
     this.router.navigate(['/forgot-password']);
   }
 
-  // Getters for easy access to form controls in template
-  get email() {
-    return this.profileForm.get('email');
-  }
+  private readonly fieldLabels: Record<string, string> = {
+    email: 'Email Address',
+    firstName: 'First Name',
+    lastName: 'Last Name',
+    phoneNumber: 'Phone Number',
+    country: 'Country',
+    city: 'City',
+    street: 'Street Address',
+    postalCode: 'Postal Code',
+  };
 
-  get firstName() {
-    return this.profileForm.get('firstName');
-  }
-
-  get lastName() {
-    return this.profileForm.get('lastName');
-  }
-
-  get phoneNumber() {
-    return this.profileForm.get('phoneNumber');
-  }
-
-  get country() {
-    return this.profileForm.get('country');
-  }
-
-  get city() {
-    return this.profileForm.get('city');
-  }
-
-  get street() {
-    return this.profileForm.get('street');
-  }
-
-  get postalCode() {
-    return this.profileForm.get('postalCode');
+  getErrorMessage(fieldName: string): string {
+    const control = this.profileForm.get(fieldName);
+    const label = this.fieldLabels[fieldName] || fieldName;
+    return getFieldError(control, label, {
+      email: 'Please enter a valid email address',
+      minlength: `Min 2 characters`,
+    });
   }
 }

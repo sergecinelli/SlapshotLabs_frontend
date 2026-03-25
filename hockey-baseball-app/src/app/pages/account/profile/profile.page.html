@@ -1,14 +1,30 @@
 <div class="page-content">
-  <!-- Profile Card -->
-  <div class="dashboard-card">
-    <div class="dashboard-card-header">
-      <h2 class="dashboard-card-title">Profile Settings</h2>
-    </div>
-    <div class="dashboard-card-content">
-      <!-- Loading State -->
-      @if (isLoading) {
-        <app-loading-spinner message="Loading profile data..." size="sm" />
-      } @else {
+  @if (isLoading) {
+    <app-loading-spinner message="Loading profile data..." size="sm" />
+  } @else {
+    <div class="page-sections">
+      <section class="profile-section">
+        <div class="section-header-row">
+          <span class="material-symbols-rounded section-icon">person</span>
+          <div class="section-header-text">
+            <h2 class="section-title">Profile Settings</h2>
+            <p class="section-subtitle">Update your personal information and account details.</p>
+          </div>
+          <app-button
+            materialIcon="lock_reset"
+            [bg]="'item_selected'"
+            [bghover]="'item_hover'"
+            [br]="'border'"
+            [color]="'text_primary'"
+            [colorhover]="'text_primary'"
+            [haveContent]="true"
+            (clicked)="onResetPassword()"
+            tooltip="Reset password via email"
+          >
+            Reset Password
+          </app-button>
+        </div>
+
         <!-- Error Message -->
         @if (errorMessage) {
           <div class="dashboard-error">
@@ -23,185 +39,110 @@
           </div>
         }
 
-        <form [formGroup]="profileForm" (ngSubmit)="onSave()" class="profile-form">
-          <div class="profile-form-grid">
-            <!-- Email Address -->
-            <div class="custom-input-field">
-              <label for="email" class="custom-input-label">Email Address</label>
-              <input
-                id="email"
-                type="email"
-                autocomplete="email"
-                formControlName="email"
-                placeholder="Enter your email"
-                class="custom-input"
-                [class.error]="email?.invalid && (email?.dirty || email?.touched)"
-              />
-              @if (email?.invalid && (email?.dirty || email?.touched)) {
-                <div class="custom-input-error">
-                  @if (email?.errors?.['required']) {
-                    Email address is required
-                  }
-                  @if (email?.errors?.['email']) {
-                    Please enter a valid email address
-                  }
-                </div>
-              }
-            </div>
+        <div class="dashboard-card">
+          <div class="dashboard-card-content">
+            <form [formGroup]="profileForm" (ngSubmit)="onSave()" class="profile-form">
+              <div class="profile-form-grid">
+                <app-form-field
+                  label="Email Address"
+                  [required]="true"
+                  [error]="getErrorMessage('email')"
+                >
+                  <input
+                    formControlName="email"
+                    type="email"
+                    autocomplete="email"
+                    placeholder="Enter your email"
+                  />
+                </app-form-field>
 
-            <!-- First Name -->
-            <div class="custom-input-field">
-              <label for="firstName" class="custom-input-label">First Name</label>
-              <input
-                id="firstName"
-                type="text"
-                autocomplete="given-name"
-                formControlName="firstName"
-                placeholder="First name"
-                class="custom-input"
-                [class.error]="firstName?.invalid && (firstName?.dirty || firstName?.touched)"
-              />
-              @if (firstName?.invalid && (firstName?.dirty || firstName?.touched)) {
-                <div class="custom-input-error">
-                  @if (firstName?.errors?.['required']) {
-                    Required
-                  }
-                  @if (firstName?.errors?.['minlength']) {
-                    Min 2 characters
-                  }
-                </div>
-              }
-            </div>
+                <app-form-field
+                  label="First Name"
+                  [required]="true"
+                  [error]="getErrorMessage('firstName')"
+                >
+                  <input
+                    formControlName="firstName"
+                    type="text"
+                    autocomplete="given-name"
+                    placeholder="First name"
+                  />
+                </app-form-field>
 
-            <!-- Last Name -->
-            <div class="custom-input-field">
-              <label for="lastName" class="custom-input-label">Last Name</label>
-              <input
-                id="lastName"
-                type="text"
-                autocomplete="family-name"
-                formControlName="lastName"
-                placeholder="Last name"
-                class="custom-input"
-                [class.error]="lastName?.invalid && (lastName?.dirty || lastName?.touched)"
-              />
-              @if (lastName?.invalid && (lastName?.dirty || lastName?.touched)) {
-                <div class="custom-input-error">
-                  @if (lastName?.errors?.['required']) {
-                    Required
-                  }
-                  @if (lastName?.errors?.['minlength']) {
-                    Min 2 characters
-                  }
-                </div>
-              }
-            </div>
+                <app-form-field
+                  label="Last Name"
+                  [required]="true"
+                  [error]="getErrorMessage('lastName')"
+                >
+                  <input
+                    formControlName="lastName"
+                    type="text"
+                    autocomplete="family-name"
+                    placeholder="Last name"
+                  />
+                </app-form-field>
 
-            <!-- Phone Number -->
-            <div class="custom-input-field">
-              <label for="phoneNumber" class="custom-input-label">Phone Number (Optional)</label>
-              <input
-                id="phoneNumber"
-                type="tel"
-                autocomplete="tel"
-                formControlName="phoneNumber"
-                placeholder="Enter your phone number (optional)"
-                class="custom-input"
-              />
-            </div>
+                <app-form-field label="Phone Number" [error]="getErrorMessage('phoneNumber')">
+                  <input
+                    formControlName="phoneNumber"
+                    type="tel"
+                    autocomplete="tel"
+                    placeholder="Enter your phone number"
+                  />
+                </app-form-field>
 
-            <!-- Country -->
-            <div class="custom-input-field">
-              <label for="country" class="custom-input-label">Country (Optional)</label>
-              <input
-                id="country"
-                type="text"
-                formControlName="country"
-                placeholder="Enter your country (optional)"
-                class="custom-input"
-              />
-            </div>
+                <app-form-field label="Country" [error]="getErrorMessage('country')">
+                  <input
+                    formControlName="country"
+                    type="text"
+                    placeholder="Enter your country"
+                  />
+                </app-form-field>
 
-            <!-- City -->
-            <div class="custom-input-field">
-              <label for="city" class="custom-input-label">City (Optional)</label>
-              <input
-                id="city"
-                type="text"
-                formControlName="city"
-                placeholder="Enter your city (optional)"
-                class="custom-input"
-              />
-            </div>
+                <app-form-field label="City" [error]="getErrorMessage('city')">
+                  <input formControlName="city" type="text" placeholder="Enter your city" />
+                </app-form-field>
 
-            <!-- Street -->
-            <div class="custom-input-field">
-              <label for="street" class="custom-input-label">Street Address (Optional)</label>
-              <input
-                id="street"
-                type="text"
-                formControlName="street"
-                placeholder="Enter your street address (optional)"
-                class="custom-input"
-              />
-            </div>
+                <app-form-field label="Street Address" [error]="getErrorMessage('street')">
+                  <input
+                    formControlName="street"
+                    type="text"
+                    placeholder="Enter your street address"
+                  />
+                </app-form-field>
 
-            <!-- Postal Code -->
-            <div class="custom-input-field">
-              <label for="postalCode" class="custom-input-label">Postal Code (Optional)</label>
-              <input
-                id="postalCode"
-                type="text"
-                formControlName="postalCode"
-                placeholder="Enter your postal code (optional)"
-                class="custom-input"
-              />
-            </div>
+                <app-form-field label="Postal Code" [error]="getErrorMessage('postalCode')">
+                  <input
+                    formControlName="postalCode"
+                    type="text"
+                    placeholder="Enter your postal code"
+                  />
+                </app-form-field>
+              </div>
 
-            <!-- Reset Password Option -->
-            <div class="profile-password-section">
-              <app-button
-                materialIcon="lock_reset"
-                [bg]="'transparent'"
-                [bghover]="'gray_tone3'"
-                [br]="'border'"
-                [brhover]="'border'"
-                [color]="'text_primary'"
-                [colorhover]="'text_primary'"
-                [opacity]="1"
-                [opacityhover]="1"
-                [width]="'auto'"
-                [rounded]="false"
-                [haveContent]="true"
-                (clicked)="onResetPassword()"
-                tooltip="Reset password via email"
-              >
-                Reset Password via Email
-              </app-button>
-            </div>
+              <!-- Save Button -->
+              <div class="profile-form-actions">
+                <app-button-loading
+                  [isLoading]="isSaving"
+                  [isDisabled]="profileForm.invalid"
+                  type="submit"
+                  [bg]="'primary'"
+                  [bghover]="'primary_dark'"
+                  [color]="'white'"
+                  [colorhover]="'white'"
+                  [opacity]="profileForm.invalid || isSaving ? 0.5 : 1"
+                  [opacityhover]="1"
+                  [width]="'auto'"
+                  [rounded]="false"
+                  tooltip="Save changes"
+                >
+                  {{ isSaving ? 'Saving...' : 'Save Changes' }}
+                </app-button-loading>
+              </div>
+            </form>
           </div>
-
-          <!-- Save Button -->
-          <div class="profile-form-actions">
-            <app-button-loading
-              [isLoading]="isSaving"
-              [isDisabled]="profileForm.invalid"
-              type="submit"
-              [bg]="'primary'"
-              [bghover]="'primary_dark'"
-              [color]="'white'"
-              [colorhover]="'white'"
-              [opacity]="profileForm.invalid || isSaving ? 0.5 : 1"
-              [opacityhover]="1"
-              [width]="'auto'"
-              [rounded]="false"
-              tooltip="Save changes"
-            >
-              {{ isSaving ? 'Saving...' : 'Save Changes' }}
-            </app-button-loading>
-          </div>
-        </form>
-      }
+        </div>
+      </section>
     </div>
-  </div>
+  }
 </div>
