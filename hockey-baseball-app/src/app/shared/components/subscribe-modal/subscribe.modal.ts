@@ -146,7 +146,8 @@ export class SubscribeModal implements OnInit {
 
     try {
       const { client_token } = await firstValueFrom(this.paymentService.getClientToken());
-      const dropin = await import('braintree-web-drop-in');
+      const module = await import('braintree-web-drop-in');
+      const dropin = 'default' in module ? (module.default as typeof module) : module;
       this.dropinInstance = await dropin.create({
         authorization: client_token,
         container: this.dropinContainer.nativeElement,
