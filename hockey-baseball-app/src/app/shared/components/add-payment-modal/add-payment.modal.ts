@@ -48,6 +48,7 @@ export class AddPaymentModal implements OnInit {
         authorization: client_token,
         container: this.dropinContainer.nativeElement,
         vaultManager: true,
+        paypal: { flow: 'vault' },
       });
       this.dropinInstance.on('paymentMethodRequestable', () => this.isPaymentReady.set(true));
       this.dropinInstance.on('noPaymentMethodRequestable', () => this.isPaymentReady.set(false));

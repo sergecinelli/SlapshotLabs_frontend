@@ -9,6 +9,13 @@ declare module 'braintree-web-drop-in' {
     overrides?: DropinCardOverrides;
   }
 
+  interface DropinPayPalOptions {
+    flow: 'vault' | 'checkout';
+    amount?: string;
+    currency?: string;
+    buttonStyle?: Record<string, string>;
+  }
+
   interface DropinCreateOptions {
     authorization: string;
     container: string | HTMLElement;
@@ -16,6 +23,7 @@ declare module 'braintree-web-drop-in' {
     translations?: Record<string, string>;
     vaultManager?: boolean;
     card?: DropinCardOptions;
+    paypal?: DropinPayPalOptions;
   }
 
   interface DropinPaymentMethodPayload {

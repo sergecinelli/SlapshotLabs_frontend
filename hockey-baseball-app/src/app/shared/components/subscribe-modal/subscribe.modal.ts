@@ -151,6 +151,7 @@ export class SubscribeModal implements OnInit {
       this.dropinInstance = await dropin.create({
         authorization: client_token,
         container: this.dropinContainer.nativeElement,
+        paypal: { flow: 'vault' },
       });
       this.isLoadingDropin.set(false);
     } catch {
