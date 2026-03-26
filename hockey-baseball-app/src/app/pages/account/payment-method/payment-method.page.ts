@@ -184,8 +184,11 @@ export class PaymentMethodPage implements OnInit {
       },
       onCloseWithDataProcessing: () => {
         this.paymentService.unsubscribe().subscribe({
-          next: () => {
-            this.subscription.set(null);
+          next: async () => {
+            const subscription = await firstValueFrom(
+              this.paymentService.getSubscription().pipe(catchError(() => of(null)))
+            );
+            this.subscription.set(subscription);
             this.modalService.closeModal();
             this.toastService.show('Subscription cancelled successfully', 'success');
           },

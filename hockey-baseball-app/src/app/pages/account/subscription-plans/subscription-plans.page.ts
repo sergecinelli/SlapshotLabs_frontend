@@ -122,7 +122,11 @@ export class SubscriptionPlansPage implements OnInit {
       },
       onCloseWithDataProcessing: () => {
         this.paymentService.unsubscribe().subscribe({
-          next: () => {
+          next: async () => {
+            const plans = await firstValueFrom(
+              this.paymentService.getSubscriptionPlans().pipe(catchError(() => of([])))
+            );
+            this.plans.set(plans);
             this.subscription.set(null);
             this.modalService.closeModal();
             this.toastService.show('Subscription cancelled successfully', 'success');
