@@ -58,4 +58,8 @@ export class PaymentService {
       `/users/payment-history?page=${page}&page_size=${pageSize}`
     );
   }
+
+  getPaymentReceipt(transactionId: string): Observable<Blob> {
+    return this.apiService.getBlob(`/users/subscriptions/receipt/${transactionId}`);
+  }
 }

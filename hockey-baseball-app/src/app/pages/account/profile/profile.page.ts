@@ -11,7 +11,13 @@ import { getFieldError } from '../../../shared/validators/form-error.util';
 
 @Component({
   selector: 'app-profile',
-  imports: [ReactiveFormsModule, ButtonLoadingComponent, ButtonComponent, FormFieldComponent, LoadingSpinnerComponent],
+  imports: [
+    ReactiveFormsModule,
+    ButtonLoadingComponent,
+    ButtonComponent,
+    FormFieldComponent,
+    LoadingSpinnerComponent,
+  ],
   templateUrl: './profile.page.html',
   styleUrl: './profile.page.scss',
 })

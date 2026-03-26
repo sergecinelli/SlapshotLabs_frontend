@@ -24,6 +24,7 @@ export class PaymentHistoryPage implements OnInit {
   rawTransactions = signal<Transaction[]>([]);
   transactions = signal<Transaction[]>([]);
   isLoading = signal(true);
+  loadingReceipts = signal<Set<string>>(new Set());
 
   currentPage = signal(1);
   totalPages = signal(0);
@@ -46,8 +47,24 @@ export class PaymentHistoryPage implements OnInit {
   ];
 
   readonly actions: TableAction[] = [
-    { label: 'Download', icon: 'download', action: 'download', variant: 'orange', iconOnly: true },
-    { label: 'View', icon: 'visibility', action: 'view', variant: 'gray', iconOnly: true },
+    {
+      label: 'Download',
+      icon: 'download',
+      action: 'download',
+      variant: 'orange',
+      iconOnly: true,
+      handler: (item) => this.downloadReceipt(item['id'] as string),
+      isLoading: (item) => this.loadingReceipts().has(`download_${item['id']}`),
+    },
+    {
+      label: 'View',
+      icon: 'visibility',
+      action: 'view',
+      variant: 'gray',
+      iconOnly: true,
+      handler: (item) => this.viewReceipt(item['id'] as string),
+      isLoading: (item) => this.loadingReceipts().has(`view_${item['id']}`),
+    },
   ];
 
   ngOnInit(): void {
@@ -81,7 +98,43 @@ export class PaymentHistoryPage implements OnInit {
     });
   }
 
-  onActionClick(event: { action: string; item: Record<string, unknown> }): void {
-    console.log('Action:', event.action, 'Item:', event.item);
+  private downloadReceipt(transactionId: string): void {
+    if (!transactionId) return;
+    this.setReceiptLoading(`download_${transactionId}`, true);
+    this.paymentService.getPaymentReceipt(transactionId).subscribe({
+      next: (blob) => {
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `receipt_${transactionId}.pdf`;
+        link.click();
+        URL.revokeObjectURL(url);
+        this.setReceiptLoading(`download_${transactionId}`, false);
+      },
+      error: () => this.setReceiptLoading(`download_${transactionId}`, false),
+    });
+  }
+
+  private viewReceipt(transactionId: string): void {
+    if (!transactionId) return;
+    this.setReceiptLoading(`view_${transactionId}`, true);
+    this.paymentService.getPaymentReceipt(transactionId).subscribe({
+      next: (blob) => {
+        const url = URL.createObjectURL(blob);
+        window.open(url, '_blank');
+        this.setReceiptLoading(`view_${transactionId}`, false);
+      },
+      error: () => this.setReceiptLoading(`view_${transactionId}`, false),
+    });
+  }
+
+  private setReceiptLoading(key: string, loading: boolean): void {
+    const updated = new Set(this.loadingReceipts());
+    if (loading) {
+      updated.add(key);
+    } else {
+      updated.delete(key);
+    }
+    this.loadingReceipts.set(updated);
   }
 }

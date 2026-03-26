@@ -735,7 +735,7 @@
                         [rounded]="false"
                         [isLoading]="action.isLoading ? action.isLoading(element) : false"
                         [isDisabled]="action.isDisabled ? action.isDisabled(element) : false"
-                        (clicked)="onActionClick(action.action, element)"
+                        (clicked)="onActionClick(action, element)"
                         [attr.role-access-name]="action.roleAccessName"
                         [attr.role-visibility-name]="action.roleVisibilityName"
                         [attr.role-visibility-author-id]="

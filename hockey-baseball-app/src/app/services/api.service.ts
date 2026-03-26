@@ -141,6 +141,18 @@ export class ApiService {
   }
 
   /**
+   * Generic GET request that returns a Blob (for file downloads)
+   */
+  getBlob(endpoint: string, includeCredentials = true): Observable<Blob> {
+    return this.http
+      .get(`${this.baseUrl}${endpoint}`, {
+        responseType: 'blob',
+        withCredentials: includeCredentials,
+      })
+      .pipe(retry(1), catchError(this.handleError));
+  }
+
+  /**
    * Generic DELETE request
    */
   delete<T>(endpoint: string, includeCredentials = true): Observable<T> {

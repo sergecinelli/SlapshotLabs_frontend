@@ -44,6 +44,7 @@ export interface TableAction {
   tooltip?: string | ((item: Record<string, unknown>) => string | null);
   route?: (item: Record<string, unknown>) => string;
   isLoading?: (item: Record<string, unknown>) => boolean;
+  handler?: (item: Record<string, unknown>) => void;
 }
 
 @Component({
@@ -93,8 +94,12 @@ export class DataTableComponent<T extends Record<string, unknown> = Record<strin
     }
   }
 
-  onActionClick(action: string, item: T): void {
-    this.actionClick.emit({ action, item });
+  onActionClick(action: TableAction, item: T): void {
+    if (action.handler) {
+      action.handler(item as Record<string, unknown>);
+    } else {
+      this.actionClick.emit({ action: action.action, item });
+    }
   }
 
   getCellValue(item: T, column: TableColumn): unknown {
