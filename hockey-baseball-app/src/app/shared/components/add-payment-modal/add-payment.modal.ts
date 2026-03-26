@@ -51,7 +51,8 @@ export class AddPaymentModal implements OnInit {
       this.dropinInstance.on('paymentMethodRequestable', () => this.isPaymentReady.set(true));
       this.dropinInstance.on('noPaymentMethodRequestable', () => this.isPaymentReady.set(false));
       this.isLoadingDropin.set(false);
-    } catch {
+    } catch (error) {
+      console.error('Braintree Drop-in initialization failed:', error);
       this.dropinError.set('Failed to initialize payment form. Please try again.');
       this.isLoadingDropin.set(false);
     }
